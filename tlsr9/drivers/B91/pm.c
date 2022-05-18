@@ -1,36 +1,20 @@
-/*
- * Copyright (c) 2019, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+/******************************************************************************
+ * Copyright (c) 2022 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  * All rights reserved.
  *
- * SPDX-License-Identifier: BSD-3-Clause
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met:
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * 3. Neither the name of TELINK nor the names of its contributors may be used
- *    to endorse or promote products derived from this software without
- *    specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY, AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- */
+ *****************************************************************************/
 
 /********************************************************************************************************
  * @file	pm.c
@@ -50,7 +34,7 @@
 #include "stimer.h"
 
 
-_attribute_aligned_(4) pm_status_info_s g_pm_status_info;
+_attribute_data_retention_sec_ _attribute_aligned_(4) pm_status_info_s g_pm_status_info;
 
 //system timer clock source is constant 16M, never change
 //NOTICE:We think that the external 32k crystal clk is very accurate, does not need to read through TIMER_32K_LAT_CAL.
@@ -62,18 +46,19 @@ _attribute_data_retention_sec_	unsigned int 		g_pm_tick_cur;
 _attribute_data_retention_sec_	unsigned int 		g_pm_tick_32k_cur;
 _attribute_data_retention_sec_  unsigned char       g_pm_long_suspend;
 _attribute_data_retention_sec_  unsigned char       g_pm_vbat_v;
-_attribute_data_retention_sec_  unsigned char       g_pm_tick_update_en=1;
+_attribute_data_retention_sec_  unsigned char       g_pm_tick_update_en;
 _attribute_data_retention_sec_  unsigned char       g_pm_suspend_power_cfg=0x87;
-_attribute_data_retention_sec_  unsigned int 		g_pm_mspi_cfg=0;
-_attribute_data_retention_sec_	pm_clock_drift_t	pmcd = {0,0,-30,0,0,0,0,0,0,0,0};
+_attribute_data_retention_sec_  unsigned int 		g_pm_multi_addr=0;
 
+_attribute_data_retention_sec_
 volatile pm_early_wakeup_time_us_s g_pm_early_wakeup_time_us = {
-	.suspend_early_wakeup_time_us = 188 + 109 + 200 + 225,	//188(r_delay) + 109(3.5*(1/32k)) + 200(XTAL_delay) + 225(code)
+	.suspend_early_wakeup_time_us = 100 + 188 + 109 + 200 + 225,	//188(r_delay) + 109(3.5*(1/32k)) + 200(XTAL_delay) + 225(code)
 	.deep_ret_early_wakeup_time_us = 188 + 109,				//188(r_delay) + 109(3.5*(1/32k))
 	.deep_early_wakeup_time_us = 688 + 259,					//688(r_delay) + 109(3.5*(1/32k)) + 150(boot_rom)
-	.sleep_min_time_us = 688 + 259 + 200,					//(the maximum value of suspend and deep) + 200. 200 means more margin, >32 is enough.
+	.sleep_min_time_us = 100 + 688 + 259 + 200,					//(the maximum value of suspend and deep) + 200. 200 means more margin, >32 is enough.
 };
 
+_attribute_data_retention_sec_
 volatile pm_early_wakeup_time_us_s g_pm_longsleep_early_wakeup_time_us = {
 	.suspend_early_wakeup_time_us = 23,
 	.deep_ret_early_wakeup_time_us = 10 ,
@@ -82,11 +67,37 @@ volatile pm_early_wakeup_time_us_s g_pm_longsleep_early_wakeup_time_us = {
 
 };
 
+_attribute_data_retention_sec_
 volatile pm_r_delay_cycle_s g_pm_r_delay_cycle = {
 
 	.deep_r_delay_cycle = 3 + 8,	// 11 * (1/16k) = 687.5
 	.suspend_ret_r_delay_cycle = 3,	// 2 * 1/16k = 125 uS, 3 * 1/16k = 187.5 uS  4*1/16k = 250 uS
 };
+
+/**
+ * @brief		This function configures pm wakeup time parameter.
+ * @param[in]	param - pm wakeup time parameter.
+ * @return		none.
+ */
+void pm_set_wakeup_time_param(pm_r_delay_cycle_s param)
+{
+	g_pm_r_delay_cycle.deep_r_delay_cycle = param.deep_r_delay_cycle;
+	g_pm_r_delay_cycle.suspend_ret_r_delay_cycle = param.suspend_ret_r_delay_cycle;
+
+	int deep_rx_delay_us = g_pm_r_delay_cycle.deep_r_delay_cycle *1000 /16;
+	int suspend_ret_rx_delay_us = g_pm_r_delay_cycle.suspend_ret_r_delay_cycle *1000 /16;
+	g_pm_early_wakeup_time_us.suspend_early_wakeup_time_us = suspend_ret_rx_delay_us + 120 + 200 + 220;
+	g_pm_early_wakeup_time_us.deep_ret_early_wakeup_time_us = suspend_ret_rx_delay_us + 120 ;//64
+	g_pm_early_wakeup_time_us.deep_early_wakeup_time_us = deep_rx_delay_us + 259;
+	if(g_pm_early_wakeup_time_us.deep_early_wakeup_time_us < g_pm_early_wakeup_time_us.suspend_early_wakeup_time_us)
+	{
+		g_pm_early_wakeup_time_us.sleep_min_time_us = g_pm_early_wakeup_time_us.suspend_early_wakeup_time_us + 200;
+	}
+	else
+	{
+		g_pm_early_wakeup_time_us.sleep_min_time_us = g_pm_early_wakeup_time_us.deep_early_wakeup_time_us + 200;
+	}
+}
 
 /**
  * @brief		This function serves to recover system timer.
@@ -126,10 +137,50 @@ void pm_stimer_recover(void)
 }
 
 /**
+ * @brief		This function configures a GPIO pin as the wakeup pin.
+ * @param[in]	pin	- the pin needs to be configured as wakeup pin.
+ * @param[in]	pol - the wakeup polarity of the pad pin(0: low-level wakeup, 1: high-level wakeup).
+ * @param[in]	en  - enable or disable the wakeup function for the pan pin(1: enable, 0: disable).
+ * @return		none.
+ */
+void pm_set_gpio_wakeup (gpio_pin_e pin, pm_gpio_wakeup_level_e pol, int en)
+{
+	///////////////////////////////////////////////////////////
+	// 		  PA[7:0]	    	PB[7:0]			PC[7:0]			PD[7:0]  	PE[7:0]
+	// en: 	ana_0x41<7:0>	 ana_0x42<7:0>  ana_0x43<7:0>  ana_0x44<7:0>  ana_0x45<7:0>
+	// pol:	ana_0x46<7:0>	 ana_0x47<7:0>  ana_0x48<7:0>  ana_0x49<7:0>  ana_0x4a<7:0>
+    unsigned char mask = pin & 0xff;
+	unsigned char areg;
+	unsigned char val;
+
+	////////////////////////// polarity ////////////////////////
+	areg = ((pin>>8) + 0x41);
+	val = analog_read_reg8(areg);
+	if (pol) {
+		val &= ~mask;
+	}
+	else {
+		val |= mask;
+	}
+	analog_write_reg8 (areg, val);
+
+	/////////////////////////// enable /////////////////////
+	areg = ((pin>>8) + 0x46);
+	val = analog_read_reg8(areg);
+	if (en) {
+		val |= mask;
+	}
+	else {
+		val &= ~mask;
+	}
+	analog_write_reg8 (areg, val);
+}
+
+/**
  * @brief		this function servers to wait bbpll clock lock.
  * @return		none.
  */
-void pm_wait_bbpll_done(void)
+_attribute_ram_code_ void pm_wait_bbpll_done(void)
 {
 	unsigned char ana_81 = analog_read_reg8(0x81);
 	analog_write_reg8(0x81, ana_81 | BIT(6));
@@ -197,6 +248,10 @@ void pm_update_status_info(void)
  */
 _attribute_ram_code_sec_noinline_ void  pm_sleep_start(void)
 {
+	//This is 1.4V and 1.8V power supply during sleep. Do not power on during initialization, because after power on,
+	//there will be two power supplies at the same time, which may cause abnormalities.add by weihua.zhang, confirmed by haitao 20210107
+	analog_write_reg8(0x0b, analog_read_reg8(0x0b) & ~(BIT(0) | BIT(1)));	//<0>:pd_nvt_1p4,	power on native 1P4.
+																			//<1>:pd_nvt_1p8,	power on native 1P8.
 	//A0 chip cann't disable baseband,A1 need disable baseband.See sys_init for specific instructions.(add by weihua zhang, confirmed by junwen 20200925)
 	if(0xff == g_chip_version){	//A0
 		analog_write_reg8(0x7d, g_pm_suspend_power_cfg&0xfe);
@@ -209,11 +264,6 @@ _attribute_ram_code_sec_noinline_ void  pm_sleep_start(void)
 	mspi_wait();
 	mspi_high();
 	write_reg8(0x140329, 0x00);	//MSPI ie disable
-
-	//This is 1.4V and 1.8V power supply during sleep. Do not power on during initialization, because after power on,
-	//there will be two power supplies at the same time, which may cause abnormalities.add by weihua.zhang, confirmed by haitao 20210107
-	analog_write_reg8(0x0b, analog_read_reg8(0x0b) & ~(BIT(0) | BIT(1)));	//<0>:pd_nvt_1p4,	power on native 1P4.
-																			//<1>:pd_nvt_1p8,	power on native 1P8.
 	analog_write_reg8(0x81, analog_read_reg8(0x81) | BIT(7));
 
     write_reg8(0x1401ef,0x80);	//trig pwdn
@@ -227,11 +277,19 @@ _attribute_ram_code_sec_noinline_ void  pm_sleep_start(void)
 	    }
 
 	analog_write_reg8(0x81, analog_read_reg8(0x81) & (~BIT(7)));
+	//The flash two-wire system uses clk+cn+ two communication lines, and the flash four-wire system uses
+	//clk+cn+ four communication lines. Before suspend sleep, the input of the six lines (PF0-PF5) used
+	//by flash will be disabled. After suspend wakes up, the six lines will be set to input function.
+	//(changed by weihua.zhang, confirmed by jianzhi 20201201)
+	write_reg8(0x140329, 0x3f);	//MSPI(PF0-PF5) ie enable
+	mspi_low();
+	mspi_write(0xab);	//flash wakeup
+	mspi_wait();
+	mspi_high();
 
+	analog_write_reg8(0x7d, 0x80); // enable digital bb, usb, npe
 	analog_write_reg8(0x0b, analog_read_reg8(0x0b) | (BIT(0) | BIT(1)));	//<0>:pd_nvt_1p4,	power down native 1P4.
 																			//<1>:pd_nvt_1p8,	power down native 1P8.
-	analog_write_reg8(0x7d, 0x80); // enable digital bb, usb, npe
-
 	//wait for xtal stable
     for(volatile unsigned int i = 0; i < 300; i++){	//200us
     	__asm__("nop");
@@ -242,19 +300,6 @@ _attribute_ram_code_sec_noinline_ void  pm_sleep_start(void)
 	while( BIT(7) != (analog_read_reg8(0x88) & (BIT(7)))); //0x88<7>: xo_ready_ana
 
 	pm_wait_bbpll_done();
-
-	//The clock of mspi uses 24M crystal oscillator and PLL, so you need to wait for PLL to stabilize
-	//before sending commands to flash. Otherwise, abnormal phenomena may occur.
-	//(changed by weihua.zhang, confirmed by wenfeng and junwen 20210126)
-	//The flash two-wire system uses clk+cn+ two communication lines, and the flash four-wire system uses
-	//clk+cn+ four communication lines. Before suspend sleep, the input of the six lines (PF0-PF5) used
-	//by flash will be disabled. After suspend wakes up, the six lines will be set to input function.
-	//(changed by weihua.zhang, confirmed by jianzhi 20201201)
-	write_reg8(0x140329, 0x3f);	//MSPI(PF0-PF5) ie enable
-	mspi_low();
-	mspi_write(0xab);	//flash wakeup
-	mspi_wait();
-	mspi_high();
 }
 
 /**
@@ -273,31 +318,67 @@ void pm_switch_ext32kpad_to_int32krc(void)
 	analog_write_reg8(0x4c, 0xef);
 }
 
+_attribute_data_retention_sec_ pm_clock_drift_t	pmcd = {0, 0, 0, 0, 0, 0};
 /**
- * @brief		Update the reference 32k tick value and 16M system clock value when needed.
- * @param[in]	tick_32k	- the reference 32k tick value.
- * @param[in]	tick		- the reference 16M system clock value.
+ * @brief		When 32k rc sleeps, the calibration function is initialized.
  * @return		none.
  */
-void pm_update_32k_rc_sleep_tick (unsigned int tick_32k, unsigned int tick)
+void pm_32k_rc_offset_init(void)
 {
-	pmcd.rc32_rt = tick_32k - pmcd.rc32_wakeup;
-	if (pmcd.calib || !pmcd.ref_tick || g_pm_tick_update_en || ((tick_32k - pmcd.ref_tick_32k) & 0xfffffff) > 32 * 5000)
+	pmcd.offset = 0;
+	pmcd.tc = 0;
+	pmcd.ref_tick = 0;
+}
+
+_attribute_ram_code_ void pm_update_32k_rc_sleep_tick (unsigned int tick_32k, unsigned int tick)
+{
+	pmcd.rc32_rt = tick_32k - pmcd.rc32_wakeup; //rc32_rt not used
+	if (pmcd.calib || pmcd.ref_no > 20 || !pmcd.ref_tick || ((tick_32k - pmcd.ref_tick_32k) & 0xfffffff) > 32 * 3000)//3 mS
 	{
 		pmcd.calib = 0;
 		pmcd.ref_tick_32k = tick_32k;
 		pmcd.ref_tick = tick | 1;
+		pmcd.ref_no = 0;
+	}
+	else
+	{
+		pmcd.ref_no++;
 	}
 }
 
-/**
- * @brief		Calculate the offset value based on the difference of 16M tick.
- * @param[in]	offset_tick	- the 16M tick difference between the standard clock and the expected clock.
- * @return		none.
- */
-void pm_cal_32k_rc_offset (int offset_tick)
+_attribute_ram_code_sec_noinline_ void pm_ble_32k_rc_cal_reset(void)
 {
-	pmcd.offset_cur = offset_tick;
+	pmcd.offset = 0;
+	pmcd.tc = 0;
+	pmcd.ref_tick = 0;
+	pmcd.offset_cal_tick = 0;
+}
+
+
+_attribute_ram_code_sec_noinline_ void pm_ble_cal_32k_rc_offset (int offset_tick, int rc32_cnt)
+{
+	int offset = offset_tick * (256 * 31) / rc32_cnt;		//256mS / sleep_period
+	int thres = rc32_cnt/9600;  //240*32=7680  300*32= 9600  400*32= 12800
+	if(!thres){
+		thres = 1;
+	}
+	thres *= 0x100;
+
+	if (offset > thres)
+	{
+		offset = thres;
+	}
+	else if (offset < -thres)
+	{
+		offset = -thres;
+	}
+	pmcd.calib = 1;
+	pmcd.offset += (offset - pmcd.offset) >> 4;
+	pmcd.offset_cal_tick  = clock_time() | 1;
+}
+
+_attribute_ram_code_sec_noinline_ void pm_cal_32k_rc_offset (int offset_tick)
+{
 	int offset = offset_tick * (240 * 31) / pmcd.rc32;		//240ms / sleep_period
 	if (offset > 0x100)
 	{
@@ -310,14 +391,13 @@ void pm_cal_32k_rc_offset (int offset_tick)
 	pmcd.calib = 1;
 	pmcd.offset += (offset - pmcd.offset) >> 4;
 	pmcd.offset_dc += (offset_tick - pmcd.offset_dc) >> 3;
-	g_pm_tick_update_en = 0;
 }
 
 /**
  * @brief		32k rc calibration clock compensation.
  * @return		32k calibration value after compensation.
  */
-unsigned int pm_get_32k_rc_calib (void)
+_attribute_ram_code_ unsigned int pm_get_32k_rc_calib (void)
 {
 	while(!read_reg32(0x140214));	//Wait for the 32k clock calibration to complete.
 
@@ -420,7 +500,7 @@ int pm_sleep_wakeup(pm_sleep_mode_e sleep_mode,  pm_sleep_wakeup_src_e wakeup_sr
 		//0x140105 mspi_set_h: program space size = mspi_set_h*4k
 		//0x140106 mspi_cmd_AHB: xip read command
 		//0x140107 mspi_fm_AHB: [3:0] dummy_h  [5:4] dat_line_h  [6] addr_line_h  [7] cmd_line_h
-		g_pm_mspi_cfg = read_reg32(0x140104);
+		g_pm_multi_addr = read_reg32(0x140104);
 
 		if(wakeup_tick_type == PM_TICK_STIMER_16M){
 			earlyWakeup_us = g_pm_early_wakeup_time_us.deep_ret_early_wakeup_time_us;

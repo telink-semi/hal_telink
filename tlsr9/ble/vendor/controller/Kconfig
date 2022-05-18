@@ -1,0 +1,212 @@
+# Copyright (c) 2022 Telink Semiconductor
+# SPDX-License-Identifier: Apache-2.0
+
+if BT_B91
+
+menu "B91 BLE Controller"
+
+config B91_BLE_CTRL_MAC_FLASH_ADDR
+	hex "MAC Flash address"
+	default FFFF0
+	help
+	  The address in Flash memory for MAC address storage.
+
+choice
+	prompt "MAC address type"
+	default B91_BLE_CTRL_MAC_PUBLIC
+config B91_BLE_CTRL_MAC_PUBLIC
+	bool "Public"
+config B91_BLE_CTRL_MAC_RUNDOM_STATIC
+	bool "Random static"
+endchoice
+
+config B91_BLE_CTRL_CONNECTION_INTERVAL_IDX
+	int "Connection interval, idx (time = idx * 1.25 ms)"
+	default 10
+	range 1 255
+	help
+	  ACL master connection interval index (time = index * 1.25 ms).
+
+config B91_BLE_CTRL_CONNECTION_TIMEOUT_MS
+	int "Connection timeout, ms"
+	default 4000
+	help
+	  ACL connection timeout, ms.
+
+choice
+    prompt "RF power"
+    default B91_BLE_CTRL_RF_POWER_P2P79DBM
+config B91_BLE_CTRL_RF_POWER_P9P11DBM
+	bool "+9.11 dBm"
+config B91_BLE_CTRL_RF_POWER_P8P57DBM
+	bool "+8.57 dBm"
+config B91_BLE_CTRL_RF_POWER_P8P05DBM
+	bool "+8.05 dBm"
+config B91_BLE_CTRL_RF_POWER_P7P45DBM
+	bool "+7.45 dBm"
+config B91_BLE_CTRL_RF_POWER_P6P98DBM
+	bool "+6.98 dBm"
+config B91_BLE_CTRL_RF_POWER_P5P68DBM
+	bool "+5.68 dBm"
+config B91_BLE_CTRL_RF_POWER_P4P35DBM
+	bool "+4.35 dBm"
+config B91_BLE_CTRL_RF_POWER_P3P83DBM
+	bool "+3.83 dBm"
+config B91_BLE_CTRL_RF_POWER_P3P25DBM
+	bool "+3.25 dBm"
+config B91_BLE_CTRL_RF_POWER_P2P79DBM
+	bool "+2.79 dBm"
+config B91_BLE_CTRL_RF_POWER_P2P32DBM
+	bool "+2.32 dBm"
+config B91_BLE_CTRL_RF_POWER_P1P72DBM
+	bool "+1.72 dBm"
+config B91_BLE_CTRL_RF_POWER_P0P80DBM
+	bool "+0.80 dBm"
+config B91_BLE_CTRL_RF_POWER_P0P01DBM
+	bool "+0.01 dBm"
+config B91_BLE_CTRL_RF_POWER_N0P53DBM
+	bool "-0.53 dBm"
+config B91_BLE_CTRL_RF_POWER_N1P37DBM
+	bool "-1.37 dBm"
+config B91_BLE_CTRL_RF_POWER_N2P01DBM
+	bool "-2.01 dBm"
+config B91_BLE_CTRL_RF_POWER_N3P37DBM
+	bool "-3.37 dBm"
+config B91_BLE_CTRL_RF_POWER_N4P77DBM
+	bool "-4.77 dBm"
+config B91_BLE_CTRL_RF_POWER_N6P54DBM
+	bool "-6.54 dBm"
+config B91_BLE_CTRL_RF_POWER_N8P78DBM
+	bool "-8.78 dBm"
+config B91_BLE_CTRL_RF_POWER_N12P06DBM
+	bool "-12.06 dBm"
+config B91_BLE_CTRL_RF_POWER_N17P83DBM
+	bool "-17.83 dBm"
+config B91_BLE_CTRL_RF_POWER_N23P54DBM
+	bool "-23.54 dBm"
+endchoice
+
+config B91_BLE_CTRL_RF_POWER
+	int
+	default 0 if B91_BLE_CTRL_RF_POWER_P9P11DBM
+	default 1 if B91_BLE_CTRL_RF_POWER_P8P57DBM
+	default 2 if B91_BLE_CTRL_RF_POWER_P8P05DBM
+	default 3 if B91_BLE_CTRL_RF_POWER_P7P45DBM
+	default 4 if B91_BLE_CTRL_RF_POWER_P6P98DBM
+	default 5 if B91_BLE_CTRL_RF_POWER_P5P68DBM
+	default 6 if B91_BLE_CTRL_RF_POWER_P4P35DBM
+	default 7 if B91_BLE_CTRL_RF_POWER_P3P83DBM
+	default 8 if B91_BLE_CTRL_RF_POWER_P3P25DBM
+	default 9 if B91_BLE_CTRL_RF_POWER_P2P79DBM
+	default 10 if B91_BLE_CTRL_RF_POWER_P2P32DBM
+	default 11 if B91_BLE_CTRL_RF_POWER_P1P72DBM
+	default 12 if B91_BLE_CTRL_RF_POWER_P0P80DBM
+	default 13 if B91_BLE_CTRL_RF_POWER_P0P01DBM
+	default 14 if B91_BLE_CTRL_RF_POWER_N0P53DBM
+	default 15 if B91_BLE_CTRL_RF_POWER_N1P37DBM
+	default 16 if B91_BLE_CTRL_RF_POWER_N2P01DBM
+	default 17 if B91_BLE_CTRL_RF_POWER_N3P37DBM
+	default 18 if B91_BLE_CTRL_RF_POWER_N4P77DBM
+	default 19 if B91_BLE_CTRL_RF_POWER_N6P54DBM
+	default 20 if B91_BLE_CTRL_RF_POWER_N8P78DBM
+	default 21 if B91_BLE_CTRL_RF_POWER_N12P06DBM
+	default 22 if B91_BLE_CTRL_RF_POWER_N17P83DBM
+	default 23 if B91_BLE_CTRL_RF_POWER_N23P54DBM
+
+config B91_BLE_CTRL_MASTER_MAX_NUM
+	int "Maximum number of master connections"
+	default 2
+	range 0 4
+	help
+	  Number of master ACL connections supported.
+
+config B91_BLE_CTRL_SLAVE_MAX_NUM
+	int "Maximum number of slave connections"
+	default 2
+	range 0 4
+	help
+	  Number of slave ACL connections supported.
+
+config B91_BLE_CTRL_EXT_ADV
+	bool "Enable extended advertising"
+	default y if BT_EXT_ADV
+	help
+	  Enable extended advertising.
+
+if B91_BLE_CTRL_EXT_ADV
+
+config B91_BLE_CTRL_EXT_ADV_SETS_NUM
+	int "Number of supported extended advertising sets"
+	default 3
+	help
+	  Number of supported extended advertising sets.
+
+config B91_BLE_CTRL_EXT_ADV_DATA_LEN_MAX
+	int "Maximum extended advertising data length"
+	default 320
+	help
+	  Maximum extended advertising data length.
+
+config B91_BLE_CTRL_EXT_ADV_SCAN_DATA_LEN_MAX
+	int "Maximum extended scan response data length"
+	default 320
+	help
+	  Maximum extended scan response data length.
+
+endif # B91_BLE_CTRL_EXT_ADV
+
+config B91_BLE_CTRL_EXT_SCAN
+	bool "Enable extended scanning"
+	default y if BT_EXT_ADV
+	help
+	  Enable extended scanning.
+
+config B91_BLE_CTRL_PER_ADV
+	bool "Enable periodic advertising"
+	default y if BT_PER_ADV
+	help
+	  Enable periodic advertising.
+
+if B91_BLE_CTRL_PER_ADV
+
+config B91_BLE_CTRL_PER_ADV_SETS_NUM
+	int "Number of supported periodic advertising sets"
+	default 2
+	help
+	  Number of supported periodic advertising sets.
+
+config B91_BLE_CTRL_PER_ADV_DATA_LEN_MAX
+	int "Maximum periodic advertising data length"
+	default 512
+	help
+	  Maximum periodic advertising data length.
+
+endif # B91_BLE_CTRL_PER_ADV
+
+config B91_BLE_CTRL_PER_ADV_SYNC
+	bool "Enable periodic advertising sync"
+	default y if BT_PER_ADV_SYNC
+	help
+	  Enable periodic advertising sync.
+
+config B91_BLE_CTRL_THREAD_STACK_SIZE
+	int "Controller thread stack size"
+	default 2048
+	help
+	  B91 BLE Controller thread stack size.
+
+config B91_BLE_CTRL_THREAD_PRIORITY
+	int "Controller thread priority"
+	default 2
+	help
+	  B91 BLE Controller thread priority.
+
+config B91_BLE_CTRL_THREAD_PERIOD_MS
+	int "Controller thread period, ms"
+	default 10
+	help
+	  B91 BLE Controller thread period in ms.
+
+endmenu
+
+endif # BT_B91

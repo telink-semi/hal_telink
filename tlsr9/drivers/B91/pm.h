@@ -1,36 +1,20 @@
-/*
- * Copyright (c) 2019, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+/******************************************************************************
+ * Copyright (c) 2022 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  * All rights reserved.
  *
- * SPDX-License-Identifier: BSD-3-Clause
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are met:
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * 3. Neither the name of TELINK nor the names of its contributors may be used
- *    to endorse or promote products derived from this software without
- *    specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY, AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- */
+ *****************************************************************************/
 
 /********************************************************************************************************
  * @file	pm.h
@@ -154,13 +138,10 @@ typedef enum {
 
 /**
  * @brief	mcu status
- * 			In order to fix the problem that reboot returns to occasional crash when hclk = 1/2cclk, after each reboot,
- * 			it will immediately enter deep. Therefore, the user will not see the reboot status. Increase the REBOOT_DEEP
- * 			state to indicate this process.(add by weihua.zhang, confirmed by libiao and yangbin 20201211)
  */
 typedef enum{
 	MCU_STATUS_POWER_ON  		= BIT(0),
-	MCU_STATUS_REBOOT_BACK    	= BIT(2),	//the user will not see the reboot status.
+	MCU_STATUS_REBOOT_BACK    	= BIT(2),
 	MCU_STATUS_DEEPRET_BACK  	= BIT(3),
 	MCU_STATUS_DEEP_BACK		= BIT(4),
 	MCU_STATUS_REBOOT_DEEP_BACK	= BIT(5),	//reboot + deep
@@ -204,13 +185,14 @@ typedef struct  pm_clock_drift
 	unsigned int	ref_tick_32k;
 	int				offset;
 	int				offset_dc;
-	int				offset_cur;
+	unsigned int	offset_cal_tick;
 	int				tc;
 	int				rc32;
 	int				rc32_wakeup;
 	int				rc32_rt;
 	int				s0;
 	unsigned char	calib;
+	unsigned char	ref_no;
 
 } pm_clock_drift_t;
 
@@ -309,6 +291,18 @@ _attribute_ram_code_sec_noinline_ int pm_sleep_wakeup(pm_sleep_mode_e sleep_mode
  * @return		none.
  */
 _attribute_ram_code_sec_noinline_ void pm_cal_32k_rc_offset (int offset_tick);
+
+/**
+ * @brief		This function resets BLE 32K RC calibration
+ * @return		none.
+ */
+void pm_ble_32k_rc_cal_reset(void);
+
+/**
+ * @brief		This function sets BLE 32K RC params
+ * @return		none.
+ */
+void pm_ble_cal_32k_rc_offset(int, int);
 
 /**
  * @brief		When 32k rc sleeps, the calibration function is initialized.

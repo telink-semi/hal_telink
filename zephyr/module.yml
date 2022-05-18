@@ -1,2 +1,4 @@
+name: hal_telink
 build:
   cmake: .
+  kconfig: Kconfig
