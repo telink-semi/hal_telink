@@ -32,13 +32,21 @@
 #define _attribute_ram_code_sec_noinline_       __attribute__((section(".ram_code"))) __attribute__((noinline))
 #define _attribute_ram_code_                    _attribute_ram_code_sec_noinline_
 #define _attribute_text_sec_                    __attribute__((section(".text")))
-#define _attribute_aes_data_sec_                __attribute__((section(".aes_data")))
-#define _attribute_data_retention_sec_          __attribute__((section(".retention_data")))
-#define _attribute_data_retention_              __attribute__((section(".retention_data")))
-#define _attribute_ble_data_retention_          __attribute__((section(".retention_data")))
+#if defined(CONFIG_TELINK_B91_RETENTION)
+	#define _attribute_aes_data_sec_                __attribute__((section(".data")))
+	#define _attribute_data_retention_sec_          __attribute__((section(".data")))
+	#define _attribute_data_retention_              __attribute__((section(".data")))
+	#define _attribute_ble_data_retention_          __attribute__((section(".data")))
+	#define _attribute_data_dlm_                    __attribute__((section(".data")))
+#else
+	#define _attribute_aes_data_sec_                __attribute__((section(".aes_data")))
+	#define _attribute_data_retention_sec_          __attribute__((section(".retention_data")))
+	#define _attribute_data_retention_              __attribute__((section(".retention_data")))
+	#define _attribute_ble_data_retention_          __attribute__((section(".retention_data")))
+	#define _attribute_data_dlm_                    __attribute__((section(".dlm_data")))
+#endif
 #define _attribute_aligned_(s)                  __attribute__((aligned(s)))
 #define _attribute_no_inline_                   __attribute__((noinline))
-#define _attribute_data_dlm_                    __attribute__((section(".dlm_data")))
 #define _attribute_session_(s)                  __attribute__((section(s)))
 
 #endif
