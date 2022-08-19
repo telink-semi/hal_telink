@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2021, Telink
+# Copyright (c) 2022, Telink
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -11,13 +11,23 @@ zephyr_include_directories(drivers/B91/compatibility_pack)
 zephyr_include_directories(drivers/B91/reg_include)
 zephyr_include_directories(drivers/B91)
 
-# soc.c referance sources
+# soc.c reference sources
 if (NOT CONFIG_PM AND NOT CONFIG_BT_B91)
 zephyr_library_sources(drivers/B91/sys.c)
 endif() # no PM and no BLE external dependency
 zephyr_library_sources(drivers/B91/pm.c)
 zephyr_library_sources(drivers/B91/clock.c)
 zephyr_library_sources(drivers/B91/analog.c)
+
+# MbedTLS HW acceleration
+if(CONFIG_MBEDTLS AND CONFIG_TELINK_B91_MBEDTLS_HW_ACCELERATION)
+	add_subdirectory( crypto/mbedtls )
+	zephyr_library_sources(
+		drivers/B91/pke.c
+		drivers/B91/aes.c
+		drivers/B91/trng.c
+	)
+endif() # MbedTLS HW acceleration
 
 # Flash driver reference sources
 zephyr_library_sources_ifdef(CONFIG_SOC_FLASH_TELINK_B91 drivers/B91/flash.c)
