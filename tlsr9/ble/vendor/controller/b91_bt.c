@@ -132,10 +132,10 @@ static void b91_bt_controller_thread()
 static void b91_bt_irq_init()
 {
 	/* Init STimer IRQ */
-	IRQ_CONNECT(IRQ1_SYSTIMER, 0, stimer_irq_handler, 0, 0);
+	IRQ_CONNECT(IRQ1_SYSTIMER + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 0, stimer_irq_handler, 0, 0);
 
 	/* Init RF IRQ */
-	IRQ_CONNECT(IRQ15_ZB_RT, 0, rf_irq_handler, 0, 0);
+	IRQ_CONNECT(IRQ15_ZB_RT + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 0, rf_irq_handler, 0, 0);
 }
 
 /**
