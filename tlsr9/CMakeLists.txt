@@ -54,6 +54,10 @@ zephyr_library_sources_ifdef(CONFIG_ENTROPY_TELINK_B91_TRNG drivers/B91/trng.c)
 zephyr_library_sources_ifdef(CONFIG_ADC_TELINK_B91 drivers/B91/adc.c)
 zephyr_library_sources_ifdef(CONFIG_ADC_TELINK_B91 drivers/B91/gpio.c)
 
+# USB driver reference sources
+zephyr_library_sources_ifdef(CONFIG_USB_TELINK_B91 drivers/B91/gpio.c)
+zephyr_library_sources_ifdef(CONFIG_USB_TELINK_B91 drivers/B91/usbhw.c)
+
 #PM driver dependency
 zephyr_library_sources_ifdef(CONFIG_PM drivers/B91/stimer.c)
 
