@@ -30,9 +30,13 @@ if(CONFIG_MBEDTLS AND CONFIG_TELINK_B91_MBEDTLS_HW_ACCELERATION)
 endif() # MbedTLS HW acceleration
 
 # Flash driver reference sources
-zephyr_library_sources_ifdef(CONFIG_SOC_FLASH_TELINK_B91 drivers/B91/flash.c)
-zephyr_library_sources_ifdef(CONFIG_SOC_FLASH_TELINK_B91 drivers/B91/plic.c)
-zephyr_library_sources_ifdef(CONFIG_SOC_FLASH_TELINK_B91 drivers/B91/stimer.c)
+if(CONFIG_SOC_FLASH_TELINK_B91 OR CONFIG_USB_TELINK_B91)
+	zephyr_library_sources(
+		drivers/B91/flash.c
+		drivers/B91/plic.c
+		drivers/B91/stimer.c
+	)
+endif()
 
 # PWM driver reference sources
 zephyr_library_sources_ifdef(CONFIG_PWM_TELINK_B91 drivers/B91/pwm.c)
