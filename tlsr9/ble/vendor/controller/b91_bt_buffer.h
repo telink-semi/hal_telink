@@ -22,14 +22,14 @@
 #include "stack/ble/ble.h"
 #include "zephyr/bluetooth/buf.h"
 
-#define BT_BUF_TX_SIZE                                                                             \
-	MAX(BT_BUF_CMD_SIZE(CONFIG_BT_BUF_CMD_TX_SIZE), BT_BUF_ACL_SIZE(CONFIG_BT_BUF_ACL_TX_SIZE))
 
 #define ACL_CONN_MAX_RX_OCTETS (BT_BUF_RX_SIZE > 251 ? 251 : BT_BUF_RX_SIZE)
 #define ACL_SLAVE_MAX_TX_OCTETS (CONFIG_BT_BUF_ACL_TX_SIZE > 251 ? 251 : CONFIG_BT_BUF_ACL_TX_SIZE)
 #define ACL_MASTER_MAX_TX_OCTETS (CONFIG_BT_BUF_ACL_TX_SIZE > 251 ? 251 : CONFIG_BT_BUF_ACL_TX_SIZE)
 
-/* Macroses to align values to specific size */
+#define BT_BUF_TX_SIZE ACL_SLAVE_MAX_TX_OCTETS
+
+/* Macros to align values to specific size */
 #define ALIGN_2 1
 #define ALIGN_4 2
 #define ALIGN_8 3
@@ -65,7 +65,7 @@
     TX from controller, RX to Host
     According to Telink implementatios, the buffer shall be alligned to 4.
 */
-#define HCI_TX_FIFO_SIZE HCI_FIFO_SIZE(BT_BUF_RX_SIZE)
+#define HCI_TX_FIFO_SIZE HCI_FIFO_SIZE(ACL_CONN_MAX_RX_OCTETS)
 
 /*
     According to Telink implementation shall number of buffers shall be power of 2
@@ -76,7 +76,7 @@
     Intermediate ACL buffer that takes data from HCI RX and pass it to ACL TX
     According to Telink implementatios, the buffer shall be alligned to 4.
 */
-#define HCI_RX_ACL_FIFO_SIZE ALIGN(BT_BUF_ACL_SIZE(CONFIG_BT_BUF_ACL_TX_SIZE), ALIGN_4)
+#define HCI_RX_ACL_FIFO_SIZE ALIGN(BT_BUF_ACL_SIZE(ACL_CONN_MAX_RX_OCTETS), ALIGN_4)
 
 /*
     According to Telink implementation shall number of buffers shall be power of 2
@@ -87,7 +87,7 @@
     Data from radio to RX ACL buffer
     According to Telink implementatios, the buffer shall be alligned to 16.
 */
-#define ACL_RX_FIFO_SIZE CAL_LL_ACL_RX_FIFO_SIZE(BT_BUF_RX_SIZE)
+#define ACL_RX_FIFO_SIZE CAL_LL_ACL_RX_FIFO_SIZE(ACL_CONN_MAX_RX_OCTETS)
 
 /*
     Number of ACL RX buffers. Shall be power of 2
@@ -98,7 +98,7 @@
     Data from ACL TX to radio
     According to Telink implementatios, the buffer shall be alligned to 16.
 */
-#define ACL_SLAVE_TX_FIFO_SIZE CAL_LL_ACL_TX_FIFO_SIZE(CONFIG_BT_BUF_ACL_TX_SIZE)
+#define ACL_SLAVE_TX_FIFO_SIZE CAL_LL_ACL_TX_FIFO_SIZE(BT_BUF_TX_SIZE)
 
 /*
     Number of ACL TX buffers. Shall be 9, 17, 33
@@ -109,7 +109,7 @@
     Data from ACL TX to radio
     According to Telink implementatios, the buffer shall be alligned to 16.
 */
-#define ACL_MASTER_TX_FIFO_SIZE CAL_LL_ACL_TX_FIFO_SIZE(CONFIG_BT_BUF_ACL_TX_SIZE)
+#define ACL_MASTER_TX_FIFO_SIZE CAL_LL_ACL_TX_FIFO_SIZE(BT_BUF_TX_SIZE)
 
 /*
     Number of ACL TX buffers. Shall be 9, 17, 33
