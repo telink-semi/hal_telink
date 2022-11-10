@@ -46,4 +46,9 @@ void b91_bt_host_send_packet(uint8_t type, uint8_t *data, uint16_t len);
  */
 int b91_bt_controller_init(void);
 
+/**
+ * @brief     Telink B91 BLE Controller deinitialization
+ */
+void b91_bt_controller_deinit(void);
+
 #endif /* B91_BT_H_ */
