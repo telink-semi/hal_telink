@@ -1049,4 +1049,18 @@ void rf_set_power_level_index(rf_power_level_index_e idx);
  */
 void rf_baseband_reset(void);
 
+/**
+ * @brief This function reset dma registrs to default (reset values)
+ * @param none
+ * @return none
+ */
+void rf_reset_dma(void);
+
+/**
+ * @brief This function reset radio registrs to default (reset values)
+ * @param none
+ * @return none
+ */
+void rf_radio_reset(void);
+
 #endif
