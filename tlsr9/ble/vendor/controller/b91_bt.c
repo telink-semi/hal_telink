@@ -135,7 +135,11 @@ static void b91_bt_irq_init()
 	IRQ_CONNECT(IRQ1_SYSTIMER + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 0, stimer_irq_handler, 0, 0);
 
 	/* Init RF IRQ */
+#if CONFIG_DYNAMIC_INTERRUPTS
+	irq_connect_dynamic(IRQ15_ZB_RT + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 0, rf_irq_handler, 0, 0);
+#else
 	IRQ_CONNECT(IRQ15_ZB_RT + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 0, rf_irq_handler, 0, 0);
+#endif
 }
 
 /**
@@ -162,6 +166,21 @@ int b91_bt_controller_init()
 	k_thread_start(ZephyrBleController);
 
 	return status;
+}
+
+/**
+ * @brief    Telink B91 BLE Controller deinitialization
+ */
+void b91_bt_controller_deinit()
+{
+	/* Stop BLE thread */
+	k_thread_abort(ZephyrBleController);
+
+	/* Reset Radio */
+	rf_radio_reset();
+
+	/* Reset DMA */
+	rf_reset_dma();
 }
 
 /**
