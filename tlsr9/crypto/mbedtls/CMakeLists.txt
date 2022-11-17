@@ -34,8 +34,3 @@ zephyr_library_sources(
 	./internal/ecp_alt_b91_backend_test.c
 	./internal/ecp_alt_b91_backend.c
 	)
-
-# HW entropy
-zephyr_library_sources(
-	./internal/entropy_poll_alt.c
-	)
