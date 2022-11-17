@@ -50,7 +50,7 @@ void swap32(u8 dst[4], const u8 src[4])
     swapX(src, dst, 4);
 }
 
-void swap48(u8 dst[7], const u8 src[7])
+void swap48(u8 dst[6], const u8 src[6])
 {
     swapX(src, dst, 6);
 }

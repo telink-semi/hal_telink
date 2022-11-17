@@ -19,7 +19,7 @@
 #ifndef DRIVERS_B91_DRIVER_EXT_EXT_PM_H_
 #define DRIVERS_B91_DRIVER_EXT_EXT_PM_H_
 
-#include <zephyr/zephyr.h>
+#include <zephyr/kernel.h>
 #undef irq_enable
 #undef irq_disable
 #undef ARRAY_SIZE
