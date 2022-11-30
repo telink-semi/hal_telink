@@ -88,18 +88,3 @@ zephyr_library_sources(
 )
 
 endif() # CONFIG_BT_B91
-
-# PM and BLE external dependency
-if(CONFIG_PM OR CONFIG_BT_B91)
-
-if(${ZEPHYR_TOOLCHAIN_VARIANT} STREQUAL "zephyr")
-	zephyr_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/ble/proj_lib/lib/liblt_9518_zephyr.a)
-else()
-	zephyr_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/ble/proj_lib/lib/liblt_9518.a)
-endif()
-
-if(CONFIG_PM)
-zephyr_ld_options(-mtune=rocket)
-endif() # PM
-
-endif() # PM or BLE external dependency

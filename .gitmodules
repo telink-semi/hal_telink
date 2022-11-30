@@ -1,3 +1,0 @@
-[submodule "tlsr9/ble/proj_lib/lib"]
-	path = tlsr9/ble/proj_lib/lib
-	url = https://github.com/telink-semi/zephyr_hal_telink_b91_ble_lib.git
