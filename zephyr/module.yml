@@ -2,3 +2,12 @@ name: hal_telink
 build:
   cmake: .
   kconfig: Kconfig
+blobs:
+  - path: liblt_9518_zephyr.a
+    sha256: c863feadbd25d6c6d6e2506554740b57d079fe22706eb768d5ee1088d4940019
+    type: lib
+    version: 'V4.0.1.0_Patch_0001'
+    license-path: tlsr9/ble/license.txt
+    url: https://github.com/telink-semi/zephyr_hal_telink_b91_ble_lib/raw/464d3e32e7195742adcc8a5dc282912b8ee8be0a/liblt_9518_zephyr.a
+    description: "Binary libraries supporting Telink B91 series BLE subsystems"
+    doc-url: https://github.com/telink-semi/zephyr_hal_telink_b91_ble_lib/blob/464d3e32e7195742adcc8a5dc282912b8ee8be0a/README.md
