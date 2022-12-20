@@ -110,37 +110,6 @@ _attribute_no_inline_ static void b91_bt_blc_mac_init(int flash_addr, u8 *mac_pu
 	}
 }
 
-#ifdef CONFIG_PM
-/**
- * @brief       Telink B91 BLE sleep implementation
- * @param[in]   sleep_mode - sleep mode to enter
- * @param[in]   wakeup_src - wake up source
- * @param[in]   wakeup_tick - wake up stimer tick
- * @return      wake up source
- */
-static int b91_bt_zephyr_wakeup(SleepMode_TypeDef sleep_mode, SleepWakeupSrc_TypeDef wakeup_src,
-				unsigned int wakeup_tick)
-{
-	k_sched_lock();
-	unsigned int sys_tick = stimer_get_tick();
-	int64_t ktime_ms = k_uptime_get();
-	k_sched_unlock();
-
-	systimer_irq_enable();
-
-	ktime_ms += (wakeup_tick - sys_tick) / SYSTEM_TIMER_TICK_1MS - B91_BT_SLEEP_AJUSTMENT;
-	k_sleep(K_TIMEOUT_ABS_MS(ktime_ms));
-
-	int src = pm_get_wakeup_src();
-
-	if (src & WAKEUP_STATUS_TIMER) {
-		src |= STATUS_ENTER_SUSPEND;
-	}
-
-	return src;
-}
-#endif /* CONFIG_PM */
-
 /**
  * @brief       Telink B91 BLE Controller initialization
  * @param[in]   prx - HCI RX callback
@@ -283,9 +252,6 @@ int b91_bt_blc_init(void *prx, void *ptx)
 #ifdef CONFIG_PM
 	/* Enable PM for BLE stack */
 	blc_ll_initPowerManagement_module();
-
-	/* Select the sleep source for BLE stack */
-	blc_pm_set_extern_wakeup_recover(b91_bt_zephyr_wakeup, pm_tim_recover_32k_rc);
 
 	/* Enable the sleep masks for BLE stack thread */
 	blc_pm_setSleepMask(PM_SLEEP_LEG_ADV | PM_SLEEP_LEG_SCAN | PM_SLEEP_ACL_SLAVE |

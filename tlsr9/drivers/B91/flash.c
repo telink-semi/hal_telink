@@ -32,10 +32,6 @@
 #include "core.h"
 #include "stimer.h"
 
-#if (CONFIG_BT_B91)
-#include "stack/ble/controller/ble_controller.h"
-#endif /* CONFIG_BT_B91 */
-
 #define DISABLE_BTB     __asm__("csrci 	0x7D0,8")
 #define ENABLE_BTB      __asm__("csrsi 	0x7D0,8")
 
@@ -117,9 +113,6 @@ _attribute_ram_code_sec_noinline_ static void flash_wait_done(void)
 			flash_cnt++;
 			break;
 		}
-#if (CONFIG_BT_B91)
-		blc_sdk_irq_handler();
-#endif /* CONFIG_BT_B91 */
 	}
 	mspi_high();
 }
