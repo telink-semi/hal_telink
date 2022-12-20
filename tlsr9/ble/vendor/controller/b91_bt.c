@@ -26,11 +26,13 @@
 #include "compiler.h"
 #include "plic.h"
 #include "stack/ble/controller/ble_controller.h"
+#include "stack/ble/controller/os_sup.h"
 
 /* Module defines */
 #define BLE_THREAD_STACK_SIZE CONFIG_B91_BLE_CTRL_THREAD_STACK_SIZE
 #define BLE_THREAD_PRIORITY CONFIG_B91_BLE_CTRL_THREAD_PRIORITY
 #define BLE_THREAD_PERIOD_MS CONFIG_B91_BLE_CTRL_THREAD_PERIOD_MS
+#define BLE_CONTROLLER_SEMAPHORE_MAX 50
 
 #define BYTES_TO_UINT16(n, p)                                                                      \
 	{                                                                                          \
@@ -46,6 +48,19 @@ static void b91_bt_controller_thread();
 
 K_THREAD_DEFINE(ZephyrBleController, BLE_THREAD_STACK_SIZE, b91_bt_controller_thread, NULL, NULL,
 		NULL, BLE_THREAD_PRIORITY, 0, -1);
+
+/**
+ * @brief    Semaphore define for controller.
+ */
+K_SEM_DEFINE(controller_sem, 1, BLE_CONTROLLER_SEMAPHORE_MAX);
+
+/**
+ * @brief    BLE semaphore callback.
+ */
+static void os_give_sem_cb(void)
+{
+	k_sem_give(&controller_sem);
+}
 
 static struct b91_ctrl_t {
 	b91_bt_host_callback_t callbacks;
@@ -71,16 +86,19 @@ static int b91_bt_hci_tx_handler(void)
 		return 0;
 	}
 
-	/* Get HCI data */
-	u8 *p = bltHci_txfifo.p + (bltHci_txfifo.rptr & bltHci_txfifo.mask) * bltHci_txfifo.size;
-	if (p) {
-		u32 len;
-		BSTREAM_TO_UINT16(len, p);
-		bltHci_txfifo.rptr++;
+	while(bltHci_txfifo.wptr != bltHci_txfifo.rptr)
+	{
+		/* Get HCI data */
+		u8 *p = bltHci_txfifo.p + (bltHci_txfifo.rptr & bltHci_txfifo.mask) * bltHci_txfifo.size;
+		if (p) {
+			u32 len;
+			BSTREAM_TO_UINT16(len, p);
+			bltHci_txfifo.rptr++;
 
-		/* Send data to the host */
-		if (b91_ctrl.callbacks.host_read_packet) {
-			b91_ctrl.callbacks.host_read_packet(p, len);
+			/* Send data to the host */
+			if (b91_ctrl.callbacks.host_read_packet) {
+				b91_ctrl.callbacks.host_read_packet(p, len);
+			}
 		}
 	}
 
@@ -119,10 +137,8 @@ static int b91_bt_hci_rx_handler(void)
 static void b91_bt_controller_thread()
 {
 	while (1) {
+		k_sem_take(&controller_sem, K_FOREVER);
 		blc_sdk_main_loop();
-#ifndef CONFIG_PM
-		k_msleep(CONFIG_B91_BLE_CTRL_THREAD_PERIOD_MS);
-#endif /* !CONFIG_PM */
 	}
 }
 
@@ -162,6 +178,9 @@ int b91_bt_controller_init()
 		return status;
 	}
 
+	/* Register callback to controller. */
+	blc_ll_registerGiveSemCb(os_give_sem_cb);
+
 	/* Start BLE thread */
 	k_thread_start(ZephyrBleController);
 
@@ -194,6 +213,9 @@ void b91_bt_host_send_packet(uint8_t type, uint8_t *data, uint16_t len)
 	*p++ = type;
 	memcpy(p, data, len);
 	bltHci_rxfifo.wptr++;
+
+	/* Send Semaphore to controller. */
+	os_give_sem_cb();
 }
 
 /**
