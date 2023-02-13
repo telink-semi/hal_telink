@@ -250,9 +250,6 @@ int b91_bt_blc_init(void *prx, void *ptx)
 	blc_register_hci_handler(prx, ptx);
 
 #ifdef CONFIG_PM
-	/* Select internal 32K for BLE PM */
-	blc_pm_select_internal_32k_crystal();
-
 	/* Enable PM for BLE stack */
 	blc_ll_initPowerManagement_module();
 
