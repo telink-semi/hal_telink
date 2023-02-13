@@ -37,6 +37,10 @@
 #endif
 
 
+#ifndef OS_SUP_EN
+#define OS_SUP_EN                   0
+#endif
+
 ///////////////////  Feature ////////////////////////////
 #ifndef		LL_MULTI_SLAVE_MAC_ENABLE
 #define		LL_MULTI_SLAVE_MAC_ENABLE				    			0
@@ -68,10 +72,7 @@
 	#error "unsupported mcu type !"
 #endif
 
-//conn param update/map update
-#ifndef	BLS_PROC_MASTER_UPDATE_REQ_IN_IRQ_ENABLE
-#define BLS_PROC_MASTER_UPDATE_REQ_IN_IRQ_ENABLE					0  //TODO:
-#endif
+
 
 
 #ifndef LE_AUTHENTICATED_PAYLOAD_TIMEOUT_SUPPORT_EN

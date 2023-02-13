@@ -44,6 +44,7 @@
 		p += 2;                                                                            \
 	}
 
+bool b91_bt_controller_started = false;
 static void b91_bt_controller_thread();
 
 K_THREAD_DEFINE(ZephyrBleController, BLE_THREAD_STACK_SIZE, b91_bt_controller_thread, NULL, NULL,
@@ -184,6 +185,7 @@ int b91_bt_controller_init()
 	/* Start BLE thread */
 	k_thread_start(ZephyrBleController);
 
+	b91_bt_controller_started = true;
 	return status;
 }
 
@@ -200,6 +202,8 @@ void b91_bt_controller_deinit()
 
 	/* Reset DMA */
 	rf_reset_dma();
+
+	b91_bt_controller_started = false;
 }
 
 /**

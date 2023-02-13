@@ -18,7 +18,7 @@
 #ifndef LL_H_
 #define LL_H_
 
-
+#include "stack/ble/ble_common.h"
 
 /**
  * @brief	Telink defined LinkLayer Event Callback
