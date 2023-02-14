@@ -19,6 +19,8 @@
 #include <ext_driver/ext_pm.h>
 #include <stack/ble/controller/os_sup.h>
 
+extern bool b91_bt_controller_started;
+
 /**
  * @brief     This function sets B91 MCU to suspend mode
  * @param[in] wake_stimer_tick - wake-up stimer tick
@@ -29,13 +31,19 @@ bool b91_suspend(uint32_t wake_stimer_tick)
 	bool result = false;
 
 #if CONFIG_BT
-	blc_pm_setAppWakeupLowPower(wake_stimer_tick, 1);
-	if (!blc_pm_handler()) {
+	if (b91_bt_controller_started) {
+		blc_pm_setAppWakeupLowPower(wake_stimer_tick, 1);
+		if (!blc_pm_handler()) {
+			result = true;
+		}
+		blc_pm_setAppWakeupLowPower(0, 0);
+	}
+	else {
+		cpu_sleep_wakeup_32k_rc(SUSPEND_MODE, PM_WAKEUP_TIMER | PM_WAKEUP_PAD, wake_stimer_tick);
 		result = true;
 	}
-	blc_pm_setAppWakeupLowPower(0, 0);
 #else
-	cpu_sleep_wakeup_32k_rc(SUSPEND_MODE, PM_WAKEUP_TIMER, wake_stimer_tick);
+	cpu_sleep_wakeup_32k_rc(SUSPEND_MODE, PM_WAKEUP_TIMER | PM_WAKEUP_PAD, wake_stimer_tick);
 	result = true;
 #endif /* CONFIG_BT */
 
