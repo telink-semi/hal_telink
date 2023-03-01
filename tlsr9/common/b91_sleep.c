@@ -17,7 +17,10 @@
  *****************************************************************************/
 #include "b91_sleep.h"
 #include <ext_driver/ext_pm.h>
+
+#if CONFIG_BT
 #include <stack/ble/controller/os_sup.h>
+#endif /* CONFIG_BT */
 
 extern bool b91_bt_controller_started;
 
