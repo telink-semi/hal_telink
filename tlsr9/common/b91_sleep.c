@@ -42,12 +42,16 @@ bool b91_suspend(uint32_t wake_stimer_tick)
 		blc_pm_setAppWakeupLowPower(0, 0);
 	}
 	else {
-		cpu_sleep_wakeup_32k_rc(SUSPEND_MODE, PM_WAKEUP_TIMER | PM_WAKEUP_PAD, wake_stimer_tick);
-		result = true;
+		if (cpu_sleep_wakeup_32k_rc(SUSPEND_MODE, PM_WAKEUP_TIMER | PM_WAKEUP_PAD,
+			wake_stimer_tick) != STATUS_GPIO_ERR_NO_ENTER_PM) {
+			result = true;
+		}
 	}
 #else
-	cpu_sleep_wakeup_32k_rc(SUSPEND_MODE, PM_WAKEUP_TIMER | PM_WAKEUP_PAD, wake_stimer_tick);
-	result = true;
+	if (cpu_sleep_wakeup_32k_rc(SUSPEND_MODE, PM_WAKEUP_TIMER | PM_WAKEUP_PAD,
+		wake_stimer_tick) != STATUS_GPIO_ERR_NO_ENTER_PM) {
+		result = true;
+	}
 #endif /* CONFIG_BT */
 
 	return result;
