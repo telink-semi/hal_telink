@@ -48,8 +48,12 @@ zephyr_library_sources_ifdef(CONFIG_SPI_TELINK_B91 drivers/B91/gpio.c)
 zephyr_library_sources_ifdef(CONFIG_I2C_TELINK_B91 drivers/B91/i2c.c)
 
 # RF driver reference sources
-zephyr_library_sources_ifdef(CONFIG_IEEE802154_TELINK_B91 drivers/B91/stimer.c)
-zephyr_library_sources_ifdef(CONFIG_IEEE802154_TELINK_B91 drivers/B91/rf.c)
+if(CONFIG_BT_B91 OR CONFIG_IEEE802154_TELINK_B91)
+	zephyr_library_sources(
+		drivers/B91/stimer.c
+		drivers/B91/rf.c
+	)
+endif()
 
 # Entropy driver reference sources
 zephyr_library_sources_ifdef(CONFIG_ENTROPY_TELINK_B91_TRNG drivers/B91/trng.c)

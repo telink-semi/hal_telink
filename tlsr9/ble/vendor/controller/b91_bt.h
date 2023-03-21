@@ -20,6 +20,16 @@
 #define B91_BT_H_
 
 /**
+ *  @brief b91_bt_contriller_state
+ *  B91 Bluetooth controller state
+ */
+enum b91_bt_controller_state {
+	B91_BT_CONTROLLER_STATE_STOPPED = 0,
+	B91_BT_CONTROLLER_STATE_ACTIVE,
+	B91_BT_CONTROLLER_STATE_STOPPING
+};
+
+/**
  *  @brief b91_bt_host_callback
  *  used for vhci call host function to notify what host need to do
  */
@@ -38,7 +48,7 @@ void b91_bt_host_callback_register(const b91_bt_host_callback_t *callback);
  * @param     data the packet point
  * @param     len the packet length
  */
-void b91_bt_host_send_packet(uint8_t type, uint8_t *data, uint16_t len);
+void b91_bt_host_send_packet(uint8_t type, const uint8_t *data, uint16_t len);
 
 /**
  * @brief     Telink B91 BLE Controller initialization
@@ -50,5 +60,11 @@ int b91_bt_controller_init(void);
  * @brief     Telink B91 BLE Controller deinitialization
  */
 void b91_bt_controller_deinit(void);
+
+/**
+ * @brief     Get state of Telink B91 BLE Controller
+ */
+enum b91_bt_controller_state b91_bt_controller_state(void);
+
 
 #endif /* B91_BT_H_ */
