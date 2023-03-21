@@ -44,16 +44,15 @@
 		p += 2;                                                                            \
 	}
 
-bool b91_bt_controller_started = false;
+static volatile enum b91_bt_controller_state b91_bt_state = B91_BT_CONTROLLER_STATE_STOPPED;
 static void b91_bt_controller_thread();
-
-K_THREAD_DEFINE(ZephyrBleController, BLE_THREAD_STACK_SIZE, b91_bt_controller_thread, NULL, NULL,
-		NULL, BLE_THREAD_PRIORITY, 0, -1);
+K_THREAD_STACK_DEFINE(b91_bt_controller_thread_stack, BLE_THREAD_STACK_SIZE);
+static struct k_thread b91_bt_controller_thread_data;
 
 /**
  * @brief    Semaphore define for controller.
  */
-K_SEM_DEFINE(controller_sem, 1, BLE_CONTROLLER_SEMAPHORE_MAX);
+K_SEM_DEFINE(controller_sem, 0, BLE_CONTROLLER_SEMAPHORE_MAX);
 
 /**
  * @brief    BLE semaphore callback.
@@ -70,12 +69,22 @@ static struct b91_ctrl_t {
 /**
  * @brief    RF driver interrupt handler
  */
-_attribute_ram_code_ void rf_irq_handler(void) { blc_sdk_irq_handler(); }
+_attribute_ram_code_ void rf_irq_handler(const void *param)
+{
+	(void)param;
+
+	blc_sdk_irq_handler();
+}
 
 /**
  * @brief    System Timer interrupt handler
  */
-_attribute_ram_code_ void stimer_irq_handler(void) { blc_sdk_irq_handler(); }
+_attribute_ram_code_ void stimer_irq_handler(const void *param)
+{
+	(void)param;
+
+	blc_sdk_irq_handler();
+}
 
 /**
  * @brief    BLE Controller HCI Tx callback implementation
@@ -96,9 +105,19 @@ static int b91_bt_hci_tx_handler(void)
 			BSTREAM_TO_UINT16(len, p);
 			bltHci_txfifo.rptr++;
 
-			/* Send data to the host */
-			if (b91_ctrl.callbacks.host_read_packet) {
-				b91_ctrl.callbacks.host_read_packet(p, len);
+			if (b91_bt_state == B91_BT_CONTROLLER_STATE_ACTIVE) {
+				/* Send data to the host */
+				if (b91_ctrl.callbacks.host_read_packet) {
+					b91_ctrl.callbacks.host_read_packet(p, len);
+				}
+			} else if (b91_bt_state == B91_BT_CONTROLLER_STATE_STOPPING) {
+				/* In this state HCI reset is sent - waiting for command complete */
+				static const uint8_t hci_reset_cmd_complette[] = {0x04, 0x0e, 0x04, 0x01, 0x03, 0x0c, 0x00};
+
+				if (len == sizeof(hci_reset_cmd_complette) && !memcmp(p, hci_reset_cmd_complette, len)) {
+					b91_bt_state = B91_BT_CONTROLLER_STATE_STOPPED;
+					k_sem_give(&controller_sem);
+				}
 			}
 		}
 	}
@@ -137,7 +156,8 @@ static int b91_bt_hci_rx_handler(void)
  */
 static void b91_bt_controller_thread()
 {
-	while (1) {
+	while (b91_bt_state == B91_BT_CONTROLLER_STATE_ACTIVE ||
+		b91_bt_state == B91_BT_CONTROLLER_STATE_STOPPING) {
 		k_sem_take(&controller_sem, K_FOREVER);
 		blc_sdk_main_loop();
 	}
@@ -149,14 +169,15 @@ static void b91_bt_controller_thread()
 static void b91_bt_irq_init()
 {
 	/* Init STimer IRQ */
-	IRQ_CONNECT(IRQ1_SYSTIMER + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 0, stimer_irq_handler, 0, 0);
-
+	IRQ_CONNECT(IRQ1_SYSTIMER + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 2, stimer_irq_handler, 0, 0);
 	/* Init RF IRQ */
 #if CONFIG_DYNAMIC_INTERRUPTS
-	irq_connect_dynamic(IRQ15_ZB_RT + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 0, rf_irq_handler, 0, 0);
+	irq_connect_dynamic(IRQ15_ZB_RT + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 2, rf_irq_handler, 0, 0);
 #else
-	IRQ_CONNECT(IRQ15_ZB_RT + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 0, rf_irq_handler, 0, 0);
+	IRQ_CONNECT(IRQ15_ZB_RT + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 2, rf_irq_handler, 0, 0);
 #endif
+	riscv_plic_set_priority(IRQ1_SYSTIMER, 2);
+	riscv_plic_set_priority(IRQ15_ZB_RT, 2);
 }
 
 /**
@@ -166,6 +187,10 @@ static void b91_bt_irq_init()
 int b91_bt_controller_init()
 {
 	int status;
+
+	/* init semaphore */
+	k_sem_reset(&controller_sem);
+	k_sem_give(&controller_sem);
 
 	/* Init IRQs */
 	b91_bt_irq_init();
@@ -182,10 +207,15 @@ int b91_bt_controller_init()
 	/* Register callback to controller. */
 	blc_ll_registerGiveSemCb(os_give_sem_cb);
 
-	/* Start BLE thread */
-	k_thread_start(ZephyrBleController);
+	/* Create BLE main thread */
+	(void)k_thread_create(&b91_bt_controller_thread_data,
+		b91_bt_controller_thread_stack, K_THREAD_STACK_SIZEOF(b91_bt_controller_thread_stack),
+		b91_bt_controller_thread, NULL, NULL, NULL, BLE_THREAD_PRIORITY, 0, K_NO_WAIT);
 
-	b91_bt_controller_started = true;
+	/* Start thread */
+	b91_bt_state = B91_BT_CONTROLLER_STATE_ACTIVE;
+	k_thread_start(&b91_bt_controller_thread_data);
+
 	return status;
 }
 
@@ -194,16 +224,24 @@ int b91_bt_controller_init()
  */
 void b91_bt_controller_deinit()
 {
-	/* Stop BLE thread */
-	k_thread_abort(ZephyrBleController);
+	/* start BLE stopping procedure */
+	b91_bt_state = B91_BT_CONTROLLER_STATE_STOPPING;
+
+	/* reset controller */
+	static const uint8_t hci_reset_cmd[] = {0x03, 0x0c, 0x00};
+	b91_bt_host_send_packet(0x01, hci_reset_cmd, sizeof(hci_reset_cmd));
+
+	/* wait thread finish */
+	(void)k_thread_join(&b91_bt_controller_thread_data, K_FOREVER);
+
+	/* disable interrupts */
+	plic_interrupt_disable(IRQ1_SYSTIMER);
+	plic_interrupt_disable(IRQ15_ZB_RT);
 
 	/* Reset Radio */
 	rf_radio_reset();
-
-	/* Reset DMA */
 	rf_reset_dma();
-
-	b91_bt_controller_started = false;
+	rf_baseband_reset();
 }
 
 /**
@@ -211,15 +249,14 @@ void b91_bt_controller_deinit()
  * @param      data the packet point
  * @param      len the packet length
  */
-void b91_bt_host_send_packet(uint8_t type, uint8_t *data, uint16_t len)
+void b91_bt_host_send_packet(uint8_t type, const uint8_t *data, uint16_t len)
 {
 	u8 *p = bltHci_rxfifo.p + (bltHci_rxfifo.wptr & bltHci_rxfifo.mask) * bltHci_rxfifo.size;
 	*p++ = type;
 	memcpy(p, data, len);
 	bltHci_rxfifo.wptr++;
 
-	/* Send Semaphore to controller. */
-	os_give_sem_cb();
+	k_sem_give(&controller_sem);
 }
 
 /**
@@ -229,4 +266,12 @@ void b91_bt_host_callback_register(const b91_bt_host_callback_t *pcb)
 {
 	b91_ctrl.callbacks.host_read_packet = pcb->host_read_packet;
 	b91_ctrl.callbacks.host_send_available = pcb->host_send_available;
+}
+
+/**
+ * @brief     Get state of Telink B91 BLE Controller
+ */
+enum b91_bt_controller_state b91_bt_controller_state(void) {
+
+	return b91_bt_state;
 }
