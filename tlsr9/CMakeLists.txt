@@ -29,8 +29,11 @@ endif()
 zephyr_library_sources(drivers/${SOC}/clock.c)
 zephyr_library_sources(drivers/${SOC}/analog.c)
 
-# driver lib (sys.c, pm.c, flash_base.c, plic.c, pke.c, rf.c, trng.c)
 if (CONFIG_SOC_RISCV_TELINK_B92)
+# watchdog.c reference sources
+zephyr_library_sources(drivers/${SOC}/watchdog.c)
+
+# driver lib (sys.c, pm.c, flash_base.c, plic.c, pke.c, rf.c, trng.c)
 zephyr_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/drivers/${SOC}/lib/libdriver.a)
 endif()
 
