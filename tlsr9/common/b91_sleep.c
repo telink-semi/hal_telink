@@ -39,6 +39,7 @@ bool b91_suspend(uint32_t wake_stimer_tick)
 		state == B91_BT_CONTROLLER_STATE_STOPPING) {
 		blc_pm_setAppWakeupLowPower(wake_stimer_tick, 1);
 		if (!blc_pm_handler()) {
+			rf_set_power_level_index(CONFIG_B91_BLE_CTRL_RF_POWER);
 			result = true;
 		}
 		blc_pm_setAppWakeupLowPower(0, 0);
