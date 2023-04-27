@@ -61,7 +61,7 @@ endif()
 endif()
 
 # PWM driver reference sources
-zephyr_library_sources_ifdef(CONFIG_PWM_TELINK_B91 drivers/${SOC}/pwm.c)
+zephyr_library_sources_ifdef(CONFIG_PWM_TELINK_B9X drivers/${SOC}/pwm.c)
 
 # SPI driver reference sources
 zephyr_library_sources_ifdef(CONFIG_SPI_TELINK_B91 drivers/${SOC}/gpio.c)
