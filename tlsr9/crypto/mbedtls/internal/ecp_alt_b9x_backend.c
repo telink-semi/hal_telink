@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2022 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * Copyright (c) 2022-2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -219,6 +219,8 @@ static eccp_curve_t secp192k1 = {
 #endif /* MBEDTLS_ECP_DP_SECP192K1_ENABLED */
 
 #if defined(MBEDTLS_ECP_DP_CURVE25519_ENABLED)
+
+#if defined CONFIG_SOC_RISCV_TELINK_B91
 static mont_curve_t x25519 = {
 	.mont_p_bitLen = 255,
 	.mont_p = (unsigned int[]){
@@ -235,6 +237,27 @@ static mont_curve_t x25519 = {
 		0x00000000, 0x00000000, 0x00000000, 0x00000000
 	}
 };
+#endif
+
+#if defined CONFIG_SOC_RISCV_TELINK_B92
+static mont_curve_t x25519 = {
+	.p_bitLen = 255,
+	.p = (unsigned int[]){
+		0xffffffed, 0xffffffff, 0xffffffff, 0xffffffff,
+		0xffffffff, 0xffffffff, 0xffffffff, 0x7fffffff
+	},
+	.p_h = (unsigned int[]){
+		0x000005a4, 0x00000000, 0x00000000, 0x00000000,
+		0x00000000, 0x00000000, 0x00000000, 0x00000000
+	},
+	.p_n1 = (unsigned int[]){0x286bca1b},
+	.a24 = (unsigned int[]){
+		0x0001db41, 0x00000000, 0x00000000, 0x00000000,
+		0x00000000, 0x00000000, 0x00000000, 0x00000000
+	}
+};
+#endif
+
 #endif /* MBEDTLS_ECP_DP_CURVE25519_ENABLED */
 
 /****************************************************************
@@ -321,7 +344,7 @@ static mont_curve_t *mont_curve_get(const mbedtls_ecp_group *grp)
  * Public functions declaration
  ****************************************************************/
 
-int ecp_alt_b91_backend_check_pubkey(
+int ecp_alt_b9x_backend_check_pubkey(
 	const mbedtls_ecp_group *grp, const mbedtls_ecp_point *pt)
 {
 	int result = MBEDTLS_ERR_ECP_BAD_INPUT_DATA;
@@ -365,7 +388,7 @@ int ecp_alt_b91_backend_check_pubkey(
 	return result;
 }
 
-int ecp_alt_b91_backend_mul(
+int ecp_alt_b9x_backend_mul(
 	mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
 	const mbedtls_mpi *m, const mbedtls_ecp_point *P)
 {
@@ -469,7 +492,7 @@ int ecp_alt_b91_backend_mul(
 	return result;
 }
 
-int ecp_alt_b91_backend_muladd(
+int ecp_alt_b9x_backend_muladd(
 	mbedtls_ecp_group *grp,
 	mbedtls_ecp_point *R, const mbedtls_mpi *m,
 	const mbedtls_ecp_point *P, const mbedtls_mpi *n,

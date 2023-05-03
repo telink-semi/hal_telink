@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2022, Telink
+# Copyright (c) 2022-2023, Telink
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -31,6 +31,6 @@ zephyr_library_sources(
 zephyr_library_sources(
 	./internal/compatibility/ecp_alt.c
 	./internal/compatibility/ecp_curves_alt.c
-	./internal/ecp_alt_b91_backend_test.c
-	./internal/ecp_alt_b91_backend.c
+	./internal/ecp_alt_b9x_backend_test.c
+	./internal/ecp_alt_b9x_backend.c
 	)

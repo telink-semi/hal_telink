@@ -14,10 +14,16 @@ endif()
 
 zephyr_library()
 
+# common headers
 zephyr_include_directories(common)
 zephyr_include_directories(drivers/${SOC}/compatibility_pack)
 zephyr_include_directories(drivers/${SOC}/reg_include)
 zephyr_include_directories(drivers/${SOC})
+
+# B92 specific headers
+if (CONFIG_SOC_RISCV_TELINK_B92)
+zephyr_include_directories(drivers/${SOC}/lib/include/pke/)
+endif()
 
 # soc.c reference sources
 if (NOT CONFIG_PM AND NOT CONFIG_BT_B91 AND CONFIG_SOC_RISCV_TELINK_B91)
@@ -33,17 +39,23 @@ if (CONFIG_SOC_RISCV_TELINK_B92)
 # watchdog.c reference sources
 zephyr_library_sources(drivers/${SOC}/watchdog.c)
 
-# driver lib (sys.c, pm.c, flash_base.c, plic.c, pke.c, rf.c, trng.c)
-zephyr_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/drivers/${SOC}/lib/libdriver.a)
+# drivers' lib (libdriver.a: sys.c, pm.c, flash_base.c, plic.c, rf.c, trng.c)
+# crypto.a contains: pke.c, pke_utility.c
+zephyr_link_libraries(
+	${CMAKE_CURRENT_SOURCE_DIR}/drivers/${SOC}/lib/libdriver.a
+	${CMAKE_CURRENT_SOURCE_DIR}/drivers/${SOC}/lib/crypto.a)
 endif()
 
 # MbedTLS HW acceleration
-if(CONFIG_MBEDTLS AND CONFIG_TELINK_B91_MBEDTLS_HW_ACCELERATION)
+if(CONFIG_MBEDTLS AND CONFIG_TELINK_B9X_MBEDTLS_HW_ACCELERATION)
 	add_subdirectory( crypto/mbedtls )
+if(CONFIG_SOC_RISCV_TELINK_B91)
 	zephyr_library_sources(
 		drivers/${SOC}/pke.c
+	)
+endif()
+	zephyr_library_sources(
 		drivers/${SOC}/aes.c
-		drivers/${SOC}/trng.c
 	)
 endif() # MbedTLS HW acceleration
 
@@ -78,7 +90,9 @@ if(CONFIG_BT_B91 OR CONFIG_IEEE802154_TELINK_B91)
 endif()
 
 # Entropy driver reference sources
-zephyr_library_sources_ifdef(CONFIG_ENTROPY_TELINK_B91_TRNG drivers/${SOC}/trng.c)
+if(CONFIG_ENTROPY_TELINK_B9X_TRNG AND CONFIG_SOC_RISCV_TELINK_B91)
+	zephyr_library_sources(drivers/${SOC}/trng.c)
+endif()
 
 # ADC driver reference sources
 zephyr_library_sources_ifdef(CONFIG_ADC_TELINK_B91 drivers/${SOC}/adc.c)
