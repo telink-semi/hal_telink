@@ -78,7 +78,7 @@ if(CONFIG_BT_B91 OR CONFIG_IEEE802154_TELINK_B91)
 endif()
 
 # Entropy driver reference sources
-zephyr_library_sources_ifdef(CONFIG_ENTROPY_TELINK_B91_TRNG drivers/${SOC}/trng.c)
+zephyr_library_sources_ifdef(CONFIG_ENTROPY_TELINK_B9X_TRNG drivers/${SOC}/trng.c)
 
 # ADC driver reference sources
 zephyr_library_sources_ifdef(CONFIG_ADC_TELINK_B91 drivers/${SOC}/adc.c)
