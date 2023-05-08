@@ -40,7 +40,7 @@ zephyr_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/drivers/${SOC}/lib/libdriver.a
 endif()
 
 # MbedTLS HW acceleration
-if(CONFIG_MBEDTLS AND CONFIG_TELINK_B91_MBEDTLS_HW_ACCELERATION)
+if(CONFIG_MBEDTLS AND CONFIG_TELINK_B9X_MBEDTLS_HW_ACCELERATION)
 	add_subdirectory( crypto/mbedtls )
 	zephyr_library_sources(
 		drivers/${SOC}/pke.c
