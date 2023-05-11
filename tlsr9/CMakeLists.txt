@@ -69,7 +69,7 @@ zephyr_library_sources_ifdef(CONFIG_PWM_TELINK_B9X drivers/${SOC}/pwm.c)
 zephyr_library_sources_ifdef(CONFIG_SPI_TELINK_B91 drivers/${SOC}/gpio.c)
 
 # I2C driver reference sources
-zephyr_library_sources_ifdef(CONFIG_I2C_TELINK_B91 drivers/${SOC}/i2c.c)
+zephyr_library_sources_ifdef(CONFIG_I2C_TELINK_B9X drivers/${SOC}/i2c.c)
 
 # RF driver reference sources
 if(CONFIG_BT_B91 OR CONFIG_IEEE802154_TELINK_B91)
