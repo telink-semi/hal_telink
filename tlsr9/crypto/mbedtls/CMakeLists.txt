@@ -32,5 +32,15 @@ zephyr_library_sources(
 	./internal/compatibility/ecp_alt.c
 	./internal/compatibility/ecp_curves_alt.c
 	./internal/ecp_alt_b91_backend_test.c
-	./internal/ecp_alt_b91_backend.c
 	)
+
+if(CONFIG_SOC_RISCV_TELINK_B91)
+	zephyr_library_sources(
+		./internal/ecp_alt_b91_backend.c
+	)
+endif()
+if(CONFIG_SOC_RISCV_TELINK_B92)
+	zephyr_library_sources(
+		./internal/ecp_alt_b92_backend.c
+	)
+endif()

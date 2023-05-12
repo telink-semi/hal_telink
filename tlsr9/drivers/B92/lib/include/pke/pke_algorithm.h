@@ -23,7 +23,7 @@
  *
  *******************************************************************************************************/
 #include "pke_utility.h"
-#include "eccp_curve.h"
+// #include "eccp_curve.h" -- possibly to be cut out
 #include "ecdh.h"
 #include "ecdsa.h"
 #include "pke_prime.h"

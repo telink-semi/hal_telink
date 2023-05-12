@@ -84,7 +84,12 @@
 
 #if defined(MBEDTLS_ECP_ALT)
 
-#include "pke.h"
+#ifdef CONFIG_SOC_RISCV_TELINK_B91
+#include <pke.h>
+#endif
+#ifdef CONFIG_SOC_RISCV_TELINK_B92
+#include </home/demetro/zephyrproject/modules/hal/telink/tlsr9/drivers/B92/lib/include/pke/pke.h>
+#endif
 
 /* HW accelerator functionality */
 extern int ecp_alt_b91_backend_check_pubkey( const mbedtls_ecp_group *grp, const mbedtls_ecp_point *pt );

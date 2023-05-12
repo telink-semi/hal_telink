@@ -33,7 +33,7 @@ extern "C" {
 
 #include "reg_include/pke_reg.h"
 #include "lib/include/trng.h"
-#include "eccp_curve.h"
+// #include "eccp_curve.h"
 #include "pke_utility.h"
 
 
@@ -57,9 +57,66 @@ extern "C" {
 //#define SUPPORT_SM2
 #define SUPPORT_C25519
 
+/********* operand length *********/
+#define PKE_OPERAND_MAX_WORD_LEN	(0x08)
+#define PKE_OPERAND_MAX_BIT_LEN		(0x100)
+#define ECC_MAX_WORD_LEN			PKE_OPERAND_MAX_WORD_LEN
+#define ECC_MAX_BIT_LEN				PKE_OPERAND_MAX_BIT_LEN
+
 #ifndef   NULL
 #define   NULL				0
 #endif
+
+/**
+ * eccp curve
+ */
+typedef struct
+{
+    unsigned int eccp_p_bitLen;        //bit length of prime p
+    unsigned int eccp_n_bitLen;        //bit length of order n
+    unsigned int *eccp_p;              //prime p
+    unsigned int *eccp_p_h;
+    unsigned int *eccp_p_n1;
+    unsigned int *eccp_a;
+    unsigned int *eccp_b;
+    unsigned int *eccp_Gx;
+    unsigned int *eccp_Gy;
+    unsigned int *eccp_n;              //order of curve or point(Gx,Gy)
+    unsigned int *eccp_n_h;
+    unsigned int *eccp_n_n1;
+} eccp_curve_t;
+
+/********* Curve25519 struct *********/
+typedef struct
+{
+    unsigned int p_bitLen;        //bit length of prime p
+    unsigned int *p;
+    unsigned int *p_h;
+    unsigned int *p_n1;
+    unsigned int *a24;            //(A-2)/4
+    unsigned int *u;
+    unsigned int *v;
+    unsigned int *n;              //order of curve or point(Gx,Gy)
+    unsigned int *n_h;
+    unsigned int *n_n1;
+    unsigned int *h;
+} mont_curve_t;
+
+/********* Edward Curve 25519 struct *********/
+typedef struct
+{
+    unsigned int p_bitLen;        //bit length of prime p
+    unsigned int *p;
+    unsigned int *p_h;
+    unsigned int *p_n1;
+    unsigned int *d;
+    unsigned int *Gx;
+    unsigned int *Gy;
+    unsigned int *n;              //order of curve or point(Gx,Gy)
+    unsigned int *n_h;
+    unsigned int *n_n1;
+    unsigned int *h;
+} edward_curve_t;
 
 //TRNG return code
 enum TRNG_RET_CODE

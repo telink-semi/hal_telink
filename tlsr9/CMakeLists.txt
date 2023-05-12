@@ -45,6 +45,14 @@ if(CONFIG_SOC_RISCV_TELINK_B91)
 		drivers/${SOC}/pke.c
 	)
 endif()
+
+# if(CONFIG_SOC_RISCV_TELINK_B92)
+# zephyr_library_sources(
+# 	drivers/${SOC}/pke.c
+# 	drivers/${SOC}/pke_utility.c
+# )
+# endif()
+
 	zephyr_library_sources(
 		drivers/${SOC}/aes.c
 		drivers/${SOC}/trng.c
