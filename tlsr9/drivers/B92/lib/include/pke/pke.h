@@ -30,10 +30,8 @@
 extern "C" {
 #endif
 
-
-#include "reg_include/pke_reg.h"
-#include "lib/include/trng.h"
-// #include "eccp_curve.h"
+#include <reg_include/pke_reg.h>
+#include <lib/include/trng.h>
 #include "pke_utility.h"
 
 

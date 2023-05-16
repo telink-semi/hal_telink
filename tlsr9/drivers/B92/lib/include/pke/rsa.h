@@ -32,12 +32,6 @@ extern "C" {
 
 #include "pke.h"
 
-
-
-
-
-
-
 //RSA return code
 enum RSA_RET_CODE
 {
