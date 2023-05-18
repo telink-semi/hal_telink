@@ -31,7 +31,6 @@
 /* Module defines */
 #define BLE_THREAD_STACK_SIZE CONFIG_B91_BLE_CTRL_THREAD_STACK_SIZE
 #define BLE_THREAD_PRIORITY CONFIG_B91_BLE_CTRL_THREAD_PRIORITY
-#define BLE_THREAD_PERIOD_MS CONFIG_B91_BLE_CTRL_THREAD_PERIOD_MS
 #define BLE_CONTROLLER_SEMAPHORE_MAX 50
 
 #define BYTES_TO_UINT16(n, p)                                                                      \
@@ -216,6 +215,7 @@ int b91_bt_controller_init()
 	(void)k_thread_create(&b91_bt_controller_thread_data,
 		b91_bt_controller_thread_stack, K_THREAD_STACK_SIZEOF(b91_bt_controller_thread_stack),
 		b91_bt_controller_thread, NULL, NULL, NULL, BLE_THREAD_PRIORITY, 0, K_NO_WAIT);
+	(void)k_thread_name_set(&b91_bt_controller_thread_data, "B91_BT");
 
 	/* Start thread */
 	b91_bt_state = B91_BT_CONTROLLER_STATE_ACTIVE;
