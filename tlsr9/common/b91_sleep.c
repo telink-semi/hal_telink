@@ -58,3 +58,59 @@ bool b91_suspend(uint32_t wake_stimer_tick)
 
 	return result;
 }
+
+#ifdef CONFIG_BOARD_TLSR9518ADK80D_RETENTION
+
+bool b91_deep_sleep(uint32_t wake_stimer_tick)
+{
+	bool result = false;
+	static volatile bool tl_sleep_retention
+	__attribute__ ((section (".retention_data"))) = false;
+
+	extern void tl_context_save(void);
+	extern int soc_b91_init(void);
+
+#if CONFIG_BT_B91
+	enum b91_bt_controller_state state = b91_bt_controller_state();
+
+	if (state == B91_BT_CONTROLLER_STATE_ACTIVE ||
+		state == B91_BT_CONTROLLER_STATE_STOPPING) {
+		blc_pm_setAppWakeupLowPower(wake_stimer_tick, 1);
+		if (!blc_pm_handler()) {
+			rf_set_power_level_index(CONFIG_B91_BLE_CTRL_RF_POWER);
+			result = true;
+		}
+		blc_pm_setAppWakeupLowPower(0, 0);
+	} else {
+		tl_context_save();
+		if (!tl_sleep_retention) {
+			tl_sleep_retention = true;
+			(void)cpu_sleep_wakeup_32k_rc(DEEPSLEEP_MODE_RET_SRAM_LOW64K,
+				PM_WAKEUP_TIMER | PM_WAKEUP_PAD,
+				wake_stimer_tick);
+			tl_sleep_retention = false;
+		} else {
+			soc_b91_init();
+			tl_sleep_retention = false;
+			result = true;
+		}
+	}
+#else
+	tl_context_save();
+	if (!tl_sleep_retention) {
+		tl_sleep_retention = true;
+		(void)cpu_sleep_wakeup_32k_rc(DEEPSLEEP_MODE_RET_SRAM_LOW64K,
+			PM_WAKEUP_TIMER | PM_WAKEUP_PAD,
+			wake_stimer_tick);
+		tl_sleep_retention = false;
+	} else {
+		soc_b91_init();
+		tl_sleep_retention = false;
+		result = true;
+	}
+#endif /* CONFIG_BT_B91 */
+
+	return result;
+}
+
+#endif /* CONFIG_BOARD_TLSR9518ADK80D_RETENTION */
