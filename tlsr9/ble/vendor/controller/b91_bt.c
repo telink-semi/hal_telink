@@ -195,6 +195,11 @@ int b91_bt_controller_init()
 	/* Init IRQs */
 	b91_bt_irq_init();
 
+	/* Reset Radio */
+	rf_radio_reset();
+	rf_reset_dma();
+	rf_baseband_reset();
+
 	/* Init RF driver */
 	rf_drv_ble_init();
 
