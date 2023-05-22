@@ -80,3 +80,10 @@ zephyr_library_sources(
 )
 
 endif() # CONFIG_BT_B91
+
+# Retention feature
+if (CONFIG_BOARD_TLSR9518ADK80D_RETENTION)
+
+zephyr_library_sources(common/b91_context.S)
+
+endif() # CONFIG_BOARD_TLSR9518ADK80D_RETENTION
