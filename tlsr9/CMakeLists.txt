@@ -66,7 +66,7 @@ endif()
 zephyr_library_sources_ifdef(CONFIG_PWM_TELINK_B9X drivers/${SOC}/pwm.c)
 
 # SPI driver reference sources
-zephyr_library_sources_ifdef(CONFIG_SPI_TELINK_B91 drivers/${SOC}/gpio.c)
+zephyr_library_sources_ifdef(CONFIG_SPI_TELINK_B9X drivers/${SOC}/gpio.c)
 
 # I2C driver reference sources
 zephyr_library_sources_ifdef(CONFIG_I2C_TELINK_B9X drivers/${SOC}/i2c.c)
