@@ -61,7 +61,7 @@ endif()
 endif() # MbedTLS HW acceleration
 
 # Flash driver reference sources
-if(CONFIG_SOC_FLASH_TELINK_B91 OR CONFIG_USB_TELINK_B91)
+if(CONFIG_SOC_FLASH_TELINK_B9X OR CONFIG_USB_TELINK_B91)
 	zephyr_library_sources(
 		drivers/${SOC}/flash.c
 		drivers/${SOC}/stimer.c
@@ -77,10 +77,10 @@ endif()
 zephyr_library_sources_ifdef(CONFIG_PWM_TELINK_B9X drivers/${SOC}/pwm.c)
 
 # SPI driver reference sources
-zephyr_library_sources_ifdef(CONFIG_SPI_TELINK_B91 drivers/${SOC}/gpio.c)
+zephyr_library_sources_ifdef(CONFIG_SPI_TELINK_B9X drivers/${SOC}/gpio.c)
 
 # I2C driver reference sources
-zephyr_library_sources_ifdef(CONFIG_I2C_TELINK_B91 drivers/${SOC}/i2c.c)
+zephyr_library_sources_ifdef(CONFIG_I2C_TELINK_B9X drivers/${SOC}/i2c.c)
 
 # RF driver reference sources
 if(CONFIG_BT_B91 OR CONFIG_IEEE802154_TELINK_B91)
@@ -94,8 +94,8 @@ endif()
 zephyr_library_sources_ifdef(CONFIG_ENTROPY_TELINK_B9X_TRNG drivers/${SOC}/trng.c)
 
 # ADC driver reference sources
-zephyr_library_sources_ifdef(CONFIG_ADC_TELINK_B91 drivers/${SOC}/adc.c)
-zephyr_library_sources_ifdef(CONFIG_ADC_TELINK_B91 drivers/${SOC}/gpio.c)
+zephyr_library_sources_ifdef(CONFIG_ADC_TELINK_B9X drivers/${SOC}/adc.c)
+zephyr_library_sources_ifdef(CONFIG_ADC_TELINK_B9X drivers/${SOC}/gpio.c)
 
 # USB driver reference sources
 zephyr_library_sources_ifdef(CONFIG_USB_TELINK_B91 drivers/${SOC}/gpio.c)

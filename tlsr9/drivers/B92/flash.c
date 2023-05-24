@@ -35,6 +35,9 @@
 #include "stimer.h"
 #include "types.h"
 
+#define DISABLE_BTB     __asm__("csrci 	0x7D0,8")
+#define ENABLE_BTB      __asm__("csrsi 	0x7D0,8")
+
 /*
  *	If add flash type, need pay attention to the read uid command and the bit number of status register
  *  Flash trim scheme has been added for P25Q80U.If other types of flash adds this scheme, user need to modify "flash_trim" and "flash_trim_check" function.
@@ -80,6 +83,29 @@ void flash_plic_preempt_config(unsigned char preempt_en,unsigned char threshold)
 	s_flash_preempt_config.threshold=threshold;
 }
 
+/**
+ * @brief 		This function serves to erase a page.
+ * @param[in]   addr	- the start address of the page needs to erase.
+ * @return 		none.
+ * @note        Attention: The block erase takes a long time, please pay attention to feeding the dog in advance.
+ * 				The maximum block erase time is listed at the beginning of this document and is available for viewing.
+ *
+ * 				Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
+ *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.
+ *              Taking into account the factors such as power supply fluctuations, the safe voltage value needs to be greater
+ *              than the minimum chip operating voltage. For the specific value, please make a reasonable setting according
+ *              to the specific application and hardware circuit.
+ *
+ *              Risk description: When the chip power supply voltage is relatively low, due to the unstable power supply,
+ *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
+ *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
+ */
+_attribute_text_sec_ void flash_erase_page(unsigned long addr)
+{
+	DISABLE_BTB;
+	flash_mspi_write_ram(FLASH_PAGE_ERASE_CMD, addr,NULL,0);
+	ENABLE_BTB;
+}
 
 /**
  * @brief 		This function serves to erase a sector.
@@ -100,9 +126,81 @@ void flash_plic_preempt_config(unsigned char preempt_en,unsigned char threshold)
  */
 _attribute_text_sec_ void flash_erase_sector(unsigned long addr)
 {
-	__asm__("csrci 	0x7D0,8");	//disable BTB
+	DISABLE_BTB;
 	flash_mspi_write_ram(FLASH_SECT_ERASE_CMD, addr,NULL,0);
-	__asm__("csrsi 	0x7D0,8");	//enable BTB
+	ENABLE_BTB;
+}
+
+/**
+ * @brief 		This function serves to erase a block(32k).
+ * @param[in]   addr	- the start address of the block needs to erase.
+ * @return 		none.
+ * @note        Attention: The block erase takes a long time, please pay attention to feeding the dog in advance.
+ * 				The maximum block erase time is listed at the beginning of this document and is available for viewing.
+ *
+ * 				Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
+ *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.
+ *              Taking into account the factors such as power supply fluctuations, the safe voltage value needs to be greater
+ *              than the minimum chip operating voltage. For the specific value, please make a reasonable setting according
+ *              to the specific application and hardware circuit.
+ *
+ *              Risk description: When the chip power supply voltage is relatively low, due to the unstable power supply,
+ *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
+ *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
+ */
+_attribute_text_sec_ void flash_erase_32kblock(unsigned long addr)
+{
+	DISABLE_BTB;
+	flash_mspi_write_ram(FLASH_32KBLK_ERASE_CMD, addr,NULL,0);
+	ENABLE_BTB;
+}
+
+/**
+ * @brief 		This function serves to erase a block(64k).
+ * @param[in]   addr	- the start address of the block needs to erase.
+ * @return 		none.
+ * @note        Attention: The block erase takes a long time, please pay attention to feeding the dog in advance.
+ * 				The maximum block erase time is listed at the beginning of this document and is available for viewing.
+ *
+ * 				Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
+ *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.
+ *              Taking into account the factors such as power supply fluctuations, the safe voltage value needs to be greater
+ *              than the minimum chip operating voltage. For the specific value, please make a reasonable setting according
+ *              to the specific application and hardware circuit.
+ *
+ *              Risk description: When the chip power supply voltage is relatively low, due to the unstable power supply,
+ *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
+ *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
+ */
+_attribute_text_sec_ void flash_erase_64kblock(unsigned long addr)
+{
+	DISABLE_BTB;
+	flash_mspi_write_ram(FLASH_64KBLK_ERASE_CMD, addr,NULL,0);
+	ENABLE_BTB;
+}
+
+/**
+ * @brief 		This function serves to erase a chip.
+ * @param[in]   addr	- the start address of the chip needs to erase.
+ * @return 		none.
+ * @note        Attention: The block erase takes a long time, please pay attention to feeding the dog in advance.
+ * 				The maximum block erase time is listed at the beginning of this document and is available for viewing.
+ *
+ * 				Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
+ *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.
+ *              Taking into account the factors such as power supply fluctuations, the safe voltage value needs to be greater
+ *              than the minimum chip operating voltage. For the specific value, please make a reasonable setting according
+ *              to the specific application and hardware circuit.
+ *
+ *              Risk description: When the chip power supply voltage is relatively low, due to the unstable power supply,
+ *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
+ *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
+ */
+_attribute_text_sec_ void flash_erase_chip(void)
+{
+	DISABLE_BTB;
+	flash_mspi_write_ram(FLASH_CHIP_ERASE_CMD, 0,NULL,0);
+	ENABLE_BTB;
 }
 
 
@@ -125,9 +223,9 @@ _attribute_text_sec_ void flash_erase_sector(unsigned long addr)
  */
 _attribute_text_sec_ void flash_read_data(unsigned long addr, unsigned long len, unsigned char *buf)
 {
-	__asm__("csrci 	0x7D0,8");	//disable BTB
+	DISABLE_BTB;
 	flash_mspi_read_ram(FLASH_READ_CMD,addr, buf,len);
-	__asm__("csrsi 	0x7D0,8");	//enable BTB
+	ENABLE_BTB;
 }
 
 
@@ -150,9 +248,9 @@ _attribute_text_sec_ void flash_read_data(unsigned long addr, unsigned long len,
  */
 _attribute_text_sec_ void flash_dread(unsigned long addr, unsigned long len, unsigned char *buf)
 {
-	__asm__("csrci 	0x7D0,8");	//disable BTB
+	DISABLE_BTB;
 	flash_mspi_read_ram(FLASH_DREAD_CMD,addr, buf,len);
-	__asm__("csrsi 	0x7D0,8");	//enable BTB
+	ENABLE_BTB;
 }
 
 /**
@@ -174,9 +272,9 @@ _attribute_text_sec_ void flash_dread(unsigned long addr, unsigned long len, uns
  */
 _attribute_text_sec_ void flash_4read(unsigned long addr, unsigned long len, unsigned char *buf)
 {
-	__asm__("csrci 	0x7D0,8");	//disable BTB
+	DISABLE_BTB;
 	flash_mspi_read_ram(FLASH_X4READ_CMD, addr,  buf,len);
-	__asm__("csrsi 	0x7D0,8");	//enable BTB
+	ENABLE_BTB;
 }
 
 
@@ -200,9 +298,9 @@ _attribute_text_sec_ void flash_4read(unsigned long addr, unsigned long len, uns
 _attribute_text_sec_ unsigned char  flash_read_data_decrypt_check(unsigned long addr,unsigned long plain_len,unsigned char* plain_buf)
 {
 	unsigned char check_data=0;
-     __asm__("csrci 	0x7D0,8");	//disable BTB
+     DISABLE_BTB;
      check_data = flash_mspi_read_decrypt_check_ram(FLASH_READ_CMD,addr,plain_buf,plain_len);
-     __asm__("csrci 	0x7D0,8");	//disable BTB
+     DISABLE_BTB;
      return check_data;
 }
 /**
@@ -225,9 +323,9 @@ _attribute_text_sec_ unsigned char  flash_read_data_decrypt_check(unsigned long 
 _attribute_text_sec_ unsigned char flash_dread_decrypt_check(unsigned long addr,unsigned long plain_len,unsigned char* plain_buf)
 {
 	unsigned char check_data=0;
-	 __asm__("csrci 	0x7D0,8");	//disable BTB
+	 DISABLE_BTB;
 	 check_data = flash_mspi_read_decrypt_check_ram(FLASH_DREAD_CMD,addr,plain_buf,plain_len);
-	 __asm__("csrci 	0x7D0,8");	//disable BTB
+	 DISABLE_BTB;
 	 return check_data;
 }
 /**
@@ -250,9 +348,9 @@ _attribute_text_sec_ unsigned char flash_dread_decrypt_check(unsigned long addr,
 _attribute_text_sec_ unsigned char flash_4read_decrypt_check(unsigned long addr,unsigned long plain_len,unsigned char* plain_buf)
 {
 	unsigned char check_data=0;
-	 __asm__("csrci 	0x7D0,8");	//disable BTB
+	 DISABLE_BTB;
 	 check_data = flash_mspi_read_decrypt_check_ram(FLASH_X4READ_CMD,addr,plain_buf,plain_len);
-	 __asm__("csrci 	0x7D0,8");	//disable BTB
+	 DISABLE_BTB;
 	 return check_data;
 }
 
@@ -273,9 +371,9 @@ _attribute_text_sec_ static void flash_write(unsigned long addr, unsigned long l
 
 	do{
 		nw = len > ns ? ns : len;
-		__asm__("csrci 	0x7D0,8");	//disable BTB
+		DISABLE_BTB;
 		flash_mspi_write_ram(cmd,addr,buf, nw);
-		__asm__("csrsi 	0x7D0,8");	//enable BTB
+		ENABLE_BTB;
 		ns = PAGE_SIZE;
 		addr += nw;
 		buf += nw;
@@ -352,9 +450,9 @@ _attribute_text_sec_ static void flash_write_encrypt(unsigned long addr, unsigne
 
 	do{
 		nw = len > ns ? ns : len;
-		__asm__("csrci 	0x7D0,8");	//disable BTB
+		DISABLE_BTB;
 		flash_mspi_write_encrypt_ram(cmd,addr,buf, nw);
-		__asm__("csrsi 	0x7D0,8");	//enable BTB
+		ENABLE_BTB;
 		ns = PAGE_SIZE;
 		addr += nw;
 		buf += nw;
@@ -433,9 +531,9 @@ _attribute_text_sec_ void flash_quad_page_pragram_encrypt(unsigned long addr, un
 _attribute_text_sec_  unsigned char flash_read_status(flash_command_e cmd)
 {
 	unsigned char status = 0;
-	__asm__("csrci 	0x7D0,8");	//disable BTB
+	DISABLE_BTB;
 	flash_mspi_read_ram(cmd,0,&status,1);
-	__asm__("csrsi 	0x7D0,8");	//enable BTB
+	ENABLE_BTB;
 	return status;
 }
 
@@ -461,7 +559,7 @@ _attribute_text_sec_ void flash_write_status(flash_status_typedef_e type , unsig
 
 	buf[0] = data;
 	buf[1] = data>>8;
-	__asm__("csrci 	0x7D0,8");	//disable BTB
+	DISABLE_BTB;
 	if(type == FLASH_TYPE_8BIT_STATUS){
 		flash_mspi_write_ram(FLASH_WRITE_STATUS_CMD_LOWBYTE,0,buf, 1);
 	}else if(type == FLASH_TYPE_16BIT_STATUS_ONE_CMD){
@@ -470,7 +568,7 @@ _attribute_text_sec_ void flash_write_status(flash_status_typedef_e type , unsig
 		flash_mspi_write_ram(FLASH_WRITE_STATUS_CMD_LOWBYTE,0, (unsigned char *)&buf[0],  1);
 		flash_mspi_write_ram(FLASH_WRITE_STATUS_CMD_HIGHBYTE,0, (unsigned char *)&buf[1],1);
 	}
-	__asm__("csrsi 	0x7D0,8");	//enable BTB
+	ENABLE_BTB;
 
 }
 
@@ -492,9 +590,9 @@ _attribute_text_sec_ void flash_write_status(flash_status_typedef_e type , unsig
  */
 _attribute_text_sec_ void flash_read_otp(unsigned long addr, unsigned long len, unsigned char* buf)
 {
-	__asm__("csrci 	0x7D0,8");	//disable BTB
+	DISABLE_BTB;
 	flash_mspi_read_ram(FLASH_READ_SECURITY_REGISTERS_CMD,addr, buf, len);
-	__asm__("csrsi 	0x7D0,8");	//enable BTB
+	ENABLE_BTB;
 }
 
 /**
@@ -520,9 +618,9 @@ _attribute_text_sec_ void flash_write_otp(unsigned long addr, unsigned long len,
 
 	do{
 		nw = len > ns ? ns : len;
-		__asm__("csrci 	0x7D0,8");	//disable BTB
+		DISABLE_BTB;
 		flash_mspi_write_ram(FLASH_WRITE_SECURITY_REGISTERS_CMD,addr,buf,nw);
-		__asm__("csrsi 	0x7D0,8");	//enable BTB
+		ENABLE_BTB;
 		ns = PAGE_SIZE_OTP;
 		addr += nw;
 		buf += nw;
@@ -547,9 +645,9 @@ _attribute_text_sec_ void flash_write_otp(unsigned long addr, unsigned long len,
  */
 _attribute_text_sec_ void flash_erase_otp(unsigned long addr)
 {
-	__asm__("csrci 	0x7D0,8");	//disable BTB
+	DISABLE_BTB;
 	flash_mspi_write_ram(FLASH_ERASE_SECURITY_REGISTERS_CMD,addr,  NULL,0 );
-	__asm__("csrsi 	0x7D0,8");	//enable BTB
+	ENABLE_BTB;
 }
 
 /**
@@ -570,9 +668,9 @@ _attribute_text_sec_ void flash_erase_otp(unsigned long addr)
 _attribute_text_sec_ unsigned int flash_read_mid(void)
 {
 	unsigned int flash_mid = 0;
-	__asm__("csrci 	0x7D0,8");	//disable BTB
+	DISABLE_BTB;
 	flash_mspi_read_ram(FLASH_GET_JEDEC_ID,0, (unsigned char *)&flash_mid, 3);
-	__asm__("csrsi 	0x7D0,8");	//enable BTB
+	ENABLE_BTB;
 	return flash_mid;
 }
 
@@ -595,12 +693,12 @@ _attribute_text_sec_ unsigned int flash_read_mid(void)
  */
 _attribute_text_sec_ void flash_read_uid(unsigned char idcmd,unsigned char *buf)
 {
-	__asm__("csrci 	0x7D0,8");	//disable BTB
+	DISABLE_BTB;
 	if(idcmd==((FLASH_READ_UID_CMD_GD_PUYA_ZB_TH>>16)&0xff))
 	{
 		flash_mspi_read_ram(FLASH_READ_UID_CMD_GD_PUYA_ZB_TH ,0, buf,16);
 	}
-	__asm__("csrsi 	0x7D0,8");	//enable BTB
+	ENABLE_BTB;
 }
 
 
@@ -627,9 +725,9 @@ _attribute_ram_code_sec_noinline_ void flash_set_xip_config_sram(flash_xip_confi
 }
 _attribute_text_sec_ void flash_set_xip_config(flash_xip_config_t config)
 {
-	__asm__("csrci 	0x7D0,8");	//disable BTB
+	DISABLE_BTB;
 	flash_set_xip_config_sram(config);
-	__asm__("csrsi 	0x7D0,8");	//enable BTB
+	ENABLE_BTB;
 }
 
 
@@ -651,9 +749,9 @@ _attribute_text_sec_ void flash_set_xip_config(flash_xip_config_t config)
  */
 _attribute_text_sec_ void flash_write_config(flash_command_e cmd,unsigned char data)
 {
-	__asm__("csrci 	0x7D0,8");	//disable BTB
+	DISABLE_BTB;
 	flash_mspi_write_ram(cmd,0, &data, 1);
-	__asm__("csrsi 	0x7D0,8");	//enable BTB
+	ENABLE_BTB;
 }
 
 /**
@@ -672,9 +770,9 @@ _attribute_text_sec_ void flash_write_config(flash_command_e cmd,unsigned char d
 _attribute_text_sec_ unsigned char  flash_read_config(void)
 {
 	unsigned char config=0;
-	__asm__("csrci 	0x7D0,8");	//disable BTB
+	DISABLE_BTB;
 	flash_mspi_read_ram(FLASH_READ_CONFIGURE_CMD,0, &config,1);
-	__asm__("csrsi 	0x7D0,8");	//enable BTB
+	ENABLE_BTB;
 	return config;
 }
 /********************************************************************************************************

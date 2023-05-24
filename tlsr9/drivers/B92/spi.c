@@ -881,13 +881,6 @@ void spi_set_rx_dma(spi_sel_e spi_sel, unsigned char* dst_addr)
 	unsigned char rx_dma_chn;
 	if (GSPI_MODULE == spi_sel)
 	{
-		/**
-		 * Bugfix: Only fix the GSPI RX DMA logic bug, the GSPI must be reset once and the value of the digital register will not be cleared, but the clock enable needs to be reconfigured.
-		 * 		changed by jiarong.ji 20221124.
-		 */
-		reg_gspi_clk_set &= ~(FLD_GSPI_DIV_RSTN);//Disable the gspi clock before resetting the gspi. Otherwise, hardware logic errors may occur.
-		gspi_reset();
-		reg_gspi_clk_set |= (FLD_GSPI_DIV_RSTN);
 		rx_dma_chn = s_gspi_slave_rx_dma_chn;
 	}
 	else
@@ -944,12 +937,11 @@ void spi_master_write_read_dma(spi_sel_e spi_sel, unsigned char *addr, unsigned 
 	if (GSPI_MODULE == spi_sel)
 	{
 		/**
-		 * Bugfix: Only fix the GSPI RX DMA logic bug, the GSPI must be reset once and the value of the digital register will not be cleared, but the clock enable needs to be reconfigured.
-		 * 		changed by jiarong.ji 20221124.
+		 * Bugfix: Only fix the GSPI RX DMA logic bug, the GSPI must be reset once and the value of the digital register will not be cleared.
+		 * 		changed by pengxiang.hong 20230329.
 		 */
-		reg_gspi_clk_set &= ~(FLD_GSPI_DIV_RSTN);//Disable the gspi clock before resetting the gspi. Otherwise, hardware logic errors may occur.
 		gspi_reset();
-		reg_gspi_clk_set |= (FLD_GSPI_DIV_RSTN);
+
 		tx_dma_chn = s_gspi_tx_dma_chn;
 		rx_dma_chn = s_gspi_master_rx_dma_chn;
 	}
@@ -1018,12 +1010,10 @@ void spi_master_read_dma_plus(spi_sel_e spi_sel, unsigned char cmd, unsigned int
 	if (GSPI_MODULE == spi_sel)
 	{
 		/**
-		 * Bugfix: Only fix the GSPI RX DMA logic bug, the GSPI must be reset once and the value of the digital register will not be cleared, but the clock enable needs to be reconfigured.
-		 * 		changed by jiarong.ji 20221124.
+		 * Bugfix: Only fix the GSPI RX DMA logic bug, the GSPI must be reset once and the value of the digital register will not be cleared.
+		 * 		changed by pengxiang.hong 20230329.
 		 */
-		reg_gspi_clk_set &= ~(FLD_GSPI_DIV_RSTN);//Disable the gspi clock before resetting the gspi. Otherwise, hardware logic errors may occur.
 		gspi_reset();
-		reg_gspi_clk_set |= (FLD_GSPI_DIV_RSTN);
 		rx_dma_chn = s_gspi_master_rx_dma_chn;
 	}
 	else
@@ -1054,18 +1044,16 @@ void spi_master_read_dma_plus(spi_sel_e spi_sel, unsigned char cmd, unsigned int
  * @param[in]  	rd_mode 	- read mode.dummy or not dummy.
  * @return   	none
  */
-void spi_master_write_read_dma_plus(spi_sel_e spi_sel, unsigned char cmd, unsigned char *addr, unsigned int addr_len, unsigned char *dst_addr, unsigned int rd_len, spi_rd_tans_mode_e rd_mode)
+void spi_master_write_read_dma_plus(spi_sel_e spi_sel, unsigned char cmd, unsigned char *addr, unsigned int addr_len, unsigned char *rd_data, unsigned int rd_len, spi_rd_tans_mode_e rd_mode)
 {
 	unsigned char tx_dma_chn, rx_dma_chn;
 	if (GSPI_MODULE == spi_sel)
 	{
 		/**
-		 * Bugfix: Only fix the GSPI RX DMA logic bug, the GSPI must be reset once and the value of the digital register will not be cleared, but the clock enable needs to be reconfigured.
-		 * 		changed by jiarong.ji 20221124.
+		 * Bugfix: Only fix the GSPI RX DMA logic bug, the GSPI must be reset once and the value of the digital register will not be cleared.
+		 * 		changed by pengxiang.hong 20230329.
 		 */
-		reg_gspi_clk_set &= ~(FLD_GSPI_DIV_RSTN);//Disable the gspi clock before resetting the gspi. Otherwise, hardware logic errors may occur.
 		gspi_reset();
-		reg_gspi_clk_set |= (FLD_GSPI_DIV_RSTN);
 		tx_dma_chn = s_gspi_tx_dma_chn;
 		rx_dma_chn = s_gspi_master_rx_dma_chn;
 	}
@@ -1082,7 +1070,7 @@ void spi_master_write_read_dma_plus(spi_sel_e spi_sel, unsigned char cmd, unsign
 	spi_rx_cnt(spi_sel, rd_len);
 	spi_set_transmode(spi_sel, rd_mode);
 	spi_set_dma(tx_dma_chn, (unsigned int)(addr), reg_spi_data_buf_adr(spi_sel), addr_len);
-	spi_set_dma(rx_dma_chn, reg_spi_data_buf_adr(spi_sel), (unsigned int)(dst_addr), rd_len);
+	spi_set_dma(rx_dma_chn, reg_spi_data_buf_adr(spi_sel), (unsigned int)(rd_data), rd_len);
 	spi_set_cmd(spi_sel, cmd);//when  cmd  disable that  will not sent cmd,just trigger spi send .
 }
 /**
