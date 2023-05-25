@@ -1,27 +1,25 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
-
 /********************************************************************************************************
  * @file	pke.h
  *
  * @brief	This is the header file for B92
  *
  * @author	Driver Group
+ * @date	2020
+ *
+ * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *          All rights reserved.
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *
  *******************************************************************************************************/
 /********* pke version:1.1 *********/
@@ -32,10 +30,8 @@
 extern "C" {
 #endif
 
-
-#include "reg_include/pke_reg.h"
-#include "trng.h"
-#include "eccp_curve.h"
+#include <reg_include/pke_reg.h>
+#include <lib/include/trng.h>
 #include "pke_utility.h"
 
 
@@ -59,9 +55,66 @@ extern "C" {
 //#define SUPPORT_SM2
 #define SUPPORT_C25519
 
+/********* operand length *********/
+#define PKE_OPERAND_MAX_WORD_LEN	(0x08)
+#define PKE_OPERAND_MAX_BIT_LEN		(0x100)
+#define ECC_MAX_WORD_LEN			PKE_OPERAND_MAX_WORD_LEN
+#define ECC_MAX_BIT_LEN				PKE_OPERAND_MAX_BIT_LEN
+
 #ifndef   NULL
 #define   NULL				0
 #endif
+
+/**
+ * eccp curve
+ */
+typedef struct
+{
+    unsigned int eccp_p_bitLen;        //bit length of prime p
+    unsigned int eccp_n_bitLen;        //bit length of order n
+    unsigned int *eccp_p;              //prime p
+    unsigned int *eccp_p_h;
+    unsigned int *eccp_p_n1;
+    unsigned int *eccp_a;
+    unsigned int *eccp_b;
+    unsigned int *eccp_Gx;
+    unsigned int *eccp_Gy;
+    unsigned int *eccp_n;              //order of curve or point(Gx,Gy)
+    unsigned int *eccp_n_h;
+    unsigned int *eccp_n_n1;
+} eccp_curve_t;
+
+/********* Curve25519 struct *********/
+typedef struct
+{
+    unsigned int p_bitLen;        //bit length of prime p
+    unsigned int *p;
+    unsigned int *p_h;
+    unsigned int *p_n1;
+    unsigned int *a24;            //(A-2)/4
+    unsigned int *u;
+    unsigned int *v;
+    unsigned int *n;              //order of curve or point(Gx,Gy)
+    unsigned int *n_h;
+    unsigned int *n_n1;
+    unsigned int *h;
+} mont_curve_t;
+
+/********* Edward Curve 25519 struct *********/
+typedef struct
+{
+    unsigned int p_bitLen;        //bit length of prime p
+    unsigned int *p;
+    unsigned int *p_h;
+    unsigned int *p_n1;
+    unsigned int *d;
+    unsigned int *Gx;
+    unsigned int *Gy;
+    unsigned int *n;              //order of curve or point(Gx,Gy)
+    unsigned int *n_h;
+    unsigned int *n_n1;
+    unsigned int *h;
+} edward_curve_t;
 
 //TRNG return code
 enum TRNG_RET_CODE
