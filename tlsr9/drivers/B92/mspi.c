@@ -76,21 +76,3 @@ _attribute_ram_code_sec_noinline_  void mspi_read(unsigned char *data, unsigned 
 	}
 	while (mspi_is_busy());
 }
-
-/**
- * @brief      	This function serves to set mspi clock
- * @param[in]  	src 	- select the mspi clock source
- * @param[in]  	div 	- set the mspi clock divider.
- * @return   	none
- */
-void mspi_clock_init(mspi_src_e src, unsigned char div)
-{
-	unsigned char mspi_clk = 0x80;
-	if(MSPI_PLL_CLK == src)
-	{
-		mspi_clk |= BIT(6);
-	}
-	mspi_clk |= (div & BIT_RNG(0, 5));
-	write_reg16(0x1401c0, mspi_clk);
-}
-
