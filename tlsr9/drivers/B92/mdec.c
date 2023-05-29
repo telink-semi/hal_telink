@@ -66,5 +66,3 @@ unsigned char mdec_read_dat(unsigned char *dat)
 	}
 	return 0;
 }
-
-

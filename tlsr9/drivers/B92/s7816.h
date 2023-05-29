@@ -126,4 +126,3 @@ extern void s7816_send_byte(uart_num_e uart_num, unsigned char tx_data);
 
 
 #endif /* S7816_H_ */
-

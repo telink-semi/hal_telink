@@ -310,7 +310,8 @@ unsigned char i2c_master_write_read(unsigned char id, unsigned char *wr_data, un
  * @param[in]  id - to set the slave ID.for kite slave ID=0x5c,for eagle slave ID=0x5a.
  * @param[in]  data - The data to be sent.
  * @param[in]  len - This length is the total length, including both the length of the slave RAM address and the length of the data to be sent.
- * @return     none.
+ * @return     none
+ * @note       data: must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
 void i2c_master_write_dma(unsigned char id, unsigned char *data, unsigned int len);
 
@@ -318,9 +319,10 @@ void i2c_master_write_dma(unsigned char id, unsigned char *data, unsigned int le
 /**
  * @brief      This function serves to read a packet of data from the specified address of slave device by dma
  * @param[in]  id - to set the slave ID.for kite slave ID=0x5c,for eagle slave ID=0x5a.
- * @param[in]  data - Store the read data
+ * @param[in]  rx_data - Store the read data.
  * @param[in]  len - The total length of the data read back.
  * @return     none
+ * @note       rx_data: must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
 void i2c_master_read_dma(unsigned char id, unsigned char *rx_data, unsigned int len);
 
@@ -330,6 +332,7 @@ void i2c_master_read_dma(unsigned char id, unsigned char *rx_data, unsigned int 
  * @param[in]  data - the pointer of tx_buff.
  * @param[in]  len - The total length of the data .
  * @return     none.
+ * @note       data: must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
 void i2c_slave_set_tx_dma( unsigned char *data, unsigned int len);
 
@@ -344,6 +347,7 @@ void i2c_slave_set_tx_dma( unsigned char *data, unsigned int len);
  * @param[in]  data - the pointer of rx_buff.
  * @param[in]  len  - the receive length of DMA,The maximum transmission length of DMA is 0xFFFFFC bytes, so dont'n over this length.
  * @return     none.
+ * @note       data: must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
 void i2c_slave_set_rx_dma(unsigned char *data, unsigned int len);
 
@@ -559,13 +563,3 @@ unsigned char i2c1_m_master_write_read(unsigned char id, unsigned char *wr_data,
 
 
 #endif
-
-
-
-
-
-
-
-
-
-

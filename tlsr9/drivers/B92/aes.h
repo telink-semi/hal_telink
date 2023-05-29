@@ -44,6 +44,8 @@
  *                                         global constants                                                           *
  *********************************************************************************************************************/
 
+#define AES_MAX_CNT   4
+
 /**********************************************************************************************************************
  *                                           global macro                                                             *
  *********************************************************************************************************************/
@@ -74,6 +76,16 @@ typedef enum{
 int aes_encrypt(unsigned char *key, unsigned char* plaintext, unsigned char *result);
 
 /**
+ * @brief     This function refer to encrypt when BT is connected. AES module register must be used by word, all data need big endian.
+ * @param[in] key       - the key of encrypt.
+ * @param[in] plaintext - the plaintext of encrypt.
+ * @param[in] result    - the result of encrypt.
+ * @return    none
+ * @note      Invoking this interface avoids the risk of AES conflicts when BT is connected.
+ */
+int aes_encrypt_bt_en(unsigned char* key, unsigned char* plaintext, unsigned char *result);
+
+/**
  * @brief     This function refer to decrypt. AES module register must be used by word., all data need big endian.
  * @param[in] key         - the key of decrypt.
  * @param[in] decrypttext - the decrypttext of decrypt.
@@ -81,6 +93,16 @@ int aes_encrypt(unsigned char *key, unsigned char* plaintext, unsigned char *res
  * @return    none.
  */
 int aes_decrypt(unsigned char *key, unsigned char* decrypttext, unsigned char *result);
+
+/**
+ * @brief     This function refer to decrypt when BT is connected. AES module register must be used by word.all data need big endian.
+ * @param[in] key         - the key of decrypt.
+ * @param[in] decrypttext - the text of decrypt.
+ * @param[in] result      - the result of decrypt.
+ * @return    none.
+ * @note      Invoking this interface avoids the risk of AES conflicts when BT is connected.
+ */
+int aes_decrypt_bt_en(unsigned char* key, unsigned char* plaintext, unsigned char *result);
 
 /**
  * @brief     This function refer to set the base addr of data which use in CEVA module
@@ -93,8 +115,10 @@ void aes_set_em_base_addr(unsigned int addr);
  * @brief     This function refer to encrypt/decrypt to set key and data. AES module register must be used by word.
  * 				All data need Little endian.
  * @param[in] key  - the key of encrypt/decrypt.
- * @param[in] data - the data which to do encrypt/decrypt.
- * @return    none
+ * @param[in] data - the data which to do encrypt/decrypt. The address is 32 bits, but only the lower 16 bits are used.
+ * @return    none.
+ * @note	  reg_embase_addr (32bit) +reg_aes_ptr (16bit) is the actual access address.
+ * 			  reg_aes_ptr is only 16bit, so access space is only 64K. Adjusting reg_embase_addr changes the initial address of 64K.
  */
 void aes_set_key_data(unsigned char *key, unsigned char* data);
 
@@ -107,10 +131,12 @@ void aes_get_result(unsigned char *result);
 
 /**
  * @brief     This function refer to match the rpa.
- * @param[in] irk         - the irk sequence, max 16 group(16byte a group).
+ * @param[in] irk         - the irk sequence, max 16 group(16byte a group). The address is 32 bits, but only the lower 16 bits are used.
  * @param[in] irk_len	  - the irk group num.
  * @param[in] rpa      	  - the rpa which want to match.
  * @return    0xff-not matched, (0x0-0x0f)-the match group index.
+ * @note	  reg_embase_addr (32bit) +reg_aes_irk_ptr (16bit) is the actual access address.
+ * 			  reg_aes_irk_ptr is only 16bit, so access space is only 64K. Adjusting reg_embase_addr changes the initial address of 64K.
  */
 unsigned char aes_rpa_match(unsigned char *irk, unsigned char irk_len, unsigned char *rpa);
 

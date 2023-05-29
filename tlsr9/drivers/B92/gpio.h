@@ -66,6 +66,12 @@ typedef enum{
 }gpio_group_e;
 /**
  *  @brief  Define GPIO types
+ *  @note	the following two points need to noticed when using PC5 GPIO port:
+ *  		1. This pin is not recommend to use as wake-up source;
+ *  		2. Since this pin is output function by default, even if it is configured with pull-up/pull-down retention,
+ *  		when deep/deep Retention is invoked, it can't maintain high/low level and an abnormal level will occur.
+ *  		Therefore, this pin can't be used in applications where a certain level state needs to be maintained all the time.
+ *  		The PG group can only be used as an mspi pin and cannot be used as a wake-up source.
  */
 typedef enum{
 		GPIO_GROUPA    = 0x000,
@@ -190,7 +196,7 @@ typedef enum{
 		GPIO_FC_PF5 =GPIO_PF5,
 		GPIO_FC_PF6 =GPIO_PF6, //Not support GSPI_CSN3,GSPI_CSN2,GSPI_CSN1,I2C1_SCL_IO,I2C1_SDA_IO in enum "gpio_func_e"
 		GPIO_FC_PF7 =GPIO_PF7, //Not support GSPI_CSN3,GSPI_CSN2,GSPI_CSN1,I2C1_SCL_IO,I2C1_SDA_IO in enum "gpio_func_e"
-		GPIO_NONE_PIN =0xfff,
+		GPIO_NONE_PIN =0x00,
 }gpio_func_pin_e;
 
 /**
@@ -754,8 +760,8 @@ void gpio_shutdown(gpio_pin_e pin);
 void gpio_set_up_down_res(gpio_pin_e pin, gpio_pull_type_e up_down_res);
 
 /**
- * @brief     This function set pin's 30k pull-up registor.
- * @param[in] pin - the pin needs to set its pull-up registor.
+ * @brief     This function set pin's 30k pull-up register.
+ * @param[in] pin - the pin needs to set its pull-up register.
  * @return    none.
  */
 void gpio_set_pullup_res_30k(gpio_pin_e pin);
@@ -781,7 +787,3 @@ static inline void gpio_set_src_irq_group(gpio_group_e group)
 }
 
 #endif
-
-
-
-

@@ -869,6 +869,7 @@ void audio_tx_dma_dis(dma_chn_e chn);
  * @param[in] data_len     - the length of dma rx size by byte
  * @param[in] head_of_list - the head address of dma llp.
  * @return    none
+ * @note      dst_addr : must be aligned by word (4 bytes), otherwise the program will enter an exception
  */
 void audio_rx_dma_config(dma_chn_e chn,unsigned short *dst_addr,unsigned int data_len,dma_chain_config_t *head_of_list);
 
@@ -879,6 +880,7 @@ void audio_rx_dma_config(dma_chn_e chn,unsigned short *dst_addr,unsigned int dat
  * @param[in] dst_addr    - the dma address of destination.
  * @param[in] data_len    - the length of dma size by byte.
  * @return    none
+ * @note      dst_addr : must be aligned by word (4 bytes), otherwise the program will enter an exception
  */
 void audio_rx_dma_add_list_element(dma_chain_config_t * rx_config,dma_chain_config_t *llpointer ,unsigned short * dst_addr,unsigned int data_len);
 
@@ -889,6 +891,7 @@ void audio_rx_dma_add_list_element(dma_chain_config_t * rx_config,dma_chain_conf
  * @param[in] in_buff     - the pointer of rx_buff.
  * @param[in] buff_size   - the size of rx_buff.
  * @return    none
+ * @note      in_buff : must be aligned by word (4 bytes), otherwise the program will enter an exception
  */
 void audio_rx_dma_chain_init (audio_fifo_chn_e rx_fifo_chn,dma_chn_e chn,unsigned short * in_buff,unsigned int buff_size);
 
@@ -899,6 +902,7 @@ void audio_rx_dma_chain_init (audio_fifo_chn_e rx_fifo_chn,dma_chn_e chn,unsigne
  * @param[in] data_len     - the length of dma rx size by byte
  * @param[in] head_of_list - the head address of dma llp.
  * @return    none
+ * @note      src_addr : must be aligned by word (4 bytes), otherwise the program will enter an exception
  */
 void audio_tx_dma_config(dma_chn_e chn,unsigned short * src_addr, unsigned int data_len,dma_chain_config_t * head_of_list);
 
@@ -909,6 +913,7 @@ void audio_tx_dma_config(dma_chn_e chn,unsigned short * src_addr, unsigned int d
  * @param[in] src_addr    - the address of source
  * @param[in] data_len    - the length of dma size by byte.
  * @return    none
+ * @note      src_addr : must be aligned by word (4 bytes), otherwise the program will enter an exception
  */
 void audio_tx_dma_add_list_element(dma_chain_config_t *config_addr,dma_chain_config_t *llpointer ,unsigned short * src_addr,unsigned int data_len);
 
@@ -919,6 +924,7 @@ void audio_tx_dma_add_list_element(dma_chain_config_t *config_addr,dma_chain_con
  * @param[in] out_buff    - the pointer of tx_buff.
  * @param[in] buff_size   - the size of tx_buff.
  * @return    none
+ * @note      out_buff : must be aligned by word (4 bytes), otherwise the program will enter an exception
  */
 void audio_tx_dma_chain_init (audio_fifo_chn_e tx_fifo_chn,dma_chn_e chn,unsigned short * out_buff,unsigned int buff_size);
 
@@ -978,6 +984,7 @@ void audio_codec_stream0_input_config(codec_stream0_input_src_e source,audio_sam
   * @brief This function serves to configure audio stream0 channel select swap.
   * @param[in]  fifo_chn        - select channel fifo
   * @param[in]  source          - audio stream0 input source select.
+  * @param[in]  rate            - select channel sample rate
   * @return    none
   * @note
   * Condition 1 (default)
@@ -988,15 +995,18 @@ void audio_codec_stream0_input_config(codec_stream0_input_src_e source,audio_sam
   * (1) audio_swap_stream0_data(DATA_INVERT_EN)
   * (2) mono:fifo0->ch1_r on
   *          fifo1->ch0_l on
+  *
+  *
   */
- void audio_codec_swap_stream0_data(audio_fifo_chn_e fifo_chn,codec_stream0_input_src_e source);
+ void audio_codec_swap_stream0_data(audio_fifo_chn_e fifo_chn,codec_stream0_input_src_e source,audio_sample_rate_e rate);
 
  /**
   * 	@brief      This function serves to set stream0 input path.
-  * 	@param[in]  ch    - channel selection
+  * 	@param[in]  che_en  - channel selection
+  * 	@param[in]  rate    - select channel sample rate
   * 	@return     none
   */
- void audio_set_codec_stream0_path(audio_chn_sel_e ch);
+ void audio_set_codec_stream0_path(codec_stream0_input_src_e che_en,audio_sample_rate_e rate);
 
  /**
   * @brief This function serves to configure audio stream1 fifo input.
@@ -1025,7 +1035,8 @@ void audio_codec_stream0_input_config(codec_stream0_input_src_e source,audio_sam
  /**
   * @brief This function serves to configure audio stream1 channel select swap.
   * @param[in]  fifo_chn        - select channel fifo
-  * @param[in]  source          - select channel .
+  * @param[in]  source          - audio stream1 input source select.
+  * @param[in]  rate            - select channel sample rate
   * @return    none
   * @note
   * Condition 1 (default)
@@ -1036,15 +1047,18 @@ void audio_codec_stream0_input_config(codec_stream0_input_src_e source,audio_sam
   * (1) audio_swap_stream1_data(DATA_INVERT_EN)
   * (2) mono:fifo0->ch1_r on
   *          fifo1->ch0_l on
+  *
+  *
   */
- void audio_codec_swap_stream1_data(audio_fifo_chn_e fifo_chn,codec_stream1_input_src_e source);
+ void audio_codec_swap_stream1_data(audio_fifo_chn_e fifo_chn,codec_stream1_input_src_e source,audio_sample_rate_e rate);
 
  /**
-  * 	@brief      This function serves to set stream1 input path.
-  * 	@param[in]  ch  -channel selection
-  * 	@return     none
-  */
- void audio_set_codec_stream1_path(audio_chn_sel_e ch);
+   * 	@brief      This function serves to set stream1 input path.
+   * 	@param[in]  che_en  - channel selection
+   * 	@param[in]  rate    - select channel sample rate
+   * 	@return     none
+   */
+ void audio_set_codec_stream1_path(codec_stream1_input_src_e che_en,audio_sample_rate_e rate);
 
  /**
   * 	@brief      This function serves to  swap data .

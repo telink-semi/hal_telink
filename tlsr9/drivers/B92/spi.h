@@ -147,7 +147,7 @@ typedef enum{
 }spi_slave_read_cmd_e;
 
 /**
- * @brief  Define the SPI command for b92m gspi/lspi slave.
+ * @brief  Define the SPI command for b91m gspi/lspi slave.
  */
 typedef enum{
 	SPI_READ_STATUS_SINGLE_CMD  = 0x05,
@@ -1401,6 +1401,7 @@ void spi_set_slave_rx_dma_config(spi_sel_e spi_sel,dma_chn_e chn);
  * @param[in]  	spi_sel     - the spi module.
  * @param[in]  	src_addr 	- the address of source.
  * @param[in]  	len 		- the length of data.
+ * @return		none
  * */
 _attribute_ram_code_sec_ void spi_set_tx_dma(spi_sel_e spi_sel, unsigned char* src_addr,unsigned int len);
 
@@ -1409,6 +1410,8 @@ _attribute_ram_code_sec_ void spi_set_tx_dma(spi_sel_e spi_sel, unsigned char* s
  * @param[in]  	spi_sel     - the spi module.
  * @param[in]  	dst_addr 	- the address of destination.
  * @param[in]  	len 		- the length of data.
+ * @return		none
+ * @note	  	dst_addr : must be aligned by word (4 bytes), otherwise the program will enter an exception.
  * */
 _attribute_ram_code_sec_ void spi_set_rx_dma(spi_sel_e spi_sel, unsigned char* dst_addr);
 
@@ -1418,6 +1421,7 @@ _attribute_ram_code_sec_ void spi_set_rx_dma(spi_sel_e spi_sel, unsigned char* d
  * @param[in] 	src_addr 	- the pointer to the data for write.
  * @param[in] 	len 		- write length.
  * @return  	none
+ * @note	  	src_addr : must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
 void spi_master_write_dma(spi_sel_e spi_sel, unsigned char *src_addr, unsigned int len);
 
@@ -1430,6 +1434,7 @@ void spi_master_write_dma(spi_sel_e spi_sel, unsigned char *src_addr, unsigned i
  * @param[in] 	data 		- the pointer to the data for read.
  * @param[in] 	data_len 	- read length.
  * @return  	none
+ * @note	  	addr/data : must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
 void spi_master_write_read_dma(spi_sel_e spi_sel, unsigned char *addr, unsigned int addr_len, unsigned char *data, unsigned int data_len);
 
@@ -1442,6 +1447,7 @@ void spi_master_write_read_dma(spi_sel_e spi_sel, unsigned char *addr, unsigned 
  * @param[in]  	data_len 	- length in byte of the data need to write.
  * @param[in]  	wr_mode 	- write mode.dummy or not dummy.
  * @return   	none
+ * @note	  	data : must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
 void spi_master_write_dma_plus(spi_sel_e spi_sel, unsigned char cmd, unsigned int addr, unsigned char *data, unsigned int data_len, spi_wr_tans_mode_e wr_mode);
 
@@ -1454,6 +1460,7 @@ void spi_master_write_dma_plus(spi_sel_e spi_sel, unsigned char cmd, unsigned in
  * @param[in]  	data_len 	- length in byte of the data need to read.
  * @param[in]  	rd_mode 	- read mode.dummy or not dummy.
  * @return   	none
+ * @note	  	dst_addr : must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
 void spi_master_read_dma_plus(spi_sel_e spi_sel, unsigned char cmd, unsigned int addr, unsigned char *dst_addr, unsigned int data_len, spi_rd_tans_mode_e rd_mode);
 
@@ -1465,12 +1472,13 @@ void spi_master_read_dma_plus(spi_sel_e spi_sel, unsigned char cmd, unsigned int
  * 2.must cmd is 0,addr_len is equal to rd_len,rd_mode is SPI_MODE_WRITE_AND_READ.
  * @param[in]  	spi_sel 	- the spi module.
  * @param[in]  	cmd 		- cmd one byte will first write.
- * @param[in]  	addr 		- the address of slave.
+ * @param[in]  	addr 		- the pointer to the cmd and address for write.
  * @param[in]  	addr_len 	- the length of address.
  * @param[in]  	rd_data 	- pointer to the buffer that will cache the reading out data.
  * @param[in]  	rd_len	 	- length in byte of the data need to read.
  * @param[in]  	rd_mode 	- read mode.dummy or not dummy.
  * @return   	none
+ * @note	  	addr/rd_data : must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
 void spi_master_write_read_dma_plus(spi_sel_e spi_sel, unsigned char cmd, unsigned char *addr, unsigned int addr_len, unsigned char *rd_data, unsigned int rd_len, spi_rd_tans_mode_e rd_mode);
 /**

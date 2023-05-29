@@ -114,6 +114,24 @@
  *********************************************************************************************************************/
 
 /**
+ * @brief	Select how you want to start IQ sampling.
+ */
+typedef enum
+{
+	RF_HADM_IQ_SAMPLE_SYNC_MODE,
+	RF_HADM_IQ_SAMPLE_RXEN_MODE
+}rf_hadm_iq_sample_mode_e;
+
+/**
+ * @brief	Select whether the antenna clock is normally open or turned on when the antenna is switched.
+ */
+typedef enum
+{
+	RF_HADM_ANT_CLK_ALWAYS_ON_MODE,
+	RF_HADM_ANT_CLK_SWITCH_ON_MODE
+}rf_hadm_ant_clk_mode_e;
+
+/**
  * @brief	select baseband transmission unit
  */
 typedef enum{
@@ -139,15 +157,18 @@ typedef enum{
 
 /*
  * @brief  Data length type of AOA/AOD sampling.
- * @note   Attention:When the iq data is 20bit, it cannot be used with the 0.25us mode, which will cause the sampling data to overflow.
+ * |                 |                         |
+ * | :-------------- | :---------------------- |
+ * |   	 <15:8>      |          <7:0>          |
+ * |   IQ byte len   |   iq data bit num mode  |
  */
 typedef enum{
-	IQ_8_BIT_MODE   		= 0,
-	IQ_16_BIT_MODE  		= 1,
-	IQ_16_BIT_LOW_MODE		= 2,
-	IQ_16_BIT_HIGH_MODE		= 3,
-	IQ_20_BIT_MODE			= 4
-}rf_aoa_aod_iq_data_mode_e;
+	IQ_8_BIT_MODE   		= 0x0200,
+	IQ_16_BIT_MODE  		= 0x0401,
+	IQ_16_BIT_LOW_MODE		= 0x0402,
+	IQ_16_BIT_HIGH_MODE		= 0x0403,
+	IQ_20_BIT_MODE			= 0x0504
+}rf_iq_data_mode_e;
 
 
 
@@ -195,71 +216,175 @@ typedef enum {
 } rf_status_e;
 
 /**
+ * @brief	Define function to set tx chanel or rx chanel.
+ */
+typedef enum
+{
+	TX_CHANNEL		= 0,
+	RX_CHANNEL		= 1,
+}rf_trx_chn_e;
+
+/**
  *  @brief  Define power list of RF.
+ *  @note	1.The energy value with the 1.8V keyword is the energy value measured
+ *  		when the IO_Config pin is set high; In this case, since the IO voltage
+ *  		is set to 1.8V, the VDDO3 voltage supplying the RF is 1.8V, resulting
+ *  		in an energy drop; therefore, when the IO_config configuration is high,
+ *  		the energy setting with the 1.8V keyword should be selected.
+ *  		2.The following energy values are obtained by testing on the A2 chip;
+ *  		Since the	 IO1.8V of the A2 chip is actually high, this energy value
+ *  		is high; the A3 chip will fix this problem
  */
 typedef enum {
 	 /*VBAT*/
-	 RF_POWER_P9p11dBm = 63,  /**<  9.1 dbm */
-	 RF_POWER_P8p57dBm  = 52, /**<  8.6 dbm */
-	 RF_POWER_P8p05dBm  = 49, /**<  8.1 dbm */
-	 RF_POWER_P7p45dBm  = 45, /**<  7.5 dbm */
-	 RF_POWER_P6p98dBm  = 42, /**<  7.0 dbm */
-	 RF_POWER_P5p68dBm  = 36, /**<  6.0 dbm */
+	 RF_POWER_P10p20dBm = 63, /**<  10.2 dbm */
+	 RF_POWER_P9p57dBm  = 57, /**<  9.6 dbm */
+	 RF_POWER_P9p15dBm  = 52, /**<  9.1 dbm */
+	 RF_POWER_P8p82dBm  = 49, /**<  8.8 dbm */
+	 RF_POWER_P8p25dBm  = 45, /**<  8.2 dbm */
+	 RF_POWER_P7p75dBm  = 42, /**<  7.7 dbm */
+	 RF_POWER_P7p00dBm  = 39, /**<  7.0 dbm */
+	 RF_POWER_P6p32dBm  = 36, /**<  6.3 dbm */
+	 RF_POWER_P5p21dBm  = 30, /**<  5.2 dbm */
+	 RF_POWER_P4p45dBm  = 28, /**<  4.5 dbm */
+	 RF_POWER_P3p85dBm  = 26, /**<  3.9 dbm */
 	 /*VANT*/
-	 RF_POWER_P4p35dBm  = BIT(7) | 63,   /**<   4.4 dbm */
-	 RF_POWER_P3p83dBm  = BIT(7) | 55,   /**<   3.8 dbm */
-	 RF_POWER_P3p25dBm  = BIT(7) | 49,   /**<   3.3 dbm */
-	 RF_POWER_P2p79dBm  = BIT(7) | 45,   /**<   2.8 dbm */
-	 RF_POWER_P2p32dBm  = BIT(7) | 41,   /**<   2.3 dbm */
-	 RF_POWER_P1p72dBm  = BIT(7) | 38,   /**<   1.7 dbm */
-	 RF_POWER_P0p80dBm  = BIT(7) | 33,   /**<   0.8 dbm */
-	 RF_POWER_P0p01dBm  = BIT(7) | 29,   /**<   0.0 dbm */
-	 RF_POWER_N0p53dBm  = BIT(7) | 27,   /**<  -0.5 dbm */
-	 RF_POWER_N1p37dBm  = BIT(7) | 24,   /**<  -1.4 dbm */
-	 RF_POWER_N2p01dBm  = BIT(7) | 22,   /**<  -2.0 dbm */
-	 RF_POWER_N3p37dBm  = BIT(7) | 19,   /**<  -3.4 dbm */
-	 RF_POWER_N4p77dBm  = BIT(7) | 16,   /**<  -4.8 dbm */
-	 RF_POWER_N6p54dBm = BIT(7) | 13,     /**<  -6.5 dbm */
-	 RF_POWER_N8p78dBm = BIT(7) | 10,     /**<  -8.8 dbm */
-	 RF_POWER_N12p06dBm = BIT(7) | 6,    /**<  -12.1 dbm */
-	 RF_POWER_N17p83dBm = BIT(7) | 4,    /**<  -17.8 dbm */
-	 RF_POWER_N23p54dBm = BIT(7) | 2,    /**<  -23.5 dbm */
+	 RF_POWER_P3p52dBm  = BIT(7) | 63,   /**<   3.5 dbm */
+	 RF_POWER_P3p00dBm  = BIT(7) | 57,   /**<   3.0 dbm */
+	 RF_POWER_P2p51dBm  = BIT(7) | 51,   /**<   2.5 dbm */
+	 RF_POWER_P2p00dBm  = BIT(7) | 46,   /**<   2.0 dbm */
+	 RF_POWER_P1p57dBm  = BIT(7) | 43,   /**<   1.6 dbm */
+	 RF_POWER_P0p95dBm  = BIT(7) | 39,   /**<   1.0 dbm */
+	 RF_POWER_P0p43dBm  = BIT(7) | 36,   /**<   0.4 dbm */
+	 RF_POWER_P0p04dBm  = BIT(7) | 34,   /**<   0.0 dbm */
+	 RF_POWER_N0p41dBm  = BIT(7) | 31,   /**<  -0.4 dbm */
+	 RF_POWER_N0p87dBm  = BIT(7) | 29,   /**<  -0.9 dbm */
+	 RF_POWER_N1p38dBm  = BIT(7) | 27,   /**<  -1.4 dbm */
+	 RF_POWER_N2p58dBm  = BIT(7) | 23,   /**<  -2.5 dbm */
+	 RF_POWER_N3p96dBm  = BIT(7) | 19,   /**<  -3.9 dbm */
+	 RF_POWER_N5p85dBm  = BIT(7) | 15,   /**<  -5.8 dbm */
+	 RF_POWER_N9p03dBm  = BIT(7) | 10,   /**<  -9.0 dbm */
+	 RF_POWER_N13p40dBm = BIT(7) | 6,    /**<  -13.4 dbm */
+	 RF_POWER_N16p80dBm = BIT(7) | 4,    /**<  -16.8 dbm */
+	 RF_POWER_N22p67dBm = BIT(7) | 2,    /**<  -22.5 dbm */
 
 	 RF_POWER_N30dBm    = 0xff,          /**<  -30 dbm */
 	 RF_POWER_N50dBm    = BIT(7) | 0,    /**<  -50 dbm */
 
+//	 The following energy values are obtained by testing on the A2 chip; Since the
+//	 IO1.8V of the A2 chip is actually high, this energy value is high; the A3 chip
+//	 will fix this problem
+	 /*VBAT*/
+	 RF_1V8_POWER_P6p15dBm = 63, /**<  6.2 dbm */
+	 RF_1V8_POWER_P5p56dBm = 56, /**<  5.5 dbm */
+	 RF_1V8_POWER_P5p00dBm = 51, /**<  5.0 dbm */
+	 RF_1V8_POWER_P4p50dBm = 48, /**<  4.5 dbm */
+	 RF_1V8_POWER_P4p20dBm = 44, /**<  4.2 dbm */
+	 RF_1V8_POWER_P3p90dBm = 42, /**<  3.9 dbm */
+	 RF_1V8_POWER_P3p50dBm = 40, /**<  3.5 dbm */
+	 /*VANT*/
+	 RF_1V8_POWER_P3p30dBm  = BIT(7) | 63,   /**<   3.3 dbm */
+	 RF_1V8_POWER_P2p80dBm  = BIT(7) | 55,   /**<   2.8 dbm */
+	 RF_1V8_POWER_P2p25dBm  = BIT(7) | 49,   /**<   2.3 dbm */
+	 RF_1V8_POWER_P1p83dBm  = BIT(7) | 45,   /**<   1.8 dbm */
+	 RF_1V8_POWER_P1p31dBm  = BIT(7) | 41,   /**<   1.3 dbm */
+	 RF_1V8_POWER_P0p85dBm  = BIT(7) | 38,   /**<   0.8 dbm */
+	 RF_1V8_POWER_P0p05dBm  = BIT(7) | 33,   /**<   0.0 dbm */
+	 RF_1V8_POWER_N0p69dBm  = BIT(7) | 29,   /**<  -0.7 dbm */
+	 RF_1V8_POWER_N1p22dBm  = BIT(7) | 27,   /**<  -1.2 dbm */
+	 RF_1V8_POWER_N2p07dBm  = BIT(7) | 24,   /**<  -2.0 dbm */
+	 RF_1V8_POWER_N2p73dBm  = BIT(7) | 22,   /**<  -2.7 dbm */
+	 RF_1V8_POWER_N3p80dBm  = BIT(7) | 19,   /**<  -3.8 dbm */
+	 RF_1V8_POWER_N5p17dBm  = BIT(7) | 16,   /**<  -5.2 dbm */
+	 RF_1V8_POWER_N6p72dBm  = BIT(7) | 13,   /**<  -6.7 dbm */
+	 RF_1V8_POWER_N9p67dBm  = BIT(7) | 10,   /**<  -9.7 dbm */
+	 RF_1V8_POWER_N13p10dBm = BIT(7) | 6,    /**<  -13.1 dbm */
+	 RF_1V8_POWER_N16p50dBm = BIT(7) | 4,    /**<  -16.5 dbm */
+	 RF_1V8_POWER_N27p80dBm = BIT(7) | 2,    /**<  -27.8 dbm */
+
+	 RF_1V8_POWER_N30p00dBm    = 0xff,          /**<  -30 dbm */
+	 RF_1V8_POWER_N50p00dBm    = BIT(7) | 0,    /**<  -50 dbm */
 } rf_power_level_e;
 
 /**
  *  @brief  Define power index list of RF.
+ *  @note	1.The energy value with the 1.8V keyword is the energy value measured
+ *  		when the IO_Config pin is set high; In this case, since the IO voltage
+ *  		is set to 1.8V, the VDDO3 voltage supplying the RF is 1.8V, resulting
+ *  		in an energy drop; therefore, when the IO_config configuration is high,
+ *  		the energy setting with the 1.8V keyword should be selected.
+ *  		2.The following energy values are obtained by testing on the A2 chip;
+ *  		Since the	 IO1.8V of the A2 chip is actually high, this energy value
+ *  		is high; the A3 chip will fix this problem
  */
 typedef enum {
 	 /*VBAT*/
-	 RF_POWER_INDEX_P9p11dBm,	/**< power index of 9.1 dbm */
-	 RF_POWER_INDEX_P8p57dBm,	/**< power index of 8.6 dbm */
-	 RF_POWER_INDEX_P8p05dBm,	/**< power index of 8.1 dbm */
-	 RF_POWER_INDEX_P7p45dBm,	/**< power index of 7.5 dbm */
-	 RF_POWER_INDEX_P6p98dBm,	/**< power index of 7.0 dbm */
-	 RF_POWER_INDEX_P5p68dBm,	/**< power index of 6.0 dbm */
+	 RF_POWER_INDEX_P10p20dBm,	/**< power index of 10.2 dbm */
+	 RF_POWER_INDEX_P9p57dBm,	/**< power index of 9.6 dbm */
+	 RF_POWER_INDEX_P9p15dBm,	/**< power index of 9.1 dbm */
+	 RF_POWER_INDEX_P8p82dBm,	/**< power index of 8.8 dbm */
+	 RF_POWER_INDEX_P8p25dBm,	/**< power index of 8.2 dbm */
+	 RF_POWER_INDEX_P7p75dBm,	/**< power index of 7.7 dbm */
+	 RF_POWER_INDEX_P7p00dBm,	/**< power index of 7.0 dbm */
+	 RF_POWER_INDEX_P6p32dBm,	/**< power index of 6.3 dbm */
+	 RF_POWER_INDEX_P5p21dBm,   /**< power index of 5.2 dbm */
+	 RF_POWER_INDEX_P4p45dBm,	/**< power index of 4.5 dbm */
+	 RF_POWER_INDEX_P3p85dBm,	/**< power index of 3.9 dbm */
+
 	 /*VANT*/
-	 RF_POWER_INDEX_P4p35dBm,	/**< power index of 4.4 dbm */
-	 RF_POWER_INDEX_P3p83dBm,	/**< power index of 3.8 dbm */
-	 RF_POWER_INDEX_P3p25dBm,	/**< power index of 3.3 dbm */
-	 RF_POWER_INDEX_P2p79dBm,	/**< power index of 2.8 dbm */
-	 RF_POWER_INDEX_P2p32dBm,	/**< power index of 2.3 dbm */
-	 RF_POWER_INDEX_P1p72dBm,	/**< power index of 1.7 dbm */
-	 RF_POWER_INDEX_P0p80dBm,	/**< power index of 0.8 dbm */
-	 RF_POWER_INDEX_P0p01dBm,	/**< power index of 0.0 dbm */
-	 RF_POWER_INDEX_N0p53dBm,	/**< power index of -0.5 dbm */
-	 RF_POWER_INDEX_N1p37dBm,	/**< power index of -1.4 dbm */
-	 RF_POWER_INDEX_N2p01dBm,	/**< power index of -2.0 dbm */
-	 RF_POWER_INDEX_N3p37dBm,	/**< power index of -3.4 dbm */
-	 RF_POWER_INDEX_N4p77dBm,	/**< power index of -4.8 dbm */
-	 RF_POWER_INDEX_N6p54dBm,	/**< power index of -6.5 dbm */
-	 RF_POWER_INDEX_N8p78dBm,	/**< power index of -8.8 dbm */
-	 RF_POWER_INDEX_N12p06dBm,	/**< power index of -12.1 dbm */
-	 RF_POWER_INDEX_N17p83dBm,	/**< power index of -17.8 dbm */
-	 RF_POWER_INDEX_N23p54dBm,	/**< power index of -23.5 dbm */
+	 RF_POWER_INDEX_P3p52dBm,	/**< power index of 3.5 dbm */
+	 RF_POWER_INDEX_P3p00dBm,	/**< power index of 3.0 dbm */
+	 RF_POWER_INDEX_P2p51dBm,	/**< power index of 2.5 dbm */
+	 RF_POWER_INDEX_P2p00dBm,	/**< power index of 2.0 dbm */
+	 RF_POWER_INDEX_P1p57dBm,	/**< power index of 1.6 dbm */
+	 RF_POWER_INDEX_P0p95dBm,	/**< power index of 0.9 dbm */
+	 RF_POWER_INDEX_P0p43dBm,	/**< power index of 0.4 dbm */
+	 RF_POWER_INDEX_P0p04dBm,	/**< power index of 0.0 dbm */
+	 RF_POWER_INDEX_N0p41dBm,	/**< power index of 0.4 dbm */
+	 RF_POWER_INDEX_N0p87dBm,	/**< power index of -0.9 dbm */
+	 RF_POWER_INDEX_N1p38dBm,	/**< power index of -1.4 dbm */
+	 RF_POWER_INDEX_N2p58dBm,	/**< power index of -2.6 dbm */
+	 RF_POWER_INDEX_N3p96dBm,	/**< power index of -3.9 dbm */
+	 RF_POWER_INDEX_N5p85dBm,	/**< power index of -5.8 dbm */
+	 RF_POWER_INDEX_N9p67dBm,	/**< power index of -9.7 dbm */
+	 RF_POWER_INDEX_N13p40dBm,	/**< power index of -13.4 dbm */
+	 RF_POWER_INDEX_N16p80dBm,	/**< power index of -16.8 dbm */
+	 RF_POWER_INDEX_N22p67dBm,	/**< power index of -22.7 dbm */
+
+ //	 The following energy values are obtained by testing on the A2 chip; Since the
+ //	 IO1.8V of the A2 chip is actually high, this energy value is high; the A3 chip
+ //	 will fix this problem
+	 /*VBAT*/
+	 RF_1V8_POWER_INDEX_P6p15dBm,	/**< power index of 6.2 dbm */
+	 RF_1V8_POWER_INDEX_P5p56dBm,	/**< power index of 5.5 dbm */
+	 RF_1V8_POWER_INDEX_P5p00dBm,	/**< power index of 5.0 dbm */
+	 RF_1V8_POWER_INDEX_P4p50dBm,	/**< power index of 4.5 dbm */
+	 RF_1V8_POWER_INDEX_P4p20dBm,	/**< power index of 4.2 dbm */
+	 RF_1V8_POWER_INDEX_P3p90dBm,	/**< power index of 3.9 dbm */
+	 RF_1V8_POWER_INDEX_P3p50dBm,	/**< power index of 3.5 dbm */
+	 /*VANT*/
+	 RF_1V8_POWER_INDEX_P3p30dBm,	/**< power index of 3.3 dbm */
+	 RF_1V8_POWER_INDEX_P2p80dBm,	/**< power index of 2.8 dbm */
+	 RF_1V8_POWER_INDEX_P2p25dBm,	/**< power index of 2.3 dbm */
+	 RF_1V8_POWER_INDEX_P1p83dBm,	/**< power index of 1.8 dbm */
+	 RF_1V8_POWER_INDEX_P1p31dBm,	/**< power index of 1.3 dbm */
+	 RF_1V8_POWER_INDEX_P0p85dBm,	/**< power index of 0.8 dbm */
+	 RF_1V8_POWER_INDEX_P0p05dBm,	/**< power index of 0.0 dbm */
+	 RF_1V8_POWER_INDEX_N0p69dBm,	/**< power index of -0.7 dbm */
+	 RF_1V8_POWER_INDEX_N1p22dBm,	/**< power index of -1.2 dbm */
+	 RF_1V8_POWER_INDEX_N2p07dBm,	/**< power index of -2.0 dbm */
+	 RF_1V8_POWER_INDEX_N2p73dBm,	/**< power index of -2.7 dbm */
+	 RF_1V8_POWER_INDEX_N3p80dBm,	/**< power index of -3.8 dbm */
+	 RF_1V8_POWER_INDEX_N5p17dBm,	/**< power index of -5.2 dbm */
+	 RF_1V8_POWER_INDEX_N6p72dBm,	/**< power index of -6.7 dbm */
+	 RF_1V8_POWER_INDEX_N9p67dBm,	/**< power index of -9.7 dbm */
+	 RF_1V8_POWER_INDEX_N13p10dBm,	/**< power index of -13.1 dbm */
+	 RF_1V8_POWER_INDEX_N16p50dBm,	/**< power index of -16.5 dbm */
+	 RF_1V8_POWER_INDEX_N27p80dBm,	/**< power index of -27.8 dbm */
+
+	 RF_1V8_POWER_INDEX_N30p00dBm,	/**< power index of -30.0 dbm */
+	 RF_1V8_POWER_INDEX_N50p00dBm,	/**< power index of -50.0 dbm */
+
 } rf_power_level_index_e;
 
 
@@ -306,12 +431,63 @@ typedef enum {
 /**********************************************************************************************************************
  *                                         RF global constants                                                        *
  *********************************************************************************************************************/
-extern const rf_power_level_e rf_power_Level_list[30];
+extern const rf_power_level_e rf_power_Level_list[60];
 
 
 /**********************************************************************************************************************
  *                                         RF function declaration                                                    *
  *********************************************************************************************************************/
+/**
+ * @brief	    This function is used to enable the ldo rxtxlf bypass function, and the calibration value
+ * 				written by the software will take effect after enabling.
+ * @param[in]	none.
+ * @return	 	none.
+ */
+static inline void rf_ldot_ldo_rxtxlf_bypass_en(void)
+{
+	write_reg8(0x17074e,0x45);//CBPF_TRIM_I && CBPF_TRIM_Q
+	write_reg8(0x17074c,0x02);//LNA_ITRIM=0x01(default)(change to 0x02[TBD])
+	write_reg8(0x1706e4,read_reg8(0x1706e4)|BIT(1));
+}
+
+/**
+ * @brief	    This function is used to close the ldo rxtxlf bypass function, and the hardware will
+ * 				automatically perform the calibration function after closing.
+ * @param[in]	none.
+ * @return	 	none.
+ */
+static inline void rf_ldot_ldo_rxtxlf_bypass_dis(void)
+{
+	write_reg8(0x17074e,0x40);//CBPF_TRIM_I && CBPF_TRIM_Q
+	write_reg8(0x17074c,0x11);//LNA_ITRIM=0x01(default)(change to 0x02[TBD])
+	write_reg8(0x1706e4,read_reg8(0x1706e4)&(~BIT(1)));
+}
+
+/**
+ * @brief      This function serves to optimize RF performance
+ * 			   This function must be called every time rx is turned on,
+ * 			   and is called by an internal function.
+ * 			   If there are other requirements that need to be called,
+ * 			   turn off rx first, then call it again to make sure the Settings take effect
+ * @param[in]  none
+ * @return     none
+ * @note	   1.Call this function after turning on rx 30us, and the calibration value set by the function
+ * 			      will take effect after calling rf_ldot_ldo_rxtxlf_bypass_en;if automatic calibration is
+ * 			      required, you can use rf_ldot_ldo_rxtxlf_bypass_dis to turn off the bypass function; how to
+ * 			      use it can refer to bqb.c file or rf_emi_rx in emi.c
+ *			   2. After using rf_ldot_ldo_rxtxlf_bypass_dis to turn off the bypass function and enter tx/rx
+ *			      automatic calibration, to use this function again, you need to call the rf_set_rxpara function
+ *			      again after entering rx 30us.
+ *
+ */
+
+static inline void rf_set_rxpara(void)
+{
+	unsigned char reg_calibration=0;
+	reg_calibration = ((read_reg8(0x1706ed)&0xf)<<2)|((read_reg8(0x1706ec)&0xc0)>>6);
+	if(reg_calibration>10)	reg_calibration -= 10;
+	write_reg8(0x1706e5,(read_reg8(0x1706e5)&0xc0)|reg_calibration);
+}
 
 
 /**
@@ -527,6 +703,7 @@ static inline void rf_set_rx_dma_fifo_num(unsigned char fifo_num)
  *	            Before setting, call the function "rf_set_rx_dma" to clear DMA fifo mask value(set 0)
  * @param[in]	rx_addr   - The address store receive packet.
  * @return	 	none
+ * @note		rx_addr:must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
 static inline void rf_set_rx_buffer(unsigned char *rx_addr)
 {
@@ -813,6 +990,7 @@ void rf_set_tx_dma(unsigned char fifo_depth,unsigned short fifo_byte_size);
  * @param[in] wptr_mask  	  - DMA fifo mask value (0~fif0_num-1).
  * @param[in] fifo_byte_size  - The length of one dma fifo.
  * @return	  none.
+ * @note	  buff:must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
 void rf_set_rx_dma(unsigned char *buff,unsigned char wptr_mask,unsigned short fifo_byte_size);
 
@@ -859,6 +1037,7 @@ void rf_set_txmode(void);
  * @brief	  	This function serves to set RF Tx packet address to DMA src_addr.
  * @param[in]	addr   - The packet address which to send.
  * @return	 	none.
+ * @note		addr:must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
 _attribute_ram_code_sec_ void rf_tx_pkt(void* addr);
 
@@ -908,6 +1087,7 @@ void rf_pn_disable(void);
  * @param[in]   fifo_dep   - deepth of each fifo set in dma.
  * @param[in]   addr       - address of rx packet.
  * @return  	the next rx_packet address.
+ * @note		addr:must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
 unsigned char* rf_get_rx_packet_addr(int fifo_num,int fifo_dep,void* addr);
 
@@ -1008,6 +1188,7 @@ void rf_prx_config(void);
  * @param[in]	addr	-	The address of tx_packet.
  * @param[in]	tick	-	Trigger ptx after (tick-current tick),If the difference is less than 0, trigger immediately.
  * @return  none.
+ * @note		addr:must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
 void rf_start_ptx  (void* addr,  unsigned int tick);
 
@@ -1043,6 +1224,7 @@ unsigned char rf_is_rx_fifo_empty(unsigned char pipe_id);
  * @param[in] 	addr  	- DMA tx buffer.
  * @param[in] 	tick  	- Send after tick delay.
  * @return	   	none.
+ * @note		addr:must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
 _attribute_ram_code_sec_noinline_ void rf_start_stx(void* addr, unsigned int tick);
 
@@ -1052,6 +1234,7 @@ _attribute_ram_code_sec_noinline_ void rf_start_stx(void* addr, unsigned int tic
  * @param[in] 	addr  	- DMA tx buffer.
  * @param[in] 	tick  	- Send after tick delay.
  * @return	    none.
+ * @note		addr:must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
 _attribute_ram_code_sec_noinline_ void rf_start_stx2rx  (void* addr, unsigned int tick);
 
@@ -1079,6 +1262,7 @@ _attribute_ram_code_sec_noinline_ void rf_set_rxmode(void);
  * @param[in]	addr   - The address to store received data.
  * @param[in]	tick   - It indicates timeout duration in Rx status.Max value: 0xffffff (16777215)
  * @return	 	none
+ * @note		addr:must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
 _attribute_ram_code_sec_noinline_ void rf_start_brx  (void* addr, unsigned int tick);
 
@@ -1091,6 +1275,7 @@ _attribute_ram_code_sec_noinline_ void rf_start_brx  (void* addr, unsigned int t
  * @param[in]	addr   - The address to store send data.
  * @param[in]	tick   - It indicates timeout duration in Rx status.Max value: 0xffffff (16777215)
  * @return	 	none
+ * @note		addr:must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
 _attribute_ram_code_sec_noinline_ void rf_start_btx (void* addr, unsigned int tick);
 
@@ -1100,6 +1285,7 @@ _attribute_ram_code_sec_noinline_ void rf_start_btx (void* addr, unsigned int ti
  * @param[in] 	addr  - DMA tx buffer.
  * @param[in] 	tick  - Trigger rx receive packet after tick delay.
  * @return	    none.
+ * @note		addr:must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
 _attribute_ram_code_sec_noinline_ void rf_start_srx2tx  (void* addr, unsigned int tick);
 
@@ -1128,6 +1314,13 @@ void rf_set_baseband_trans_unit(rf_trans_unit_e size);
  * @return	 	none.
  */
 unsigned char rf_get_crc_err(void);
+
+/**
+ * @brief	  	This function is mainly used to set the energy when sending a single carrier.
+ * @param[in]	level		- The slice corresponding to the energy value.
+ * @return	 	none.
+ */
+void rf_set_power_level_singletone(rf_power_level_e level);
 
 /**
  * @brief	  	This function is used to  set the modulation index of the receiver.
@@ -1346,11 +1539,466 @@ void rf_aoa_aod_sample_interval_time(rf_aoa_aod_sample_interval_time_e time_us);
  * 				the package.
  * @param[in]	mode	- The length of each I or Q data.
  * @return		none.
- * @note		Attention :When the iq data is 20bit, it cannot be used with the 0.25us mode, which will cause the sampling data to overflow.
  */
-static inline void rf_aoa_aod_iq_data_mode(rf_aoa_aod_iq_data_mode_e mode)
+void rf_aoa_aod_iq_data_mode(rf_iq_data_mode_e mode);
+
+
+/****************************************************************************************************************************************
+ *                                         RF : HADM related functions                          		 			  					*
+ ****************************************************************************************************************************************/
+
+/**
+ * @brief		This function is mainly used to initialize some parameter settings of the HADM IQ sample.
+ * @param[in]	samp_num	- Number of groups to sample IQ data.
+ * @param[in]	interval	- The interval time between each IQ sampling is (interval + 1)*0.125us.
+ * @param[in]	start_point	- Set the starting point of the sample.If it is rx_en mode, sampling starts
+ * 							  at 0.25us+start_point*0.125us after settle. If it is in sync mode, sampling
+ * 							  starts at (start_point + 1) * 0.125us after sync.
+ * @param[in]	suppmode    - The length of each I or Q data.
+ * @param[in]	sample_mode - IQ sampling starts after syncing packets or after the rx_en is pulled up.
+ * @return		none.
+ */
+void rf_hadm_iq_sample_init(unsigned short samp_num,unsigned char interval,unsigned char start_point,rf_iq_data_mode_e suppmode,rf_hadm_iq_sample_mode_e sample_mode);
+
+
+/**
+ * @brief		This function is mainly used to set the sample interval.
+ * @param[in]	ant_interval- Set the interval for IQ sample, (interval + 1)*0.125us.
+ * @return		none.
+ * @note 		The max sample rate is 4Mhz.
+ */
+void rf_hadm_sample_interval_time(unsigned char interval);
+
+/**
+ * @brief		This function is mainly used to initialize the parameters related to HADM antennas.
+ * @param[in]	clk_mode	- Set whether the antenna-related clock is always on or only when switching antennas.
+ * @param[in]	ant_interval- Set the interval for antenna switching, (interval + 1)*0.125us.
+ * @param[in]	ant_rxoffset- Adjust the switching start point of the rx-side antenna,(ant_rxoffset + 1)*0.125us.
+ * @param[in]	ant_txoffset- Adjust the switching start point of the tx-side antenna,(ant_rxoffset + 1)*0.125us.
+ * @return		none.
+ */
+void rf_hadm_ant_init(rf_hadm_ant_clk_mode_e clk_mode,unsigned char ant_interval,unsigned char ant_rxoffset,unsigned char ant_txoffset);
+
+/**
+ * @brief		This function is mainly used to set the antenna switching interval.
+ * @param[in]	ant_interval- Set the interval for antenna switching, (interval + 1)*0.125us.
+ * @return		none.
+ */
+void rf_set_hadm_ant_interval(unsigned char ant_interval);
+
+/**
+ * @brief		This function is mainly used to set the starting position of the antenna switching at the rx-side.
+ * @param[in]	ant_rxoffset- Adjust the switching start point of the rx-side antenna,(ant_rxoffset + 1)*0.125us.
+ * @return		none.
+ */
+void rf_set_hadm_rx_ant_offset(unsigned char ant_rxoffset);
+
+/**
+ * @brief		This function is mainly used to set the starting position of the antenna switching at the tx-side.
+ * @param[in]	ant_txoffset- Adjust the switching start point of the rx-side antenna,(ant_txoffset + 1)*0.125us.
+ * @return		none.
+ */
+void rf_set_hadm_tx_ant_offset(unsigned char ant_txoffset);
+
+/**
+ * @brief		This function is mainly used to set the clock working mode of the antenna.
+ * @para[in]	clk_mode	- Open all the time or only when switching antennas.
+ * @return		none.
+ */
+void rf_hadm_ant_clk_mode(rf_hadm_ant_clk_mode_e clk_mode);
+
+/**
+ * @brief		This function is mainly used to set the way IQ sampling starts.
+ * @para[in]	sample_mode	- IQ sampling starts after syncing packets or after the rx_en is pulled up.
+ * @return		none.
+ */
+void rf_hadm_iq_sample_mode(rf_hadm_iq_sample_mode_e sample_mode);
+
+/**
+ * @brief		This function is mainly used to set the starting position of IQ sampling.
+ * @para[in]	start_point  - Set the starting point of the sample.If it is rx_en mode, sampling starts
+ * 							  at 0.25us+start_point*0.125us after settle. If it is in sync mode, sampling
+ * 							  starts at (start_point + 1) * 0.125us after sync.
+ * @return		none.
+ */
+void rf_hadm_iq_start_point(unsigned char pos);
+
+/**
+ * @brief		This function is mainly used to set the number of IQ samples in groups.
+ * @para[in]	samp_num    - Number of groups to sample IQ data.
+ * @return		none.
+ */
+void rf_hadm_iq_sample_numer(unsigned short samp_num);
+
+/**
+ * @brief		Mainly used to set thresholds when sync data packets.
+ * @para[in]	thre_value  - The value of thresholds.
+ * @return		none.
+ */
+void rf_set_ble_sync_threshold(unsigned char thre_value);
+
+/**
+ * @brief		This function is mainly used to enable the IQ sampling function.
+ * @return		none.
+ */
+void rf_iq_sample_enable(void);
+
+/**
+ * @brief		This function is mainly used to disable the IQ sampling function.
+ * @return		none.
+ */
+void rf_iq_sample_disable(void);
+
+/**
+ * @brief		This function is mainly used to obtain the timestamp information of the tx_pos from the packet.
+ * @param[in]	p			- The packet address.
+ * @param[in]	sample_num	- The number of sample points that the packet contains.
+ * @param[in]	data_len	- The data length of the sample point in the packet.
+ * @return		Returns the timestamp information in the packet.
+ */
+unsigned int rf_hadm_get_pkt_tx_pos_timestamp(unsigned char *p,unsigned short sample_num,rf_iq_data_mode_e data_len);
+
+/**
+ * @brief		This function is mainly used to obtain the timestamp information of the tx_neg from the packet.
+ * @param[in]	p			- The packet address.
+ * @param[in]	sample_num	- The number of sample points that the packet contains.
+ * @param[in]	data_len	- The data length of the sample point in the packet.
+ * @return		Returns the timestamp information in the packet.
+ */
+unsigned int rf_hadm_get_pkt_tx_neg_timestamp(unsigned char *p,unsigned short sample_num,rf_iq_data_mode_e data_len);
+
+/**
+ * @brief		This function is mainly used to obtain the timestamp information of the iq_start from the packet.
+ * @param[in]	p			- The packet address.
+ * @param[in]	sample_num	- The number of sample points that the packet contains.
+ * @param[in]	data_len	- The data length of the sample point in the packet.
+ * @return		Returns the timestamp information in the packet.
+ */
+unsigned int rf_hadm_get_pkt_iq_start_timestamp(unsigned char *p,unsigned short sample_num,rf_iq_data_mode_e data_len);
+
+/**
+ * @brief   	This function serves to set RF's channel.The step of this function is in KHz.
+ *				The frequency set by this function is (chn+2400) MHz+chn_k KHz.
+ * @param[in]   chn_m - RF channel. The unit of this parameter is MHz, and its set frequency
+ * 					 	point is (2400+chn)MHz.
+ * @param[in]   chn_k - The unit of this parameter is KHz, which means to shift chn_k KHz to
+ * 						the right on the basis of chn.Its value ranges from 0 to 999.
+ * @param[in]	trx_mode - Defines the frequency point setting of tx mode or rx mode.
+ * @return  	none.
+ */
+void rf_set_channel_k_step(signed char chn_m,unsigned int chn_k,rf_trx_chn_e trx_mode);//general
+
+/**
+ * @brief		This function is mainly used for frezee agc.
+ * @return		none.
+ * @note		It should be noted that this function should be called after receiving the package.
+ */
+void rf_agc_disable(void);
+
+/**
+ * @brief		This function is mainly used to set the sequence related to Fast Settle in HADM.
+ * @return		none.
+ */
+void rf_fast_settle_sequence_set(void);
+
+/**
+ * @brief		This function is mainly used to set the adc_pup to auto mode.
+ * @return		none.
+ */
+static inline void rf_adc_pup_auto(void)
 {
-	reg_rf_sof_offset = ((reg_rf_sof_offset & (~FLD_RF_SUPP_MODE))|(mode << 4));
+	write_reg8(0x17078c,read_reg8(0x17078c)&0x7f);
 }
 
+/**
+ * @brief		This function is mainly used to set the tx_pa to auto mode.
+ * @return		none.
+ */
+static inline void rf_tx_pa_pup_auto(void)
+{
+	write_reg8(0x170778,read_reg8(0x170778)&(~BIT(5)));
+}
+
+/**
+ * @brief		This function is mainly used to get the gain lat value.
+ * @return		Returns the value of gain lat.
+ * @note		Call this function after agc disable.
+ */
+static inline unsigned char rf_get_gain_lat_value(void)
+{
+	return ((reg_rf_max_match1>>4)&0x07);
+}
+
+/**
+ * @brief		This function is mainly used to get the cal_trim value of LDO.
+ * @return		Returns the cal_trim value of the LDO.
+ * @note		Call this function after packets are sent and received.
+ */
+static inline unsigned char rf_get_ldo_cal_trim_value(void)
+{
+	return read_reg8(0x1706ea);
+}
+
+/**
+ * @brief		This function is mainly used to get the rxtxhf_trim value of LDO.
+ * @return		Returns the rxtxhf_trim value of the LDO.
+ * @note		Call this function after packets are sent and received.
+ */
+static inline unsigned char rf_get_ldo_rxtxhf_trim_value(void)
+{
+	return (read_reg8(0x1706ec)&0x3f);
+}
+
+/**
+ * @brief		This function is mainly used to get the rxtxlf_trim value of LDO.
+ * @return		Returns the rxtxlf_trim value of the LDO.
+ * @note		Call this function after packets are sent and received.
+ */
+static inline unsigned char rf_get_ldo_rxtxlf_trim_value(void)
+{
+	return (((read_reg8(0x1706ed) & 0x0f) << 2) + ((read_reg8(0x1706ec) & 0xc0) >> 6));
+}
+
+/**
+ * @brief		This function is mainly used to get the pll_trim value of LDO.
+ * @return		Returns the pll_trim value of the LDO.
+ * @note		Call this function after packets are sent and received.
+ */
+static inline unsigned char rf_get_ldo_pll_trim_value(void)
+{
+	return (read_reg8(0x1706ee) & 0x3f);
+}
+
+/**
+ * @brief		This function is mainly used to get the vco_trim value of LDO.
+ * @return		Returns the vco_trim value of the LDO.
+ * @note		Call this function after packets are sent and received.
+ */
+static inline unsigned char rf_get_ldo_vco_trim_value(void)
+{
+	return (((read_reg8(0x1706ef) & 0x0f) << 2) + ((read_reg8(0x1706ee) & 0xc0) >> 6));
+}
+
+/**
+ * @brief		This function is mainly used to get the fcal_dcap value.
+ * @return		Returns the fcal_dcap value.
+ * @note		Call this function after the packet has been sent.
+ */
+static inline unsigned short rf_get_fcal_dcap_value(void)
+{
+	write_reg8(0x1706c3,(read_reg8(0x1706c3)&0xc3)|(0x0b<<2));
+	return (read_reg16(0x1706c0));
+}
+
+/**
+ * @brief		This function is mainly used to get the hpmc_gain value.
+ * @return		Returns the hpmc_gain value.
+ * @note		Call this function after the packet has been sent.
+ */
+static inline unsigned short rf_get_hpmc_gain_value(void)
+{
+	return (read_reg16(0x1706fe));
+}
+
+/**
+ * @brief		This function is mainly used to get the rccal_code value.
+ * @return		Returns the rccal_code value.
+ * @note		Call this function after the packet has been received.
+ */
+static inline unsigned short rf_get_rccal_code_value(void)
+{
+	return (read_reg16(0x1706ca));
+}
+
+/**
+ * @brief		This function is mainly used to get the idac_code value.
+ * @return		Returns the idac_code value.
+ * @note		Call this function after the packet has been received.
+ */
+static inline unsigned char rf_get_dcoc_idac_code_value(void)
+{
+	return (read_reg8(0x1706d8));
+}
+
+/**
+ * @brief		This function is mainly used to get the qdac_code value.
+ * @return		Returns the qdac_code value.
+ * @note		Call this function after the packet has been received.
+ */
+static inline unsigned char rf_get_dcoc_qdac_code_value(void)
+{
+	return (read_reg8(0x1706da));
+}
+
+/**
+ * @brief		This function is mainly used to get the dcoc_offset_code value.
+ * @return		Returns the dcoc_offset_code value.
+ * @note		Call this function after the packet has been received.
+ */
+static inline unsigned short rf_get_dcoc_offset_code_value(void)
+{
+	return (read_reg16(0x1706dc));
+}
+
+/**
+ * @brief		This function is mainly used to enable LNA.
+ * @return		none.
+ */
+static inline void rf_lna_pup(void)
+{
+	write_reg8(0x17077a,read_reg8(0x17077a)|BIT(0));
+	write_reg8(0x170778,read_reg8(0x170778)|BIT(0));
+}
+
+/**
+ * @brief		This function is mainly used to disable LNA.
+ * @return		none.
+ */
+static inline void rf_lna_pup_off(void)
+{
+	write_reg8(0x17077a,read_reg8(0x17077a)&(~BIT(0)));
+	write_reg8(0x170778,read_reg8(0x170778)|BIT(0));
+}
+
+/**
+ * @brief		This function is mainly used to set LDO Calibration-related values.
+ * @param[in]	ldo_cal_trim	- The value of ldo_cal_trim.
+ * @param[in]	ldo_rxtxhf_trim	- The value of ldo_rxtxhf_trim.
+ * @param[in]	ldo_rxtxlf_trim	- The value of ldo_rxtxlf_trim.
+ * @param[in]	ldo_pll_trim	- The value of ldo_pll_trim.
+ * @param[in]	ldo_vco_trim	- The value of ldo_vco_trim.
+ * @return		none.
+ */
+void rf_dis_ldo_trim(unsigned char ldo_cal_trim, unsigned char ldo_rxtxhf_trim,unsigned char ldo_rxtxlf_trim,unsigned char ldo_pll_trim,unsigned char ldo_vco_trim);
+
+/**
+ * @brief		This function is mainly used for the disable fcal trim function.
+ * @return		none.
+ */
+void rf_dis_fcal_trim(/*unsigned short fcal_dcap*/);
+
+/**
+ * @brief		This function is mainly used to set the value of hpmc_trim.
+ * @param[in]	hpmc_gain	- The value of hpmc_gain need to set.
+ * @return		none.
+ */
+void rf_dis_hpmc_trim(unsigned short hpmc_gain);
+
+/**
+ * @brief		This function is mainly used to set the value of rccal.
+ * @param[in]	rccal_code	- The value of rccal need to set.
+ * @return		none.
+ */
+void rf_dis_rccal_trim(unsigned short rccal_code);
+
+/**
+ * @brief		This function is mainly used to set the value relative dcoc.
+ * @param[in]	dcoc_idac	- The idac value of dcoc.
+ * @param[in]	dcoc_qdac	- The qdac value of dcoc.
+ * @param[in]	dcoc_offset	- The offset value of dcoc.
+ * @return		none.
+ */
+void rf_dis_dcoc_trim(unsigned char dcoc_idac, unsigned char dcoc_qdac,unsigned short dcoc_offset);
+
+/**
+ * @brief		This function is mainly used to set the value of the dac_pup.
+ * @param[in]	value	- The value of dac_pup.
+ * @return		none.
+ */
+void rf_seq_dac_pup_ow(unsigned char value);
+
+/**
+ * @brief		This function is mainly used to set the value of the pa_pup.
+ * @param[in]	value	- The value of pa_pup.
+ * @return		none.
+ */
+void rf_seq_tx_pa_pup_ow(unsigned char value);
+
+/**
+ * @brief		This function is mainly used to open the PA module.
+ * @param[in]	pwr		- The slice value of power.
+ * @return		none.
+ */
+void rf_pa_pwr_on(unsigned char pwr);
+
+/**
+ * @brief		This function is mainly used to close the PA module.
+ * @return		none.
+ */
+void rf_pa_pwr_off(void);
+
+/**
+ * @brief		This function is mainly used to enable the HADM extension function of the hd_info.
+ * @return		none.
+ */
+static inline void rf_hadm_hd_info_enable()
+{
+	reg_rf_mode_ctrl0 |= FLD_RF_INFO_EXTENSION;
+}
+
+/**
+ * @brief		This function is mainly used to disable the HADM extension function of the hd_info.
+ * @return		none.
+ */
+static inline void rf_hadm_hd_info_disable()
+{
+	reg_rf_mode_ctrl0 &= (~FLD_RF_INFO_EXTENSION);
+}
+
+/**
+ * @brief		This function is mainly used to return the timestamp of the start point of tx through a register.
+ * @return		The timestamp of the start point of tx.
+ */
+static inline unsigned int rf_get_hadm_tx_pos_timestamp()
+{
+	return reg_rf_tr_turnaround_pos_time;
+}
+
+/**
+ * @brief		This function is mainly used to return the timestamp of the end point of tx through a register.
+ * @return		The timestamp of the end point of tx.
+ */
+static inline unsigned int rf_get_hadm_tx_neg_timestamp()
+{
+	return reg_rf_tr_turnaround_neg_time;
+}
+
+/**
+ * @brief		This function is mainly used to return the timestamp of the IQ sampling start point through the register.
+ * @return		The timestamp of IQ sampling.
+ */
+static inline unsigned int rf_get_hadm_iq_start_timestamp()
+{
+	return reg_rf_iqstart_tstamp;
+}
+
+/**
+ * @brief		This function is mainly used to wait for the state machine to return to the idle state.
+ * @return		none.
+ */
+static inline void rf_wait_ll_sm_idle()
+{
+	while(reg_rf_ll_2d_sclk != FLD_RF_STATE_MACHINE_IDLE);
+}
+
+/**
+ * @brief		This function is mainly used to set the preparation and enable of manual fcal.
+ * @return		none.
+ */
+void rf_manual_fcal_setup(void);
+
+/**
+ * @brief		This function is mainly used to set the relevant value after manual fcal.
+ * @return		none.
+ * @note		The function needs to be called after the rf_manual_fcal_setup call 22us.
+ */
+void rf_manual_fcal_done(void);
+
+
+/**
+ * @brief		This function is mainly used for agc auto run.
+ * @return		none.
+ * @note		It needs to be called before sending and receiving packets after the tone interaction is complete.
+ */
+void rf_agc_enable(void);
 #endif

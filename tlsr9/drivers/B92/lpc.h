@@ -150,5 +150,3 @@ static inline void lpc_set_single_mode(void)
  * @return		none.
  */
 void lpc_set_input_ref(lpc_mode_e mode, lpc_reference_e ref);
-
-
