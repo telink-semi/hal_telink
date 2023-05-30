@@ -68,7 +68,7 @@ bool b91_deep_sleep(uint32_t wake_stimer_tick)
 	__attribute__ ((section (".retention_data"))) = false;
 
 	extern void tl_context_save(void);
-	extern int soc_b91_init(void);
+	extern void soc_b91_restore(void);
 
 #if CONFIG_BT_B91
 	enum b91_bt_controller_state state = b91_bt_controller_state();
@@ -90,7 +90,7 @@ bool b91_deep_sleep(uint32_t wake_stimer_tick)
 				wake_stimer_tick);
 			tl_sleep_retention = false;
 		} else {
-			soc_b91_init();
+			soc_b91_restore();
 			tl_sleep_retention = false;
 			result = true;
 		}
@@ -104,7 +104,7 @@ bool b91_deep_sleep(uint32_t wake_stimer_tick)
 			wake_stimer_tick);
 		tl_sleep_retention = false;
 	} else {
-		soc_b91_init();
+		soc_b91_restore();
 		tl_sleep_retention = false;
 		result = true;
 	}
