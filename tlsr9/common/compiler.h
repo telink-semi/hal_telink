@@ -32,6 +32,7 @@
 #define _attribute_ram_code_sec_noinline_       __attribute__((section(".ram_code"))) __attribute__((noinline))
 #define _attribute_ram_code_                    _attribute_ram_code_sec_noinline_
 #define _attribute_text_sec_                    __attribute__((section(".text")))
+#define _attribute_text_code_                   _attribute_text_sec_
 #define _attribute_aes_data_sec_                __attribute__((section(".aes_data")))
 #define _attribute_data_retention_sec_          __attribute__((section(".retention_data")))
 #define _attribute_data_retention_              __attribute__((section(".retention_data")))
