@@ -35,7 +35,7 @@ endif() # MbedTLS HW acceleration
 endif() # MbedTLS
 
 # Flash driver reference sources
-if(CONFIG_SOC_FLASH_TELINK_B9X OR CONFIG_USB_TELINK_B91)
+if(CONFIG_SOC_FLASH_TELINK_B9X OR CONFIG_USB_TELINK_B9X)
 	zephyr_library_sources(
 		drivers/${SOC}/flash.c
 		drivers/${SOC}/stimer.c
@@ -63,8 +63,8 @@ zephyr_library_sources_ifdef(CONFIG_ADC_TELINK_B9X drivers/${SOC}/adc.c)
 zephyr_library_sources_ifdef(CONFIG_ADC_TELINK_B9X drivers/${SOC}/gpio.c)
 
 # USB driver reference sources
-zephyr_library_sources_ifdef(CONFIG_USB_TELINK_B91 drivers/${SOC}/gpio.c)
-zephyr_library_sources_ifdef(CONFIG_USB_TELINK_B91 drivers/${SOC}/usbhw.c)
+zephyr_library_sources_ifdef(CONFIG_USB_TELINK_B9X drivers/${SOC}/gpio.c)
+zephyr_library_sources_ifdef(CONFIG_USB_TELINK_B9X drivers/${SOC}/usbhw.c)
 
 #PM driver dependency
 zephyr_library_sources_ifdef(CONFIG_PM drivers/${SOC}/stimer.c)
