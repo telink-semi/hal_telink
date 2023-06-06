@@ -66,7 +66,9 @@ zephyr_library_sources_ifdef(CONFIG_USB_TELINK_B91 drivers/${SOC}/usbhw.c)
 
 #PM driver dependency
 zephyr_library_sources_ifdef(CONFIG_PM drivers/${SOC}/stimer.c)
-zephyr_library_sources_ifdef(CONFIG_PM common/${SOC}_sleep.c)
+if (CONFIG_SOC_RISCV_TELINK_B91)
+	zephyr_library_sources_ifdef(CONFIG_PM common/b91_sleep.c)
+endif()
 
 # BLE reference sources
 if (CONFIG_BT_B91)
