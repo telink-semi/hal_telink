@@ -68,7 +68,7 @@ zephyr_library_sources_ifdef(CONFIG_USB_TELINK_B9X drivers/${SOC}/usbhw.c)
 
 #PM driver dependency
 zephyr_library_sources_ifdef(CONFIG_PM drivers/${SOC}/stimer.c)
-if (CONFIG_SOC_RISCV_TELINK_B91)
+if (CONFIG_SOC_RISCV_TELINK_B91 OR CONFIG_SOC_RISCV_TELINK_B92)
 	zephyr_library_sources_ifdef(CONFIG_PM common/b91_sleep.c)
 endif()
 
