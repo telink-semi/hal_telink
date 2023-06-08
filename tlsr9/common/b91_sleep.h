@@ -30,7 +30,9 @@
 #ifndef __B91_SLEEP_H
 #define __B91_SLEEP_H
 
+bool b9x_suspend(uint32_t wake_stimer_tick);
 bool b91_suspend(uint32_t wake_stimer_tick);
+bool b92_suspend(uint32_t wake_stimer_tick);
 #ifdef CONFIG_BOARD_TLSR9518ADK80D_RETENTION
 bool b91_deep_sleep(uint32_t wake_stimer_tick);
 #endif /* CONFIG_BOARD_TLSR9518ADK80D_RETENTION */
