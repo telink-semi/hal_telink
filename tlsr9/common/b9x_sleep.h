@@ -17,9 +17,9 @@
  *****************************************************************************/
 
 /********************************************************************************************************
- * @file	b91_sleep.h
+ * @file	b9x_sleep.h
  *
- * @brief	This is the header file for B91
+ * @brief	This is the header file for B9x
  *
  * @author	Driver Group
  *
@@ -27,14 +27,12 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#ifndef __B91_SLEEP_H
-#define __B91_SLEEP_H
+#ifndef __B9X_SLEEP_H
+#define __B9X_SLEEP_H
 
 bool b9x_suspend(uint32_t wake_stimer_tick);
-bool b91_suspend(uint32_t wake_stimer_tick);
-bool b92_suspend(uint32_t wake_stimer_tick);
 #ifdef CONFIG_BOARD_TLSR9518ADK80D_RETENTION
 bool b91_deep_sleep(uint32_t wake_stimer_tick);
 #endif /* CONFIG_BOARD_TLSR9518ADK80D_RETENTION */
 
-#endif /* __B91_SLEEP_H */
+#endif /* __B9X_SLEEP_H */
