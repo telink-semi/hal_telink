@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  *****************************************************************************/
-#include "b91_sleep.h"
+#include "b9x_sleep.h"
 #include <ext_driver/ext_pm.h>
 
 #if CONFIG_BT_B91
@@ -23,27 +23,12 @@
 #include <b91_bt.h>
 #endif /* CONFIG_BT_B91 */
 
-
-bool b9x_suspend(uint32_t wake_stimer_tick)
-{
-	#if CONFIG_SOC_RISCV_TELINK_B91
-	return b91_suspend(wake_stimer_tick);
-	#elif CONFIG_SOC_RISCV_TELINK_B92
-	return b92_suspend(wake_stimer_tick);
-	#else
-		#error PM mode is not supported on this SOC.
-	#endif
-
-
-}
-
-#if CONFIG_SOC_RISCV_TELINK_B91
 /**
  * @brief     This function sets B91 MCU to suspend mode
  * @param[in] wake_stimer_tick - wake-up stimer tick
  * @return    true if suspend mode entered otherwise false
  */
-bool b91_suspend(uint32_t wake_stimer_tick)
+bool b9x_suspend(uint32_t wake_stimer_tick)
 {
 	bool result = false;
 
@@ -73,26 +58,6 @@ bool b91_suspend(uint32_t wake_stimer_tick)
 
 	return result;
 }
-#endif
-
-#if CONFIG_SOC_RISCV_TELINK_B92
-
-/**
- * @brief     This function sets B91 MCU to suspend mode
- * @param[in] wake_stimer_tick - wake-up stimer tick
- * @return    true if suspend mode entered otherwise false
- */
-bool b92_suspend(uint32_t wake_stimer_tick)
-{
-	bool result = false;
-	if (pm_sleep_wakeup(SUSPEND_MODE, PM_WAKEUP_TIMER | PM_WAKEUP_PAD, PM_TICK_STIMER, wake_stimer_tick) != STATUS_GPIO_ERR_NO_ENTER_PM) {
-		result = true;
-	}
-	return result;
-}
-
-#endif
-
 
 #ifdef CONFIG_BOARD_TLSR9518ADK80D_RETENTION
 
