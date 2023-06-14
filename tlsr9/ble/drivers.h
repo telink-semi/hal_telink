@@ -17,6 +17,11 @@
  *****************************************************************************/
 #pragma once
 
+#if CONFIG_SOC_RISCV_TELINK_B91
 #include "../drivers/B91/driver_b91.h"
 #include "../drivers/B91/ext_driver/driver_ext.h"
+#elif CONFIG_SOC_RISCV_TELINK_B92
+#include "../drivers/B92/driver_b92.h"
+#include "../drivers/B92/ext_driver/driver_ext.h"
+#endif
 #include "../common/types.h"

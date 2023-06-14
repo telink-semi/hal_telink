@@ -19,8 +19,14 @@
 #ifndef DRIVERS_B92_DRIVER_EXT_EXT_PM_H_
 #define DRIVERS_B92_DRIVER_EXT_EXT_PM_H_
 
+#include <zephyr/kernel.h>
+#undef irq_enable
+#undef irq_disable
+#undef ARRAY_SIZE
+
 #include "../pm.h"
 #include "types.h"
+#include "ext_misc.h"
 
 #ifndef	PM_32k_RC_CALIBRATION_ALGORITHM_EN
 #define PM_32k_RC_CALIBRATION_ALGORITHM_EN	1
