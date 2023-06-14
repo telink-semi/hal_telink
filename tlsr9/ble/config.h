@@ -18,11 +18,12 @@
 #pragma once
 
 
-#define	CHIP_TYPE_9518		1
+#define	CHIP_TYPE_B91		1
+#define	CHIP_TYPE_B92		2
 
 
 #ifndef CHIP_TYPE
-#define	CHIP_TYPE 			CHIP_TYPE_9518
+#define	CHIP_TYPE 			CHIP_TYPE_B91
 #endif
 
 
@@ -30,11 +31,14 @@
 
 
 
-#define	MCU_CORE_9518 		1
+#define	MCU_CORE_B91 		1
+#define	MCU_CORE_B92 		2
 
 
-#if(CHIP_TYPE == CHIP_TYPE_9518)
-	#define MCU_CORE_TYPE	MCU_CORE_9518
+#if(CHIP_TYPE == CHIP_TYPE_B91)
+	#define MCU_CORE_TYPE	MCU_CORE_B91
+#elif(CHIP_TYPE == CHIP_TYPE_B92)
+	#define MCU_CORE_TYPE	MCU_CORE_B92
 #endif
 
 

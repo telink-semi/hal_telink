@@ -18,10 +18,10 @@
 #ifndef HW_ECC_H_
 #define HW_ECC_H_
 
-#include "algorithm/ecc/hw_ecc.h"
+#include "config.h"
 #include "algorithm/ecc/ecc_curve.h"
 
-#if ( (MCU_CORE_TYPE == MCU_CORE_827x) || (MCU_CORE_TYPE == MCU_CORE_9518) )
+#if ( (MCU_CORE_TYPE == MCU_CORE_827x) || (MCU_CORE_TYPE == MCU_CORE_B91) || (MCU_CORE_TYPE == MCU_CORE_B92) )
 
 /* hECC_RNG_Function type
 The RNG function should fill 'size' random bytes into 'dest'. It should return 1 if
@@ -65,8 +65,8 @@ unsigned char	hwECC_shared_secret(const unsigned char *public_key, const unsigne
 
 
 
-#endif /* HW_ECC_H_ */
+#endif /* The end of #if((MCU_CORE_TYPE == MCU_CORE_827x) || (MCU_CORE_TYPE == MCU_CORE_B91) || (MCU_CORE_TYPE == MCU_CORE_B92)) */
 
-#endif /* The end of #if((MCU_CORE_TYPE == MCU_CORE_827x) || (MCU_CORE_TYPE == MCU_CORE_9518)) */
+#endif /* HW_ECC_H_ */
 
 
