@@ -2001,4 +2001,25 @@ void rf_manual_fcal_done(void);
  * @note		It needs to be called before sending and receiving packets after the tone interaction is complete.
  */
 void rf_agc_enable(void);
+
+/**
+ * @brief       This function do radio baseband reset
+ * @param       none
+ * @return      none
+ */
+void rf_baseband_reset(void);
+
+/**
+ * @brief This function reset dma registrs to default (reset values)
+ * @param none
+ * @return none
+ */
+void rf_reset_dma(void);
+
+/**
+ * @brief This function reset radio registrs to default (reset values)
+ * @param none
+ * @return none
+ */
+void rf_radio_reset(void);
 #endif

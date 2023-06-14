@@ -50,7 +50,7 @@ zephyr_library_sources_ifdef(CONFIG_SPI_TELINK_B9X drivers/${SOC}/gpio.c)
 zephyr_library_sources_ifdef(CONFIG_I2C_TELINK_B9X drivers/${SOC}/i2c.c)
 
 # RF driver reference sources
-if(CONFIG_BT_B91 OR CONFIG_IEEE802154_TELINK_B9X)
+if(CONFIG_BT_B9X OR CONFIG_IEEE802154_TELINK_B9X)
 	zephyr_library_sources(
 		drivers/${SOC}/stimer.c
 	)
@@ -69,7 +69,7 @@ zephyr_library_sources_ifdef(CONFIG_PM drivers/${SOC}/stimer.c)
 zephyr_library_sources_ifdef(CONFIG_PM common/${SOC}/sleep.c)
 
 # BLE reference sources
-if (CONFIG_BT_B91)
+if (CONFIG_BT_B9X)
 
 zephyr_include_directories(
 	ble
@@ -81,16 +81,16 @@ zephyr_library_sources(
 	drivers/${SOC}/flash.c
 	drivers/${SOC}/stimer.c
 	ble/common/utility.c
-	ble/vendor/controller/b91_bt.c
-	ble/vendor/controller/b91_bt_init.c
-	ble/vendor/controller/b91_bt_buffer.c
+	ble/vendor/controller/b9x_bt.c
+	ble/vendor/controller/b9x_bt_init.c
+	ble/vendor/controller/b9x_bt_buffer.c
 )
 
-endif() # CONFIG_BT_B91
+endif() # CONFIG_BT_B9X
 
 # Retention feature
 if (CONFIG_BOARD_TLSR9518ADK80D_RETENTION)
 
-zephyr_library_sources(common/b91_context.S)
+zephyr_library_sources(common/b9x_context.S)
 
 endif() # CONFIG_BOARD_TLSR9518ADK80D_RETENTION
