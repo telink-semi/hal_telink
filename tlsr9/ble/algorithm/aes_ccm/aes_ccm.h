@@ -17,7 +17,11 @@
  *****************************************************************************/
 #pragma  once
 
-#include "stack/ble/ble_format.h"
+#if CONFIG_SOC_RISCV_TELINK_B91
+#include "stack/ble/B91/ble_format.h"
+#elif CONFIG_SOC_RISCV_TELINK_B92
+#include "stack/ble/B92/ble_format.h"
+#endif
 
 #define AES_BLOCK_SIZE     16
 

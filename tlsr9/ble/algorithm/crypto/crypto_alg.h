@@ -18,9 +18,7 @@
 #ifndef CRYPTO_ALG_H_
 #define CRYPTO_ALG_H_
 
-
-
-
+#if CONFIG_SOC_RISCV_TELINK_B91
 /*
  * @brief 	This function is used to generate the prand
  * @param[out]	prand - The out are stored in little endian format
@@ -36,6 +34,63 @@ void			blt_crypto_alg_prand(unsigned char prand[3]);
  * @return      none
  * */
 void			blt_crypto_alg_ah(const unsigned char irk[16], unsigned char r[3], unsigned char out[3]);
+#elif CONFIG_SOC_RISCV_TELINK_B92
+
+typedef struct{
+	unsigned char key[16];
+	unsigned char mac[16];
+} blc_aes_cmac_context_t;
+
+/*
+ * If the data length calculated by AES-CMAC is less than or equal to 16 bytes, perform the following operations
+ * blc_crypto_alg_aes_cmac_init_key(aesCmac, key);
+ * blc_crpto_alg_aes_cmac_finsh(aesCmac, value, valueLen);
+ * printf("%s", str(aesCmac->mac, 16));
+ *
+ * If the data length calculated by AES-CMAC is greater than 16 bytes, perform the following operations
+ * blc_crypto_alg_aes_cmac_init_key(aesCmac, key);
+ * for(int i=0; i<valueLen-16; i+=16)
+ * 	blc_crypto_alg_aes_cmac_block(aesCmac, value+i);
+ * blc_crpto_alg_aes_cmac_finsh(aesCmac, value+i, valueLen%16);
+ * printf("%s", str(aesCmac->mac, 16));
+ */
+
+/**
+ * @brief		The function is used to calculate the AES-CMAC, initial key.
+ * @param[in]	aesCmac: is AES-CMAC calculate structural.
+ * @param[in]   key: 	is the 128-bit key, big--endian.
+ * @return	none.
+ */
+void blc_crypto_alg_aes_cmac_init_key (blc_aes_cmac_context_t* aesCmac, unsigned char *key);
+
+/*
+ * @brief		The function is used AES-CMAC, calculate
+ * @param[in]	aesCmac: is AES-CMAC calculate structural.
+ * @param[in]   block: 	is the 128-bit block, big--endian.
+ * @return	none.
+ */
+void blc_crypto_alg_aes_cmac_block(blc_aes_cmac_context_t* aesCmac, unsigned char* block);
+
+/*
+ * @brief		The function is used AES-CMAC, calculate last block .
+ * @param[in]	aesCmac: is AES-CMAC calculate structural.
+ * @param[in]   endBlock: 	is the last block, big--endian.
+ * @param[in]	blockSize:  is the last block size, must greater than 0, less than or equal to 16.
+ * @return	aesCmac->mac: AES-CMAC calculation result.
+ */
+void blc_crpto_alg_aes_cmac_finsh(blc_aes_cmac_context_t* aesCmac, unsigned char* endBlock, unsigned char blockSize);
+
+/**
+ * @brief	This function is used to convert keys of a given size from one key type to another
+ * 			key type with equivalent strength
+ * 			--- s1(M) = AES-CMACzero(M) ---
+ * @param[in]   key:	is the 128-bits, 		big--endian.
+ * @param[in]   key_size:	u8,key length
+ * @param[out]  r: the output of h7:128-bits, 	big--endian.
+ * @return	none.
+ */
+void blt_crypto_alg_csip_s1 (unsigned char key[], unsigned char key_size, unsigned char *r);
+#endif
 
 /**
  * @brief   	This function is used to generate the confirm values
