@@ -18,10 +18,10 @@
 #include "b9x_sleep.h"
 #include <ext_driver/ext_pm.h>
 
-#if CONFIG_BT_B91
-#include <stack/ble/controller/os_sup.h>
-#include <b91_bt.h>
-#endif /* CONFIG_BT_B91 */
+#if CONFIG_BT_B9X
+#include <stack/ble/B91/controller/os_sup.h>
+#include <b9x_bt.h>
+#endif /* CONFIG_BT_B9X */
 
 /**
  * @brief     This function sets B91 MCU to suspend mode
@@ -32,14 +32,14 @@ bool b9x_suspend(uint32_t wake_stimer_tick)
 {
 	bool result = false;
 
-#if CONFIG_BT_B91
-	enum b91_bt_controller_state state = b91_bt_controller_state();
+#if CONFIG_BT_B9X
+	enum b9x_bt_controller_state state = b9x_bt_controller_state();
 
-	if (state == B91_BT_CONTROLLER_STATE_ACTIVE ||
-		state == B91_BT_CONTROLLER_STATE_STOPPING) {
+	if (state == B9X_BT_CONTROLLER_STATE_ACTIVE ||
+		state == B9X_BT_CONTROLLER_STATE_STOPPING) {
 		blc_pm_setAppWakeupLowPower(wake_stimer_tick, 1);
 		if (!blc_pm_handler()) {
-			rf_set_power_level_index(CONFIG_B91_BLE_CTRL_RF_POWER);
+			rf_set_power_level_index(CONFIG_B9X_BLE_CTRL_RF_POWER);
 			result = true;
 		}
 		blc_pm_setAppWakeupLowPower(0, 0);
@@ -54,7 +54,7 @@ bool b9x_suspend(uint32_t wake_stimer_tick)
 		wake_stimer_tick) != STATUS_GPIO_ERR_NO_ENTER_PM) {
 		result = true;
 	}
-#endif /* CONFIG_BT_B91 */
+#endif /* CONFIG_BT_B9X */
 
 	return result;
 }
@@ -70,14 +70,14 @@ bool b91_deep_sleep(uint32_t wake_stimer_tick)
 	extern void tl_context_save(void);
 	extern int soc_b9x_init(void);
 
-#if CONFIG_BT_B91
-	enum b91_bt_controller_state state = b91_bt_controller_state();
+#if CONFIG_BT_B9X
+	enum b9x_bt_controller_state state = b9x_bt_controller_state();
 
-	if (state == B91_BT_CONTROLLER_STATE_ACTIVE ||
-		state == B91_BT_CONTROLLER_STATE_STOPPING) {
+	if (state == B9X_BT_CONTROLLER_STATE_ACTIVE ||
+		state == B9X_BT_CONTROLLER_STATE_STOPPING) {
 		blc_pm_setAppWakeupLowPower(wake_stimer_tick, 1);
 		if (!blc_pm_handler()) {
-			rf_set_power_level_index(CONFIG_B91_BLE_CTRL_RF_POWER);
+			rf_set_power_level_index(CONFIG_B9X_BLE_CTRL_RF_POWER);
 			result = true;
 		}
 		blc_pm_setAppWakeupLowPower(0, 0);
@@ -108,7 +108,7 @@ bool b91_deep_sleep(uint32_t wake_stimer_tick)
 		tl_sleep_retention = false;
 		result = true;
 	}
-#endif /* CONFIG_BT_B91 */
+#endif /* CONFIG_BT_B9X */
 
 	return result;
 }
