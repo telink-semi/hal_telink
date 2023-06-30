@@ -48,6 +48,7 @@
 #include <pke.h>
 
 #if (CONFIG_SOC_RISCV_TELINK_B92)
+#include <ext_driver/ext_lib.h>
 #include <ext_driver/ext_misc.h>
 #endif
 

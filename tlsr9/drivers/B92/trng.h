@@ -28,7 +28,7 @@
  *
  *	Introduction
  *	===============
- *	TLSRB92 supports hardware trng.
+ *	B92 supports hardware trng.
  *
  *	API Reference
  *	===============

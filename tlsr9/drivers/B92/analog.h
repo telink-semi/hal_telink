@@ -29,7 +29,7 @@
  *
  *	Introduction
  *	===============
- *	TLSRB92 analog support dma and normal mode, in each mode, support byte/halfword/word/buffer write and read.
+ *  B92 analog support dma and normal mode, in each mode, support byte/halfword/word/buffer write and read.
  *
  *	API Reference
  *	===============
