@@ -116,7 +116,7 @@ enum{
  * BIT[4]  set address format 0:single mode  1:the format of addr phase is the same as the data phase(Dual/Quad),MASTER ONLY
  * BIT[5]  1:enable addr phase, MASTER ONLY.
  * BIT[6]  set cmd format 0: single mode  1: the format of the cmd phase is the same as the data phase(Dual/Quad),MASTER ONLY
- * BIT[7]  the spi commnd phase enable,MASTER ONLY
+ * BIT[7]  the spi command phase enable,MASTER ONLY
  */
 #define reg_spi_ctrl1(i) 		REG_ADDR8(LSPI_BASE_ADDR+0x08+(i)*BASE_ADDR_DIFF)
 enum{
@@ -133,14 +133,14 @@ enum{
  * BIT[0:3]  dummy data cnt, dummy is always single wire mode, dummy number = {dummy_cnt_add, dummy_cnt} + 1.default 7,master/slave
  * BIT[4:7]  the transfer mode.master only
  * the transfer sequence could be:
- * 0x0:write and read at the same time(must enbale CmdEn)
+ * 0x0:write and read at the same time(must enable CmdEn)
  * 0x1:write only
- * 0x2:read only(must enbale CmdEn)
+ * 0x2:read only(must enable CmdEn)
  * 0x3:write,read
  * 0x4:read,write
  * 0x5:write,dummy,read
- * 0x6:read,dummy,write(must enbale CmdEn)
- * 0x7:None Data(must enbale CmdEn)
+ * 0x6:read,dummy,write(must enable CmdEn)
+ * 0x7:None Data(must enable CmdEn)
  * 0x8:Dummy,write
  * 0x9:Dummy,read
  * 0xa~0xf:reserved
@@ -343,18 +343,18 @@ enum{
  * BIT[4]  set xip read address format 0:single mode  1:the format of addr phase is the same as the data phase(Dual/Quad),XIP ONLY
  * BIT[5]  1:enable xip read addr phase, XIP ONLY.
  * BIT[6]  xip read cmd format 0: single mode  1: the format of the cmd phase is the same as the data phase(Dual/Quad),XIP ONLY
- * BIT[7]  xip read spi commnd phase enable,XIP ONLY
+ * BIT[7]  xip read spi command phase enable,XIP ONLY
  * BIT[8:11]   xip read dummy data cnt, dummy is always single wire mode, dummy number = dummy_cnt + 1.XIP only
- * BIT[12:15]   xip read transmode/lcd display transmode
+ * BIT[12:15]   xip read transfer mode/lcd display transfer mode
  * 				the transfer sequence could be:
- * 				0x0:write and read at the same time(must enbale CmdEn)
+ * 				0x0:write and read at the same time(must enable CmdEn)
  *  			0x1:write only
- *  			0x2:read only(must enbale CmdEn)
+ *  			0x2:read only(must enable CmdEn)
  *  			0x3:write,read
  *  			0x4:read,write
  *  			0x5:write,dummy,read
- *  			0x6:read,dummy,write(must enbale CmdEn)
- *  			0x7:None Data(must enbale CmdEn)
+ *  			0x6:read,dummy,write(must enable CmdEn)
+ *  			0x7:None Data(must enable CmdEn)
  *  			0x8:Dummy,write
  *  			0x9:Dummy,read
  *  			0xa~0xf:reserved
@@ -379,17 +379,17 @@ typedef enum{
  * BIT[4]  set xip write address format 0:single mode  1:the format of addr phase is the same as the data phase(Dual/Quad),XIP ONLY
  * BIT[5]  1:enable xip write addr phase, XIP ONLY.
  * BIT[6]  xip write cmd format 0: single mode  1: the format of the cmd phase is the same as the data phase(Dual/Quad),XIP ONLY
- * BIT[7]  xip write spi commnd phase enable,XIP ONLY
- * BIT[12:15]   xip write transmode/lcd display transmode
+ * BIT[7]  xip write spi command phase enable,XIP ONLY
+ * BIT[12:15]   xip write transfer mode/lcd display transfer mode
  * 				the transfer sequence could be:
- * 				0x0:write and read at the same time(must enbale CmdEn)
+ * 				0x0:write and read at the same time(must enable CmdEn)
  *  			0x1:write only
- *  			0x2:read only(must enbale CmdEn)
+ *  			0x2:read only(must enable CmdEn)
  *  			0x3:write,read
  *  			0x4:read,write
  *  			0x5:write,dummy,read
- *  			0x6:read,dummy,write(must enbale CmdEn)
- *  			0x7:None Data(must enbale CmdEn)
+ *  			0x6:read,dummy,write(must enable CmdEn)
+ *  			0x7:None Data(must enable CmdEn)
  *  			0x8:Dummy,write
  *  			0x9:Dummy,read
  *  			0xa~0xf:reserved
@@ -527,16 +527,16 @@ enum{
 #define reg_lspi_lcd_lut_data32(i)	REG_ADDR32(LSPI_BASE_ADDR+0x40+(i<<2))
 
 /**
-* BIT[4:7]  lcd display transmode
+* BIT[4:7]  lcd display transfer mode
 * 			the transfer sequence could be:
-* 			0x0:write and read at the same time(must enbale CmdEn)
+* 			0x0:write and read at the same time(must enable CmdEn)
 *  			0x1:write only
-*  			0x2:read only(must enbale CmdEn)
+*  			0x2:read only(must enable CmdEn)
 *  			0x3:write,read
 *  			0x4:read,write
 *  			0x5:write,dummy,read
-*  			0x6:read,dummy,write(must enbale CmdEn)
-*  			0x7:None Data(must enbale CmdEn)
+*  			0x6:read,dummy,write(must enable CmdEn)
+*  			0x7:None Data(must enable CmdEn)
 *  			0x8:Dummy,write
 *  			0x9:Dummy,read
 *  			0xa~0xf:reserved
@@ -547,16 +547,16 @@ enum{
 };
 
 /**
-* BIT[4:7]  lcd porch transmode
+* BIT[4:7]  lcd porch transfer mode
 * 			the transfer sequence could be:
-* 			0x0:write and read at the same time(must enbale CmdEn)
+* 			0x0:write and read at the same time(must enable CmdEn)
 *  			0x1:write only
-*  			0x2:read only(must enbale CmdEn)
+*  			0x2:read only(must enable CmdEn)
 *  			0x3:write,read
 *  			0x4:read,write
 *  			0x5:write,dummy,read
-*  			0x6:read,dummy,write(must enbale CmdEn)
-*  			0x7:None Data(must enbale CmdEn)
+*  			0x6:read,dummy,write(must enable CmdEn)
+*  			0x7:None Data(must enable CmdEn)
 *  			0x8:Dummy,write
 *  			0x9:Dummy,read
 *  			0xa~0xf:reserved

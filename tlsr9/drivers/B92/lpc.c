@@ -48,3 +48,4 @@ void lpc_set_input_ref(lpc_mode_e mode,lpc_reference_e ref)
 	}
 	analog_write_reg8(0x0d,(analog_read_reg8(0x0d)&0x8f)|(ref<<4));
 }
+

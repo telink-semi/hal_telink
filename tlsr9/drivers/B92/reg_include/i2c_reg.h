@@ -37,10 +37,7 @@
 
 
 /**
- * this register to configure I2C master clock speed,eagle i2c has default clock speed.
- * for eagle i2c,its default clock resource is 24M, its default speed is 200K.
- * user can configure this register to get other speed: i2c clock = i2c_system_clock/(4*DivClock)
- * DivClock=0x80140280[7:0].max_value=0xff.
+ *  i2c clock = pclk/(4*DivClock)
  */
 #define reg_i2c_sp				    REG_ADDR8(REG_I2C_BASE)
 
@@ -61,8 +58,8 @@ enum{
  * this register is to configure i2c master
  * BIT[0] means i2c bus whether busy.
  * BIT[1] means that a start signal is coming, it is 1, and an end signal is coming it will be 0.
- * BIT[2] Indicates the status of master send and receive,bit[2]=1,means have not ability to send or receivebit[2]=0,means have ability to send or receive.
- * BIT_RNG[3:5] Indicate what state the i2c is in when it acts as master, BIT_RNG[3:5] defaule value is 0x06 it means master's state is IDLE.
+ * BIT[2] master received status: 1 for nak; 0 for ack.
+ * BIT_RNG[3:5] Indicate what state the i2c is in when it acts as master, BIT_RNG[3:5] default value is 0x06 it means master's state is IDLE.
  * BIT_RNG[6:7] Indicate what state the i2c is in when it acts as slave.
  */
 #define reg_i2c_mst				    REG_ADDR8(REG_I2C_BASE+0x02)
@@ -79,9 +76,9 @@ enum{
  * This shows the interrupt mask register of i2c
  * BIT[0] mask the slave parsing master cmd interrupt,when received the master read or write cmd, will generate interrupt.
  * BIT[1] when slave is wrong, reply nack to master,master detect to the nack, will generate interrupt.
- * BIT[2] rx interrupt enable.RX is related to rx_irq_trig_lev function (this function is always present and does not need any setting to enable).
+ * BIT[2] rx interrupt enable.RX is related to rx_irq_trig_lev function.
  *        fifo_data_cnt> = rx_irq_trig_lev generates an interrupt.
- * BIT[3] tx interrupt enable.Related to tx_irq_trig_lev function,(This function is always present and does not require any setting to enable).
+ * BIT[3] tx interrupt enable.Related to tx_irq_trig_lev function.
  *        fifo_data_cnt <= tx_irq_trig_lev, generate interrupt.
  * BIT[4] rx_done.An interrupt is generated when one frame of data is received.
  * BIT[5] tx_done.An interrupt is generated when one frame of data is sent.
@@ -146,19 +143,6 @@ enum{
 
 
 /*
- * BIT[2] can clear everything associated i2c rx_fifo.
- * BIT[3] can clear everything associated i2c tx_fifo.
- */
-enum{
-	FLD_I2C_RX_BUFF_CLR  		= BIT(2),
-    FLD_I2C_TX_BUFF_CLR         = BIT(3),
-};
-
-
-
-
-
-/*
  * this register is to configure i2c master
  * BIT[0]: i2c master enable.
  * BIT[1]: open master stretch function.
@@ -173,7 +157,7 @@ enum{
 #define reg_i2c_ctrl2			    REG_ADDR8(REG_I2C_BASE+0x06)
 typedef enum{
 	FLD_I2C_MASTER                   =  BIT(0),
-	FLD_I2C_MASTER_STRECH_EN         =  BIT(1),
+	FLD_I2C_MASTER_STRETCH_EN         =  BIT(1),
 	FLD_MANUAL_TX_STOP_HIT          =   BIT(2),
 	FLD_MANUAL_RX_STOP_HIT          =   BIT(3),
 	FLD_I2C_MASTER_NAK_STOP_EN       =  BIT(4),
@@ -186,13 +170,13 @@ typedef enum{
  * BIT[0] to enable slave stretch function.
  * BIT[2] to master,the last byte data read is automatically returned to nack.
  * BIT[3] there is some delay before going back to ACK in the (id,address,dataw) phase
- * BIT[4] If eable rx_done interrupted on the master, it needs to be set to 1 under no_dma,
+ * BIT[4] If enable rx_done interrupt, it needs to be set to 1 under no_dma,
  *        but not under dma because there is a mechanism for setting it to 1 under DMA.
  * BIT[5] auto_clear function.
  */
 #define reg_i2c_ctrl3			 REG_ADDR8(REG_I2C_BASE+0x07)
 enum{
-	FLD_I2C_SLAVE_STRECH_EN     = BIT(0),
+	FLD_I2C_SLAVE_STRETCH_EN     = BIT(0),
 	FLD_I2C_RNCK_EN              = BIT(2),
 	FLD_MANUAL_SDA_DELAY         = BIT(3),
 	FLD_NDMA_RXDONE_EN           = BIT(4),
@@ -254,13 +238,19 @@ enum{
 
 /**
  * This register used to configure the status of i2c.
+ * BIT(0): W1C,clear the slave manual stretch.
+ * BIT(1): W1C,slave manual stretch clk.
+ * BIT(2): W1C,clear FLD_I2C_ACK_IN.
  * BIT_RNG[0,2] rbcnt is the accumulation of this action read, fifo clear will clear.
  * BIT[3]       Indicates whether i2c is in an interrupted state.
- * BIT_RNG[4,6] Indicates the number of bytes of tx_buffer.
+ * BIT_RNG[4,6] wbcnt is the accumulation of this action write.
  * BIT[7]       the rx_done interrupt,consistent with eagle's rx_done functionality
  */
 #define reg_i2c_status			    REG_ADDR8(REG_I2C_BASE+0x0d)
 enum{
+	FLD_I2C_MANUAL_STRETCH_CLR      = BIT(0),
+	FLD_I2C_R_MANUAL_STRETCH        = BIT(1),
+	FLD_I2C_MANUAL_CLR_MASTER_ACK    = BIT(2),
 	FLD_I2C_RBCNT                   = BIT_RNG(0,2),
 	FLD_I2C_IRQ_O                   = BIT(3),
 	FLD_I2C_WBCNT                   = BIT_RNG(4,6),

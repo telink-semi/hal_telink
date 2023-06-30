@@ -50,7 +50,7 @@ unsigned char audio_tx_fifo_chn;
 dma_chain_config_t g_audio_tx_dma_list_cfg[2];
 dma_chain_config_t g_audio_rx_dma_list_cfg[2];
 
-aduio_i2s_invert_config_t audio_i2s_invert_config[2]=
+audio_i2s_invert_config_t audio_i2s_invert_config[2]=
 {
    {
 	.i2s_lr_clk_invert_select=I2S_LR_CLK_INVERT_DIS,
@@ -133,7 +133,7 @@ dma_config_t audio_dma_tx_config[2]=
 
 
 /**
- * @brief     This function configures stream0 dimc pin.
+ * @brief     This function configures stream0 dmic pin.
  * @param[in] dmic0_data - the data of  dmic pin
  * @param[in] dmic0_clk1 - the clk1 of dmic pin
  * @param[in] dmic0_clk2 - the clk2 of dmic pin,if need not set clk2,please set GPIO_NONE_PIN
@@ -155,7 +155,7 @@ void audio_set_stream0_dmic_pin(gpio_func_pin_e dmic0_data,gpio_func_pin_e dmic0
 }
 
 /**
- * @brief     This function configures stream1 dimc pin.
+ * @brief     This function configures stream1 dmic pin.
  * @param[in] dmic1_data - the data of dmic  pin
  * @param[in] dmic1_clk1 - the clk1 of dmic pin
  * @param[in] dmic1_clk2 - the clk2 of dmic pin,if need not set clk2,please set GPIO_NONE_PIN
@@ -215,15 +215,15 @@ void audio_set_stream1_dmic_pin(gpio_func_pin_e dmic1_data,gpio_func_pin_e dmic1
 	 dma_chn_dis(chn);
 }
 
- /**
-  * @brief     This function serves to config  rx_dma channel.
-  * @param[in] chn          - dma channel
-  * @param[in] dst_addr     - the dma address of destination
-  * @param[in] data_len     - the length of dma rx size by byte
-  * @param[in] head_of_list - the head address of dma llp.
-  * @return    none
-  * @note      dst_addr : must be aligned by word (4 bytes), otherwise the program will enter an exception
-  */
+/**
+ * @brief     This function serves to config  rx_dma channel.
+ * @param[in] chn          - dma channel
+ * @param[in] dst_addr     - Pointer to data buffer, it must be 4-bytes aligned address.
+ *                           and the actual buffer size defined by the user needs to be not smaller than the data_len, otherwise there may be an out-of-bounds problem.
+ * @param[in] data_len     - Length of DMA in bytes,it must be set to a multiple of 4. The maximum value that can be set is 0x10000. 
+ * @param[in] head_of_list - the head address of dma llp.
+ * @return    none
+ */
 void audio_rx_dma_config(dma_chn_e chn,unsigned short *dst_addr,unsigned int data_len,dma_chain_config_t *head_of_list)
 {
 	audio_rx_dma_chn=chn;
@@ -238,10 +238,10 @@ void audio_rx_dma_config(dma_chn_e chn,unsigned short *dst_addr,unsigned int dat
  * @brief     This function serves to set rx dma chain transfer
  * @param[in] config_addr - the head of list of llp_pointer.
  * @param[in] llpointer   - the next element of llp_pointer.
- * @param[in] dst_addr    - the dma address of destination.
- * @param[in] data_len    - the length of dma size by byte.
- * @return    none
- * @note      dst_addr : must be aligned by word (4 bytes), otherwise the program will enter an exception
+ * @param[in] dst_addr    - Pointer to data buffer, it must be 4-bytes aligned address and the actual buffer size defined by the user needs to
+ *							be not smaller than the data_len, otherwise there may be an out-of-bounds problem.
+ * @param[in] data_len    - Length of DMA in bytes,it must be set to a multiple of 4. The maximum value that can be set is 0x10000.
+ * @return 	  none
  */
 void audio_rx_dma_add_list_element(dma_chain_config_t *config_addr,dma_chain_config_t *llpointer ,unsigned short * dst_addr,unsigned int data_len)
 {
@@ -256,10 +256,10 @@ void audio_rx_dma_add_list_element(dma_chain_config_t *config_addr,dma_chain_con
  * @brief     This function serves to set audio rx dma chain transfer.
  * @param[in] rx_fifo_chn - rx fifo select.
  * @param[in] chn         - dma channel
- * @param[in] in_buff     - the pointer of rx_buff.
- * @param[in] buff_size   - the size of rx_buff.
- * @return    none
- * @note      in_buff : must be aligned by word (4 bytes), otherwise the program will enter an exception
+ * @param[in] in_buff     - Pointer to data buffer, it must be 4-bytes aligned address and the actual buffer size defined by the user needs to
+ *						 	be not smaller than the data_len, otherwise there may be an out-of-bounds problem.
+ * @param[in] buff_size   - Length of DMA in bytes,it must be set to a multiple of 4. The maximum value that can be set is 0x10000.
+ * @return 	  none
  */
 void audio_rx_dma_chain_init (audio_fifo_chn_e rx_fifo_chn,dma_chn_e chn,unsigned short * in_buff,unsigned int buff_size)
 {
@@ -271,11 +271,10 @@ void audio_rx_dma_chain_init (audio_fifo_chn_e rx_fifo_chn,dma_chn_e chn,unsigne
 /**
  * @brief     This function serves to config  tx_dma channel.
  * @param[in] chn          - dma channel
- * @param[in] src_addr     - the address of source
- * @param[in] data_len     - the length of dma rx size by byte
+ * @param[in] src_addr     - Pointer to data buffer, it must be 4-bytes aligned address.
+ * @param[in] data_len     - Length of DMA in bytes, range from 1 to 0x10000.
  * @param[in] head_of_list - the head address of dma llp.
  * @return    none
- * @note      src_addr : must be aligned by word (4 bytes), otherwise the program will enter an exception
  */
 void audio_tx_dma_config(dma_chn_e chn,unsigned short * src_addr, unsigned int data_len,dma_chain_config_t * head_of_list)
 {
@@ -291,10 +290,9 @@ void audio_tx_dma_config(dma_chn_e chn,unsigned short * src_addr, unsigned int d
  * @brief     This function serves to set tx dma chain transfer
  * @param[in] config_addr - the head of list of llp_pointer.
  * @param[in] llpointer   - the next element of llp_pointer.
- * @param[in] src_addr    - the address of source
- * @param[in] data_len    - the length of dma size by byte.
+ * @param[in] src_addr    - Pointer to data buffer, it must be 4-bytes aligned address.
+ * @param[in] data_len    - Length of DMA in bytes, range from 1 to 0x10000.
  * @return    none
- * @note      src_addr : must be aligned by word (4 bytes), otherwise the program will enter an exception
  */
 void audio_tx_dma_add_list_element(dma_chain_config_t *config_addr,dma_chain_config_t *llpointer ,unsigned short * src_addr,unsigned int data_len)
 {
@@ -309,10 +307,9 @@ void audio_tx_dma_add_list_element(dma_chain_config_t *config_addr,dma_chain_con
  * @brief     This function serves to initialize audio tx dma chain transfer.
  * @param[in] tx_fifo_chn - tx fifo select.
  * @param[in] chn         - dma channel
- * @param[in] out_buff    - the pointer of tx_buff.
- * @param[in] buff_size   - the size of tx_buff.
+ * @param[in] out_buff    - Pointer to data buffer, it must be 4-bytes aligned address.
+ * @param[in] buff_size   - Length of DMA in bytes, range from 1 to 0x10000.
  * @return    none
- * @note      out_buff : must be aligned by word (4 bytes), otherwise the program will enter an exception
  */
 void audio_tx_dma_chain_init (audio_fifo_chn_e tx_fifo_chn,dma_chn_e chn,unsigned short * out_buff,unsigned int buff_size)
 {
@@ -1077,7 +1074,7 @@ void audio_codec_stream_fifo_output_config(audio_fifo_chn_e fifo_chn,audio_dac_o
  * @return    none
  * @note   When mono channel, The hardware will output the data of mono channel on the dac L and R at the same time.
  *         If only need one channel output, in order to save power, you can turn off any channel
- * For example:audio_codec_output->output_src= CODEC_DAC_NONO_L or CODEC_DAC_NONO_R select mono channel
+ * For example:audio_codec_output->output_src= CODEC_DAC_MONO_L or CODEC_DAC_MONO_R select mono channel
  */
 void audio_codec_stream_output_init(audio_codec_output_t *audio_codec_output)
 {
@@ -1093,7 +1090,7 @@ void audio_codec_stream_output_init(audio_codec_output_t *audio_codec_output)
  * @return    none
  * @attention If need to use internal codec at the same time, mclk must be set to 12M.
  */
-void aduio_i2s_set_mclk(gpio_func_pin_e mclk_pin,unsigned short div_numerator,unsigned short div_denominator)
+void audio_i2s_set_mclk(gpio_func_pin_e mclk_pin,unsigned short div_numerator,unsigned short div_denominator)
 {
     audio_set_codec_clk(div_numerator,div_denominator);
 	gpio_set_probe_clk_function(mclk_pin,PROBE_CODEC_MCLK);
@@ -1193,7 +1190,7 @@ void audio_set_i2s_output_chn_wl(audio_fifo_chn_e fifo_chn,audio_i2s_select_e i2
  * but data output channel will be inverted,you can also set i2s_config_t->i2s_data_invert_select=1 to recovery it.
  * @return    none
  */
-void audio_i2s_config(audio_i2s_select_e i2s_sel,i2s_mode_select_e i2s_format,audio_i2s_wl_mode_e wl, i2s_m_s_mode_e m_s , aduio_i2s_invert_config_t * i2s_config_t)
+void audio_i2s_config(audio_i2s_select_e i2s_sel,i2s_mode_select_e i2s_format,audio_i2s_wl_mode_e wl, i2s_m_s_mode_e m_s , audio_i2s_invert_config_t * i2s_config_t)
 {
 	reg_i2s_cfg1(i2s_sel) = MASK_VAL(FLD_AUDIO_I2S_FORMAT,     i2s_format,\
 								     FLD_AUDIO_I2S_WL,         wl,\
@@ -1212,7 +1209,7 @@ void audio_i2s_config(audio_i2s_select_e i2s_sel,i2s_mode_select_e i2s_format,au
  *                           ||                                       ||
  *           i2s_clk_config[0]/i2s_clk_config[1]                 i2s_clk_config[4]-->lrclk_dac (sampling rate)
  *
- For example:sampling rate=16K，i2s_clk_config[5]={ 8,125,6,64,64}, sampling rate=192M*(8/125)/(2*6)/64=16K
+ For example:sampling rate=16K,i2s_clk_config[5]={ 8,125,6,64,64}, sampling rate=192M*(8/125)/(2*6)/64=16K
 
  * @return    none
  * @attention The default is from pll 192M(default). If the pll is changed, the clk will be changed accordingly.

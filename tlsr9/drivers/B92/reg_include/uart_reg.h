@@ -133,7 +133,7 @@ enum{
 //state machine use for IC debug
 #define reg_uart_state(i)       REG_ADDR8(0x14008f+0x40*(i))
 enum{
-	FLD_UART_TSTATE_i   	=  BIT_RNG(0,2),//only for dma default 1.
+	FLD_UART_TSTATE_i   	=  BIT_RNG(0,2),
 	FLD_UART_RSTATE_i   	=  BIT_RNG(4,7),
 };
 

@@ -54,7 +54,7 @@ typedef enum{
 }dma_burst_size_e;
 
 typedef enum{
-	DMA_CONTINE_MODE=0,
+	DMA_CONTINUE_MODE=0,
 	DMA_INTERRUPT_MODE,
 	DMA_TERMINAL_MODE,
 }dma_llp_int_mode_e;
@@ -119,9 +119,14 @@ typedef enum{
 }
 dma_ctr_width_e;
 
+
+/**
+ * DMA supports the following three types of transfer bytes, but all the related peripherals of this chip are designed according to DMA_WORD_WIDTH,
+ * so the modes that cannot be used are commented out.
+ */
 typedef enum{
-	DMA_BYTE_WIDTH=1,
-	DMA_HWORD_WIDTH=2,
+	//DMA_BYTE_WIDTH=1,
+	//DMA_HWORD_WIDTH=2,
 	DMA_WORD_WIDTH=4,
 }
 dma_transfer_width_e;

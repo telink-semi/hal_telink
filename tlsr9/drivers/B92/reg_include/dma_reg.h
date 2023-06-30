@@ -100,6 +100,12 @@ enum{
 #define reg_dma_dst_addr(i)			REG_ADDR32 (( 0x0010044c +(i)*0x14))
 #define reg_dma_size(i)			    REG_ADDR32 (( 0x00100450 +(i)*0x14))
 
+/**
+ * Due to the design constraints of the peripheral, the DMA must be transferred by word.
+ * When the DMA is used as receive, FLD_DMA_TX_SIZE_IDX is invalid, the byte length of the DMA = FLD_DMA_TX_SIZE*4;
+ * When the DMA is used as transmit, FLD_DMA_TX_SIZE_IDX is valid. if FLD_DMA_TX_SIZE_IDX is not equal to 0, the byte length of the DMA = (FLD_DMA_TX_SIZE-1)4 + FLD_DMA_TX_SIZE_IDX;
+ * If FLD_DMA_TX_SIZE_IDX is equal to 0, the byte length of DMA = FLD_DMA_TX_SIZE*4;
+ */
 enum{
 	FLD_DMA_TX_SIZE    		=	BIT_RNG(0,21),
 	FLD_DMA_TX_SIZE_IDX    	=	BIT_RNG(22,23),

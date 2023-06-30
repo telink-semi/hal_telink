@@ -27,7 +27,7 @@
 #include "usbhw.h"
 /**
  * @brief      This function disables the manual interrupt
- *             (Endpont8 is the alias of endpoint0)
+ *             (Endpoint8 is the alias of endpoint0)
  * @param[in]  m - the irq mode needs to set
  * @return     none
  */
@@ -81,3 +81,7 @@ unsigned short usbhw_read_ctrl_ep_u16(void){
 	unsigned short v = usbhw_read_ctrl_ep_data();
 	return (usbhw_read_ctrl_ep_data() << 8) | v;
 }
+
+
+
+

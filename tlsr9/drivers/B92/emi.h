@@ -149,4 +149,17 @@ void rf_emi_reset_baseband(void);
  * @return     the new random number
  */
 unsigned int emi_pn_gen(unsigned int state);
+
+/**
+ * @brief This function is used in RF current test configurations where only RF modules work
+ * @param[in]	none.
+ * @return		none.
+ * @note  The complete test conditions for TX/RX current:
+ *        (1) turn off the clock and power of the modules irrelevant to RF;
+ *        (2) hold the modules irrelevant to RF;
+ *        (3) disable PLL clock and RC_24M to make the Pad_24M is the only clock source for cclk;
+ *        (4) stall the MCU.
+ */
+_attribute_ram_code_sec_noinline_ void rf_current_test_cfg(void);
+
 #endif
