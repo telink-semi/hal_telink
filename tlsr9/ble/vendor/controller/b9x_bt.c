@@ -97,10 +97,6 @@ _attribute_ram_code_ void stimer_irq_handler(const void *param)
 static int b9x_bt_hci_tx_handler(void)
 {
 	/* check for data available */
-	if (bltHci_txfifo.wptr == bltHci_txfifo.rptr) {
-		return 0;
-	}
-
 	while(bltHci_txfifo.wptr != bltHci_txfifo.rptr)
 	{
 		/* Get HCI data */
@@ -150,6 +146,11 @@ static int b9x_bt_hci_rx_handler(void)
 	if (p) {
 		/* Send data to the controller */
 		blc_hci_handler(&p[0], 0);
+#if CONFIG_SOC_RISCV_TELINK_B92
+		if (p[0] == HCI_TYPE_ACL_DATA) {
+			k_sem_give(&controller_sem);
+		}
+#endif
 		bltHci_rxfifo.rptr++;
 	}
 

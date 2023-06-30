@@ -24,7 +24,6 @@
  * @author	Driver Group
  *
  *******************************************************************************************************/
-
 /**	@page WATCHDOG
  *
  *	Introduction
@@ -41,7 +40,7 @@
  *  |                |              |                                                    |source in the sleep state,32K watchdog cannot be enabled. |
  *  |                |              |                                                    |                                                          |
  *  |                |              | 1. reset exceptions that occur during active       |                                                          |                                                         |
- *  | 32k watchdog   | 32k timer    | 2. reser exceptions thar occur during sleep wakeup |2.Because the 32K clock source may also be used by other  |
+ *  | 32k watchdog   | 32k timer    | 2. reset exceptions that occur during sleep wakeup |2.Because the 32K clock source may also be used by other  |
  *  |                |              |                                                    |modules,the 32K watchdog has no action to clear watchdog, |
  *  |                |              |                                                    |and can only feed the dog by resetting the capture value. |
  *  |                |              |                                                    |The correct operation process is:                         |

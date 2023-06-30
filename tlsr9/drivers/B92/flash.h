@@ -106,7 +106,19 @@ typedef enum {
     FLASH_SIZE_2M      = 0x15,
     FLASH_SIZE_4M      = 0x16,
     FLASH_SIZE_8M      = 0x17,
+	FLASH_SIZE_16M     = 0x18,
 }flash_capacity_e;
+
+/**
+ * @brief     flash mid definition
+ */
+typedef enum{
+	MID146085   =   0x146085,//P25Q80U
+	MID156085   =   0x156085,//P25Q16SU
+	MID1560c8   =   0x1560c8,//GD25LQ16E
+	MID166085   =   0x166085,//P25Q32SU
+	MID186085   =   0x186085,//P25Q128L
+}flash_mid_e;
 
 
 typedef struct{
@@ -452,7 +464,7 @@ _attribute_text_sec_ void flash_page_program_encrypt(unsigned long addr, unsigne
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-_attribute_text_sec_ void flash_quad_page_pragram_encrypt(unsigned long addr, unsigned long len, unsigned char *buf);
+_attribute_text_sec_ void flash_quad_page_program_encrypt(unsigned long addr, unsigned long len, unsigned char *buf);
 
 /**
  * @brief	  	This function serves to read MID of flash(MAC id). Before reading UID of flash,

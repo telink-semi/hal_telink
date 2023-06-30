@@ -47,28 +47,28 @@ typedef enum{
 #define reg_aes_mode     			REG_ADDR32(aes_base_addr + 0xb0)
 enum{
 	FLD_AES_START	=	BIT(0),
-	FLD_AES_MODE	=	BIT(1),   /**< 0-ciher  1-deciher */
+	FLD_AES_MODE	=	BIT(1),   /**< 0-cipher  1-decipher */
 };
 
 #define reg_aes_key(v)     			REG_ADDR32(aes_base_addr + 0xb4 + (v*4))	// v = 0 1 2 3
 
 #define reg_aes_ptr     			REG_ADDR32(aes_base_addr + 0xc4)	//only the lower 16 bits are used.
 
-#define reg_aes_RPACE_CNT     		REG_ADDR32(aes_base_addr + 0x288)
+#define reg_aes_rpase_cnt     		REG_ADDR32(aes_base_addr + 0x288)
 enum{
 	FLD_AES_PRAND				=	BIT_RNG(0, 23),
 	FLD_AES_IRK_NUM				=	BIT_RNG(24, 27),
 	FLD_AES_GEN_RES				=	BIT(29),   /**< W1C */
-	FLD_AES_RPACE_START			=	BIT(30), /**< 0-idle 1-running 2-finished */
-	FLD_AES_RPACE_EN			=	BIT(31),  /**< 0-unmatched 1-matched */
+	FLD_AES_RPASE_START			=	BIT(30), /**< 0-idle 1-running 2-finished */
+	FLD_AES_RPASE_EN			=	BIT(31),  /**< 0-unmatched 1-matched */
 };
 
 #define reg_aes_hash_status     	REG_ADDR32(aes_base_addr + 0x28c)
 enum{
 	FLD_AES_HASH_STA			=	BIT_RNG(0, 23),
 	FLD_AES_IRK_CNT				=	BIT_RNG(24, 27),
-	FLD_AES_RPACE_STA_CLR		=	BIT(28),   /**< W1C */
-	FLD_AES_RPACE_STA			=	BIT_RNG(29, 30), /**< 0-idle 1-running 2-finished */
+	FLD_AES_RPASE_STA_CLR		=	BIT(28),   /**< W1C */
+	FLD_AES_RPASE_STA			=	BIT_RNG(29, 30), /**< 0-idle 1-running 2-finished */
 	FLD_AES_HASH_MATCH			=	BIT(31),  /**< 0-unmatched 1-matched */
 };
 

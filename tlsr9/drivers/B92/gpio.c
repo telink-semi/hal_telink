@@ -276,8 +276,6 @@ void gpio_shutdown(gpio_pin_e pin)
 	}
 }
 
-
-
 /**
  * @brief     This function set a pin's IRQ.
  * @param[in] pin 			- the pin needs to enable its IRQ.
@@ -322,7 +320,7 @@ void gpio_set_irq(gpio_pin_e pin, gpio_irq_trigger_type_e trigger_type)
 /**
  * @brief     This function set a pin's IRQ_RISC0.
  * @param[in] pin 			- the pin needs to enable its IRQ.
- * @param[in] trigger_type  - gpio interrupt type 0  rising edge 1 falling edge 2 high level 3 low level.
+ * @param[in] trigger_type  - gpio interrupt type 0:rising edge 1:falling edge 2:high level 3:low level.
  * @return    none.
  */
 void gpio_set_gpio2risc0_irq(gpio_pin_e pin, gpio_irq_trigger_type_e trigger_type)
@@ -359,7 +357,7 @@ void gpio_set_gpio2risc0_irq(gpio_pin_e pin, gpio_irq_trigger_type_e trigger_typ
 /**
  * @brief     This function set a pin's IRQ_RISC1.
  * @param[in] pin 			- the pin needs to enable its IRQ.
- * @param[in] trigger_type  - gpio interrupt type 0  rising edge 1 falling edge 2 high level 3 low level
+ * @param[in] trigger_type  - gpio interrupt type 0:rising edge 1:falling edge 2:high level 3:low level.
  * @return    none.
  */
 void gpio_set_gpio2risc1_irq(gpio_pin_e pin, gpio_irq_trigger_type_e trigger_type)
@@ -394,14 +392,20 @@ void gpio_set_gpio2risc1_irq(gpio_pin_e pin, gpio_irq_trigger_type_e trigger_typ
 }
 
 /**
- * @brief     This function set a pin's IRQ.
- * @param[in] pin 			- the pin needs to enable its IRQ.
+ * @brief     This function is used to set the gpio interrupt
+ * @param[in] pin 			 - gpio pin that needs to enable irq
+ *							  <p> This parameter can only be set to the pin in GPIO_GROUP selected using the function "gpio_set_src_irq_group()"
+ *							  <p> For example, if you call the function gpio_set_src_irq_group(GPIO_GROUP_A) to select GPIO_GROUP_A,
+ *							  <p> the pin parameter of function gpio_set_src_irq() can only select the following gpio:GPIO_PA0/GPIO_PA1/GPIO_PA2/GPIO_PA3/GPIO_PA4/GPIO_PA5/GPIO_PA6/GPIO_PA7
  * @param[in] trigger_type  - gpio interrupt type.
  * 							  0: rising edge.
  * 							  1: falling edge.
  * 							  2: high level.
  * 							  3: low level
- * @note      if you want to use this irq,you should select irq_group first,which correspond to the function "gpio_set_src_irq_group()".
+ * @attention <p> GPIO_PX0 (GPIO_PA0/GPIO_PB0/... /GPIO_PF0) corresponds to the interrupt source IRQ34_GPIO_SRC0
+ *			  <p> GPIO_PX1 (GPIO_PA1/GPIO_PB1/... /GPIO_PF1) corresponds to the interrupt source IRQ35_GPIO_SRC1
+ *			  <p> ...
+ *			  <p> GPIO_PX7 (GPIO_PA7/GPIO_PB7/... /GPIO_PF7) corresponds to the interrupt source IRQ41_GPIO_SRC7
  * @return    none.
  */
 void gpio_set_src_irq(gpio_pin_e pin, gpio_irq_trigger_type_e trigger_type)
@@ -434,7 +438,7 @@ void gpio_set_src_irq(gpio_pin_e pin, gpio_irq_trigger_type_e trigger_type)
 /**
  * @brief     This function set a pin's pull-up/down resistor.
  * @param[in] pin - the pin needs to set its pull-up/down resistor.
- * @param[in] up_down_res - the type of the pull-up/down resistor.
+ * @param[in] up_down_res - the type of the pull-up/down resistor,0:FLOAT 1:PULLUP_1M 2:PULLDOWN_100K 3:PULLUP_10K.
  * @return    none.
  */
 void gpio_set_up_down_res(gpio_pin_e pin, gpio_pull_type_e up_down_res)
@@ -477,9 +481,8 @@ void gpio_set_up_down_res(gpio_pin_e pin, gpio_pull_type_e up_down_res)
 
 /**
  * @brief     This function set pin's 30k pull-up register.
- * @param[in] pin - the pin needs to set its pull-up register.
+ * @param[in] pin - the pin needs to set its pull-up register,not include PF[5:0] and PG[5:0] which are not available.
  * @return    none.
- * @attention  This function sets the digital pull-up, it will not work after entering low power consumption.
  */
 void gpio_set_pullup_res_30k(gpio_pin_e pin)
 {
@@ -493,6 +496,12 @@ void gpio_set_pullup_res_30k(gpio_pin_e pin)
 	else if(group==GPIO_GROUPD)
 	{
 		analog_write_reg8(areg_gpio_pd_pe, analog_read_reg8(areg_gpio_pd_pe) | bit);
+	}
+	else if (group==GPIO_GROUPF || group==GPIO_GROUPG){
+		if(pin == GPIO_PF6 || pin == GPIO_PF7){
+			BM_SET(reg_gpio_oen(pin),bit);
+			BM_SET(reg_gpio_out(pin),bit);
+		}
 	}
 	else
 	{
@@ -517,3 +526,4 @@ void  gpio_set_probe_clk_function(gpio_func_pin_e pin,probe_clk_sel_e sel_clk)
 /**********************************************************************************************************************
   *                    						local function implementation                                             *
   *********************************************************************************************************************/
+

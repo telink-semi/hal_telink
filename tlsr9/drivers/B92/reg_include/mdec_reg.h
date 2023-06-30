@@ -43,3 +43,8 @@ typedef enum{
 }mdec_set_e;
 
 #define	mdec_ctrl						0x54
+
+
+
+
+

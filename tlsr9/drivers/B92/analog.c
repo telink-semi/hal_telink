@@ -437,3 +437,6 @@ void analog_write_addr_data_dma(dma_chn_e chn, void *pdat, int len)
 static inline void analog_wait(){
 	while(reg_ana_ctrl & FLD_ANA_BUSY){}
 }
+
+
+

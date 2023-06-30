@@ -51,23 +51,23 @@ typedef enum{
 } mspi_io_mode_e;
 
 typedef enum{
-	MSPI_NOMAL = 0,
+	MSPI_NORMAL = 0,
     MSPI_3LINE = 3,
-} mspi_nomal_3line_mode_e;
+} mspi_normal_3line_mode_e;
 
 
 /**
  * @brief  Define the SPI command & translate mode.
  */
 typedef enum{
-	MSPI_MODE_WRITE_AND_READ = 0,//write and read at the same.must enbale CmdEn
+	MSPI_MODE_WRITE_AND_READ = 0,//write and read at the same.must enable CmdEn
 	MSPI_MODE_WRITE_ONLY,//write
-	MSPI_MODE_READ_ONLY,// read must enbale CmdEn
+	MSPI_MODE_READ_ONLY,// read must enable CmdEn
 	MSPI_MODE_WRITE_READ,//write_ read
 	MSPI_MODE_READ_WRITE,//read_write
 	MSPI_MODE_WRITE_DUMMY_READ,//write_dummy_read
-	MSPI_MODE_READ_DUMMY_WRITE,//read_ dummy_write must enbale CmdEn
-	MSPI_MODE_NONE_DATA,//must enbale CmdEn
+	MSPI_MODE_READ_DUMMY_WRITE,//read_ dummy_write must enable CmdEn
+	MSPI_MODE_NONE_DATA,//must enable CmdEn
 	MSPI_MODE_DUMMY_WRITE,//dummy_write
 	MSPI_MODE_DUMMY_READ,//dummy_read
 	MSPI_MODE_RESERVED,
@@ -79,12 +79,12 @@ typedef enum{
 }mspi_wr_tans_mode_e;
 
 typedef enum{
-	MSPI_MODE_RD_READ_ONLY  = 2,//must enbale CmdEn
+	MSPI_MODE_RD_READ_ONLY  = 2,//must enable CmdEn
 	MSPI_MODE_RD_DUMMY_READ = 9,//dummy_read
 }mspi_rd_tans_mode_e;
 
 typedef enum{
-	MSPI_MODE_WR_RD 		 = 3,//must enbale CmdEn
+	MSPI_MODE_WR_RD 		 = 3,//must enable CmdEn
 	MSPI_MODE_WR_DUMMY_RD = 5,//write_dummy_read
 }mspi_wr_rd_tans_mode_e;
 
@@ -328,8 +328,8 @@ _attribute_ram_code_sec_ static inline void mspi_tx_cnt(unsigned int cnt)
 }
 
 /**
- * @brief 		This function serve to set txfifo thres.
- * @param[in]	thres 	- the mspi txfifo thres.
+ * @brief 		This function serve to set txfifo threshold.
+ * @param[in]	thres 	- the mspi txfifo threshold.
  * @return 		none
  */
 _attribute_ram_code_sec_ static inline void mspi_set_txfifo_thres(unsigned char thres)
@@ -338,8 +338,8 @@ _attribute_ram_code_sec_ static inline void mspi_set_txfifo_thres(unsigned char 
 }
 
 /**
- * @brief 		This function serve to set rxfifo thres.
- * @param[in]	thres 	- the mspi rxfifo thres.
+ * @brief 		This function serve to set rxfifo threshold.
+ * @param[in]	thres 	- the mspi rxfifo threshold.
  * @return 		none
  */
 _attribute_ram_code_sec_ static inline void mspi_set_rxfifo_thres(unsigned char thres)
@@ -433,8 +433,8 @@ _attribute_ram_code_sec_ static inline void mspi_set_xip_timeout_cnt(unsigned ch
 }
 
 /**
- * @brief 		This function serve to set xip write transmode.
- * para[in]		cnt - xip write transmode.
+ * @brief 		This function serve to set xip write transfer mode.
+ * para[in]		cnt - xip write transfer mode.
  * @return 		none
  */
 _attribute_ram_code_sec_ static inline void mspi_set_xip_write_transmode(mspi_wr_tans_mode_e mode)
@@ -443,8 +443,8 @@ _attribute_ram_code_sec_ static inline void mspi_set_xip_write_transmode(mspi_wr
 }
 
 /**
- * @brief 		This function serve to set xip read transmode.
- * para[in]		cnt - xip write transmode.
+ * @brief 		This function serve to set xip read transfer mode.
+ * para[in]		cnt - xip write transfer mode.
  * @return 		none
  */
 _attribute_ram_code_sec_ static inline void mspi_set_xip_read_transmode(mspi_rd_tans_mode_e mode)
@@ -662,3 +662,8 @@ _attribute_ram_code_sec_noinline_  void mspi_write(unsigned char *data, unsigned
  * @return    	none
  */
 _attribute_ram_code_sec_noinline_  void mspi_read(unsigned char *data, unsigned int len);
+
+
+
+
+

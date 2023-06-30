@@ -19,156 +19,103 @@
 #ifndef DRIVERS_B92_EXT_MISC_H_
 #define DRIVERS_B92_EXT_MISC_H_
 
-#include "../analog.h"
-#include "../dma.h"
-#include "../gpio.h"
-#include "../pm.h"
-#include "../timer.h"
-#include "../flash.h"
-#include "../mdec.h"
-#include "../trng.h"
-#include "../sys.h"
-#include "../plic.h"
-#include "../stimer.h"
-#include "../clock.h"
-#include "../uart.h"
+//#include "nds_intrinsic.h"
+
 #include "types.h"
-#include "compiler.h"
-#include "bit.h"
-#include "../reg_include/soc.h"
-
-/* for debug */
-#define	DBG_SRAM_ADDR					0x00014
-
-#define PKE_OPERAND_MAX_WORD_LEN      (0x08)
-#define PKE_OPERAND_MAX_BIT_LEN       (0x100)
-#define ECC_MAX_WORD_LEN              PKE_OPERAND_MAX_WORD_LEN
-/*
- * addr - only 0x00012 ~ 0x00021 can be used !!! */
-#define write_dbg32(addr, value)   		write_sram32(addr, value)
-
-#define write_log32(err_code)   		write_sram32(0x00014, err_code)
+#include "../compatibility_pack/cmpt.h"
+#include "../analog.h"
+#include "../adc.h"
+#include "../gpio.h"
+#include "../stimer.h"
+#include "../pm.h"
+#include "../rf.h"
+#include "../trng.h"
+#include "stdbool.h"
 
 
-
-/******************************* stimer_start ******************************************************************/
-#define	SYSTICK_NUM_PER_US				24
-
-#define	SSLOT_TICK_NUM					1875/4    //attention: not use "()" for purpose !!!    625uS*24/32=625*3/4=1875/4=468.75
-#define	SSLOT_TICK_REVERSE				4/1875	  //attention: not use "()" for purpose !!!
-
-#define reg_system_tick_irq				reg_system_irq_level
-
-typedef enum {
-	STIMER_IRQ_MASK     		=   BIT(0),
-	STIMER_32K_CAL_IRQ_MASK     =   BIT(1),
-}stimer_irq_mask_e;
-
-typedef enum {
-	FLD_IRQ_SYSTEM_TIMER     		=   BIT(0),
-}system_timer_irq_mask_e;
-
-
-typedef enum {
-	STIMER_IRQ_CLR	     		=   BIT(0),
-	STIMER_32K_CAL_IRQ_CLR     	=   BIT(1),
-}stimer_irq_clr_e;
-
-
-/**
- * @brief    This function serves to enable system timer interrupt.
- * @return  none
- */
-static inline void systimer_irq_enable(void)
-{
-	reg_irq_src0 |= BIT(IRQ1_SYSTIMER);
-	//plic_interrupt_enable(IRQ1_SYSTIMER);
-}
-
-/**
- * @brief    This function serves to disable system timer interrupt.
- * @return  none
- */
-static inline void systimer_irq_disable(void)
-{
-	reg_irq_src0 &= ~BIT(IRQ1_SYSTIMER);
-	//plic_interrupt_disable(IRQ1_SYSTIMER);
-}
-
-static inline void systimer_set_irq_mask(void)
-{
-	reg_system_irq_mask |= STIMER_IRQ_MASK;
-}
-
-static inline void systimer_clr_irq_mask(void)
-{
-	reg_system_irq_mask &= (~STIMER_IRQ_MASK);
-}
-
-static inline unsigned char systimer_get_irq_status(void)
-{
-	return reg_system_cal_irq & FLD_IRQ_SYSTEM_TIMER;
-}
-
-static inline void systimer_clr_irq_status(void)
-{
-	reg_system_cal_irq = STIMER_IRQ_CLR;
-}
-
-static inline void systimer_set_irq_capture(unsigned int tick)
-{
-	reg_system_irq_level = tick;
-}
-
-static inline unsigned int systimer_get_irq_capture(void)
-{
-	return reg_system_irq_level;
-}
-
-static inline int tick1_exceed_tick2(u32 tick1, u32 tick2)
-{
-	return (u32)(tick1 - tick2) < BIT(30);
-}
-
-
-static inline int tick1_closed_to_tick2(unsigned int tick1, unsigned int tick2, unsigned int tick_distance)
-{
-	return (unsigned int)(tick1 + tick_distance - tick2) < (tick_distance<<1);
-}
-
-static inline int tick1_out_range_of_tick2(unsigned int tick1, unsigned int tick2, unsigned int tick_distance)
-{
-	return (unsigned int)(tick1 + tick_distance - tick2) > (tick_distance<<1);
-}
-/******************************* stimer_end ********************************************************************/
-
-
-
-
-
-
+/******************************* analog_start ******************************************************************/
+#define analog_write				analog_write_reg8
+#define analog_read					analog_read_reg8
+/******************************* analog_end ********************************************************************/
 
 
 
 /******************************* core_start ******************************************************************/
-#define  irq_disable		core_interrupt_disable
-#define	 irq_enable			core_interrupt_enable
-#define  irq_restore(en)	core_restore_interrupt(en)
+#define	irq_disable					core_interrupt_disable
+#define	irq_enable					core_interrupt_enable
+#define	irq_restore(en)				core_restore_interrupt(en)
+
 /******************************* core_end ********************************************************************/
 
 
 
 
-
-
-/******************************* analog_start ******************************************************************/
-#define analog_write	analog_write_reg8
-#define analog_read		analog_read_reg8
-
-/******************************* analog_end ********************************************************************/
+/******************************* efuse start *****************************************************************/
+bool efuse_get_mac_address(u8* mac_read, int length);
+/******************************* efuse end *******************************************************************/
 
 
 
+
+/******************************* gpio start ******************************************************************/
+/**
+ * @brief     This function read a pin's cache from the buffer.
+ * @param[in] pin - the pin needs to read.
+ * @param[in] p - the buffer from which to read the pin's level.
+ * @return    the state of the pin.
+ */
+static inline unsigned int gpio_read_cache(gpio_pin_e pin, unsigned char *p)
+{
+	return p[pin>>8] & (pin & 0xff);
+}
+
+/**
+ * @brief      This function read all the pins' input level.
+ * @param[out] p - the buffer used to store all the pins' input level
+ * @return     none
+ */
+static inline void gpio_read_all(unsigned char *p)
+{
+	p[0] = REG_ADDR8(0x140300);
+	p[1] = REG_ADDR8(0x140308);
+	p[2] = REG_ADDR8(0x140310);
+	p[3] = REG_ADDR8(0x140318);
+	p[4] = REG_ADDR8(0x140320);
+}
+
+/**
+ *  @brief  Define pull up or down types
+ */
+typedef enum {
+	PM_PIN_UP_DOWN_FLOAT    = 0,
+	PM_PIN_PULLUP_1M     	= 1,
+	PM_PIN_PULLDOWN_100K  	= 2,
+	PM_PIN_PULLUP_10K 		= 3,
+}gpio_pull_type;
+
+/**
+ * @brief     This function set a pin's pull-up/down resistor.
+ * @param[in] gpio - the pin needs to set its pull-up/down resistor
+ * @param[in] up_down - the type of the pull-up/down resistor
+ * @return    none
+ */
+void gpio_setup_up_down_resistor(gpio_pin_e gpio, gpio_pull_type up_down);
+/******************************* gpio end ********************************************************************/
+
+
+
+
+/******************************* rf tart **********************************************************************/
+/**
+ * @brief     This function serves to set BLE mode of RF.
+ * @return	  none.
+ */
+void rf_drv_ble_init(void);
+
+#define RF_POWER_P3dBm   RF_POWER_INDEX_P3p00dBm
+#define RF_POWER_P0dBm   RF_POWER_INDEX_P0p01dBm
+#define RF_POWER_P9dBm   RF_POWER_INDEX_P9p15dBm
+/******************************* rf end  **********************************************************************/
 
 
 
@@ -189,30 +136,15 @@ void generateRandomNum(int len, unsigned char *data);
 /******************************* trng_end ********************************************************************/
 
 
-
-
-
-/******************************* sys_start ******************************************************************/
+/******************************* stimer start ******************************************************************/
 #define sleep_us(x)					delay_us(x)
 #define sleep_ms(x)					delay_ms(x)
+/******************************* stimer end ********************************************************************/
 
 
-/******************************* sys_end ********************************************************************/
-
-/******************************* clock_start ******************************************************************/
-typedef enum{
-	SYSCLK_16M    =    16,
-	SYSCLK_24M    =    24,
-	SYSCLK_32M    =    32,
-	SYSCLK_48M    =    48,
-	SYSCLK_64M    =    64,
-}sys_clk_fre_t;
-
-static inline unsigned char clock_get_system_clk()
-{
-	return sys_clk.cclk;
-}
-/******************************* clock_end ********************************************************************/
+/******************************* usb_end *********************************************************************/
+#define reg_usb_irq					REG_ADDR8(0x100839)
+/******************************* usb_end *********************************************************************/
 
 /******************************* dma_start ***************************************************************/
 
@@ -266,7 +198,7 @@ static inline unsigned char clock_get_system_clk()
 * DMA_LEN(4B)+Hdr(2B)+PLD(251B)+MIC(4B)+CRC(3B)+TLK_PKT_INFO(12B)
 *             **use 2B enough**
 */
-#define		ISO_BIS_RX_PDU_SIZE_ALLIGN16(n)			(((n + 25) + 15) / 16 * 16) //4+2+4+2+4+3+12
+#define		ISO_BIS_RX_PDU_SIZE_ALIGN16(n)			(((n + 25) + 15) / 16 * 16) //4+2+4+2+4+3+12
 
 //12 = 4(struct bis_rx_pdu_tag	*next) + 4(u32 payloadNum) + 4(u32 idealPldAnchorTick) in bis_rx_pdu_t
 #define		BIS_LL_RX_PDU_FIFO_SIZE(n)				(CAL_LL_ISO_RX_FIFO_SIZE(n) + 12)
@@ -276,143 +208,10 @@ static inline unsigned char clock_get_system_clk()
 
 
 /******************************* plic_start ******************************************************************/
-enum{//todo
-	FLD_IRQ_EXCEPTION_EN ,
-	FLD_IRQ_SYSTIMER_EN,
-	FLD_IRQ_ALG_EN,
-	FLD_IRQ_TIMER1_EN,
-	FLD_IRQ_TIMER0_EN,
-	FLD_IRQ_DMA_EN,
-	FLD_IRQ_BMC_EN,
-	FLD_IRQ_USB_CTRL_EP_SETUP_EN,
-	FLD_IRQ_USB_CTRL_EP_DATA_EN,
-	FLD_IRQ_USB_CTRL_EP_STATUS_EN,
-	FLD_IRQ_USB_CTRL_EP_SETINF_EN,
-	FLD_IRQ_USB_ENDPOINT_EN,
-	FLD_IRQ_ZB_DM_EN,
-	FLD_IRQ_ZB_BLE_EN,
-	FLD_IRQ_ZB_BT_EN,
-	FLD_IRQ_ZB_RT_EN,
-	FLD_IRQ_PWM_EN,
-	FLD_IRQ_PKE_EN,//add
-	FLD_IRQ_UART1_EN,
-	FLD_IRQ_UART0_EN,
-	FLD_IRQ_DFIFO_EN,
-	FLD_IRQ_I2C_EN,
-	FLD_IRQ_SPI_APB_EN,
-	FLD_IRQ_USB_PWDN_EN,
-	FLD_IRQ_EN,
-	FLD_IRQ_GPIO2RISC0_EN,
-	FLD_IRQ_GPIO2RISC1_EN,
-	FLD_IRQ_SOFT_EN,
-
-	FLD_IRQ_NPE_BUS0_EN,
-	FLD_IRQ_NPE_BUS1_EN,
-	FLD_IRQ_NPE_BUS2_EN,
-	FLD_IRQ_NPE_BUS3_EN,
-	FLD_IRQ_NPE_BUS4_EN,
-
-	FLD_IRQ_USB_250US_EN,
-	FLD_IRQ_USB_RESET_EN,
-	FLD_IRQ_NPE_BUS7_EN,
-	FLD_IRQ_NPE_BUS8_EN,
-
-	FLD_IRQ_NPE_BUS13_EN=42,
-	FLD_IRQ_NPE_BUS14_EN,
-	FLD_IRQ_NPE_BUS15_EN,
-
-	FLD_IRQ_NPE_BUS17_EN=46,
-
-	FLD_IRQ_NPE_BUS21_EN=50,
-	FLD_IRQ_NPE_BUS22_EN,
-	FLD_IRQ_NPE_BUS23_EN,
-	FLD_IRQ_NPE_BUS24_EN,
-	FLD_IRQ_NPE_BUS25_EN,
-	FLD_IRQ_NPE_BUS26_EN,
-	FLD_IRQ_NPE_BUS27_EN,
-	FLD_IRQ_NPE_BUS28_EN,
-	FLD_IRQ_NPE_BUS29_EN,
-	FLD_IRQ_NPE_BUS30_EN,
-	FLD_IRQ_NPE_BUS31_EN,
-
-	FLD_IRQ_NPE_COMB_EN,
-	FLD_IRQ_PM_TM_EN,
-	FLD_IRQ_EOC_EN,
-
+enum{//todo: SunWei &YeYang
+	FLD_IRQ_ZB_RT_EN = 15,
 };
-
-unsigned int cpu_stall_WakeUp_By_RF_SystemTick(int WakeupSrc, unsigned short rf_mask, unsigned int tick);
-
 /******************************* plic_end ********************************************************************/
-
-
-
-/******************************* flash_start *****************************************************************/
-extern	  unsigned int  flash_type;
-extern	  unsigned int  get_flash_mid;
-
-_attribute_text_code_ unsigned int flash_get_jedec_id(void);
-
-void flash_set_capacity(flash_capacity_e flash_cap);
-flash_capacity_e flash_get_capacity(void);
-
-/******************************* flash_end *******************************************************************/
-
-/******************************* usb_end *********************************************************************/
-#define reg_usb_irq	REG_ADDR8(0x100839)
-/******************************* usb_end *********************************************************************/
-
-/******************************* core_start ******************************************************************/
-#define	SUPPORT_PFT_ARCH		1
-/******************************* core_end ********************************************************************/
-
-
-/******************************* plic_start *****************************************************************/
-bool efuse_get_mac_address(u8* mac_read, int length);
-/******************************* plic_end *******************************************************************/
-
-
-/******************************* debug_start ******************************************************************/
-void sub_wr_ana(unsigned int addr, unsigned char value, unsigned char e, unsigned char s);
-void sub_wr(unsigned int addr, unsigned char value, unsigned char e, unsigned char s);
-/******************************* debug_end ********************************************************************/
-
-
-/******************************* security_start ******************************************************************/
-#define SECBOOT_DESC_SECTOR_NUM		2
-#define SECBOOT_DESC_SIZE			0x2000  //8K for secure boot descriptor size
-
-#define SECBOOT_PUBKEY_OFFSET		0x1002
-
-typedef struct {
-	unsigned char vendor_mark[4];
-} sb_desc_1st_sector_t;
-
-#define DESC_1ST_SECTOR_DATA_LEN      4
-#define DESC_2ND_SECTOR_DATA_LEN	146  //16*9 + 2 = 144 + 2
-
-
-typedef struct {
-	unsigned short	multi_boot;
-	unsigned char	public_key[64];
-	unsigned char	signature[64];
-	unsigned int	run_code_adr;   //4 byte
-	unsigned int	run_code_size;
-	unsigned char	watdog_v[4];
-	unsigned char	smpi_lane[4];
-} sb_desc_2nd_sector_t;
-
-
-typedef struct {
-	unsigned char	fw_enc_en;
-	unsigned char	secboot_en;
-	unsigned short  sb_desc_adr_k; //unit: KB
-} mcu_secure_t;
-extern mcu_secure_t  mcuSecur;
-
-bool mcu_securuty_init(void);
-bool efuse_get_pubkey_hash(u8* pHash);
-/******************************* security_end ********************************************************************/
 
 
 #endif /* DRIVERS_B92_EXT_MISC_H_ */

@@ -347,6 +347,9 @@ typedef enum{
 
 /**
  *  @brief  Define pull up or down types
+ *  @note   The GPIO pull-up/pull-down resistance is a simulation result by the internal
+ *          MOSFET and affected by the IO voltage VDDO3. The lower the IO voltage of GPIO,
+ *          the higher the pull-up/pull-down resistance of GPIO.
  */
 typedef enum {
 	GPIO_PIN_UP_DOWN_FLOAT      = 0,
@@ -408,8 +411,6 @@ static inline void gpio_function_dis(gpio_pin_e pin)
 	BM_CLR(reg_gpio_func(pin), bit);
 }
 
-
-
 /**
  * @brief     This function set the pin's output high level.
  * @param[in] pin - the pin needs to set its output level.
@@ -421,7 +422,6 @@ static inline void gpio_set_high_level(gpio_pin_e pin)
 	BM_SET(reg_gpio_out(pin), bit);
 
 }
-
 
 /**
  * @brief     This function set the pin's output low level.
@@ -476,6 +476,8 @@ static inline void gpio_get_level_all(unsigned char *p)
 	p[2] = reg_gpio_pc_in;
 	p[3] = reg_gpio_pd_in;
 	p[4] = reg_gpio_pe_in;
+	p[5] = reg_gpio_pf_in;
+	p[6] = reg_gpio_pg_in;
 }
 
 /**
@@ -527,6 +529,7 @@ static inline void gpio_set_output(gpio_pin_e pin, unsigned char value)
 	}
 
 }
+
 /**
  * @brief      This function determines whether the output function of a pin is enabled.
  * @param[in]  pin - the pin needs to determine whether its output function is enabled.
@@ -537,7 +540,6 @@ static inline _Bool  gpio_is_output_en(gpio_pin_e pin)
 {
 	return !BM_IS_SET(reg_gpio_oen(pin), pin & 0xff);
 }
-
 
 /**
  * @brief     This function determines whether the input function of a pin is enabled.
@@ -579,6 +581,7 @@ static inline void gpio_gpio2risc0_irq_en(gpio_pin_e pin)
 {
 	BM_SET(reg_gpio_irq_risc0_en(pin), pin & 0xff);
 }
+
 /**
  * @brief      This function serves to disable gpio risc0 irq function.
  * @param[in]  pin  - the pin needs to disable its IRQ.
@@ -588,6 +591,7 @@ static inline void gpio_gpio2risc0_irq_dis(gpio_pin_e pin)
 {
 	BM_CLR(reg_gpio_irq_risc0_en(pin), pin & 0xff);
 }
+
 /**
  * @brief      This function serves to enable gpio risc1 irq function.
  * @param[in]  pin  - the pin needs to enable its IRQ.
@@ -607,6 +611,7 @@ static inline void gpio_gpio2risc1_irq_dis(gpio_pin_e pin)
 {
 	BM_CLR(reg_gpio_irq_risc1_en(pin), pin & 0xff);
 }
+
 /**
  * @brief      This function serves to clr gpio irq status.
  * @param[in]  status  - the irq need to clear.
@@ -626,6 +631,7 @@ static inline void gpio_clr_group_irq_status(gpio_group_irq_e status)
 {
 	reg_gpio_irq_src = status;
 }
+
 /**
  * @brief      This function serves to enable gpio irq mask function.
  * @param[in]  mask  - to select interrupt type.
@@ -666,7 +672,6 @@ static inline void gpio_clr_group_irq_mask(gpio_group_irq_e mask)
 	BM_CLR(reg_gpio_irq_src_mask, mask);
 }
 
-
 /**
  * @brief      This function set the pin's driving strength at strong.
  * @param[in]  pin - the pin needs to set the driving strength.
@@ -674,34 +679,12 @@ static inline void gpio_clr_group_irq_mask(gpio_group_irq_e mask)
  */
 void gpio_ds_en(gpio_pin_e pin);
 
-
 /**
  * @brief      This function set the pin's driving strength.
  * @param[in]  pin - the pin needs to set the driving strength at poor.
  * @return     none.
  */
- void gpio_ds_dis(gpio_pin_e pin);
-
-
-
-
-void gpio_set_irq(gpio_pin_e pin, gpio_irq_trigger_type_e trigger_type);
-
-/**
- * @brief     This function set a pin's IRQ_RISC0.
- * @param[in] pin 			- the pin needs to enable its IRQ.
- * @param[in] trigger_type  - gpio interrupt type 0  rising edge 1 falling edge 2 high level 3 low level
- * @return    none.
- */
-void gpio_set_gpio2risc0_irq(gpio_pin_e pin, gpio_irq_trigger_type_e trigger_type);
-
-/**
- * @brief     This function set a pin's IRQ_RISC1.
- * @param[in] pin 			- the pin needs to enable its IRQ.
- * @param[in] trigger_type  - gpio interrupt type 0  rising edge 1 falling edge 2 high level 3 low level
- * @return    none.
- */
-void gpio_set_gpio2risc1_irq(gpio_pin_e pin, gpio_irq_trigger_type_e trigger_type);
+void gpio_ds_dis(gpio_pin_e pin);
 
 /**
  * @brief     This function set a pin's IRQ.
@@ -710,11 +693,46 @@ void gpio_set_gpio2risc1_irq(gpio_pin_e pin, gpio_irq_trigger_type_e trigger_typ
  * 							  0: rising edge.
  * 							  1: falling edge.
  * 							  2: high level.
+ * 							  3: low level.
+ * @return    none.
+ */
+void gpio_set_irq(gpio_pin_e pin, gpio_irq_trigger_type_e trigger_type);
+
+/**
+ * @brief     This function set a pin's IRQ_RISC0.
+ * @param[in] pin 			- the pin needs to enable its IRQ.
+ * @param[in] trigger_type  - gpio interrupt type 0:rising edge 1:falling edge 2:high level 3:low level.
+ * @return    none.
+ */
+void gpio_set_gpio2risc0_irq(gpio_pin_e pin, gpio_irq_trigger_type_e trigger_type);
+
+/**
+ * @brief     This function set a pin's IRQ_RISC1.
+ * @param[in] pin 			- the pin needs to enable its IRQ.
+ * @param[in] trigger_type  - gpio interrupt type 0:rising edge 1:falling edge 2:high level 3:low level.
+ * @return    none.
+ */
+void gpio_set_gpio2risc1_irq(gpio_pin_e pin, gpio_irq_trigger_type_e trigger_type);
+
+/**
+ * @brief     This function is used to set the gpio interrupt
+ * @param[in] pin 			 - gpio pin that needs to enable irq
+ *							  <p> This parameter can only be set to the pin in GPIO_GROUP selected using the function "gpio_set_src_irq_group()"
+ *							  <p> For example, if you call the function gpio_set_src_irq_group(GPIO_GROUP_A) to select GPIO_GROUP_A,
+ *							  <p> the pin parameter of function gpio_set_src_irq() can only select the following gpio:GPIO_PA0/GPIO_PA1/GPIO_PA2/GPIO_PA3/GPIO_PA4/GPIO_PA5/GPIO_PA6/GPIO_PA7
+ * @param[in] trigger_type  - gpio interrupt type.
+ * 							  0: rising edge.
+ * 							  1: falling edge.
+ * 							  2: high level.
  * 							  3: low level
- * @note      if you want to use this irq,you should select irq_group first,which correspond to the function "gpio_set_src_irq_group()".
+ * @attention <p> GPIO_PX0 (GPIO_PA0/GPIO_PB0/... /GPIO_PF0) corresponds to the interrupt source IRQ34_GPIO_SRC0
+ *			  <p> GPIO_PX1 (GPIO_PA1/GPIO_PB1/... /GPIO_PF1) corresponds to the interrupt source IRQ35_GPIO_SRC1
+ *			  <p> ...
+ *			  <p> GPIO_PX7 (GPIO_PA7/GPIO_PB7/... /GPIO_PF7) corresponds to the interrupt source IRQ41_GPIO_SRC7
  * @return    none.
  */
 void gpio_set_src_irq(gpio_pin_e pin, gpio_irq_trigger_type_e trigger_type);
+
 /**
  * @brief      This function serves to set the gpio-mux function.
  * @param[in]  pin      - the pin needs to set.
@@ -744,6 +762,7 @@ void gpio_input_dis(gpio_pin_e pin);
  * @return     none
  */
 void gpio_set_input(gpio_pin_e pin, unsigned char value);
+
 /**
  * @brief      This function servers to set the specified GPIO as high resistor.
  * @param[in]  pin  - select the specified GPIO.
@@ -754,14 +773,14 @@ void gpio_shutdown(gpio_pin_e pin);
 /**
  * @brief     This function set a pin's pull-up/down resistor.
  * @param[in] pin - the pin needs to set its pull-up/down resistor.
- * @param[in] up_down_res - the type of the pull-up/down resistor.
+ * @param[in] up_down_res - the type of the pull-up/down resistor,0:FLOAT 1:PULLUP_1M 2:PULLDOWN_100K 3:PULLUP_10K.
  * @return    none.
  */
 void gpio_set_up_down_res(gpio_pin_e pin, gpio_pull_type_e up_down_res);
 
 /**
  * @brief     This function set pin's 30k pull-up register.
- * @param[in] pin - the pin needs to set its pull-up register.
+ * @param[in] pin - the pin needs to set its pull-up register,not include PF[5:0] and PG[5:0] which are not available.
  * @return    none.
  */
 void gpio_set_pullup_res_30k(gpio_pin_e pin);
@@ -776,8 +795,12 @@ void  gpio_set_probe_clk_function(gpio_func_pin_e pin,probe_clk_sel_e sel_clk);
 
 /**
  * @brief     This function select the irq group source.
- * @param[in] group - gpio irq group,include group A,B,C,D,E,F.
- * @note      after you choose the gpio_group,you should set the pin's irq one by one,which correspond to the function "gpio_set_src_irq()".
+ * @param[in] group - enum gpio_group_e, to specify which GPIO_GROUP_x to enable
+ * @note      To enable the gpio group interrupt, you would need to do the following:
+ *			  gpio_set_src_irq_group()   - specify the group of gpio to enable
+ *            gpio_set_src_irq()		 - select the pin from the group to enable the interrupt.
+ *
+ *            you could only set the pin in the GPIO_GROUP that has been selected
  * @return    none.
  */
 static inline void gpio_set_src_irq_group(gpio_group_e group)
@@ -787,3 +810,7 @@ static inline void gpio_set_src_irq_group(gpio_group_e group)
 }
 
 #endif
+
+
+
+

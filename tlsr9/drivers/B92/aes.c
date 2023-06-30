@@ -273,16 +273,16 @@ unsigned char aes_rpa_match(unsigned char *irk, unsigned char irk_len, unsigned 
 
 	reg_embase_addr = aes_embase_addr;  //set the embase addr
 
-	reg_aes_hash_status |= FLD_AES_RPACE_STA_CLR;
-	reg_aes_RPACE_CNT = (prand & FLD_AES_PRAND) | ((irk_len << 24) & FLD_AES_IRK_NUM) | FLD_AES_RPACE_EN;
+	reg_aes_hash_status |= FLD_AES_RPASE_STA_CLR;
+	reg_aes_rpase_cnt = (prand & FLD_AES_PRAND) | ((irk_len << 24) & FLD_AES_IRK_NUM) | FLD_AES_RPASE_EN;
 
 	reg_aes_irk_ptr = (unsigned int)rpa_data_buff - embase_offset;
 
 	reg_aes_hash_status = (hash & FLD_AES_HASH_STA);
 
-	reg_aes_RPACE_CNT |= FLD_AES_RPACE_START;
+	reg_aes_rpase_cnt |= FLD_AES_RPASE_START;
 
-	while(BIT(30) != (reg_aes_hash_status & FLD_AES_RPACE_STA));
+	while(BIT(30) != (reg_aes_hash_status & FLD_AES_RPASE_STA));
 
 	unsigned int match_status = reg_aes_hash_status;
 
@@ -298,10 +298,13 @@ unsigned char aes_rpa_match(unsigned char *irk, unsigned char irk_len, unsigned 
   *                    						local function implementation                                             *
   *********************************************************************************************************************/
 /**
- * @brief     This function refer to set the embase addr.
- * @param[in] addr - the base addr of CEVA data.the [addr,addr+64k) need to cover the head address of the session of aes_data,
- * 						Maybe you should to modify the link file to change the aes_data session address.
+ * @brief     This function refer to set the em base address.
+ * @param[in] addr - The range of em base address that can be set is the address space of DLM and ILM, which can view the Memory Map of datasheets.
+ * 					 The current driver default setting is em_base_addr = 0xc0000000, if you call this function to modify the em base address,
+ * 					 you need to ensure that the _attribute_aes_data_sec_ section in the link file (AES-related functions will use this section)
+ * 					 is set in the following address range: [em_base_addr,em_base_addr+64KB] (chip design requirements)
  * @return    none.
+ * @attention If you are using a BT-related SDK, you must follow the planning of BT's sdk to handle this address and not call this function
  */
 void aes_set_em_base_addr(unsigned int addr){
 	aes_embase_addr = addr;   //set the embase addr

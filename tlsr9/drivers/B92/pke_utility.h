@@ -130,10 +130,10 @@ void uint8_XOR(unsigned char *A, unsigned char *B, unsigned char *C, unsigned in
 unsigned int get_valid_bits(const unsigned int *a, unsigned int wordLen);
 
 /**
- * @brief       get real word lenth of big number a of max_words words.
+ * @brief       get real word length of big number a of max_words words.
  * @param[in]   a         - big integer a.
  * @param[in]   max_words - max word length of a.
- * @return   	real word lenth of big number a.
+ * @return   	real word length of big number a.
  */
 unsigned int get_valid_words(unsigned int *a, unsigned int max_words);
 
