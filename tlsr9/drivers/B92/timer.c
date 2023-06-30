@@ -30,7 +30,7 @@
  *********************************************************************************************************************/
 
 /**
- * @brief     the specifed timer start working.
+ * @brief     the specified timer start working.
  * @param[in] type - select the timer to start.
  * @return    none
  */
@@ -50,7 +50,7 @@ void timer_start(timer_type_e type)
 }
 
 /**
- * @brief     the specifed timer stop working.
+ * @brief     the specified timer stop working.
  * @param[in] type - select the timer to stop.
  * @return    none
  */

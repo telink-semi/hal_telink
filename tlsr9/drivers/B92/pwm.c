@@ -116,17 +116,18 @@ void pwm_set_dma_chain_llp(dma_chn_e chn,unsigned short * src_addr, unsigned int
  * @brief     This function servers to configure DMA cycle chain node.
  * @param[in] chn - to select the DMA channel.
  * @param[in] config_addr  - to servers to configure the address of the current node.
- * @param[in] llponit - to configure the address of the next node configure.
+ * @param[in] llpoint - to configure the address of the next node configure.
  * @param[in] src_addr - to configure DMA source address.
  * @param[in] data_len - to configure DMA length.
  * @return    none
  * @note      src_addr: must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
-void pwm_set_tx_dma_add_list_element(dma_chn_e chn,dma_chain_config_t *config_addr,dma_chain_config_t *llponit ,unsigned short * src_addr,unsigned int data_len)
+void pwm_set_tx_dma_add_list_element(dma_chn_e chn,dma_chain_config_t *config_addr,dma_chain_config_t *llpoint ,unsigned short * src_addr,unsigned int data_len)
 {
 	config_addr->dma_chain_ctl= reg_dma_ctrl(chn)|BIT(0);
 	config_addr->dma_chain_src_addr=(unsigned int)convert_ram_addr_cpu2bus(src_addr);
 	config_addr->dma_chain_dst_addr=reg_pwm_data_buf_adr;
     config_addr->dma_chain_data_len=dma_cal_size(data_len,DMA_WORD_WIDTH);
-	config_addr->dma_chain_llp_ptr=(unsigned int)convert_ram_addr_cpu2bus(llponit);
+	config_addr->dma_chain_llp_ptr=(unsigned int)convert_ram_addr_cpu2bus(llpoint);
 }
+

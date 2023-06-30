@@ -41,23 +41,6 @@
 #include "gpio.h"
 #include "reg_include/register.h"
 
-enum {
-	USB_EDP_PRINTER_IN = 8, // endpoint 8 is alias of enpoint 0,  becareful.  // default hw buf len = 64
-	USB_EDP_MOUSE = 2,			// default hw buf len = 8
-	USB_EDP_KEYBOARD_IN = 1,	// default hw buf len = 8
-	USB_EDP3_UNUSED_IN = 3,	    // default hw buf len = 16
-	USB_EDP_AUDIO_IN = 4,		// default hw buf len = 64
-	USB_EDP_PRINTER_OUT = 5,	// default hw buf len = 64
-	USB_EDP_SPEAKER = 6,		// default hw buf len = 16
-	USB_EDP_MIC = 7,			// default hw buf len = 16
-	USB_EDP_MS_IN = USB_EDP_PRINTER_IN,		// mass storage
-	USB_EDP_MS_OUT = USB_EDP_PRINTER_OUT,
-	USB_EDP_SOMATIC_IN = USB_EDP_AUDIO_IN,		//  when USB_SOMATIC_ENABLE, USB_EDP_PRINTER_OUT disable
-	USB_EDP_SOMATIC_OUT = USB_EDP_PRINTER_OUT,
-    USB_EDP_CDC_IN = 4,
-    USB_EDP_CDC_OUT = 5,
-};
-
 typedef enum {
 	USB_EDP8_IN  = 8, // default buff len = 64
 	USB_EDP1_IN  = 1, // default buff len = 8
@@ -67,6 +50,21 @@ typedef enum {
 	USB_EDP5_OUT = 5, // default buff len = 64
 	USB_EDP6_OUT = 6, // default buff len = 16
 	USB_EDP7_IN  = 7, // default buff len = 16
+
+	USB_EDP_PRINTER_IN = USB_EDP8_IN,
+	USB_EDP_KEYBOARD_IN = USB_EDP1_IN,
+	USB_EDP_MOUSE = USB_EDP2_IN,
+	USB_EDP3_UNUSED_IN = USB_EDP3_IN,
+	USB_EDP_AUDIO_IN = USB_EDP4_IN,
+	USB_EDP_PRINTER_OUT = USB_EDP5_OUT,
+	USB_EDP_SPEAKER = USB_EDP6_OUT,
+	USB_EDP_MIC = USB_EDP7_IN,
+	USB_EDP_MS_IN = USB_EDP_PRINTER_IN,
+	USB_EDP_MS_OUT = USB_EDP5_OUT,
+	USB_EDP_SOMATIC_IN = USB_EDP4_IN,
+	USB_EDP_SOMATIC_OUT = USB_EDP5_OUT,
+	USB_EDP_CDC_IN = USB_EDP4_IN,
+	USB_EDP_CDC_OUT = USB_EDP5_OUT,
 }usb_ep_index;
 
 // #defined in the standard spec
@@ -351,14 +349,14 @@ static inline void usbhw_data_ep_stall(unsigned int ep) {
  * @return    none.
  */
 static inline void usbhw_set_printer_threshold(unsigned char th) {
-	reg_usb_ep8_send_thre = th;
+	reg_usb_ep8_send_thres = th;
 }
 
 
 
 /**
  * @brief      This function disables the manual interrupt
- *             (Endpont8 is the alias of endpoint0)
+ *             (Endpoint8 is the alias of endpoint0)
  * @param[in]  m - the irq mode needs to set
  * @return     none
  */

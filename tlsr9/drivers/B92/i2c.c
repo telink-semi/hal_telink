@@ -62,7 +62,7 @@ dma_config_t i2c_rx_dma_config={
 
 
 
-/*
+/**
  * This parameter is 0x20 by default, that is, each write or read API opens the stop command.
  * if g_i2c_stop_en=0x00,it means every write or read API will disable stop command.
  */
@@ -114,25 +114,26 @@ void i2c_set_pin(gpio_func_pin_e sda_pin,gpio_func_pin_e scl_pin)
 
 /**
  * @brief      This function serves to enable i2c master function.
- * @param[in]  none.
  * @return     none.
  */
 void i2c_master_init(void)
 {
 	reg_i2c_ctrl2  |=  FLD_I2C_MASTER;       //i2c master enable.
+	i2c_master_detect_nack_en();
+	i2c_master_stretch_en();
 }
 
 
 /**
- * @brief      This function serves to set the i2c clock frequency.The i2c clock is consistent with the system clock.
- * @param[in]  clock - the division factor of I2C clock,
- *             I2C frequency = System_clock / (4*DivClock).
+ * @brief      This function serves to set the i2c clock frequency.The i2c clock is consistent with the pclk.
+ * @param[in]  clock - the division factor of I2C clock,the i2c frequency can meet 1M, and the maximum limit is not confirmed,
+ *             I2C frequency = pclk/ (4*DivClock).
  * @return     none
  */
 void i2c_set_master_clk(unsigned char clock)
 {
 
-	//i2c frequency = system_clock/(4*clock)
+	//i2c frequency = pclk/(4*clock)
 	reg_i2c_sp = clock;
 
 	//set enable flag.
@@ -154,15 +155,51 @@ void i2c_slave_init(unsigned char id)
 }
 
 
-/*
+/**
+ *@brief   in no_dma master,check whether the master ID phase receives nack that slave returns,if nack is received, launch stop cycle.
+ *@return  0:no detect nack, 1: detect nack in id phase.
+ */
+static inline unsigned char i2c_master_id_nack_detect(void)
+{
+	//After enabling master nack, I2C_MASTER_NAK_IRQ interrupt will be activated if master receives nack returned by slave.
+	if(i2c_get_irq_status(I2C_MASTER_NAK_STATUS))
+	{
+	    i2c_clr_irq_status(I2C_MASTER_NAK_CLR);
+	    reg_i2c_sct1 = (FLD_I2C_LS_STOP);
+	    while(i2c_master_busy());//wait for the STOP signal to finish sending.
+	    return 1;
+    }
+    return 0;
+}
+
+/**
+ *@brief   in no_dma master,check whether the master data phase receives nack that slave return,if nack is received,clear fifo.
+ *@return  0:no detect nack, 1: detect nack in data phase.
+ */
+static inline unsigned char i2c_master_data_nack_detect(void)
+{
+	if(i2c_get_irq_status(I2C_MASTER_NAK_STATUS))
+	{
+	    i2c_clr_irq_status(I2C_MASTER_NAK_CLR);
+	    reg_i2c_sct1 = (FLD_I2C_LS_STOP);
+	    //If configure stop once more, will no longer be busy as long as the current stop is sent.
+	    while(i2c_master_busy());//wait for the STOP signal to finish sending.
+	    i2c_clr_fifo(I2C_TX_BUFF_CLR);
+	    return 1;
+    }
+   return 0;
+}
+
+
+/**
  * @brief      The function of this API is to ensure that the data can be successfully sent out.
  *             can choose whether to send stop,if i2c stop is not configured, the next time a start signal is sent, it will be a restart signal,
  *             but if a nack exception is received in id or data phase, during exception handling, a stop signal will be sent.
  *             1.in the id phase,detect nack,stop sending.
  *             2.in the data phase,detect nack,stop sending.
- * @param[in]  id - to set the slave ID.for kite slave ID=0x5c,for eagle slave ID=0x5a.
+ * @param[in]  id   - to set the slave ID.
  * @param[in]  data - The data to be sent.
- * @param[in]  len - This length is the total length, including both the length of the slave RAM address and the length of the data to be sent.
+ * @param[in]  len  - This length is the total length, including both the length of the slave RAM address and the length of the data to be sent.
  * @return     0:received nack in id or data phase,and then stop, 1:write successfully
  */
 unsigned char i2c_master_write(unsigned char id, unsigned char *data, unsigned int len)
@@ -215,9 +252,9 @@ unsigned char i2c_master_write(unsigned char id, unsigned char *data, unsigned i
  *             can choose whether to send stop,if i2c stop is not configured, the next time a start signal is sent, it will be a restart signal,
  *             but if a nack exception is received in id phase, during exception handling, a stop signal will be sent.
  *             only in id phase, detect nack,stop receiving.
- * @param[in]  id - to set the slave ID.for kite slave ID=0x5c,for eagle slave ID=0x5a.
+ * @param[in]  id   - to set the slave ID.
  * @param[in]  data - Store the read data
- * @param[in]  len - The total length of the data read back.
+ * @param[in]  len  - The total length of the data read back.
  * @return     0 : the master receive NACK after sending out the id and then send stop.  1: the master receive the data successfully.
  */
 unsigned char  i2c_master_read(unsigned char id, unsigned char *data, unsigned int len)
@@ -252,11 +289,11 @@ unsigned char  i2c_master_read(unsigned char id, unsigned char *data, unsigned i
  *             can choose whether to send stop or not,If i2c stop is not configured,the master between writing and reading, it will be a restart signal,
  *             and after reading and writing, a stop signal is sent,but the stop configure,stays in its original state,
  *             when a nack exception signal is received, during exception handling, a stop signal will be sent.
- * @param[in]  id - to set the slave ID.for kite slave ID=0x5c,for eagle slave ID=0x5a.
+ * @param[in]  id      - to set the slave ID.
  * @param[in]  wr_data - The data to be sent.
- * @param[in]  wr_len -  This length is the total length, including both the length of the slave RAM address and the length of the data to be sent.
+ * @param[in]  wr_len  - This length is the total length, including both the length of the slave RAM address and the length of the data to be sent.
  * @param[in]  rd_data - Store the read data
- * @param[in]  rd_len -  The total length of the data read back.
+ * @param[in]  rd_len  - The total length of the data read back.
  * @return     0: the master detect nack in the id or data when the master write,stop sending,and return.
  *                or the master detect nack in the id when the master read,stop receiving,and return.
  *             1: the master receive the data successfully.
@@ -292,9 +329,10 @@ unsigned char i2c_master_write_read(unsigned char id, unsigned char *wr_data, un
  * @brief      The function of this API is just to write data to the i2c tx_fifo by DMA.
  *             can choose whether to send stop,if i2c stop is not configured, the next time a start signal is sent, it will be a restart signal,
  *             but if a nack exception is received in id or data phase, during exception handling, a stop signal will be sent.
- * @param[in]  id - to set the slave ID.for kite slave ID=0x5c,for eagle slave ID=0x5a.
+ * @param[in]  id   - to set the slave ID.
  * @param[in]  data - The data to be sent.
- * @param[in]  len - This length is the total length, including both the length of the slave RAM address and the length of the data to be sent.
+ * @param[in]  len  - This length is the total length, including both the length of the slave RAM address and the length of the data to be sent,
+ *                    the maximum transmission length of DMA is 0xFFFFFC bytes, so dont'n over this length.
  * @return     none.
  * @note       data: must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
@@ -317,9 +355,9 @@ void i2c_master_write_dma(unsigned char id, unsigned char *data, unsigned int le
  * @brief      This function serves to read a packet of data from the specified address of slave device by dma.
  *             can choose whether to send stop,if i2c stop is not configured, the next time a start signal is sent, it will be a restart signal,
  *             but if a nack exception is received in id phase, during exception handling, a stop signal will be sent.
- * @param[in]  id - to set the slave ID.for kite slave ID=0x5c,for eagle slave ID=0x5a.
+ * @param[in]  id      - to set the slave ID.
  * @param[in]  rx_data - Store the read data.
- * @param[in]  len - The total length of the data read back.
+ * @param[in]  len     - The total length of the data read back,the maximum transmission length of DMA is 0xFFFFFC bytes, so dont'n over this length.
  * @return     none
  * @note       rx_data: must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
@@ -342,7 +380,7 @@ void i2c_master_read_dma(unsigned char id, unsigned char *rx_data, unsigned int 
 /**
  * @brief      This function serves to write a packet of data to master device.
  * @param[in]  data - the pointer of tx_buff.
- * @param[in]  len - The total length of the data .
+ * @param[in]  len - The total length of the data,the maximum transmission length of DMA is 0xFFFFFC bytes, so dont'n over this length.
  * @return     none.
  * @note       data: must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
@@ -356,15 +394,16 @@ void i2c_slave_set_tx_dma( unsigned char *data, unsigned int len)
 
 
 /**
- * @brief      This function serves to receive a packet of data from master device.
- *             1.If the receiving length of DMA is set to max value:0xfffffc byte, and write_num is turned on,
- *               then The length of the data received by dma will be written to the first four bytes of addr,so addr = the receive buff addr +4;
- *	           2.If the receiving length information of DMA is set to less than max value:0xfffffc byte, even if write_num is turned on,
- *	             the length of data received by DMA will not be written to the first four bytes of addr;
- * @param[in]  data - the pointer of rx_buff.
- * @param[in]  len  - the receive length of DMA,The maximum transmission length of DMA is 0xFFFFFC bytes, so dont'n over this length.
+ * @brief      When the chip is used as an i2c slave device and you want to use dma mode for reception, you need to call this function for dma related configuration。
+ * @param[in]  data - This parameter is the first address of the received data buffer, which must be 4 bytes aligned, otherwise the program will enter an exception.
+ * @param[in]  len  - It must be set to 0xFFFFFC.
+ * @attention  The first four bytes in the buffer of the received data are the length of the received data.
+ *             The actual buffer size that the user needs to set needs to be noted on two points:
+ *			   -# you need to leave 4bytes of space for the length information.
+ *			   -# dma is transmitted in accordance with 4bytes, so the length of the buffer needs to be a multiple of 4. Otherwise, there may be an out-of-bounds problem
+ *			   For example, the actual received data length is 5bytes, the minimum value of the actual buffer size that the user needs to set is 12bytes, and the calculation of 12bytes is explained as follows:
+ *			   4bytes (length information) + 5bytes (data) + 3bytes (the number of additional bytes to prevent out-of-bounds)
  * @return     none.
- * @note       data: must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
 void i2c_slave_set_rx_dma(unsigned char *data, unsigned int len)
 {
@@ -373,8 +412,8 @@ void i2c_slave_set_rx_dma(unsigned char *data, unsigned int len)
 	dma_set_size(i2c_dma_rx_chn,len,DMA_WORD_WIDTH);
 	dma_chn_en(i2c_dma_rx_chn);
 }
-//logs the current read position in the fifo.
-unsigned char i2c_slave_rx_index = 0;
+
+unsigned char i2c_slave_rx_index = 0;//logs the current read position in the fifo.
 /**
  * @brief     This function serves to receive data .
  * @param[in]  data - the data need read.
@@ -397,7 +436,7 @@ void i2c_slave_read(unsigned char* data , unsigned int len )
 }
 
 /**
- * @brief     This function serves to receive uart data by byte with not DMA method.
+ * @brief     This function serves to receive i2c data by byte with not DMA method.
  * @param[in]  data - the data need send.
  * @param[in]  len - The total length of the data.
  * @return    none
@@ -418,7 +457,7 @@ void i2c_slave_write(unsigned char* data , unsigned int len)
 
 
 /**
- * @brief     This function serves to set i2c tx_dam channel and config dma tx default.
+ * @brief     This function serves to set i2c tx_dma channel and config dma tx default.
  * @param[in] chn: dma channel.
  * @return    none
  */
@@ -429,7 +468,7 @@ void i2c_set_tx_dma_config(dma_chn_e chn)
 }
 
 /**
- * @brief     This function serves to set i2c rx_dam channel and config dma rx default.
+ * @brief     This function serves to set i2c rx_dma channel and config dma rx default.
  * @param[in] chn: dma channel.
  * @return    none
  */
@@ -442,8 +481,8 @@ void i2c_set_rx_dma_config(dma_chn_e chn)
 
 
 /**
- * @brief     This function serves to configure the master i2c send and receive byte length,the hardware needs to know what the length is..
- * @param[in] len:  len.
+ * @brief     This function serves to configure the master i2c send and receive byte length,the hardware needs to know what the length is.
+ * @param[in] len - the maximum transmission length of i2c is 0xffffff bytes, so dont'n over this length.
  * @return    none
  */
 void i2c_master_set_len(unsigned int len){
@@ -452,63 +491,7 @@ void i2c_master_set_len(unsigned int len){
 	reg_i2c_len(2)=(len>>16)&0xff;
 }
 
-/*
- * @brief      enable master nack function, can detect whether slave return nack.
- * @return     none.
- */
-void i2c_master_detect_nack_en(void)
-{
-	reg_i2c_ctrl2 |= FLD_I2C_MASTER_NAK_STOP_EN;
-}
-
-/*
- * @brief      disable i2c master nack function.
- * @return     none.
- */
-void i2c_master_detect_nack_dis(void)
-{
-	reg_i2c_ctrl2 &= ~(FLD_I2C_MASTER_NAK_STOP_EN);
-}
-
-/*
- *@brief     enable i2c slave strech function,conjunction with Stretch function of master,
- *           this stretch function is usually used in combination with I2C_SLAVER_WR_IRQ interrupt,
- *           when TX_FIFO of slave terminal is empty or RX_FIFO of slave terminal is full, the interrupt state is up and the clock line is pulled down.
- *@return    none.
- */
-void i2c_slave_strech_en(void){
-
-	reg_i2c_ctrl3 |= FLD_I2C_SLAVE_STRECH_EN;
-}
-
-/*
- *@brief     disable i2c slave strech function.
- *@return    none.
- */
-void i2c_slave_strech_dis(void){
-
-	reg_i2c_ctrl3 &= ~FLD_I2C_SLAVE_STRECH_EN;
-}
-
-/*
- *@brief     enable i2c master strech function,combination with whether the Stretch function of slave terminal is turned on.
- *@return    none.
- */
-void i2c_master_strech_en(void){
-
-	reg_i2c_ctrl2 |=FLD_I2C_MASTER_STRECH_EN;
-}
-
-/*
- *@brief     disable i2c master strech function.
- *@return    none.
- */
-void i2c_master_strech_dis(void){
-
-	reg_i2c_ctrl2 &=~(FLD_I2C_MASTER_STRECH_EN);
-}
-
-/*
+/**
  *@brief     in slave ,judge whether the master is sending a read cmd or a write cmd.
  *@return    1:if return 1,it means that the slave is to get master read cmd.
  *           0:if return 0,it means that the slave is to get master write cmd.
@@ -518,57 +501,23 @@ i2c_slave_wr_e i2c_slave_get_cmd()
      return (i2c_slave_status1&FLD_I2C_SLAVE_READ);
 }
 
-/*
- *@brief     in master,judge whether master is to read or write
- *@return    1:if return 1,it means that the state of the master is read status.
- *           0:if return 0,it means that the state of the master is not read status.
+/**
+ * @brief     in master,judge whether master is to read or write
+ * @return    1:if return 1,it means that the state of the master is read status.
+ *            0:if return 0,it means that the state of the master is not read status.
  */
 i2c_master_wr_e i2c_get_master_wr_status()
 {
     return (reg_i2c_sct1 & FLD_I2C_LS_ID_R);
 }
 
-/*
- *@brief   in no_dma master,check whether the master ID phase receives nack that slave returns,if nack is received, launch stop cycle.
- *@return  0:no detect nack, 1: detect nack in id phase.
- */
-unsigned char i2c_master_id_nack_detect(void)
-{
-	//After enabling master nack, I2C_MASTER_NAK_IRQ interrupt will be activated if master receives nack returned by slave.
-	if(i2c_get_irq_status(I2C_MASTER_NAK_STATUS))
-	{
-	    i2c_clr_irq_status(I2C_MASTER_NAK_CLR);
-	    reg_i2c_sct1 = (FLD_I2C_LS_STOP);
-	    while(i2c_master_busy());//wait for the STOP signal to finish sending.
-	    return 1;
-    }
-    return 0;
-}
-
-/*
- *@brief   in no_dma master,check whether the master data phase receives nack that slave return,if nack is received,clear fifo.
- *@return  0:no detect nack, 1: detect nack in data phase.
- */
-unsigned char i2c_master_data_nack_detect(void)
-{
-	if(i2c_get_irq_status(I2C_MASTER_NAK_STATUS))
-	{
-	    i2c_clr_irq_status(I2C_MASTER_NAK_CLR);
-	    reg_i2c_sct1 = (FLD_I2C_LS_STOP);
-	    //If configure stop once more, will no longer be busy as long as the current stop is sent.
-	    while(i2c_master_busy());//wait for the STOP signal to finish sending.
-	    i2c_clr_fifo(I2C_TX_BUFF_CLR);
-	    return 1;
-    }
-   return 0;
-}
 
 /********************************************************************************************
  *****|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|*****
  *****|								i2c1_m.c 						                   |*****
  *****|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|*****
  ********************************************************************************************/
-/*
+/**
  * This parameter is 0x20 by default, that is, each write or read API opens the stop command.
  * if g_i2c_stop_en=0x00,it means every write or read API will disable stop command.
  */
@@ -600,19 +549,19 @@ void i2c1_m_master_send_stop(unsigned char en)
  * @param[in]  scl_pin - the pin port selected as I2C scl pin port.
  * @return     none
  */
-void i2c1_m_set_pin(gpio_pin_e sda_pin,gpio_pin_e scl_pin)
+void i2c1_m_set_pin(gpio_func_pin_e sda_pin,gpio_func_pin_e scl_pin)
 {
 	//When the pad is configured with mux input and a pull-up resistor is required, gpio_input_en needs to be placed before gpio_function_dis,
 	//otherwise first set gpio_input_disable and then call the mux function interface,the mux pad will misread the short low-level timing.confirmed by minghai.20210709.
-	gpio_input_en(sda_pin);//enable sda input
-	gpio_input_en(scl_pin);//enable scl input
-	gpio_set_up_down_res(sda_pin, GPIO_PIN_PULLUP_10K);
-	gpio_set_up_down_res(scl_pin, GPIO_PIN_PULLUP_10K);
+	gpio_input_en((gpio_pin_e)sda_pin);//enable sda input
+	gpio_input_en((gpio_pin_e)scl_pin);//enable scl input
+	gpio_set_up_down_res((gpio_pin_e)sda_pin, GPIO_PIN_PULLUP_10K);
+	gpio_set_up_down_res((gpio_pin_e)scl_pin, GPIO_PIN_PULLUP_10K);
 	//disable sda_pin and scl_pin gpio function.
-	gpio_function_dis(scl_pin);
-	gpio_function_dis(sda_pin);
-	gpio_set_mux_function((gpio_func_pin_e)scl_pin,I2C1_SCL_IO);
-	gpio_set_mux_function((gpio_func_pin_e)sda_pin,I2C1_SDA_IO);
+	gpio_function_dis((gpio_pin_e)scl_pin);
+	gpio_function_dis((gpio_pin_e)sda_pin);
+	gpio_set_mux_function(scl_pin,I2C1_SCL_IO);
+	gpio_set_mux_function(sda_pin,I2C1_SDA_IO);
 
 
 
@@ -620,7 +569,6 @@ void i2c1_m_set_pin(gpio_pin_e sda_pin,gpio_pin_e scl_pin)
 
 /**
  * @brief      This function serves to enable i2c1_m master function.
- * @param[in]  none.
  * @return     none.
  */
 void i2c1_m_master_init(void)
@@ -630,9 +578,9 @@ void i2c1_m_master_init(void)
 
 
 /**
- * @brief      This function serves to set the i2c1_m clock frequency.The i2c1_m clock is consistent with the system clock.
+ * @brief      This function serves to set the i2c1_m clock frequency.The i2c1_m clock is consistent with the pclk.
  * @param[in]  clock - the division factor of i2c1_m clock,
- *             i2c1_m frequency = system_clock / (4*clock).
+ *             i2c1_m frequency = pclk / (4*clock).
  * @return     none
  */
 void i2c1_m_set_master_clk(unsigned char clock)
@@ -647,6 +595,7 @@ void i2c1_m_set_master_clk(unsigned char clock)
 
 /**
  *  @brief      This function serves to write a packet of data to the specified address of slave device
+ *  @param[in]  id      - to set the slave ID.
  *  @param[in]  data_buf - the first SRAM buffer address to write data to slave in.
  *  @param[in]  data_len - the length of data master write to slave.
  *  @return     0:During sending id or data, the master receives the nack returned by the slave, and stops sending.
@@ -687,6 +636,7 @@ unsigned char i2c1_m_master_write(unsigned char id, unsigned char * data_buf, un
 
 /**
  * @brief      This function serves to read a packet of data.
+ * @param[in]  id      - to set the slave ID.
  * @param[in]  data_buf - the first address of SRAM buffer master store data in.
  * @param[in]  data_len - the length of data master read from slave.
  * @return     0:During sending id, the master receives the nack returned by the slave, and stops sending.
@@ -728,6 +678,7 @@ unsigned char i2c1_m_master_read(unsigned char id, unsigned char * data_buf, uns
  * @brief      This function serves to read a packet of data from the specified address of slave device.
  *             the master between writing and reading, it will be a restart signal,and after reading and writing, a stop signal is sent,
  *             but the stop configure,stays in its original state,when a nack exception signal is received, during exception handling, a stop signal will be sent.
+ * @param[in]  id      - to set the slave ID.
  * @param[in]  wr_data - specifies the SRAM address of the slave to send data.
  * @param[in]  wr_len - the length of register. enum 0 or 1 or 2 or 3 based on the demand of i2c slave.
  * @param[in]  rd_data - the first address of SRAM buffer master store data in.
@@ -761,3 +712,5 @@ unsigned char i2c1_m_master_write_read(unsigned char id, unsigned char *wr_data,
     }
 	return 1;
 }
+
+

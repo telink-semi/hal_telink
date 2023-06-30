@@ -27,6 +27,7 @@
 #ifndef SPI_H
 #define SPI_H
 
+#include <stdbool.h>
 #include "reg_include/register.h"
 #include "gpio.h"
 #include "dma.h"
@@ -40,6 +41,7 @@
  *	===============
  *	Header File: spi.h
  */
+
 typedef enum{
 	SPI_RXFIFO_OR_INT_EN        =BIT(0),
 	SPI_TXFIFO_UR_INT_EN        =BIT(1),
@@ -88,22 +90,22 @@ typedef enum{
 }spi_io_mode_e;
 
 typedef enum{
-	SPI_NOMAL = 0,
+	SPI_NORMAL = 0,
     SPI_3LINE = 3,
-} spi_nomal_3line_mode_e;
+}spi_normal_3line_mode_e;
 
 /**
  * @brief  Define the SPI translate mode.
  */
 typedef enum{
-	SPI_MODE_WRITE_AND_READ = 0,//write and read at the same.must enbale CmdEn
+	SPI_MODE_WRITE_AND_READ = 0,//write and read at the same.must enable CmdEn
 	SPI_MODE_WRITE_ONLY,//write
-	SPI_MODE_READ_ONLY,// read must enbale CmdEn
+	SPI_MODE_READ_ONLY,// read must enable CmdEn
 	SPI_MODE_WRITE_READ,//write_ read
 	SPI_MODE_READ_WRITE,//read_write
 	SPI_MODE_WRITE_DUMMY_READ,//write_dummy_read
-	SPI_MODE_READ_DUMMY_WRITE,//read_ dummy_write must enbale CmdEn
-	SPI_MODE_NONE_DATA,//must enbale CmdEn
+	SPI_MODE_READ_DUMMY_WRITE,//read_ dummy_write must enable CmdEn
+	SPI_MODE_NONE_DATA,//must enable CmdEn
 	SPI_MODE_DUMMY_WRITE,//dummy_write
 	SPI_MODE_DUMMY_READ,//dummy_read
 	SPI_MODE_RESERVED,
@@ -115,12 +117,12 @@ typedef enum{
 }spi_wr_tans_mode_e;
 
 typedef enum{
-	SPI_MODE_RD_READ_ONLY  = 2,//must enbale CmdEn
+	SPI_MODE_RD_READ_ONLY  = 2,//must enable CmdEn
 	SPI_MODE_RD_DUMMY_READ = 9,//dummy_read
 }spi_rd_tans_mode_e;
 
 typedef enum{
-	SPI_MODE_WR_RD 		 = 3,//must enbale CmdEn
+	SPI_MODE_WR_RD 		 = 3,//must enable CmdEn
 	SPI_MODE_WR_DUMMY_RD = 5,//write_dummy_read
 }spi_wr_rd_tans_mode_e;
 
@@ -174,9 +176,6 @@ typedef struct{
 	unsigned char spi_addr_fmt_en;//if addr_en enable addr fmt will follow the interface (dual/quad)
 }spi_wr_rd_config_t;
 
-/**
- * @brief  Define the spi pin struct.
- */
 typedef enum{
 	LSPI_CSN_PE0_PIN 		= GPIO_PE0,
 	LSPI_CLK_PE1_PIN 		= GPIO_PE1,
@@ -186,14 +185,24 @@ typedef enum{
 	LSPI_IO3_PE5_PIN 		= GPIO_PE5,
 }lspi_pin_def_e;
 
+
 typedef struct{
-	gpio_pin_e      	spi_clk_pin;
-	gpio_pin_e         	spi_csn_pin;
-	gpio_pin_e     spi_mosi_io0_pin;
-	gpio_pin_e     spi_miso_io1_pin;
-	gpio_pin_e       	spi_io2_pin;
-	gpio_pin_e     		spi_io3_pin;
-}spi_pin_config_t;
+	gpio_func_pin_e      	spi_clk_pin;
+	gpio_func_pin_e         spi_csn_pin;
+	gpio_func_pin_e     spi_mosi_io0_pin;
+	gpio_func_pin_e     spi_miso_io1_pin;
+	gpio_func_pin_e         spi_io2_pin;
+	gpio_func_pin_e     	spi_io3_pin;
+}gspi_pin_config_t;
+
+typedef struct{
+	lspi_pin_def_e         spi_clk_pin;
+	lspi_pin_def_e         spi_csn_pin;
+	lspi_pin_def_e     spi_mosi_io0_pin;
+	lspi_pin_def_e     spi_miso_io1_pin;
+	lspi_pin_def_e         spi_io2_pin;
+	lspi_pin_def_e     	   spi_io3_pin;
+}lspi_pin_config_t;
 
 typedef struct{
 	gpio_func_pin_e      	gspi_clk_pin;
@@ -231,7 +240,7 @@ typedef struct{
 	unsigned char spi_xip_rd_cmd_fmt_en:1;//if cmd_en enable cmd fmt will follow the interface (dual/quad)
 	unsigned char spi_xip_rd_cmd_en:1;//enable cmd phase
 	unsigned char spi_xip_rd_dummy_cnt:4;//set dummy cnt if tans_mode have dummy.
-	unsigned char spi_xip_rd_transmode:4;//set read transmode
+	unsigned char spi_xip_rd_transmode:4;//set read transfer mode
 	unsigned char reserved0;
 	unsigned char spi_xip_rd_cmd;//set read cmd
 	//Byte 4~7;
@@ -242,7 +251,7 @@ typedef struct{
 	unsigned char spi_xip_wr_cmd_fmt_en:1;//if cmd_en enable cmd fmt will follow the interface (dual/quad)
 	unsigned char spi_xip_wr_cmd_en:1;//enable cmd phase
 	unsigned char reserved1:4;
-	unsigned char spi_xip_wr_transmode:4;//set write transmode
+	unsigned char spi_xip_wr_transmode:4;//set write transfer mode
 	unsigned char reserved2;
 	unsigned char xip_xip_wr_cmd;//set write cmd
 }spi_xip_config_t;
@@ -1068,7 +1077,7 @@ static inline void lspi_lcd_set_res(unsigned short line_res, unsigned short row_
 }
 
 /**
- * @brief 		This function servers to set lspi lcd 4bit color look up table. 4bit in ram is maped to totaly 16 lookup tables.
+ * @brief 		This function servers to set lspi lcd 4bit color look up table. 4bit in ram is mapped to totally 16 lookup tables.
  * @return  	none.
  */
 static inline void lspi_lcd_set_lut(unsigned char addr, unsigned int color)
@@ -1077,7 +1086,7 @@ static inline void lspi_lcd_set_lut(unsigned char addr, unsigned int color)
 }
 
 /**
- * @brief 		This function servers to set lspi lcd display line transmode.
+ * @brief 		This function servers to set lspi lcd display line transfer mode.
  * @return  	none.
  */
 static inline void lspi_lcd_set_display_transmode(spi_tans_mode_e mode)
@@ -1086,7 +1095,7 @@ static inline void lspi_lcd_set_display_transmode(spi_tans_mode_e mode)
 }
 
 /**
- * @brief 		This function servers to set lspi lcd porch line transmode.
+ * @brief 		This function servers to set lspi lcd porch line transfer mode.
  * @return  	none.
  */
 static inline void lspi_lcd_set_porch_transmode(spi_tans_mode_e mode)
@@ -1134,7 +1143,7 @@ void gspi_change_csn_pin(gpio_pin_e current_csn_pin,gpio_pin_e next_csn_pin);
  * @param[in]  pin  - the selected pin.
  * @return     none
  */
-void lspi_set_pin_mux(lspi_pin_def_e pin);
+void lspi_set_pin_mux(gpio_pin_e pin);
 
 /**
  * @brief   This function set pin for spi slave module.
@@ -1232,7 +1241,7 @@ void spi_set_io_mode(spi_sel_e spi_sel, spi_io_mode_e mode);
 /**
  * @brief     	This function servers to config normal mode.
  * @param[in] 	spi_sel - the spi module.
- * @param[in] 	mode 	- nomal ,mode 3line.
+ * @param[in] 	mode 	- normal ,mode 3line.
  * @return  	none
  */
 void spi_master_config(spi_sel_e spi_sel, spi_io_mode_e mode);
@@ -1249,7 +1258,7 @@ void spi_master_config_plus(spi_sel_e spi_sel,spi_wr_rd_config_t *config);
  * @param[in] 	gspi_pin_config - the pointer of pin config struct.
  * @return 		none
  */
-void gspi_set_pin(spi_pin_config_t *spi_pin_config);
+void gspi_set_pin(gspi_pin_config_t *spi_pin_config);
 /**
  * @brief     	This function servers to set gspi pin for XIP.
  * @param[in] 	gspi_xip_pin_config - the pointer of pin config struct.
@@ -1261,7 +1270,7 @@ void gspi_set_xip_pin(gspi_xip_pin_config_t *gspi_xip_pin_config);
  * @param[in] 	spi_pin_config - the pointer of pin config struct.
  * @return 		none
  */
-void lspi_set_pin(spi_pin_config_t *spi_pin_config);
+void lspi_set_pin(lspi_pin_config_t *spi_pin_config);
 /**
  * @brief     	This function servers to send command by spi.
  * @param[in] 	spi_sel - the spi module.
@@ -1397,22 +1406,26 @@ void spi_set_slave_rx_dma_config(spi_sel_e spi_sel,dma_chn_e chn);
 
 
 /**
- * @brief   	this  function set spi tx dma channel.
- * @param[in]  	spi_sel     - the spi module.
- * @param[in]  	src_addr 	- the address of source.
- * @param[in]  	len 		- the length of data.
+ * @brief   	Send an amount of data in DMA mode
+ * @param[in]  	spi_sel     - to specify the spi module.
+ * @param[in]  	src_addr 	- Pointer to data buffer, it must be 4-bytes aligned address
+ * @param[in]  	len 		- Amount of data to be sent in bytes, range from 1 to 0xFFFFFC
  * @return		none
  * */
 _attribute_ram_code_sec_ void spi_set_tx_dma(spi_sel_e spi_sel, unsigned char* src_addr,unsigned int len);
 
 /**
- * @brief   	this  function set spi rx dma channel.
- * @param[in]  	spi_sel     - the spi module.
- * @param[in]  	dst_addr 	- the address of destination.
- * @param[in]  	len 		- the length of data.
- * @return		none
- * @note	  	dst_addr : must be aligned by word (4 bytes), otherwise the program will enter an exception.
- * */
+ * @brief      Receive an amount of data in DMA mode
+ * @param[in]  spi_sel		- to specify the spi module.
+ * @param[in]  dst_addr 	- Pointer to data buffer, it must be 4-bytes aligned
+ * @attention  The first four bytes in the buffer of the received data are the length of the received data.
+ *             The actual buffer size that the user needs to set needs to be noted on two points:
+ *			   -# you need to leave 4bytes of space for the length information.
+ *			   -# dma is transmitted in accordance with 4bytes, so the length of the buffer needs to be a multiple of 4. Otherwise, there may be an out-of-bounds problem
+ *			   For example, the actual received data length is 5bytes, the minimum value of the actual buffer size that the user needs to set is 12bytes, and the calculation of 12bytes is explained as follows::
+ *			   4bytes (length information) + 5bytes (data) + 3bytes (the number of additional bytes to prevent out-of-bounds)
+ * @return     none.
+ */
 _attribute_ram_code_sec_ void spi_set_rx_dma(spi_sel_e spi_sel, unsigned char* dst_addr);
 
 /**

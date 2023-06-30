@@ -68,8 +68,8 @@
 /*
  * IRAM area:0x00000~0x3FFFF BIT(19) is 0,BIT(17~0) 256K is address offset
  * DRAM area:0x80000~0xBFFFF BIT(19) is 1,BIT(17~0) 256K is address offset
- * ILM area:0xc0000000~0xc0040000 BIT(31~30) is 3,BIT(21) is 0, BIT(20~18) do not care  BIT(17~0) 128K is address offset 128K is address offset
- * DLM area:0xc0200000~0xc0240000 BIT(31~30) is 3,BIT(21) is 1, BIT(20~18) do not care  BIT(17~0) 128K is address offset 128K is address offset
+ * ILM area:0xc0000000~0xc0040000 BIT(31~30) is 3,BIT(21) is 0, BIT(20~18) do not care  BIT(17~0) 256K is address offset 256K is address offset
+ * DLM area:0xc0200000~0xc0240000 BIT(31~30) is 3,BIT(21) is 1, BIT(20~18) do not care  BIT(17~0) 256K is address offset 256K is address offset
  * BIT(19) is used to distinguish from IRAM to DRAM, BIT(21) is used to distinguish from ILM to DLM.
  * so we can write it as follow
  * #define  convert_ram_addr_cpu2bus  (((((addr))&0x80000)? ((addr)| 0xc0200000) : ((addr)|0xc0000000)))
@@ -84,8 +84,8 @@
 //#endif
 // go further, if the source and destination  address is not in the sram(IRAM/DRAM)  interval, no address translation
 #define convert_ram_addr_cpu2bus(addr)  (unsigned int)(addr) < 0xc0000 ? ((unsigned int)(addr)+0xc0180000): (unsigned int)(addr)
-
-#define convert_ram_addr_bus2cpu(addr)  (((((unsigned int)(addr)) >=0xc0200000)?(((unsigned int)(addr)) + 0x80000-0xc0200000) : (((unsigned int)(addr)) - 0xc0000000)))
+//When using convert_ram_addr_cpu2bus(addr) formula to write to the register, BIT(20~18) may not be zero,  need to clear the corresponding bit to zero
+#define convert_ram_addr_bus2cpu(addr)  (((((unsigned int)(addr)) >=0xc0200000)?(((unsigned int)(addr)) + 0x80000-0xc0200000) : (((unsigned int)(addr)&(~0x1c0000))-0xc0000000)))
 
 
 #define LM_BASE                        0x80000000
@@ -288,3 +288,5 @@ typedef enum{
 	FLD_WKUP_VAD			=	BIT(6),
 	FLD_VBUS_ON				=	BIT(7),
 }wakeup_status_e;
+
+

@@ -90,7 +90,7 @@ typedef enum{
 } spi_io_mode_e;
 
 typedef enum{
-	SPI_NOMAL = 0,
+	SPI_NORMAL = 0,
     SPI_3LINE = 3,
 } spi_nomal_3line_mode_e;
 

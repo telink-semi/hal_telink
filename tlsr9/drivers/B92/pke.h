@@ -150,9 +150,17 @@ typedef void *(*KDF_FUNC)(const void *input, unsigned int byteLen, unsigned char
 //APIs
 
 /**
+ * @brief		This function is used to determine whether the array is all 0s.
+ * @param[in]	data	- the buffer data.
+ * @param[in]	len		- the length of data.
+ * @return		1: all 0, 0: not all 0.
+ */
+int ismemzero4(unsigned int a[], unsigned int wordLen);
+
+/**
  * @brief       get random data.
  * @param[in]   rand_pke  - random data array.
- * @param[in]   bytes     - lenth of the random data.
+ * @param[in]   bytes     - length of the random data.
  * @return   	TRNG_SUCCESS(success), other(error).
  */
 unsigned char rand_get(unsigned char *rand, unsigned int byteLen);
@@ -276,7 +284,7 @@ unsigned int pke_modmul_internal(const unsigned int *modulus, const unsigned int
 unsigned int pke_modmul(const unsigned int *modulus, const unsigned int *a, const unsigned int *b, unsigned int *out, unsigned int wordLen);
 
 /**
- * @brief       mod exponent, this could be used for rsa encrypting,decrypting,signing,verifing.
+ * @brief       mod exponent, this could be used for rsa encrypting,decrypting,signing,verifying.
  * @param[in]   modulus     - modulus.
  * @param[in]   exponent    - exponent.
  * @param[in]   base        - base number.
@@ -303,7 +311,7 @@ unsigned int pke_modexp(const unsigned int *modulus, const unsigned int *exponen
  * @param[out]	c          - unsigned int big integer, RSA public key e.
  * @return   	PKE_SUCCESS(success), other(error).
  * @caution     1. b must be odd, and please make sure bWordLen is real word length of b.
- *              2. pleae make sure aWordLen <= 2*OPERAND_MAX_WORD_LEN, bWordLen <= OPERAND_MAX_WORD_LEN.
+ *              2. please make sure aWordLen <= 2*OPERAND_MAX_WORD_LEN, bWordLen <= OPERAND_MAX_WORD_LEN.
  *              3. real bit length of a can not be bigger than 2*(real bit length of b).
  */
 unsigned int pke_mod(unsigned int *a, unsigned int aWordLen, unsigned int *b, unsigned int *b_h, unsigned int *b_n1, unsigned int bWordLen,

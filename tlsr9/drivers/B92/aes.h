@@ -28,7 +28,7 @@
  *
  *	Introduction
  *	===============
- *	TLSRB92 supports hardware AES function.
+ *	B92 supports hardware AES function.
  *
  *	API Reference
  *	===============
@@ -105,9 +105,13 @@ int aes_decrypt(unsigned char *key, unsigned char* decrypttext, unsigned char *r
 int aes_decrypt_bt_en(unsigned char* key, unsigned char* plaintext, unsigned char *result);
 
 /**
- * @brief     This function refer to set the base addr of data which use in CEVA module
- * @param[in] addr - the base addr of CEVA data.
+ * @brief     This function refer to set the em base address.
+ * @param[in] addr - The range of em base address that can be set is the address space of DLM and ILM, which can view the Memory Map of datasheets.
+ * 					 The current driver default setting is em_base_addr = 0xc0000000, if you call this function to modify the em base address,
+ * 					 you need to ensure that the _attribute_aes_data_sec_ section in the link file (AES-related functions will use this section)
+ * 					 is set in the following address range: [em_base_addr,em_base_addr+64KB] (chip design requirements)
  * @return    none.
+ * @attention If you are using a BT-related SDK, you must follow the planning of BT's sdk to handle this address and not call this function
  */
 void aes_set_em_base_addr(unsigned int addr);
 

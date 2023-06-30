@@ -28,23 +28,13 @@
 #include "types.h"
 #include "ext_misc.h"
 
-#ifndef	PM_32k_RC_CALIBRATION_ALGORITHM_EN
-#define PM_32k_RC_CALIBRATION_ALGORITHM_EN	1
-#endif
+
+
+#define DEEPSLEEP_RAM_SIZE_TO_MODE(ram_size)  ram_size==0x8000? DEEPSLEEP_MODE_RET_SRAM_LOW32K: (ram_size==0x10000)? DEEPSLEEP_MODE_RET_SRAM_LOW64K:DEEPSLEEP_MODE_RET_SRAM_LOW96K
 
 
 
 
-
-
-/**
- * @brief	available wake-up source for customer
- */
-typedef enum {
-	 //not available wake-up source for customer
-	 PM_TIM_RECOVER_START   = BIT(14),
-	 PM_TIM_RECOVER_END     = BIT(15),
-}pm_tim_recover_wakeup_src_e;
 
 
 
@@ -64,13 +54,7 @@ extern  check_32k_clk_handler_t  	pm_check_32k_clk_stable;
 extern  pm_get_32k_clk_handler_t 	pm_get_32k_tick;
 extern  pm_tim_recover_handler_t 	pm_tim_recover;
 
-/**
- * @brief	gpio wakeup level definition
- */
-typedef enum{
-	Level_Low=0,
-	Level_High =1,
-}pm_gpio_wakeup_Level_e;
+
 
 
 /**
@@ -85,37 +69,13 @@ typedef struct{
 
 extern  _attribute_aligned_(4) misc_para_t 				blt_miscParam;
 
-#define SYS_NEED_REINIT_EXT32K			    BIT(1)
-#define WAKEUP_STATUS_TIMER_CORE     	    ( WAKEUP_STATUS_TIMER | WAKEUP_STATUS_CORE)
-#define WAKEUP_STATUS_TIMER_PAD		        ( WAKEUP_STATUS_TIMER | WAKEUP_STATUS_PAD)
+
 
 
 
 void bls_pm_registerFuncBeforeSuspend (suspend_handler_t func );
 
-/**
- * @brief analog register below can store infomation when MCU in deepsleep mode
- * 	      store your information in these ana_regs before deepsleep by calling analog_write function
- * 	      when MCU wakeup from deepsleep, read the information by by calling analog_read function
- * 	      Reset these analog registers only by power cycle
- */
-#define DEEP_ANA_REG0                       PM_ANA_REG_POWER_ON_CLR_BUF0 //initial value =0x00	[Bit0][Bit1] is already occupied. The customer cannot change!
-#define DEEP_ANA_REG1                       PM_ANA_REG_POWER_ON_CLR_BUF1 //initial value =0x00
-#define DEEP_ANA_REG2                       PM_ANA_REG_POWER_ON_CLR_BUF2 //initial value =0x00
-#define DEEP_ANA_REG3                      	PM_ANA_REG_POWER_ON_CLR_BUF3 //initial value =0x00
-#define DEEP_ANA_REG4                       PM_ANA_REG_POWER_ON_CLR_BUF4 //initial value =0x00
-#define DEEP_ANA_REG5                       PM_ANA_REG_POWER_ON_CLR_BUF5 //initial value =0x00
-#define DEEP_ANA_REG6                       PM_ANA_REG_POWER_ON_CLR_BUF6 //initial value =0x0f
 
-/**
- * @brief these analog register can store data in deepsleep mode or deepsleep with SRAM retention mode.
- * 	      Reset these analog registers by watchdog, chip reset, RESET Pin, power cycle
- */
-
-#define DEEP_ANA_REG7                       PM_ANA_REG_WD_CLR_BUF0 //initial value =0xff	[Bit0] is already occupied. The customer cannot change!
-
-//ana39 system used, user can not use
-#define SYS_DEEP_ANA_REG 					PM_ANA_REG_POWER_ON_CLR_BUF0
 
 
 /**
@@ -191,16 +151,7 @@ extern void check_32k_clk_stable(void);
  * @param[in]  none.
  * @return     none.
  */
-static inline void blc_pm_select_external_32k_crystal(void)
-{
-	cpu_sleep_wakeup 	 	= cpu_sleep_wakeup_32k_xtal;
-	pm_check_32k_clk_stable = check_32k_clk_stable;
-	pm_tim_recover		 	= pm_tim_recover_32k_xtal;
-	g_clk_32k_src = CLK_32K_XTAL;
-	pm_get_32k_tick 		= clock_get_32k_tick;
-	blt_miscParam.pad32k_en 	= 1; // set '1': 32k clk src use external 32k crystal
-}
-
+_attribute_ram_code_ void blc_pm_select_external_32k_crystal(void);
 
 
 
@@ -258,54 +209,6 @@ void mcu_oscillator_crystal_calibration(void);
 
 #define cpu_set_gpio_wakeup				pm_set_gpio_wakeup
 
-/**********************************  Internal APIs (not for user)***************************************************/
-extern  unsigned char 		    tl_24mrc_cal;
-extern 	unsigned int 			g_pm_tick_32k_calib;
-extern  unsigned int 			g_pm_tick_cur;
-extern  unsigned int 			g_pm_tick_32k_cur;
-extern  unsigned char       	g_pm_long_suspend;
-extern  unsigned int 			g_pm_mspi_cfg;
-
-extern	unsigned int 			g_sleep_32k_rc_cnt;
-extern	unsigned int 			g_sleep_stimer_tick;
-
-extern unsigned int	ota_program_bootAddr;
-extern unsigned int	ota_firmware_max_size;
-extern unsigned int	ota_program_offset;
-
-/**
- * @brief   pm 32k rc calibration algorithm.
- */
-typedef struct  pm_clock_drift
-{
-	unsigned int	ref_tick;
-	unsigned int	ref_tick_32k;
-	int				offset;
-	int				offset_dc;
-//	int				offset_cur;
-	unsigned int	offset_cal_tick;
-	int				tc;
-	int				rc32;
-	int				rc32_wakeup;
-	int				rc32_rt;
-	int				s0;
-	unsigned char	calib;
-	unsigned char	ref_no;
-} pm_clock_drift_t;
 
 
-extern pm_clock_drift_t	pmcd;
-
-static inline unsigned int pm_get_latest_offset_cal_time(void)
-{
-	return pmcd.offset_cal_tick;
-}
-/**
- * @brief		Calculate the offset value based on the difference of 16M tick.
- * @param[in]	offset_tick	- the 16M tick difference between the standard clock and the expected clock.
- * @return		none.
- */
-_attribute_ram_code_sec_noinline_ void pm_cal_32k_rc_offset (int offset_tick);
-
-#define PM_MIN_SLEEP_US			1500  //B92 todo
 #endif /* DRIVERS_B92_DRIVER_EXT_EXT_PM_H_ */
