@@ -167,7 +167,7 @@ static inline unsigned int timer1_get_tick(void)
 }
 
 /*
- * @brief     This function set to initial tick for timr0/timer1.
+ * @brief     This function set to initial tick for timer0/timer1.
  * @param[in] type - timer0/timer1.
  * @param[in] init_tick - initial tick value.
  * @return    none
@@ -177,7 +177,7 @@ static inline void timer_set_init_tick(timer_type_e type, unsigned int init_tick
 	reg_tmr_tick(type) = init_tick;
 }
 /*
- * @brief     This function set to capture tick for timr0/timer1.
+ * @brief     This function set to capture tick for timer0/timer1.
  * @param[in] type - timer0/timer1.
  * @param[in] cap_tick - initial tick value.
  * @return    none
@@ -190,7 +190,7 @@ static inline void timer_set_cap_tick(timer_type_e type, unsigned int cap_tick)
 
 
 /**
- * @brief     the specifed timer start working.
+ * @brief     the specified timer start working.
  * @param[in] type - select the timer to start.
  * @return    none
  */
@@ -216,7 +216,7 @@ void timer_gpio_init(timer_type_e type, gpio_pin_e pin, gpio_pol_e pol );
 
 
 /**
- * @brief     the specifed timer stop working.
+ * @brief     the specified timer stop working.
  * @param[in] type - select the timer to stop.
  * @return    none
  */

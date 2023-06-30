@@ -28,7 +28,7 @@
  *
  *	Introduction
  *	===============
- *	TLSRB92 stimer use 16M clock count, have stimer irq.
+ *	B92 stimer use 16M clock count, have stimer irq.
  *
  *	API Reference
  *	===============
@@ -36,6 +36,8 @@
  */
 #ifndef STIMER_H_
 #define STIMER_H_
+
+#include <stdbool.h>
 #include "compiler.h"
 #include "reg_include/stimer_reg.h"
 

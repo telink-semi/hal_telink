@@ -223,10 +223,6 @@ enum{
 	FLD_MSPI_TRANS_END_INT_STA          = BIT(4),
 };
 
-#define reg_mspi_cipher_key				REG_ADDR32(MSPI_BASE_ADDR + 0x80)
-
-#define reg_mspi_data_nonce				REG_ADDR8(MSPI_BASE_ADDR + 0x84)
-
 
 #define reg_mspi_xip_config				REG_ADDR32(MSPI_BASE_ADDR + 0x90)
 

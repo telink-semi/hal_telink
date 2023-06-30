@@ -40,7 +40,6 @@ typedef enum
 	FLD_MIE_MEIE     = BIT(11),//M-mode external interrupt enable bit
 }mie_e;
 
-
 #define NDS_MSTATUS             0x300
 #define NDS_MIE                 0x304
 #define NDS_MEPC                0x341

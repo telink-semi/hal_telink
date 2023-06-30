@@ -43,16 +43,6 @@
 /**********************************************************************************************************************
  *                                         global constants                                                           *
  *********************************************************************************************************************/
-/**
- * @brief	This configuration corresponds to the hardware configuration of the GPIO voltage
- * @note	1. If the GPIO is set to 1.8V, the maximum detection voltage of the ADC input cannot be higher than 1.8V.
- * 			   If a voltage higher than this needs to be detected, external access to the divider circuit is required.
- * 			2. If VBAT_MAX_VALUE_LESS_THAN_3V6 is used, the GPIO cannot be set to 1.8V.
- * 			3. Since 1.8V IO does not comply with USB electrical layer regulations, GPIO cannot be configured to 1.8V when using USB.
- */
-#define	GPIO_POWER_3V3			0
-#define	GPIO_POWER_1V8			1
-#define GPIO_POWER				GPIO_POWER_3V3
 
 /**********************************************************************************************************************
  *                                           global macro                                                             *
@@ -83,25 +73,44 @@
  * @brief 	Power type for different application
  */
 typedef enum{
-	LDO_1P2_LDO_2P0 	= 0x00,	/**< 1.2V-LDO & 2.0V-LDO mode */
-//	DCDC_1P2_LDO_2P0	= 0x01,	/**< 1.2V-DCDC & 2.0V-LDO mode */
-//	DCDC_1P2_DCDC_2P0	= 0x03,	/**< 1.2V-DCDC & 2.0V-DCDC mode */
+	LDO_1P4_LDO_2P0 	= 0x00,	/**< 1.4V-LDO & 2.0V-LDO mode */
+	DCDC_1P4_LDO_2P0	= 0x01,	/**< 1.4V-DCDC & 2.0V-LDO mode */
+	DCDC_1P4_DCDC_2P0	= 0x03,	/**< 1.4V-DCDC & 2.0V-DCDC mode */
 }power_mode_e;
 
 /**
- * @brief 	The maximum voltage that the chip can withstand is 3.6V.
- * 			When the vbat power supply voltage is lower than 3.6V, it is configured as VBAT_MAX_VALUE_LESS_THAN_3V6 mode,
- * 			bypass is turned on, and the vbat voltage directly supplies power to the chip.
- * 			When the vbat power supply voltage may be higher than 3.6V, it is configured as VBAT_MAX_VALUE_GREATER_THAN_3V6 mode,
- * 			the bypass is closed, and the vbat voltage passes through an LDO to supply power to the chip.
- * 			The voltage of the GPIO pin (V_ioh) is the voltage after Vbat passes through the LDO (V_ldo),
- * 			and the maximum value is about 3.3V floating 10% (V_ldoh).
- * 			When Vbat > V_ldoh, V_ioh = V_ldo = V_ldoh. When Vbat < V_ldoh, V_ioh = V_ldo = Vbat.
+ * @brief 	This enumeration is used to select whether VBAT can be greater than 3.6V.
  */
 typedef enum{
-	VBAT_MAX_VALUE_GREATER_THAN_3V6	= 0x00,		/*VBAT may be greater than 3.6V. */
-	VBAT_MAX_VALUE_LESS_THAN_3V6	= BIT(3),	/*VBAT must be below 3.6V. */
+	VBAT_MAX_VALUE_GREATER_THAN_3V6	= 0x00,		/**  VBAT may be greater than 3.6V.
+												<p>  In this configuration the bypass is closed
+												<p>	 and the VBAT voltage passes through the 3V3 LDO to supply power to the chip.
+												<p>	 The voltage of the GPIO pin (VOH) is the voltage after VBAT passes through the LDO (V_ldo),
+												<p>  and the maximum value is about 3.3V floating 10% (V_ldoh).
+												<p>  When VBAT > V_ldoh, <p>VOH = V_ldo = V_ldoh.
+												<p>  When VBAT < V_ldoh, <p>VOH = V_ldo = VBAT */
+	VBAT_MAX_VALUE_LESS_THAN_3V6	= BIT(3),	/**  VBAT must be below 3.6V.
+												<p>  In this configuration bypass is turned on.vbat is directly supplying power to the chip
+												<p>  VOH(the output voltage of GPIO)= VBAT */
 }vbat_type_e;
+
+/**
+ * @enum 		gpio_voltage_e
+ * @brief		This is the configuration of GPIO voltage.
+ * @attention   If the enumeration uses GPIO_VOLTAGE_1V8, the following usage considerations need to be noted:
+ *				-# Pay attention to check the sampling range of ADC, the maximum detection voltage of the ADC input cannot be higher than 1.8V.
+ * 			   	   If a voltage higher than this needs to be detected, external access to the divider circuit is required.
+ * 			   	-# ADC_VBAT_SAMPLE can not be used.
+ * 			   	   Users can use external voltage divider instead, the details refer to the Driver SDK Developer Handbook for this chip.
+ *				-# Since 1.8V IO does not comply with USB electrical layer regulations, GPIO cannot be configured to 1.8V when using USB.
+ *				-# When using VBUS 5V to power the chip, only after register configuration will GPIO be 1.8V.
+ * 			   	   So from power-on to register configuration, the default output GPIO(PC5) is still 3.3V. reboot will also be 3.3V for a while.
+ * 			   	   (the other default output GPIO(PG1/PG2/PG3/PG5) are not affected by this.)
+ */
+typedef enum{
+	GPIO_VOLTAGE_3V3	= 0x00,	/**< the GPIO voltage is set to 3.3V. */
+	GPIO_VOLTAGE_1V8 	= 0x01,	/**< the GPIO voltage is set to 1.8V. */
+}gpio_voltage_e;
 
 /**
  * @brief command table for special registers
@@ -130,11 +139,17 @@ _attribute_text_sec_ void sys_reboot(void);
 
 /**
  * @brief   	This function serves to initialize system.
- * @param[in]	power_mode - power mode(LDO/DCDC/LDO_DCDC)
- * @param[in]	vbat_v		- vbat voltage type: 0 vbat may be greater than 3.6V,  1 vbat must be below 3.6V.
+ * @param[in]	power_mode	- power mode(LDO/DCDC/LDO_DCDC)
+ * @param[in]	vbat_v		- This parameter is used to determine whether the VBAT voltage can be greater than 3.6V.
+ * @param[in]	gpio_v		- This is the configuration of GPIO voltage.
+ * 							  For some chip models the GPIO voltage is fixed 3.3V or fixed 1.8V,
+ * 							  For other GPIO models the voltage is configurable:
+ * 							  Requires hardware configuration: 3v3 (CFG_VIO connects to VSS) or 1V8 (CFG_VIO connects to VDDO3/AVDD3)),
+ * 							  please configure this parameter correctly according to the chip data sheet and the corresponding board design.
+ * @attention	If vbat_v is set to VBAT_MAX_VALUE_LESS_THAN_3V6, then gpio_v can only be set to GPIO_VOLTAGE_3V3.
  * @return  	none
  */
-void sys_init(power_mode_e power_mode, vbat_type_e vbat_v);
+void sys_init(power_mode_e power_mode, vbat_type_e vbat_v, gpio_voltage_e gpio_v);
 
 /**
  * @brief      This function performs a series of operations of writing digital or analog registers
@@ -146,4 +161,10 @@ void sys_init(power_mode_e power_mode, vbat_type_e vbat_v);
 
 int write_reg_table(const tbl_cmd_set_t * pt, int size);
 
+/**
+ * @brief      This function servers to get calibration value from EFUSE.
+ * @param[in]  gpio_type - select the type of GPIO.
+ * @return 	   1 - the calibration value update, 0 - the calibration value is not update.
+ */
+unsigned char efuse_calib_adc_vref(gpio_voltage_e gpio_type);
 #endif

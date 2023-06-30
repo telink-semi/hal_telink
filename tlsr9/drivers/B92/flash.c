@@ -510,7 +510,7 @@ _attribute_text_sec_ void flash_page_program_encrypt(unsigned long addr, unsigne
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-_attribute_text_sec_ void flash_quad_page_pragram_encrypt(unsigned long addr, unsigned long len, unsigned char *buf)
+_attribute_text_sec_ void flash_quad_page_program_encrypt(unsigned long addr, unsigned long len, unsigned char *buf)
 {
 	flash_write_encrypt(addr, len, buf, FLASH_QUAD_PAGE_PROGRAM_CMD);
 }

@@ -1195,3 +1195,4 @@ static inline void gpio_init(int anaRes_init_en)
 }
 
 #endif /* DRIVERS_GPIO_SETTING_H_ */
+
