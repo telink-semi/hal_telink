@@ -30,8 +30,4 @@ bool blc_isOsSupEnable(void);
 bool blc_isBleSchedulerBusy(void);
 void blc_ll_registerGiveSemCb(os_give_sem_t give_sem_from_isr, os_give_sem_t give_sem);
 
-/* Stack API. !!! user can't use. */
-void blt_ll_sem_give(void);
-void blt_ll_sem_give_from_isr(void);
-
 #endif /* OS_SUP_H_ */

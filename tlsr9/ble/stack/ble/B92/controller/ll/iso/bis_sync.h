@@ -60,7 +60,7 @@ ble_sts_t blc_ll_initBisRxFifo(u8 *pRxbuf, int full_size, int fifo_number, u8 bi
  * @brief      be used to stop synchronizing or cancel the process of synchronizing to the BIG identified by the bigHandle.
  *             also terminate the reception of BISes in the BIG specified in the blc_hci_le_bigCreateSync,
  *             destroys the associated connection handles of the BISes in the BIG and removes the data paths for all BISes in the BIG.
- * @param[in]  bigHandle - Identifer of the BIG to terminate.
+ * @param[in]  bigHandle - Identifier of the BIG to terminate.
  * @return     status, 0x00:  succeed
  * 					   other: failed
  */
@@ -69,7 +69,7 @@ ble_sts_t 	blc_ll_bigTerminateSync(u8 bigHandle);
 
 /**
  * @brief      For user to pop rx SDU FIFO that hold Rx data.
- * @param[in]  bis_connHandle - Identifer of the bis handle.
+ * @param[in]  bis_connHandle - Identifier of the bis handle.
  * @return     sdu_packet_t, PDU packet to SDU data structure
  */
 sdu_packet_t* blc_ll_popBisSyncRxSduData(u16 bis_connHandle);

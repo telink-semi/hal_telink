@@ -29,7 +29,7 @@ extern  user_irq_handler_cb_t  usr_irq_handler_cb;
 
 
 typedef enum{
-	BLT_EV_FLAG_RX_DATA_ABANDOM,
+	BLT_EV_FLAG_RX_DATA_ABANDON,
 	BLT_EV_FLAG_GPIO_EARLY_WAKEUP,
 	BLT_EV_FLAG_SLEEP_ENTER,
 	BLT_EV_FLAG_SUSPEND_EXIT,

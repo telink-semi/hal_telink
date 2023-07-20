@@ -174,6 +174,11 @@ static void b9x_bt_controller_thread()
  */
 static void b9x_bt_irq_init()
 {
+#if CONFIG_SOC_RISCV_TELINK_B92
+	plic_preempt_feature_dis();
+	flash_plic_preempt_config(0,1);
+#endif
+
 	/* Init STimer IRQ */
 	IRQ_CONNECT(IRQ1_SYSTIMER + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 2, stimer_irq_handler, 0, 0);
 	/* Init RF IRQ */
@@ -194,9 +199,6 @@ int b9x_bt_controller_init()
 {
 	int status;
 
-	/* Init IRQs */
-	b9x_bt_irq_init();
-
 	/* Reset Radio */
 	rf_radio_reset();
 	rf_reset_dma();
@@ -210,6 +212,9 @@ int b9x_bt_controller_init()
 	if (status != INIT_OK) {
 		return status;
 	}
+
+	/* Init IRQs */
+	b9x_bt_irq_init();
 
 	/* Register callback to controller. */
 #if CONFIG_SOC_RISCV_TELINK_B91

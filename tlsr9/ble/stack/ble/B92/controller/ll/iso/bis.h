@@ -19,7 +19,7 @@
 #define BIS_H_
 
 
-#define			BIS_PARAM_LENGTH								sizeof(ll_bis_t)	//280	todo SDK release should modify it to 288 user can't modify this value !!!
+#define			BIS_PARAM_LENGTH								sizeof(ll_bis_t)	//288	todo SDK release should modify it to 288 user can't modify this value !!!
 
 
 
