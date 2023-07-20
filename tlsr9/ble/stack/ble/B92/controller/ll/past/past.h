@@ -79,7 +79,7 @@ typedef struct{
     u8      rsvd[1];
 
     u16     perServiceData; /*!< ID for periodic sync indication. */
-    u16     perSyncHandle; /*!< Periodic sync handle.(src:ext_scan, syncHandl /src:own_prd_bcst, advHandle) */
+    u16     perSyncHandle; /*!< Periodic sync handle.(src:ext_scan, syncHandle /src:own_prd_bcst, advHandle) */
     u16     pastSkip;
     u16     pastSyncTimeout;
 

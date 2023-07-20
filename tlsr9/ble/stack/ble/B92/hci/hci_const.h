@@ -131,13 +131,13 @@ TBD	LE CS Test End Complete event
 #define HCI_EVT_MASK_NONE                                        	 0x00000000
 #define HCI_EVT_MASK_INQUIRY_COMPLETE                          	  	 0x00000001	// 0
 #define HCI_EVT_MASK_INQUIRY_RESULT                              	 0x00000002	// 1
-#define HCI_EVT_MASK_CONNECTION_COMPELETE                        	 0x00000004	// 2
+#define HCI_EVT_MASK_CONNECTION_COMPLETE                        	 0x00000004	// 2
 #define HCI_EVT_MASK_CONNECTION_REQUEST                          	 0x00000008	// 3
 #define HCI_EVT_MASK_DISCONNECTION_COMPLETE                      	 0x00000010	// 4
 #define HCI_EVT_MASK_AUTHENTICATION_COMPLETE                     	 0x00000020	// 5
 #define HCI_EVT_MASK_REMOTE_NAME_REQUEST_COMPLETE                	 0x00000040	// 6
 #define HCI_EVT_MASK_ENCRYPTION_CHANGE                           	 0x00000080	// 7
-#define HCI_EVT_MASK_CHANGE_CONECTION_LINK_KEY_COMPLETE              0x00000100	// 8
+#define HCI_EVT_MASK_CHANGE_CONNECTION_LINK_KEY_COMPLETE              0x00000100	// 8
 #define HCI_EVT_MASK_MASTER_LINK_KEY_COMPLETE                        0x00000200	// 9
 #define HCI_EVT_MASK_READ_REMOTE_SUPPORTED_FEATURES_COMPLETE     	 0x00000400	// 10
 #define HCI_EVT_MASK_READ_REMOTE_VERSION_INFORMATION_COMPLETE    	 0x00000800	// 11
@@ -176,15 +176,15 @@ TBD	LE CS Test End Complete event
 #define HCI_LE_EVT_MASK_CHANNEL_SELECTION_ALGORITHM                  0x00080000 // core5.0 - bit19
 
 #define HCI_LE_EVT_MASK_CONNECTIONLESS_IQ_REPORT                     0x00100000 // core5.1 - bit20
-#define HCI_LE_EVT_MASK_CONNECTION_IQ_REPORTD          				 0x00200000 // core5.1 - bit21
+#define HCI_LE_EVT_MASK_CONNECTION_IQ_REPORT          				 0x00200000 // core5.1 - bit21
 #define HCI_LE_EVT_MASK_CTE_REQUEST_FAILED                           0x00400000 // core5.1 - bit22
-#define HCI_LE_EVT_MASK_PERIODIC_ADVERTISING_SYNC_TRANSFOR_RECEIVED  0x00800000 // core5.1 - bit23
+#define HCI_LE_EVT_MASK_PERIODIC_ADVERTISING_SYNC_TRANSFER_RECEIVED  0x00800000 // core5.1 - bit23
 
 #define HCI_LE_EVT_MASK_CIS_ESTABLISHED								 0x01000000 // core5.2 - bit24
 #define HCI_LE_EVT_MASK_CIS_REQUESTED								 0x02000000 // core5.2 - bit25
 #define HCI_LE_EVT_MASK_CREATE_BIG_COMPLETE							 0x04000000 // core5.2 - bit26
 #define HCI_LE_EVT_MASK_TERMINATE_BIG_COMPLETE						 0x08000000 // core5.2 - bit27
-#define HCI_LE_EVT_MASK_BIG_SYNC_ESTABLILSHED						 0x10000000 // core5.2 - bit28
+#define HCI_LE_EVT_MASK_BIG_SYNC_ESTABLISHED						 0x10000000 // core5.2 - bit28
 #define HCI_LE_EVT_MASK_BIG_SYNC_LOST								 0x20000000 // core5.2 - bit29
 #define HCI_LE_EVT_MASK_REQUEST_PEER_SCA_COMPLETE					 0x40000000 // core5.2 - bit30
 #define HCI_LE_EVT_MASK_PATH_LOSS_THRESHOLD							 0x80000000 // core5.2 - bit31
@@ -400,10 +400,10 @@ TBD	LE CS Test End Complete event
 #define HCI_CMD_LE_CONNECTION_RESPONSE_ENABLE					 	 0x57 //7.8.86 LE Connection CTE Response Enable command
 #define HCI_CMD_LE_READ_ANTENNA_INFORMATION						 	 0x58 //7.8.87 LE Read Antenna Information command
 #define HCI_CMD_LE_SET_PERIODIC_ADVERTISING_RECEIVE_ENABLE		     0x59 //7.8.88 LE Set Periodic Advertising Receive Enable command
-#define HCI_CMD_LE_PERIODIC_ADVERTISING_SYNC_TRANSFOR				 0x5A //7.8.89 LE Periodic Advertising Sync Transfer command
-#define HCI_CMD_LE_PERIODIC_ADVERTISING_SET_INFO_TRANSFOR			 0x5B //7.8.90 LE Periodic Advertising Set Info Transfer command
-#define HCI_CMD_LE_SET_PERIODIC_ADV_SYNC_TRANSFOR_PARAMETERS 		 0x5C //7.8.91 LE Set Periodic Advertising Sync Transfer Parameters command
-#define HCI_CMD_LE_SET_DEFAULT_PERIODIC_ADV_SYNC_TRANSFOR_PARAMS 	 0x5D //7.8.92 LE Set Default Periodic Advertising Sync Transfer Parameters command
+#define HCI_CMD_LE_PERIODIC_ADVERTISING_SYNC_TRANSFER				 0x5A //7.8.89 LE Periodic Advertising Sync Transfer command
+#define HCI_CMD_LE_PERIODIC_ADVERTISING_SET_INFO_TRANSFER			 0x5B //7.8.90 LE Periodic Advertising Set Info Transfer command
+#define HCI_CMD_LE_SET_PERIODIC_ADV_SYNC_TRANSFER_PARAMETERS 		 0x5C //7.8.91 LE Set Periodic Advertising Sync Transfer Parameters command
+#define HCI_CMD_LE_SET_DEFAULT_PERIODIC_ADV_SYNC_TRANSFER_PARAMS 	 0x5D //7.8.92 LE Set Default Periodic Advertising Sync Transfer Parameters command
 #define HCI_CMD_LE_GENERATE_DHKEY_V2								 0x5E //7.8.93 LE Generate DHKey command [v2]
 #define HCI_CMD_LE_MODIFY_SLEEP_CLOCK_ACCURACY						 0x5F //7.8.94 LE Modify Sleep Clock Accuracy command
 //core_5.1 end
@@ -424,8 +424,8 @@ TBD	LE CS Test End Complete event
 #define HCI_CMD_LE_BIG_TERMINATE_SYNC								 0x6C //7.8.107 LE BIG Terminate Sync command
 #define HCI_CMD_LE_REQUEST_PEER_SCA									 0x6D //7.8.108 LE Request Peer SCA command
 #define HCI_CMD_LE_SETUP_ISO_DATA_PATH								 0x6E //7.8.109 LE Setup ISO Data Path command
-#define HCI_CMD_LE_REMOVE_ISO_DARA_PATH								 0x6F //7.8.110 LE Remove ISO Data Path command
-#define HCI_CMD_LE_ISO_TRTANSMIT_TEST								 0x70 //7.8.111 LE ISO Transmit Test command
+#define HCI_CMD_LE_REMOVE_ISO_DATA_PATH								 0x6F //7.8.110 LE Remove ISO Data Path command
+#define HCI_CMD_LE_ISO_TRANSMIT_TEST								 0x70 //7.8.111 LE ISO Transmit Test command
 #define HCI_CMD_LE_ISO_RECEIVE_TEST									 0x71 //7.8.112 LE ISO Receive Test command
 #define HCI_CMD_LE_ISO_READ_TEST_COUNTERS							 0x72 //7.8.113 LE ISO Read Test Counters command
 #define HCI_CMD_LE_ISO_TEST_END										 0x73 //7.8.114 LE ISO Test End command
@@ -445,9 +445,12 @@ TBD	LE CS Test End Complete event
 //core_5.3 end
 
 //core_5.4 begin
-#define	HCI_CMD_LE_SET_EXTENDED_ADVERTISING_SUBEVENT_DATA			 0X82 //7.8.125 LE Set Periodic Advertising Subevent Data command
-#define	HCI_CMD_LE_SET_EXTENDED_ADVERTISING_RESPONSE_DATA			 0x83 //7.8.126 LE Set Periodic Advertising Response Data command
-#define HCI_CMD_LE_SET_EXTENDED_SYNC_SUBEVENT						 0x84 //7.8.127 LE Set Periodic Sync Subevent command
+#define	HCI_CMD_LE_SET_PERIODIC_ADVERTISING_SUBEVENT_DATA			 0X82 //7.8.125 LE Set Periodic Advertising Subevent Data command
+#define	HCI_CMD_LE_SET_PERIODIC_ADVERTISING_RESPONSE_DATA			 0x83 //7.8.126 LE Set Periodic Advertising Response Data command
+#define HCI_CMD_LE_SET_PERIODIC_SYNC_SUBEVENT						 0x84 //7.8.127 LE Set Periodic Sync Subevent command
+#define HCI_CMD_LE_EXTENDED_CREATE_CONNECTION_V2              		 0x85 //7.8.66 LE Extended Create Connection Command [v2]
+#define HCI_CMD_LE_SET_PERIODIC_ADVERTISING_PARAMETERS_V2            0x86 //7.8.61 LE Set Periodic Advertising Parameters Command [v2]
+
 //core_5.4 end
 
 

@@ -76,7 +76,7 @@ void 		blc_ll_initCisSduBuffer(u8 *in_fifo, int in_fifo_size, u8 in_fifo_num, u8
 
 
 /**
- * @brief      This function is used to disconnect CIS conection.
+ * @brief      This function is used to disconnect CIS connection.
  * @param[in]  cisHandle - CIS connection handle.
  * @param[in]  reason - Reason for disconnection..
  * @return     status, 0x00:  succeed

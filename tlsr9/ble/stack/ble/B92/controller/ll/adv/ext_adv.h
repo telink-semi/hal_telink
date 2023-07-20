@@ -26,7 +26,7 @@
 #define			ADV_SETS_NUMBER_MAX								4 //user can't modify this value !!!
 
 
-/* extended ADV parameters buffer length for each ADV set */
+/* extended ADV parameters buffer length for each ADV set */							//if pawra en : 500
 #define 		ADV_SET_PARAM_LENGTH							sizeof(st_ext_adv_t)	//492 //user can't modify this value !!!
 
 
@@ -78,7 +78,7 @@ void 		blc_ll_initExtendedScanRspDataBuffer(u8 *pScanRspData, int max_len_scanRs
  * @param[in]  sec_adv_max_skip - Maximum advertising events the Controller can skip
  * @param[in]  sec_adv_phy - Secondary advertisement PHY
  * @param[in]  adv_sid - Value of the Advertising SID subfield in the ADI field of the PDU
- * @param[in]  scan_req_noti_en - Scan Request Notification Enable
+ * @param[in]  scan_req_notify_en - Scan Request Notification Enable
  * @param[in]  pri_adv_codePhy_option -- host set primary channel coded phy. prefer S2/S8 or require S2/S8 or no prefer no require
  * @param[in]  sec_adv_codePhy_option -- host set second channel coded phy. prefer S2/S8 or require S2/S8 or no prefer no require
  * @return     Status - 0x00: command succeeded;
@@ -89,7 +89,7 @@ void 		blc_ll_initExtendedScanRspDataBuffer(u8 *pScanRspData, int max_len_scanRs
 ble_sts_t 	blc_ll_setExtAdvParam_v2(  u8 adv_handle, 		 		   advEvtProp_type_t adv_evt_prop,	u32 pri_advInter_min, 		u32 pri_advInter_max,
 									   adv_chn_map_t pri_advChnMap,	   own_addr_type_t ownAddrType, 	u8 peerAddrType, 			u8  *peerAddr,
 									   adv_fp_type_t advFilterPolicy,  tx_power_t adv_tx_pow,			le_phy_type_t pri_adv_phy, 	u8 sec_adv_max_skip,
-									   le_phy_type_t sec_adv_phy, 	 	u8 adv_sid, 					u8 scan_req_noti_en,
+									   le_phy_type_t sec_adv_phy, 	 	u8 adv_sid, 					u8 scan_req_notify_en,
 									   u8 pri_adv_codePhy_option,   u8 sec_adv_codePhy_option);
 
 #else
@@ -109,7 +109,7 @@ ble_sts_t 	blc_ll_setExtAdvParam_v2(  u8 adv_handle, 		 		   advEvtProp_type_t a
  * @param[in]  sec_adv_max_skip - Maximum advertising events the Controller can skip
  * @param[in]  sec_adv_phy - Secondary advertisement PHY
  * @param[in]  adv_sid - Value of the Advertising SID subfield in the ADI field of the PDU
- * @param[in]  scan_req_noti_en - Scan Request Notification Enable
+ * @param[in]  scan_req_notify_en - Scan Request Notification Enable
  * @return     Status - 0x00: command succeeded;
  * 						0x12:  1. adv_handle out of range;
  * 						       2. pri_advChnMap out of range
@@ -118,7 +118,7 @@ ble_sts_t 	blc_ll_setExtAdvParam_v2(  u8 adv_handle, 		 		   advEvtProp_type_t a
 ble_sts_t 	blc_ll_setExtAdvParam(  u8 adv_handle, 		 			advEvtProp_type_t adv_evt_prop,	u32 pri_advInter_min, 		u32 pri_advInter_max,
 									adv_chn_map_t pri_advChnMap,	own_addr_type_t ownAddrType, 	u8 peerAddrType, 			u8  *peerAddr,
 									adv_fp_type_t advFilterPolicy,  tx_power_t adv_tx_pow,			le_phy_type_t pri_adv_phy, 	u8 sec_adv_max_skip,
-									le_phy_type_t sec_adv_phy, 	 	u8 adv_sid, 					u8 scan_req_noti_en);
+									le_phy_type_t sec_adv_phy, 	 	u8 adv_sid, 					u8 scan_req_notify_en);
 
 #endif
 

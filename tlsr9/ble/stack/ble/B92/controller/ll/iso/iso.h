@@ -44,14 +44,12 @@ typedef struct{
 
 
 /**
- * @brief      This function is used to send ISO data.
- * @param[in]  cisHandle or bisHandle
- * @param[in]  pData  point to data to send
- * @param[in]  len  the length to send
- * @return      Status - 0x00:  succeeded;
- * 						 other:  failed
+ * @brief  This function is used to enable/disable time stamp in SDU reported from controller
+ * to host
+ * @param[in]      Status - 0x00:  disable, time stamp is invalid in SDU;
+ * 						  - 0x01:  enable, time stamp is valid in SDU
  */
-void blc_ll_timestamp_en(u8 en);
+void blc_iso_enableSduToHostTimestamp(u8 en);
 
 
 

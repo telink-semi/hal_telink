@@ -19,7 +19,7 @@
 #define CIS_CENTRAL_H_
 
 
-#define 		CIG_PARAM_LEN									sizeof(ll_cig_mst_t) //528	//user can't modify this value !!!
+#define 		CIG_PARAM_LEN									sizeof(ll_cig_mst_t) //532	//user can't modify this value !!!
 
 
 

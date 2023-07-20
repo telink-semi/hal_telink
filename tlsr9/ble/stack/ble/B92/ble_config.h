@@ -271,6 +271,16 @@
 #endif
 //core_5.4 end
 
+//core_5.4+  begin
+#ifndef	LL_FEATURE_SUPPORT_CHANNEL_SOUNDING_INITIATOR
+#define	LL_FEATURE_SUPPORT_CHANNEL_SOUNDING_INITIATOR						1
+#endif
+
+#ifndef	LL_FEATURE_SUPPORT_CHANNEL_SOUNDING_REFLECTOR
+#define	LL_FEATURE_SUPPORT_CHANNEL_SOUNDING_REFLECTOR						1
+#endif
+//core_5.4+  end
+
 
 
 
@@ -321,8 +331,8 @@
 #define	CONTROLLER_GEN_P256KEY_ENABLE								0
 #endif
 
-#ifndef SMP_SEC_LEVEL_CHEACK_EN
-#define	SMP_SEC_LEVEL_CHEACK_EN										0
+#ifndef SMP_SEC_LEVEL_CHECK_EN
+#define	SMP_SEC_LEVEL_CHECK_EN										0
 #endif
 
 
