@@ -102,10 +102,10 @@ void 		bls_pm_setManualLatency(u16 latency);
 
 /**
  * @brief	for user to set the threshold of sleep tick for entering deep retention mode
- * @param	thres_ms - the threshold of time for suspend or deepsleep retention
+ * @param	threshold_ms - the threshold of time for suspend or deepsleep retention
  * @return  none.
  */
-void 		blc_pm_setDeepsleepRetentionThreshold(u32 thres_ms);
+void 		blc_pm_setDeepsleepRetentionThreshold(u32 threshold_ms);
 
 /**
  * @brief	for user to set early wake up tick for deep retention mode

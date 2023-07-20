@@ -68,7 +68,7 @@ ble_sts_t 	blc_ll_periodicAdvertisingTerminateSync (u16 sync_handle);
  * @param[in]  adv_sid - Advertising_SID
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t 	blc_ll_addDeivceToPeriodicAdvertiserList (u8 adv_adrType, u8 *adv_addr, u8 adv_sid);
+ble_sts_t 	blc_ll_addDeviceToPeriodicAdvertiserList (u8 adv_adrType, u8 *adv_addr, u8 adv_sid);
 
 /**
  * @brief      This function is used to remove one entry from the list of Periodic Advertisers
@@ -78,7 +78,7 @@ ble_sts_t 	blc_ll_addDeivceToPeriodicAdvertiserList (u8 adv_adrType, u8 *adv_add
  * @param[in]  adv_sid - Advertising_SID
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t 	blc_ll_removeDeivceFromPeriodicAdvertiserList (u8 adv_adrType, u8 *adv_addr, u8 adv_sid);
+ble_sts_t 	blc_ll_removeDeviceFromPeriodicAdvertiserList (u8 adv_adrType, u8 *adv_addr, u8 adv_sid);
 
 /**
  * @brief      This function is used to remove all entries from the list of Periodic Advertisers.

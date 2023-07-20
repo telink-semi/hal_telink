@@ -74,7 +74,7 @@ typedef struct{
     u8      chnMaxDelay;   /* center role used */
 
     u8      chnc_occpied;
-    u8      resverd[3];
+    u8      reserved[3];
 }ll_chnc_cb_t;
 
 
