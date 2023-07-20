@@ -130,7 +130,7 @@ typedef enum {
 	//GATT status
 	GATT_ERR_INVALID_PARAMETER 									   = 0xB0,
 	GATT_ERR_PREVIOUS_INDICATE_DATA_HAS_NOT_CONFIRMED,
-	GATT_ERR_SERVICE_DISCOVERY_TIEMOUT,
+	GATT_ERR_SERVICE_DISCOVERY_TIMEOUT,
 	GATT_ERR_NOTIFY_INDICATION_NOT_PERMITTED,
 	GATT_ERR_DATA_PENDING_DUE_TO_SERVICE_DISCOVERY_BUSY,
 	GATT_ERR_DATA_LENGTH_EXCEED_MTU_SIZE,
@@ -157,7 +157,7 @@ typedef enum {
 	//Audio Profile status
 	AUDIO_ERR_NO_MEMORY											   = 0xE0,
 	AUDIO_ERR_INVALID_PARAMETER,
-	AUDIO_ERR_DISCPVERY_FAILED,
+	AUDIO_ERR_DISCOVERY_FAILED,
 	AUDIO_ERR_BUSY,
 	AUDIO_ERR_STATUS,
 
@@ -366,7 +366,7 @@ typedef enum{
 /**
  * @brief	12 = type(1) + len(1) + l2cap_len(2) + cid(2) + sud_len(2) + mic(4)
  */
-#define		L2CAP_ALLIGN4_KFRAM_DMA_BUFF(n)		(((n + 12) + 3) / 4 * 4)
+#define		L2CAP_ALIGN4_KFRAM_DMA_BUFF(n)		(((n + 12) + 3) / 4 * 4)
 
 /**
  * @brief	CIS TX FIFO Size = n + CIS_TX_PDU_BUF_EXT_LEN + TLK_RF_TX_EXT_LEN
@@ -374,11 +374,11 @@ typedef enum{
  * TLK_RF_TX_EXT_LEN depend on MCU
  * CIS TX FIFO do not use hardware FIFO, so no 16 byte align limitation
  * TX dma_len must be 4 byte align, so total buffer need 4 byte align */
-#define		CAL_LL_CIS_TX_FIFO_SIZE(n)			DATA_LENGTH_ALLIGN4(n + CIS_TX_PDU_BUF_EXT_LEN + TLK_RF_TX_EXT_LEN)
+#define		CAL_LL_CIS_TX_FIFO_SIZE(n)			DATA_LENGTH_ALIGN4(n + CIS_TX_PDU_BUF_EXT_LEN + TLK_RF_TX_EXT_LEN)
 
-#define		BIS_PDU_ALLIGN4_TXBUFF(n)			DATA_LENGTH_ALLIGN4((CAL_LL_ISO_TX_FIFO_SIZE(n) +12 ))//12=OFFSETOF(bis_tx_pdu_t, isoTxPdu)
+#define		BIS_PDU_ALIGN4_TXBUFF(n)			DATA_LENGTH_ALIGN4((CAL_LL_ISO_TX_FIFO_SIZE(n) +12 ))//12=OFFSETOF(bis_tx_pdu_t, isoTxPdu)
 
-#define		BIS_PDU_ALLIGN4_RXBUFF(n)			DATA_LENGTH_ALLIGN4(BIS_LL_RX_PDU_FIFO_SIZE(n))
+#define		BIS_PDU_ALIGN4_RXBUFF(n)			DATA_LENGTH_ALIGN4(BIS_LL_RX_PDU_FIFO_SIZE(n))
 
 
 /*
@@ -468,7 +468,7 @@ HCI TX fifo include ACL data report, HCI Event report (controller to host)
 
 
 /**
- * @brief      ota crc16_lib related fuinction.
+ * @brief      ota crc16_lib related function.
  * @param[in]  pD: input data.
  * @param[in]  len: data length.
  * @return     crc result.

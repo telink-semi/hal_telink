@@ -34,7 +34,7 @@ ble_sts_t		blc_ll_clearWhiteList(void);
  * @param[in]  addr - device address
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t		blc_ll_addDeivceToWhiteList(u8 adr_type, u8 *addr);
+ble_sts_t		blc_ll_addDeviceToWhiteList(u8 adr_type, u8 *addr);
 
 
 /**
@@ -43,14 +43,14 @@ ble_sts_t		blc_ll_addDeivceToWhiteList(u8 adr_type, u8 *addr);
  * @param[in]  addr - device address
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t		blc_ll_removeDeivceFromWhiteList(u8 adr_type, u8 *addr);
+ble_sts_t		blc_ll_removeDeviceFromWhiteList(u8 adr_type, u8 *addr);
 
 
 
 
 #define	ll_whiteList_reset		blc_ll_clearWhiteList
-#define	ll_whiteList_add		blc_ll_addDeivceToWhiteList
-#define	ll_whiteList_delete		blc_ll_removeDeivceFromWhiteList
+#define	ll_whiteList_add		blc_ll_addDeviceToWhiteList
+#define	ll_whiteList_delete		blc_ll_removeDeviceFromWhiteList
 
 
 #endif /* LL_WHITELIST_H_ */
