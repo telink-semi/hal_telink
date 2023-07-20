@@ -72,7 +72,7 @@ typedef struct{
 	u16		auth_pdu_timeout;
 } hci_readAuthPduTimeout_retParam_t;
 /**
- *  @brief  Command & Return Parameters for "7.3.94 HCI write authenticated payload timeoutd"
+ *  @brief  Command & Return Parameters for "7.3.94 HCI write authenticated payload timeout"
  */
 typedef struct
 {
@@ -89,7 +89,7 @@ typedef struct
 typedef struct
 {
 	u8	num_sets;
-	hostNumOfCompletedPkt_cfg_t complatePktCfg[4];
+	hostNumOfCompletedPkt_cfg_t completePktCfg[4];
 } hci_hostNumOfCompletedPkt_cmdParam_t;
 
 
@@ -282,7 +282,7 @@ typedef enum {
 /* Scan Parameters structure */
 typedef struct {
 	u8		le_scanType;
-	u16		le_scaninterval;
+	u16		le_scanInterval;
 	u16		le_scanWindow;
 	u8		ownAddrType;
 	u8		scanFilterPolicy;
@@ -296,8 +296,8 @@ typedef enum {
 } scan_type_t;
 
 
-/* Scannning_Interval, Time = N * 0.625 ms,
- * Notice that these are just part of but not all Scannning_Interval value */
+/* Scanning_Interval, Time = N * 0.625 ms,
+ * Notice that these are just part of but not all Scanning_Interval value */
 typedef enum{
 	SCAN_INTERVAL_10MS              =            16,
 	SCAN_INTERVAL_20MS              =            32,
@@ -324,8 +324,8 @@ typedef enum{
 	SCAN_INTERVAL_1000MS            =            1600,
 }scan_inter_t;
 
-/* Scannning_Window, Time = N * 0.625 ms,
- * Notice that these are just part of but not all Scannning_Window value */
+/* Scanning_Window, Time = N * 0.625 ms,
+ * Notice that these are just part of but not all Scanning_Window value */
 typedef enum{
 	SCAN_WINDOW_10MS                =            16,
 	SCAN_WINDOW_20MS                =            32,
@@ -375,8 +375,8 @@ typedef enum{
 typedef enum {
 	SCAN_FP_ALLOW_ADV_ANY						=		0x00,
 	SCAN_FP_ALLOW_ADV_WL 	      				=		0x01,
-	SCAN_FP_ALLOW_UNDIRECT_ADV      			=		0x02,
-	SCAN_FP_ALLOW_ADV_WL_DIRECT_ADV_MACTH		=		0x03,
+	SCAN_FP_ALLOW_UNDIRECTED_ADV      			=		0x02,
+	SCAN_FP_ALLOW_ADV_WL_DIRECT_ADV_MATCH		=		0x03,
 } scan_fp_type_t;
 
 #define SCAN_FP_WHITELIST_MASK							BIT(0)
@@ -635,7 +635,7 @@ typedef struct{
 	unsigned char phy;
 	unsigned char CTELen;
 	unsigned char CTEType;
-	unsigned char swtichPatternLen;
+	unsigned char switchPatternLen;
 	unsigned char antennaId[0];
 } hci_le_transmitterTestV3_cmdParam_t;
 
@@ -646,7 +646,7 @@ typedef struct{
 	unsigned char phy;
 	unsigned char CTELen;
 	unsigned char CTEType;
-	unsigned char swtichPatternLen;
+	unsigned char switchPatternLen;
 	unsigned char antennaId[1];
 	//unsigned char powerLevel;
 } hci_le_transmitterTestV4_cmdParam_t;
@@ -818,7 +818,7 @@ typedef struct {
     u8		sec_adv_max_skip;
     u8		sec_adv_phy;
     u8		adv_sid;
-    u8		scan_req_noti_en;
+    u8		scan_req_notify_en;
 }hci_le_setExtAdvParam_cmdParam_t;
 
 /* Advertising_Handle */
@@ -919,15 +919,15 @@ typedef enum {
 	DATA_OPER_FIRST      	=	0x01,
 	DATA_OPER_LAST       	=	0x02,
 	DATA_OPER_COMPLETE   	=	0x03,
-	DATA_OPER_UNCHANGEED	=  	0x04,
+	DATA_OPER_UNCHANGED	=  	0x04,
 } data_oper_t;
 
 
 /* Fragment_Preference */
 typedef enum {
-	DATA_FRAGM_ALLOWED			      	=	0x00,
-	DATA_FRAGM_NONE_OR_MINIMIZE      	=	0x01,
-} data_fragm_t;
+	DATA_FRAGMENT_ALLOWED			      	=	0x00,
+	DATA_FRAGMENT_NONE_OR_MINIMIZE      	=	0x01,
+} data_fragment_t;
 
 
 /**
@@ -1052,6 +1052,31 @@ typedef enum{
 
 }perd_adv_prop_t;
 
+typedef struct{
+	u8	adv_handle; //refer to 'adv_handle_t'
+	u16 advInter_min;
+	u16 advInter_max;
+	u8	property; //refer to 'perd_adv_prop_t'
+} hci_le_setPeriodicAdvParam_cmdParam_t;
+
+typedef struct{
+	u8	adv_handle; //refer to 'adv_handle_t'
+	u16 advInter_min;
+	u16 advInter_max;
+	u8	property; //refer to 'perd_adv_prop_t'
+	u8 numSubevents;
+	u8 subeventInterval;
+	u8 responseSlotDelay;
+	u8 responseSlotSpace;
+	u8 numResponseSlots;
+} hci_le_setPeriodicAdvParamV2_cmdParam_t;
+
+/**
+ *  @brief  Return Parameters for "LE Set Periodic Advertising Parameters command v2"
+ */
+typedef struct {
+	u8  	status;
+} hci_le_setPeriodicAdvParamV2_retParam_t;
 
 
 /**
@@ -1171,13 +1196,24 @@ typedef struct{
 } ext_init_cfg_t;
 
 typedef struct{
-	u8		fp; //init_filter_policy
+	u8		fp; //refer to 'init_fp_t'
 	u8		ownAddr_type;
   	u8		peerAddr_type;
 	u8		peer_addr[6];
 	u8		init_PHYs;
   	ext_init_cfg_t		initCfg[3];
 } hci_le_ext_createConn_cmdParam_t;
+
+typedef struct{
+	u8		adv_handle; //refer to 'adv_handle_t'
+	u8		subevent;
+	u8		fp; //refer to 'init_fp_t'
+	u8		ownAddr_type;
+  	u8		peerAddr_type;
+	u8		peer_addr[6];
+	u8		init_PHYs;
+  	ext_init_cfg_t		initCfg[3];
+} hci_le_ext_createConnV2_cmdParam_t;
 
 #define EXT_CREATE_CONN_CMD_PARAM_MAX_LENGTH		(10 + 16 * 3)   //10 + sizeof(ext_init_cfg_t) * 3
 
@@ -1830,7 +1866,7 @@ typedef enum {
 /* Data_Path_ID */
 typedef enum {
 	Data_Path_HCI	 	= 0x00,
-	//x01 to 0xFE: Logical_Channel_Number. The meaning of the logical channel is vendorspecific.
+	//x01 to 0xFE: Logical_Channel_Number. The meaning of the logical channel is vendor specific.
 	Data_Path_Disable	= 0xFF,
 } dat_path_id_t;
 
@@ -2050,7 +2086,7 @@ typedef struct{
 	u8		rsp_slot_count;
   	u8  	subevt_data_len;
 
-  	u8*     pSubevt_data;
+  	u8		pSubevt_data[0];
 } pdaSubevtData_subevtCfg_t;
 /**
  *  @brief  Command Parameters for "7.8.125 LE Set Periodic Advertising Subevent Data command"
@@ -2058,9 +2094,15 @@ typedef struct{
 typedef struct {
 	u8  	adv_handle;   //1. only advertising device; 2. advertising and PAST device. adv_handle indicate advertising set.
 	u8		num_subevent; //0x00~0x0F
-	pdaSubevtData_subevtCfg_t		subevtCfg[15]; //the command max support 15 subevent configurations at a time. refer to core spec.
+	pdaSubevtData_subevtCfg_t subevtCfg[0]; //the command max support 15 subevent configurations at a time. refer to core spec.
 
 } hci_le_setPeridAdvSubeventData_cmdParam_t; //hci_le_setCigParam_cmdParam_t
+
+typedef struct
+{
+	u8 		status;
+	u16 	advHandle;
+}hci_le_setPeridAdvSubeventDataRetParams_t;
 
 /**
  *  @brief  Command Parameters for "7.8.126 LE Set Periodic Advertising Response Data command"
@@ -2076,6 +2118,11 @@ typedef struct {
 	u8      rsp_data[1];
 } hci_le_setPeridAdvRspData_cmdParam_t;
 
+typedef struct
+{
+	u8 		status;
+	u16 	syncHandle;
+} hci_le_setPeridAdvRspDataRetParams_t;
 
 /**
  * @brief	   create a CIG and to set the parameters of one or more CISes that are associated with a CIG in the Controller.
@@ -2105,7 +2152,7 @@ ble_sts_t 	blc_hci_le_removeCig(u8 cigId, hci_le_removeCig_retParam_t*);
 
 
 /**
- * @brief      used to identify and createmthe isochronous data path between the Host and the Controller for a CIS, CIS configuration,
+ * @brief      used to identify and create the isochronous data path between the Host and the Controller for a CIS, CIS configuration,
  * 			   or BIS identified by the Connection_Handle parameter. This command can also be used to configure a codec for each data path.
  * @param[in]  cmdPara - Command Parameters buffer pointer
  * @param[out] pRetParam - Command Parameters buffer pointer
@@ -2164,5 +2211,138 @@ ble_sts_t 	blc_hci_le_createBigParamsTest(hci_le_createBigParamsTest_t* pCmdPara
  * 					   other: failed
  */
 ble_sts_t 	blc_hci_le_terminateBig(hci_le_terminateBigParams_t* pCmdParam);
+
+
+
+typedef struct {
+	u8  	status;
+	u8		Num_Config_Supported;//range 1-4
+	u16		max_consecutive_procedures_supported;
+	u8		Num_Antennas_Supported; // range 1--4
+	u8  	Max_Antenna_Paths_Supported; //range 1--4
+	u8 		Roles_Supported;
+	u8 		Mode_Types;
+	u8 		RTT_Capability;
+	u8 		RTT_AA_Only_N;
+	u8		RTT_Sounding_N;
+	u8		RTT_Random_Payload_N;
+	u16		Optional_NADM_Sounding_Capability;
+	u16		Optional_NADM_Random_Capability;
+	u8		Optional_CS_SYNC_PHYs_Supported;
+	u16		Optional_Subfeatures_Supported;
+	u16 	Optional_T_IP1_Times_Supported;
+	u16		Optional_T_IP2_Times_Supported;
+	u16		Optional_T_FCS_Times_Supported;
+	u16		Optional_T_PM_Times_Supported;
+	u8		T_SW_Time_Supported;
+
+} hci_le_cs_readLocalSupportedCap_retParam_t;
+
+
+typedef struct
+{
+	u16	Connection_Handle;
+	u8	Num_Config_Supported;
+	u16	Max_Consecutive_Procedures_Supported;
+	u8	Num_Antennas_Supported;
+	u8	Max_Antenna_Paths_Supported;
+	u8	Roles_Supported;
+	u8 Mode_Types;
+	u8 RTT_Capability;
+	u8 RTT_AA_Only_N;
+	u8 RTT_Sounding_N;
+	u8 RTT_Random_Payload_N;
+	u16 Optional_NADM_Sounding_Capability;
+	u16 Optional_NADM_Random_Capability;
+	u8	Optional_CS_SYNC_PHYs_Supported;
+	u16 Optional_Subfeatures_Supported;
+	u16  Optional_T_IP1_Times_Supported;
+	u16 Optional_T_IP2_Times_Supported;
+	u16 Optional_T_FCS_Times_Supported;
+	u16 Optional_T_PM_Times_Supported;
+	u8 T_SW_Time_Supported;
+}hci_le_cs_writeCachedRemoteSupportedCap_cmdParam_t;
+
+
+typedef struct{
+	u8 status;
+	u16 connnection_handle;
+}hci_le_cs_writeCachedRemoteSupportedCap_retParam_t;
+
+
+typedef struct{
+
+	u16 Connection_Handle;
+	u8 Role_Enable;
+	u8 CS_SYNC_Antenna_Selection;
+	u8 Max_TX_Power;
+}hci_le_cs_setDefaultSetting_cmdParam_t;
+
+typedef struct{
+	u8 status;
+	u16 connnection_handle;
+}hci_le_cs_setDefaultSetting_retParam_t;
+
+typedef struct{
+	u8 status;
+	u16 connnection_handle;
+}hci_le_cs_writeChchedRemoteFAE_retParam_t;
+
+
+enum{
+	CS_ROLE_BIT_INITIATOR = BIT(0),
+	CS_ROLE_BIT_REFLECTOR = BIT(1),
+};
+
+typedef struct{
+	u16 Connection_Handle;
+	u8 Config_ID;
+	u8 Create_Context;
+	u8 Main_Mode_Type;
+	u8 Sub_Mode_Type;
+	u8 Min_Main_Mode_Steps;
+	u8 Max_Main_Mode_Steps;
+	u8 Main_Mode_Repetition;
+	u8 Mode_0_Steps;
+	u8 Role;
+	u8 RTT_Type;
+	u8 CS_SYNC_PHY;
+	u8 Channel_Map[10];
+	u8 Channel_Map_Repetition;
+	u8 Channel_Selection_Type;
+	u8 Ch3c_Shape;
+	u8 Ch3c_Jump;
+	u8 Companion_Signal_Enable;
+}hci_le_cs_creatConfig_cmdParam_t;
+
+
+typedef struct{
+	u16 Connection_Handle;
+	u8 Config_ID;
+	u16 Max_Procedure_Len;
+	u16 Min_Procedure_Interval;
+	u16 Max_Procedure_Interval;
+	u16 Max_Procedure_Count;
+	u8 Min_Subevent_Len[3];
+	u8 Max_Subevent_Len[3];
+	u8 Tone_Antenna_Config_Selection;
+	u8 PHY;
+	u8 Tx_Pwr_Delta;
+	u8 Preferred_Peer_Antenna;
+}hci_le_cs_setProcedureParame_cmdParam_t;
+
+
+typedef struct{
+	u8 status;
+	u16 connnection_handle;
+}hci_le_cs_setProcedureParam_retParam_t;
+
+
+typedef struct{
+	u16 Connection_Handle;
+	u8 Config_ID;
+	u8 Enable;
+}hci_le_cs_enableProcedure_cmdParam_t;
+
 
 #endif /* HCI_CMD_H_ */

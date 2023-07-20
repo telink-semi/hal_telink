@@ -37,7 +37,7 @@ ble_sts_t   blc_ll_initBigBcstModule_initBigBcstParametersBuffer(u8 *pBigBcstPar
 /**
  * @brief      for user to initialize BIS ISO TX FIFO.
  * @param[in]  pRxbuf - TX FIFO buffer address.
- * @param[in]  fifo_size - RX FIFO size, must use BIS_PDU_ALLIGN4_TXBUFF to calculate.
+ * @param[in]  fifo_size - RX FIFO size, must use BIS_PDU_ALIGN4_TXBUFF to calculate.
  * @param[in]  fifo_number - RX FIFO number, must be: 2^n, (power of 2),recommended value: 2, 4, 8, 16, 32, 64
  * @return     status, 0x00:  succeed
  * 					   other: failed

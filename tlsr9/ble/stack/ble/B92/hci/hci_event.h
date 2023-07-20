@@ -140,7 +140,7 @@ typedef struct {
 typedef enum {
 	ACL_ROLE_CENTRAL 		= 0,
 	ACL_ROLE_PERIPHERAL 	= 1,
-} acl_conection_role_t;
+} acl_connection_role_t;
 
 
 /* compatible with previous released SDK */
@@ -427,7 +427,7 @@ typedef struct{
 }hci_le_connectionIQReportEvt_t;
 
 
-#define	PDAADV_INFO_LEGNTH				8
+#define	PDAADV_INFO_LENGTH				8
 #define	PDAADV_RPT_DATA_LEN_MAX			247
 #define EXTADV_INFO_LENGTH				24	 //byte number from "event_type" to "data_length"
 #define EXTADV_RPT_DATA_LEN_MAX			229  //253 - 24 = 229
@@ -498,7 +498,7 @@ typedef enum{
 
 
 /**
- *  @brief  Event Parameters for "7.7.65.14 LE Periodic Advertising Sync Established event"
+ *  @brief  Event Parameters for "7.7.65.14 LE Periodic Advertising Sync Established event v1"
  */
 typedef struct {
 	u8		subEventCode;
@@ -513,9 +513,30 @@ typedef struct {
 	u8		advClkAccuracy;
 }hci_le_periodicAdvSyncEstablishedEvt_t;
 
+/**
+ *  @brief  Event Parameters for "7.7.65.14 LE Periodic Advertising Sync Established event v2"
+ */
+typedef struct {
+	u8		subEventCode;
+	u8		status;
+	u16		syncHandle;
+//	extadv_id_t	adverting_id;
+	u8		advSID;
+	u8		advAddrType;
+	u8		advAddr[6];
+	u8		advPHY;
+	u16		perdAdvItvl;
+	u8		advClkAccuracy;
+
+	///the following is for pawr
+	u8		num_subevent;
+	u8      subevent_intvl;
+	u8      rsp_slot_delay;
+	u8      rsp_slot_spacing;
+}hci_le_periodicAdvSyncEstablishedEvtV2_t;
 
 /**
- *  @brief  Event Parameters for "7.7.65.15 LE Periodic Advertising Report event"
+ *  @brief  Event Parameters for "7.7.65.15 LE Periodic Advertising Report event V1"
  */
 typedef struct {
 	u8		subEventCode;
@@ -528,6 +549,24 @@ typedef struct {
 	u8		data[1];
 } hci_le_periodicAdvReportEvt_t;
 
+
+/**
+ *  @brief  Event Parameters for "7.7.65.15 LE Periodic Advertising Report event V2"
+ */
+typedef struct {
+	u8		subEventCode;
+	u16		syncHandle;
+	u8		txPower;
+	u8		RSSI;
+	u8		cteType;
+
+	u16     paEventCounter;
+	u8		subevent;
+
+	u8		dataStatus;
+	u8		dataLength;  // 0 to 247 Length of the Data field
+	u8		data[1];
+} hci_le_periodicAdvReportEvtV2_t;
 
 /**
  *  @brief  Event Parameters for "7.7.65.16 LE Periodic Advertising Sync Lost event"
@@ -575,7 +614,7 @@ typedef struct {
 typedef struct {
 	u8         subEventCode;
 	u16        connHandle;
-	u8		   channel_selection_algotihm;
+	u8		   channel_selection_algorithm;
 } hci_le_chnSelectAlgorithmEvt_t;
 
 
@@ -756,7 +795,7 @@ typedef struct{
 	u8 		status;
 	u16		connHandle;
 	u16     subrate_factor;
-	u16     periphreal_latency;
+	u16     peripheral_latency;
 	u16		conti_num;
 	u16     subrate_timeout;
 }hci_le_subrateChangeEvt_t;
@@ -789,8 +828,59 @@ typedef struct{
 #endif
 
 
+typedef struct {
+	u8 Subevent_Code;
+	u8 Status;
+	u16 Connection_Handle;
+	u8 Num_Config_Supported;
+	u16 Max_Consecutive_Procedures_Supported;
+	u8 Num_Antennas_Supported;
+	u8 Max_Antenna_Paths_Supported;
+	u8 Roles_Supported;
+	u8 Mode_Types;
+	u8 RTT_Capability;
+	u8 RTT_AA_Only_N;
+	u8 RTT_Sounding_N;
+	u8 RTT_Random_Payload_N;
+	u16 Optional_NADM_Sounding_Capability;
+	u16 Optional_NADM_Random_Capability;
+	u8 Optional_CS_SYNC_PHYs_Supported;
+	u16 Optional_Subfeatures_Supported;
+	u16 Optional_T_IP1_Times_Supported;
+	u16 Optional_T_IP2_Times_Supported;
+	u16 Optional_T_FCS_Times_Supported;
+	u16 Optional_T_PM_Times_Supported;
+	u8 T_SW_Time_Supported;
+} hci_le_readRemoteSupCapCompleteEvt_t;
 
 
+
+typedef struct {
+	u8 Subevent_Code;
+	u8 Status;
+	u16 Connection_Handle;
+	u8 Config_ID;
+	u8 Action;
+	u8 Main_Mode_Type;
+	u8 Sub_Mode_Type;
+	u8 Min_Main_Mode_Steps;
+	u8 Max_Main_Mode_Steps;
+	u8 Main_Mode_Repetition;
+	u8 Mode_0_Steps;
+	u8 Role;
+	u8 RTT_Type;
+	u8 CS_SYNC_PHY;
+	u8 Channel_Map[10];
+	u8 Channel_Map_Repetition;
+	u8 Channel_Selection_Type;
+	u8 Ch3c_Shape;
+	u8 Ch3c_Jump;
+	u8 Companion_Signal_Enable;
+	u8 T_IP1_Time;
+	u8 T_IP2_Time;
+	u8 T_FCS_Time;
+	u8 T_PM_Time;
+} hci_le_csConfigCompleteEvt_t;
 
 /**
  *  @brief  Event Parameters for Telink Private "LE Connection Establish event"
@@ -822,7 +912,7 @@ typedef struct {
 typedef enum{
 	INIT_TIMEOUT	= 0x01,
 	CONNECT_FAIL	= 0x02,
-}crt_conn_fail_resson_t;
+}crt_conn_fail_reason_t;
 
 
 
@@ -844,7 +934,7 @@ int		hci_le_cisReq_evt(u16 aclHandle, u16 cisHandle, u8 cigId, u8 cisId);
 int		hci_le_createBigComplete_evt(u8 status, u8 bigHandle, u8 bigSyncDly[3], u8 transLatyBig[3], u8 phy, u8 nse,
 								     u8 bn, u8 pto, u8 irc, u16 maxPDU, u16 isoIntvl, u8 numBis, u16* bisHandles);
 int		hci_le_terminateBigComplete_evt(u8 bigHandle, u8 reason);
-int		hci_le_bigSyncEstablished_evt(u8 staus, u8 bigHandle, u8 transLatyBig[3], u8 nse, u8 bn, u8 pto, u8 irc,
+int		hci_le_bigSyncEstablished_evt(u8 status, u8 bigHandle, u8 transLatyBig[3], u8 nse, u8 bn, u8 pto, u8 irc,
 		                              u16 maxPDU, u16 isoIntvl,  u8 numBis, u16* bisHandles);
 int		hci_le_bigSyncLost_evt(u8 bigHandle, u8 reason);
 int		hci_le_BigInfoAdvReport_evt(u16 syncHandle, u8 numBis, u8 nse, u16 IsoItvl, u8 bn, u8 pto, u8 irc,
@@ -854,14 +944,14 @@ int		hci_cmdComplete_evt(u8 numHciCmds, u8 opCode_ocf, u8 opCode_ogf, u8 paraLen
 int		hci_cmdStatus_evt(u8 numHciCmds, u8 opCode_ocf, u8 opCode_ogf, u8 status, u8 *result);
 int		hci_le_connectionComplete_evt(u8 status, u16 connHandle, u8 role, u8 peerAddrType, u8 *peerAddr,
                                       u16 connInterval, u16 slaveLatency, u16 supervisionTimeout, u8 masterClkAccuracy);
-int		hci_le_enhancedConnectionComplete_evt(u8 status, u16 connHandle, u8 role, u8 peerAddrType, u8 *peerAddr, u8 *loaclRpa, u8 *peerRpa,
+int		hci_le_enhancedConnectionComplete_evt(u8 status, u16 connHandle, u8 role, u8 peerAddrType, u8 *peerAddr, u8 *localRpa, u8 *peerRpa,
                                               u16 connInterval, u16 connLatency, u16 supervisionTimeout, u8 masterClkAccuracy);
 int		hci_le_connectionUpdateComplete_evt(u8 status, u16 connHandle, u16 connInterval,
         									u16 connLatency, u16 supervisionTimeout);
 
 int 	hci_le_directAdvertisingReport_evt(u8 addr_type, u8 *addr, u8 *direct_addr, s8 rssi);
 int		hci_le_readRemoteFeaturesComplete_evt(u8 status, u16 connHandle, u8 * feature);
-int		hci_le_chennel_selection_algorithm_evt(u16 connhandle, u8 channel_selection_alg);
+int		hci_le_channel_selection_algorithm_evt(u16 connhandle, u8 channel_selection_alg);
 int		hci_le_phyUpdateComplete_evt(u16 connhandle,u8 status, u8 new_phy);
 int		hci_le_data_len_update_evt(u16 connhandle,u16 effTxOctets, u16 effRxOctets, u16 maxtxtime, u16 maxrxtime);
 int		hci_le_longTermKeyRequest_evt(u16 connHandle, u8* random, u16 ediv, u8* result);
@@ -873,7 +963,7 @@ int		hci_remoteNateReqComplete_evt (u8* bd_addr);
 int		hci_le_pathLossThreshold_evt(u16 connHandle, u8 currPathLoss, u8 zoneEntered);
 int		hci_le_transmitPwrRpting_evt(u8 status, u16 connHandle, u8 reason, u8 phy, s8 txPwrLvl, u8 txPwrLvlFlg, s8 delta);
 int     hci_le_authPayloadTimeoutExpired_evt(u16 connHandle);
-
+int 	hci_le_readRemoteSupCapComplete_evt(u8 status, u16 connHandle, u8 *feature);
 
 
 

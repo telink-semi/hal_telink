@@ -123,7 +123,7 @@ void 		blc_ll_set_scan_rsp_en(u8 enable);
  * @param[in]  chn2 - channel to replace channel 39
  * @return     none
  */
-void 		blc_ll_setAdvCustomedChannel (u8 chn0, u8 chn1, u8 chn2);
+void 		blc_ll_setAdvCustomizedChannel (u8 chn0, u8 chn1, u8 chn2);
 
 
 

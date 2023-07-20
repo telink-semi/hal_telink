@@ -31,7 +31,7 @@
  * @param[in]  local_irk - local IRK
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t	blc_ll_addDeivceToResolvingList(ida_type_t peerIdAddrType, u8 *peerIdAddr, u8 *peer_irk, u8 *local_irk);
+ble_sts_t	blc_ll_addDeviceToResolvingList(ida_type_t peerIdAddrType, u8 *peerIdAddr, u8 *peer_irk, u8 *local_irk);
 
 
 /**
@@ -40,7 +40,7 @@ ble_sts_t	blc_ll_addDeivceToResolvingList(ida_type_t peerIdAddrType, u8 *peerIdA
  * @param[in]  peerIdAddr - Peer_Identity_Address
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t	blc_ll_removeDeivceFromResolvingList(ida_type_t peerIdAddrType, u8 *peerIdAddr);
+ble_sts_t	blc_ll_removeDeviceFromResolvingList(ida_type_t peerIdAddrType, u8 *peerIdAddr);
 
 
 /**
@@ -88,4 +88,4 @@ ble_sts_t  		blc_ll_setResolvablePrivateAddressTimeout (u16 rpa_timeout_s);
 ble_sts_t  		blc_ll_setPrivacyMode(ida_type_t peerIdAddrType, u8* peerIdAddr, privacy_mode_t privMode);
 
 
-#endif /* LL_RESOLVLIST_H_ */
+#endif /* LL_RESOLVELIST_H_ */
