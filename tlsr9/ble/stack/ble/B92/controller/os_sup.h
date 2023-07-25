@@ -29,5 +29,10 @@ void blc_setOsSupEnable(bool en);
 bool blc_isOsSupEnable(void);
 bool blc_isBleSchedulerBusy(void);
 void blc_ll_registerGiveSemCb(os_give_sem_t give_sem_from_isr, os_give_sem_t give_sem);
+extern int blc_pm_handler(void);
+extern void blc_pm_setAppWakeupLowPower(u32 wakeup_tick, u8 enable);
+
+/* Stack API. !!! user can't use. */
+extern void blt_ll_sem_give(void);
 
 #endif /* OS_SUP_H_ */

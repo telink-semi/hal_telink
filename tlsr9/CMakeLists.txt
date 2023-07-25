@@ -66,7 +66,7 @@ zephyr_library_sources_ifdef(CONFIG_USB_TELINK_B9X drivers/${SOC}/usbhw.c)
 
 #PM driver dependency
 zephyr_library_sources_ifdef(CONFIG_PM drivers/${SOC}/stimer.c)
-zephyr_library_sources_ifdef(CONFIG_PM common/${SOC}/sleep.c)
+zephyr_library_sources_ifdef(CONFIG_PM common/sleep.c)
 
 # BLE reference sources
 if (CONFIG_BT_B9X)

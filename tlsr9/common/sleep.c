@@ -19,12 +19,16 @@
 #include <ext_driver/ext_pm.h>
 
 #if CONFIG_BT_B9X
+#if CONFIG_SOC_RISCV_TELINK_B91
 #include <stack/ble/B91/controller/os_sup.h>
+#elif CONFIG_SOC_RISCV_TELINK_B92
+#include <stack/ble/B92/controller/os_sup.h>
+#endif
 #include <b9x_bt.h>
 #endif /* CONFIG_BT_B9X */
 
 /**
- * @brief     This function sets B91 MCU to suspend mode
+ * @brief     This function sets B9X MCU to suspend mode
  * @param[in] wake_stimer_tick - wake-up stimer tick
  * @return    true if suspend mode entered otherwise false
  */
@@ -61,7 +65,7 @@ bool b9x_suspend(uint32_t wake_stimer_tick)
 
 #ifdef CONFIG_BOARD_TLSR9518ADK80D_RETENTION
 
-bool b91_deep_sleep(uint32_t wake_stimer_tick)
+bool b9x_deep_sleep(uint32_t wake_stimer_tick)
 {
 	bool result = false;
 	static volatile bool tl_sleep_retention
