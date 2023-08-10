@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2022 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,23 +17,34 @@
  *****************************************************************************/
 
 /********************************************************************************************************
- * @file	fifo.h
+ * @file	mdec_reg.h
  *
- * @brief	This is the header file for B9x
+ * @brief	This is the header file for B92
  *
  * @author	Driver Group
  *
  *******************************************************************************************************/
-#ifndef FIFO_H_
-#define FIFO_H_
+#pragma once
 
-typedef	struct {
-	unsigned int		size;
-	unsigned short		num;
-	unsigned char		wptr;
-	unsigned char		rptr;
-	unsigned char*		p;
-}	my_fifo_t;
+#include "soc.h"
+
+#define mdec_rst_addr                   0x53
+typedef enum{
+	FLD_SELE_PA0		= BIT(0),
+	FLD_SELE_PB7		= BIT(1),
+	FLD_SELE_PC4		= BIT(2),
+	FLD_SELE_PD0		= BIT(3),
+	FLD_SELE_PE0		= BIT(4),
+}mdec_pin_e;
+typedef enum{
+	FLD_CLS_MDEC	    = BIT_RNG(0,4),
+	FLD_RSVD			= BIT_RNG(5,6),
+	FLD_MDEC_RST		= BIT(7),
+}mdec_set_e;
+
+#define	mdec_ctrl						0x54
 
 
-#endif /* FIFO_H_ */
+
+
+

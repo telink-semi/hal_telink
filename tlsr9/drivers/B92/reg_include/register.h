@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2022 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,23 +17,35 @@
  *****************************************************************************/
 
 /********************************************************************************************************
- * @file	fifo.h
+ * @file	register.h
  *
- * @brief	This is the header file for B9x
+ * @brief	This is the header file for B92
  *
  * @author	Driver Group
  *
  *******************************************************************************************************/
-#ifndef FIFO_H_
-#define FIFO_H_
+#ifndef  REGISTER_H
+#define  REGISTER_H
 
-typedef	struct {
-	unsigned int		size;
-	unsigned short		num;
-	unsigned char		wptr;
-	unsigned char		rptr;
-	unsigned char*		p;
-}	my_fifo_t;
-
-
-#endif /* FIFO_H_ */
+#include "gpio_reg.h"
+#include "soc.h"
+#include "analog_reg.h"
+#include "audio_reg.h"
+#include "timer_reg.h"
+#include "dma_reg.h"
+#include "usb_reg.h"
+#include "pwm_reg.h"
+#include "spi_reg.h"
+#include "i2c_reg.h"
+#include "mspi_reg.h"
+#include "rf_reg.h"
+#include "trng_reg.h"
+#include "pke_reg.h"
+#include "plic_reg.h"
+#include "uart_reg.h"
+#include "stimer_reg.h"
+#include "aes_reg.h"
+#include "adc_reg.h"
+#include "mdec_reg.h"
+#include "qdec_reg.h"
+#endif
