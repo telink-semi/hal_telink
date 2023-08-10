@@ -90,9 +90,9 @@ zephyr_library_sources(
 	drivers/${SOC}/flash.c
 	drivers/${SOC}/stimer.c
 	ble/common/utility.c
-	ble/vendor/controller/${SOC}_bt.c
-	ble/vendor/controller/${SOC}_bt_init.c
-	ble/vendor/controller/${SOC}_bt_buffer.c
+	ble/vendor/controller/b91_bt.c
+	ble/vendor/controller/b91_bt_init.c
+	ble/vendor/controller/b91_bt_buffer.c
 )
 
 endif() # CONFIG_BT_B91
