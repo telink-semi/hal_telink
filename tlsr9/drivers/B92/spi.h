@@ -308,8 +308,10 @@ static inline void lspi_reset(void)
  */
 static inline void gspi_reset(void)
 {
+	reg_gspi_clk_set &= ~(FLD_GSPI_DIV_RSTN);//Disable the gspi clock before resetting the gspi. Otherwise, hardware logic errors may occur,the clock enable needs to be reconfigured.
 	reg_rst1 &= (~FLD_RST1_GSPI);
 	reg_rst1 |= FLD_RST1_GSPI;
+	reg_gspi_clk_set |= (FLD_GSPI_DIV_RSTN);
 }
 
 /**
