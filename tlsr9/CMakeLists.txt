@@ -14,6 +14,7 @@ endif()
 
 zephyr_library()
 
+# common headers
 zephyr_include_directories(common)
 zephyr_include_directories(drivers/${SOC}/compatibility_pack)
 zephyr_include_directories(drivers/${SOC}/reg_include)
