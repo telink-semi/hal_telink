@@ -71,8 +71,8 @@ endif()
 zephyr_library_sources_ifdef(CONFIG_ENTROPY_TELINK_B9X_TRNG drivers/${SOC}/trng.c)
 
 # ADC driver reference sources
-zephyr_library_sources_ifdef(CONFIG_ADC_TELINK_B91 drivers/${SOC}/adc.c)
-zephyr_library_sources_ifdef(CONFIG_ADC_TELINK_B91 drivers/${SOC}/gpio.c)
+zephyr_library_sources_ifdef(CONFIG_ADC_TELINK_B9X drivers/${SOC}/adc.c)
+zephyr_library_sources_ifdef(CONFIG_ADC_TELINK_B9X drivers/${SOC}/gpio.c)
 
 # USB driver reference sources
 zephyr_library_sources_ifdef(CONFIG_USB_TELINK_B91 drivers/${SOC}/gpio.c)
