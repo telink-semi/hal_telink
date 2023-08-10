@@ -36,9 +36,9 @@ endif()
 # MbedTLS HW acceleration
 if(CONFIG_MBEDTLS)
 	add_subdirectory( crypto/mbedtls )
-if(CONFIG_TELINK_B91_MBEDTLS_HW_ACCELERATION)
+if(CONFIG_TELINK_B9X_MBEDTLS_HW_ACCELERATION)
 	zephyr_library_sources(
-		drivers/B91/pke.c
+		drivers/${SOC}/pke.c
 	)
 endif() # MbedTLS HW acceleration
 endif() # MbedTLS

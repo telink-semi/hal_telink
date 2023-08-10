@@ -207,11 +207,19 @@ static eccp_curve_t secp192k1_curve_dat = {
 
 #if defined(MBEDTLS_ECP_DP_CURVE25519_ENABLED)
 
+#if CONFIG_SOC_RISCV_TELINK_B91
 #define MONT_P_BITLEN       mont_p_bitLen
 #define MONT_P              mont_p
 #define MONT_P_H            mont_p_h
 #define MONT_P_N1           mont_p_n1
 #define MONT_A24            mont_a24
+#elif CONFIG_SOC_RISCV_TELINK_B92
+#define MONT_P_BITLEN       p_bitLen
+#define MONT_P              p
+#define MONT_P_H            p_h
+#define MONT_P_N1           p_n1
+#define MONT_A24            a24
+#endif
 
 static mont_curve_t x25519 = {
 	.MONT_P_BITLEN = 255,
