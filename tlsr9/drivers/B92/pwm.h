@@ -132,25 +132,30 @@ static inline void pwm_set_tmax(pwm_id_e id, unsigned short tmax){
 
 /**
  * @brief     This function servers to start the pwm,can have more than one PWM open at the same time.
- * @param[in] en - variable of enum to select the pwm.
+ * @param[in] id - variable of enum to select the pwm number.
  * @return	  none.
  */
-static inline void pwm_start(pwm_en_e en){
-
-		reg_pwm_enable|=en;
+static inline void pwm_start(pwm_id_e id){
+	if(PWM0_ID == id){
+		BM_SET(reg_pwm0_enable, BIT(PWM0_ID));
+	}
+	else{
+		BM_SET(reg_pwm_enable, BIT(id));
+	}
 }
-
-
 
 /**
  * @brief     This function servers to stop the pwm,can have more than one PWM stop at the same time.
- * @param[in] en - variable of enum to select the pwm.
+ * @param[in] id - variable of enum to select the pwm number.
  * @return	  none.
  */
-static inline void pwm_stop(pwm_en_e en){
-
-		reg_pwm_enable&=~en;
-
+static inline void pwm_stop(pwm_id_e id){
+	if(PWM0_ID == id){
+		BM_CLR(reg_pwm0_enable, BIT(PWM0_ID));
+	}
+	else{
+		BM_CLR(reg_pwm_enable, BIT(id));
+	}
 }
 
 
