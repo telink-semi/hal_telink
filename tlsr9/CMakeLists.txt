@@ -28,6 +28,8 @@ if (CONFIG_SOC_RISCV_TELINK_B92)
 zephyr_library_sources(drivers/${SOC}/watchdog.c)
 
 # driver lib (sys.c, pm.c, flash_base.c, plic.c, pke.c, rf.c, trng.c)
+# a temprory solution for the flash_base module (need to remove the next line when ZEPHYR-355 will completed)
+zephyr_library_sources(drivers/${SOC}/flash_base.c)
 zephyr_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/drivers/${SOC}/lib/libdriver.a)
 endif()
 
@@ -40,7 +42,7 @@ if(CONFIG_MBEDTLS AND CONFIG_TELINK_B91_MBEDTLS_HW_ACCELERATION)
 endif() # MbedTLS HW acceleration
 
 # Flash driver reference sources
-if(CONFIG_SOC_FLASH_TELINK_B91 OR CONFIG_USB_TELINK_B91)
+if(CONFIG_SOC_FLASH_TELINK_B9X OR CONFIG_USB_TELINK_B91)
 	zephyr_library_sources(
 		drivers/${SOC}/flash.c
 		drivers/${SOC}/stimer.c
