@@ -76,7 +76,7 @@ enum{
 
 #define reg_system_cal_latch_32k         	REG_ADDR32(STIMER_BASE_ADDR+0x14)
 
-#define reg_system_up_32k					REG_ADDR32(STIMER_BASE_ADDR+0x18)
+#define reg_system_up_32k					REG_ADDR8(STIMER_BASE_ADDR+0x18)
 enum{
 
 	FLD_SYSTEM_UPDATE_UPON_32K 			=   BIT(0),

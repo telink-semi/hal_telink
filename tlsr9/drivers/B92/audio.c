@@ -28,6 +28,7 @@
 #include "clock.h"
 #include "pwm.h"
 #include "stimer.h"
+#include "pm.h"
 
 
 unsigned char audio_codec_rate[AUDIO_RATE_SIZE] = {	0x06,/*8k*/                 //12Mhz/1500=8K
@@ -140,15 +141,15 @@ dma_config_t audio_dma_tx_config[2]=
  */
 void audio_set_stream0_dmic_pin(gpio_func_pin_e dmic0_data,gpio_func_pin_e dmic0_clk1,gpio_func_pin_e dmic0_clk2)
 {
-	gpio_input_en(dmic0_data);
+	gpio_input_en((gpio_pin_e)dmic0_data);
 	gpio_set_mux_function(dmic0_data,DMIC0_DAT_I);
-	gpio_function_dis(dmic0_data);
+	gpio_function_dis((gpio_pin_e)dmic0_data);
 	gpio_set_mux_function(dmic0_clk1,DMIC0_CLK);
-	gpio_function_dis(dmic0_clk1);
+	gpio_function_dis((gpio_pin_e)dmic0_clk1);
 	if( dmic0_clk2 != GPIO_NONE_PIN)
 	{
 		gpio_set_mux_function(dmic0_clk2,DMIC0_CLK);
-		gpio_function_dis(dmic0_clk2);
+		gpio_function_dis((gpio_pin_e)dmic0_clk2);
 	}
 
 }
@@ -162,15 +163,15 @@ void audio_set_stream0_dmic_pin(gpio_func_pin_e dmic0_data,gpio_func_pin_e dmic0
  */
 void audio_set_stream1_dmic_pin(gpio_func_pin_e dmic1_data,gpio_func_pin_e dmic1_clk1,gpio_func_pin_e dmic1_clk2)
 {
-	gpio_input_en(dmic1_data);
+	gpio_input_en((gpio_pin_e)dmic1_data);
 	gpio_set_mux_function(dmic1_data,DMIC1_DAT_I);
-	gpio_function_dis(dmic1_data);
+	gpio_function_dis((gpio_pin_e)dmic1_data);
 	gpio_set_mux_function(dmic1_clk1,DMIC1_CLK);
-	gpio_function_dis(dmic1_clk1);
+	gpio_function_dis((gpio_pin_e)dmic1_clk1);
 	if( dmic1_clk2 != GPIO_NONE_PIN)
 	{
 		gpio_set_mux_function(dmic1_clk2,DMIC1_CLK);
-		gpio_function_dis(dmic1_clk2);
+		gpio_function_dis((gpio_pin_e)dmic1_clk2);
 	}
 }
 
@@ -221,6 +222,7 @@ void audio_set_stream1_dmic_pin(gpio_func_pin_e dmic1_data,gpio_func_pin_e dmic1
   * @param[in] data_len     - the length of dma rx size by byte
   * @param[in] head_of_list - the head address of dma llp.
   * @return    none
+  * @note      dst_addr : must be aligned by word (4 bytes), otherwise the program will enter an exception
   */
 void audio_rx_dma_config(dma_chn_e chn,unsigned short *dst_addr,unsigned int data_len,dma_chain_config_t *head_of_list)
 {
@@ -239,6 +241,7 @@ void audio_rx_dma_config(dma_chn_e chn,unsigned short *dst_addr,unsigned int dat
  * @param[in] dst_addr    - the dma address of destination.
  * @param[in] data_len    - the length of dma size by byte.
  * @return    none
+ * @note      dst_addr : must be aligned by word (4 bytes), otherwise the program will enter an exception
  */
 void audio_rx_dma_add_list_element(dma_chain_config_t *config_addr,dma_chain_config_t *llpointer ,unsigned short * dst_addr,unsigned int data_len)
 {
@@ -256,6 +259,7 @@ void audio_rx_dma_add_list_element(dma_chain_config_t *config_addr,dma_chain_con
  * @param[in] in_buff     - the pointer of rx_buff.
  * @param[in] buff_size   - the size of rx_buff.
  * @return    none
+ * @note      in_buff : must be aligned by word (4 bytes), otherwise the program will enter an exception
  */
 void audio_rx_dma_chain_init (audio_fifo_chn_e rx_fifo_chn,dma_chn_e chn,unsigned short * in_buff,unsigned int buff_size)
 {
@@ -271,6 +275,7 @@ void audio_rx_dma_chain_init (audio_fifo_chn_e rx_fifo_chn,dma_chn_e chn,unsigne
  * @param[in] data_len     - the length of dma rx size by byte
  * @param[in] head_of_list - the head address of dma llp.
  * @return    none
+ * @note      src_addr : must be aligned by word (4 bytes), otherwise the program will enter an exception
  */
 void audio_tx_dma_config(dma_chn_e chn,unsigned short * src_addr, unsigned int data_len,dma_chain_config_t * head_of_list)
 {
@@ -289,6 +294,7 @@ void audio_tx_dma_config(dma_chn_e chn,unsigned short * src_addr, unsigned int d
  * @param[in] src_addr    - the address of source
  * @param[in] data_len    - the length of dma size by byte.
  * @return    none
+ * @note      src_addr : must be aligned by word (4 bytes), otherwise the program will enter an exception
  */
 void audio_tx_dma_add_list_element(dma_chain_config_t *config_addr,dma_chain_config_t *llpointer ,unsigned short * src_addr,unsigned int data_len)
 {
@@ -306,6 +312,7 @@ void audio_tx_dma_add_list_element(dma_chain_config_t *config_addr,dma_chain_con
  * @param[in] out_buff    - the pointer of tx_buff.
  * @param[in] buff_size   - the size of tx_buff.
  * @return    none
+ * @note      out_buff : must be aligned by word (4 bytes), otherwise the program will enter an exception
  */
 void audio_tx_dma_chain_init (audio_fifo_chn_e tx_fifo_chn,dma_chn_e chn,unsigned short * out_buff,unsigned int buff_size)
 {
@@ -375,18 +382,36 @@ void audio_set_codec_stream0_input_mode(audio_stream0_input_mode_e input_mode)
 	 }
 }
 
-/**
- * 	@brief      This function serves to set stream0 input path.
- * 	@param[in]  che_en  - channel selection
- * 	@return     none
- */
-void audio_set_codec_stream0_path(audio_chn_sel_e che_en)
-{
-   reg_codec_clk_ctr2 |=FLD_AUDIO_CODEC_DEC0_EN;
-   reg_codec_mic_ctr =(reg_codec_mic_ctr&(~(FLD_AUDIO_CODEC_DEC0_CH0_EN|FLD_AUDIO_CODEC_DEC0_CH1_EN)))\
-										  | MASK_VAL( FLD_AUDIO_CODEC_DEC0_CH0_EN, (che_en&CHANNEL_LEFT)==CHANNEL_LEFT ? 1:0,\
-											        FLD_AUDIO_CODEC_DEC0_CH1_EN, (che_en&CHANNEL_RIGHT)==CHANNEL_RIGHT ? 1:0);
-}
+ /**
+  * 	@brief      This function serves to set stream0 input path.
+  * 	@param[in]  che_en  - channel selection
+  * 	@param[in]  rate    - select channel sample rate
+  * 	@return     none
+  */
+ void audio_set_codec_stream0_path(codec_stream0_input_src_e che_en,audio_sample_rate_e rate)
+
+ {
+	/* at 44.1k, 48k sampling rate, the DMCI channel will be switched (amic, line_in does not affect),
+	 * and the switch here restores the original channel correspondence
+	 */
+
+ 	if(rate == AUDIO_44P1K ||rate == AUDIO_48K)
+ 	{
+
+		if(che_en == DMIC_STREAM0_MONO_L)
+		 {
+			che_en = DMIC_STREAM0_MONO_R;
+		 }
+		else if(che_en == DMIC_STREAM0_MONO_R)
+		 {
+			che_en = DMIC_STREAM0_MONO_L;
+		 }
+ 	}
+    reg_codec_mic_ctr =(reg_codec_mic_ctr&(~(FLD_AUDIO_CODEC_DEC0_CH0_EN|FLD_AUDIO_CODEC_DEC0_CH1_EN)))\
+ 										  | MASK_VAL( FLD_AUDIO_CODEC_DEC0_CH0_EN, (che_en&CHANNEL_LEFT)==CHANNEL_LEFT ? 1:0,\
+ 											        FLD_AUDIO_CODEC_DEC0_CH1_EN, (che_en&CHANNEL_RIGHT)==CHANNEL_RIGHT ? 1:0);
+    reg_codec_clk_ctr2 |=FLD_AUDIO_CODEC_DEC0_EN;
+ }
 
 /**
  * 	@brief      This function serves to  swap stream1 data.
@@ -405,23 +430,35 @@ void audio_set_codec_stream0_path(audio_chn_sel_e che_en)
 	 }
 }
 
-/**
- * 	@brief      This function serves to set stream1 input path.
- * 	@param[in]  che_en  -channel selection
- * 	@return     none
- */
-void audio_set_codec_stream1_path(audio_chn_sel_e che_en)
-{
- /*Enabling FLD_AUDIO_CODEC_R_NEG bit is valid for both stream0 and stream1.
- * If this bit is 0 and the DMIC sampling rate is 44.1k and 48k,
- *  the left and right channel data will be exchanged.
- */
-	reg_codec_mic_ctr |= FLD_AUDIO_CODEC_R_NEG;
-	reg_codec_dec1_ctr0 =(reg_codec_dec1_ctr0&(~(FLD_AUDIO_CODEC_DEC1_CH0_EN|FLD_AUDIO_CODEC_DEC1_CH1_EN|FLD_AUDIO_CODEC_DEC1_SWAP)))\
-			                                          |MASK_VAL(FLD_AUDIO_CODEC_DEC1_EN,1,FLD_AUDIO_CODEC_CLK1_EN,1,\
-													  FLD_AUDIO_CODEC_DEC1_CH0_EN, (che_en&CHANNEL_LEFT)==CHANNEL_LEFT ? 1:0,\
-													  FLD_AUDIO_CODEC_DEC1_CH1_EN, (che_en&CHANNEL_RIGHT)==CHANNEL_RIGHT ? 1:0);
-}
+ /**
+   * 	@brief      This function serves to set stream1 input path.
+   * 	@param[in]  che_en  - channel selection
+   * 	@param[in]  rate    - select channel sample rate
+   * 	@return     none
+   */
+ void audio_set_codec_stream1_path(codec_stream1_input_src_e che_en,audio_sample_rate_e rate)
+ {
+	 /* at 44.1k, 48k sampling rate, the DMCI channel will be switched (amic, line_in does not affect),
+	 * and the switch here restores the original channel correspondence
+	 */
+
+	if(rate == AUDIO_44P1K ||rate == AUDIO_48K)
+	{
+
+		if(che_en == DMIC_STREAM1_MONO_L)
+		 {
+			che_en = DMIC_STREAM1_MONO_R;
+		 }
+		else if(che_en == DMIC_STREAM1_MONO_R)
+		 {
+			che_en = DMIC_STREAM1_MONO_L;
+		 }
+	}
+ 	reg_codec_dec1_ctr0 =(reg_codec_dec1_ctr0&(~(FLD_AUDIO_CODEC_DEC1_CH0_EN|FLD_AUDIO_CODEC_DEC1_CH1_EN)))\
+ 			                                          |MASK_VAL(FLD_AUDIO_CODEC_DEC1_EN,1,FLD_AUDIO_CODEC_CLK1_EN,1,\
+ 													  FLD_AUDIO_CODEC_DEC1_CH0_EN, (che_en&CHANNEL_LEFT)==CHANNEL_LEFT ? 1:0,\
+ 													  FLD_AUDIO_CODEC_DEC1_CH1_EN, (che_en&CHANNEL_RIGHT)==CHANNEL_RIGHT ? 1:0);
+ }
 
 /**
  * @brief      This function serves to set codec stream0 input data bit width mode for fifo0 or fifo1 .
@@ -601,6 +638,7 @@ void audio_power_on(void)
 	 * 4.power on audio power
 	 * 5.wait audio power stabilization
 	 * */
+	pm_set_suspend_power_cfg(PM_POWER_AUDIO, 1);
 	analog_write_reg8(0x7d,analog_read_reg8(0x7d)|(BIT(2)));   //1.audio power down  ,     1:power down 0:power on
 	delay_us(6);                                               //2.wait audio power stabilization
 	analog_write_reg8(0x1e,analog_read_reg8(0x1e) & (~BIT(5)));//3.power switch default 1, 1:switch off 0:switch on
@@ -620,6 +658,7 @@ void audio_power_down(void)
 	 * 1.power down audio power
 	 * 2.switch off audio power switch
 	 * */
+	pm_set_suspend_power_cfg(PM_POWER_AUDIO, 0);
 	analog_write_reg8(0x7d,analog_read_reg8(0x7d) |BIT(2));//audio power        default 1, 1:power down 0:power on
 	analog_write_reg8(0x1e,analog_read_reg8(0x1e) |BIT(5));//codec power switch default 1, 1:switch off 0:switch on
 	audio_codec_adc_power_down();
@@ -802,7 +841,7 @@ void audio_codec_stream0_input_config(codec_stream0_input_src_e source,audio_sam
 		audio_codec_adc_power_on(source&3,source>>2);
 	}
 	audio_set_codec_stream0_input_mode(source>>3);
-	audio_set_codec_stream0_path(source&3);
+	audio_set_codec_stream0_path(source,rate);
 	audio_set_codec_stream0_sample_rate(rate);
 
 	 /*Initialization sets all input stream gain to 0
@@ -823,7 +862,7 @@ void audio_codec_stream0_input_config(codec_stream0_input_src_e source,audio_sam
  */
 void audio_codec_stream1_input_config(codec_stream1_input_src_e source,audio_sample_rate_e rate)
 {
-	audio_set_codec_stream1_path(source&3);
+	audio_set_codec_stream1_path(source,rate);
     audio_set_codec_stream1_sample_rate(rate);
 }
 
@@ -831,6 +870,7 @@ void audio_codec_stream1_input_config(codec_stream1_input_src_e source,audio_sam
  * @brief This function serves to configure audio stream0 channel select swap.
  * @param[in]  fifo_chn        - select channel fifo
  * @param[in]  source          - audio stream0 input source select.
+ * @param[in]  rate            - select channel sample rate
  * @return    none
  * @note
  * Condition 1 (default)
@@ -841,26 +881,57 @@ void audio_codec_stream1_input_config(codec_stream1_input_src_e source,audio_sam
  * (1) audio_swap_stream0_data(DATA_INVERT_EN)
  * (2) mono:fifo0->ch1_r on
  *          fifo1->ch0_l on
+ *
+ *
  */
-void audio_codec_swap_stream0_data(audio_fifo_chn_e fifo_chn,codec_stream0_input_src_e source)
+void audio_codec_swap_stream0_data(audio_fifo_chn_e fifo_chn,codec_stream0_input_src_e source,audio_sample_rate_e rate)
 {
+	/*at the sampling rate of 44.1k and 48k, two dmic data exchanges occur in the mono and stereo modes
+	 * so at the sampling rate of 44.1k and 48k, software is required to exchange the two dmic
+	 *  data so as to restore the original data of the two dmics.
+	 *
+	 * sample rate = AUDIO_44P1K or AUDIO_48K,fifo = fifo0
+	 * (1) audio_swap_stream0_data(DATA_INVERT_EN)
+	 * (2) mono:fifo0->ch1_r on
+	 *          fifo1->ch0_l on
+	 * sample rate = AUDIO_44P1K or AUDIO_48K,fifo = fifo1
+	 * (1) audio_swap_stream0_data(DATA_INVERT_DIS)
+	 * (2) mono:fifo0->ch0_l on
+	 *          fifo1->ch1_r on
+	 */
 	switch(source)
  {
 	case LINE_STREAM0_MONO_L:
 	case AMIC_STREAM0_MONO_L:
-	case DMIC_STREAM0_MONO_L:(fifo_chn == FIFO1)?(audio_swap_stream0_data(DATA_INVERT_EN)):(audio_swap_stream0_data(DATA_INVERT_DIS));
-	                 break;
+	case DMIC_STREAM0_MONO_L:if(rate == AUDIO_44P1K || rate == AUDIO_48K){
+		                        (fifo_chn == FIFO1)?(audio_swap_stream0_data(DATA_INVERT_DIS)):(audio_swap_stream0_data(DATA_INVERT_EN));
+	                         }
+	                         else{
+	                        	 (fifo_chn == FIFO1)?(audio_swap_stream0_data(DATA_INVERT_EN)):(audio_swap_stream0_data(DATA_INVERT_DIS));
+	                         }
+		                     break;
 	case LINE_STREAM0_MONO_R:
 	case AMIC_STREAM0_MONO_R:
-	case DMIC_STREAM0_MONO_R:(fifo_chn == FIFO0)?(audio_swap_stream0_data(DATA_INVERT_EN)):(audio_swap_stream0_data(DATA_INVERT_DIS));
-	                 break;
+	case DMIC_STREAM0_MONO_R:if(rate == AUDIO_44P1K || rate == AUDIO_48K){
+                               (fifo_chn == FIFO0)?(audio_swap_stream0_data(DATA_INVERT_DIS)):(audio_swap_stream0_data(DATA_INVERT_EN));
+                             }
+                             else{
+    	                        (fifo_chn == FIFO0)?(audio_swap_stream0_data(DATA_INVERT_EN)):(audio_swap_stream0_data(DATA_INVERT_DIS));
+                             }
+                             break;
+	case DMIC_STREAM0_STEREO:if(rate == AUDIO_44P1K || rate == AUDIO_48K){
+                                audio_swap_stream0_data(DATA_INVERT_EN);
+                             }
+	                         break;
+	default:break;
  }
 }
 
 /**
  * @brief This function serves to configure audio stream1 channel select swap.
  * @param[in]  fifo_chn        - select channel fifo
- * @param[in]  source          - select channel .
+ * @param[in]  source          - audio stream1 input source select.
+ * @param[in]  rate            - select channel sample rate
  * @return    none
  * @note
  * Condition 1 (default)
@@ -871,15 +942,45 @@ void audio_codec_swap_stream0_data(audio_fifo_chn_e fifo_chn,codec_stream0_input
  * (1) audio_swap_stream1_data(DATA_INVERT_EN)
  * (2) mono:fifo0->ch1_r on
  *          fifo1->ch0_l on
+ *
+ *
  */
-void audio_codec_swap_stream1_data(audio_fifo_chn_e fifo_chn,codec_stream1_input_src_e source)
+void audio_codec_swap_stream1_data(audio_fifo_chn_e fifo_chn,codec_stream1_input_src_e source,audio_sample_rate_e rate)
 {
+	/*at the sampling rate of 44.1k and 48k, two dmic data exchanges occur in the mono and stereo modes
+	 * so at the sampling rate of 44.1k and 48k, software is required to exchange the two dmic
+	 *  data so as to restore the original data of the two dmics.
+	 *
+	 * sample rate = AUDIO_44P1K or AUDIO_48K,fifo = fifo0
+	 * (1) audio_swap_stream0_data(DATA_INVERT_EN)
+	 * (2) mono:fifo0->ch1_r on
+	 *          fifo1->ch0_l on
+	 * sample rate = AUDIO_44P1K or AUDIO_48K,fifo = fifo1
+	 * (1) audio_swap_stream0_data(DATA_INVERT_DIS)
+	 * (2) mono:fifo0->ch0_l on
+	 *          fifo1->ch1_r on
+	 */
 	switch(source)
  {
-	case DMIC_STREAM1_MONO_L:(fifo_chn == FIFO1)?(audio_swap_stream1_data(DATA_INVERT_EN)):(audio_swap_stream1_data(DATA_INVERT_DIS));
-				     break;
-	case DMIC_STREAM1_MONO_R:(fifo_chn == FIFO0)?(audio_swap_stream1_data(DATA_INVERT_DIS)):(audio_swap_stream1_data(DATA_INVERT_EN));
-					 break;
+	case DMIC_STREAM1_MONO_L:if(rate == AUDIO_44P1K || rate == AUDIO_48K){
+                               (fifo_chn == FIFO1)?(audio_swap_stream1_data(DATA_INVERT_DIS)):(audio_swap_stream1_data(DATA_INVERT_EN));
+                             }
+                             else{
+    	                       (fifo_chn == FIFO1)?(audio_swap_stream1_data(DATA_INVERT_EN)):(audio_swap_stream1_data(DATA_INVERT_DIS));
+                             }
+                             break;
+	case DMIC_STREAM1_MONO_R:if(rate == AUDIO_44P1K || rate == AUDIO_48K){
+                               (fifo_chn == FIFO0)?(audio_swap_stream1_data(DATA_INVERT_DIS)):(audio_swap_stream1_data(DATA_INVERT_EN));
+                             }
+                            else{
+                               (fifo_chn == FIFO0)?(audio_swap_stream1_data(DATA_INVERT_EN)):(audio_swap_stream1_data(DATA_INVERT_DIS));
+                             }
+                            break;
+	case DMIC_STREAM1_STEREO:if(rate == AUDIO_44P1K || rate == AUDIO_48K){
+							 audio_swap_stream1_data(DATA_INVERT_EN);
+							 }
+		                    break;
+	default:break;
  }
 }
 
@@ -894,7 +995,6 @@ void audio_codec_stream0_fifo_input_config(audio_fifo_chn_e fifo_chn,codec_strea
 {
 	audio_codec_set_stream0_fifo_input_mode(fifo_chn,source,data_width);
 	audio_data_fifo_input_path_sel(fifo_chn,CODEC_STREAM0_IN_FIFO);
-	audio_codec_swap_stream0_data(fifo_chn,source);
 }
 
 /**
@@ -908,7 +1008,6 @@ void audio_codec_stream1_fifo_input_config(audio_fifo_chn_e fifo_chn,codec_strea
 {
 	audio_codec_set_stream1_fifo_input_mode(fifo_chn,source,data_width);
 	audio_data_fifo_input_path_sel(fifo_chn,CODEC_STREAM1_IN_FIFO);
-	audio_codec_swap_stream1_data(fifo_chn,source);
 }
 
 /**
@@ -919,6 +1018,7 @@ void audio_codec_stream1_fifo_input_config(audio_fifo_chn_e fifo_chn,codec_strea
 void audio_codec_stream0_input_init(audio_codec_stream0_input_t* audio_codec_input)
 {
 	audio_codec_stream0_input_config(audio_codec_input->input_src,audio_codec_input->sample_rate);
+	audio_codec_swap_stream0_data(audio_codec_input->fifo_num,audio_codec_input->input_src,audio_codec_input->sample_rate);
 	audio_codec_stream0_fifo_input_config(audio_codec_input->fifo_num,audio_codec_input->input_src,audio_codec_input->data_width);
 }
 
@@ -930,6 +1030,7 @@ void audio_codec_stream0_input_init(audio_codec_stream0_input_t* audio_codec_inp
 void audio_codec_stream1_input_init(audio_codec_stream1_input_t* audio_codec_input)
 {
 	audio_codec_stream1_input_config(audio_codec_input->input_src,audio_codec_input->sample_rate);
+	audio_codec_swap_stream1_data(audio_codec_input->fifo_num,audio_codec_input->input_src,audio_codec_input->sample_rate);
 	audio_codec_stream1_fifo_input_config(audio_codec_input->fifo_num,audio_codec_input->input_src,audio_codec_input->data_width);
 }
 
@@ -943,7 +1044,7 @@ void audio_codec_stream1_input_init(audio_codec_stream1_input_t* audio_codec_inp
 void audio_codec_stream_output_config(audio_dac_output_src_e chn,audio_sample_rate_e rate,codec_dac_mode_e dac_mode)
 {
 
-	audio_codec_dac_power_on(chn);
+	audio_codec_dac_power_on((audio_chn_sel_e)chn);
 	audio_codec_dac_init(dac_mode);
 	audio_set_codec_dac_sample_rate(rate);
 
@@ -1006,33 +1107,33 @@ void aduio_i2s_set_mclk(gpio_func_pin_e mclk_pin,unsigned short div_numerator,un
  */
 void i2s_set_pin(audio_i2s_select_e i2s_select,i2s_pin_config_t *config)
 {
-	gpio_input_en(config->bclk_pin);
+	gpio_input_en((gpio_pin_e)config->bclk_pin);
 	gpio_set_mux_function(config->bclk_pin,I2S0_BCK_IO+(i2s_select)*6);
-	gpio_function_dis(config->bclk_pin);
+	gpio_function_dis((gpio_pin_e)config->bclk_pin);
 
 	if(config->adc_lr_clk_pin!=GPIO_NONE_PIN)
 	{
-		gpio_input_en(config->adc_lr_clk_pin);
+		gpio_input_en((gpio_pin_e)config->adc_lr_clk_pin);
 		gpio_set_mux_function(config->adc_lr_clk_pin,I2S0_LR_IN_IO+(i2s_select)*6);
-		gpio_function_dis(config->adc_lr_clk_pin);
+		gpio_function_dis((gpio_pin_e)config->adc_lr_clk_pin);
 	}
 	if(config->dac_lr_clk_pin!=GPIO_NONE_PIN)
 	{
-		gpio_input_en(config->dac_lr_clk_pin);
+		gpio_input_en((gpio_pin_e)config->dac_lr_clk_pin);
 		gpio_set_mux_function(config->dac_lr_clk_pin,I2S0_LR_OUT_IO+(i2s_select)*6);
-		gpio_function_dis(config->dac_lr_clk_pin);
+		gpio_function_dis((gpio_pin_e)config->dac_lr_clk_pin);
 	}
 	if(config->adc_dat_pin!=GPIO_NONE_PIN)
 	{
-		gpio_input_en(config->adc_dat_pin);
+		gpio_input_en((gpio_pin_e)config->adc_dat_pin);
 		gpio_set_mux_function(config->adc_dat_pin,I2S0_DAT_IN_I+(i2s_select)*6);
-		gpio_function_dis(config->adc_dat_pin);
+		gpio_function_dis((gpio_pin_e)config->adc_dat_pin);
 	}
 	if(config->dac_dat_pin!=GPIO_NONE_PIN)
 	{
-		gpio_input_en(config->dac_dat_pin);
+		gpio_input_en((gpio_pin_e)config->dac_dat_pin);
 		gpio_set_mux_function(config->dac_dat_pin,I2S0_DAT_OUT+(i2s_select)*6);
-		gpio_function_dis(config->dac_dat_pin);
+		gpio_function_dis((gpio_pin_e)config->dac_dat_pin);
 	}
 }
 

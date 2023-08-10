@@ -38,17 +38,27 @@
 #ifndef SYS_H_
 #define SYS_H_
 #include "reg_include/stimer_reg.h"
-
+#include "compiler.h"
 
 /**********************************************************************************************************************
  *                                         global constants                                                           *
  *********************************************************************************************************************/
+/**
+ * @brief	This configuration corresponds to the hardware configuration of the GPIO voltage
+ * @note	1. If the GPIO is set to 1.8V, the maximum detection voltage of the ADC input cannot be higher than 1.8V.
+ * 			   If a voltage higher than this needs to be detected, external access to the divider circuit is required.
+ * 			2. If VBAT_MAX_VALUE_LESS_THAN_3V6 is used, the GPIO cannot be set to 1.8V.
+ * 			3. Since 1.8V IO does not comply with USB electrical layer regulations, GPIO cannot be configured to 1.8V when using USB.
+ */
+#define	GPIO_POWER_3V3			0
+#define	GPIO_POWER_1V8			1
+#define GPIO_POWER				GPIO_POWER_3V3
 
 /**********************************************************************************************************************
  *                                           global macro                                                             *
  *********************************************************************************************************************/
-/*
- * brief instruction delay
+/**
+ * @brief instruction delay
  */
 
 #define	_ASM_NOP_					__asm__("nop")
@@ -74,8 +84,8 @@
  */
 typedef enum{
 	LDO_1P2_LDO_2P0 	= 0x00,	/**< 1.2V-LDO & 2.0V-LDO mode */
-	DCDC_1P2_LDO_2P0	= 0x01,	/**< 1.2V-DCDC & 2.0V-LDO mode */
-	DCDC_1P2_DCDC_2P0	= 0x03,	/**< 1.2V-DCDC & 2.0V-DCDC mode */
+//	DCDC_1P2_LDO_2P0	= 0x01,	/**< 1.2V-DCDC & 2.0V-LDO mode */
+//	DCDC_1P2_DCDC_2P0	= 0x03,	/**< 1.2V-DCDC & 2.0V-DCDC mode */
 }power_mode_e;
 
 /**
@@ -116,10 +126,8 @@ extern unsigned int g_chip_version;
  * @brief      This function reboot mcu.
  * @return     none
  */
-static inline void sys_reboot(void)
-{
-	write_reg8(0x1401ef, 0x20);
-}
+_attribute_text_sec_ void sys_reboot(void);
+
 /**
  * @brief   	This function serves to initialize system.
  * @param[in]	power_mode - power mode(LDO/DCDC/LDO_DCDC)

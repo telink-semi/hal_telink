@@ -154,6 +154,7 @@ enum{
 enum{
 	FLD_RF_PN_INIT 			    =	BIT_RNG(0,5),
 };
+#define		reg_rf_iq_samp_num		REG_ADDR16(REG_BASEBAND_BASE_ADDR+0x0e)
 #define		reg_rf_iq_samp_num0		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x0e)
 #define		reg_rf_iq_samp_num1		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x0f)
 
@@ -353,7 +354,7 @@ enum{
 enum{
 	FLD_RF_R_TSTAMP3             =	BIT_RNG(0,7),
 };
-
+#define	   reg_rf_iqstart_tstamp	         REG_ADDR32(REG_BASEBAND_BASE_ADDR+0x54)
 #define    reg_rf_iqstart_tstamp0	         REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x54)
 enum{
 	FLD_RF_IQSTART_TSTAMP0            =	BIT_RNG(0,7),
@@ -505,12 +506,14 @@ enum{
 #define	reg_rf_hpm_neg_time3	       REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x8f)
 
 #define	reg_rf_tr_turnaround_pos_time_addr	0x170090
+#define	reg_rf_tr_turnaround_pos_time		REG_ADDR32(REG_BASEBAND_BASE_ADDR+0x90)
 #define	reg_rf_tr_turnaround_pos_time0		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x90)
 #define	reg_rf_tr_turnaround_pos_time1		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x91)
 #define	reg_rf_tr_turnaround_pos_time2		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x92)
 #define	reg_rf_tr_turnaround_pos_time3		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x93)
 
 #define	reg_rf_tr_turnaround_neg_time_addr	0x170094
+#define	reg_rf_tr_turnaround_neg_time		REG_ADDR32(REG_BASEBAND_BASE_ADDR+0x94)
 #define	reg_rf_tr_turnaround_neg_time0		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x94)
 #define	reg_rf_tr_turnaround_neg_time1		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x95)
 #define	reg_rf_tr_turnaround_neg_time2		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x96)
@@ -985,6 +988,27 @@ enum
 	FLD_RF_NORM_PKT_FAST_STL_EN			= BIT(5),
 	FLD_RF_NON_ID_FAST_STL_EN			= BIT(6),
 	FLD_RF_FAST_STL_EN					= BIT(7),
+};
+
+#define		reg_rf_radio_txrx_dbg1_0	REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x40)
+enum
+{
+	FLD_RF_AGC_DISABLE					= BIT(1),
+	FLD_RF_RX_GAIN						= BIT_RNG(2,4),
+	FLD_RF_ADC_IQ_SWAP					= BIT(5),
+	FLD_RF_INVERT_CLK_DSM				= BIT(6),
+	FLD_RF_DSM_FRAC_LSW_L				= BIT(7),
+};
+
+#define		reg_rf_radio_txrx_dbg1_1	REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x41)
+enum
+{
+	FLD_RF_DSM_FRAC_LSW_H				= BIT_RNG(0,1),
+	FLD_RF_SPARE_1						= BIT(2),
+	FLD_RF_AM_OVERRIDE_EN				= BIT(3),
+	FLD_RF_AM_OVERRIDE_VAL				= BIT(4),
+	FLD_RF_LOAD_PREV_GAIN				= BIT(5),
+	FLD_RF_ADC_CLIP_EN					= BIT(6),
 };
 
 

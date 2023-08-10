@@ -46,19 +46,20 @@
 	P25Q16SU    0x4b        0x156085    PUYA        30ms
 	P25Q32SU    0x4b        0x166085    PUYA        30ms
 	P25Q128L    0x4b        0x186085    PUYA        30ms
+    GD25LQ16E   0x4b        0x1560c8    GD          300ms/500ms(85℃/125℃)
  */
-unsigned int flash_support_mid[] = {0x146085,0x156085,0x166085,0x186085};
+unsigned int flash_support_mid[] = {0x146085,0x156085,0x166085,0x186085,0x1560c8};
 const unsigned int FLASH_CNT = sizeof(flash_support_mid)/sizeof(*flash_support_mid);
 
 
 
-_attribute_data_retention_sec_ flash_hander_t flash_read_page = flash_dread;
-_attribute_data_retention_sec_ flash_hander_t flash_write_page = flash_page_program;
+_attribute_data_retention_sec_ flash_handler_t flash_read_page = flash_dread;
+_attribute_data_retention_sec_ flash_handler_t flash_write_page = flash_page_program;
 /*
  * note:flash_write_page_encrypt and flash_read_page_decrypt_check should be used in combination,and the check read address is corresponding to the encrypted write.
  */
-_attribute_data_retention_sec_ flash_hander_t flash_write_page_encrypt = flash_page_program_encrypt;
-_attribute_data_retention_sec_ flash_read_check_hander_t flash_read_page_decrypt_check = flash_read_data_decrypt_check;
+_attribute_data_retention_sec_ flash_handler_t flash_write_page_encrypt = flash_page_program_encrypt;
+_attribute_data_retention_sec_ flash_read_check_handler_t flash_read_page_decrypt_check = flash_read_data_decrypt_check;
 
 
 

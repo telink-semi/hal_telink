@@ -411,19 +411,19 @@ void gpio_set_src_irq(gpio_pin_e pin, gpio_irq_trigger_type_e trigger_type)
 	{
 	case INTR_RISING_EDGE:
 		BM_CLR(reg_gpio_pol(pin), pin & 0xff);
-		BM_CLR(reg_gpio_irq_level, FLD_GPIO_IRQ_LVL_GPIO);
+		BM_CLR(reg_gpio_irq_level, bit);
 	break;
 	case INTR_FALLING_EDGE:
 		BM_SET(reg_gpio_pol(pin), pin & 0xff);
-		BM_CLR(reg_gpio_irq_level, FLD_GPIO_IRQ_LVL_GPIO);
+		BM_CLR(reg_gpio_irq_level, bit);
 	break;
 	case INTR_HIGH_LEVEL:
 		BM_CLR(reg_gpio_pol(pin), pin & 0xff);
-		BM_SET(reg_gpio_irq_level, FLD_GPIO_IRQ_LVL_GPIO);
+		BM_SET(reg_gpio_irq_level, bit);
 	break;
 	case INTR_LOW_LEVEL:
 		BM_SET(reg_gpio_pol(pin), pin & 0xff);
-		BM_SET(reg_gpio_irq_level, FLD_GPIO_IRQ_LVL_GPIO);
+		BM_SET(reg_gpio_irq_level, bit);
 	 break;
 	}
 	gpio_clr_group_irq_status(bit);//must clear, or it will cause to unexpected interrupt.
@@ -476,8 +476,8 @@ void gpio_set_up_down_res(gpio_pin_e pin, gpio_pull_type_e up_down_res)
 }
 
 /**
- * @brief     This function set pin's 30k pull-up registor.
- * @param[in] pin - the pin needs to set its pull-up registor.
+ * @brief     This function set pin's 30k pull-up register.
+ * @param[in] pin - the pin needs to set its pull-up register.
  * @return    none.
  * @attention  This function sets the digital pull-up, it will not work after entering low power consumption.
  */
@@ -511,10 +511,9 @@ void  gpio_set_probe_clk_function(gpio_func_pin_e pin,probe_clk_sel_e sel_clk)
 {
 	reg_probe_clk_sel= (reg_probe_clk_sel&0xe0)|sel_clk;	//probe_clk_sel_e
 	gpio_set_mux_function(pin,DBG_PROBE_CLK);		        //sel probe_clk function
-	gpio_function_dis(pin);
+	gpio_function_dis((gpio_pin_e)pin);
 }
 
 /**********************************************************************************************************************
   *                    						local function implementation                                             *
   *********************************************************************************************************************/
-

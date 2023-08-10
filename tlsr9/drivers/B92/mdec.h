@@ -76,6 +76,3 @@ void mdec_init(mdec_pin_e pin);
  * @return		1 decode success,  0 decode failure.
  */
 unsigned char mdec_read_dat(unsigned char *dat);
-
-
-

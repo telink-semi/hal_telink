@@ -369,7 +369,7 @@ void uart_set_cts_pin(uart_num_e uart_num,gpio_func_pin_e cts_pin)
 	{
 		gpio_set_mux_function(cts_pin,UART1_CTS_I);
 	}
-	gpio_function_dis(cts_pin);
+	gpio_function_dis((gpio_pin_e)cts_pin);
 }
 
 /**
@@ -388,7 +388,7 @@ void uart_set_rts_pin(uart_num_e uart_num,gpio_func_pin_e rts_pin)
 	{
 		gpio_set_mux_function(rts_pin,UART1_RTS);
 	}
-	gpio_function_dis(rts_pin);
+	gpio_function_dis((gpio_pin_e)rts_pin);
 }
 
 /**
@@ -402,24 +402,24 @@ void uart_set_pin(uart_num_e uart_num,gpio_func_pin_e tx_pin,gpio_func_pin_e rx_
 	//When the pad is configured with mux input and a pull-up resistor is required, gpio_input_en needs to be placed before gpio_function_dis,
 	//otherwise first set gpio_input_disable and then call the mux function interface,the mux pad will misread the short low-level timing.confirmed by minghai.20210709.
 	if(tx_pin != GPIO_NONE_PIN){
-		gpio_input_en(tx_pin);
-		gpio_set_up_down_res(tx_pin, GPIO_PIN_PULLUP_10K);
+		gpio_input_en((gpio_pin_e)tx_pin);
+		gpio_set_up_down_res((gpio_pin_e)tx_pin, GPIO_PIN_PULLUP_10K);
 		if (0 == uart_num) {
 			gpio_set_mux_function(tx_pin, UART0_TX);
 		} else {
 			gpio_set_mux_function(tx_pin, UART1_TX);
 		}
-		gpio_function_dis(tx_pin);
+		gpio_function_dis((gpio_pin_e)tx_pin);
 	}
 	if(rx_pin != GPIO_NONE_PIN){
-		gpio_input_en(rx_pin);
-		gpio_set_up_down_res(rx_pin, GPIO_PIN_PULLUP_10K);
+		gpio_input_en((gpio_pin_e)rx_pin);
+		gpio_set_up_down_res((gpio_pin_e)rx_pin, GPIO_PIN_PULLUP_10K);
 		if (0 == uart_num) {
 			gpio_set_mux_function(rx_pin, UART0_RTX_IO);
 		} else {
 			gpio_set_mux_function(rx_pin, UART1_RTX);
 		}
-		gpio_function_dis(rx_pin);
+		gpio_function_dis((gpio_pin_e)rx_pin);
 	}
 }
 
@@ -434,8 +434,8 @@ void uart_set_rtx_pin(uart_num_e uart_num,gpio_func_pin_e rtx_pin)
 {
 	//When the pad is configured with mux input and a pull-up resistor is required, gpio_input_en needs to be placed before gpio_function_dis,
 	//otherwise first set gpio_input_disable and then call the mux function interface,the mux pad will misread the short low-level timing.confirmed by minghai.20210709.
-	gpio_input_en(rtx_pin);
-	gpio_set_up_down_res(rtx_pin, GPIO_PIN_PULLUP_10K);
+	gpio_input_en((gpio_pin_e)rtx_pin);
+	gpio_set_up_down_res((gpio_pin_e)rtx_pin, GPIO_PIN_PULLUP_10K);
 	if(0==uart_num){
     	gpio_set_mux_function(rtx_pin,UART0_RTX_IO);
 	}
@@ -443,7 +443,7 @@ void uart_set_rtx_pin(uart_num_e uart_num,gpio_func_pin_e rtx_pin)
 	{
 		gpio_set_mux_function(rtx_pin,UART1_RTX);
 	}
-	gpio_function_dis(rtx_pin);
+	gpio_function_dis((gpio_pin_e)rtx_pin);
 }
 
 /**
@@ -469,6 +469,7 @@ unsigned char uart_send(uart_num_e uart_num, unsigned char * addr, unsigned char
  * @param[in] 	len      - DMA transmission length.The maximum transmission length of DMA is 0xFFFFFC bytes, so dont'n over this length.
  * @return      1  dma start send.
  *              0  the length is error.
+ * @note        addr: must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
 unsigned char uart_send_dma(uart_num_e uart_num, unsigned char * addr, unsigned int len )
 {
@@ -495,15 +496,16 @@ unsigned char uart_send_dma(uart_num_e uart_num, unsigned char * addr, unsigned 
  *              2. if the receiving length information of DMA is set to less than 0xFFFFFC byte, and write_num is turned on,
  *                 then the length of data received by DMA will not be written to the first four bytes of addr,  requires the uart_get_dma_rev_data_len calculation.
  * @param[in]  	uart_num - UART0 or UART1.
- * @param[in] 	addr     - pointer to the buffer  receive data.
+ * @param[in] 	addr     - pointer to the buffer receive data.
  * @param[in]   rev_size - the receive length of DMA,The maximum transmission length of DMA is 0xFFFFFC bytes, so dont'n over this length.
  * @return    	none
+ * @note        addr: must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
 void uart_receive_dma(uart_num_e uart_num, unsigned char * addr,unsigned int rev_size)
 {
 
 	uart_dma_rev_size[uart_num] = rev_size;
-	uart_rxdone_sel(UART0,UART_DMA_MODE);
+	uart_rxdone_sel(uart_num,UART_DMA_MODE);
 /*
  *1.If the DMA length is set to 0xFFFFFC (maximum), the hardware has a write back length, no need uart_get_dma_rev_data_len to calculate,
  *  uart_auto_clr_rx_fifo_pointer is enabled, the hardware can clear the fifo without manual clearing,the benefits of this feature:
@@ -592,7 +594,7 @@ unsigned int uart_get_dma_rev_data_len(uart_num_e uart_num,dma_chn_e chn)
  {
 	 //When the pad is configured with mux input and a pull-up resistor is required, gpio_input_en needs to be placed before gpio_function_dis,
 	 //otherwise first set gpio_input_disable and then call the mux function interface,the mux pad will misread the short low-level timing.confirmed by minghai.20210709.
-	 gpio_input_en(cts_pin);//enable input
+	 gpio_input_en((gpio_pin_e)cts_pin);//enable input
 	 uart_set_cts_pin(uart_num,cts_pin);
 
 	if (cts_parity)
@@ -640,10 +642,11 @@ unsigned int uart_get_dma_rev_data_len(uart_num_e uart_num,dma_chn_e chn)
    * @brief     This function servers to configure DMA head node,the chain function only applies to data_len = 0xFFFFFC.
    * @param[in] uart_num - UART0/UART1.
    * @param[in] chn          - to select the DMA channel.
-   * @param[in] dst_addr     - the dma address of destination
+   * @param[in] dst_addr     - the dma address of destination.
    * @param[in] data_len     - to configure DMA length.
    * @param[in] head_of_list - the head address of dma llp.
    * @return    none
+   * @note      dst_addr: must be aligned by word (4 bytes), otherwise the program will enter an exception.
    */
   void uart_set_dma_chain_llp(uart_num_e uart_num, dma_chn_e chn,unsigned char * dst_addr,unsigned int data_len,dma_chain_config_t *head_of_list)
   {
@@ -665,6 +668,7 @@ unsigned int uart_get_dma_rev_data_len(uart_num_e uart_num,dma_chn_e chn)
    * @param[in] dst_addr    - the dma address of destination.
    * @param[in] data_len    - to configure DMA length.
    * @return    none
+   * @note      dst_addr: must be aligned by word (4 bytes), otherwise the program will enter an exception.
    */
   void uart_rx_dma_add_list_element(uart_num_e uart_num,dma_chn_e chn,dma_chain_config_t *config_addr,dma_chain_config_t *llpointer ,unsigned char * dst_addr,unsigned int data_len)
   {
@@ -683,6 +687,7 @@ unsigned int uart_get_dma_rev_data_len(uart_num_e uart_num,dma_chn_e chn)
    * @param[in] in_buff   - the pointer of rx_buff.
    * @param[in] buff_size - the size of rx_buff.
    * @return    none
+   * @note      in_buff: must be aligned by word (4 bytes), otherwise the program will enter an exception.
    */
    void uart_rx_dma_chain_init (uart_num_e uart_num, dma_chn_e chn,unsigned char * in_buff,unsigned int buff_size )
   {
@@ -719,4 +724,3 @@ unsigned int uart_get_dma_rev_data_len(uart_num_e uart_num,dma_chn_e chn)
  		return 1;
  	}
  }
-
