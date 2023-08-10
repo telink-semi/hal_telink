@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2022 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * Copyright (c) 2022-2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -47,6 +47,10 @@
 #include <multithread.h>
 #include <pke.h>
 
+#if (CONFIG_SOC_RISCV_TELINK_B92)
+#include <ext_driver/ext_misc.h>
+#endif
+
 #include <string.h>
 
 #if defined(MBEDTLS_ECP_ALT)
@@ -58,7 +62,7 @@
  ****************************************************************/
 
 #if defined(MBEDTLS_ECP_DP_SECP256R1_ENABLED)
-static eccp_curve_t secp256r1 = {
+static eccp_curve_t secp256r1_curve_dat = {
 	.eccp_p_bitLen = 256,
 	.eccp_p = (unsigned int[]){
 		0xffffffff, 0xffffffff, 0xffffffff, 0x00000000,
@@ -81,7 +85,7 @@ static eccp_curve_t secp256r1 = {
 #endif /* MBEDTLS_ECP_DP_SECP256R1_ENABLED */
 
 #if defined(MBEDTLS_ECP_DP_SECP256K1_ENABLED)
-static eccp_curve_t secp256k1 = {
+static eccp_curve_t secp256k1_curve_dat = {
 	.eccp_p_bitLen = 256,
 	.eccp_p = (unsigned int[]){
 		0xfffffc2f, 0xfffffffe, 0xffffffff, 0xffffffff,
@@ -104,7 +108,7 @@ static eccp_curve_t secp256k1 = {
 #endif /* MBEDTLS_ECP_DP_SECP256K1_ENABLED */
 
 #if defined(MBEDTLS_ECP_DP_BP256R1_ENABLED)
-static eccp_curve_t BP256r1 = {
+static eccp_curve_t BP256r1_curve_dat = {
 	.eccp_p_bitLen = 256,
 	.eccp_p = (unsigned int[]){
 		0x1f6e5377, 0x2013481d, 0xd5262028, 0x6e3bf623,
@@ -127,7 +131,7 @@ static eccp_curve_t BP256r1 = {
 #endif /* MBEDTLS_ECP_DP_BP256R1_ENABLED */
 
 #if defined(MBEDTLS_ECP_DP_SECP224R1_ENABLED)
-static eccp_curve_t secp224r1 = {
+static eccp_curve_t secp224r1_curve_dat = {
 	.eccp_p_bitLen = 224,
 	.eccp_p = (unsigned int[]){
 		0x00000001, 0x00000000, 0x00000000, 0xffffffff,
@@ -150,7 +154,7 @@ static eccp_curve_t secp224r1 = {
 #endif /* MBEDTLS_ECP_DP_SECP224R1_ENABLED */
 
 #if defined(MBEDTLS_ECP_DP_SECP224K1_ENABLED)
-static eccp_curve_t secp224k1 = {
+static eccp_curve_t secp224k1_curve_dat = {
 	.eccp_p_bitLen = 224,
 	.eccp_p = (unsigned int[]){
 		0xffffe56d, 0xfffffffe, 0xffffffff, 0xffffffff,
@@ -173,7 +177,7 @@ static eccp_curve_t secp224k1 = {
 #endif /* MBEDTLS_ECP_DP_SECP224K1_ENABLED */
 
 #if defined(MBEDTLS_ECP_DP_SECP192R1_ENABLED)
-static eccp_curve_t secp192r1 = {
+static eccp_curve_t secp192r1_curve_dat = {
 	.eccp_p_bitLen = 192,
 	.eccp_p = (unsigned int[]){
 		0xffffffff, 0xffffffff, 0xfffffffe, 0xffffffff,
@@ -196,7 +200,7 @@ static eccp_curve_t secp192r1 = {
 #endif /* MBEDTLS_ECP_DP_SECP192R1_ENABLED */
 
 #if defined(MBEDTLS_ECP_DP_SECP192K1_ENABLED)
-static eccp_curve_t secp192k1 = {
+static eccp_curve_t secp192k1_curve_dat = {
 	.eccp_p_bitLen = 192,
 	.eccp_p = (unsigned int[]){
 		0xffffee37, 0xfffffffe, 0xffffffff, 0xffffffff,
@@ -219,6 +223,8 @@ static eccp_curve_t secp192k1 = {
 #endif /* MBEDTLS_ECP_DP_SECP192K1_ENABLED */
 
 #if defined(MBEDTLS_ECP_DP_CURVE25519_ENABLED)
+
+#if defined CONFIG_SOC_RISCV_TELINK_B91
 static mont_curve_t x25519 = {
 	.mont_p_bitLen = 255,
 	.mont_p = (unsigned int[]){
@@ -235,6 +241,27 @@ static mont_curve_t x25519 = {
 		0x00000000, 0x00000000, 0x00000000, 0x00000000
 	}
 };
+#endif
+
+#if defined CONFIG_SOC_RISCV_TELINK_B92
+static mont_curve_t x25519 = {
+	.p_bitLen = 255,
+	.p = (unsigned int[]){
+		0xffffffed, 0xffffffff, 0xffffffff, 0xffffffff,
+		0xffffffff, 0xffffffff, 0xffffffff, 0x7fffffff
+	},
+	.p_h = (unsigned int[]){
+		0x000005a4, 0x00000000, 0x00000000, 0x00000000,
+		0x00000000, 0x00000000, 0x00000000, 0x00000000
+	},
+	.p_n1 = (unsigned int[]){0x286bca1b},
+	.a24 = (unsigned int[]){
+		0x0001db41, 0x00000000, 0x00000000, 0x00000000,
+		0x00000000, 0x00000000, 0x00000000, 0x00000000
+	}
+};
+#endif
+
 #endif /* MBEDTLS_ECP_DP_CURVE25519_ENABLED */
 
 /****************************************************************
@@ -247,25 +274,25 @@ static const struct {
 	eccp_curve_t *curve_dat;
 } eccp_curve_linking[] = {
 #if defined(MBEDTLS_ECP_DP_SECP256R1_ENABLED)
-	{.group = MBEDTLS_ECP_DP_SECP256R1, .curve_dat = &secp256r1},
+	{.group = MBEDTLS_ECP_DP_SECP256R1, .curve_dat = &secp256r1_curve_dat},
 #endif /* MBEDTLS_ECP_DP_SECP256R1_ENABLED */
 #if defined(MBEDTLS_ECP_DP_SECP256K1_ENABLED)
-	{.group = MBEDTLS_ECP_DP_SECP256K1, .curve_dat = &secp256k1},
+	{.group = MBEDTLS_ECP_DP_SECP256K1, .curve_dat = &secp256k1_curve_dat},
 #endif /* MBEDTLS_ECP_DP_SECP256K1_ENABLED */
 #if defined(MBEDTLS_ECP_DP_BP256R1_ENABLED)
-	{.group = MBEDTLS_ECP_DP_BP256R1, .curve_dat = &BP256r1},
+	{.group = MBEDTLS_ECP_DP_BP256R1, .curve_dat = &BP256r1_curve_dat},
 #endif /* MBEDTLS_ECP_DP_BP256R1_ENABLED */
 #if defined(MBEDTLS_ECP_DP_SECP224R1_ENABLED)
-	{.group = MBEDTLS_ECP_DP_SECP224R1, .curve_dat = &secp224r1},
+	{.group = MBEDTLS_ECP_DP_SECP224R1, .curve_dat = &secp224r1_curve_dat},
 #endif /* MBEDTLS_ECP_DP_SECP224R1_ENABLED */
 #if defined(MBEDTLS_ECP_DP_SECP224K1_ENABLED)
-	{.group = MBEDTLS_ECP_DP_SECP224K1, .curve_dat = &secp224k1},
+	{.group = MBEDTLS_ECP_DP_SECP224K1, .curve_dat = &secp224k1_curve_dat},
 #endif /* MBEDTLS_ECP_DP_SECP224K1_ENABLED */
 #if defined(MBEDTLS_ECP_DP_SECP192R1_ENABLED)
-	{.group = MBEDTLS_ECP_DP_SECP192R1, .curve_dat = &secp192r1},
+	{.group = MBEDTLS_ECP_DP_SECP192R1, .curve_dat = &secp192r1_curve_dat},
 #endif /* MBEDTLS_ECP_DP_SECP192R1_ENABLED */
 #if defined(MBEDTLS_ECP_DP_SECP192K1_ENABLED)
-	{.group = MBEDTLS_ECP_DP_SECP192K1, .curve_dat = &secp192k1}
+	{.group = MBEDTLS_ECP_DP_SECP192K1, .curve_dat = &secp192k1_curve_dat}
 #endif /* MBEDTLS_ECP_DP_SECP192K1_ENABLED */
 };
 #endif /* MBEDTLS_ECP_SHORT_WEIERSTRASS_ENABLED */
@@ -321,7 +348,7 @@ static mont_curve_t *mont_curve_get(const mbedtls_ecp_group *grp)
  * Public functions declaration
  ****************************************************************/
 
-int ecp_alt_b91_backend_check_pubkey(
+int ecp_alt_b9x_backend_check_pubkey(
 	const mbedtls_ecp_group *grp, const mbedtls_ecp_point *pt)
 {
 	int result = MBEDTLS_ERR_ECP_BAD_INPUT_DATA;
@@ -365,7 +392,7 @@ int ecp_alt_b91_backend_check_pubkey(
 	return result;
 }
 
-int ecp_alt_b91_backend_mul(
+int ecp_alt_b9x_backend_mul(
 	mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
 	const mbedtls_mpi *m, const mbedtls_ecp_point *P)
 {
@@ -469,7 +496,7 @@ int ecp_alt_b91_backend_mul(
 	return result;
 }
 
-int ecp_alt_b91_backend_muladd(
+int ecp_alt_b9x_backend_muladd(
 	mbedtls_ecp_group *grp,
 	mbedtls_ecp_point *R, const mbedtls_mpi *m,
 	const mbedtls_ecp_point *P, const mbedtls_mpi *n,

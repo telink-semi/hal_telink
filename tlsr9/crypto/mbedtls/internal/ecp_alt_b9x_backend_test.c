@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2022 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * Copyright (c) 2022-2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,7 +32,7 @@
 
 #define ARRAY_SIZE(array)	(sizeof(array) / sizeof(array)[0])
 
-static void ecp_alt_b91_backend_printbuf(const char *comment,
+static void ecp_alt_b9x_backend_printbuf(const char *comment,
 	const void *buf, size_t len)
 {
 	mbedtls_printf("%s [%u]:", comment, (unsigned int)len);
@@ -536,14 +536,14 @@ static const struct {
 /****************************************************************
  * Dummy variable to skip mbedtls_ecp_self_test sw functionality
  ****************************************************************/
-const int __ecp_alt_b91_skip_internal_self_tests = 1;
+const int __ecp_alt_b9x_skip_internal_self_tests = 1;
 
 
 /****************************************************************
  * Public functions declaration
  ****************************************************************/
 
-int ecp_alt_b91_backend_test(int verbose)
+int ecp_alt_b9x_backend_test(int verbose)
 {
 	int result = 0;
 
@@ -638,11 +638,11 @@ int ecp_alt_b91_backend_test(int verbose)
 				if (result != 0 && verbose) {
 					mbedtls_printf(
 						"mbedtls_ecp_point_cmp (PK) failed\n");
-					ecp_alt_b91_backend_printbuf(
+					ecp_alt_b9x_backend_printbuf(
 						"sk    :",
 						ecp_tc[i].sk,
 						ecp_tc[i].sk_len);
-					ecp_alt_b91_backend_printbuf(
+					ecp_alt_b9x_backend_printbuf(
 						"pk ref:",
 						ecp_tc[i].pk,
 						ecp_tc[i].pk_len);
@@ -655,7 +655,7 @@ int ecp_alt_b91_backend_test(int verbose)
 						MBEDTLS_ECP_PF_UNCOMPRESSED,
 						&buf_len, buf,
 						sizeof(buf)) == 0)
-						ecp_alt_b91_backend_printbuf(
+						ecp_alt_b9x_backend_printbuf(
 							"pk    :",
 							buf, buf_len);
 				}
@@ -700,13 +700,13 @@ int ecp_alt_b91_backend_test(int verbose)
 				if (result != 0 && verbose) {
 					mbedtls_printf(
 						"mbedtls_ecp_point_cmp (sum) failed\n");
-					ecp_alt_b91_backend_printbuf(
+					ecp_alt_b9x_backend_printbuf(
 						"sk     :", ecp_tc[i].sk,
 						ecp_tc[i].sk_len);
-					ecp_alt_b91_backend_printbuf(
+					ecp_alt_b9x_backend_printbuf(
 						"pk ref :", ecp_tc[i].pk,
 						ecp_tc[i].pk_len);
-					ecp_alt_b91_backend_printbuf(
+					ecp_alt_b9x_backend_printbuf(
 						"sum ref:", ecp_tc[i].pk,
 						ecp_tc[i].pk_len);
 
@@ -718,7 +718,7 @@ int ecp_alt_b91_backend_test(int verbose)
 						MBEDTLS_ECP_PF_UNCOMPRESSED,
 						&buf_len, buf,
 						sizeof(buf)) == 0)
-						ecp_alt_b91_backend_printbuf(
+						ecp_alt_b9x_backend_printbuf(
 							"sum    :",
 							buf, buf_len);
 				}

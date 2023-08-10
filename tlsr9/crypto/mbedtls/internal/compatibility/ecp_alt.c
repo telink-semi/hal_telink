@@ -83,20 +83,22 @@
 #include <string.h>
 
 #if defined(MBEDTLS_ECP_ALT)
-
-#include "pke.h"
+#include <pke.h>
+#if (CONFIG_SOC_RISCV_TELINK_B92)
+#include <ext_driver/ext_misc.h>
+#endif
 
 /* HW accelerator functionality */
-extern int ecp_alt_b91_backend_check_pubkey( const mbedtls_ecp_group *grp, const mbedtls_ecp_point *pt );
-extern int ecp_alt_b91_backend_mul( mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
+extern int ecp_alt_b9x_backend_check_pubkey( const mbedtls_ecp_group *grp, const mbedtls_ecp_point *pt );
+extern int ecp_alt_b9x_backend_mul( mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
                                     const mbedtls_mpi *m, const mbedtls_ecp_point *P );
-extern int ecp_alt_b91_backend_muladd( mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
+extern int ecp_alt_b9x_backend_muladd( mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
                                        const mbedtls_mpi *m, const mbedtls_ecp_point *P,
                                        const mbedtls_mpi *n, const mbedtls_ecp_point *Q );
 /* self test functionality */
 #if defined(MBEDTLS_SELF_TEST)
-extern const int __ecp_alt_b91_skip_internal_self_tests;
-extern int ecp_alt_b91_backend_test(int verbose);
+extern const int __ecp_alt_b9x_skip_internal_self_tests;
+extern int ecp_alt_b9x_backend_test(int verbose);
 #endif /* MBEDTLS_SELF_TEST */
 
 /* Parameter validation macros based on platform_util.h */
@@ -2542,7 +2544,7 @@ int mbedtls_ecp_mul_restartable( mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
         return( MBEDTLS_ERR_ECP_BAD_INPUT_DATA );
 
     if( GET_WORD_LEN( grp->pbits ) <= PKE_OPERAND_MAX_WORD_LEN )
-        return( ecp_alt_b91_backend_mul( grp, R, m, P ) );
+        return( ecp_alt_b9x_backend_mul( grp, R, m, P ) );
 
     return( ecp_mul_restartable_internal( grp, R, m, P, f_rng, p_rng, rs_ctx ) );
 }
@@ -2676,7 +2678,7 @@ int mbedtls_ecp_muladd_restartable(
         return( MBEDTLS_ERR_ECP_FEATURE_UNAVAILABLE );
 
     if( GET_WORD_LEN( grp->pbits ) <= PKE_OPERAND_MAX_WORD_LEN )
-        return( ecp_alt_b91_backend_muladd( grp, R, m, P, n, Q ) );
+        return( ecp_alt_b9x_backend_muladd( grp, R, m, P, n, Q ) );
 
     mbedtls_ecp_point_init( &mP );
 
@@ -2902,7 +2904,7 @@ int mbedtls_ecp_check_pubkey( const mbedtls_ecp_group *grp,
     }
     if( mbedtls_ecp_get_type( grp ) == MBEDTLS_ECP_TYPE_SHORT_WEIERSTRASS ) {
         if( GET_WORD_LEN( grp->pbits ) <= PKE_OPERAND_MAX_WORD_LEN )
-            return( ecp_alt_b91_backend_check_pubkey( grp, pt ) );
+            return( ecp_alt_b9x_backend_check_pubkey( grp, pt ) );
         else
             return( ecp_check_pubkey_sw( grp, pt ) );
     }
@@ -3371,8 +3373,8 @@ cleanup:
  */
 int mbedtls_ecp_self_test( int verbose )
 {
-    if( __ecp_alt_b91_skip_internal_self_tests )
-        return ecp_alt_b91_backend_test(verbose);
+    if( __ecp_alt_b9x_skip_internal_self_tests )
+        return ecp_alt_b9x_backend_test(verbose);
 
     int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
     mbedtls_ecp_group grp;

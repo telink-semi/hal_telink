@@ -19,7 +19,7 @@
 #ifndef DRIVERS_B92_DRIVER_EXT_EXT_PM_H_
 #define DRIVERS_B92_DRIVER_EXT_EXT_PM_H_
 
-#include "../lib/include/pm.h"
+#include "../pm.h"
 #include "types.h"
 
 #ifndef	PM_32k_RC_CALIBRATION_ALGORITHM_EN
