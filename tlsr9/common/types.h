@@ -27,6 +27,7 @@
 #ifndef TYPES_H_
 #define TYPES_H_
 
+#include <stdbool.h>
 
 #ifndef NULL
 #define NULL  0
