@@ -1017,65 +1017,65 @@
 static inline void gpio_analog_resistance_init(void)
 {
 	//A<3:0>
-	analog_write_reg8 (0x0e,  PULL_WAKEUP_SRC_PA0 |
+	analog_write_reg8(0x0e,  PULL_WAKEUP_SRC_PA0 |
 						(PULL_WAKEUP_SRC_PA1<<2) |
 						(PULL_WAKEUP_SRC_PA2<<4) |
 						(PULL_WAKEUP_SRC_PA3<<6));
 	//A<7:4>
-	analog_write_reg8 (0x0f,  PULL_WAKEUP_SRC_PA4 |
+	analog_write_reg8(0x0f,  PULL_WAKEUP_SRC_PA4 |
 						(PULL_WAKEUP_SRC_PA5<<2) |
 						(PULL_WAKEUP_SRC_PA6<<4) |
 						(PULL_WAKEUP_SRC_PA7<<6));
 	//B<3:0>
-	analog_write_reg8 (0x10,  PULL_WAKEUP_SRC_PB0 |
+	analog_write_reg8(0x10,  PULL_WAKEUP_SRC_PB0 |
 						(PULL_WAKEUP_SRC_PB1<<2) |
 						(PULL_WAKEUP_SRC_PB2<<4) |
 						(PULL_WAKEUP_SRC_PB3<<6));
 	//B<7:4>
-	analog_write_reg8 (0x11,  PULL_WAKEUP_SRC_PB4 |
+	analog_write_reg8(0x11,  PULL_WAKEUP_SRC_PB4 |
 						(PULL_WAKEUP_SRC_PB5<<2) |
 						(PULL_WAKEUP_SRC_PB6<<4) |
 						(PULL_WAKEUP_SRC_PB7<<6));
 
     //C<3:0>
-	analog_write_reg8 (0x12,  PULL_WAKEUP_SRC_PC0 |
+	analog_write_reg8(0x12,  PULL_WAKEUP_SRC_PC0 |
 						(PULL_WAKEUP_SRC_PC1<<2) |
 						(PULL_WAKEUP_SRC_PC2<<4) |
 						(PULL_WAKEUP_SRC_PC3<<6));
     //C<7:4>
-	analog_write_reg8 (0x13,  PULL_WAKEUP_SRC_PC4 |
+	analog_write_reg8(0x13,  PULL_WAKEUP_SRC_PC4 |
 						(PULL_WAKEUP_SRC_PC5<<2) |
 						(PULL_WAKEUP_SRC_PC6<<4) |
 						(PULL_WAKEUP_SRC_PC7<<6));
 
     //D<3:0>
-	analog_write_reg8 (0x14,  PULL_WAKEUP_SRC_PD0 |
+	analog_write_reg8(0x14,  PULL_WAKEUP_SRC_PD0 |
 						(PULL_WAKEUP_SRC_PD1<<2) |
 						(PULL_WAKEUP_SRC_PD2<<4) |
 						(PULL_WAKEUP_SRC_PD3<<6));
 	//D<7:4>
-	analog_write_reg8 (0x15,  PULL_WAKEUP_SRC_PD4 |
+	analog_write_reg8(0x15,  PULL_WAKEUP_SRC_PD4 |
 						(PULL_WAKEUP_SRC_PD5<<2) |
 						(PULL_WAKEUP_SRC_PD6<<4) |
 						(PULL_WAKEUP_SRC_PD7<<6));
 	//E<3:0>
-	analog_write_reg8 (0x16,  PULL_WAKEUP_SRC_PE0 |
+	analog_write_reg8(0x16,  PULL_WAKEUP_SRC_PE0 |
 						(PULL_WAKEUP_SRC_PE1<<2) |
 						(PULL_WAKEUP_SRC_PE2<<4) |
 						(PULL_WAKEUP_SRC_PE3<<6));
 	//E<7:4>
-	analog_write_reg8 (0x17,  PULL_WAKEUP_SRC_PE4 |
+	analog_write_reg8(0x17,  PULL_WAKEUP_SRC_PE4 |
 						(PULL_WAKEUP_SRC_PE5<<2) |
 						(PULL_WAKEUP_SRC_PE6<<4) |
 						(PULL_WAKEUP_SRC_PE7<<6));
 
 	//F<3:0>
-	analog_write_reg8 (0x23,  PULL_WAKEUP_SRC_PF0 |
+	analog_write_reg8(0x23,  PULL_WAKEUP_SRC_PF0 |
 							(PULL_WAKEUP_SRC_PF1<<2) |
 							(PULL_WAKEUP_SRC_PF2<<4) |
 							(PULL_WAKEUP_SRC_PF3<<6));
 	//F<7:4>
-	analog_write_reg8 (0x24,  PULL_WAKEUP_SRC_PF4 |
+	analog_write_reg8(0x24,  PULL_WAKEUP_SRC_PF4 |
 							(PULL_WAKEUP_SRC_PF5<<2) |
 							(PULL_WAKEUP_SRC_PF6<<4) |
 							(PULL_WAKEUP_SRC_PF7<<6));
@@ -1195,4 +1195,3 @@ static inline void gpio_init(int anaRes_init_en)
 }
 
 #endif /* DRIVERS_GPIO_SETTING_H_ */
-

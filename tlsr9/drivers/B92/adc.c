@@ -28,6 +28,10 @@
 #include "audio.h"
 #include "compiler.h"
 
+/**
+ * Note: When the reference voltage is configured to 1.2V, the calculated ADC voltage value is closest to the actual voltage value using 1175 as the coefficient default.
+ * 1175 is the value obtained by ATE through big data statistics, which is more in line with most chips than 1200.
+ */
 _attribute_data_retention_sec_ unsigned short g_adc_vref = 1175; //default ADC ref voltage (unit:mV)
 volatile unsigned char g_adc_pre_scale;
 volatile unsigned char g_adc_vbat_divider;
@@ -79,10 +83,11 @@ void adc_set_dma_config(dma_chn_e chn,audio_fifo_chn_e fifo_chn)
 }
 /**
  * @brief     This function serves to start sample with adc DMA channel.
- * @param[in] adc_data_buf 	- the address of data buffer
+ * @param[in] adc_data_buf 	- the address of data buffer.
  * @param[in] data_byte_len - the length of data size by byte
  * @param[in] fifo_chn - 	audio fifo channel number
  * @return    none
+ * @note	  adc_data_buf : must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
 void adc_start_sample_dma(unsigned short *adc_data_buf,unsigned int data_byte_len)
 {
@@ -166,7 +171,7 @@ void adc_set_ref_voltage(adc_ref_vol_e v_ref)
 	{
 		//Vref buffer bias current trimming: 		100%
 		//Comparator preamp bias current trimming:  100%
-		analog_write_reg8( areg_ain_scale  , (analog_read_reg8( areg_ain_scale  )&(0xC0)) | 0x15 );
+		analog_write_reg8(areg_ain_scale  , (analog_read_reg8( areg_ain_scale  )&(0xC0)) | 0x15 );
 		g_adc_vref=900;// v_ref = ADC_VREF_0P9V,
 	}
 }
@@ -208,7 +213,7 @@ void adc_set_sample_rate(adc_sample_freq_e sample_freq)
  */
 void adc_set_scale_factor(adc_pre_scale_e pre_scale)
 {
-	analog_write_reg8( areg_ain_scale  , (analog_read_reg8( areg_ain_scale  )&(~FLD_SEL_AIN_SCALE)) | (pre_scale<<6) );
+	analog_write_reg8(areg_ain_scale  , (analog_read_reg8( areg_ain_scale  )&(~FLD_SEL_AIN_SCALE)) | (pre_scale<<6) );
 	g_adc_pre_scale = 1<<(unsigned char)pre_scale;
 }
 /**
@@ -257,12 +262,12 @@ void adc_init(adc_ref_vol_e v_ref,adc_pre_scale_e pre_scale,adc_sample_freq_e sa
  * @param[in]  pre_scale - enum variable of ADC pre_scaling factor.
  * @param[in]  sample_freq - enum variable of ADC sample frequency.
  * @return none
- * @attention gpio voltage sample suggested initial setting are Vref = 1.2V, pre_scale = 1/8.
+ * @attention gpio voltage sample suggested initial setting are Vref = 1.2V, pre_scale = 1/4.
  * 			0.9V Vref pre_scale must be 1.
  * 			The sampling range are as follows:
  * 			Vref        pre_scale        sampling range
  * 			1.2V			1				0 ~ 1.1V (suggest)
- * 			1.2V			1/8				0 ~ 3.5V (suggest)
+ * 			1.2V			1/4				0 ~ 3.5V (suggest)
  * 			0.9V            1				0 ~ 0.8V
  */
 void adc_gpio_sample_init(adc_input_pin_def_e pin,adc_ref_vol_e v_ref,adc_pre_scale_e pre_scale,adc_sample_freq_e sample_freq)
@@ -290,7 +295,7 @@ void adc_temperature_sample_init(void)
 /**
  * @brief This function servers to set ADC configuration for ADC supply voltage sampling.
  * @return none
- * @attention battery voltage sample suggested initial setting are Vref = 1.2V, pre_scale = 1, vbat_div = 1/3.
+ * @attention battery voltage sample suggested initial setting are Vref = 1.2V, pre_scale = 1, vbat_div = 1/4.
  * 			Which has higher accuracy, user don't need to change it.
  * 			The battery voltage sample range is 1.8~3.5V,
  * 			and must set sys_init with the mode for battery voltage less than 3.6V.
@@ -307,6 +312,7 @@ void adc_battery_voltage_sample_init(void)
  * @param[in]   sample_buffer 		- pointer to the buffer adc sample code need to store.
  * @param[in]   sample_num 			- the number of adc sample code.
  * @return 		none
+ * @note	  sample_buffer : must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
 void adc_get_code_dma(unsigned short *sample_buffer, unsigned short sample_num)
 {
@@ -377,5 +383,3 @@ unsigned short adc_calculate_temperature(unsigned short adc_code)
 	//adc_temp_value = 564 - ((adc_code * 819)>>13)
 	return 564 - ((adc_code * 819)>>13);
 }
-
-

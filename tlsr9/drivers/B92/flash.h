@@ -126,12 +126,12 @@ typedef struct{
 
 }flash_xip_config_t;
 
-typedef void (*flash_hander_t)(unsigned long, unsigned long, unsigned char*);
-typedef unsigned char (*flash_read_check_hander_t)(unsigned long, unsigned long, unsigned char*);
-extern _attribute_data_retention_sec_ flash_hander_t flash_read_page;
-extern _attribute_data_retention_sec_ flash_hander_t flash_write_page;
-extern _attribute_data_retention_sec_ flash_hander_t flash_write_page_encrypt;
-extern _attribute_data_retention_sec_ flash_read_check_hander_t flash_read_page_decrypt_check;
+typedef void (*flash_handler_t)(unsigned long, unsigned long, unsigned char*);
+typedef unsigned char (*flash_read_check_handler_t)(unsigned long, unsigned long, unsigned char*);
+extern _attribute_data_retention_sec_ flash_handler_t flash_read_page;
+extern _attribute_data_retention_sec_ flash_handler_t flash_write_page;
+extern _attribute_data_retention_sec_ flash_handler_t flash_write_page_encrypt;
+extern _attribute_data_retention_sec_ flash_read_check_handler_t flash_read_page_decrypt_check;
 
 
 /*******************************************************************************************************************
@@ -144,7 +144,7 @@ extern _attribute_data_retention_sec_ flash_read_check_hander_t flash_read_page_
  * @param[in]   write	- the write function.
  * @none
  */
-static inline void flash_change_rw_func(flash_hander_t read, flash_hander_t write)
+static inline void flash_change_rw_func(flash_handler_t read, flash_handler_t write)
 {
 	flash_read_page = read;
 	flash_write_page = write;

@@ -17,34 +17,46 @@
  *****************************************************************************/
 
 /********************************************************************************************************
- * @file	lpc.c
+ * @file	driver_b92.h
  *
- * @brief	This is the source file for B92
+ * @brief	This is the header file for B92
  *
  * @author	Driver Group
  *
  *******************************************************************************************************/
-#include "lpc.h"
+#pragma once
 
-/**
- * @brief		This function selects input reference voltage for low power comparator.
- * @param[in]	mode	- lower power comparator working mode includes normal mode and low power mode.
- * @param[in]	ref		- selected input reference voltage.
- * @return		none.
- */
-void lpc_set_input_ref(lpc_mode_e mode,lpc_reference_e ref)
-{
-	if(mode == LPC_LOWPOWER)
-	{
-		//switch uvlo vref
-		analog_write_reg8(0x0b,analog_read_reg8(0x0b)|0x08);
-		analog_write_reg8(0x0d,analog_read_reg8(0x0d)|0x80);
-	}
-	else if(mode == LPC_NORMAL)
-	{
-		//switch uvlo vref
-		analog_write_reg8(0x0b,analog_read_reg8(0x0b)&0xf7);
-		analog_write_reg8(0x0d,analog_read_reg8(0x0d)&0x7f);
-	}
-	analog_write_reg8(0x0d,(analog_read_reg8(0x0d)&0x8f)|(ref<<4));
-}
+
+
+#include "audio.h"
+#include "analog.h"
+#include "dma.h"
+#include "gpio.h"
+#include "i2c.h"
+#include "spi.h"
+#include "pwm.h"
+#include "pm.h"
+#include "timer.h"
+#include "flash.h"
+#include "usbhw.h"
+#include "watchdog.h"
+#include "s7816.h"
+#include "mdec.h"
+
+#include "trng.h"
+#include "sys.h"
+#include "pke.h"
+#include "plic.h"
+#include "uart.h"
+#include "stimer.h"
+#include "aes.h"
+
+#include "rf.h"
+
+#include "lpc.h"
+#include "clock.h"
+#include "emi.h"
+
+#include "mspi.h"
+#include "adc.h"
+#include "swire.h"

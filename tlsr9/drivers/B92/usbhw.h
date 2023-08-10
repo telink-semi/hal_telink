@@ -410,7 +410,7 @@ static inline void usb_dp_pullup_en (int en)
 		dat = dat & 0x7f ;
 	}
 
-	analog_write_reg8 (0x0b, dat);
+	analog_write_reg8(0x0b, dat);
 }
 
 /**
@@ -444,4 +444,14 @@ static inline void usb_set_pin_en(void)
 	usb_dp_pullup_en (1);
 	write_reg8(0x100c01, (read_reg8(0x100c01) | BIT(7)));   //swire_usb_en
 
+}
+
+/**
+ * @brief		get vbus detect status.
+ * @return		vbus detect status.
+ * @note        When using the vbus (not vbat) power supply, the vbus detect status remains at 1. Conversely, it is 0.
+ */
+static inline unsigned char usb_get_vbus_detect_status(void)
+{
+	return (analog_read_reg8(0x69) & 0x40);
 }

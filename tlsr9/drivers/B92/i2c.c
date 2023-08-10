@@ -99,16 +99,16 @@ void i2c_set_pin(gpio_func_pin_e sda_pin,gpio_func_pin_e scl_pin)
 {
 	//When the pad is configured with mux input and a pull-up resistor is required, gpio_input_en needs to be placed before gpio_function_dis,
 	//otherwise first set gpio_input_disable and then call the mux function interface,the mux pad will misread the short low-level timing.confirmed by minghai.20210709.
-	gpio_input_en(sda_pin);//enable sda input
-	gpio_input_en(scl_pin);//enable scl input
-	gpio_set_up_down_res(sda_pin, GPIO_PIN_PULLUP_10K);
-	gpio_set_up_down_res(scl_pin, GPIO_PIN_PULLUP_10K);
+	gpio_input_en((gpio_pin_e)sda_pin);//enable sda input
+	gpio_input_en((gpio_pin_e)scl_pin);//enable scl input
+	gpio_set_up_down_res((gpio_pin_e)sda_pin, GPIO_PIN_PULLUP_10K);
+	gpio_set_up_down_res((gpio_pin_e)scl_pin, GPIO_PIN_PULLUP_10K);
 
 	gpio_set_mux_function(scl_pin,I2C_SCL_IO);
 	gpio_set_mux_function(sda_pin,I2C_SDA_IO);
 	//disable sda_pin and scl_pin gpio function.
-	gpio_function_dis(scl_pin);
-	gpio_function_dis(sda_pin);
+	gpio_function_dis((gpio_pin_e)scl_pin);
+	gpio_function_dis((gpio_pin_e)sda_pin);
 
 }
 
@@ -150,7 +150,7 @@ void i2c_slave_init(unsigned char id)
 {
 	reg_i2c_ctrl2 &= (~FLD_I2C_MASTER); //enable slave mode.
 
-	reg_i2c_id	  = id;                   //defaul eagle slave ID is 0x5a
+	reg_i2c_id	  = id;                   //default eagle slave ID is 0x5a
 }
 
 
@@ -296,6 +296,7 @@ unsigned char i2c_master_write_read(unsigned char id, unsigned char *wr_data, un
  * @param[in]  data - The data to be sent.
  * @param[in]  len - This length is the total length, including both the length of the slave RAM address and the length of the data to be sent.
  * @return     none.
+ * @note       data: must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
 void i2c_master_write_dma(unsigned char id, unsigned char *data, unsigned int len)
 {
@@ -317,9 +318,10 @@ void i2c_master_write_dma(unsigned char id, unsigned char *data, unsigned int le
  *             can choose whether to send stop,if i2c stop is not configured, the next time a start signal is sent, it will be a restart signal,
  *             but if a nack exception is received in id phase, during exception handling, a stop signal will be sent.
  * @param[in]  id - to set the slave ID.for kite slave ID=0x5c,for eagle slave ID=0x5a.
- * @param[in]  data - Store the read data
+ * @param[in]  rx_data - Store the read data.
  * @param[in]  len - The total length of the data read back.
  * @return     none
+ * @note       rx_data: must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
 void i2c_master_read_dma(unsigned char id, unsigned char *rx_data, unsigned int len)
 {
@@ -342,6 +344,7 @@ void i2c_master_read_dma(unsigned char id, unsigned char *rx_data, unsigned int 
  * @param[in]  data - the pointer of tx_buff.
  * @param[in]  len - The total length of the data .
  * @return     none.
+ * @note       data: must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
 void i2c_slave_set_tx_dma( unsigned char *data, unsigned int len)
 {
@@ -361,6 +364,7 @@ void i2c_slave_set_tx_dma( unsigned char *data, unsigned int len)
  * @param[in]  data - the pointer of rx_buff.
  * @param[in]  len  - the receive length of DMA,The maximum transmission length of DMA is 0xFFFFFC bytes, so dont'n over this length.
  * @return     none.
+ * @note       data: must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
 void i2c_slave_set_rx_dma(unsigned char *data, unsigned int len)
 {
@@ -607,8 +611,8 @@ void i2c1_m_set_pin(gpio_pin_e sda_pin,gpio_pin_e scl_pin)
 	//disable sda_pin and scl_pin gpio function.
 	gpio_function_dis(scl_pin);
 	gpio_function_dis(sda_pin);
-	gpio_set_mux_function(scl_pin,I2C1_SCL_IO);
-	gpio_set_mux_function(sda_pin,I2C1_SDA_IO);
+	gpio_set_mux_function((gpio_func_pin_e)scl_pin,I2C1_SCL_IO);
+	gpio_set_mux_function((gpio_func_pin_e)sda_pin,I2C1_SDA_IO);
 
 
 
@@ -757,5 +761,3 @@ unsigned char i2c1_m_master_write_read(unsigned char id, unsigned char *wr_data,
     }
 	return 1;
 }
-
-

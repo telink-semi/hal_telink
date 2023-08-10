@@ -81,7 +81,3 @@ unsigned short usbhw_read_ctrl_ep_u16(void){
 	unsigned short v = usbhw_read_ctrl_ep_data();
 	return (usbhw_read_ctrl_ep_data() << 8) | v;
 }
-
-
-
-
