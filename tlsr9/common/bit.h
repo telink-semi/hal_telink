@@ -19,7 +19,7 @@
 /********************************************************************************************************
  * @file	bit.h
  *
- * @brief	This is the header file for B91
+ * @brief	This is the header file for B9x
  *
  * @author	Driver Group
  *

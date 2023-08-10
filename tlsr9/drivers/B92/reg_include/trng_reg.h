@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2022 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,23 +17,39 @@
  *****************************************************************************/
 
 /********************************************************************************************************
- * @file	fifo.h
+ * @file	trng_reg.h
  *
- * @brief	This is the header file for B9x
+ * @brief	This is the header file for B92
  *
  * @author	Driver Group
  *
  *******************************************************************************************************/
-#ifndef FIFO_H_
-#define FIFO_H_
+#ifndef TRNG_REG_H_
+#define TRNG_REG_H_
 
-typedef	struct {
-	unsigned int		size;
-	unsigned short		num;
-	unsigned char		wptr;
-	unsigned char		rptr;
-	unsigned char*		p;
-}	my_fifo_t;
+/*******************************      trng registers: 101800      ******************************/
+#define REG_TRNG_BASE					0x101800
 
 
-#endif /* FIFO_H_ */
+#define reg_trng_cr0					REG_ADDR8(REG_TRNG_BASE)
+enum{
+	FLD_TRNG_CR0_RBGEN		= 	BIT(0),
+	FLD_TRNG_CR0_ROSEN0 	= 	BIT(1),
+	FLD_TRNG_CR0_ROSEN1 	= 	BIT(2),
+	FLD_TRNG_CR0_ROSEN2 	= 	BIT(3),
+	FLD_TRNG_CR0_ROSEN3 	= 	BIT(4),
+};
+
+#define reg_trng_rtcr					REG_ADDR32(REG_TRNG_BASE+0x04)
+enum{
+	FLD_TRNG_RTCR_MSEL		= 	BIT(0),
+};
+
+#define reg_rbg_sr						REG_ADDR8(REG_TRNG_BASE+0x08)
+enum{
+	FLD_RBG_SR_DRDY			= 	BIT(0),
+};
+
+#define reg_rbg_dr						REG_ADDR32(REG_TRNG_BASE+0x0c)
+
+#endif

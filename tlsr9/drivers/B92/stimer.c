@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2022 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,23 +17,34 @@
  *****************************************************************************/
 
 /********************************************************************************************************
- * @file	fifo.h
+ * @file	stimer.c
  *
- * @brief	This is the header file for B9x
+ * @brief	This is the source file for B92
  *
  * @author	Driver Group
  *
  *******************************************************************************************************/
-#ifndef FIFO_H_
-#define FIFO_H_
+#include "stimer.h"
+/**
+ * @brief     This function performs to set delay time by us.
+ * @param[in] microsec - need to delay.
+ * @return    none
+*/
+ void delay_us(unsigned int microsec)
+{
+	unsigned long t = stimer_get_tick();
+	while(!clock_time_exceed(t, microsec)){
+	}
+}
 
-typedef	struct {
-	unsigned int		size;
-	unsigned short		num;
-	unsigned char		wptr;
-	unsigned char		rptr;
-	unsigned char*		p;
-}	my_fifo_t;
-
-
-#endif /* FIFO_H_ */
+/*
+ * @brief     This function performs to set delay time by ms.
+ * @param[in] millisec - need to delay.
+ * @return    none
+*/
+ void delay_ms(unsigned int millisec)
+{
+	unsigned long t = stimer_get_tick();
+	while(!clock_time_exceed(t, millisec*1000)){
+	}
+}
