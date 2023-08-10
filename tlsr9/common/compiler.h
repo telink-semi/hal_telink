@@ -41,4 +41,6 @@
 #define _attribute_data_dlm_                    __attribute__((section(".dlm_data")))
 #define _attribute_session_(s)                  __attribute__((section(s)))
 
+#define _always_inline                          inline __attribute__((always_inline))
+
 #endif

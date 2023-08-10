@@ -53,7 +53,11 @@ typedef enum{
 	//The command called by the flash_mspi_write_ram() function.
 	FLASH_WRITE_CMD						            = 0x0210a8,
 	FLASH_QUAD_PAGE_PROGRAM_CMD					    = 0x3210aa,
-	FLASH_SECT_ERASE_CMD						    = 0x2070a8,
+	FLASH_PAGE_ERASE_CMD							= 0x8170a8,    // Caution: only P25Q40L support this function
+	FLASH_SECT_ERASE_CMD						    = 0x2070a8,    // Sector size = 4KBytes
+	FLASH_32KBLK_ERASE_CMD							= 0x5270a8,
+	FLASH_64KBLK_ERASE_CMD							= 0xD870a8,
+	FLASH_CHIP_ERASE_CMD							= 0x6070a8,    // Or 0xc770a8
 	FLASH_WRITE_SECURITY_REGISTERS_CMD              = 0x4210a8,
 	FLASH_ERASE_SECURITY_REGISTERS_CMD              = 0x4470a8,
 	FLASH_WRITE_STATUS_CMD_LOWBYTE					= 0x011080,
@@ -146,6 +150,24 @@ static inline void flash_change_rw_func(flash_hander_t read, flash_hander_t writ
 	flash_write_page = write;
 }
 
+/**
+ * @brief 		This function serves to erase a page.
+ * @param[in]   addr	- the start address of the page needs to erase.
+ * @return 		none.
+ * @note        Attention: The block erase takes a long time, please pay attention to feeding the dog in advance.
+ * 				The maximum block erase time is listed at the beginning of this document and is available for viewing.
+ *
+ * 				Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
+ *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.
+ *              Taking into account the factors such as power supply fluctuations, the safe voltage value needs to be greater
+ *              than the minimum chip operating voltage. For the specific value, please make a reasonable setting according
+ *              to the specific application and hardware circuit.
+ *
+ *              Risk description: When the chip power supply voltage is relatively low, due to the unstable power supply,
+ *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
+ *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
+ */
+_attribute_text_sec_ void flash_erase_page(unsigned long addr);
 
 /**
  * @brief 		This function serves to erase a sector.
@@ -166,6 +188,62 @@ static inline void flash_change_rw_func(flash_hander_t read, flash_hander_t writ
  */
 _attribute_text_sec_ void flash_erase_sector(unsigned long addr);
 
+/**
+ * @brief 		This function serves to erase a block(32k).
+ * @param[in]   addr	- the start address of the block needs to erase.
+ * @return 		none.
+ * @note        Attention: The block erase takes a long time, please pay attention to feeding the dog in advance.
+ * 				The maximum block erase time is listed at the beginning of this document and is available for viewing.
+ *
+ * 				Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
+ *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.
+ *              Taking into account the factors such as power supply fluctuations, the safe voltage value needs to be greater
+ *              than the minimum chip operating voltage. For the specific value, please make a reasonable setting according
+ *              to the specific application and hardware circuit.
+ *
+ *              Risk description: When the chip power supply voltage is relatively low, due to the unstable power supply,
+ *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
+ *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
+ */
+_attribute_text_sec_ void flash_erase_32kblock(unsigned long addr);
+
+/**
+ * @brief 		This function serves to erase a block(64k).
+ * @param[in]   addr	- the start address of the block needs to erase.
+ * @return 		none.
+ * @note        Attention: The block erase takes a long time, please pay attention to feeding the dog in advance.
+ * 				The maximum block erase time is listed at the beginning of this document and is available for viewing.
+ *
+ * 				Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
+ *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.
+ *              Taking into account the factors such as power supply fluctuations, the safe voltage value needs to be greater
+ *              than the minimum chip operating voltage. For the specific value, please make a reasonable setting according
+ *              to the specific application and hardware circuit.
+ *
+ *              Risk description: When the chip power supply voltage is relatively low, due to the unstable power supply,
+ *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
+ *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
+ */
+_attribute_text_sec_ void flash_erase_64kblock(unsigned long addr);
+
+/**
+ * @brief 		This function serves to erase a chip.
+ * @param[in]   addr	- the start address of the chip needs to erase.
+ * @return 		none.
+ * @note        Attention: The block erase takes a long time, please pay attention to feeding the dog in advance.
+ * 				The maximum block erase time is listed at the beginning of this document and is available for viewing.
+ *
+ * 				Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
+ *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.
+ *              Taking into account the factors such as power supply fluctuations, the safe voltage value needs to be greater
+ *              than the minimum chip operating voltage. For the specific value, please make a reasonable setting according
+ *              to the specific application and hardware circuit.
+ *
+ *              Risk description: When the chip power supply voltage is relatively low, due to the unstable power supply,
+ *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
+ *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
+ */
+_attribute_text_sec_ void flash_erase_chip(void);
 
 /**
  * @brief 		This function reads the content from a page to the buf with single mode.
@@ -457,14 +535,3 @@ _attribute_text_sec_ int flash_read_mid_uid_with_check(unsigned int *flash_mid, 
  * @return		0 - err, other - flash vendor.
  */
 unsigned int flash_get_vendor(unsigned int flash_mid);
-
-
-
-
-
-
-
-
-
-
-
