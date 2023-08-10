@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2022 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,23 +17,35 @@
  *****************************************************************************/
 
 /********************************************************************************************************
- * @file	fifo.h
+ * @file	lpc.c
  *
- * @brief	This is the header file for B9x
+ * @brief	This is the source file for B92
  *
  * @author	Driver Group
  *
  *******************************************************************************************************/
-#ifndef FIFO_H_
-#define FIFO_H_
+#include "lpc.h"
 
-typedef	struct {
-	unsigned int		size;
-	unsigned short		num;
-	unsigned char		wptr;
-	unsigned char		rptr;
-	unsigned char*		p;
-}	my_fifo_t;
+/**
+ * @brief		This function selects input reference voltage for low power comparator.
+ * @param[in]	mode	- lower power comparator working mode includes normal mode and low power mode.
+ * @param[in]	ref		- selected input reference voltage.
+ * @return		none.
+ */
+void lpc_set_input_ref(lpc_mode_e mode,lpc_reference_e ref)
+{
+	if(mode == LPC_LOWPOWER)
+	{
+		//switch uvlo vref
+		analog_write_reg8(0x0b,analog_read_reg8(0x0b)|0x08);
+		analog_write_reg8(0x0d,analog_read_reg8(0x0d)|0x80);
+	}
+	else if(mode == LPC_NORMAL)
+	{
+		//switch uvlo vref
+		analog_write_reg8(0x0b,analog_read_reg8(0x0b)&0xf7);
+		analog_write_reg8(0x0d,analog_read_reg8(0x0d)&0x7f);
+	}
+	analog_write_reg8(0x0d,(analog_read_reg8(0x0d)&0x8f)|(ref<<4));
+}
 
-
-#endif /* FIFO_H_ */
