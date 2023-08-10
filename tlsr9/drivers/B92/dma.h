@@ -324,7 +324,8 @@ static inline unsigned int dma_cal_size(unsigned int size_byte,dma_transfer_widt
  * @param[in]  src_addr - the address of source.
  * @param[in]  dst_addr - the address of destination.
  * @return    none
- * @note      When a certain dma channel has not finished the transmission (bit 0 of reg_dma_ctr0(chn) is 1),need to disable dma before writing to the dma register.
+ * @note      1.src_addr and dst_addr must be aligned by word (4 bytes), otherwise the program will enter an exception
+ *            2.When a certain dma channel has not finished the transmission (bit 0 of reg_dma_ctr0(chn) is 1),need to disable dma before writing to the dma register.
  */
 static inline void dma_set_address(dma_chn_e chn,unsigned int src_addr,unsigned int dst_addr)
 {
@@ -337,7 +338,9 @@ static inline void dma_set_address(dma_chn_e chn,unsigned int src_addr,unsigned 
  * @brief   this function set source address for DMA,
  * @param[in]  chn - DMA channel
  * @param[in]  src_addr - the address of source.
- * @note      When a certain dma channel has not finished the transmission (bit 0 of reg_dma_ctr0(chn) is 1),need to disable dma before writing to the dma register.
+ * @return     none
+ * @note      1.src_addr must be aligned by word (4 bytes), otherwise the program will enter an exception
+ *            2.When a certain dma channel has not finished the transmission (bit 0 of reg_dma_ctr0(chn) is 1),need to disable dma before writing to the dma register.
  **/
 static inline void dma_set_src_address(dma_chn_e chn,unsigned int src_addr)
 {
@@ -348,7 +351,9 @@ static inline void dma_set_src_address(dma_chn_e chn,unsigned int src_addr)
  * @brief   this function set destination address for DMA,
  * @param[in]  chn - DMA channel
  * @param[in]  dst_addr - the address of destination.
- * @note       When a certain dma channel has not finished the transmission (bit 0 of reg_dma_ctr0(chn) is 1),need to disable dma before writing to the dma register.
+ * @return     none
+ * @note       1.dst_addr must be aligned by word (4 bytes), otherwise the program will enter an exception
+ *             2.When a certain dma channel has not finished the transmission (bit 0 of reg_dma_ctr0(chn) is 1),need to disable dma before writing to the dma register.
  **/
 static inline void dma_set_dst_address(dma_chn_e chn,unsigned int dst_addr)
 {

@@ -48,11 +48,13 @@
 /**********************************************************************************************************************
  *                                           global macro                                                             *
  *********************************************************************************************************************/
-#define  	CCLK_16M_HCLK_16M_PCLK_16M		clock_init(PLL_CLK_192M, PAD_PLL_DIV, PLL_DIV12_TO_CCLK, CCLK_DIV1_TO_HCLK, HCLK_DIV1_TO_PCLK, PLL_DIV4_TO_MSPI_CLK)
-#define		CCLK_24M_HCLK_24M_PCLK_24M		clock_init(PLL_CLK_192M, PAD_PLL_DIV, PLL_DIV8_TO_CCLK, CCLK_DIV1_TO_HCLK, HCLK_DIV1_TO_PCLK, PLL_DIV4_TO_MSPI_CLK)
-#define		CCLK_32M_HCLK_32M_PCLK_16M		clock_init(PLL_CLK_192M, PAD_PLL_DIV, PLL_DIV6_TO_CCLK, CCLK_DIV1_TO_HCLK, HCLK_DIV2_TO_PCLK, PLL_DIV4_TO_MSPI_CLK)
-#define		CCLK_48M_HCLK_48M_PCLK_24M		clock_init(PLL_CLK_192M, PAD_PLL_DIV, PLL_DIV4_TO_CCLK, CCLK_DIV1_TO_HCLK, HCLK_DIV2_TO_PCLK, PLL_DIV4_TO_MSPI_CLK)
-
+#define  	CCLK_16M_HCLK_16M_PCLK_16M		clock_init(PLL_CLK_48M, PAD_PLL_DIV, PLL_DIV3_TO_CCLK, CCLK_DIV1_TO_HCLK, HCLK_DIV1_TO_PCLK, PLL_DIV2_TO_MSPI_CLK)
+#define		CCLK_24M_HCLK_24M_PCLK_24M		clock_init(PLL_CLK_48M, PAD_PLL_DIV, PLL_DIV2_TO_CCLK, CCLK_DIV1_TO_HCLK, HCLK_DIV1_TO_PCLK, PLL_DIV2_TO_MSPI_CLK)
+#define		CCLK_32M_HCLK_32M_PCLK_16M		clock_init(PLL_CLK_96M, PAD_PLL_DIV, PLL_DIV3_TO_CCLK, CCLK_DIV1_TO_HCLK, HCLK_DIV2_TO_PCLK, PLL_DIV4_TO_MSPI_CLK)
+#define		CCLK_48M_HCLK_48M_PCLK_24M		clock_init(PLL_CLK_96M, PAD_PLL_DIV, PLL_DIV2_TO_CCLK, CCLK_DIV1_TO_HCLK, HCLK_DIV2_TO_PCLK, PLL_DIV4_TO_MSPI_CLK)
+#define 	CCLK_60M_HCLK_30M_PCLK_15M		clock_init(PLL_CLK_120M, PAD_PLL_DIV, PLL_DIV2_TO_CCLK, CCLK_DIV2_TO_HCLK, HCLK_DIV2_TO_PCLK, PLL_DIV4_TO_MSPI_CLK)
+#define 	CCLK_96M_HCLK_48M_PCLK_24M		clock_init(PLL_CLK_192M, PAD_PLL_DIV, PLL_DIV2_TO_CCLK, CCLK_DIV2_TO_HCLK, HCLK_DIV2_TO_PCLK, PLL_DIV4_TO_MSPI_CLK)
+/*using the 96 MHz core clock (PLL > 120MHz) can cause the hang during PLL lock after CPU Wakeup after PM mode*/
 /**********************************************************************************************************************
  *                                         global data type                                                           *
  *********************************************************************************************************************/
@@ -194,7 +196,11 @@ extern clk_32k_type_e g_clk_32k_src;
  * @param[in]	cclk_div - the cclk divide from pll.it is useless if src is not PAD_PLL_DIV. cclk max is 96M
  * @param[in]	hclk_div - the hclk divide from cclk.hclk max is 48M.
  * @param[in]	pclk_div - the pclk divide from hclk.pclk max is 24M.
- * @param[in]	mspi_clk_div - mspi_clk has two source. pll div and hclk.mspi max is 64M.
+ * @param[in]	mspi_clk_div - mspi_clk has two source - pll div and 24M rc. If it is built-in flash, the maximum speed of mspi is 64M.
+							   If it is an external flash, the maximum speed of mspi needs to be based on the board test.
+							   Because the maximum speed is related to the wiring of the board, and is also affected by temperature and GPIO voltage,
+							   the maximum speed needs to be tested at the highest and lowest voltage of the board,
+							   and the high and low temperature long-term stability test speed is no problem.
  * @return      none
  * @note		Do not switch the clock during the DMA sending and receiving process;
  * 			    because during the clock switching process, the system clock will be
@@ -246,4 +252,3 @@ _attribute_ram_code_sec_noinline_  unsigned int clock_get_32k_tick (void);
  */
 _attribute_ram_code_sec_noinline_ void clock_set_32k_tick(unsigned int tick);
 #endif
-

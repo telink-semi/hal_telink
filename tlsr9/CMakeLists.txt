@@ -23,16 +23,6 @@ zephyr_include_directories(drivers/${SOC})
 zephyr_library_sources(drivers/${SOC}/clock.c)
 zephyr_library_sources(drivers/${SOC}/analog.c)
 
-if (CONFIG_SOC_RISCV_TELINK_B92)
-# watchdog.c reference sources
-zephyr_library_sources(drivers/${SOC}/watchdog.c)
-
-# driver lib (sys.c, pm.c, flash_base.c, plic.c, pke.c, rf.c, trng.c)
-# a temprory solution for the flash_base module (need to remove the next line when ZEPHYR-355 will completed)
-zephyr_library_sources(drivers/${SOC}/flash_base.c)
-zephyr_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/drivers/${SOC}/lib/libdriver.a)
-endif()
-
 # MbedTLS HW acceleration
 if(CONFIG_MBEDTLS)
 	add_subdirectory( crypto/mbedtls )
@@ -66,9 +56,6 @@ if(CONFIG_BT_B91 OR CONFIG_IEEE802154_TELINK_B91)
 		drivers/${SOC}/stimer.c
 	)
 endif()
-
-# Entropy driver reference sources
-zephyr_library_sources_ifdef(CONFIG_ENTROPY_TELINK_B9X_TRNG drivers/${SOC}/trng.c)
 
 # ADC driver reference sources
 zephyr_library_sources_ifdef(CONFIG_ADC_TELINK_B9X drivers/${SOC}/adc.c)

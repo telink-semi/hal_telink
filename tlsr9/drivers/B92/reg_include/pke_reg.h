@@ -47,13 +47,3 @@
 #define PKE_B(a, step)     ((volatile unsigned int *)(PKE_BASE_ADDR+0x1000+(a)*(step)))
 
 #endif
-
-
-
-
-
-
-
-
-
-

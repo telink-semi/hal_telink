@@ -159,7 +159,7 @@ enum{
  */
 static inline void adc_power_on(void)
 {
-	analog_write_reg8 (areg_adc_pga_ctrl, (analog_read_reg8(areg_adc_pga_ctrl)&(~FLD_SAR_ADC_POWER_DOWN)));
+	analog_write_reg8(areg_adc_pga_ctrl, (analog_read_reg8(areg_adc_pga_ctrl)&(~FLD_SAR_ADC_POWER_DOWN)));
 }
 /**
  * @brief      This function close sar_adc power.
@@ -167,7 +167,7 @@ static inline void adc_power_on(void)
  */
 static inline void adc_power_off(void)
 {
-	analog_write_reg8 (areg_adc_pga_ctrl, (analog_read_reg8(areg_adc_pga_ctrl)|FLD_SAR_ADC_POWER_DOWN));
+	analog_write_reg8(areg_adc_pga_ctrl, (analog_read_reg8(areg_adc_pga_ctrl)|FLD_SAR_ADC_POWER_DOWN));
 }
 /**
  * @brief      This function reset adc module
@@ -279,9 +279,10 @@ static inline void adc_set_state_length(unsigned short r_max_mc,unsigned char r_
 void adc_set_dma_config(dma_chn_e chn,audio_fifo_chn_e fifo_chn);
 /**
  * @brief     This function serves to start sample with adc DMA channel.
- * @param[in] adc_data_buf 	- the address of data buffer
+ * @param[in] adc_data_buf 	- the address of data buffer.
  * @param[in] data_byte_len - the length of data size by byte
  * @return    none
+ * @note	  adc_data_buf : must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
 void adc_start_sample_dma(unsigned short *adc_data_buf,unsigned int data_byte_len);
 /**
@@ -331,12 +332,12 @@ void adc_temperature_sample_init(void);
  * @param[in]  pre_scale - enum variable of ADC pre_scaling factor.
  * @param[in]  sample_freq - enum variable of ADC sample frequency.
  * @return none
- * @attention  gpio voltage sample suggested initial setting are Vref = 1.2V, pre_scale = 1/8.
+ * @attention  gpio voltage sample suggested initial setting are Vref = 1.2V, pre_scale = 1/4.
  * 			0.9V Vref pre_scale must be 1.
  * 			The sampling range are as follows:
  * 			Vref        pre_scale        sampling range
  * 			1.2V			1				0 ~ 1.1V (suggest)
- * 			1.2V			1/8				0 ~ 3.5V (suggest)
+ * 			1.2V			1/4				0 ~ 3.5V (suggest)
  * 			0.9V            1				0 ~ 0.8V
  */
 void adc_gpio_sample_init(adc_input_pin_def_e pin,adc_ref_vol_e v_ref,adc_pre_scale_e pre_scale,adc_sample_freq_e sample_freq);
@@ -344,7 +345,7 @@ void adc_gpio_sample_init(adc_input_pin_def_e pin,adc_ref_vol_e v_ref,adc_pre_sc
 /**
  * @brief This function servers to set ADC configuration for ADC supply voltage sampling.
  * @return none
- * @attention battery voltage sample suggested initial setting are Vref = 1.2V, pre_scale = 1, vbat_div = 1/3.
+ * @attention battery voltage sample suggested initial setting are Vref = 1.2V, pre_scale = 1, vbat_div = 1/4.
  * 			Which has higher accuracy, user don't need to change it.
  * 			The battery voltage sample range is 1.8~3.5V,
  * 			and must set sys_init with the mode for battery voltage less than 3.6V.
@@ -373,6 +374,7 @@ void adc_init(adc_ref_vol_e v_ref,adc_pre_scale_e pre_scale,adc_sample_freq_e sa
  * @param[in]   sample_buffer 		- pointer to the buffer adc sample code need to store.
  * @param[in]   sample_num 			- the number of adc sample code.
  * @return 		none
+ * @note	  sample_buffer : must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
 void adc_get_code_dma(unsigned short *sample_buffer, unsigned short sample_num);
 /**

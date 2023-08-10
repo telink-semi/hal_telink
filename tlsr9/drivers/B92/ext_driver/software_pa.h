@@ -16,30 +16,39 @@
  *
  *****************************************************************************/
 
-/********************************************************************************************************
- * @file	mdec_reg.h
- *
- * @brief	This is the header file for B92
- *
- * @author	Driver Group
- *
- *******************************************************************************************************/
-#pragma once
+#ifndef BLT_PA_H_
+#define BLT_PA_H_
 
-#include "soc.h"
+#include "../gpio.h"
 
-#define mdec_rst_addr                   0x53
-typedef enum{
-	FLD_SELE_PA0		= BIT(0),
-	FLD_SELE_PB7		= BIT(1),
-	FLD_SELE_PC4		= BIT(2),
-	FLD_SELE_PD0		= BIT(3),
-	FLD_SELE_PE0		= BIT(4),
-}mdec_pin_e;
-typedef enum{
-	FLD_CLS_MDEC	    = BIT_RNG(0,4),
-	FLD_RSVD			= BIT_RNG(5,6),
-	FLD_MDEC_RST		= BIT(7),
-}mdec_set_e;
 
-#define	mdec_ctrl						0x54
+#ifndef PA_ENABLE
+#define PA_ENABLE                           0
+#endif
+
+
+
+#ifndef PA_TXEN_PIN
+#define PA_TXEN_PIN                         GPIO_PB2
+#endif
+
+#ifndef PA_RXEN_PIN
+#define PA_RXEN_PIN                         GPIO_PB3
+#endif
+
+
+
+#define PA_TYPE_OFF							0
+#define PA_TYPE_TX_ON						1
+#define PA_TYPE_RX_ON						2
+
+
+typedef void (*rf_pa_callback_t)(int type);
+extern rf_pa_callback_t  blc_rf_pa_cb;
+
+
+
+void rf_pa_init(void);
+
+
+#endif /* BLT_PA_H_ */
