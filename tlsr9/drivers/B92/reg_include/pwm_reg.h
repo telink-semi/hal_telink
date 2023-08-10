@@ -42,17 +42,24 @@
 
 
 /**
- * This register is used to enable PWM0~PWM5.
+ * This register is used to enable PWM1~PWM5.
  */
-#define reg_pwm_enable			REG_ADDR16(REG_PWM_BASE)
-typedef enum{
+#define reg_pwm_enable			REG_ADDR8(REG_PWM_BASE)
+enum{
 	FLD_PWM1_EN = BIT(1),
 	FLD_PWM2_EN = BIT(2),
 	FLD_PWM3_EN = BIT(3),
 	FLD_PWM4_EN = BIT(4),
 	FLD_PWM5_EN = BIT(5),
-	FLD_PWM0_EN = BIT(8),
-}pwm_en_e;
+};
+
+/**
+ * This register is used to enable PWM0.
+ */
+#define reg_pwm0_enable			REG_ADDR8(REG_PWM_BASE+0x01)
+enum{
+	FLD_PWM0_EN = BIT(0),
+};
 
 
 /**
