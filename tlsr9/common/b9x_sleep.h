@@ -31,8 +31,8 @@
 #define __B9X_SLEEP_H
 
 bool b9x_suspend(uint32_t wake_stimer_tick);
-#ifdef CONFIG_BOARD_TLSR9518ADK80D_RETENTION
-bool b91_deep_sleep(uint32_t wake_stimer_tick);
-#endif /* CONFIG_BOARD_TLSR9518ADK80D_RETENTION */
+#if defined(CONFIG_BOARD_TLSR9518ADK80D_RETENTION) || defined(CONFIG_BOARD_TLSR9528A_RETENTION)
+bool b9x_deep_sleep(uint32_t wake_stimer_tick);
+#endif /* CONFIG_BOARD_TLSR9518ADK80D_RETENTION || CONFIG_BOARD_TLSR9528A_RETENTION */
 
 #endif /* __B9X_SLEEP_H */
