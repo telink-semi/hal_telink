@@ -66,7 +66,7 @@ zephyr_library_sources_ifdef(CONFIG_USB_TELINK_B9X drivers/${SOC}/usbhw.c)
 
 #PM driver dependency
 zephyr_library_sources_ifdef(CONFIG_PM drivers/${SOC}/stimer.c)
-zephyr_library_sources_ifdef(CONFIG_PM common/${SOC}/sleep.c)
+zephyr_library_sources_ifdef(CONFIG_PM common/sleep.c)
 
 # BLE reference sources
 if (CONFIG_BT_B9X)
@@ -89,8 +89,8 @@ zephyr_library_sources(
 endif() # CONFIG_BT_B9X
 
 # Retention feature
-if (CONFIG_BOARD_TLSR9518ADK80D_RETENTION)
+if (CONFIG_BOARD_TLSR9518ADK80D_RETENTION OR CONFIG_BOARD_TLSR9528A_RETENTION)
 
 zephyr_library_sources(common/b9x_context.S)
 
-endif() # CONFIG_BOARD_TLSR9518ADK80D_RETENTION
+endif() # CONFIG_BOARD_TLSR9518ADK80D_RETENTION OR CONFIG_BOARD_TLSR9528A_RETENTION
