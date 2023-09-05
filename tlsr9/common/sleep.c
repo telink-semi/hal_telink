@@ -27,6 +27,12 @@
 #include <b9x_bt.h>
 #endif /* CONFIG_BT_B9X */
 
+#if CONFIG_BOARD_TLSR9518ADK80D_RETENTION
+#define DEEPSLEEP_MODE_RET_SRAM DEEPSLEEP_MODE_RET_SRAM_LOW64K
+#elif CONFIG_BOARD_TLSR9528A_RETENTION
+#define DEEPSLEEP_MODE_RET_SRAM DEEPSLEEP_MODE_RET_SRAM_LOW96K
+#endif
+
 /**
  * @brief     This function sets B9X MCU to suspend mode
  * @param[in] wake_stimer_tick - wake-up stimer tick
@@ -89,7 +95,7 @@ bool b9x_deep_sleep(uint32_t wake_stimer_tick)
 		tl_context_save();
 		if (!tl_sleep_retention) {
 			tl_sleep_retention = true;
-			(void)cpu_sleep_wakeup_32k_rc(DEEPSLEEP_MODE_RET_SRAM_LOW64K,
+			(void)cpu_sleep_wakeup_32k_rc(DEEPSLEEP_MODE_RET_SRAM,
 				PM_WAKEUP_TIMER | PM_WAKEUP_PAD,
 				wake_stimer_tick);
 			tl_sleep_retention = false;
@@ -103,7 +109,7 @@ bool b9x_deep_sleep(uint32_t wake_stimer_tick)
 	tl_context_save();
 	if (!tl_sleep_retention) {
 		tl_sleep_retention = true;
-		(void)cpu_sleep_wakeup_32k_rc(DEEPSLEEP_MODE_RET_SRAM_LOW64K,
+		(void)cpu_sleep_wakeup_32k_rc(DEEPSLEEP_MODE_RET_SRAM,
 			PM_WAKEUP_TIMER | PM_WAKEUP_PAD,
 			wake_stimer_tick);
 		tl_sleep_retention = false;
