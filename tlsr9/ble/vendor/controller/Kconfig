@@ -5,12 +5,6 @@ if BT_B9X
 
 menu "B9X BLE Controller"
 
-config B9X_BLE_CTRL_MAC_FLASH_ADDR
-	hex "MAC Flash address"
-	default 0xFFFF0
-	help
-	  The address in Flash memory for MAC address storage.
-
 choice
 	prompt "MAC address type"
 	default B9X_BLE_CTRL_MAC_PUBLIC
