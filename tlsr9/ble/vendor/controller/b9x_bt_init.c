@@ -17,6 +17,7 @@
  *****************************************************************************/
 
 #include "zephyr/bluetooth/buf.h"
+#include <zephyr/storage/flash_map.h>
 #if CONFIG_SOC_RISCV_TELINK_B91
 #include "stack/ble/B91/ble.h"
 #include "stack/ble/B91/ble_format.h"
@@ -32,6 +33,8 @@
 #ifdef CONFIG_PM
 #include "ext_driver/ext_pm.h"
 #endif /* CONFIG_PM */
+
+#define B9X_BT_MAC_PUBLIC_ADDR_OFFSET 0x1000
 
 #if CONFIG_B9X_BLE_CTRL_EXT_ADV
 
@@ -132,7 +135,7 @@ int b9x_bt_blc_init(void *prx, void *ptx)
 	 * for 1M   Flash, mac_address equals to 0xFF000 */
 	u8 mac_public[BLE_ADDR_LEN];
 	u8 mac_random_static[BLE_ADDR_LEN];
-	b9x_bt_blc_mac_init(CONFIG_B9X_BLE_CTRL_MAC_FLASH_ADDR, mac_public, mac_random_static);
+	b9x_bt_blc_mac_init(FIXED_PARTITION_OFFSET(vendor_partition) + B9X_BT_MAC_PUBLIC_ADDR_OFFSET, mac_public, mac_random_static);
 
 	blc_ll_initBasicMCU();
 
