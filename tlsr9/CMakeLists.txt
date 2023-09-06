@@ -68,7 +68,17 @@ zephyr_library_sources_ifdef(CONFIG_USB_TELINK_B9X drivers/${SOC}/usbhw.c)
 zephyr_library_sources_ifdef(CONFIG_PM drivers/${SOC}/stimer.c)
 zephyr_library_sources_ifdef(CONFIG_PM common/sleep.c)
 
-# BLE reference sources
+#BLE flash reference sources
+if (CONFIG_IEEE802154_TELINK_B9X)
+
+zephyr_include_directories(
+	ble
+	ble/vendor/controller
+)
+
+endif()
+
+# BLE stack reference sources
 if (CONFIG_BT_B9X)
 
 zephyr_include_directories(
@@ -84,6 +94,7 @@ zephyr_library_sources(
 	ble/vendor/controller/b9x_bt.c
 	ble/vendor/controller/b9x_bt_init.c
 	ble/vendor/controller/b9x_bt_buffer.c
+	ble/vendor/controller/b9x_bt_flash.c
 )
 
 endif() # CONFIG_BT_B9X
