@@ -72,50 +72,29 @@ _attribute_ble_data_retention_ u8
 /**
  * @brief		This function is used to initialize the MAC address
  * @param[in]	flash_addr - flash address for MAC address
- * @param[in]	mac_public - public address
- * @param[in]	mac_random_static - random static MAC address
+ * @param[in]	bt_mac - BT MAC address
  * @return      none
  */
-_attribute_no_inline_ static void b9x_bt_blc_mac_init(int flash_addr, u8 *mac_public,
-						      u8 *mac_random_static)
+_attribute_no_inline_ static void b9x_bt_blc_mac_init(u8 *bt_mac)
 {
-	if (flash_addr == 0) {
-		return;
-	}
+	uint8_t dummy_mac[BLE_ADDR_LEN] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
-	u8 mac_read[8];
-	flash_read_page(flash_addr, 8, mac_read);
-
-	u8 value_rand[5];
-	generateRandomNum(5, value_rand);
-
-	u8 ff_six_byte[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
-	if (memcmp(mac_read, ff_six_byte, 6)) {
-		memcpy(mac_public, mac_read, 6); /* copy public address from flash */
-	} else {				 /* no public address in flash */
-		mac_public[0] = value_rand[0];
-		mac_public[1] = value_rand[1];
-		mac_public[2] = value_rand[2];
-		mac_public[3] = 0x38; /* company id: 0xA4C138 */
-		mac_public[4] = 0xC1;
-		mac_public[5] = 0xA4;
-
-		flash_write_page(flash_addr, 6, mac_public);
-	}
-
-	mac_random_static[0] = mac_public[0];
-	mac_random_static[1] = mac_public[1];
-	mac_random_static[2] = mac_public[2];
-	mac_random_static[5] = 0xC0; /* for random static */
-
-	u16 high_2_byte = (mac_read[6] | mac_read[7] << 8);
-	if (high_2_byte != 0xFFFF) {
-		memcpy((u8 *)(mac_random_static + 3), (u8 *)(mac_read + 6), 2);
-	} else {
-		mac_random_static[3] = value_rand[3];
-		mac_random_static[4] = value_rand[4];
-
-		flash_write_page(flash_addr + 6, 2, (u8 *)(mac_random_static + 3));
+	flash_read_page(FIXED_PARTITION_OFFSET(vendor_partition) +
+	B9X_BT_MAC_PUBLIC_ADDR_OFFSET, BLE_ADDR_LEN, bt_mac);
+	if (!memcmp(bt_mac, dummy_mac, BLE_ADDR_LEN))
+    {
+		generateRandomNum(BLE_ADDR_LEN, bt_mac);
+#if CONFIG_B9X_BLE_CTRL_MAC_PUBLIC
+		bt_mac[3] = 0x38; /* company id: 0xA4C138 */
+ 		bt_mac[4] = 0xC1;
+ 		bt_mac[5] = 0xA4;
+#elif CONFIG_B9X_BLE_CTRL_MAC_RANDOM_STATIC
+		bt_mac[5] = 0xC0; /* random static by default */
+#else
+	#error "Other address types are not supported or need to be set via HCI"
+#endif
+		flash_write_page(FIXED_PARTITION_OFFSET(vendor_partition) +
+		B9X_BT_MAC_PUBLIC_ADDR_OFFSET, BLE_ADDR_LEN, bt_mac);
 	}
 }
 
@@ -133,17 +112,13 @@ int b9x_bt_blc_init(void *prx, void *ptx)
 
 	/* for 512K Flash, mac_address equals to 0x76000
 	 * for 1M   Flash, mac_address equals to 0xFF000 */
-	u8 mac_public[BLE_ADDR_LEN];
-	u8 mac_random_static[BLE_ADDR_LEN];
-	b9x_bt_blc_mac_init(FIXED_PARTITION_OFFSET(vendor_partition) + B9X_BT_MAC_PUBLIC_ADDR_OFFSET, mac_public, mac_random_static);
+	u8 ble_mac[BLE_ADDR_LEN];
+
+	b9x_bt_blc_mac_init(ble_mac);
 
 	blc_ll_initBasicMCU();
 
-#ifdef CONFIG_B9X_BLE_CTRL_MAC_PUBLIC
-	blc_ll_initStandby_module(mac_public);
-#else
-	blc_ll_initStandby_module(mac_random_static);
-#endif /* CONFIG_B9X_BLE_CTRL_MAC_PUBLIC */
+	blc_ll_initStandby_module(ble_mac);
 
 	blc_ll_initLegacyAdvertising_module(); // adv module: 		 mandatory for BLE slave,
 

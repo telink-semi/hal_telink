@@ -10,7 +10,7 @@ choice
 	default B9X_BLE_CTRL_MAC_PUBLIC
 config B9X_BLE_CTRL_MAC_PUBLIC
 	bool "Public"
-config B9X_BLE_CTRL_MAC_RUNDOM_STATIC
+config B9X_BLE_CTRL_MAC_RANDOM_STATIC
 	bool "Random static"
 endchoice
 
