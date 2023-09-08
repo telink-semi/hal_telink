@@ -26,6 +26,8 @@
 #include "stack/ble/B92/ble.h"
 #endif
 
+#define BT_BUF_HCI_RX_SIZE                                                                             \
+        MAX(BT_BUF_CMD_SIZE(CONFIG_BT_BUF_CMD_TX_SIZE), BT_BUF_ACL_SIZE(CONFIG_BT_BUF_ACL_TX_SIZE))
 
 #define ACL_CONN_MAX_RX_OCTETS (BT_BUF_RX_SIZE > 251 ? 251 : BT_BUF_RX_SIZE)
 #define ACL_SLAVE_MAX_TX_OCTETS (CONFIG_BT_BUF_ACL_TX_SIZE > 251 ? 251 : CONFIG_BT_BUF_ACL_TX_SIZE)
@@ -58,7 +60,7 @@
     TX from host CMD or ACL buffer, RX to Contorller HCI buffer
     According to Telink implementatios, the buffer shall be alligned to 16.
 */
-#define HCI_RX_FIFO_SIZE HCI_FIFO_SIZE(BT_BUF_TX_SIZE)
+#define HCI_RX_FIFO_SIZE HCI_FIFO_SIZE(BT_BUF_HCI_RX_SIZE)
 
 /*
     According to Telink implementation shall number of buffers shall be power of 2
@@ -80,7 +82,7 @@
     Intermediate ACL buffer that takes data from HCI RX and pass it to ACL TX
     According to Telink implementatios, the buffer shall be alligned to 4.
 */
-#define HCI_RX_ACL_FIFO_SIZE ALIGN(BT_BUF_ACL_SIZE(ACL_CONN_MAX_RX_OCTETS), ALIGN_4)
+#define HCI_RX_ACL_FIFO_SIZE ALIGN(BT_BUF_ACL_SIZE(BT_BUF_TX_SIZE), ALIGN_4)
 
 /*
     According to Telink implementation shall number of buffers shall be power of 2
