@@ -40,4 +40,7 @@
 #define	blc_ll_setAclMasterConnectionInterval		blc_ll_setAclCentralBaseConnectionInterval
 
 
+#define blc_ll_setAdvCustomedChannel               blc_ll_setCustomizedAdvertisingScanningChannel
+
+
 #endif /* STACK_BLE_CONTROLLER_CONTR_API_COMP_H_ */

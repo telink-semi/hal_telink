@@ -37,7 +37,7 @@
 #ifndef DRIVERS_GPIO_H_
 #define DRIVERS_GPIO_H_
 
-
+#include <stdbool.h>
 #include "plic.h"
 #include "analog.h"
 #include "reg_include/gpio_reg.h"

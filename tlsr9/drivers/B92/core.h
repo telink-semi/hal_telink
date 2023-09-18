@@ -65,14 +65,29 @@ typedef enum
 #define save_mxstatus()         save_csr(NDS_MXSTATUS)
 #define restore_mxstatus()      restore_csr(NDS_MXSTATUS)
 
- /* Nested IRQ entry macro : Save CSRs and enable global interrupt. */
+/* Nested external IRQ entry macro : Save CSRs and enable global interrupt.
+ * - If mei does not want to be interrupted by msi and mti, can do the following
+ *     save_csr(NDS_MIE)                                 \
+ *     save_csr(NDS_MEPC)                                \
+ *     save_csr(NDS_MSTATUS)                             \
+ *     save_mxstatus()                                   \
+ *     clear_csr(NDS_MIE, FLD_MIE_MTIE | FLD_MIE_MSIE);  \
+ *     set_csr(NDS_MSTATUS, FLD_MSTATUS_MIE);
+ */
 #define core_save_nested_context()                              \
 	 save_csr(NDS_MEPC)                              \
 	 save_csr(NDS_MSTATUS)                           \
 	 save_mxstatus()                                 \
 	 set_csr(NDS_MSTATUS, FLD_MSTATUS_MIE);
 
-/* Nested IRQ exit macro : Restore CSRs */
+/* Nested external IRQ exit macro : Restore CSRs
+ * - If closed mti and msi in mei, can restore with the following
+ *     clear_csr(NDS_MSTATUS, FLD_MSTATUS_MIE);        \
+ *     restore_csr(NDS_MSTATUS)                        \
+ *     restore_csr(NDS_MEPC)                           \
+ *     restore_mxstatus()                              \
+ *     restore_csr(NDS_MIE);
+ */
 #define core_restore_nested_context()                               \
 	 clear_csr(NDS_MSTATUS, FLD_MSTATUS_MIE);            \
 	 restore_csr(NDS_MSTATUS)                        \

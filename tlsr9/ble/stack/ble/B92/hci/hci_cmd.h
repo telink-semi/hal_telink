@@ -2108,21 +2108,49 @@ typedef struct
  *  @brief  Command Parameters for "7.8.126 LE Set Periodic Advertising Response Data command"
  */
 typedef struct {
-	u8      sync_handle;
+	u16     sync_handle;
 	u16     req_event_count; // indicate PAwR event count. i.e. receive packet in the PAwR event count. ---paEventCounter
-	u8      req_subevt_idx;  // indicate subevent. i.e. receive packet in the subevent idx.
 
+	u8      req_subevt_idx;  // indicate subevent. i.e. receive packet in the subevent idx.
 	u8      rsp_subevt_idx;  // the subevent that the response shall be sent in
 	u8      rsp_slot_idx;    // the response slot in which this response data is to be transmitted. note slot need to be in the response subevent.
 	u8      rsp_data_len;
+
 	u8      rsp_data[1];
 } hci_le_setPeridAdvRspData_cmdParam_t;
 
-typedef struct
-{
+typedef struct{
 	u8 		status;
 	u16 	syncHandle;
 } hci_le_setPeridAdvRspDataRetParams_t;
+
+
+/**
+ *  @brief  Command Parameters for "7.8.127 LE Set Periodic Sync Subevent command"
+ */
+typedef struct {
+	u16      sync_handle;
+	u16      pda_prop;
+
+	u8       num_subevent;
+	u8       subeventIdx[0];
+} hci_le_setPeriodicSyncSubevent_cmdParam_t;
+
+
+
+
+
+
+/**
+ * @brief      get current connection channel map
+ * @param[in]  connHandle - connect handle
+ * @param[in]  returnChannelMap - current channel map
+ * @return     status, 0x00:  succeed
+ * 			           other: failed
+ */
+ble_sts_t 	blc_hci_le_readChannelMap(u16 connHandle, u8 *returnChannelMap);
+
+
 
 /**
  * @brief	   create a CIG and to set the parameters of one or more CISes that are associated with a CIG in the Controller.
@@ -2298,10 +2326,10 @@ typedef struct{
 	u16 Connection_Handle;
 	u8 Config_ID;
 	u8 Create_Context;
-	u8 Main_Mode_Type;
-	u8 Sub_Mode_Type;
-	u8 Min_Main_Mode_Steps;
-	u8 Max_Main_Mode_Steps;
+	u8 Main_Mode;
+	u8 Sub_Mode;
+	u8 Main_Mode_Min_Steps;
+	u8 Main_Mode_Max_Steps;
 	u8 Main_Mode_Repetition;
 	u8 Mode_0_Steps;
 	u8 Role;
@@ -2309,7 +2337,7 @@ typedef struct{
 	u8 CS_SYNC_PHY;
 	u8 Channel_Map[10];
 	u8 Channel_Map_Repetition;
-	u8 Channel_Selection_Type;
+	u8 ChSel;
 	u8 Ch3c_Shape;
 	u8 Ch3c_Jump;
 	u8 Companion_Signal_Enable;
@@ -2327,7 +2355,7 @@ typedef struct{
 	u8 Max_Subevent_Len[3];
 	u8 Tone_Antenna_Config_Selection;
 	u8 PHY;
-	u8 Tx_Pwr_Delta;
+	s8 Tx_Pwr_Delta;
 	u8 Preferred_Peer_Antenna;
 }hci_le_cs_setProcedureParame_cmdParam_t;
 

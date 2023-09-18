@@ -116,16 +116,6 @@ void 		blc_ll_continue_adv_after_scan_req(u8 enable);
 void 		blc_ll_set_scan_rsp_en(u8 enable);
 
 
-/**
- * @brief      This function is used to set some other channel to replace advertising chn37/38/39.
- * @param[in]  chn0 - channel to replace channel 37
- * @param[in]  chn1 - channel to replace channel 38
- * @param[in]  chn2 - channel to replace channel 39
- * @return     none
- */
-void 		blc_ll_setAdvCustomizedChannel (u8 chn0, u8 chn1, u8 chn2);
-
-
 
 /**
  * @brief      This function is used to configure leg_adv enabling by API only.

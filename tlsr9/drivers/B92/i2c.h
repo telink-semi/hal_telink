@@ -28,7 +28,10 @@
  *
  *	Introduction
  *	===============
- *	i2c support master mode or slave mode.
+ *	-# B92 supports two i2c: i2c/i2c1_m.
+ *	-# i2c:support master mode or slave mode,and support nodma/dma.
+ *	-# i2c1_m: only support master mode,only support nodma.
+ *  -# i2c1_m master mode and i2c master mode are different in design, see the demo and interface implementation.
  *
  *	API Reference
  *	===============
@@ -355,20 +358,19 @@ void i2c_master_read_dma(unsigned char id, unsigned char *rx_data, unsigned int 
 
 
 /**
- * @brief      This function serves to write a packet of data to master device.
- * @param[in]  data - the pointer of tx_buff.
- * @param[in]  len - The total length of the data,the maximum transmission length of DMA is 0xFFFFFC bytes, so dont'n over this length.
+ * @brief      Send an amount of data in DMA mode
+ * @param[in]  data -  Pointer to data buffer, it must be 4-bytes aligned address
+ * @param[in]  len  -  Amount of data to be sent in bytes, range from 1 to 0xFFFFFC
  * @return     none.
- * @note       data: must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
 void i2c_slave_set_tx_dma( unsigned char *data, unsigned int len);
 
 
 
 /**
- * @brief      When the chip is used as an i2c slave device and you want to use dma mode for reception, you need to call this function for dma related configuration。
- * @param[in]  data - This parameter is the first address of the received data buffer, which must be 4 bytes aligned, otherwise the program will enter an exception.
- * @param[in]  len  - It must be set to 0xFFFFFC.
+ * @brief      Receive an amount of data in DMA mode
+ * @param[in]  data - Pointer to data buffer, it must be 4-bytes aligned address
+ * @param[in]  len  - Length of DMA in bytes��It must be set to 0xFFFFFC.
  * @attention  The first four bytes in the buffer of the received data are the length of the received data.
  *             The actual buffer size that the user needs to set needs to be noted on two points:
  *			   -# you need to leave 4bytes of space for the length information.

@@ -34,6 +34,7 @@
 #include "core.h"
 #include "stimer.h"
 #include "types.h"
+#include "watchdog.h" //For BLE SDK, do not delete it.
 
 #define DISABLE_BTB     __asm__("csrci 	0x7D0,8")
 #define ENABLE_BTB      __asm__("csrsi 	0x7D0,8")
@@ -46,7 +47,7 @@
 	P25Q16SU    0x4b        0x156085    PUYA        30ms
 	P25Q32SU    0x4b        0x166085    PUYA        30ms
 	P25Q128L    0x4b        0x186085    PUYA        30ms
-    GD25LQ16E   0x4b        0x1560c8    GD          300ms/500ms(85℃/125℃)
+    GD25LQ16E   0x4b        0x1560c8    GD          300ms/500ms(85 centigrade/125 centigrade)
  */
 unsigned int flash_support_mid[] = {0x146085,0x156085,0x166085,0x186085,0x1560c8};
 const unsigned int FLASH_CNT = sizeof(flash_support_mid)/sizeof(*flash_support_mid);
@@ -77,6 +78,14 @@ _attribute_data_retention_sec_ preempt_config_t s_flash_preempt_config =
  * @param[in]   preempt_en	- 1 can disturb by interrupt, 0 can disturb by interrupt.
  * @param[in]	threshold	- priority Threshold.
  * @return    	none.
+ * @note
+ *              -# The correlation between flash_plic_preempt_config() and the flash functions that call sub-functions (all declared in flash_base.h) is as follows:
+ *                  - When preempt_en = 1 and interrupt nesting is enabled (plic_preempt_feature_en):
+ *                      - The initialized interrupt threshold can only be 0, because the PLIC threshold will be set to 0 when the flash functions returns.
+ *                      - During the flash functions execution, it can be interrupted by external interrupts with priority greater than given threshold
+ *                      - machine timer and software interrupt will definitely interrupt the flash functions execution, they are not controlled by the plic interrupt threshold
+ *                  - In other cases(preempt_en = 0 or plic_preempt_feature_en = 0), global interrupts (including machine timer and software interrupt) will be turned off during the execution of the flash functions and will be restored when the flash functions exits.
+ *              -# If the flash operation may be interrupted by an interrupt, it is necessary to ensure that the interrupt handling function and the function it calls must be in the RAM code. 
  */
 void flash_plic_preempt_config(unsigned char preempt_en,unsigned char threshold)
 {
@@ -103,6 +112,7 @@ void flash_plic_preempt_config(unsigned char preempt_en,unsigned char threshold)
  */
 _attribute_text_sec_ void flash_erase_page(unsigned long addr)
 {
+	wd_clear(); //clear watch dog //For BLE SDK, do not delete it.
 	DISABLE_BTB;
 	flash_mspi_write_ram(FLASH_PAGE_ERASE_CMD, addr,NULL,0);
 	ENABLE_BTB;
@@ -127,6 +137,7 @@ _attribute_text_sec_ void flash_erase_page(unsigned long addr)
  */
 _attribute_text_sec_ void flash_erase_sector(unsigned long addr)
 {
+	wd_clear(); //clear watch dog //For BLE SDK, do not delete it.
 	DISABLE_BTB;
 	flash_mspi_write_ram(FLASH_SECT_ERASE_CMD, addr,NULL,0);
 	ENABLE_BTB;
@@ -151,6 +162,7 @@ _attribute_text_sec_ void flash_erase_sector(unsigned long addr)
  */
 _attribute_text_sec_ void flash_erase_32kblock(unsigned long addr)
 {
+	wd_clear(); //clear watch dog //For BLE SDK, do not delete it.
 	DISABLE_BTB;
 	flash_mspi_write_ram(FLASH_32KBLK_ERASE_CMD, addr,NULL,0);
 	ENABLE_BTB;
@@ -175,6 +187,7 @@ _attribute_text_sec_ void flash_erase_32kblock(unsigned long addr)
  */
 _attribute_text_sec_ void flash_erase_64kblock(unsigned long addr)
 {
+	wd_clear(); //clear watch dog //For BLE SDK, do not delete it.
 	DISABLE_BTB;
 	flash_mspi_write_ram(FLASH_64KBLK_ERASE_CMD, addr,NULL,0);
 	ENABLE_BTB;
@@ -199,6 +212,7 @@ _attribute_text_sec_ void flash_erase_64kblock(unsigned long addr)
  */
 _attribute_text_sec_ void flash_erase_chip(void)
 {
+	wd_clear(); //clear watch dog //For BLE SDK, do not delete it.
 	DISABLE_BTB;
 	flash_mspi_write_ram(FLASH_CHIP_ERASE_CMD, 0,NULL,0);
 	ENABLE_BTB;
@@ -209,7 +223,7 @@ _attribute_text_sec_ void flash_erase_chip(void)
  * @brief 		This function reads the content from a page to the buf with single mode.
  * @param[in]   addr	- the start address of the page.
  * @param[in]   len		- the length(in byte) of content needs to read out from the page.
- * @param[out]  buf		- the start address of the buffer.
+ * @param[out]  buf		- the start address of the buffer(ram address).
  * @return 		none.
  * @note        cmd:1x, addr:1x, data:1x, dummy:0
  * 				Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
@@ -234,7 +248,7 @@ _attribute_text_sec_ void flash_read_data(unsigned long addr, unsigned long len,
  * @brief 		This function reads the content from a page to the buf with dual read mode.
  * @param[in]   addr	- the start address of the page.
  * @param[in]   len		- the length(in byte) of content needs to read out from the page.
- * @param[out]  buf		- the start address of the buffer.
+ * @param[out]  buf		- the start address of the buffer(ram address).
  * @return 		none.
  * @note        cmd:1x, addr:1x, data:2x, dummy:8
  * 				Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
@@ -258,7 +272,7 @@ _attribute_text_sec_ void flash_dread(unsigned long addr, unsigned long len, uns
  * @brief 		This function reads the content from a page to the buf with 4*IO read mode.
  * @param[in]   addr	- the start address of the page.
  * @param[in]   len		- the length(in byte) of content needs to read out from the page.
- * @param[out]  buf		- the start address of the buffer.
+ * @param[out]  buf		- the start address of the buffer(ram address).
  * @return 		none.
  * @note        cmd:1x, addr:4x, data:4x, dummy:6
  * 				Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
@@ -283,7 +297,7 @@ _attribute_text_sec_ void flash_4read(unsigned long addr, unsigned long len, uns
  * @brief 		This function serves to decrypt the read data from the flash at the specified address and compare it with the plain text in single mode.
  * @param[in]   addr	        - the start address of the page.
  * @param[in]   plain_len		- the length(in byte) of content needs to read out from the page.
- * @param[out]  plain_buf		- the start address of the plain buffer.
+ * @param[out]  plain_buf		- the start address of the plain buffer(ram address).
  * @return 		0: check pass; 1: check fail.
  * @note        cmd:1x, addr:1x, data:1x, dummy:0
  * 				Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
@@ -308,7 +322,7 @@ _attribute_text_sec_ unsigned char  flash_read_data_decrypt_check(unsigned long 
  * @brief 		This function serves to decrypt the read data from the flash at the specified address and compare it with the plain text in dual read mode.
  * @param[in]   addr	        - the start address of the page.
  * @param[in]   plain_len		- the length(in byte) of content needs to read out from the page.
- * @param[out]  plain_buf		- the start address of the plain buffer.
+ * @param[out]  plain_buf		- the start address of the plain buffer(ram address).
  * @return 		0: check pass; 1: check fail.
  * @note        cmd:1x, addr:1x, data:2x, dummy:8
  * 				Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
@@ -333,7 +347,7 @@ _attribute_text_sec_ unsigned char flash_dread_decrypt_check(unsigned long addr,
  * @brief 		This function serves to decrypt the read data from the flash at the specified address and compare it with the plain text in 4*IO read mode.
  * @param[in]   addr	        - the start address of the page.
  * @param[in]   plain_len		- the length(in byte) of content needs to read out from the page.
- * @param[out]  plain_buf		- the start address of the plain buffer.
+ * @param[out]  plain_buf		- the start address of the plain buffer(ram address).
  * @return 		0: check pass; 1: check fail.
  * @note        cmd:1x, addr:4x, data:4x, dummy:6
  * 				Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
@@ -361,7 +375,7 @@ _attribute_text_sec_ unsigned char flash_4read_decrypt_check(unsigned long addr,
  * @brief 		This function writes the buffer's content to the flash.
  * @param[in]   addr	- the start address of the area.
  * @param[in]   len		- the length(in byte) of content needs to write into the flash.
- * @param[in]   buf		- the start address of the content needs to write into.
+ * @param[in]   buf		- the start address of the content needs to write into(ram address).
  * @param[in]   cmd		- the write command. FLASH_WRITE_CMD or FLASH_QUAD_PAGE_PROGRAM_CMD.
  * @return 		none.
  */
@@ -389,10 +403,10 @@ _attribute_text_sec_ static void flash_write(unsigned long addr, unsigned long l
  * 				Do not erase the useful information in other locations of the sector during erasing.
  * @param[in]   addr	- the start address of the area.
  * @param[in]   len		- the length(in byte) of content needs to write into the flash.
- * @param[in]   buf		- the start address of the content needs to write into.
+ * @param[in]   buf		- the start address of the content needs to write into(ram address).
  * @return 		none.
  * @note        cmd:1x, addr:1x, data:1x
- * 				the funciton support cross-page writing,which means the len of buf can bigger than 256.
+ * 				the function support cross-page writing,which means the len of buf can bigger than 256.
  *
  *              Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
  *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.
@@ -416,10 +430,10 @@ _attribute_text_sec_ void flash_page_program(unsigned long addr, unsigned long l
  * 				Do not erase the useful information in other locations of the sector during erasing.
  * @param[in]   addr	- the start address of the area.
  * @param[in]   len		- the length(in byte) of content needs to write into the flash.
- * @param[in]   buf		- the start address of the content needs to write into.
+ * @param[in]   buf		- the start address of the content needs to write into(ram address).
  * @return 		none.
  * @note        cmd:1x, addr:1x, data:4x
- * 				the funciton support cross-page writing,which means the len of buf can bigger than 256.
+ * 				the function support cross-page writing,which means the len of buf can bigger than 256.
  *
  *              Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
  *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.
@@ -440,7 +454,7 @@ _attribute_text_sec_ void flash_quad_page_program(unsigned long addr, unsigned l
  * @brief 		This function writes the buffer's content to the flash in encrypt mode.
  * @param[in]   addr	- the start address of the area.
  * @param[in]   len		- the length(in byte) of content needs to write into the flash.
- * @param[in]   buf		- the start address of the content needs to write into.
+ * @param[in]   buf		- the start address of the content needs to write into(ram address).
  * @param[in]   cmd		- the write command. FLASH_WRITE_CMD or FLASH_QUAD_PAGE_PROGRAM_CMD.
  * @return 		none.
  */
@@ -468,10 +482,10 @@ _attribute_text_sec_ static void flash_write_encrypt(unsigned long addr, unsigne
  * 				Do not erase the useful information in other locations of the sector during erasing.
  * @param[in]   addr	- the start address of the area.
  * @param[in]   len		- the length(in byte) of content needs to write into the flash.
- * @param[in]   buf		- the start address of the content needs to write into.
+ * @param[in]   buf		- the start address of the content needs to write into(ram address).
  * @return 		none.
  * @note        cmd:1x, addr:1x, data:1x
- * 				the funciton support cross-page writing,which means the len of buf can bigger than 256.
+ * 				the function support cross-page writing,which means the len of buf can bigger than 256.
  *
  *              Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
  *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.
@@ -495,10 +509,10 @@ _attribute_text_sec_ void flash_page_program_encrypt(unsigned long addr, unsigne
  * 				Do not erase the useful information in other locations of the sector during erasing.
  * @param[in]   addr	- the start address of the area.
  * @param[in]   len		- the length(in byte) of content needs to write into the flash.
- * @param[in]   buf		- the start address of the content needs to write into.
+ * @param[in]   buf		- the start address of the content needs to write into(ram address).
  * @return 		none.
  * @note        cmd:1x, addr:1x, data:4x
- * 				the funciton support cross-page writing,which means the len of buf can bigger than 256.
+ * 				the function support cross-page writing,which means the len of buf can bigger than 256.
  *
  *              Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
  *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.
@@ -577,7 +591,7 @@ _attribute_text_sec_ void flash_write_status(flash_status_typedef_e type , unsig
  * @brief 		This function serves to read data from the Security Registers of the flash.
  * @param[in]   addr	- the start address of the Security Registers.
  * @param[in]   len		- the length of the content to be read.
- * @param[out]  buf		- the starting address of the content to be read.
+ * @param[out]  buf		- the starting address of the content to be read(ram address).
  * @return 		none.
  * @note        Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
  *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.
@@ -600,7 +614,7 @@ _attribute_text_sec_ void flash_read_otp(unsigned long addr, unsigned long len, 
  * @brief 		This function serves to write data to the Security Registers of the flash you choose.
  * @param[in]   addr	- the start address of the Security Registers.
  * @param[in]   len		- the length of content to be written.
- * @param[in]   buf		- the starting address of the content to be written.
+ * @param[in]   buf		- the starting address of the content to be written(ram address).
  * @return 		none.
  * @note        Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
  *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.

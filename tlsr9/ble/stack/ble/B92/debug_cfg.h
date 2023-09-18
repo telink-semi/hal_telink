@@ -33,7 +33,7 @@
 #define			ERR_TRIGGER_CODE_STUCK						1
 #define			ERR_LOG_ON_SRAM								2
 
-#define			BLT_ERR_PROCESS								ERR_TRIGGER_CODE_STUCK
+#define			BLT_ERR_PROCESS								ERR_LOG_ON_SRAM
 
 
 #if (BLT_ERR_PROCESS == ERR_TRIGGER_CODE_STUCK || BLT_ERR_PROCESS == ERR_LOG_ON_SRAM)
@@ -43,7 +43,7 @@
 	#define 		BLMS_ERR_DEBUG(en, x)
 #endif
 
-#define			BLMS_DEBUG_EN								1
+#define			BLMS_DEBUG_EN								0
 
 
 /*****************************************************************************************************************
@@ -104,7 +104,7 @@
 #endif
 
 #ifndef DBG_HOST_LOG
-#define DBG_HOST_LOG											1
+#define DBG_HOST_LOG											0
 #endif
 
 #ifndef DBG_L2CAP_BTSNOOP_LOG
