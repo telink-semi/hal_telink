@@ -21,18 +21,55 @@
 
 #include "stack/ble/B92/ble_config.h"
 
-
+/**
+ *  @brief  Define the prototypes that the os_give_sem_t must conform to.
+ */
 typedef void (*os_give_sem_t)(void);
 
-/* User API */
+/**
+ *  @brief  Define the prototypes that the take_mutex_sem&give_mutex_sem must conform to.
+ */
+typedef void (*os_mutex_sem_t)(void);
+
+/**
+ * @brief		This feature is used to enable support for OS mode
+ * @param[in]   true - Enable, false - disable
+ * @return      none
+ */
 void blc_setOsSupEnable(bool en);
+
+/**
+ * @brief		This function is to check if OS is supported
+ * @param[in]   none
+ * @return      true - Enable, false - disable
+ */
 bool blc_isOsSupEnable(void);
+
+/**
+ * @brief		This feature is used to check if the task schedule is busy
+ * @param[in]   none
+ * @return      true - busy,   false - no busy
+ */
 bool blc_isBleSchedulerBusy(void);
+
+/**
+ * @brief      Register an input for the Bluetooth OS semaphore
+ * @param[in]  give_sem_from_isr -Interrupt  use
+ * @param[in]  give_sem - Non-interruptible  use
+ * @return
+ */
 void blc_ll_registerGiveSemCb(os_give_sem_t give_sem_from_isr, os_give_sem_t give_sem);
+
+/**
+ * @brief      Register a Bluetooth send data mutex.
+ * Handling multitasking while sending packets results in an exception.
+ * @param[in]  take_mutex_sem    -  lock
+ * @param[in]  give_mutex_sem    -  unlock
+ * @return
+ */
+void blc_ll_registerMutexSemCb(os_mutex_sem_t take_mutex_sem, os_mutex_sem_t give_mutex_sem);
+
 extern int blc_pm_handler(void);
 extern void blc_pm_setAppWakeupLowPower(u32 wakeup_tick, u8 enable);
-
-/* Stack API. !!! user can't use. */
-extern void blt_ll_sem_give(void);
 
 #endif /* OS_SUP_H_ */

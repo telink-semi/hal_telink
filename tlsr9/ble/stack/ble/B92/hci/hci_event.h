@@ -130,7 +130,7 @@ typedef struct {
 	u8         peerAddrType;
 	u8         peerAddr[6];
 	u16        connInterval;
-	u16        slaveLatency;
+	u16        peripheralLatency;
 	u16        supervisionTimeout;
 	u8         masterClkAccuracy;
 } hci_le_connectionCompleteEvt_t;
@@ -377,6 +377,22 @@ typedef struct{
 	u8   data[1];
 }le_periodAdvReportEvt_t;
 
+typedef struct{
+	u8	 sub_code;
+	u16  sync_handle;
+	u8   tx_power;
+
+	u8   rssi;
+	u8   cte_type;
+	u16  periodic_evt_cnt;
+
+	u8   subevent;
+	u8   data_status;
+	u8   data_len;	// 0 to 247
+
+	u8   data[1];
+}le_periodAdvReportEvt_t_v2;
+
 
 typedef struct{
 	u8		I_sample;
@@ -557,12 +573,12 @@ typedef struct {
 	u8		subEventCode;
 	u16		syncHandle;
 	u8		txPower;
+
 	u8		RSSI;
 	u8		cteType;
-
 	u16     paEventCounter;
-	u8		subevent;
 
+	u8		subevent;
 	u8		dataStatus;
 	u8		dataLength;  // 0 to 247 Length of the Data field
 	u8		data[1];
@@ -634,6 +650,26 @@ typedef struct {
 	u16		   perdAdvItvl;
 	u8		   advClkAccuracy;
 } hci_le_periodicAdvSyncTransferRcvdEvt_t;
+
+
+typedef struct {
+	u8         subEventCode;
+	u8         status;
+	u16		   connHandle;
+	u16		   serviceData;
+	u16		   syncHandle;
+	u8		   advSID;
+	u8		   advAddrType;
+	u8		   advAddr[6];
+	u8		   advPHY;
+	u16		   perdAdvItvl;
+	u8		   advClkAccuracy;
+
+	u8		   num_subevt;
+	u8		   subevent_intvl;
+	u8         rsp_slot_delay;
+	u8         rsp_slot_spacing;
+} hci_le_periodicAdvSyncTransferRcvdEvt_V2_t;
 
 
 /**
@@ -816,16 +852,23 @@ typedef struct{
 /**
  * @brief  Event Parameters for "77.7.65.37 LE Periodic Advertising Response Report event"
  */
-#if 0
+typedef struct {
+	s8		txPower;
+	s8		RSSI;
+	u8		cteType;
+	u8		responseSlot;
+	u8		dataStatus;
+	u8		dataLength;  // 0 to 247 Length of the Data field
+	u8		data[0];
+} pawrRspReportDat_t;
 typedef struct{
 	u8 		subEventCode;
-	u8 		Advertising_Handle;
+	u8 		advHandle;
 	u8		Subevent;
 	u8      Tx_Status;
 	u8      Num_Responses;
-	...
+	pawrRspReportDat_t rspReportDat[0];
 }hci_le_periodicAdvRspReportEvt_t;
-#endif
 
 
 typedef struct {
@@ -861,10 +904,10 @@ typedef struct {
 	u16 Connection_Handle;
 	u8 Config_ID;
 	u8 Action;
-	u8 Main_Mode_Type;
-	u8 Sub_Mode_Type;
-	u8 Min_Main_Mode_Steps;
-	u8 Max_Main_Mode_Steps;
+	u8 Main_Mode;
+	u8 Sub_Mode;
+	u8 Main_Mode_Min_Steps;
+	u8 Main_Mode_Max_Steps;
 	u8 Main_Mode_Repetition;
 	u8 Mode_0_Steps;
 	u8 Role;
@@ -872,7 +915,7 @@ typedef struct {
 	u8 CS_SYNC_PHY;
 	u8 Channel_Map[10];
 	u8 Channel_Map_Repetition;
-	u8 Channel_Selection_Type;
+	u8 ChSel;
 	u8 Ch3c_Shape;
 	u8 Ch3c_Jump;
 	u8 Companion_Signal_Enable;
@@ -893,7 +936,7 @@ typedef struct {
 	u8         peerAddrType;
 	u8         peerAddr[6];
 	u16        connInterval;
-	u16        slaveLatency;
+	u16        peripheralLatency;
 	u16        supervisionTimeout;
 	u8         masterClkAccuracy;
 } hci_tlk_connectionEstablishEvt_t;
@@ -921,6 +964,8 @@ int		hci_numberOfCompletePacket_evt(u16 connHandle, u8 numOfCmpConn);
 
 int		hci_le_periodicAdvSyncEstablished_evt (u8 status, u16 syncHandle,u8 advSID, u8 advAddrType, u8 advAddress[6], u8 advPHY,
 										       u16 perdAdvItvl, u8 advClkAccuracy);
+int 	hci_le_periodicAdvSyncEstablished_evt_v2 (u8 status, u16 syncHandle,u8 advSID, u8 advAddrType, u8 advAddress[6], u8 advPHY,u16 perdAdvItvl,
+		                                          u8 advClkAccuracy,u8 num_subevent, u8 subevent_intvl, u8 rsp_slot_delay, u8 rsp_slot_spacing);
 //int		hci_le_periodicAdvSyncEstablished_evt (u8 status, u16 syncHandle, extadv_id_t *pId, u8 advPHY, u16 perdAdvItvl, u8 advClkAccuracy);
 
 int		hci_le_periodicAdvReport_evt (u8 subEventCode, u16 syncHandle, u8 txPower, u8 RSSI, u8 cteType,u8 dataStatus, u8 dataLength,
@@ -943,7 +988,7 @@ int		hci_disconnectionComplete_evt(u8 status, u16 connHandle, u8 reason);
 int		hci_cmdComplete_evt(u8 numHciCmds, u8 opCode_ocf, u8 opCode_ogf, u8 paraLen, u8 *para, u8 *result);
 int		hci_cmdStatus_evt(u8 numHciCmds, u8 opCode_ocf, u8 opCode_ogf, u8 status, u8 *result);
 int		hci_le_connectionComplete_evt(u8 status, u16 connHandle, u8 role, u8 peerAddrType, u8 *peerAddr,
-                                      u16 connInterval, u16 slaveLatency, u16 supervisionTimeout, u8 masterClkAccuracy);
+                                      u16 connInterval, u16 periphr_Latency, u16 supervisionTimeout, u8 masterClkAccuracy);
 int		hci_le_enhancedConnectionComplete_evt(u8 status, u16 connHandle, u8 role, u8 peerAddrType, u8 *peerAddr, u8 *localRpa, u8 *peerRpa,
                                               u16 connInterval, u16 connLatency, u16 supervisionTimeout, u8 masterClkAccuracy);
 int		hci_le_connectionUpdateComplete_evt(u8 status, u16 connHandle, u16 connInterval,
@@ -971,7 +1016,7 @@ int 	hci_le_readRemoteSupCapComplete_evt(u8 status, u16 connHandle, u8 *feature)
 
 
 int 	hci_tlk_connectionEstablish_evt(u8 status, u16 connHandle, u8 role, u8 peerAddrType, u8 *peerAddr,
-                                   	   u16 connInterval, u16 slaveLatency, u16 supervisionTimeout, u8 masterClkAccuracy);
+                                   	   u16 connInterval, u16 periphr_Latency, u16 supervisionTimeout, u8 masterClkAccuracy);
 
 int 	hci_tlk_createConnectionFail_evt(u8 fail_reason, u8 create_conn_cnt);
 

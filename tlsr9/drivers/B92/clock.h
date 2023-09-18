@@ -175,8 +175,40 @@ typedef enum{
 typedef enum {
 	RC_24M_CAL_DISABLE=0,
 	RC_24M_CAL_ENABLE,
-
 }rc_24M_cal_e;
+
+/**
+ *  @brief  Enumerate the configurable cclk/hclk/pclk frequencies when the PLL is 192M.
+ */
+typedef enum{
+	PLL_192M_DIV_CCLK_16M_HCLK_16M_PCLK_16M	= (1 | (1 << 4) | (12 << 8)),
+	PLL_192M_DIV_CCLK_32M_HCLK_16M_PCLK_16M	= (1 | (2 << 4) | (6 << 8)),
+	PLL_192M_DIV_CCLK_16M_HCLK_16M_PCLK_8M	= (2 | (1 << 4) | (12 << 8)),
+	PLL_192M_DIV_CCLK_32M_HCLK_16M_PCLK_8M	= (2 | (2 << 4) | (6 << 8)),
+	PLL_192M_DIV_CCLK_16M_HCLK_16M_PCLK_4M	= (4 | (1 << 4) | (12 << 8)),
+	PLL_192M_DIV_CCLK_32M_HCLK_16M_PCLK_4M	= (4 | (2 << 4) | (6 << 8)),
+
+	PLL_192M_DIV_CCLK_24M_HCLK_24M_PCLK_24M	= (1 | (1 << 4) | (8 << 8)),
+	PLL_192M_DIV_CCLK_48M_HCLK_24M_PCLK_24M	= (1 | (2 << 4) | (4 << 8)),
+	PLL_192M_DIV_CCLK_24M_HCLK_24M_PCLK_12M	= (2 | (1 << 4) | (8 << 8)),
+	PLL_192M_DIV_CCLK_48M_HCLK_24M_PCLK_12M	= (2 | (2 << 4) | (4 << 8)),
+	PLL_192M_DIV_CCLK_24M_HCLK_24M_PCLK_6M	= (4 | (1 << 4) | (8 << 8)),
+	PLL_192M_DIV_CCLK_48M_HCLK_24M_PCLK_6M	= (4 | (2 << 4) | (4 << 8)),
+
+	PLL_192M_DIV_CCLK_32M_HCLK_32M_PCLK_32M	= (1 | (1 << 4) | (6 << 8)),
+	PLL_192M_DIV_CCLK_64M_HCLK_32M_PCLK_32M	= (1 | (2 << 4) | (3 << 8)),
+	PLL_192M_DIV_CCLK_32M_HCLK_32M_PCLK_16M	= (2 | (1 << 4) | (6 << 8)),
+	PLL_192M_DIV_CCLK_64M_HCLK_32M_PCLK_16M	= (2 | (2 << 4) | (3 << 8)),
+	PLL_192M_DIV_CCLK_32M_HCLK_32M_PCLK_8M	= (4 | (1 << 4) | (6 << 8)),
+	PLL_192M_DIV_CCLK_64M_HCLK_32M_PCLK_8M	= (4 | (2 << 4) | (3 << 8)),
+
+	PLL_192M_DIV_CCLK_48M_HCLK_48M_PCLK_48M	= (1 | (1 << 4) | (4 << 8)),
+	PLL_192M_DIV_CCLK_96M_HCLK_48M_PCLK_48M	= (1 | (2 << 4) | (2 << 8)),
+	PLL_192M_DIV_CCLK_48M_HCLK_48M_PCLK_24M	= (2 | (1 << 4) | (4 << 8)),
+	PLL_192M_DIV_CCLK_96M_HCLK_48M_PCLK_24M	= (2 | (2 << 4) | (2 << 8)),
+	PLL_192M_DIV_CCLK_48M_HCLK_48M_PCLK_12M	= (4 | (1 << 4) | (4 << 8)),
+	PLL_192M_DIV_CCLK_96M_HCLK_48M_PCLK_12M	= (4 | (2 << 4) | (2 << 8)),
+}pll_div_cclk_hclk_pclk_e;
 
 
 /**********************************************************************************************************************
@@ -206,7 +238,7 @@ extern clk_32k_type_e g_clk_32k_src;
  * 			    because during the clock switching process, the system clock will be
  * 			    suspended for a period of time, which may cause data loss
  */
-_attribute_ram_code_sec_noinline_ void clock_init(sys_pll_clk_e pll,
+_attribute_text_sec_ void clock_init(sys_pll_clk_e pll,
 		sys_clock_src_e src,
 		sys_pll_div_to_cclk_e cclk_div,
 		sys_cclk_div_to_hclk_e hclk_div,
@@ -251,4 +283,14 @@ _attribute_ram_code_sec_noinline_  unsigned int clock_get_32k_tick (void);
  * @return none.
  */
 _attribute_ram_code_sec_noinline_ void clock_set_32k_tick(unsigned int tick);
+
+/**
+ * @brief       This function used to configure the frequency of CCLK/HCLK/PCLK when the PLL is 192M.
+ * 				You need to wait until all the peripherals that use these clocks are idle before you can switch frequencies.
+ * @param[in]   cclk_hclk_pclk - frequency of CCLK/HCLK/PCLK.
+ * @return      none
+ */
+void cclk_hclk_pclk_config(pll_div_cclk_hclk_pclk_e div);
+
 #endif
+

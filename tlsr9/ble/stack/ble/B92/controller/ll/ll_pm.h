@@ -83,7 +83,7 @@ void 		blc_pm_setDeepsleepRetentionEnable (deep_retn_en_t en);
  * @param	wakeup_src - low power mode wake_up source
  * @return	none
  */
-void		blc_pm_setWakeupSource (SleepWakeupSrc_TypeDef wakeup_src);
+void		blc_pm_setWakeupSource (pm_sleep_wakeup_src_e wakeup_src);
 
 
 /**
@@ -119,7 +119,7 @@ void 		blc_pm_setDeepsleepRetentionEarlyWakeupTiming(u32 earlyWakeup_us);
  * @param	sleep_type - the type of deep retention mode
  * @return  none.
  */
-void 		blc_pm_setDeepsleepRetentionType(SleepMode_TypeDef sleep_type);
+void 		blc_pm_setDeepsleepRetentionType(pm_sleep_mode_e sleep_type);
 
 
 
@@ -143,6 +143,11 @@ void 		blc_pm_setAppWakeupLowPower(u32 wakeup_tick, u8 enable);
  */
 void 		blc_pm_registerAppWakeupLowPowerCb(pm_appWakeupLowPower_callback_t cb);
 
-
+/**
+ * @brief	This function enables low power mode in OS usage
+ * @param	none
+ * @return	none
+ */
+void	blc_ll_enOsPowerManagement_module(void);
 
 #endif /* LL_PM_H_ */

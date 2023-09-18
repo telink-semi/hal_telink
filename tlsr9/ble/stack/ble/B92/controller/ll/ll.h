@@ -143,7 +143,7 @@ bool 		blc_ll_isValidOwnAddrByAddrType(u8 ownAddrType, u8* randomAddr);
 
 /**
  * @brief      this function is used by the Host to specify a channel classification based on its local information,
- *             only the master role is valid.
+ *             only the ACL Central role is valid.
  * @param[in]  bit_number - Bit position in the FeatureSet.
  * @param[in]  bit_value - refer to the struct "ll_feature_value_t".
  * @return     status, 0x00:  succeed
@@ -165,7 +165,7 @@ init_err_t	blc_contr_checkControllerInitialization(void);
 
 /**
  * @brief      this function is used by the Host to specify a channel classification based on its local information,
- *             only the master role is valid.
+ *             only the ACL Central role is valid.
  * @param[in]  *map - channel map
  * @return     status, 0x00:  succeed
  * 			           other: failed
@@ -251,7 +251,18 @@ ble_sts_t  	blc_hci_reset(void);
  * @return     status, 0:  idle
  *                     1:  task
  */
-u32 blc_ll_checkBleTaskIsIdle(void);
+u32 		blc_ll_checkBleTaskIsIdle(void);
+
+
+/**
+ * @brief      This function is used to set some other channel to replace advertising & scanning channel 37/38/39.
+ * @param[in]  chn0 - channel to replace channel 37
+ * @param[in]  chn1 - channel to replace channel 38
+ * @param[in]  chn2 - channel to replace channel 39
+ * @return     none
+ */
+void 		blc_ll_setCustomizedAdvertisingScanningChannel (u8 chn0, u8 chn1, u8 chn2);
+
 
 
 #endif /* LL_H_ */

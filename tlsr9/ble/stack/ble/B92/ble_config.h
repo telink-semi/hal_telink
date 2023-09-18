@@ -56,25 +56,10 @@
 
 
 /* Different process for different MCU: ****************************/
-#if(MCU_CORE_TYPE == MCU_CORE_825x)
-	#define	FIX_HW_CRC24_EN											1
-	#define HW_ECDH_EN                                     			0
-	#define ZBIT_FLASH_WRITE_TIME_LONG_WORKAROUND_EN				1
-#elif(MCU_CORE_TYPE == MCU_CORE_827x)
-	#define	FIX_HW_CRC24_EN											0
-	#define HW_ECDH_EN                                      		1
-	#define ZBIT_FLASH_WRITE_TIME_LONG_WORKAROUND_EN				1
-#elif(MCU_CORE_TYPE == MCU_CORE_B91)
-	#define	FIX_HW_CRC24_EN											0
-	#define HW_ECDH_EN                                      		1
-	#define ZBIT_FLASH_WRITE_TIME_LONG_WORKAROUND_EN				0
+#if(MCU_CORE_TYPE == MCU_CORE_B91)
 	#define STACK_IRQ_CODE_IN_SRAM_DUE_TO_FLASH_OPERATION			1
 #elif(MCU_CORE_TYPE == MCU_CORE_B92)
-	#define	FIX_HW_CRC24_EN											0
-	#define HW_ECDH_EN                                      		1
-	#define ZBIT_FLASH_WRITE_TIME_LONG_WORKAROUND_EN				0
 	#define STACK_IRQ_CODE_IN_SRAM_DUE_TO_FLASH_OPERATION			1
-	#define HW_AES_CCM_ALG_EN										0
 #else
 	#error "unsupported mcu type !"
 #endif
@@ -96,6 +81,36 @@
 #ifndef STACK_IRQ_CODE_IN_SRAM_DUE_TO_FLASH_OPERATION
 #define STACK_IRQ_CODE_IN_SRAM_DUE_TO_FLASH_OPERATION				0
 #endif
+
+#ifndef STACK_SUPPORT_FLASH_PROTECTION_ENABLE
+#define STACK_SUPPORT_FLASH_PROTECTION_ENABLE				1
+#endif
+
+
+
+/*
+ * for single priority interrupt IC, such as B85m, not support break nesting, generally use GD flash,  add Zbit flash vendor
+ * defect:
+ * when temperature rise, writing 16B flash(particular for OTA) time may bigger than 200uS, or even greater than 300uS, this time
+ * of IRQ disabling will cost BLE stack data errors(e.g. RX data loss cause decryption MIC fail, then BLE disconnect)
+ *
+ */
+#ifndef ZBIT_FLASH_ON_SINGLE_PRIORITY_IRQ_IC_WORKAROUND_EN
+#define ZBIT_FLASH_ON_SINGLE_PRIORITY_IRQ_IC_WORKAROUND_EN						0
+#endif
+
+/*
+ * for single priority interrupt IC, such as B85m, not support break nesting, generally use GD flash,  add second flash vendor which
+ * provide Sonos architecture flash(such as PUYA)
+ * feature:
+ * write 1B, 2B, ... 255B timing cost equal to write a page(256B),
+ * about 1~2 mS. In flash_write_page function, disable IRQ may lead to RX packet loss for BTX/BRX
+ * so we should take some action to workaround this problem
+ */
+#ifndef SONOS_ARCH_FLASH_ON_SINGLE_PRIORITY_IRQ_IC_WORKAROUND_EN
+#define SONOS_ARCH_FLASH_ON_SINGLE_PRIORITY_IRQ_IC_WORKAROUND_EN				0
+#endif
+
 
 
 
@@ -263,7 +278,7 @@
 #endif
 
 #ifndef	LL_FEATURE_SUPPORT_PERIODIC_ADVERTISING_WITH_RESPONSES_ADVERTISER
-#define	LL_FEATURE_SUPPORT_PERIODIC_ADVERTISING_WITH_RESPONSES_ADVERTISER	0
+#define	LL_FEATURE_SUPPORT_PERIODIC_ADVERTISING_WITH_RESPONSES_ADVERTISER	1
 #endif
 
 #ifndef	LL_FEATURE_SUPPORT_PERIODIC_ADVERTISING_WITH_RESPONSES_SCANNER
@@ -324,7 +339,9 @@
 #define L2CAP_CREDIT_BASED_FLOW_CONTROL_MODE_EN     				1
 #endif
 
-
+#ifndef L2CAP_SERVER_FEATURE_SUPPORTED_EATT
+#define L2CAP_SERVER_FEATURE_SUPPORTED_EATT							0
+#endif
 
 //gen p256, dhkey supported by controller
 #ifndef	CONTROLLER_GEN_P256KEY_ENABLE
@@ -336,15 +353,6 @@
 #endif
 
 
-
-#ifndef ZBIT_FLASH_WRITE_TIME_LONG_WORKAROUND_EN
-#define	ZBIT_FLASH_WRITE_TIME_LONG_WORKAROUND_EN					0
-#endif
-
-/* MCU without IRQ Priority, but need support sonos Flash */
-#ifndef SONOS_FLASH_WRITE_TIME_LONG_WORKAROUND_EN
-#define	SONOS_FLASH_WRITE_TIME_LONG_WORKAROUND_EN					0
-#endif
 
 #ifndef  LE_AUTHENTICATED_PAYLOAD_TIMEOUT_SUPPORT_EN
 #define  LE_AUTHENTICATED_PAYLOAD_TIMEOUT_SUPPORT_EN                0
@@ -396,6 +404,10 @@
 
 #ifndef	CIS_ADD_CIE
 #define	CIS_ADD_CIE													1
+#endif
+
+#ifndef	CIS_CIE_CENTRAL_OPTIMIZE
+#define	CIS_CIE_CENTRAL_OPTIMIZE									1
 #endif
 
 #ifndef	BIS_BRD_SET_PARAM

@@ -192,7 +192,7 @@ static inline void adc_clk_dis(void)
 	analog_write_reg8(areg_adc_clk_setting	, analog_read_reg8(areg_adc_clk_setting	) & (~FLD_CLK_24M_TO_SAR_EN));
 }
 /**
- * @brief      This function sets adc sample clk. adc sample clk = 24M/(1+div)  div: 0~7.
+ * @brief      This function sets adc sample clk. adc sample clk = 24M/(1+div)  div=5.
  * @param[in]  div - the divider of adc sample clock.
  * @return     none
  * @attention: The ADC clock is fixed at 4MHz and should not be modified.
@@ -250,6 +250,7 @@ static inline void adc_temp_sensor_power_off(void)
  * @param[in]  p_ain - enum variable of ADC analog positive input channel.
  * @param[in]  n_ain - enum variable of ADC analog negative input channel.
  * @return none
+ *
  */
 static inline void adc_set_diff_input(adc_input_pch_e p_ain, adc_input_nch_e n_ain)
 {
@@ -268,15 +269,15 @@ static inline void adc_set_state_length(unsigned short r_max_mc,unsigned char r_
 	analog_write_reg8(areg_r_max_s, ((r_max_mc>>8)<<6)| (r_max_s & FLD_R_MAX_S));
 }
 /**
- * @brief     This function serves to config adc_dma_chn channel.
+ * @brief      This function serves to config adc_dma_chn channel.
  * @param[in]  chn - the DMA channel
- * @param[in] fifo_chn - 	audio fifo channel number
- * @attention  audio and adc share the audio fifo, and the same fifo cannot be configured for audio and adc at the same time.
- * @return    none
+ * @param[in]  fifo_chn - audio fifo channel number
+ * @attention  sar_adc can use audio's fifo0 or fifo1, but the same fifo cannot be used on sar_adc and audio at the same time.
+ * @return     none
  */
 void adc_set_dma_config(dma_chn_e chn,audio_fifo_chn_e fifo_chn);
 /**
- * @brief     To start sample the adc in DMA mode
+ * @brief     The adc starts sampling in DMA mode.
  * @param[in] adc_data_buf 	- Pointer to data buffer, it must be 4-bytes aligned address
  * 							  and the actual buffer size defined by the user needs to be not smaller than the data_byte_len,
  * 							  otherwise there may be an out-of-bounds problem.
@@ -300,41 +301,41 @@ void adc_pin_config(adc_input_pin_mode_e mode ,adc_input_pin_def_e pin);
 void adc_set_diff_pin(adc_input_pin_def_e p_pin, adc_input_pin_def_e n_pin);
 
 /**
- * @brief     This function is serves to set the reference voltage for one-point calibration.
+ * @brief     This function is serves to set the reference voltage for calibration of GPIO sampling.
  *            ADC calibration environment: GPIO sampling, the vref is 1.2V, the pre_scale is 1/4, and the sampling frequency is 96K.
  * 		      Therefore, the voltage value measured using the calibration interface in this environment is the most accurate.
- * @param[in] data - GPIO sampling one-point calibration value.
+ * @param[in] data - the reference voltage for calibration of GPIO sampling.
  * @return none
  */
 void adc_set_gpio_calib_vref(unsigned short data);
 
 /**
- * @brief This function is used to calib ADC 1.2V vref offset for GPIO two-point.
- * @param[in] offset - GPIO sampling two-point calibration value offset.
+ * @brief  This function is used to set the offset of the two-point calibration of GPIO sampling.
+ * @param[in] offset - the offset for two-point calibration of GPIO sampling.
  * @return none
  */
 void adc_set_gpio_two_point_calib_offset(signed char offset);
 
 
 /**
- * @brief     This function is serves to set the reference voltage for Vbat two-point calibration.
+ * @brief     This function is serves to set the reference voltage for calibration of Vbat sampling.
  *            ADC calibration environment: Vbat sampling,the vref is 1.2V, the divider is 1/4, the pre_scale is 1, and the sampling frequency is 96K.
  * 		      Therefore, the voltage value measured using the calibration interface in this environment is the most accurate.
- * @param[in] data - Vbat sampling two-point calibration value.
+ * @param[in] data - the reference voltage for calibration of Vbat sampling.
  * @return none
  */
 void adc_set_vbat_calib_vref(unsigned short data);
 
 
 /**
- * @brief This function is used to calib ADC 1.2V vref offset for Vbat two-point calibration.
- * @param[in] offset - Vbat sampling two-point calibration value offset.
+ * @brief This function is used to set the offset of the two-point calibration of Vbat sampling.
+ * @param[in] offset - the offset for two-point calibration of Vbat sampling.
  * @return none
  */
 void adc_set_vbat_two_point_calib_offset(signed char offset);
 
 /**
- * @brief This function serves to set the channel reference voltage.
+ * @brief This function serves to set the reference voltage of the channel.
  * @param[in]  v_ref - enum variable of ADC reference voltage.
  * @return none
  */
@@ -352,15 +353,14 @@ void adc_set_sample_rate(adc_sample_freq_e sample_freq);
  */
 void adc_set_scale_factor(adc_pre_scale_e pre_scale);
 /**
- * @brief This function servers to initialized ADC temperature sensor.When the reference voltage is set to 1.2V, and
- * at the same time, the division factor is set to 1 the most accurate.
+ * @brief This function servers to initialize ADC temperature sensor.
  * @return     none.
- * @attention  Temperature sensor suggested initial setting are Vref = 1.2V, pre_scale = 1, sample_freq =96K.
- * 			The user don't need to change it.
+ * @attention Temperature sensor suggested initial setting are Vref = 1.2V, pre_scale = 1, sample_freq =96K.
+ * 			  The user don't need to change it.
  */
 void adc_temperature_sample_init(void);
 /**
- * @brief This function serves to ADC gpio sample init.
+ * @brief This function is used to initialize the ADC for gpio sampling.
  * @param[in]  pin - adc_input_pin_def_e ADC input gpio pin
  * @param[in]  v_ref - enum variable of ADC reference voltage.
  * @param[in]  pre_scale - enum variable of ADC pre_scaling factor.
@@ -390,7 +390,7 @@ void adc_temperature_sample_init(void);
 void adc_gpio_sample_init(adc_input_pin_def_e pin,adc_ref_vol_e v_ref,adc_pre_scale_e pre_scale,adc_sample_freq_e sample_freq);
 
 /**
- * @brief This function servers to set ADC configuration for ADC supply voltage sampling.
+ * @brief  This function is used to initialize the ADC for battery voltage sampling.
  * @return none
  * @attention battery voltage sample suggested initial setting are Vref = 1.2V, pre_scale = 1, vbat_div = 1/4, sample_freq =96K,
  * 		      because the chip is factory calibrated for the adc according to this group configuration.	
@@ -402,13 +402,13 @@ void adc_gpio_sample_init(adc_input_pin_def_e pin,adc_ref_vol_e v_ref,adc_pre_sc
  */
 void adc_battery_voltage_sample_init(void);
 /**
- * @brief      This function serves to select Vbat voltage division factor
+ * @brief      This function serves to select Vbat voltage division factor.
  * @param[in]  vbat_div - enum variable of Vbat division factor.
  * @return     none
  */
 void adc_set_vbat_divider(adc_vbat_div_e vbat_div);
 /**
- * @brief This function serves to ADC init.
+ * @brief This function is used to initialize the ADC.
  * @param[in]  v_ref - enum variable of ADC reference voltage.
  * @param[in]  pre_scale - enum variable of ADC pre_scaling factor.
  * @param[in]  sample_freq - enum variable of ADC sample frequency.
@@ -440,7 +440,7 @@ unsigned short adc_calculate_voltage(unsigned short adc_code);
 /**
  * @brief This function serves to calculate temperature from temperature sensor adc sample code.
  * @param[in]   adc_code	 		- the temperature sensor adc sample code.
- * @return 		adc_temp_value	 	- the of temperature value.
+ * @return 		adc_temp_value	 	- the temperature value.
  * attention   Temperature and adc_code are linearly related. We test four chips between -40~130 (Celsius) and got an average relationship:
  * 			Temp =  564 - ((adc_code * 819)>>13),when Vref = 1.2V, pre_scale = 1.
  */

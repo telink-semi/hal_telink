@@ -29,6 +29,8 @@
 #include "ext_pm.h"
 
 
+
+
 /******************************* debug_start ******************************************************************/
 void sub_wr_ana(unsigned int addr, unsigned char value, unsigned char e, unsigned char s);
 void sub_wr(unsigned int addr, unsigned char value, unsigned char e, unsigned char s);
@@ -36,51 +38,16 @@ void sub_wr(unsigned int addr, unsigned char value, unsigned char e, unsigned ch
 
 
 /******************************* dbgport start ******************************************************************/
-#define reg_bt_dbg_sel      REG_ADDR16(0x140354)
-#define reg_bt_dbg_sel_l    REG_ADDR8(0x140354)
-#define reg_bt_dbg_sel_h    REG_ADDR8(0x140355)
-
-typedef enum{
-	BT_DBG0_BB0_A0  = GPIO_PA0,
-	BT_DBG0_BB1_A1  = GPIO_PA1,
-	BT_DBG0_BB2_A2  = GPIO_PA2,
-	BT_DBG0_BB3_A3  = GPIO_PA3,
-	BT_DBG0_BB4_A4  = GPIO_PA4,
-	BT_DBG0_BB5_B0  = GPIO_PB0,
-	BT_DBG0_BB6_B1  = GPIO_PB1,
-	BT_DBG0_BB7_B2  = GPIO_PB2,
-
-	BT_DBG1_BB8_B3  = GPIO_PB3,
-	BT_DBG1_BB9_B4  = GPIO_PB4,
-	BT_DBG1_BB10_B5 = GPIO_PB5,
-	BT_DBG1_BB11_B6 = GPIO_PB6,
-	BT_DBG1_BB12_B7 = GPIO_PB7,
-	BT_DBG1_BB13_C0 = GPIO_PC0,
-	BT_DBG1_BB14_C1 = GPIO_PC1,
-	BT_DBG1_BB15_C2 = GPIO_PC2,
-
-	BT_DBG2_BB16_C3 = GPIO_PC3,
-	BT_DBG2_BB17_C4 = GPIO_PC4,
-	BT_DBG2_BB18_C5 = GPIO_PC5,
-	BT_DBG2_BB19_C6 = GPIO_PC6,
-	BT_DBG2_BB20_C7 = GPIO_PC7,
-	BT_DBG2_BB21_D0 = GPIO_PD0,
-	BT_DBG2_BB22_D1 = GPIO_PD1,
-	BT_DBG2_BB23_D2 = GPIO_PD2,
-
-	BT_DBG3_BB24_D3 = GPIO_PD3,
-	BT_DBG3_BB25_D4 = GPIO_PD4,
-	BT_DBG3_BB26_D5 = GPIO_PD5,
-	BT_DBG3_BB27_D6 = GPIO_PD6,
-	BT_DBG3_BB28_D7 = GPIO_PD7,
-	BT_DBG3_BB29_E0 = GPIO_PE0,
-	BT_DBG3_BB30_E1 = GPIO_PE1,
-	BT_DBG3_BB31_E2 = GPIO_PE2,
-}btdbg_pin_e;
-
+#define reg_bb_dbg_sel      REG_ADDR16(0x140378)
+#define reg_bb_dbg_sel_l    REG_ADDR8(0x140378)
+#define reg_bb_dbg_sel_h    REG_ADDR8(0x140379)
+#define	bt_dbg_set_pin		dbg_bb_set_pin
 
 void ble_dbg_port_init(int deg_sel0);
-void bt_dbg_set_pin(btdbg_pin_e pin);
+
+void dbg_bb_set_pin(gpio_pin_e pin);
+
+void rf_enable_bb_debug(void);
 /******************************* dbgport end ********************************************************************/
 
 
@@ -100,6 +67,8 @@ void bt_dbg_set_pin(btdbg_pin_e pin);
 
 
 /******************************* ext_aes start ******************************************************************/
+#define HW_AES_CCM_ALG_EN										0  //TODO
+
 extern unsigned int aes_data_buff[8];
 
 
@@ -386,6 +355,26 @@ _attribute_ram_code_sec_noinline_ void pm_ble_cal_32k_rc_offset (int offset_tick
  */
 void pm_ble_32k_rc_cal_reset(void);
 #define PM_MIN_SLEEP_US			1500  //B92 todo
+
+/**
+ * @brief   internal oscillator or crystal calibration for environment change such as voltage, temperature
+ * 			to keep some critical PM or RF performance stable
+ * 			attention: this is a stack API, user can not call it
+ * @param	none
+ * @return	none
+ */
+void mcu_oscillator_crystal_calibration(void);
+
+typedef int (*suspend_handler_t)(void);
+typedef void (*check_32k_clk_handler_t)(void);
+typedef unsigned int (*pm_get_32k_clk_handler_t)(void);
+typedef unsigned int (*pm_tim_recover_handler_t)(unsigned int);
+
+extern  suspend_handler_t 		 	func_before_suspend;
+extern  check_32k_clk_handler_t  	pm_check_32k_clk_stable;
+extern  pm_get_32k_clk_handler_t 	pm_get_32k_tick;
+extern  pm_tim_recover_handler_t 	pm_tim_recover;
+
 
 /******************************* ext_pm end ********************************************************************/
 
@@ -982,9 +971,7 @@ static inline void rf_ble_set_coded_phy_s8(void)
 	typedef struct
 	{
 		unsigned char tx_fast_en;
-		unsigned char tx_stl_save_us;
 		unsigned char rx_fast_en;
-		unsigned char rx_stl_save_us;
 		unsigned short cal_tbl[40];
 		rf_ldo_trim_t	ldo_trim;
 		rf_dcoc_cal_t   dcoc_cal;
@@ -1085,7 +1072,15 @@ static inline s8 rf_ble_get_tx_pwr_level(rf_power_level_index_e rfPwrLvlIdx)
     return rfTxPower;
 }
 
+void ble_rf_tx_channel_sounding_mode_en(void);
 
+void ble_rf_tx_channel_sounding_mode_dis(void);
+
+void ble_rf_rx_channel_sounding_mode_en(unsigned char interval, rf_iq_data_mode_e suppmode);
+
+void ble_rf_rx_channel_sounding_mode_dis(void);
+
+void ble_rf_channel_sounding_iq_sample_config(unsigned short sample_num, unsigned char start_point, rf_hadm_iq_sample_mode_e sample_mode);
 
 /******************************* ext_rf end ********************************************************************/
 

@@ -19,7 +19,7 @@
 #define CIS_CENTRAL_H_
 
 
-#define 		CIG_PARAM_LEN									sizeof(ll_cig_mst_t) //532	//user can't modify this value !!!
+#define 		CIG_PARAM_LEN									532	//user can't modify this value !!!
 
 
 
@@ -50,6 +50,6 @@ ble_sts_t 	blc_ll_setCigTimingOffsetOfAclCentral(u8 acl_cen_index, u16 offset_cu
 
 
 
-void blc_set_cis_nse(u8 nse);
+
 
 #endif /* CIS_CENTRAL_H_ */

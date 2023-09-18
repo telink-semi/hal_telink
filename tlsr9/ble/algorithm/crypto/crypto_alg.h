@@ -41,6 +41,22 @@ typedef struct{
 	unsigned char mac[16];
 } blc_aes_cmac_context_t;
 
+typedef struct {
+	u32		pkt;
+	u8		dir;
+	u8		iv[8];
+} aes_ccm_nonce_t;
+typedef struct {
+	u64					enc_pno;
+	u64					dec_pno;
+	u8                  ltk[16];
+	u8					sk[16]; //session key
+	aes_ccm_nonce_t		nonce;
+	u8					st;
+	u8					enable;
+	u8					mic_fail;
+} blc_aes_ccm_crypt_t;
+
 /*
  * If the data length calculated by AES-CMAC is less than or equal to 16 bytes, perform the following operations
  * blc_crypto_alg_aes_cmac_init_key(aesCmac, key);
@@ -90,6 +106,38 @@ void blc_crpto_alg_aes_cmac_finsh(blc_aes_cmac_context_t* aesCmac, unsigned char
  * @return	none.
  */
 void blt_crypto_alg_csip_s1 (unsigned char key[], unsigned char key_size, unsigned char *r);
+
+/**
+ * @brief   	This function is used to initialize the aes_ccm initial value for Encrypted Advertising Data
+ * @param[in]   sk -, little--endian.
+ * @param[in]   iv -, little--endian.
+ * @param[in]   pd - Reference structure ble_crypt_para_t
+ * @return  	none
+ */
+void blt_crypto_init_ccm_adv(u8 sk[16], u8 iv[8], blc_aes_ccm_crypt_t *pd);
+
+/**
+ * @brief       This function is used to encrypt the aes_ccm value for Encrypted Advertising Data
+ * @param[in]   randomizer - Randomizer, little--endian.
+ * @param[in]   payload - Payload Data, little--endian.
+ * @param[in]   payloadLen - Payload Data length
+ * @param[in]   pd - Reference structure ble_crypt_para_t
+ * @param[out]  outEncData - Encrypted Data (contain Randomizer, encrypted Payload, MIC), little--endian.
+ * @param[out]  outEncDataLen - Encrypted Data length
+ * @return      none
+ */
+void blt_crypto_ccm_enc_adv(u8 randomizer[5], u8 *payload, u8 payloadLen, blc_aes_ccm_crypt_t *pd, u8 *outEncData, u8 *outEncDataLen);
+
+/**
+ * @brief       This function is used to decrypt the aes_ccm value for Encrypted Advertising Data
+ * @param[in]   encData - Encrypted Data(contain Randomizer, encrypted Payload, MIC), little--endian.
+ * @param[in]   encDataLen - Encrypted Data length
+ * @param[in]   pd - Reference structure ble_crypt_para_t
+ * @param[out]  outRawPayload - Payload, little--endian.
+ * @param[out]  outRawPayloadLen - Payload length
+ * @return      0: decryption succeeded; 1: decryption failed
+ */
+int blt_crypto_ccm_dec_adv(u8 *encData, u8 encDataLen, blc_aes_ccm_crypt_t *pd, u8 *outRawPayload, u8 *outRawPayloadLen);
 #endif
 
 /**
