@@ -32,6 +32,9 @@
 #include "../trng.h"
 #include "stdbool.h"
 
+/*
+ * addr - only 0x00012 ~ 0x00021 can be used !!! */
+#define write_log32(err_code)   		write_sram32(0x00014, err_code)
 
 /******************************* analog_start ******************************************************************/
 #define analog_write				analog_write_reg8
@@ -115,6 +118,24 @@ void rf_drv_ble_init(void);
 #define RF_POWER_P3dBm   RF_POWER_INDEX_P3p00dBm
 #define RF_POWER_P0dBm   RF_POWER_INDEX_P0p01dBm
 #define RF_POWER_P9dBm   RF_POWER_INDEX_P9p15dBm
+
+#if RF_THREE_CHANNEL_CALIBRATION
+
+/**
+ *	@brief	  	this function serve to set the TX power calibration.
+ *	@param[in]	channel_power: channel power calibration of 40 channel.
+ *	@return	 	none
+*/
+void rf_set_channel_power_calibration(unsigned char *channel_power);
+
+/**
+ *	@brief	  	this function serve to enable the rx timing sequence adjusted.
+ *	@param[in]	enable: channel power calibration enable or disable.
+ *	@return	 	none
+*/
+void rf_set_channel_power_enable(unsigned char enable);
+#endif
+
 /******************************* rf end  **********************************************************************/
 
 

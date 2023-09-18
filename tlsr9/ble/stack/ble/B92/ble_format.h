@@ -43,7 +43,7 @@ typedef struct{
 //Local Name: Optional in this context;  shall not appear more than once in a block.
 
 //Shortened Local Name: utf8s
-//For example, if the device name is ��BT_Device_Name�� then the shortened name could be ��BT_Device�� or ��BT_Dev.
+//For example, if the device name is 'BT_Device_Name' then the shortened name could be 'BT_Device' or 'BT_Dev'.
 typedef struct{
 	advData_ltv_t header;		//refer to DT_SHORTENED_LOCAL_NAME
 	unsigned char shortenedLocalName[0];
@@ -93,7 +93,7 @@ typedef struct{
 
 //Manufacturer Specific Data: Optional in this context (may appear more than once in a block).
 typedef struct{
-	advData_ltv_t header;		//refer to DATA_TYPE_MANUFACTURER_SPECIFIC_DATA
+	advData_ltv_t header;		//refer to DT_MANUFACTURER_SPECIFIC_DATA
 	unsigned short companyID;	//
 	unsigned char manufacturerSpecificData[0];
 }advData_manufacturerSpecificData_t;
@@ -262,7 +262,7 @@ typedef enum {
 	DT_ELECTRONIC_SHELF_LABEL				= 0x34,
 	DT_3D_INFORMATION_DATA					= 0x3D,		//	3D Information Data
 
-	DATA_TYPE_MANUFACTURER_SPECIFIC_DATA 	= 0xFF,     //	Manufacturer Specific Data
+	DT_MANUFACTURER_SPECIFIC_DATA 			= 0xFF,     //	Manufacturer Specific Data
 }data_type_t;
 
 
@@ -344,5 +344,27 @@ typedef struct{
 	u32 dma_len;
 	llPhysChnPdu_t llPhysChnPdu;
 }rf_packet_ll_data_t;
+
+typedef struct{
+	u8	type;
+	u8  rf_len;
+	u16	l2capLen;
+	u16	chanId;
+	u8  opcode;
+	u8  datalen;
+	u8  data[1];			// character_handle / property / value_handle / value
+}rf_packet_att_readByTypeRsp_t;
+
+
+typedef struct{
+	u8	type;
+	u8  rf_len;
+	u16	l2capLen;
+	u16	chanId;
+	u8  opcode;
+	u8 	errOpcode;
+	u16 errHandle;
+	u8  errReason;
+}rf_packet_att_errRsp_t;
 
 #endif	/* BLE_FORMAT_H */

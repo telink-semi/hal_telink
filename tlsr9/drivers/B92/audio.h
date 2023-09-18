@@ -867,7 +867,7 @@ void audio_tx_dma_dis(dma_chn_e chn);
  * @param[in] chn          - dma channel
  * @param[in] dst_addr     - Pointer to data buffer, it must be 4-bytes aligned address.
  *                           and the actual buffer size defined by the user needs to be not smaller than the data_len, otherwise there may be an out-of-bounds problem.
- * @param[in] data_len     - Length of DMA in bytes��it must be set to a multiple of 4. The maximum value that can be set is 0x10000.
+ * @param[in] data_len     - Length of DMA in bytes，it must be set to a multiple of 4. The maximum value that can be set is 0x10000.
  * @param[in] head_of_list - the head address of dma llp.
  * @return    none
  */
@@ -879,7 +879,7 @@ void audio_rx_dma_config(dma_chn_e chn,unsigned short *dst_addr,unsigned int dat
  * @param[in] llpointer   - the next element of llp_pointer.
  * @param[in] dst_addr    - Pointer to data buffer, it must be 4-bytes aligned address and the actual buffer size defined by the user needs to
  *							be not smaller than the data_len, otherwise there may be an out-of-bounds problem.
- * @param[in] data_len    - Length of DMA in bytes��it must be set to a multiple of 4. The maximum value that can be set is 0x10000.
+ * @param[in] data_len    - Length of DMA in bytes，it must be set to a multiple of 4. The maximum value that can be set is 0x10000.
  * @return 	  none
  */
 void audio_rx_dma_add_list_element(dma_chain_config_t * rx_config,dma_chain_config_t *llpointer ,unsigned short * dst_addr,unsigned int data_len);
@@ -890,7 +890,7 @@ void audio_rx_dma_add_list_element(dma_chain_config_t * rx_config,dma_chain_conf
  * @param[in] chn         - dma channel
  * @param[in] in_buff     - Pointer to data buffer, it must be 4-bytes aligned address and the actual buffer size defined by the user needs to
  *						 	be not smaller than the data_len, otherwise there may be an out-of-bounds problem.
- * @param[in] buff_size   - Length of DMA in bytes��it must be set to a multiple of 4. The maximum value that can be set is 0x10000.
+ * @param[in] buff_size   - Length of DMA in bytes，it must be set to a multiple of 4. The maximum value that can be set is 0x10000.
  * @return 	  none
  */
 void audio_rx_dma_chain_init (audio_fifo_chn_e rx_fifo_chn,dma_chn_e chn,unsigned short * in_buff,unsigned int buff_size);

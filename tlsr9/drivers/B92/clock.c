@@ -29,8 +29,10 @@
 #include "mspi.h"
 #include "stimer.h"
 
+
 unsigned char rc_24m_power;
 unsigned char bbpll_power;
+
 /**********************************************************************************************************************
  *                                			  local constants                                                       *
  *********************************************************************************************************************/
@@ -219,6 +221,24 @@ void clock_set_32k_tick(unsigned int tick)
  * @brief  This function serves to get the 32k tick.
  * @return 32k tick value.
  */
+#if 0
+/*
+ * modify by yi.bao,confirmed by guangjun at 20210105
+ * Use digital register way to get 32k tick may read error tick,cause the wakeup time is
+ * incorrect with the setting time,the sleep time will very little or very big,will not wakeup on time.
+ */
+unsigned int clock_get_32k_tick(void)
+{
+	unsigned int timer_32k_tick;
+	reg_system_st = FLD_SYSTEM_CLR_RD_DONE;	//clr rd_done
+	while((reg_system_st & FLD_SYSTEM_CLR_RD_DONE) != 0);	//wait rd_done = 0;
+	reg_system_ctrl &= ~FLD_SYSTEM_32K_WR_EN;	//1:32k write mode; 0:32k read mode
+	while((reg_system_st & FLD_SYSTEM_CLR_RD_DONE) == 0);	//wait rd_done = 1;
+	timer_32k_tick = reg_system_timer_read_32k;
+	reg_system_ctrl |= FLD_SYSTEM_32K_WR_EN;	//1:32k write mode; 0:32k read mode
+	return timer_32k_tick;
+}
+#else
 unsigned int clock_get_32k_tick(void)
 {
     unsigned int t0 = 0;
@@ -242,6 +262,7 @@ unsigned int clock_get_32k_tick(void)
 		}
 	}
 }
+#endif
 
 /**
  * @brief       This function use to select the system clock source.
@@ -260,12 +281,13 @@ unsigned int clock_get_32k_tick(void)
  * 			    because during the clock switching process, the system clock will be
  * 			    suspended for a period of time, which may cause data loss
  */
-void clock_init(sys_pll_clk_e pll,
-		sys_clock_src_e src,
-		sys_pll_div_to_cclk_e cclk_div,
-		sys_cclk_div_to_hclk_e hclk_div,
-		sys_hclk_div_to_pclk_e pclk_div,
-		sys_pll_div_to_mspi_clk_e mspi_clk_div)
+_attribute_ram_code_sec_noinline_
+void clock_init_ram(sys_pll_clk_e pll,
+					sys_clock_src_e src,
+					sys_pll_div_to_cclk_e cclk_div,
+					sys_cclk_div_to_hclk_e hclk_div,
+					sys_hclk_div_to_pclk_e pclk_div,
+					sys_pll_div_to_mspi_clk_e mspi_clk_div)
 {
 
 	//pll clk
@@ -299,7 +321,7 @@ void clock_init(sys_pll_clk_e pll,
 	}
 	mspi_set_xip_en();
 
-	//hclk and pclk should be set ahead of cclk, ensure the hclk and pclk not exceed the max clk(cclk max 96M, hclk max 48M, pclk max 24M)
+	//hclk and pclk should be set ahead of cclk, ensure the hclk and pclk not exceed the max clk(cclk max 96M, hclk max 48M, pclk max 48M)
 	if(CCLK_DIV1_TO_HCLK == hclk_div)
 	{
 		write_reg8(0x1401d8, read_reg8(0x1401d8) & ~BIT(2));
@@ -340,6 +362,58 @@ void clock_init(sys_pll_clk_e pll,
 	sys_clk.pclk = sys_clk.hclk / pclk_div;
 }
 
+_attribute_text_sec_
+void clock_init(sys_pll_clk_e pll,
+				sys_clock_src_e src,
+				sys_pll_div_to_cclk_e cclk_div,
+				sys_cclk_div_to_hclk_e hclk_div,
+				sys_hclk_div_to_pclk_e pclk_div,
+				sys_pll_div_to_mspi_clk_e mspi_clk_div)
+{
+	__asm__("csrci 	0x7D0,8");	//disable BTB
+	clock_init_ram(pll, src, cclk_div, hclk_div, pclk_div, mspi_clk_div);
+	__asm__("csrsi 	0x7D0,8");	//enable BTB
+}
+
+/**
+ * @brief       This function used to configure the frequency of CCLK/HCLK/PCLK when the PLL is 192M.
+ * 				You need to wait until all the peripherals that use these clocks are idle before you can switch frequencies.
+ * @param[in]   cclk_hclk_pclk - frequency of CCLK/HCLK/PCLK.
+ * @return      none
+ */
+void cclk_hclk_pclk_config(pll_div_cclk_hclk_pclk_e div)
+{
+	unsigned char cclk_div = div>>8;
+	unsigned char hclk_div = (div&0x00f0)>>4;
+	unsigned char pclk_div = div&0x000f;
+
+	//HCLK and PCLK should be set ahead of CCLK, ensure the HCLK and PCLK not exceed the max CCLK(CCLK max 96M, HCLK max 48M, PCLK max 48M)
+	if(CCLK_DIV1_TO_HCLK == hclk_div)
+	{
+		write_reg8(0x1401d8, read_reg8(0x1401d8) & ~BIT(2));
+	}
+	else
+	{
+		write_reg8(0x1401d8, read_reg8(0x1401d8) | BIT(2));
+	}
+
+	//PCLK can div1/div2/div4 from HCLK.
+	if(HCLK_DIV1_TO_PCLK == pclk_div)
+	{
+		write_reg8(0x1401d8, read_reg8(0x1401d8) & 0xfc);
+	}
+	else
+	{
+		write_reg8(0x1401d8, (read_reg8(0x1401d8) & 0xfc) | (pclk_div/2));
+	}
+
+	//Configure the CCLK clock frequency.
+	write_reg8(0x1401e8, (read_reg8(0x1401e8) & 0xf0) | cclk_div);
+
+	sys_clk.cclk = sys_clk.pll_clk / cclk_div;
+	sys_clk.hclk = sys_clk.cclk / hclk_div;
+	sys_clk.pclk = sys_clk.hclk / pclk_div;
+}
 
 /**********************************************************************************************************************
  *                    						local function implementation                                             *

@@ -80,14 +80,14 @@ ble_sts_t	blc_ll_setPeriodicAdvParam_v2(adv_handle_t adv_handle, u16 advInter_mi
 		                                  u8 numSubevents,u8 subeventInterval,
 										  u8 responseSlotDelay,u8 responseSlotSpace,u8 numResponseSlots);
 
-/*
- * LE Periodic Advertising Subevent Data Request event
+/**
+ * @brief      This function is used by the Host to set periodic advertising subevent data.
+ * @param[in]  adv_handle - Used to identify a periodic advertising train
+ * @param[in]  numSubevents -
+ * @param[in]  pSubevtCfg - refer to 'pdaSubevtData_subevtCfg_t'
+ * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t	blc_ll_periodicAdvSubeventDataReq_evt(adv_handle_t adv_handle,u8 subeventStart, u8 subeventDataCount);
-
-
-ble_sts_t	blc_ll_setPeriodicAdvSubeventData_cmd(adv_handle_t adv_handle, u8 numSubevents, setSubeventDataCmd_subInfo_t* subeventSlotParam);
-
+ble_sts_t	blc_ll_setPeriodicAdvSubeventData(adv_handle_t adv_handle, u8 num_subevent, pdaSubevtData_subevtCfg_t* pSubevtCfg);
 
 /**
  * @brief      This function is used to create an ACL connection to a connectable advertiser [v2].

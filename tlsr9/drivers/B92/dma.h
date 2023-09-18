@@ -26,17 +26,14 @@
  *******************************************************************************************************/
 /**	@page DMA
  *
- *	Introduction
- *	===============
- *
- *
- *	API Reference
- *	===============
  *	Header File: dma.h
  */
 #ifndef DMA_H_
 #define DMA_H_
 #include "reg_include/register.h"
+/**
+ * @brief Supports up to 8 DMA channels,DMA0 and DMA1 support additional functions for RF.
+ */
  typedef enum{
 	DMA0=0,
 	DMA1,
@@ -47,18 +44,31 @@
 	DMA6,
 	DMA7,
 }dma_chn_e;
+
+
+/**
+ * @brief Define DMA burst size,Source burst size. It indicates the number of transfers before DMA channel re-arbitration.
+ * @note  DMA_BURST_1_WORD by default, only support in  Audio/MSPI/LSPI support DMA_BURST_2_WORD/DMA_BURST_4_WORD.
+ */
 typedef enum{
 	DMA_BURST_1_WORD = 0,
 	DMA_BURST_2_WORD = 1,
 	DMA_BURST_4_WORD = 2,
 }dma_burst_size_e;
 
+
+/**
+ * @brief  Define DMA chain interrupt mode.
+ */
 typedef enum{
-	DMA_CONTINUE_MODE=0,
-	DMA_INTERRUPT_MODE,
-	DMA_TERMINAL_MODE,
+	DMA_CONTINUE_MODE=0, /**< The chain transfers are constant, interrupts are only generated when the last chain is completed.*/
+	DMA_INTERRUPT_MODE,  /**< The chain transfers are constant,interrupts are generated at the completion of each chain.*/
+	DMA_TERMINAL_MODE,   /**< The chain transfers are automatically stopped at the completion of each chain, and interrupts are generated at the completion of each chain.*/
 }dma_llp_int_mode_e;
 
+/**
+ * @brief Define DMA Interrupt Request enumeration.
+ */
 typedef enum{
 	DMA_CHN0_IRQ		= BIT(0),
 	DMA_CHN1_IRQ		= BIT(1),
@@ -70,6 +80,9 @@ typedef enum{
 	DMA_CHN7_IRQ		= BIT(7),
 }dma_irq_chn_e;
 
+/**
+ * @brief Define Peripheral request (dst_req_sel and src_req_sel) enumeration. Peripheral request and DMA ack constitute hardware handshake(request/ack ) pairs
+ */
 typedef enum{
 	DMA_REQ_LSPI_TX=0,
 	DMA_REQ_LSPI_RX,
@@ -93,69 +106,112 @@ typedef enum{
 	DMA_REQ_AUDIO1_RX,
 	DMA_REG_MSPI_TX,
 	DMA_REG_MSPI_RX,
-	DMA_REG_RSVD1,
-	DMA_REG_RSVD2,
-
 }dma_req_sel_e;
-
-typedef enum{
-	DMA_ADDR_INCREMENT=0,
-	DMA_ADDR_DECREMENT,
-	DMA_ADDR_FIX,
-}
-dma_addr_ctrl_e;
-
-
-typedef enum{
-	DMA_NORMAL_MODE=0,
-	DMA_HANDSHAKE_MODE,
-}
-dma_mode_e;
-
-typedef enum{
-	DMA_CTR_BYTE_WIDTH=0,
-	DMA_CTR_HWORD_WIDTH,
-	DMA_CTR_WORD_WIDTH,
-}
-dma_ctr_width_e;
 
 
 /**
- * DMA supports the following three types of transfer bytes, but all the related peripherals of this chip are designed according to DMA_WORD_WIDTH,
- * so the modes that cannot be used are commented out.
+ * @brief  Define DMA address control enumeration.
  */
 typedef enum{
-	//DMA_BYTE_WIDTH=1,
-	//DMA_HWORD_WIDTH=2,
-	DMA_WORD_WIDTH=4,
-}
-dma_transfer_width_e;
+	DMA_ADDR_INCREMENT=0, /**< Increment address,For example,if the transfer direction is: sram -> peripheral, the source address (sram) needs to be increased */
+	DMA_ADDR_DECREMENT,   /**< Decrement address,Not usually used.*/
+	DMA_ADDR_FIX,		  /**< Fixed address,For example,if the transfer direction is: sram -> peripheral, the destination address (peripheral fifo) needs to be fixed.*/
+}dma_addr_ctrl_e;
 
+
+/**
+ * @brief  Define DMA source or destination handshake mode.
+ */
 typedef enum{
-	TC_MASK   =   	BIT(1),
-	ERR_MASK  =		BIT(2),
-	ABT_MASK  =		BIT(3),
+	DMA_NORMAL_MODE=0, /**< The SRAM as either source or destination does not require a handshake mechanism because there is no empty-full situation. */
+	DMA_HANDSHAKE_MODE,/**<
+		                   For the peripheral FIFO as the source, there is the case that the FIFO is empty when DMA fetching data, so the handshake mechanism is needed.
+		                   For the peripheral FIFO as the destination, there is the case that the FIFO is full when DMA writing data, so the handshake mechanism is needed.
+		                   */
+}dma_mode_e;
+
+
+/**
+ * @brief Define DMA source or destination transfer width.
+ * @note  <p> For peripheral-related DMA transfer, source width and destination width are only supported for DMA_CTR_WORD_WIDTH,so the corresponding SRAM(rx buff) length can only be a multiple of WORD_WIDTH.
+ *        <p> If both the destination and source address are SRAM, all 3 width are supported.
+ */
+typedef enum{
+	DMA_CTR_BYTE_WIDTH=0,/**< byte transfer.  */
+    DMA_CTR_HWORD_WIDTH,/**<  half word transfer. */
+	DMA_CTR_WORD_WIDTH, /**<  word transfer.  */
+}dma_ctr_width_e;
+
+
+/**
+ * @brief Define the peripherals of DMA transfer width.
+ * @note <p> DMA supports the following three types of transfer bytes, For Peripheral-related DMA transfer, transfer width is only supported for DMA_WORD_WIDTH.
+ *       <p> If the destination address and source address of DMA are both SRAM, either one can be chosen.
+ */
+typedef enum{
+	DMA_BYTE_WIDTH=1, /**< data is transmitted in bytes. */
+	DMA_HWORD_WIDTH=2,/**< data is transmitted in half word. */
+	DMA_WORD_WIDTH=4, /**< data is transmitted in word. */
+}dma_transfer_width_e;
+
+
+/**
+ *  @brief  Define DMA IRQ MASK.
+ */
+typedef enum{
+	TC_MASK   =   	BIT(1),/**<
+	                           <pre>
+	                            Channel terminal count interrupt mask,Channel terminal count interrupt mask, the TC status is asserted when a channel transfer finishes.
+	                            The tc interrupt status bits need to be manually cleared,interfaces to get and clear tc interrupt:dma_get_tc_irq_status() / dma_clr_tc_irq_status()</pre>
+	                         */
+	ERR_MASK  =		BIT(2),/**<
+	                            <pre>
+	                            Channel error interrupt mask, the error status is asserted when channel transfer encounters the following error events: Bus error/Unaligned address/Unaligned transfer width/Reserved configuration.
+                                the err interrupt status bits need to be manually cleared,interfaces to get and clear err interrupt:dma_get_err_irq_status() / dma_clr_err_irq_status() </pre>
+	                         */
+	ABT_MASK  =		BIT(3),/**<
+	                            <pre> Channel abort interrupt mask, the abort status is asserted when channel transfer is aborted.
+                                 the abort interrupt status bits need to be manually cleared,interfaces to get and clear err interrupt:dma_get_abt_irq_status() / dma_clr_abt_irq_status() </pre>
+                            */
 }dma_irq_mask_e;
 
+
+/**
+ * @brief Define DMA control struct.
+ * -# dst_req_sel: if dstmode is DMA_HANDSHAKE_MODE, dst_req_sel is set to the value defined in dma_req_sel_e(peripherals tx),otherwise dstmode is DMA_NORMAL_MODE and does not need to be set,just write 0.
+ * -# src_req_sel: if srcmode is DMA_HANDSHAKE_MODE, src_req_sel is set to the value defined in dma_req_sel_e(peripherals rx),otherwise srcmode is DMA_NORMAL_MODE and does not need to be set,just write 0.
+ * -# dst_addr_ctrl: see dma_addr_ctrl_e.
+ * -# src_addr_ctrl: see dma_addr_ctrl_e.
+ * -# dstmode: see dma_mode_e.
+ * -# srcmode: see dma_mode_e.
+ * -# dstwidth:see dma_ctr_width_e.
+ * -# srcwidth:see dma_ctr_width_e.
+ * -# src_burst_size:see dma_burst_size_e.
+ * -# read_num_en:0 - need to manually configure reg_dma_size. 1 - The hardware automatically uses the value of the first four bytes of the source address as the transfer length instead of reg_dma_size(Not usually used).
+ * -# priority:Generally it is set to 0, because setting to 1 will block the transmission of the other channels set to 0.
+ * -# write_num_en:1- When reg_dma_size is set to the maximum value, the hardware automatically writes the length of the received data to the SRAM(4 bytes) before the destination address. 0-Hardware will not write data length to SRAM
+ * -# auto_en:only DMA0  rf tx is supported. After auto_enable_en is enabled, DMA0 is automatically enabled based on the baseband generation requests.
+ */
 typedef struct {
-	unsigned int dst_req_sel:5;  /*DstReqSel   :8:4   */
-	unsigned int src_req_sel:5;  /*SrcReqSel   :13:9 */
-	unsigned int dst_addr_ctrl:2;/*DstAddrCtrl :15:14  0:increment address 1: decrement address 2: fixed address */
-	unsigned int src_addr_ctrl:2;/*SrcAddrCtrl :17:16  0:increment address 1: decrement address 2: fixed address */
-	unsigned int dstmode:1;      /*DstMode:18   0 normal mode  1 handshake*/
-	unsigned int srcmode:1;     /*SrcMode :19   0 normal mode  1 handshake*/
-	unsigned int dstwidth:2;  /*DstWidth :21:20 00:byte 01:hword 02:word*/
-	unsigned int srcwidth:2;  /*SrcWidth :23:22  00:byte 01:hword 02:word*/
-	unsigned int src_burst_size:3;  /*SrcBurstSize: 26:24*/
-	unsigned int vacant_bit  :1;/*vacant:27*/
-	unsigned int read_num_en:1;/*Rnum_en :28*/
-	unsigned int priority:1; /*Pri :29*/
-	unsigned int write_num_en:1;/*wnum_en : 30*/
-	unsigned int auto_en:1;/*/*auto_en : 31*/
+	unsigned int dst_req_sel:5;     /**< DstReqSel   :8:4    */
+	unsigned int src_req_sel:5;     /**< SrcReqSel   :13:9   */
+	unsigned int dst_addr_ctrl:2;   /**< DstAddrCtrl :15:14  */
+	unsigned int src_addr_ctrl:2;   /**< SrcAddrCtrl :17:16  */
+	unsigned int dstmode:1;         /**< DstMode     :18     */
+	unsigned int srcmode:1;         /**< SrcMode     :19     */
+	unsigned int dstwidth:2;        /**< DstWidth    :21:20  */
+	unsigned int srcwidth:2;        /**< SrcWidth    :23:22  */
+	unsigned int src_burst_size:3;  /**< SrcBurstSize:26:24  */
+	unsigned int vacant_bit  :1;    /**< vacant      :27     */
+	unsigned int read_num_en:1;     /**< Rnum_en     :28     */
+	unsigned int priority:1;        /**< Pri         :29     */
+	unsigned int write_num_en:1;    /**< wnum_en     :30     */
+	unsigned int auto_en:1;         /**< auto_en     :31     */
 }dma_config_t;
 
-/*
- * If volatile is not added, the compiler optimization will affect the configuration of the chain, which will lead to the abnormal work of pwm/audio(when using the chain function).
+ /**
+ * @brief Define DMA chain struct.
+ * @note If volatile is not added, the compiler optimization will affect the configuration of the chain, which will lead to the abnormal work of pwm/audio(when using the chain function).
  */
 typedef struct {
 	volatile unsigned int dma_chain_ctl;
@@ -166,10 +222,10 @@ typedef struct {
 }dma_chain_config_t ;
 
 /**
- * @brief   this function set dma chain transfer interrupt mode,
- * @param[in]  chn - DMA channel
+ * @brief      This function sets DMA chain transfer interrupt mode.
+ * @param[in]  chn      - DMA channel
  * @param[in]  llp_mode - DMA channel
- * @return    none
+ * @return     none
  */
 static inline void dma_set_llp_int_mode(dma_chn_e chn,dma_llp_int_mode_e llp_mode)
 {
@@ -179,9 +235,9 @@ static inline void dma_set_llp_int_mode(dma_chn_e chn,dma_llp_int_mode_e llp_mod
 /**
  * @brief     This function configures DMA control register.
  * @param[in] chn    - dma channel
- * @param[in] config - the prt of dma_config that configured control register
+ * @param[in] config - the ptr dma_config that configured control register
  * @return    none
- * @note      When a certain dma channel has not finished the transmission (bit 0 of reg_dma_ctr0(chn) is 1),need to disable dma before writing to the dma register.
+ * @note      When a certain DMA channel has not finished the transmission (bit 0 of reg_dma_ctr0(chn) is 1),it is needed to disable DMA before writing to the DMA register.
  */
 static inline void dma_config(dma_chn_e chn ,dma_config_t *config)
 {
@@ -189,7 +245,7 @@ static inline void dma_config(dma_chn_e chn ,dma_config_t *config)
 }
 
 /**
- * @brief      This function servers to enable dma that selected channel.
+ * @brief      This function servers to enable DMA that selected channel.
  * @param[in] chn - dma channel.
  * @return    none
  */
@@ -199,7 +255,7 @@ static inline void dma_chn_en(dma_chn_e chn)
 }
 
 /**
- * @brief      This function servers to disable dma that selected channel.
+ * @brief      This function servers to disable DMA that selected channel.
  * @param[in] chn - dma channel.
  * @return    none
  */
@@ -209,7 +265,17 @@ static inline void dma_chn_dis(dma_chn_e chn)
 }
 
 /**
- * @brief      This function servers to set dma irq mask.
+ * @brief     Stop DMA,compare with dma_chn_dis: DMA is not stopped until the current request/ack is complete.
+ * @param[in] chn - dma channel.
+ * @return    none
+ * @note      If ABT_MASK is enabled after the interface is invoked, an ABT interrupt is generated.
+ *            After the ABT interrupt is cleared, the interface function is cleared. After DMA is enabled, DMA continues to work.
+ */
+static inline void dma_set_chn_abort(dma_chn_e chn){
+	reg_dma_car |= BIT(chn);
+}
+/**
+ * @brief     This function servers to set DMA irq mask.
  * @param[in] chn  - dma channel.
  * @param[in] mask - dma irq mask.
  * @return    none
@@ -221,11 +287,10 @@ static inline void dma_set_irq_mask(dma_chn_e chn,dma_irq_mask_e mask)
 }
 
 /**
- * @brief      This function servers to clr dma irq mask.
+ * @brief      This function servers to clear DMA irq mask.
  * @param[in] chn  - dma channel.
  * @param[in] mask - dma irq mask.
  * @return    none
- * attention the mask of dma tc/err/abt is enable default.we must disable when don'n use it.
  */
 static inline void dma_clr_irq_mask(dma_chn_e chn,dma_irq_mask_e mask)
 {
@@ -295,12 +360,14 @@ static inline void dma_clr_abt_irq_status(dma_irq_chn_e abt_chn)
 }
 
 /**
- * @brief   this  function set  the DMA to tx/rx size byte.
+ * @brief   This function sets the DMA to tx/rx size byte.
  * @param[in] chn - DMA channel
- * @param[in] size_byte  - the address of dma tx/rx size .The maximum transmission length of DMA is 0xFFFFFC bytes  and cannot exceed this length.
+ * @param[in] size_byte  - The address of dma tx/rx size .The maximum transmission length of DMA is 0xFFFFFC bytes and this length cannot be exceeded.
+ *                         However,some peripherals can be set to a length less than 0xFFFFFC. For example, the maximum length of audio is 0x10000.
  * @param[in] byte_width -  dma   tx/rx  width
  * @return    none 
- * @note      When a certain dma channel has not finished the transmission (bit 0 of reg_dma_ctr0(chn) is 1),need to disable dma before writing to the dma register.
+ * @note  <p>  If a channel is enabled with zero total transfer size, the error event will be triggered and the transfer will be terminated.
+ *        <p> When a certain DMA channel has not finished the transmission (bit 0 of reg_dma_ctr0(chn) is 1), it is needed to disable DMA before writing to the DMA register.
  */
 static inline void dma_set_size(dma_chn_e chn,unsigned int size_byte,dma_transfer_width_e byte_width)
 {
@@ -309,7 +376,7 @@ static inline void dma_set_size(dma_chn_e chn,unsigned int size_byte,dma_transfe
 
 
 /**
- * @brief   this  function calculate the DMA to tx/rx size byte.
+ * @brief   This  function calculates the DMA to tx/rx size byte.
  * @param[in] size_byte  - the address of dma   tx/rx size
  * @param[in] byte_width -  dma   tx/rx  width
  * @return    none
@@ -321,16 +388,18 @@ static inline unsigned int dma_cal_size(unsigned int size_byte,dma_transfer_widt
 
 
 /**
- * @brief   this function set source and destination address for DMA,
- *        src_address          dst_address
- * tx      sram               interface fifo.
- * rx      interface fifo      sram
+ * @brief   This function sets source and destination address for DMA.
+   @verbatim
+                   src_address          dst_address
+           tx      sram                 interface fifo.
+           rx      interface fifo       sram
+   @endverbatim
  * @param[in]  chn      - DMA channel
  * @param[in]  src_addr - the address of source.
  * @param[in]  dst_addr - the address of destination.
  * @return    none
- * @note      1.src_addr and dst_addr must be aligned by word (4 bytes), otherwise the program will enter an exception
- *            2.When a certain dma channel has not finished the transmission (bit 0 of reg_dma_ctr0(chn) is 1),need to disable dma before writing to the dma register.
+ * @note      <p> The src_addr and dst_addr must be aligned by word (4 bytes), otherwise the program will enter an exception.
+ *            <p>  When a certain DMA channel has not finished the transmission (bit 0 of reg_dma_ctr0(chn) is 1), it is needed  to disable DMA before writing to the DMA register.
  */
 static inline void dma_set_address(dma_chn_e chn,unsigned int src_addr,unsigned int dst_addr)
 {
@@ -340,12 +409,12 @@ static inline void dma_set_address(dma_chn_e chn,unsigned int src_addr,unsigned 
 
 
 /**
- * @brief   this function set source address for DMA,
+ * @brief   This function sets source address for DMA.
  * @param[in]  chn - DMA channel
  * @param[in]  src_addr - the address of source.
  * @return     none
- * @note      1.src_addr must be aligned by word (4 bytes), otherwise the program will enter an exception
- *            2.When a certain dma channel has not finished the transmission (bit 0 of reg_dma_ctr0(chn) is 1),need to disable dma before writing to the dma register.
+ * @note      <p> The src_addr must be aligned by word (4 bytes), otherwise the program will enter an exception.
+ *            <p>  When a certain DMA channel has not finished the transmission (bit 0 of reg_dma_ctr0(chn) is 1),it is needed to disable DMA before writing to the DMA register.
  **/
 static inline void dma_set_src_address(dma_chn_e chn,unsigned int src_addr)
 {
@@ -353,12 +422,12 @@ static inline void dma_set_src_address(dma_chn_e chn,unsigned int src_addr)
 }
 
 /**
- * @brief   this function set destination address for DMA,
+ * @brief   This function sets destination address for DMA,
  * @param[in]  chn - DMA channel
  * @param[in]  dst_addr - the address of destination.
  * @return     none
- * @note       1.dst_addr must be aligned by word (4 bytes), otherwise the program will enter an exception
- *             2.When a certain dma channel has not finished the transmission (bit 0 of reg_dma_ctr0(chn) is 1),need to disable dma before writing to the dma register.
+ * @note       <p>  dst_addr must be aligned by word (4 bytes), otherwise the program will enter an exception
+ *             <p>  When a certain dma channel has not finished the transmission (bit 0 of reg_dma_ctr0(chn) is 1),need to disable dma before writing to the dma register.
  **/
 static inline void dma_set_dst_address(dma_chn_e chn,unsigned int dst_addr)
 {
@@ -367,7 +436,7 @@ static inline void dma_set_dst_address(dma_chn_e chn,unsigned int dst_addr)
 
 
 /**
- * @brief   this function set reset DMA,DMA logic and registers will be reset.
+ * @brief   This function resets DMA,the DMA logic and registers will be reset.
  * @return    none
  */
 static inline void dma_reset(void)
@@ -376,7 +445,9 @@ static inline void dma_reset(void)
 	reg_rst1 |= FLD_RST1_DMA;
 }
 
-/* @brief      This function servers to set dma wnum enable.
+
+/**
+ * @brief      This function servers to enable DMA wnum
  * @param[in]  chn - dma channel.
  * @return     none
  */
@@ -384,7 +455,8 @@ static inline void dma_set_wnum_en(dma_chn_e chn){
 	reg_dma_ch_cr3(chn) |= BIT(6);
 }
 
-/* @brief      This function servers to disable dma wnum.
+/**
+ * @brief      This function servers to disable DMA wnum.
  * @param[in]  chn - dma channel.
  * @return     none
  */
@@ -393,18 +465,15 @@ static inline void dma_set_wnum_dis(dma_chn_e chn){
 }
 
 /**
- * @brief     This function set DMA burst size.
- * Only the DMA channel of SPI supports to modify the BURST size.
- * DMA does not support the burst function between 64 bytes before the address of 1k byte,
- * and will switch back to the set burst mode after the 1k byte address
- * @param[in] chn    - dma channel
- * @param[in] burst_mode - dma burst mode
+ * @brief     This function sets DMA burst size. Only the DMA channel of SPI/Audio supports to modify the BURST size.
+ *            DMA does not support the burst function between 64 bytes before the address of 1k byte,and will switch back to the set burst mode after the 1k byte address
+ * @param[in] chn        - dma channel
+ * @param[in] burst_size - dma burst mode
  * @return    none
  */
 static inline void dma_set_spi_burst_size(dma_chn_e chn ,dma_burst_size_e burst_size)
 {
 		reg_dma_ctr3(chn) = (reg_dma_ctr3(chn)&(~FLD_DMA_SRC_BURST_SIZE))|burst_size;
 }
-
 
 #endif

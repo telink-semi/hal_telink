@@ -232,6 +232,35 @@ u8			blc_ll_getAclLatestAvgRSSI(u16 connHandle);
 
 
 /**
+ * @brief      for user to read current ACL connection interval
+ * @param[in]  connHandle - ACL connection handle.
+ * @return     0    :  connHandle invalid, not match a connection
+ * 			   other:  connection interval, unit: 1.25mS
+ */
+u16 		blc_ll_getAclConnectionInterval(u16 connHandle);
+
+
+/**
+ * @brief      for user to read current ACL connection latency
+ * @param[in]  connHandle - ACL connection handle.
+ * @return     0    :  connHandle invalid, not match a connection
+ * 			   other:  connection latency
+ */
+u16	 		blc_ll_getAclConnectionLatency(u16 connHandle);
+
+
+/**
+ * @brief      for user to read current ACL connection supervision timeout
+ * @param[in]  connHandle - ACL connection handle.
+ * @return     0    :  connHandle invalid, not match a connection
+ * 			   other:  connection supervision timeout, unit: 10 mS
+ */
+u16	 		blc_ll_getAclConnectionTimeout(u16 connHandle);
+
+
+
+
+/**
  * @brief      This function is used to disable DLE exchange automatically.
  *             User can call this API in connection callback(HCI_LE_EVT_MASK_CONNECTION_COMPLETE/HCI_SUB_EVT_LE_ENHANCED_CONNECTION_COMPLETE).
  * @param[in]  connHandle - ACL connection handle.

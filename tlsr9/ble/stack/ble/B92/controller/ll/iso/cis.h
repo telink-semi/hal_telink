@@ -18,11 +18,13 @@
 #ifndef CIS_H_
 #define CIS_H_
 
+#include "stack/ble/B92/controller/ble_controller.h"
+
 #define			CIS_TX_PDU_BUF_EXT_LEN							12	//user can't modify this value !!!
 
 
 
-#define			CIS_CONN_PARAM_LENGTH							sizeof(ll_cis_conn_t) //396	//user can't modify this value !!!
+#define			CIS_CONN_PARAM_LENGTH							396	//user can't modify this value !!!
 
 
 

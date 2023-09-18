@@ -21,7 +21,7 @@
 
 
 
-#define     	CIS_SLV_PARAM_LEN								sizeof(ll_cis_slv_t)	//488 //user can't modify this value !!!
+#define     	CIS_SLV_PARAM_LEN							488 //user can't modify this value !!!
 
 
 

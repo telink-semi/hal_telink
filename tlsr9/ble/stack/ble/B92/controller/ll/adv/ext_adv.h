@@ -27,7 +27,7 @@
 
 
 /* extended ADV parameters buffer length for each ADV set */							//if pawra en : 500
-#define 		ADV_SET_PARAM_LENGTH							sizeof(st_ext_adv_t)	//492 //user can't modify this value !!!
+#define 		ADV_SET_PARAM_LENGTH							492 //user can't modify this value !!! sizeof(st_ext_adv_t)
 
 
 
