@@ -42,12 +42,12 @@ _attribute_no_inline_ void b9x_bt_blc_mac_init(uint8_t *bt_mac)
 	if (!memcmp(bt_mac, dummy_mac, BLE_ADDR_LEN))
     {
 		generateRandomNum(BLE_ADDR_LEN, bt_mac);
-#if CONFIG_B9X_BLE_CTRL_MAC_PUBLIC && CONFIG_B9X_BLE_CTRL_MAC_PUBLIC_DEBUG
+#if CONFIG_B9X_BLE_CTRL_MAC_TYPE_PUBLIC && CONFIG_B9X_BLE_CTRL_MAC_PUBLIC_DEBUG
 	/* Debug purpose only. Public address must be set by vendor only */
 		bt_mac[3] = 0x38; /* company id: 0xA4C138 */
  		bt_mac[4] = 0xC1;
  		bt_mac[5] = 0xA4;
-#elif CONFIG_B9X_BLE_CTRL_MAC_RANDOM_STATIC || CONFIG_B9X_BLE_CTRL_MAC_PUBLIC
+#elif CONFIG_B9X_BLE_CTRL_MAC_TYPE_RANDOM_STATIC || CONFIG_B9X_BLE_CTRL_MAC_TYPE_PUBLIC
 	/* Enters this condition, when configured public address is empty */
 	/* Generally we are not allowed to generate public address in mass production device */
 	/* The random static address will be generated, if stored public MAC is empty */
