@@ -5,12 +5,12 @@ if BT_B9X
 
 menu "B9X BLE Controller"
 
-choice
+choice B9X_BLE_CTRL_MAC_TYPE
 	prompt "MAC address type"
-	default B9X_BLE_CTRL_MAC_PUBLIC
-config B9X_BLE_CTRL_MAC_PUBLIC
+	default B9X_BLE_CTRL_MAC_TYPE_PUBLIC
+config B9X_BLE_CTRL_MAC_TYPE_PUBLIC
 	bool "Public"
-config B9X_BLE_CTRL_MAC_RANDOM_STATIC
+config B9X_BLE_CTRL_MAC_TYPE_RANDOM_STATIC
 	bool "Random static"
 endchoice
 
