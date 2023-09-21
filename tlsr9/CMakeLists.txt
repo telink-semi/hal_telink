@@ -55,6 +55,7 @@ zephyr_library_sources_ifdef(CONFIG_I2C_TELINK_B9X drivers/${SOC}/i2c.c)
 if(CONFIG_BT_B9X OR CONFIG_IEEE802154_TELINK_B9X)
 	zephyr_library_sources(
 		drivers/${SOC}/stimer.c
+		common/b9x_rf_power.c
 	)
 endif()
 

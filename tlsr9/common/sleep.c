@@ -25,6 +25,7 @@
 #include <stack/ble/B92/controller/os_sup.h>
 #endif
 #include <b9x_bt.h>
+#include <b9x_rf_power.h>
 #endif /* CONFIG_BT_B9X */
 
 #if CONFIG_BOARD_TLSR9518ADK80D_RETENTION
@@ -49,7 +50,8 @@ bool b9x_suspend(uint32_t wake_stimer_tick)
 		state == B9X_BT_CONTROLLER_STATE_STOPPING) {
 		blc_pm_setAppWakeupLowPower(wake_stimer_tick, 1);
 		if (!blc_pm_handler()) {
-			rf_set_power_level_index(CONFIG_B9X_BLE_CTRL_RF_POWER);
+			rf_set_power_level(b9x_tx_pwr_lt[CONFIG_B9X_BLE_CTRL_RF_POWER
+			- B9X_TX_POWER_MIN]);
 			result = true;
 		}
 		blc_pm_setAppWakeupLowPower(0, 0);
@@ -87,7 +89,8 @@ bool b9x_deep_sleep(uint32_t wake_stimer_tick)
 		state == B9X_BT_CONTROLLER_STATE_STOPPING) {
 		blc_pm_setAppWakeupLowPower(wake_stimer_tick, 1);
 		if (!blc_pm_handler()) {
-			rf_set_power_level_index(CONFIG_B9X_BLE_CTRL_RF_POWER);
+			rf_set_power_level(b9x_tx_pwr_lt[CONFIG_B9X_BLE_CTRL_RF_POWER
+			- B9X_TX_POWER_MIN]);
 			result = true;
 		}
 		blc_pm_setAppWakeupLowPower(0, 0);

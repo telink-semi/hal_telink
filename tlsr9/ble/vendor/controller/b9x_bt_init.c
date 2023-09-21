@@ -28,8 +28,7 @@
 #include "b9x_bt_buffer.h"
 #include "b9x_bt_init.h"
 #include "b9x_bt_flash.h"
-
-#define B9X_BT_SLEEP_AJUSTMENT (2)
+#include "b9x_rf_power.h"
 
 #ifdef CONFIG_PM
 #include "ext_driver/ext_pm.h"
@@ -161,8 +160,7 @@ int b9x_bt_blc_init(void *prx, void *ptx)
 				      CONFIG_B9X_BLE_CTRL_SLAVE_MAX_NUM);
 	blc_ll_setAclMasterConnectionInterval(CONFIG_B9X_BLE_CTRL_CONNECTION_INTERVAL_IDX);
 	blc_ll_setCreateConnectionTimeout(CONFIG_B9X_BLE_CTRL_CONNECTION_TIMEOUT_MS);
-
-	rf_set_power_level_index(CONFIG_B9X_BLE_CTRL_RF_POWER);
+	rf_set_power_level(b9x_tx_pwr_lt[CONFIG_B9X_BLE_CTRL_RF_POWER - B9X_TX_POWER_MIN]);
 
 	blc_ll_initChannelSelectionAlgorithm_2_feature();
 	blc_ll_init2MPhyCodedPhy_feature();
