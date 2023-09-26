@@ -223,7 +223,7 @@ static inline void usbhw_clr_irq_status(usb_irq_status_e status)
  */
 static inline void  usbhw_set_eps_en(usb_ep_en_e ep)
 {
-	reg_usb_edp_en= ep;
+	reg_usb_edp_en |= ep;
 }
 
 /**
