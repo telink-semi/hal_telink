@@ -21,6 +21,8 @@ zephyr_include_directories(drivers/${SOC}/reg_include)
 zephyr_include_directories(drivers/${SOC})
 
 # soc.c reference sources
+zephyr_library_sources(lib/c_alloc.c)
+
 zephyr_library_sources(drivers/${SOC}/clock.c)
 zephyr_library_sources(drivers/${SOC}/analog.c)
 
