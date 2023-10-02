@@ -100,11 +100,11 @@
 #endif
 
 #ifndef DEB_ISO_TEST_EN
-#define	DEG_ISO_TEST_EN											1
+#define	DEG_ISO_TEST_EN											0
 #endif
 
 #ifndef DEB_STRUCT_BUFFER_SIZE_CHECK
-#define	DEB_STRUCT_BUFFER_SIZE_CHECK							1
+#define	DEB_STRUCT_BUFFER_SIZE_CHECK							0
 #endif
 
 

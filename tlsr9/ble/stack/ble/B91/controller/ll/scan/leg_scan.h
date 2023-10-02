@@ -21,17 +21,6 @@
 
 #include "stack/ble/B91/hci/hci_cmd.h"
 
-enum{
-	LEG_SCAN_STRATEGY_0 = 0, /*!< The number of scans corresponds to the number of connections,
-	                              that is to say, after the number of connections reaches the
-	                              maximum allowed number, scan cannot be started.*/
-	LEG_SCAN_STRATEGY_1 = 1, /*!< When 1m is configured, if a master establishes a link,
-	                              scan continues to work. However, if the scan is disabled,
-	                              the scan cannot be started again.*/
-	LEG_SCAN_STRATEGY_2 = 2, /*!< When 1m is configured, if a master establishes a link,
-	                              scan continues to work and scan can be turned on and off normally.*/
-};
-
 /**
  * @brief      for user to initialize legacy scanning module
  * 			   notice that only one module can be selected between legacy scanning module and extended scanning module
@@ -75,11 +64,4 @@ ble_sts_t 	blc_ll_setScanEnable (scan_en_t scan_enable, dupFilter_en_t filter_du
  */
 void		blc_ll_enPrivLegScanFilterByExtAdvSid(u8 sid);
 
-/**
- * @brief      This function is used to configure leg_scan enabling by API only.
- * 			   e.g. M4S4, even master connection number is 4, leg_scan still work
- * @param[in]  scanStrategy   can be LEG_SCAN_STRATEGY_0/LEG_SCAN_STRATEGY_1/LEG_SCAN_STRATEGY_2
- * @return     none
- */
-void 		blc_ll_ConfigLegacyScanEnable_by_API_only (u8 scanStrategy);
 #endif /* LLMS_SCAN_H_ */
