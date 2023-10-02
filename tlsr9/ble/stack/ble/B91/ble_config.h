@@ -36,6 +36,10 @@
     #define BQB_TEST_CHN_MAP_EN     0
 #endif
 
+/* OS Support: default open RTOS */
+#ifndef OS_SUP_EN
+#define OS_SUP_EN                   1
+#endif
 
 ///////////////////  Feature ////////////////////////////
 #ifndef		LL_MULTI_SLAVE_MAC_ENABLE

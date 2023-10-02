@@ -18,16 +18,6 @@
 #ifndef LEG_ADV_H_
 #define LEG_ADV_H_
 
-enum{
-	LEG_ADV_STRATEGY_0 = 0, /*!< default adv strategy */
-	LEG_ADV_STRATEGY_1 = 1, /*!< adv keep sending. eg: if 1M1S configuration, After a slave establishes a link, adv can continue to send,
-	                         but after disabling adv, adv can no longer be enbled. */
-	LEG_ADV_STRATEGY_2 = 2, /*!< Advertiser. eg: if  1M1S configuration,
-	                         After a slave establishes a link, adv can still be switched on and off normally.
-	                         It should be noted that: adv will be closed every time the link is established.
-	                         If you need to send adv, you need to manually enable adv (HCI_LE_Set_Adv_Enable_Cmd)*/
-};
-
 /**
  * @brief      for user to initialize legacy advertising module
  * 			   notice that only one module can be selected between legacy advertising module and extended advertising module
@@ -96,19 +86,5 @@ void 		blc_ll_continue_adv_after_scan_req(u8 enable);
  * @return     none
  */
 void 		blc_ll_setAdvCustomedChannel (u8 chn0, u8 chn1, u8 chn2);
-
-
-
-/**
- * @brief      This function is used to configure leg_adv enabling by API only.
- * 			   e.g. M4S4, even slave connection number is 4, leg_adv still work but can not be connected
- * @param[in]  advStrategy    can be LEG_ADV_STRATEGY_0/LEG_ADV_STRATEGY_1/LEG_ADV_STRATEGY_2
- * @return     none
- */
-void 		blc_ll_ConfigLegacyAdvEnable_by_API_only (u8 advStrategy);
-
-
-
-
 
 #endif /* LEG_ADV_H_ */
