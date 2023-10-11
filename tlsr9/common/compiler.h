@@ -39,7 +39,7 @@
 #define _attribute_ble_data_retention_          __attribute__((section(".retention_data")))
 #define _attribute_aligned_(s)                  __attribute__((aligned(s)))
 #define _attribute_no_inline_                   __attribute__((noinline))
-#define _attribute_data_dlm_                    __attribute__((section(".dlm_data")))
+#define _attribute_data_                        __attribute__((section(".data")))
 #define _attribute_session_(s)                  __attribute__((section(s)))
 
 #define _always_inline                          inline __attribute__((always_inline))
