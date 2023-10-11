@@ -19,16 +19,16 @@
 #include "b9x_bt_buffer.h"
 
 /******* ACL connection LinkLayer TX & RX data FIFO allocation, Begin ********/
-u8 app_acl_rxfifo[ACL_RX_FIFO_SIZE * ACL_RX_FIFO_NUM] = {0};
+_attribute_data_ u8 app_acl_rxfifo[ACL_RX_FIFO_SIZE * ACL_RX_FIFO_NUM] = {0};
 #ifdef CONFIG_BT_CENTRAL
-u8 app_acl_mstTxfifo[ACL_MASTER_TX_FIFO_SIZE * ACL_MASTER_TX_FIFO_NUM *
+_attribute_data_ u8 app_acl_mstTxfifo[ACL_MASTER_TX_FIFO_SIZE * ACL_MASTER_TX_FIFO_NUM *
 		     CONFIG_B9X_BLE_CTRL_MASTER_MAX_NUM] = {0};
 #endif /* CONFIG_BT_CENTRAL */
 #ifdef CONFIG_BT_PERIPHERAL
-u8 app_acl_slvTxfifo[ACL_SLAVE_TX_FIFO_SIZE * ACL_SLAVE_TX_FIFO_NUM *
+_attribute_data_ u8 app_acl_slvTxfifo[ACL_SLAVE_TX_FIFO_SIZE * ACL_SLAVE_TX_FIFO_NUM *
 		     CONFIG_B9X_BLE_CTRL_SLAVE_MAX_NUM] = {0};
 #endif /* CONFIG_BT_PERIPHERAL */
 /******** HCI TX & RX data FIFO allocation, Begin  ***************************/
-u8 app_hci_rxfifo[HCI_RX_FIFO_SIZE * HCI_RX_FIFO_NUM] = {0};
-u8 app_hci_txfifo[HCI_TX_FIFO_SIZE * HCI_TX_FIFO_NUM] = {0};
-u8 app_hci_rxAclfifo[HCI_RX_ACL_FIFO_SIZE * HCI_RX_ACL_FIFO_NUM] = {0};
+_attribute_data_ u8 app_hci_rxfifo[HCI_RX_FIFO_SIZE * HCI_RX_FIFO_NUM] = {0};
+_attribute_data_ u8 app_hci_txfifo[HCI_TX_FIFO_SIZE * HCI_TX_FIFO_NUM] = {0};
+_attribute_data_ u8 app_hci_rxAclfifo[HCI_RX_ACL_FIFO_SIZE * HCI_RX_ACL_FIFO_NUM] = {0};
