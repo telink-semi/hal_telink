@@ -17,6 +17,10 @@
  *****************************************************************************/
 
 #include <zephyr/kernel.h>
+#ifdef CONFIG_PM
+#include <zephyr/pm/policy.h>
+#endif /* CONFIG_PM */
+
 #undef irq_enable
 #undef irq_disable
 #undef ARRAY_SIZE
@@ -199,6 +203,10 @@ int b9x_bt_controller_init()
 {
 	int status;
 
+#if defined(CONFIG_PM) && (defined(CONFIG_BOARD_TLSR9518ADK80D_RETENTION) || defined(CONFIG_BOARD_TLSR9528A_RETENTION))
+	pm_policy_state_lock_get(PM_STATE_STANDBY, PM_ALL_SUBSTATES);
+#endif
+
 	/* Reset Radio */
 	rf_radio_reset();
 	rf_reset_dma();
@@ -268,6 +276,10 @@ void b9x_bt_controller_deinit()
 	rf_radio_reset();
 	rf_reset_dma();
 	rf_baseband_reset();
+
+#if defined(CONFIG_PM) && (defined(CONFIG_BOARD_TLSR9518ADK80D_RETENTION) || defined(CONFIG_BOARD_TLSR9528A_RETENTION))
+	pm_policy_state_lock_put(PM_STATE_STANDBY, PM_ALL_SUBSTATES);
+#endif
 }
 
 /**
@@ -277,6 +289,10 @@ void b9x_bt_controller_deinit()
  */
 void b9x_bt_host_send_packet(uint8_t type, const uint8_t *data, uint16_t len)
 {
+	if (b9x_bt_state == B9X_BT_CONTROLLER_STATE_STOPPED) {
+		return;
+	}
+
 	u8 *p = bltHci_rxfifo.p + (bltHci_rxfifo.wptr & bltHci_rxfifo.mask) * bltHci_rxfifo.size;
 	*p++ = type;
 	memcpy(p, data, len);
