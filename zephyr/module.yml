@@ -4,18 +4,18 @@ build:
   kconfig: Kconfig
 blobs:
   - path: liblt_9518_zephyr.a
-    sha256: f50739f06bf78be1cdafac310b5d923e59517e658d9209d989a06feaaed0847a
+    sha256: 354B2F972F4A9012A66C2015A7092591EEC18F29A06BA8F50EC25BD0D3CF9A31
     type: lib
-    version: 'V4.0.1.1_patch_001'
+    version: 'V4.0.1.1_patch_002'
     license-path: tlsr9/ble/license.txt
     url: https://github.com/telink-semi/zephyr_hal_telink_b91_ble_lib/raw/e1fa1784dc4b144b4c033ecbe236f3f31099439e/liblt_9518_zephyr.a
     description: "Binary libraries supporting Telink B91 series BLE subsystems"
     doc-url: https://github.com/telink-semi/zephyr_hal_telink_b91_ble_lib/blob/e1fa1784dc4b144b4c033ecbe236f3f31099439e/README.md
 
   - path: liblt_9528_zephyr.a
-    sha256: aa4e101f38662dfcffb2f7821a6a8f89bbfc7245af416597a7792ee2aa183eaf
+    sha256: 756D51112BAC3D7E0C0772E84CB5B0FD7F3AF6683263A3206265A58E315BDDF1
     type: lib
-    version: 'V4.0.2.0_ER_patch_001'
+    version: 'V4.0.2.0_ER_patch_002'
     license-path: tlsr9/ble/license.txt
     url: https://github.com/telink-semi/zephyr_hal_telink_b91_ble_lib/raw/e1fa1784dc4b144b4c033ecbe236f3f31099439e/liblt_9528_zephyr.a
     description: "Binary libraries supporting Telink B92 series BLE subsystems"
