@@ -8,6 +8,8 @@ if (CONFIG_SOC_RISCV_TELINK_B91)
 	set(SOC "B91")
 elseif (CONFIG_SOC_RISCV_TELINK_B92)
 	set(SOC "B92")
+elseif (CONFIG_SOC_RISCV_TELINK_W91)
+	set(SOC "W91")
 else()
 	message( FATAL_ERROR "Not supported SOC" )
 endif()
@@ -21,8 +23,10 @@ zephyr_include_directories(drivers/${SOC}/reg_include)
 zephyr_include_directories(drivers/${SOC})
 
 # soc.c reference sources
+if (!CONFIG_SOC_RISCV_TELINK_W91)
 zephyr_library_sources(drivers/${SOC}/clock.c)
 zephyr_library_sources(drivers/${SOC}/analog.c)
+endif()
 
 # MbedTLS HW acceleration
 if(CONFIG_MBEDTLS AND CONFIG_TELINK_B9X_MBEDTLS_HW_ACCELERATION)
