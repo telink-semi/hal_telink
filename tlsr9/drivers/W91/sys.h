@@ -58,7 +58,7 @@
 #define SYS_H_
 
 #include "bit.h"
-
+#include "compiler.h"
 
 /**********************************************************************************************************************
  *                                         global constants                                                           *
@@ -207,10 +207,6 @@ void ble_sys_init(void);
 int write_reg_table(const tbl_cmd_set_t * pt, int size);
 
 void generateRandomNum(int len, unsigned char *data);
-
-#define irq_disable		core_interrupt_disable
-#define irq_enable			core_interrupt_enable
-#define irq_restore(en)	core_restore_interrupt(en)
 
 #define clock_time      stimer_get_tick
 
