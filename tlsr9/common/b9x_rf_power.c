@@ -64,7 +64,7 @@ const uint8_t b9x_tx_pwr_lt[] = {
 	RF_POWER_P9p11dBm,      /*   9.1 dBm:   9 */
 };
 
-#elif CONFIG_SOC_RISCV_TELINK_B92
+#elif CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B93
 /* TX power B92 lookup table */
 const uint8_t b9x_tx_pwr_lt[] = {
 	RF_POWER_N30dBm,        /* -30.0 dBm: -30 */

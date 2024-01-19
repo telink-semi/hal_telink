@@ -23,6 +23,8 @@
 #include <stack/ble/B91/controller/os_sup.h>
 #elif CONFIG_SOC_RISCV_TELINK_B92
 #include <stack/ble/B92/controller/os_sup.h>
+#elif CONFIG_SOC_RISCV_TELINK_B93
+#include <stack/ble/B93/controller/os_sup.h>
 #endif
 #include <b9x_bt.h>
 #include <b9x_rf_power.h>
@@ -31,6 +33,8 @@
 #if CONFIG_BOARD_TLSR9518ADK80D_RETENTION
 #define DEEPSLEEP_MODE_RET_SRAM DEEPSLEEP_MODE_RET_SRAM_LOW64K
 #elif CONFIG_BOARD_TLSR9528A_RETENTION
+#define DEEPSLEEP_MODE_RET_SRAM DEEPSLEEP_MODE_RET_SRAM_LOW96K
+#elif CONFIG_BOARD_TLSR9253B_RETENTION
 #define DEEPSLEEP_MODE_RET_SRAM DEEPSLEEP_MODE_RET_SRAM_LOW96K
 #endif
 
@@ -71,7 +75,7 @@ bool b9x_suspend(uint32_t wake_stimer_tick)
 	return result;
 }
 
-#if defined(CONFIG_BOARD_TLSR9518ADK80D_RETENTION) || defined(CONFIG_BOARD_TLSR9528A_RETENTION)
+#if defined(CONFIG_BOARD_TLSR9518ADK80D_RETENTION) || defined(CONFIG_BOARD_TLSR9528A_RETENTION) || defined(CONFIG_BOARD_TLSR9253B_RETENTION)
 
 bool b9x_deep_sleep(uint32_t wake_stimer_tick)
 {
@@ -126,4 +130,4 @@ bool b9x_deep_sleep(uint32_t wake_stimer_tick)
 	return result;
 }
 
-#endif /* CONFIG_BOARD_TLSR9518ADK80D_RETENTION || CONFIG_BOARD_TLSR9528A_RETENTION */
+#endif /* CONFIG_BOARD_TLSR9518ADK80D_RETENTION || CONFIG_BOARD_TLSR9528A_RETENTION || CONFIG_BOARD_TLSR9253B_RETENTION */
