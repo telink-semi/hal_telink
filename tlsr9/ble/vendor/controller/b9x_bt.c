@@ -36,6 +36,9 @@
 #elif CONFIG_SOC_RISCV_TELINK_B92
 #include "stack/ble/B92/controller/ble_controller.h"
 #include "stack/ble/B92/controller/os_sup.h"
+#elif CONFIG_SOC_RISCV_TELINK_B93
+#include "stack/ble/B93/controller/ble_controller.h"
+#include "stack/ble/B93/controller/os_sup.h"
 #endif
 
 /* Module defines */
@@ -150,7 +153,7 @@ static int b9x_bt_hci_rx_handler(void)
 	if (p) {
 		/* Send data to the controller */
 		blc_hci_handler(&p[0], 0);
-#if CONFIG_SOC_RISCV_TELINK_B92
+#if CONFIG_SOC_RISCV_TELINK_B92||CONFIG_SOC_RISCV_TELINK_B93
 		if (p[0] == HCI_TYPE_ACL_DATA) {
 			k_sem_give(&controller_sem);
 		}
@@ -178,7 +181,7 @@ static void b9x_bt_controller_thread()
  */
 static void b9x_bt_irq_init()
 {
-#if CONFIG_SOC_RISCV_TELINK_B92
+#if CONFIG_SOC_RISCV_TELINK_B92||CONFIG_SOC_RISCV_TELINK_B93
 	plic_preempt_feature_dis();
 	flash_plic_preempt_config(0,1);
 #endif
@@ -227,7 +230,7 @@ int b9x_bt_controller_init()
 	/* Register callback to controller. */
 #if CONFIG_SOC_RISCV_TELINK_B91
 	blc_ll_registerGiveSemCb(os_give_sem_cb);
-#elif CONFIG_SOC_RISCV_TELINK_B92
+#elif CONFIG_SOC_RISCV_TELINK_B92||CONFIG_SOC_RISCV_TELINK_B93
 	blc_ll_registerGiveSemCb(os_give_sem_cb, os_give_sem_cb);
 	blc_setOsSupEnable(true);
 #endif
@@ -244,6 +247,8 @@ int b9x_bt_controller_init()
 		(void)k_thread_name_set(&b9x_bt_controller_thread_data, "B91_BT");
 #elif CONFIG_SOC_RISCV_TELINK_B92
 		(void)k_thread_name_set(&b9x_bt_controller_thread_data, "B92_BT");
+#elif CONFIG_SOC_RISCV_TELINK_B93
+		(void)k_thread_name_set(&b9x_bt_controller_thread_data, "B93_BT");
 #endif
 
 	/* Start thread */

@@ -219,8 +219,21 @@ static eccp_curve_t secp192k1_curve_dat = {
 #define MONT_P_H            p_h
 #define MONT_P_N1           p_n1
 #define MONT_A24            a24
+#elif CONFIG_SOC_RISCV_TELINK_B93
+/* dummy function to compile */
+inline static uint8_t pke_x25519_point_mul(mont_curve_t *curve,
+	uint32_t *k, uint32_t *Pu, uint32_t *Qu)
+{
+	(void) curve;
+	(void) k;
+	(void) Pu;
+	(void) Qu;
+
+	return PKE_INVALID_INPUT;
+}
 #endif
 
+#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92
 static mont_curve_t x25519 = {
 	.MONT_P_BITLEN = 255,
 	.MONT_P = (unsigned int[]){
@@ -237,6 +250,7 @@ static mont_curve_t x25519 = {
 		0x00000000, 0x00000000, 0x00000000, 0x00000000
 	}
 };
+#endif /* CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92 */
 
 #endif /* MBEDTLS_ECP_DP_CURVE25519_ENABLED */
 
@@ -279,7 +293,9 @@ static const struct {
 	mont_curve_t *curve_dat;
 } mont_curve_linking[] = {
 #if defined(MBEDTLS_ECP_DP_CURVE25519_ENABLED)
+#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92
 	{.group = MBEDTLS_ECP_DP_CURVE25519, .curve_dat = &x25519}
+#endif /* CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92 */
 #endif /* MBEDTLS_ECP_DP_CURVE25519_ENABLED */
 };
 #endif /* MBEDTLS_ECP_MONTGOMERY_ENABLED */
