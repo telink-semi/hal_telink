@@ -34,7 +34,7 @@ void			blt_crypto_alg_prand(unsigned char prand[3]);
  * @return      none
  * */
 void			blt_crypto_alg_ah(const unsigned char irk[16], unsigned char r[3], unsigned char out[3]);
-#elif CONFIG_SOC_RISCV_TELINK_B92
+#elif CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B93
 
 typedef struct{
 	unsigned char key[16];
