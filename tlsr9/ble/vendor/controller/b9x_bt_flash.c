@@ -27,35 +27,67 @@
 #include "flash.h"
 #include "string.h"
 #include <zephyr/storage/flash_map.h>
+#include <zephyr/drivers/flash.h>
+#include <zephyr/net/net_ip.h>
+
+#if CONFIG_B9X_BLE_CTRL_MAC_TYPE_PUBLIC || CONFIG_B9X_BLE_CTRL_MAC_FLASH
+static const struct device *flash_device =
+	DEVICE_DT_GET(DT_CHOSEN(zephyr_flash_controller));
+#endif
 
 /**
  * @brief		This function is used to initialize the MAC address
  * @param[in]	bt_mac - BT MAC address
- * @return      none
+ * @return      Status - 0: command succeeded
  */
-_attribute_no_inline_ void b9x_bt_blc_mac_init(uint8_t *bt_mac)
+_attribute_no_inline_ int b9x_bt_blc_mac_init(uint8_t *bt_mac)
 {
+	int err = 0;
+#if CONFIG_B9X_BLE_CTRL_MAC_TYPE_PUBLIC
 	uint8_t dummy_mac[BLE_ADDR_LEN] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
-	flash_read_page(FIXED_PARTITION_OFFSET(vendor_partition) +
-	B9X_BT_MAC_ADDR_OFFSET, BLE_ADDR_LEN, bt_mac);
-	if (!memcmp(bt_mac, dummy_mac, BLE_ADDR_LEN))
-    {
-		generateRandomNum(BLE_ADDR_LEN, bt_mac);
-#if CONFIG_B9X_BLE_CTRL_MAC_TYPE_PUBLIC && CONFIG_B9X_BLE_CTRL_MAC_PUBLIC_DEBUG
-	/* Debug purpose only. Public address must be set by vendor only */
-		bt_mac[3] = 0x38; /* company id: 0xA4C138 */
- 		bt_mac[4] = 0xC1;
- 		bt_mac[5] = 0xA4;
-#elif CONFIG_B9X_BLE_CTRL_MAC_TYPE_RANDOM_STATIC || CONFIG_B9X_BLE_CTRL_MAC_TYPE_PUBLIC
-	/* Enters this condition, when configured public address is empty */
-	/* Generally we are not allowed to generate public address in mass production device */
-	/* The random static address will be generated, if stored public MAC is empty */
-		bt_mac[5] |= 0xC0; /* random static by default */
-#else
-	#error "Other address types are not supported or need to be set via HCI"
-#endif
-		flash_write_page(FIXED_PARTITION_OFFSET(vendor_partition) +
-		B9X_BT_MAC_ADDR_OFFSET, BLE_ADDR_LEN, bt_mac);
+	err = flash_read(flash_device, FIXED_PARTITION_OFFSET(vendor_partition)
+			+ B9X_BT_MAC_ADDR_OFFSET, bt_mac, BLE_ADDR_LEN);
+	if (err < 0)
+		return err;
+
+	if (memcmp(bt_mac, dummy_mac, BLE_ADDR_LEN))
+		return 0;
+
+	err = net_bytes_from_str(bt_mac, BLE_ADDR_LEN,
+			CONFIG_B9X_BLE_PUBLIC_MAC_ADDR);
+	if (err)
+		return err;
+
+#elif CONFIG_B9X_BLE_CTRL_MAC_TYPE_RANDOM_STATIC
+#if CONFIG_B9X_BLE_CTRL_MAC_FLASH
+	uint8_t temp_mac[BLE_ADDR_LEN + 3];
+
+	err = flash_read(flash_device, FIXED_PARTITION_OFFSET(vendor_partition)
+			+ B9X_BT_MAC_ADDR_OFFSET, temp_mac, BLE_ADDR_LEN + 3);
+	if (err < 0)
+		return err;
+
+	if (temp_mac[8] == 0) {
+		memcpy(bt_mac, temp_mac, BLE_ADDR_LEN);
+		return 0;
 	}
+	generateRandomNum(BLE_ADDR_LEN, bt_mac);
+	/* The random static address will be generated,
+	 * if stored random static MAC is empty
+	 */
+	bt_mac[5] |= 0xC0; /* random static by default */
+	memcpy(temp_mac, bt_mac, BLE_ADDR_LEN);
+	temp_mac[8] = 0;
+	err = flash_write(flash_device, FIXED_PARTITION_OFFSET(vendor_partition)
+			+ B9X_BT_MAC_ADDR_OFFSET, temp_mac, BLE_ADDR_LEN + 3);
+#else
+	generateRandomNum(BLE_ADDR_LEN, bt_mac);
+	/* The random static address will be generated on every reboot */
+	bt_mac[5] |= 0xC0; /* random static by default */
+#endif
+#else
+#error "Other address types are not supported or need to be set via HCI"
+#endif
+	return err;
 }
