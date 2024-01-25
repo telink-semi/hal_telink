@@ -263,7 +263,6 @@ static mont_curve_t x25519 = {
 };
 #endif
 
-
 #if defined CONFIG_SOC_RISCV_TELINK_B93
 static mont_curve_t x25519 = {
 	.p_bitLen = 255,
