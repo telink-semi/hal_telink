@@ -19,7 +19,7 @@
 /********************************************************************************************************
  * @file	adc.h
  *
- * @brief	This is the header file for B92
+ * @brief	This is the header file for B93
  *
  * @author	Driver Group
  *
@@ -28,7 +28,7 @@
  *
  *	Introduction
  *	===============
- *	TLSRB92 supports hardware ADC function.
+ *	TLSRB93 supports hardware ADC function.
  *
  *	API Reference
  *	===============

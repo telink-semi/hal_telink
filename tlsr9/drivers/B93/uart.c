@@ -19,7 +19,7 @@
 /********************************************************************************************************
  * @file	uart.c
  *
- * @brief	This is the source file for B92
+ * @brief	This is the source file for B93
  *
  * @author	Driver Group
  *
@@ -194,7 +194,7 @@ void uart_init(uart_num_e uart_num,unsigned short div, unsigned char bwpc, uart_
 	   The maximum baud rate depends on the hardware environment (such as cable length, etc.) and pclk/cclk/hclk:
 	   -# pclk is the main factor affecting the upper baud rate of UART
 	   -# cclk and pclk affect interrupt processing times
-	   Using the B92 development board,the test results:
+	   Using the B93 development board,the test results:
 	   -# CCLK_16M_HCLK_16M_PCLK_16M:in nodma,the maximum speed is 750 kHz; in dma,the maximum speed is 2 MHz;
 	   -# CCLK_24M_HCLK_24M_PCLK_24M:in nodma,the maximum speed is 2 MHz(this is not a garbled code, interrupt processing can not come over);
                                      in dma,3 MHz can be met, the maximum limit of non-garbled codes has not been confirmed;

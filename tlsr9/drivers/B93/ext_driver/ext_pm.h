@@ -16,8 +16,8 @@
  *
  *****************************************************************************/
 
-#ifndef DRIVERS_B92_DRIVER_EXT_EXT_PM_H_
-#define DRIVERS_B92_DRIVER_EXT_EXT_PM_H_
+#ifndef DRIVERS_B93_DRIVER_EXT_EXT_PM_H_
+#define DRIVERS_B93_DRIVER_EXT_EXT_PM_H_
 
 #include <zephyr/kernel.h>
 #undef irq_enable
@@ -157,4 +157,4 @@ static inline int pm_get_mcu_status(void)
 
 #define cpu_set_gpio_wakeup				pm_set_gpio_wakeup
 
-#endif /* DRIVERS_B92_DRIVER_EXT_EXT_PM_H_ */
+#endif /* DRIVERS_B93_DRIVER_EXT_EXT_PM_H_ */

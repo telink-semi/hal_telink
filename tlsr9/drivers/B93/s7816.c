@@ -19,7 +19,7 @@
 /********************************************************************************************************
  * @file	s7816.c
  *
- * @brief	This is the source file for B92
+ * @brief	This is the source file for B93
  *
  * @author	Driver Group
  *
