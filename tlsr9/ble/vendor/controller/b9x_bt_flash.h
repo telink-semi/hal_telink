@@ -28,6 +28,6 @@
 /* SOC BT MAC Address Offset */
 #define B9X_BT_MAC_ADDR_OFFSET 0x1000
 
-_attribute_no_inline_ void b9x_bt_blc_mac_init(unsigned char *bt_mac);
+_attribute_no_inline_ int b9x_bt_blc_mac_init(unsigned char *bt_mac);
 
 #endif

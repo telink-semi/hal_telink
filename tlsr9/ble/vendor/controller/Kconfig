@@ -14,11 +14,19 @@ config B9X_BLE_CTRL_MAC_TYPE_RANDOM_STATIC
 	bool "Random static"
 endchoice
 
-config B9X_BLE_CTRL_MAC_PUBLIC_DEBUG
-	bool "Public address debug"
+config B9X_BLE_PUBLIC_MAC_ADDR
+	depends on B9X_BLE_CTRL_MAC_TYPE_PUBLIC
+	string "Default Development Public BLE Address"
+	default "00:11:22:38:c1:a4"
+	help
+	  Development Public BLE Address
+
+config B9X_BLE_CTRL_MAC_FLASH
+	depends on B9X_BLE_CTRL_MAC_TYPE_RANDOM_STATIC
+	bool "Store static BLE MAC address in flash"
 	default n
 	help
-	  Enable BLE public MAC address generation
+	  Store once generated static BLE MAC address in flash
 
 config B9X_BLE_CTRL_CONNECTION_INTERVAL_IDX
 	int "Connection interval, idx (time = idx * 1.25 ms)"
