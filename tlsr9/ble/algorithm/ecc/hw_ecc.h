@@ -65,7 +65,7 @@ unsigned char	hwECC_shared_secret(const unsigned char *public_key, const unsigne
 
 
 
-#endif /* The end of #if((MCU_CORE_TYPE == MCU_CORE_827x) || (MCU_CORE_TYPE == MCU_CORE_B91) || (MCU_CORE_TYPE == MCU_CORE_B92)) */
+#endif /* The end of #if((MCU_CORE_TYPE == MCU_CORE_827x) || (MCU_CORE_TYPE == MCU_CORE_B91) || (MCU_CORE_TYPE == MCU_CORE_B92) || (MCU_CORE_TYPE == MCU_CORE_B93)) */
 
 #endif /* HW_ECC_H_ */
 
