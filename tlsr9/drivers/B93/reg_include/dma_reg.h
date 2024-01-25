@@ -19,7 +19,7 @@
 /********************************************************************************************************
  * @file	dma_reg.h
  *
- * @brief	This is the header file for B92
+ * @brief	This is the header file for B93
  *
  * @author	Driver Group
  *
@@ -125,7 +125,7 @@ enum{
 
 #define reg_dma_llp_int_mode(i)	REG_ADDR8(REG_DMA_BASE+0x113+(((i)>3) ? 1 : 0))
 
-#if 1	//BLE SDK use: for B91/B92 compatible, may modify next driver release
+#if 1	//BLE SDK use: for B91/B92/B93 compatible, may modify next driver release
 //#define reg_dma_rx_wptr			REG_ADDR8(0x801004f4)
 #define reg_dma_tx_wptr			REG_ADDR8(0x80100500)		//rf_get_tx_wptr(0)
 

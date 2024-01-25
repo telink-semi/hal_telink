@@ -16,8 +16,8 @@
  *
  *****************************************************************************/
 
-#ifndef DRIVERS_B92_EXT_MISC_H_
-#define DRIVERS_B92_EXT_MISC_H_
+#ifndef DRIVERS_B93_EXT_MISC_H_
+#define DRIVERS_B93_EXT_MISC_H_
 
 //#include "nds_intrinsic.h"
 
@@ -235,4 +235,4 @@ enum{//todo: SunWei &YeYang
 /******************************* plic_end ********************************************************************/
 
 
-#endif /* DRIVERS_B92_EXT_MISC_H_ */
+#endif /* DRIVERS_B93_EXT_MISC_H_ */

@@ -19,7 +19,7 @@
 /********************************************************************************************************
  * @file	aes.h
  *
- * @brief	This is the header file for B92
+ * @brief	This is the header file for B93
  *
  * @author	Driver Group
  *
@@ -28,7 +28,7 @@
  *
  *	Introduction
  *	===============
- *	B92 supports hardware AES function.
+ *	B93 supports hardware AES function.
  *
  *	API Reference
  *	===============

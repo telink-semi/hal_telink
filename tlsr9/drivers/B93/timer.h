@@ -19,7 +19,7 @@
 /********************************************************************************************************
  * @file	timer.h
  *
- * @brief	This is the header file for B92
+ * @brief	This is the header file for B93
  *
  * @author	Driver Group
  *
@@ -28,7 +28,7 @@
  *
  *	Introduction
  *	===============
- *	B92 supports two timers: Timer0~ Timer1. The two timers all support four modes:
+ *	B93 supports two timers: Timer0~ Timer1. The two timers all support four modes:
  *		- Mode 0 (System Clock Mode),
  *		- Mode 1 (GPIO Trigger Mode),
  *		- Mode 2 (GPIO Pulse Width Mode),

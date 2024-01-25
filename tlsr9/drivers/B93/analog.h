@@ -19,7 +19,7 @@
 /********************************************************************************************************
  * @file	analog.h
  *
- * @brief	This is the header file for B92
+ * @brief	This is the header file for B93
  *
  * @author	Driver Group
  *
@@ -29,7 +29,7 @@
  *
  *	Introduction
  *	===============
- *  B92 analog support dma and normal mode, in each mode, support byte/halfword/word/buffer write and read.
+ *  B93 analog support dma and normal mode, in each mode, support byte/halfword/word/buffer write and read.
  *
  *	API Reference
  *	===============

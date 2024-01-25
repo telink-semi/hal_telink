@@ -17,8 +17,8 @@
  *****************************************************************************/
 
 
-#ifndef DRIVERS_B92_EXT_DRIVER_EXT_LIB_H_
-#define DRIVERS_B92_EXT_DRIVER_EXT_LIB_H_
+#ifndef DRIVERS_B93_EXT_DRIVER_EXT_LIB_H_
+#define DRIVERS_B93_EXT_DRIVER_EXT_LIB_H_
 
 
 #include "types.h"
@@ -354,7 +354,7 @@ _attribute_ram_code_sec_noinline_ void pm_ble_cal_32k_rc_offset (int offset_tick
  * @return		none.
  */
 void pm_ble_32k_rc_cal_reset(void);
-#define PM_MIN_SLEEP_US			1500  //B92 todo
+#define PM_MIN_SLEEP_US			1500  //B93 todo
 
 /**
  * @brief   internal oscillator or crystal calibration for environment change such as voltage, temperature
@@ -741,7 +741,7 @@ static inline void zb_rt_irq_enable(void)
 
 /*
  * SiHui & QingHua & SunWei sync with Xuqiang.Zhang & Zhiwei.Wang & Kaixin.Chen & Shujuan.chu
- * B91/B92
+ * B91/B92/B93
  * TX settle recommend value by digital team: 108.5uS without fast settle;   108.5-58.5=50 with fast settle
  * we BLE use 110 without fast settle; 110-57=53 with fast settle, here 53 = real settle 45uS + extra 1 preamble 8uS(1M for example)
  *
@@ -1131,4 +1131,4 @@ bool mcu_securuty_read_idcode(void);
 bool efuse_get_pubkey_hash(u8* pHash);
 /******************************* mcu_security end ********************************************************************/
 
-#endif /* DRIVERS_B92_EXT_DRIVER_EXT_LIB_H_ */
+#endif /* DRIVERS_B93_EXT_DRIVER_EXT_LIB_H_ */

@@ -19,7 +19,7 @@
 /********************************************************************************************************
  * @file	cmpt.h
  *
- * @brief	This is the header file for B92
+ * @brief	This is the header file for B93
  *
  * @author	Driver Group
  *

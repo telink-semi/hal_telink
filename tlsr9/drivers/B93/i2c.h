@@ -19,7 +19,7 @@
 /********************************************************************************************************
  * @file	i2c.h
  *
- * @brief	This is the header file for B92
+ * @brief	This is the header file for B93
  *
  * @author	Driver Group
  *
@@ -28,7 +28,7 @@
  *
  *	Introduction
  *	===============
- *	-# B92 supports two i2c: i2c/i2c1_m.
+ *	-# B93 supports two i2c: i2c/i2c1_m.
  *	-# i2c:support master mode or slave mode,and support nodma/dma.
  *	-# i2c1_m: only support master mode,only support nodma.
  *  -# i2c1_m master mode and i2c master mode are different in design, see the demo and interface implementation.
