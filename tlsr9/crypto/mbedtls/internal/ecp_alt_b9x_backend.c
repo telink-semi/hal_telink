@@ -225,7 +225,7 @@ static eccp_curve_t secp192k1_curve_dat = {
 
 #if defined(MBEDTLS_ECP_DP_CURVE25519_ENABLED)
 
-#if defined CONFIG_SOC_RISCV_TELINK_B91
+#if CONFIG_SOC_RISCV_TELINK_B91
 static mont_curve_t x25519 = {
 	.mont_p_bitLen = 255,
 	.mont_p = (unsigned int[]){
@@ -242,28 +242,7 @@ static mont_curve_t x25519 = {
 		0x00000000, 0x00000000, 0x00000000, 0x00000000
 	}
 };
-#endif
-
-#if defined CONFIG_SOC_RISCV_TELINK_B92
-static mont_curve_t x25519 = {
-	.p_bitLen = 255,
-	.p = (unsigned int[]){
-		0xffffffed, 0xffffffff, 0xffffffff, 0xffffffff,
-		0xffffffff, 0xffffffff, 0xffffffff, 0x7fffffff
-	},
-	.p_h = (unsigned int[]){
-		0x000005a4, 0x00000000, 0x00000000, 0x00000000,
-		0x00000000, 0x00000000, 0x00000000, 0x00000000
-	},
-	.p_n1 = (unsigned int[]){0x286bca1b},
-	.a24 = (unsigned int[]){
-		0x0001db41, 0x00000000, 0x00000000, 0x00000000,
-		0x00000000, 0x00000000, 0x00000000, 0x00000000
-	}
-};
-#endif
-
-#if defined CONFIG_SOC_RISCV_TELINK_B93
+#elif CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B93
 static mont_curve_t x25519 = {
 	.p_bitLen = 255,
 	.p = (unsigned int[]){
