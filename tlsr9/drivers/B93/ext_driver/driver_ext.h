@@ -16,12 +16,12 @@
  *
  *****************************************************************************/
 
-#ifndef DRIVERS_B92_EXT_DRIVER_DRIVER_EXT_H_
-#define DRIVERS_B92_EXT_DRIVER_DRIVER_EXT_H_
+#ifndef DRIVERS_B93_EXT_DRIVER_DRIVER_EXT_H_
+#define DRIVERS_B93_EXT_DRIVER_DRIVER_EXT_H_
 
 #include "ext_lib.h"
 #include "ext_misc.h"
 #include "ext_pm.h"
 #include "software_pa.h"
 
-#endif /* DRIVERS_B92_EXT_DRIVER_DRIVER_EXT_H_ */
+#endif /* DRIVERS_B93_EXT_DRIVER_DRIVER_EXT_H_ */

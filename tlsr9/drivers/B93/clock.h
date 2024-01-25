@@ -19,7 +19,7 @@
 /********************************************************************************************************
  * @file	clock.h
  *
- * @brief	This is the header file for B92
+ * @brief	This is the header file for B93
  *
  * @author	Driver Group
  *
@@ -28,7 +28,7 @@
  *
  *	Introduction
  *	===============
- *	TLSRB92 clock setting.
+ *	TLSRB93 clock setting.
  *
  *	API Reference
  *	===============

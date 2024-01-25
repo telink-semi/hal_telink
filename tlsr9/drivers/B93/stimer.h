@@ -19,7 +19,7 @@
 /********************************************************************************************************
  * @file	stimer.h
  *
- * @brief	This is the header file for B92
+ * @brief	This is the header file for B93
  *
  * @author	Driver Group
  *
@@ -28,7 +28,7 @@
  *
  *	Introduction
  *	===============
- *	B92 stimer use 16M clock count, have stimer irq.
+ *	B93 stimer use 16M clock count, have stimer irq.
  *
  *	API Reference
  *	===============
