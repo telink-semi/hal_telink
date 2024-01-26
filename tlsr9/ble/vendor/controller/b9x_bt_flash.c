@@ -30,12 +30,39 @@
 #include "string.h"
 #include <zephyr/storage/flash_map.h>
 #include <zephyr/drivers/flash.h>
-#include <zephyr/net/net_ip.h>
 
 #if CONFIG_B9X_BLE_CTRL_MAC_TYPE_PUBLIC || CONFIG_B9X_BLE_CTRL_MAC_FLASH
 static const struct device *flash_device =
 	DEVICE_DT_GET(DT_CHOSEN(zephyr_flash_controller));
 #endif
+
+static int get_bytes_from_str(uint8_t *buf, int buf_len, const char *src)
+{
+	unsigned int i;
+
+	for (i = 0U; i < strlen(src); i++) {
+		if (!(src[i] >= '0' && src[i] <= '9') &&
+		    !(src[i] >= 'A' && src[i] <= 'F') &&
+		    !(src[i] >= 'a' && src[i] <= 'f') &&
+		    src[i] != ':') {
+			return -EINVAL;
+		}
+	}
+
+	(void)memset(buf, 0, buf_len);
+
+	for (i = 0U; i < buf_len; i++) {
+		uint8_t temp;
+
+		char2hex(*src, &temp);
+		buf[i] = temp;
+		char2hex(*(src + 1), &temp);
+		buf[i] |= temp << 4;
+		src = src + 3;
+	}
+
+	return 0;
+}
 
 /**
  * @brief		This function is used to initialize the MAC address
@@ -56,7 +83,7 @@ _attribute_no_inline_ int b9x_bt_blc_mac_init(uint8_t *bt_mac)
 	if (memcmp(bt_mac, dummy_mac, BLE_ADDR_LEN))
 		return 0;
 
-	err = net_bytes_from_str(bt_mac, BLE_ADDR_LEN,
+	err = get_bytes_from_str(bt_mac, BLE_ADDR_LEN,
 			CONFIG_B9X_BLE_PUBLIC_MAC_ADDR);
 	if (err)
 		return err;
