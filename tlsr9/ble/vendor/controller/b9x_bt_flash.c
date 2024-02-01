@@ -22,8 +22,8 @@
 #include "stack/ble/B91/ble_common.h"
 #elif CONFIG_SOC_RISCV_TELINK_B92
 #include "stack/ble/B92/ble_common.h"
-#elif CONFIG_SOC_RISCV_TELINK_B93
-#include "stack/ble/B93/ble_common.h"
+#elif CONFIG_SOC_RISCV_TELINK_B95
+#include "stack/ble/B95/ble_common.h"
 #endif
 
 #include "flash.h"

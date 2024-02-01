@@ -23,8 +23,8 @@
 #elif CONFIG_SOC_RISCV_TELINK_B92
 #include "../drivers/B92/driver_b92.h"
 #include "../drivers/B92/ext_driver/driver_ext.h"
-#elif CONFIG_SOC_RISCV_TELINK_B93
-#include "../drivers/B93/driver_b93.h"
-#include "../drivers/B93/ext_driver/driver_ext.h"
+#elif CONFIG_SOC_RISCV_TELINK_B95
+#include "../drivers/B95/driver_b95.h"
+#include "../drivers/B95/ext_driver/driver_ext.h"
 #endif
 #include "../common/types.h"
