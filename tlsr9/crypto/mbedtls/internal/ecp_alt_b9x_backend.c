@@ -47,7 +47,7 @@
 #include <multithread.h>
 #include <pke.h>
 
-#if (CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B93)
+#if (CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B95)
 #include <ext_driver/ext_lib.h>
 #include <ext_driver/ext_misc.h>
 #endif
@@ -242,7 +242,7 @@ static mont_curve_t x25519 = {
 		0x00000000, 0x00000000, 0x00000000, 0x00000000
 	}
 };
-#elif CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B93
+#elif CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B95
 static mont_curve_t x25519 = {
 	.p_bitLen = 255,
 	.p = (unsigned int[]){
