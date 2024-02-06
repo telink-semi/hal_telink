@@ -1,46 +1,27 @@
+/******************************************************************************
+ * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ *****************************************************************************/
+
 /********************************************************************************************************
  * @file	sys.h
  *
- * @brief	This is the header file for B91
+ * @brief	This is the header file for B92
  *
  * @author	Driver Group
- * @date	2019
- *
- * @par     Copyright (c) 2019, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- *          All rights reserved.
- *
- *          Redistribution and use in source and binary forms, with or without
- *          modification, are permitted provided that the following conditions are met:
- *
- *              1. Redistributions of source code must retain the above copyright
- *              notice, this list of conditions and the following disclaimer.
- *
- *              2. Unless for usage inside a TELINK integrated circuit, redistributions
- *              in binary form must reproduce the above copyright notice, this list of
- *              conditions and the following disclaimer in the documentation and/or other
- *              materials provided with the distribution.
- *
- *              3. Neither the name of TELINK, nor the names of its contributors may be
- *              used to endorse or promote products derived from this software without
- *              specific prior written permission.
- *
- *              4. This software, with or without modification, must only be used with a
- *              TELINK integrated circuit. All other usages are subject to written permission
- *              from TELINK and different commercial license may apply.
- *
- *              5. Licensee shall be solely responsible for any claim to the extent arising out of or
- *              relating to such deletion(s), modification(s) or alteration(s).
- *
- *          THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- *          ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- *          WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- *          DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDER BE LIABLE FOR ANY
- *          DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- *          (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- *          LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- *          ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- *          (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- *          SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *******************************************************************************************************/
 /**	@page SYS
@@ -56,9 +37,9 @@
 
 #ifndef SYS_H_
 #define SYS_H_
-
 #include "bit.h"
-
+// #include "reg_include/stimer_reg.h"
+#include "compiler.h"
 
 /**********************************************************************************************************************
  *                                         global constants                                                           *
@@ -67,8 +48,8 @@
 /**********************************************************************************************************************
  *                                           global macro                                                             *
  *********************************************************************************************************************/
-/*
- * brief instruction delay
+/**
+ * @brief instruction delay
  */
 
 #define	_ASM_NOP_					__asm__("nop")
@@ -84,26 +65,27 @@
 #define	CLOCK_DLY_9_CYC				_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_
 #define	CLOCK_DLY_10_CYC			_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_
 
-#define BLE_TEST_NO_REG             1
+#define FLASH_R_BASE_ADDR   		0x20000000
+#define REG_RW_BASE_ADDR  			0x80000000
+#define REG_ADDR8(a)				(*(volatile unsigned char*)(REG_RW_BASE_ADDR | (a)))
+#define REG_ADDR16(a)				(*(volatile unsigned short*)(REG_RW_BASE_ADDR | (a)))
+#define REG_ADDR32(a)				(*(volatile unsigned long*)(REG_RW_BASE_ADDR | (a)))
 
-/*Attention: for all the 2-byte address operation (like REG_ADDR16,write_reg16,read_reg16) ,
- *           the address parameter should  be multiple of 2. For example:REG_ADDR16(0x2),REG_ADDR16(0x4).
- *
- *           for all the 4-byte address operation (like REG_ADDR32,write_reg32,read_reg32) ,
- *           the address parameter should  be multiple of 4. For example:write_reg32(0x4),write_reg32(0x8).
-*/
-#define REG_ADDR8(a)				(*(volatile unsigned char*)((a)))
-#define REG_ADDR16(a)				(*(volatile unsigned short*)((a)))
-#define REG_ADDR32(a)				(*(volatile unsigned long*)((a)))
+#define write_reg8(addr,v)			(*(volatile unsigned char*)(REG_RW_BASE_ADDR | (addr)) = (unsigned char)(v))
+#define write_reg16(addr,v)			(*(volatile unsigned short*)(REG_RW_BASE_ADDR | (addr)) = (unsigned short)(v))
+#define write_reg32(addr,v)			(*(volatile unsigned long*)(REG_RW_BASE_ADDR | (addr)) = (unsigned long)(v))
 
-#define write_reg8(addr,v)			(*(volatile unsigned char*)((addr))) = (unsigned char)(v)
-#define write_reg16(addr,v)			(*(volatile unsigned short*)((addr))) = (unsigned short)(v)
-#define write_reg32(addr,v)			(*(volatile unsigned long*)((addr))) = (unsigned long)(v)
+#define read_reg8(addr)				(*(volatile unsigned char*)(REG_RW_BASE_ADDR | (addr)))
+#define read_reg16(addr)            (*(volatile unsigned short*)(REG_RW_BASE_ADDR | (addr)))
+#define read_reg32(addr)            (*(volatile unsigned long*)(REG_RW_BASE_ADDR | (addr)))
 
-#define read_reg8(addr)				(*(volatile unsigned char*)((addr)))
-#define read_reg16(addr)            (*(volatile unsigned short*)((addr)))
-#define read_reg32(addr)            (*(volatile unsigned long*)((addr)))
+#define write_sram8(addr,v)			(*(volatile unsigned char*)( (addr)) = (unsigned char)(v))
+#define write_sram16(addr,v)		(*(volatile unsigned short*)( (addr)) = (unsigned short)(v))
+#define write_sram32(addr,v)		(*(volatile unsigned long*)( (addr)) = (unsigned long)(v))
 
+#define read_sram8(addr)			(*(volatile unsigned char*)((addr)))
+#define read_sram16(addr)           (*(volatile unsigned short*)((addr)))
+#define read_sram32(addr)           (*(volatile unsigned long*)((addr)))
 #define TCMD_UNDER_BOTH				0xc0
 #define TCMD_UNDER_RD				0x80
 #define TCMD_UNDER_WR				0x40
@@ -127,9 +109,7 @@
  *  to simplify
  *  #define convert(addr) ((addr)+0xc0180000)
  * */
-//#define convert_ram_addr_cpu2bus(addr)  ((unsigned int)(addr)+0xc0180000)
-//#define convert_ram_addr_cpu2bus(addr)  ((unsigned int)(addr)+0xc0000000)
-#define convert_ram_addr_cpu2bus(addr)  ((unsigned int)(addr))
+#define convert_ram_addr_cpu2bus(addr)  ((unsigned int)(addr)+0xc0180000)
 //#else  //no optimize
 //#define  convert_ram_addr_cpu2bus  (((((unsigned int)(addr)) >=0x80000)?(((unsigned int)(addr))-0x80000+0xc0200000) : (((unsigned int)(addr)) + 0xc0000000)))
 //#endif
@@ -144,22 +124,44 @@
  * @brief 	Power type for different application
  */
 typedef enum{
-	LDO_1P4_LDO_1P8 	= 0x00,	/**< 1.4V-LDO & 1.8V-LDO mode */
-	DCDC_1P4_LDO_1P8	= 0x01,	/**< 1.4V-DCDC & 1.8V-LDO mode */
-	DCDC_1P4_DCDC_1P8	= 0x03,	/**< 1.4V-DCDC & 1.8V-DCDC mode */
+	LDO_1P4_LDO_2P0 	= 0x00,	/**< 1.4V-LDO & 2.0V-LDO mode */
+	DCDC_1P4_LDO_2P0	= 0x01,	/**< 1.4V-DCDC & 2.0V-LDO mode */
+	DCDC_1P4_DCDC_2P0	= 0x03,	/**< 1.4V-DCDC & 2.0V-DCDC mode */
 }power_mode_e;
 
 /**
- * @brief 	The maximum voltage that the chip can withstand is 3.6V.
- * 			When the vbat power supply voltage is lower than 3.6V, it is configured as VBAT_MAX_VALUE_LESS_THAN_3V6 mode,
- * 			bypass is turned on, and the vbat voltage directly supplies power to the chip.
- * 			When the vbat power supply voltage may be higher than 3.6V, it is configured as VBAT_MAX_VALUE_GREATER_THAN_3V6 mode,
- * 			the bypass is closed, and the vbat voltage passes through an LDO to supply power to the chip.
+ * @brief 	This enumeration is used to select whether VBAT can be greater than 3.6V.
  */
 typedef enum{
-	VBAT_MAX_VALUE_GREATER_THAN_3V6	= 0x00,	/*VBAT may be greater than 3.6V. */
-	VBAT_MAX_VALUE_LESS_THAN_3V6	= BIT(3),	/*VBAT must be below 3.6V. */
+	VBAT_MAX_VALUE_GREATER_THAN_3V6	= 0x00,		/**  VBAT may be greater than 3.6V.
+												<p>  In this configuration the bypass is closed
+												<p>	 and the VBAT voltage passes through the 3V3 LDO to supply power to the chip.
+												<p>	 The voltage of the GPIO pin (VOH) is the voltage after VBAT passes through the LDO (V_ldo),
+												<p>  and the maximum value is about 3.3V floating 10% (V_ldoh).
+												<p>  When VBAT > V_ldoh, <p>VOH = V_ldo = V_ldoh.
+												<p>  When VBAT < V_ldoh, <p>VOH = V_ldo = VBAT */
+	VBAT_MAX_VALUE_LESS_THAN_3V6	= BIT(3),	/**  VBAT must be below 3.6V.
+												<p>  In this configuration bypass is turned on.vbat is directly supplying power to the chip
+												<p>  VOH(the output voltage of GPIO)= VBAT */
 }vbat_type_e;
+
+/**
+ * @enum 		gpio_voltage_e
+ * @brief		This is the configuration of GPIO voltage.
+ * @attention   If the enumeration uses GPIO_VOLTAGE_1V8, the following usage considerations need to be noted:
+ *				-# Pay attention to check the sampling range of ADC, the maximum detection voltage of the ADC input cannot be higher than 1.8V.
+ * 			   	   If a voltage higher than this needs to be detected, external access to the divider circuit is required.
+ * 			   	-# ADC_VBAT_SAMPLE can not be used.
+ * 			   	   Users can use external voltage divider instead, the details refer to the Driver SDK Developer Handbook for this chip.
+ *				-# Since 1.8V IO does not comply with USB electrical layer regulations, GPIO cannot be configured to 1.8V when using USB.
+ *				-# When using VBUS 5V to power the chip, only after register configuration will GPIO be 1.8V.
+ * 			   	   So from power-on to register configuration, the default output GPIO(PC5) is still 3.3V. reboot will also be 3.3V for a while.
+ * 			   	   (the other default output GPIO(PG1/PG2/PG3/PG5) are not affected by this.)
+ */
+typedef enum{
+	GPIO_VOLTAGE_3V3	= 0x00,	/**< the GPIO voltage is set to 3.3V. */
+	GPIO_VOLTAGE_1V8 	= 0x01,	/**< the GPIO voltage is set to 1.8V. */
+}gpio_voltage_e;
 
 /**
  * @brief command table for special registers
@@ -177,7 +179,6 @@ typedef struct tbl_cmd_set_t {
 
 extern unsigned int g_chip_version;
 
-
 /**********************************************************************************************************************
  *                                      global function prototype                                                     *
  *********************************************************************************************************************/
@@ -185,16 +186,21 @@ extern unsigned int g_chip_version;
  * @brief      This function reboot mcu.
  * @return     none
  */
-static inline void sys_reboot(void)
-{
-	write_reg8(0x1401ef, 0x20);
-}
+_attribute_text_sec_ void sys_reboot(void);
+
 /**
  * @brief   	This function serves to initialize system.
- * @param[in]	power_mode - power mode(LDO/DCDC/LDO_DCDC)
+ * @param[in]	power_mode	- power mode(LDO/DCDC/LDO_DCDC)
+ * @param[in]	vbat_v		- This parameter is used to determine whether the VBAT voltage can be greater than 3.6V.
+ * @param[in]	gpio_v		- This is the configuration of GPIO voltage.
+ * 							  For some chip models the GPIO voltage is fixed 3.3V or fixed 1.8V,
+ * 							  For other GPIO models the voltage is configurable:
+ * 							  Requires hardware configuration: 3v3 (CFG_VIO connects to VSS) or 1V8 (CFG_VIO connects to VDDO3/AVDD3)),
+ * 							  please configure this parameter correctly according to the chip data sheet and the corresponding board design.
+ * @attention	If vbat_v is set to VBAT_MAX_VALUE_LESS_THAN_3V6, then gpio_v can only be set to GPIO_VOLTAGE_3V3.
  * @return  	none
  */
-void ble_sys_init(void);
+void sys_init(power_mode_e power_mode, vbat_type_e vbat_v, gpio_voltage_e gpio_v);
 
 /**
  * @brief      This function performs a series of operations of writing digital or analog registers
@@ -206,12 +212,10 @@ void ble_sys_init(void);
 
 int write_reg_table(const tbl_cmd_set_t * pt, int size);
 
-void generateRandomNum(int len, unsigned char *data);
-
-#define irq_disable		core_interrupt_disable
-#define irq_enable			core_interrupt_enable
-#define irq_restore(en)	core_restore_interrupt(en)
-
-#define clock_time      stimer_get_tick
-
+/**
+ * @brief      This function servers to get calibration value from EFUSE.
+ * @param[in]  gpio_type - select the type of GPIO.
+ * @return 	   1 - the calibration value update, 0 - the calibration value is not update.
+ */
+unsigned char efuse_calib_adc_vref(gpio_voltage_e gpio_type);
 #endif
