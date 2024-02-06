@@ -4,7 +4,9 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-add_subdirectory_ifdef(CONFIG_HAS_TELINK_DRIVERS tlsr9)
+if(CONFIG_HAS_TELINK_DRIVERS)
+
+add_subdirectory(tlsr9)
 
 if (CONFIG_SOC_RISCV_TELINK_B91)
 zephyr_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/zephyr/blobs/liblt_9518_zephyr.a)
@@ -17,3 +19,5 @@ endif()
 if(CONFIG_PM)
 zephyr_ld_options(-mtune=rocket)
 endif() # PM
+
+endif() # CONFIG_HAS_TELINK_DRIVERS
