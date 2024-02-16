@@ -206,9 +206,9 @@ int b9x_bt_controller_init()
 {
 	int status;
 
-#if defined(CONFIG_PM) && (defined(CONFIG_BOARD_TLSR9518ADK80D_RETENTION) || defined(CONFIG_BOARD_TLSR9528A_RETENTION) || defined(CONFIG_BOARD_TLSR9258A_RETENTION))
+#if CONFIG_PM && CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION
 	pm_policy_state_lock_get(PM_STATE_STANDBY, PM_ALL_SUBSTATES);
-#endif
+#endif /* CONFIG_PM && CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION */
 
 	/* Reset Radio */
 	rf_radio_reset();
@@ -282,9 +282,9 @@ void b9x_bt_controller_deinit()
 	rf_reset_dma();
 	rf_baseband_reset();
 
-#if defined(CONFIG_PM) && (defined(CONFIG_BOARD_TLSR9518ADK80D_RETENTION) || defined(CONFIG_BOARD_TLSR9528A_RETENTION) || defined(CONFIG_BOARD_TLSR9258A_RETENTION))
+#if CONFIG_PM && CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION
 	pm_policy_state_lock_put(PM_STATE_STANDBY, PM_ALL_SUBSTATES);
-#endif
+#endif /* CONFIG_PM && CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION */
 }
 
 /**
