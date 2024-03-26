@@ -185,7 +185,7 @@ void clock_cal_32k_rc(void)
 
 	analog_write_reg8(areg_0xc6, FLD_CAL_32K_RC_DISABLE);
 	analog_write_reg8(areg_0xc6, FLD_CAL_32K_RC_ENABLE);
-    while(0 == (analog_read_reg8(areg_0xce) & FLD_CAL_32K_DONE)){};
+    while(0 == (analog_read_reg8(0xcf) & FLD_CAL_32K_DONE)){};
 
 	analog_write_reg8(areg_aon_0x51, analog_read_reg8(areg_0xc9));//write 32k res[13:6] into manual register
 	analog_write_reg8(areg_aon_0x4f, (analog_read_reg8(areg_aon_0x4f) & 0xc0) | analog_read_reg8(areg_0xca));//write 32k res[5:0] into manual register
