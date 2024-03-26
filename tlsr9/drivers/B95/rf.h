@@ -1355,4 +1355,27 @@ void rf_set_fcal_cal_val(unsigned char *fcal_tx_group,unsigned char *fcal_rx_gro
 */
 void rf_set_fcal_chn_group_range_ctf(unsigned short *fcal_chn_range);
 
+
+/**
+ * @brief       This function do radio baseband reset
+ * @param       none
+ * @return      none
+ */
+void rf_baseband_reset(void);
+
+
+/**
+ * @brief This function reset dma registrs to default (reset values)
+ * @param none
+ * @return none
+ */
+void rf_reset_dma(void);
+
+
+/**
+ * @brief This function reset radio registrs to default (reset values)
+ * @param none
+ * @return none
+ */
+void rf_radio_reset(void);
 #endif
