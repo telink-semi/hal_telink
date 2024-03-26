@@ -42,9 +42,6 @@ if(CONFIG_SOC_FLASH_TELINK_B9X OR CONFIG_USB_TELINK_B9X)
 	)
 endif()
 
-zephyr_library_sources_ifdef(CONFIG_SOC_RISCV_TELINK_B95 drivers/B95/watchdog.c)
-zephyr_library_sources_ifdef(CONFIG_SOC_RISCV_TELINK_B95 drivers/B95/core.c)
-
 # PWM driver reference sources
 zephyr_library_sources_ifdef(CONFIG_PWM_TELINK_B9X drivers/${SOC}/pwm.c)
 
