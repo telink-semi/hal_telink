@@ -26,16 +26,16 @@
 
 
 
-#include "lib/include/plic.h"
-#include "lib/include/pm.h"
-#include "lib/include/rf.h"
-#include "lib/include/swire.h"
-#include "lib/include/sys.h"
-#include "lib/include/trng/trng_algorithm.h"
-#include "lib/include/pke/pke_algorithm.h"
-#include "lib/include/hash/hash_algorithm.h"
-#include "lib/include/ske/ske_algorithm.h"
-#include "lib/include/chacha20_poly1305/chacha20_poly1305_algorithm.h"
+#include "plic.h"
+#include "pm.h"
+#include "rf.h"
+#include "swire.h"
+#include "sys.h"
+// #include "lib/include/trng/trng_algorithm.h"
+// #include "lib/include/pke/pke_algorithm.h"
+// #include "lib/include/hash/hash_algorithm.h"
+// #include "lib/include/ske/ske_algorithm.h"
+// #include "lib/include/chacha20_poly1305/chacha20_poly1305_algorithm.h"
 
 #include "emi.h"
 #include "audio.h"
@@ -50,7 +50,7 @@
 #include "usbhw.h"
 #include "watchdog.h"
 #include "s7816.h"
-#include "nds_intrinsic.h"
+// #include "nds_intrinsic.h"
 
 #include "uart.h"
 #include "stimer.h"
@@ -62,5 +62,5 @@
 #include "qdec.h"
 #include "plic_sw.h"
 #include "plmt.h"
-#include "flash/flash_type.h"
-#include "flash/flash_common.h"
+// #include "flash/flash_type.h"
+// #include "flash/flash_common.h"
