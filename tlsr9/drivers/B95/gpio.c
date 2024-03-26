@@ -1,27 +1,24 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
-
 /********************************************************************************************************
- * @file	gpio.c
+ * @file    gpio.c
  *
- * @brief	This is the source file for B95
+ * @brief   This is the source file for B95
  *
- * @author	Driver Group
+ * @author  Driver Group
+ * @date    2023
+ *
+ * @par     Copyright (c) 2023, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *
  *******************************************************************************************************/
 #include "gpio.h"
@@ -163,8 +160,8 @@ void gpio_set_input(gpio_pin_e pin, unsigned char value)
   * @param[in]  pin - the pin needs to set the driving strength at poor.
   * @return     none
   */
-  void gpio_ds_dis(gpio_pin_e pin)
- {
+void gpio_ds_dis(gpio_pin_e pin)
+{
  	unsigned char	bit = pin & 0xff;
  	unsigned short group = pin & 0xf00;
  	if(group == GPIO_GROUPC)
@@ -179,13 +176,16 @@ void gpio_set_input(gpio_pin_e pin, unsigned char value)
  	{
  		BM_CLR(reg_gpio_ds(pin), bit);
  	}
- }
-
+}
 
 /**
  * @brief      This function servers to set the specified GPIO as high resistor.
- * @param[in]  pin  - select the specified GPIO, GPIOG group is not included in GPIO_ALL
+ * @param[in]  pin  - select the specified GPIO, GPIOI GPIOJ group is not included in GPIO_ALL.
  * @return     none.
+ * @note       -# gpio_shutdown(GPIO_ALL) is a debugging method only and is not recommended for use in applications.
+ *             -# gpio_shutdown(GPIO_ALL) set all GPIOs to high impedance except SWS and MSPI.
+ *             -# If you want to use JTAG/USB in active state, or wake up the MCU with a specific pin,
+ *                you can enable the corresponding pin after calling gpio_shutdown(GPIO_ALL).
  */
 void gpio_shutdown(gpio_pin_e pin)
 {
@@ -194,51 +194,42 @@ void gpio_shutdown(gpio_pin_e pin)
 	switch(group)
 	{
 		case GPIO_GROUPA:
-			reg_gpio_pa_out &= (~bit);
 			reg_gpio_pa_oen |= bit;//disable output
-			reg_gpio_pa_gpio |= bit;
-			reg_gpio_pa_ie &= (~bit);//disable input
+			reg_gpio_pa_gpio |= (bit&0x7f);
+			reg_gpio_pa_ie &= ((~bit)|0x80);//disable input
 			break;
 		case GPIO_GROUPB:
-			reg_gpio_pb_out &= (~bit);
 			reg_gpio_pb_oen |= bit;
 			reg_gpio_pb_gpio |= bit;
 			reg_gpio_pb_ie &= (~bit);
 			break;
 		case GPIO_GROUPC:
-			reg_gpio_pc_out &= (~bit);
 			reg_gpio_pc_oen |= bit;
 			reg_gpio_pc_gpio |= bit;
 			analog_write_reg8(areg_gpio_pc_ie, analog_read_reg8(areg_gpio_pc_ie) & (~bit));
 			break;
 		case GPIO_GROUPD:
-			reg_gpio_pd_out &= (~bit);
 			reg_gpio_pd_oen |= bit;
 			reg_gpio_pd_gpio |= bit;
 			analog_write_reg8(areg_gpio_pd_ie, analog_read_reg8(areg_gpio_pd_ie) & (~bit));
 			break;
 
 		case GPIO_GROUPE:
-			reg_gpio_pe_out &= (~bit);
 			reg_gpio_pe_oen |= bit;
 			reg_gpio_pe_gpio |= bit;
 			reg_gpio_pe_ie &= (~bit);
 			break;
-
 		case GPIO_GROUPF:
-			reg_gpio_pf_out &= (~bit);
 			reg_gpio_pf_oen |= bit;
 			reg_gpio_pf_gpio |= bit;
 			reg_gpio_pf_ie &= (~bit);
 			break;
 
 		case GPIO_GROUPG:
-			reg_gpio_pg_out &= (~bit);
 			reg_gpio_pg_oen |= bit;
 			reg_gpio_pg_gpio |= bit;
 			reg_gpio_pg_ie &= (~bit);
 			break;
-
 		case GPIO_ALL:
 		{
 			//as gpio
@@ -248,14 +239,7 @@ void gpio_shutdown(gpio_pin_e pin)
 			reg_gpio_pd_gpio = 0xff;
 			reg_gpio_pe_gpio = 0xff;
 			reg_gpio_pf_gpio = 0xff;
-
-			//set low level
-			reg_gpio_pa_out = 0x00;
-			reg_gpio_pb_out = 0x00;
-			reg_gpio_pc_out = 0x00;
-			reg_gpio_pd_out = 0x00;
-			reg_gpio_pe_out = 0x00;
-			reg_gpio_pf_out = 0x00;
+//			reg_gpio_pg_gpio = 0xff;
 
 			//output disable
 			reg_gpio_pa_oen = 0xff;
@@ -264,6 +248,7 @@ void gpio_shutdown(gpio_pin_e pin)
 			reg_gpio_pd_oen = 0xff;
 			reg_gpio_pe_oen = 0xff;
 			reg_gpio_pf_oen = 0xff;
+//			reg_gpio_pg_oen = 0xff;
 
 			//disable input
 			reg_gpio_pa_ie = 0x80;					//SWS
@@ -272,6 +257,7 @@ void gpio_shutdown(gpio_pin_e pin)
 			analog_write_reg8(areg_gpio_pd_ie, 0);
 			reg_gpio_pe_ie = 0x00;
 			reg_gpio_pf_ie = 0x00;
+//			reg_gpio_pg_ie = 0x00;
 		}
 	}
 }
@@ -320,7 +306,7 @@ void gpio_set_irq(gpio_pin_e pin, gpio_irq_trigger_type_e trigger_type)
 /**
  * @brief     This function set a pin's IRQ_RISC0.
  * @param[in] pin 			- the pin needs to enable its IRQ.
- * @param[in] trigger_type  - gpio interrupt type 0:rising edge 1:falling edge 2:high level 3:low level.
+ * @param[in] trigger_type  - gpio interrupt type 0  rising edge 1 falling edge 2 high level 3 low level.
  * @return    none.
  */
 void gpio_set_gpio2risc0_irq(gpio_pin_e pin, gpio_irq_trigger_type_e trigger_type)
@@ -357,7 +343,7 @@ void gpio_set_gpio2risc0_irq(gpio_pin_e pin, gpio_irq_trigger_type_e trigger_typ
 /**
  * @brief     This function set a pin's IRQ_RISC1.
  * @param[in] pin 			- the pin needs to enable its IRQ.
- * @param[in] trigger_type  - gpio interrupt type 0:rising edge 1:falling edge 2:high level 3:low level.
+ * @param[in] trigger_type  - gpio interrupt type 0  rising edge 1 falling edge 2 high level 3 low level
  * @return    none.
  */
 void gpio_set_gpio2risc1_irq(gpio_pin_e pin, gpio_irq_trigger_type_e trigger_type)
@@ -392,20 +378,14 @@ void gpio_set_gpio2risc1_irq(gpio_pin_e pin, gpio_irq_trigger_type_e trigger_typ
 }
 
 /**
- * @brief     This function is used to set the gpio interrupt
- * @param[in] pin 			 - gpio pin that needs to enable irq
- *							  <p> This parameter can only be set to the pin in GPIO_GROUP selected using the function "gpio_set_src_irq_group()"
- *							  <p> For example, if you call the function gpio_set_src_irq_group(GPIO_GROUP_A) to select GPIO_GROUP_A,
- *							  <p> the pin parameter of function gpio_set_src_irq() can only select the following gpio:GPIO_PA0/GPIO_PA1/GPIO_PA2/GPIO_PA3/GPIO_PA4/GPIO_PA5/GPIO_PA6/GPIO_PA7
+ * @brief     This function set a pin's IRQ.
+ * @param[in] pin 			- the pin needs to enable its IRQ.
  * @param[in] trigger_type  - gpio interrupt type.
  * 							  0: rising edge.
  * 							  1: falling edge.
  * 							  2: high level.
  * 							  3: low level
- * @attention <p> GPIO_PX0 (GPIO_PA0/GPIO_PB0/... /GPIO_PF0) corresponds to the interrupt source IRQ34_GPIO_SRC0
- *			  <p> GPIO_PX1 (GPIO_PA1/GPIO_PB1/... /GPIO_PF1) corresponds to the interrupt source IRQ35_GPIO_SRC1
- *			  <p> ...
- *			  <p> GPIO_PX7 (GPIO_PA7/GPIO_PB7/... /GPIO_PF7) corresponds to the interrupt source IRQ41_GPIO_SRC7
+ * @note      if you want to use this irq,you should select irq_group first,which correspond to the function "gpio_set_src_irq_group()".
  * @return    none.
  */
 void gpio_set_src_irq(gpio_pin_e pin, gpio_irq_trigger_type_e trigger_type)
@@ -415,19 +395,19 @@ void gpio_set_src_irq(gpio_pin_e pin, gpio_irq_trigger_type_e trigger_type)
 	{
 	case INTR_RISING_EDGE:
 		BM_CLR(reg_gpio_pol(pin), pin & 0xff);
-		BM_CLR(reg_gpio_irq_level, bit);
+		BM_CLR(reg_gpio_irq_level, FLD_GPIO_IRQ_LVL_GPIO);
 	break;
 	case INTR_FALLING_EDGE:
 		BM_SET(reg_gpio_pol(pin), pin & 0xff);
-		BM_CLR(reg_gpio_irq_level, bit);
+		BM_CLR(reg_gpio_irq_level, FLD_GPIO_IRQ_LVL_GPIO);
 	break;
 	case INTR_HIGH_LEVEL:
 		BM_CLR(reg_gpio_pol(pin), pin & 0xff);
-		BM_SET(reg_gpio_irq_level, bit);
+		BM_SET(reg_gpio_irq_level, FLD_GPIO_IRQ_LVL_GPIO);
 	break;
 	case INTR_LOW_LEVEL:
 		BM_SET(reg_gpio_pol(pin), pin & 0xff);
-		BM_SET(reg_gpio_irq_level, bit);
+		BM_SET(reg_gpio_irq_level, FLD_GPIO_IRQ_LVL_GPIO);
 	 break;
 	}
 	gpio_clr_group_irq_status(bit);//must clear, or it will cause to unexpected interrupt.
@@ -438,75 +418,97 @@ void gpio_set_src_irq(gpio_pin_e pin, gpio_irq_trigger_type_e trigger_type)
 /**
  * @brief     This function set a pin's pull-up/down resistor.
  * @param[in] pin - the pin needs to set its pull-up/down resistor.
- * @param[in] up_down_res - the type of the pull-up/down resistor,0:FLOAT 1:PULLUP_1M 2:PULLDOWN_100K 3:PULLUP_10K.
+ * @param[in] up_down_res - the type of the pull-up/down resistor.
  * @return    none.
  */
 void gpio_set_up_down_res(gpio_pin_e pin, gpio_pull_type_e up_down_res)
 {
+	///////////////////////////////////////////////////////////
+	// 		  PA[3:0]	    	PA[7:4]			PB[3:0]			PB[7:4]  	PC[3:0]  	    PC[7:4]
+	// sel: ana_0x17<7:0>	 ana_0x18<7:0>  ana_0x19<7:0>  ana_0x1a<7:0>  ana_0x1b<7:0>  ana_0x1c<7:0>
+	// 		  PD[3:0]	    	PD[7:4]			PE[3:0]			PE[7:4]  	PF[3:0]  	    PF[7:4]
+	// sel: ana_0x1d<7:0>	 ana_0x1e<7:0>  ana_0x1f<7:0>  ana_0x20<7:0>  ana_0x21<7:0>  ana_0x22<7:0>
 	unsigned char r_val = up_down_res & 0x03;
 
 	unsigned char base_ana_reg = 0;
-	if((pin>>8)==5)
+	if((pin>>8)<6)//A-E
 	{
-		 base_ana_reg = 0x23 + ( (pin & 0xf0) ? 1 : 0 );
-
+		 base_ana_reg = 0x17 + ((pin >> 8) << 1) + ((pin & 0xf0) ? 1 : 0 );
 	}
-	else
-	{
-		 base_ana_reg = 0x0e + ((pin >> 8) << 1) + ( (pin & 0xf0) ? 1 : 0 );  //group = gpio>>8;
+	else{
+		return;
 	}
 	unsigned char shift_num, mask_not;
 
 	if(pin & 0x11){
-			shift_num = 0;
-			mask_not = 0xfc;
-		}
-		else if(pin & 0x22){
-			shift_num = 2;
-			mask_not = 0xf3;
-		}
-		else if(pin & 0x44){
-			shift_num = 4;
-			mask_not = 0xcf;
-		}
-		else if(pin & 0x88){
-			shift_num = 6;
-			mask_not = 0x3f;
-		}
-		else{
-			return;
-		}
+		shift_num = 0;
+		mask_not = 0xfc;
+	}
+	else if(pin & 0x22){
+		shift_num = 2;
+		mask_not = 0xf3;
+	}
+	else if(pin & 0x44){
+		shift_num = 4;
+		mask_not = 0xcf;
+	}
+	else if(pin & 0x88){
+		shift_num = 6;
+		mask_not = 0x3f;
+	}
+	else{
+		return;
+	}
 	analog_write_reg8(base_ana_reg, (analog_read_reg8(base_ana_reg) & mask_not) | (r_val << shift_num));
 }
 
 /**
- * @brief     This function set pin's 30k pull-up register.
- * @param[in] pin - the pin needs to set its pull-up register,not include PF[5:0] and PG[5:0] which are not available.
+ * @brief     This function set pin's  pull-up register .
+ * @param[in] pin - the pin needs to set its pull-up register .
  * @return    none.
+ * @attention  This function sets the digital pull-up, it will not work after entering low power consumption.
  */
-void gpio_set_pullup_res_30k(gpio_pin_e pin)
+void gpio_set_digital_pulldown(gpio_pin_e pin)
 {
 	unsigned char	bit = pin & 0xff;
 	unsigned short group = pin & 0xf00;
 
 	if(group==GPIO_GROUPC)
 	{
-		analog_write_reg8(areg_gpio_pc_pe, analog_read_reg8(areg_gpio_pc_pe) | bit);
+		analog_write_reg8(areg_gpio_pc_pd, analog_read_reg8(areg_gpio_pc_pd) | bit);
 	}
 	else if(group==GPIO_GROUPD)
 	{
-		analog_write_reg8(areg_gpio_pd_pe, analog_read_reg8(areg_gpio_pd_pe) | bit);
-	}
-	else if (group==GPIO_GROUPF || group==GPIO_GROUPG){
-		if(pin == GPIO_PF6 || pin == GPIO_PF7){
-			BM_SET(reg_gpio_oen(pin),bit);
-			BM_SET(reg_gpio_out(pin),bit);
-		}
+		analog_write_reg8(areg_gpio_pd_pd, analog_read_reg8(areg_gpio_pd_pd) | bit);
 	}
 	else
 	{
-		BM_SET(reg_gpio_oen(pin),bit);
-		BM_SET(reg_gpio_out(pin),bit);
+ 		BM_SET(reg_gpio_pd(pin),bit);
+	}
+}
+
+/**
+ * @brief     This function set pin's  pull-down register .
+ * @param[in] pin - the pin needs to set its pull-down register .
+ * @return    none.
+ * @attention  This function sets the digital pull-down, it will not work after entering low power consumption.
+ */
+void gpio_set_digital_pullup(gpio_pin_e pin)
+{
+	unsigned char	bit = pin & 0xff;
+	unsigned short group = pin & 0xf00;
+
+	if(group==GPIO_GROUPC)
+	{
+		analog_write_reg8(areg_gpio_pc_pu, analog_read_reg8(areg_gpio_pc_pu) | bit);
+	}
+	else if(group==GPIO_GROUPD)
+	{
+		analog_write_reg8(areg_gpio_pd_pu, analog_read_reg8(areg_gpio_pd_pu) | bit);
+	}
+	else
+	{
+ 		BM_SET(reg_gpio_pu(pin),bit);
 	}
 }
 
@@ -516,13 +518,12 @@ void gpio_set_pullup_res_30k(gpio_pin_e pin)
  * @param[in] sel_clk
  * @return    none.
  */
-void  gpio_set_probe_clk_function(gpio_func_pin_e pin,probe_clk_sel_e sel_clk)
+void gpio_set_probe_clk_function(gpio_func_pin_e pin, probe_clk_sel_e sel_clk)
 {
-	reg_probe_clk_sel= (reg_probe_clk_sel&0xe0)|sel_clk;	//probe_clk_sel_e
-	gpio_set_mux_function(pin,DBG_PROBE_CLK);		        //sel probe_clk function
+	reg_probe_clk_sel= (reg_probe_clk_sel & 0xe0) | sel_clk;	//probe_clk_sel_e
+	gpio_set_mux_function(pin, DBG_PROBE_CLK);		        //sel probe_clk function
 	gpio_function_dis((gpio_pin_e)pin);
 }
-
 /**********************************************************************************************************************
   *                    						local function implementation                                             *
   *********************************************************************************************************************/

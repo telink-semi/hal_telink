@@ -30,6 +30,8 @@
 #define _attribute_noinline_                    __attribute__((noinline))
 #define _attribute_ram_code_sec_                __attribute__((section(".ram_code")))
 #define _attribute_ram_code_sec_noinline_       __attribute__((section(".ram_code"))) __attribute__((noinline))
+#define _attribute_ram_code_sec_optimize_o2_    __attribute__((section(".ram_code"))) __attribute__((optimize("O2"))) 
+#define _attribute_ram_code_sec_optimize_o2_noinline_    __attribute__((noinline)) __attribute__((section(".ram_code"))) __attribute__((optimize("O2"))) 
 #define _attribute_ram_code_                    _attribute_ram_code_sec_noinline_
 #define _attribute_text_sec_                    __attribute__((section(".text")))
 #define _attribute_text_code_                   _attribute_text_sec_

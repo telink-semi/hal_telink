@@ -1,27 +1,24 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
-
 /********************************************************************************************************
- * @file	sys.h
+ * @file    sys.h
  *
- * @brief	This is the header file for B95
+ * @brief   This is the header file for B95
  *
- * @author	Driver Group
+ * @author  Driver Group
+ * @date    2023
+ *
+ * @par     Copyright (c) 2023, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *
  *******************************************************************************************************/
 /**	@page SYS
@@ -51,7 +48,7 @@
  * @brief instruction delay
  */
 
-#define	_ASM_NOP_					__asm__("nop")
+#define	_ASM_NOP_					__asm__ __volatile__("nop")
 
 #define	CLOCK_DLY_1_CYC				_ASM_NOP_
 #define	CLOCK_DLY_2_CYC				_ASM_NOP_;_ASM_NOP_
@@ -63,7 +60,7 @@
 #define	CLOCK_DLY_8_CYC				_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_
 #define	CLOCK_DLY_9_CYC				_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_
 #define	CLOCK_DLY_10_CYC			_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_
-
+#define	CLOCK_DLY_64_CYC			CLOCK_DLY_10_CYC;CLOCK_DLY_10_CYC;CLOCK_DLY_10_CYC;CLOCK_DLY_10_CYC;CLOCK_DLY_10_CYC;CLOCK_DLY_10_CYC;CLOCK_DLY_4_CYC
 
 /**********************************************************************************************************************
  *                                         global data type                                                           *
@@ -73,9 +70,9 @@
  * @brief 	Power type for different application
  */
 typedef enum{
-	LDO_1P4_LDO_2P0 	= 0x00,	/**< 1.4V-LDO & 2.0V-LDO mode */
-	DCDC_1P4_LDO_2P0	= 0x01,	/**< 1.4V-DCDC & 2.0V-LDO mode */
-	DCDC_1P4_DCDC_2P0	= 0x03,	/**< 1.4V-DCDC & 2.0V-DCDC mode */
+	LDO_0P94_LDO_1P8 	= 0x00,	/**< 0.94V-LDO  & 1.8V-LDO  mode */
+//	DCDC_0P94_LDO_1P8	= 0x01,	/**< 0.94V-DCDC & 1.8V-LDO  mode */
+//	 DCDC_0P94_DCDC_1P8	= 0x03,	/**< 0.94V-DCDC & 1.8V-DCDC mode */
 }power_mode_e;
 
 /**
@@ -93,24 +90,6 @@ typedef enum{
 												<p>  In this configuration bypass is turned on.vbat is directly supplying power to the chip
 												<p>  VOH(the output voltage of GPIO)= VBAT */
 }vbat_type_e;
-
-/**
- * @enum 		gpio_voltage_e
- * @brief		This is the configuration of GPIO voltage.
- * @attention   If the enumeration uses GPIO_VOLTAGE_1V8, the following usage considerations need to be noted:
- *				-# Pay attention to check the sampling range of ADC, the maximum detection voltage of the ADC input cannot be higher than 1.8V.
- * 			   	   If a voltage higher than this needs to be detected, external access to the divider circuit is required.
- * 			   	-# ADC_VBAT_SAMPLE can not be used.
- * 			   	   Users can use external voltage divider instead, the details refer to the Driver SDK Developer Handbook for this chip.
- *				-# Since 1.8V IO does not comply with USB electrical layer regulations, GPIO cannot be configured to 1.8V when using USB.
- *				-# When using VBUS 5V to power the chip, only after register configuration will GPIO be 1.8V.
- * 			   	   So from power-on to register configuration, the default output GPIO(PC5) is still 3.3V. reboot will also be 3.3V for a while.
- * 			   	   (the other default output GPIO(PG1/PG2/PG3/PG5) are not affected by this.)
- */
-typedef enum{
-	GPIO_VOLTAGE_3V3	= 0x00,	/**< the GPIO voltage is set to 3.3V. */
-	GPIO_VOLTAGE_1V8 	= 0x01,	/**< the GPIO voltage is set to 1.8V. */
-}gpio_voltage_e;
 
 /**
  * @brief command table for special registers
@@ -135,36 +114,35 @@ extern unsigned int g_chip_version;
  * @brief      This function reboot mcu.
  * @return     none
  */
-_attribute_text_sec_ void sys_reboot(void);
+_attribute_text_sec_ void sys_reboot_lib(void);
 
 /**
  * @brief   	This function serves to initialize system.
  * @param[in]	power_mode	- power mode(LDO/DCDC/LDO_DCDC)
  * @param[in]	vbat_v		- This parameter is used to determine whether the VBAT voltage can be greater than 3.6V.
- * @param[in]	gpio_v		- This is the configuration of GPIO voltage.
- * 							  For some chip models the GPIO voltage is fixed 3.3V or fixed 1.8V,
- * 							  For other GPIO models the voltage is configurable:
- * 							  Requires hardware configuration: 3v3 (CFG_VIO connects to VSS) or 1V8 (CFG_VIO connects to VDDO3/AVDD3)),
- * 							  please configure this parameter correctly according to the chip data sheet and the corresponding board design.
  * @attention	If vbat_v is set to VBAT_MAX_VALUE_LESS_THAN_3V6, then gpio_v can only be set to GPIO_VOLTAGE_3V3.
  * @return  	none
  */
-void sys_init(power_mode_e power_mode, vbat_type_e vbat_v, gpio_voltage_e gpio_v);
+void sys_init(power_mode_e power_mode, vbat_type_e vbat_v);
 
 /**
- * @brief      This function performs a series of operations of writing digital or analog registers
- *             according to a command table
- * @param[in]  pt    - pointer to a command table containing several writing commands
- * @param[in]  size  - number of commands in the table
- * @return     number of commands are carried out
+ * @brief 		This function serves to set system power mode.
+ * @param[in]   power_mode	- power mode(LDO/DCDC/LDO_DCDC).
+ * @return		none.
+ * @note		pd_dcdc_ldo_sw<1:0>, dcdc & bypass ldo status bits:
+					dcdc_0p94	dcdc_1p8	 ldo_0p94	 ldo_1p8
+				00:		N			N			Y			Y
+				01:		Y			N			N			Y
+				10:		Y			N			N			N
+				11:		Y			Y			N			N
  */
-
-int write_reg_table(const tbl_cmd_set_t * pt, int size);
+void sys_set_power_mode(power_mode_e power_mode);
 
 /**
- * @brief      This function servers to get calibration value from EFUSE.
- * @param[in]  gpio_type - select the type of GPIO.
- * @return 	   1 - the calibration value update, 0 - the calibration value is not update.
+ * @brief		This function serves to set vbat type. 
+ * @param[in]	vbat_v	- This parameter is used to determine whether the VBAT voltage can be greater than 3.6V.
+ * 						- Please refer to vbat_type_e for specific usage precautions.
+ * @return		none
  */
-unsigned char efuse_calib_adc_vref(gpio_voltage_e gpio_type);
+void sys_set_vbat_type(vbat_type_e vbat_v);
 #endif
