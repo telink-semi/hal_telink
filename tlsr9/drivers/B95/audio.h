@@ -1,27 +1,24 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
-
 /********************************************************************************************************
- * @file	audio.h
+ * @file    audio.h
  *
- * @brief	This is the header file for B95
+ * @brief   This is the header file for B95
  *
- * @author	Driver Group
+ * @author  Driver Group
+ * @date    2023
+ *
+ * @par     Copyright (c) 2023, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *
  *******************************************************************************************************/
 /**	@page AUDIO
@@ -334,56 +331,56 @@ typedef enum{
 }audio_i2s_align_data_width_e;
 typedef struct
 {
+	void* data_buf;
+	unsigned int data_buf_size;
 	codec_stream0_input_src_e input_src;
 	audio_sample_rate_e sample_rate;
 	audio_codec_wl_mode_e data_width;
 	audio_fifo_chn_e fifo_num;
 	dma_chn_e dma_num;
-	volatile void* data_buf;
-	unsigned int data_buf_size;
 }audio_codec_stream0_input_t;
 
 typedef struct
 {
+	void* data_buf;
+	unsigned int data_buf_size;
 	codec_stream1_input_src_e input_src;
 	audio_sample_rate_e sample_rate;
 	audio_codec_wl_mode_e data_width;
 	audio_fifo_chn_e fifo_num;
 	dma_chn_e dma_num;
-	volatile void* data_buf;
-	unsigned int data_buf_size;
 }audio_codec_stream1_input_t;
 
 typedef struct
 {
+	void* data_buf;
+	unsigned int data_buf_size;
 	audio_dac_output_src_e output_src;
-	unsigned char sample_rate;
+	audio_sample_rate_e sample_rate;
 	audio_codec_wl_mode_e data_width;
 	audio_fifo_chn_e fifo_num;
 	dma_chn_e dma_num;
-	volatile void* data_buf;
-	unsigned int data_buf_size;
 	codec_dac_mode_e mode;
 }audio_codec_output_t;
 
 typedef struct
 {
+	void *data_buf;
+	unsigned int data_buf_size;
 	audio_i2s_select_e i2s_select;
 	i2s_channel_select_e i2s_ch_sel;
 	audio_i2s_wl_mode_e data_width;
 	audio_fifo_chn_e fifo_chn;
 	dma_chn_e dma_num;
-	volatile void *data_buf;
-	unsigned int data_buf_size;
 }audio_i2s_input_output_t;
 
 typedef struct{
-	audio_i2s_select_e i2s_select;
 	unsigned short *sample_rate;
+	i2s_pin_config_t *pin_config;
+	audio_i2s_select_e i2s_select;
 	audio_i2s_wl_mode_e data_width;
 	i2s_mode_select_e i2s_mode;
 	i2s_m_s_mode_e master_slave_mode;
-	i2s_pin_config_t *pin_config;
 }audio_i2s_config_t;
 
 /**
@@ -538,7 +535,8 @@ static inline void audio_clr_irq_mask(audio_fifo_irq_type_e irq_mask)
 /**
  * @brief 		This function servers to get irq status.
  * @param[in] 	irq_status 	- the irq status.
- * @return    - the value of status is be set.
+ * @retval      non-zero      -  the interrupt occurred.
+ * @retval      zero  -  the interrupt did not occur.
  */
 static inline unsigned char  audio_get_irq_status(audio_fifo_irq_type_e irq_status)
 {
@@ -584,7 +582,7 @@ static inline void audio_set_rx_fifo_threshold(audio_fifo_chn_e rx_fifo_chn,unsi
  */
 static inline unsigned int audio_get_tx_dma_rptr (dma_chn_e chn)
 {
-	return convert_ram_addr_bus2cpu(reg_dma_src_addr(chn));
+	return reg_dma_src_addr(chn);
 }
 /**
  * 	@brief      This function serves to get dma rx buff pointer.
@@ -593,7 +591,7 @@ static inline unsigned int audio_get_tx_dma_rptr (dma_chn_e chn)
  */
 static inline unsigned int audio_get_rx_dma_wptr (dma_chn_e chn)
 {
-	return   convert_ram_addr_bus2cpu(reg_dma_dst_addr(chn));
+	return reg_dma_dst_addr(chn);
 }
 
 /**
@@ -867,7 +865,7 @@ void audio_tx_dma_dis(dma_chn_e chn);
  * @param[in] chn          - dma channel
  * @param[in] dst_addr     - Pointer to data buffer, it must be 4-bytes aligned address.
  *                           and the actual buffer size defined by the user needs to be not smaller than the data_len, otherwise there may be an out-of-bounds problem.
- * @param[in] data_len     - Length of DMA in bytes，it must be set to a multiple of 4. The maximum value that can be set is 0x10000.
+ * @param[in] data_len     - Length of DMA in bytes, it must be set to a multiple of 4. The maximum value that can be set is 0x10000.
  * @param[in] head_of_list - the head address of dma llp.
  * @return    none
  */
@@ -879,7 +877,7 @@ void audio_rx_dma_config(dma_chn_e chn,unsigned short *dst_addr,unsigned int dat
  * @param[in] llpointer   - the next element of llp_pointer.
  * @param[in] dst_addr    - Pointer to data buffer, it must be 4-bytes aligned address and the actual buffer size defined by the user needs to
  *							be not smaller than the data_len, otherwise there may be an out-of-bounds problem.
- * @param[in] data_len    - Length of DMA in bytes，it must be set to a multiple of 4. The maximum value that can be set is 0x10000.
+ * @param[in] data_len    - Length of DMA in bytes, it must be set to a multiple of 4. The maximum value that can be set is 0x10000.
  * @return 	  none
  */
 void audio_rx_dma_add_list_element(dma_chain_config_t * rx_config,dma_chain_config_t *llpointer ,unsigned short * dst_addr,unsigned int data_len);
@@ -890,7 +888,7 @@ void audio_rx_dma_add_list_element(dma_chain_config_t * rx_config,dma_chain_conf
  * @param[in] chn         - dma channel
  * @param[in] in_buff     - Pointer to data buffer, it must be 4-bytes aligned address and the actual buffer size defined by the user needs to
  *						 	be not smaller than the data_len, otherwise there may be an out-of-bounds problem.
- * @param[in] buff_size   - Length of DMA in bytes，it must be set to a multiple of 4. The maximum value that can be set is 0x10000.
+ * @param[in] buff_size   - Length of DMA in bytes, it must be set to a multiple of 4. The maximum value that can be set is 0x10000.
  * @return 	  none
  */
 void audio_rx_dma_chain_init (audio_fifo_chn_e rx_fifo_chn,dma_chn_e chn,unsigned short * in_buff,unsigned int buff_size);

@@ -1,27 +1,24 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
-
 /********************************************************************************************************
- * @file	i2c_reg.h
+ * @file    i2c_reg.h
  *
- * @brief	This is the header file for B95
+ * @brief   This is the header file for B95
  *
- * @author	Driver Group
+ * @author  Driver Group
+ * @date    2023
+ *
+ * @par     Copyright (c) 2023, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *
  *******************************************************************************************************/
 #ifndef I2C_REG_H_
@@ -29,18 +26,14 @@
 #include "soc.h"
 /*******************************      i2c registers: 0x140280      ******************************/
 
-
 #define 	REG_I2C_BASE		    0x140280
 
-
 #define reg_i2c_data_buf0_addr      0x80140288
-
 
 /**
  *  i2c clock = pclk/(4*DivClock)
  */
 #define reg_i2c_sp				    REG_ADDR8(REG_I2C_BASE)
-
 
 /**
  * this register to configure I2C ID.
@@ -52,7 +45,6 @@ enum{
 	FLD_I2C_WRITE_READ_BIT  =  BIT(0),
 	FLD_I2C_ID              =  BIT_RNG(1,7),
 };
-
 
 /**
  * this register is to configure i2c master
@@ -70,7 +62,6 @@ enum{
 	FLD_I2C_MST_P           =  BIT_RNG(3,5),
 	FLD_I2C_SS              =  BIT_RNG(6,7),
 };
-
 
 /**
  * This shows the interrupt mask register of i2c
@@ -127,8 +118,6 @@ enum{
 	FLD_I2C_LS_ACK                  =  BIT(7),
 };
 
-
-
 /**
  * This is the register that configures the i2c trigger interrupt
  * BIT_RNG[0,3] to configure the interrupt trigger level of rx_status, for example BIT_RNG[0:3]=0x04,when rx 4bytes,will trigger interrupt.
@@ -139,8 +128,6 @@ enum{
 	FLD_I2C_RX_IRQ_TRIG_LEV         =  BIT_RNG(0,3),
 	FLD_I2C_TX_IRQ_TRIG_LEV         =  BIT_RNG(4,7),
 };
-
-
 
 /*
  * this register is to configure i2c master
@@ -164,7 +151,6 @@ typedef enum{
     FLD_I2C_TX_STRETCH_SEL           =  BIT(5),
 	FLD_I2C_MASK_STRETCH              =  BIT(6),
 }i2c_master_e;
-
 
 /*
  * BIT[0] to enable slave stretch function.
@@ -193,7 +179,6 @@ enum{
 	FLD_I2C_BUF0                    = BIT_RNG(0,7),
 };
 
-
 /**
  * This register represents the data buffer of i2c.
  * BIT_RNG[0,7]  Buffer that stores one byte of data
@@ -202,7 +187,6 @@ enum{
 enum{
 	FLD_I2C_BUF1                    = BIT_RNG(0,7),
 };
-
 
 /**
  * This register represents the data buffer of i2c.
@@ -213,7 +197,6 @@ enum{
 	FLD_I2C_BUF2                    = BIT_RNG(0,7),
 };
 
-
 /**
  * This register represents the data buffer of i2c.
  * BIT_RNG[0,7]  Buffer that stores one byte of data
@@ -222,7 +205,6 @@ enum{
 enum{
 	FLD_I2C_BUF3                    = BIT_RNG(0,7),
 };
-
 
 /**
  * This register is used to configure the number of bytes in the i2c buffer
@@ -234,7 +216,6 @@ enum{
 	FLD_I2C_RX_BUFCNT               = BIT_RNG(0,3),
 	FLD_I2C_TX_BUFCNT               = BIT_RNG(4,7),
 };
-
 
 /**
  * This register used to configure the status of i2c.
@@ -257,15 +238,13 @@ enum{
     FLD_I2C_RX_DONE                 = BIT(7),
 };
 
-
-
 /*
- * this register is use to get slave relevant status
- * BIT[0] Judge whether slave is to read or write.
- * BIT[1] slave stretch indicate.
- * BIT[2] judge slave tx_fifo is empty.
- * BIT[3] judge slave rx_fifo is full.
- * BIT[3] the stretch interrupt status.
+ * this register is use to get slave relevant status read only.
+ * BIT[0] Judge whether slave is to read or write. read only.
+ * BIT[1] slave stretch indicate. read only.
+ * BIT[2] judge slave tx_fifo is empty. read only.
+ * BIT[3] judge slave rx_fifo is full. read only.
+ * BIT[3] the stretch interrupt status. Write 1 to clear zero.
  */
 #define i2c_slave_status1               REG_ADDR8(REG_I2C_BASE+0x0e)
 enum{
@@ -277,12 +256,8 @@ enum{
 
 };
 
-
-
-
 //As a master, you need to configure this length for both sending and receiving, and the hardware needs to know what the length is.
 #define reg_i2c_len(i)			        REG_ADDR8(REG_I2C_BASE+0x10+(i))
-
 
 /**
  *  This register is used to indicate the status of i2c master.
@@ -297,11 +272,9 @@ enum{
 	FLD_ADDR_BUSY  =  BIT(1),
 	FLD_DATAW_BUSY = BIT(2),
 	FLD_DATAR_BUSY = BIT(3),
-
 };
 
 /*******************************      i2c1_m registers: 0x140480     ******************************/
-
 
 #define 	REG_I2C1_M_BASE		    0x140480
 
@@ -329,9 +302,6 @@ enum{
 #define reg_i2c1_m_dw			REG_ADDR8(REG_I2C1_M_BASE+0x05)
 #define reg_i2c1_m_dr			REG_ADDR8(REG_I2C1_M_BASE+0x06)
 
-
-
-
 #define reg_i2c1_m_ctrl			REG_ADDR8(REG_I2C1_M_BASE+0x07)
 
 enum{
@@ -346,13 +316,5 @@ enum{
 };
 
 #endif
-
-
-
-
-
-
-
-
 
 

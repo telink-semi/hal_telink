@@ -154,7 +154,7 @@ int b9x_bt_blc_init(void *prx, void *ptx)
 	}
 #endif /* CONFIG_BT_PERIPHERAL */
 
-#if CONFIG_SOC_RISCV_TELINK_B92||CONFIG_SOC_RISCV_TELINK_B95
+#if CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B95
 	blc_ll_configLegacyAdvEnableStrategy(LEG_ADV_EN_STRATEGY_3);
 	blc_ll_configScanEnableStrategy(SCAN_STRATEGY_1);
 #endif
