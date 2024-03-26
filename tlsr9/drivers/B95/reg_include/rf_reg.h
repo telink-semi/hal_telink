@@ -4,9 +4,9 @@
  * @brief   This is the header file for B95
  *
  * @author  Driver Group
- * @date    2020
+ * @date    2023
  *
- * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2023, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -26,14 +26,131 @@
 #include "soc.h"
 
 ///*******************************      RF      ******************************/
+/*******************************      baseband clock registers: 0x170a00       ******************************/
+#define BB_TIMER_BASE_ADDR			   	0x170a00
+#define reg_bb_timer_tick         		REG_ADDR32(BB_TIMER_BASE_ADDR)
+#define reg_bb_timer_irq_level         	REG_ADDR32(BB_TIMER_BASE_ADDR+0x4)
+
+#define reg_bb_timer_irq_mask				REG_ADDR8(BB_TIMER_BASE_ADDR+0x8)
+enum{
+	FLD_BB_TIMER_IRQ_MASK 	= 	BIT_RNG(0,1),
+	FLD_BB_TIMER_IRQ_WAIT 	= 	BIT(2),
+	FLD_BB_TIMER_TRIG_PAST_EN 	= 	BIT(3),
+};
+
+#define reg_bb_timer_cal_irq		REG_ADDR8(BB_TIMER_BASE_ADDR+0x9)
+
+typedef enum{
+	FLD_BB_TIMER_IRQ_CLR_BB_TIMER  		= 	BIT(0),//clear IRQ systimer level irq  0x09[0]
+	FLD_BB_TIMER_IRQ_CLR_CAL 		    = 	BIT(1),//calibration latch result update irq (clear 32k cal irq 09[1] )
+}rf_bb_timer_irq_e;
+
+#define reg_bb_timer_ctrl		    REG_ADDR8(BB_TIMER_BASE_ADDR+0xa)
+enum{
+	FLD_BB_TIMER_32K_WR_EN 	    = 	BIT(0),
+	FLD_BB_TIMER_TIMER_EN 	    = 	BIT(1),
+	FLD_BB_TIMER_TIMER_AUTO     = 	BIT(2),
+	FLD_BB_TIMER_32K_TRACK_EN 	= 	BIT(3),
+	FLD_BB_TIMER_32K_CAL_MODE 	= 	BIT_RNG(4,7),
+
+};
+
+#define reg_bb_timer_st		    REG_ADDR8(BB_TIMER_BASE_ADDR+0xb)
+
+enum{
+
+	FLD_BB_TIMER_CMD_STOP 			    =   BIT(1),
+	FLD_BB_TIMER_CMD_SYNC		        =   BIT(3),
+	FLD_BB_TIMER_CLK_32K		        =   BIT(4),
+	FLD_BB_TIMER_CLR_RD_DONE			=   BIT(5),
+	FLD_BB_TIMER_RD_BUSY			    =   BIT(6),
+	FLD_BB_TIMER_CMD_SET_DLY_DONE	    =   BIT(7),
+
+};
+
+#define reg_bb_timer_ctrl1		    REG_ADDR8(BB_TIMER_BASE_ADDR+0x19)
+enum{
+
+	FLD_BB_TIMER_PEM_EVENT_EN 			=   BIT(3),
+	FLD_BB_TIMER_PEM_TASK_0_EN		    =   BIT(4),
+	FLD_BB_TIMER_PEM_TASK_1_EN		    =   BIT(5),
+	FLD_BB_TIMER_R_TMR_MAN_SEL			=   BIT(7),
+
+};
 
 
-#define                 CHNADDR           0x100400
-#define REG_TL_RADIO_BASE_ADDR						0X170600
+
+///*******************************      baseband dma registers: 0x170800      ******************************/
+#define BB_DMA_BASE_ADDR			       0x170800
 
 
-#define reg_rf_bb_auto_ctrl				REG_ADDR8(0x10050c)
+#define reg_bb_dma_ctr0(i)			    REG_ADDR8(( BB_DMA_BASE_ADDR+0x44 +(i)*0x14))
+#define reg_bb_dma_ctrl(i)				REG_ADDR32(BB_DMA_BASE_ADDR+0x44 +(i)*0x14)
+enum{
+	FLD_BB_DMA_CHANNEL_ENABLE			= BIT(0),
+	FLD_BB_DMA_CHANNEL_TC_MASK			= BIT(1),
+	FLD_BB_DMA_CHANNEL_ERR_MASK		= BIT(2),
+	FLD_BB_DMA_CHANNEL_ABT_MASK		= BIT(3),
+	FLD_BB_DMA_CHANNEL_DST_REQ_SEL		= BIT_RNG(4,8),
+	FLD_BB_DMA_CHANNEL_SRC_REQ_SEL		= BIT_RNG(9,13),
+	FLD_BB_DMA_CHANNEL_DST_ADDR_CTRL	= BIT_RNG(14,15),
+	FLD_BB_DMA_CHANNEL_SRC_ADDR_CTRL	= BIT_RNG(16,17),
+	FLD_BB_DMA_CHANNEL_DST_MODE		= BIT(18),
+	FLD_BB_DMA_CHANNEL_SRC_MODE		= BIT(19),
+	FLD_BB_DMA_CHANNEL_DST_WIDTH		= BIT_RNG(20,21),
+	FLD_BB_DMA_CHANNEL_SRC_WIDTH		= BIT_RNG(22,23),
+};
 
+#define reg_bb_dma_ctr3(i)			    REG_ADDR8(BB_DMA_BASE_ADDR+0x47+(i)*0x14)
+enum{
+	FLD_BB_DMA_SRC_BURST_SIZE    		=	BIT_RNG(0,2),
+	FLD_BB_DMA_R_NUM_EN    	        =	BIT(4),
+	FLD_BB_DMA_PRIORITY    	        =	BIT(5),
+	FLD_BB_DMA_W_NUM_EN   	            =	BIT(6),
+	FLD_BB_DMA_AUTO_ENABLE_EN           =	BIT(7),
+};
+
+#define reg_bb_dma_src_addr(i)			REG_ADDR32(BB_DMA_BASE_ADDR+0x48+(i)*0x14)
+#define reg_bb_dma_dst_addr(i)			REG_ADDR32(BB_DMA_BASE_ADDR+0x4c+(i)*0x14)
+
+#define reg_bb_dma_size0(i)			REG_ADDR16(BB_DMA_BASE_ADDR+0x50+(i)*0x14)
+enum{
+	FLD_BB_DMA_TANS_SIZE0    		    = BIT_RNG(0,15),
+};
+#define reg_bb_dma_size1(i)			REG_ADDR8(BB_DMA_BASE_ADDR+0x52+(i)*0x14)
+enum{
+	FLD_BB_DMA_TANS_SIZE1    		    = BIT_RNG(0,5),
+	FLD_BB_DMA_TANS_IDX    	        = BIT_RNG(6,7),
+};
+
+#define reg_bb_dma_size(i)			    REG_ADDR32 (BB_DMA_BASE_ADDR+0x50+(i)*0x14)
+
+enum{
+	FLD_BB_DMA_TX_SIZE    		=	BIT_RNG(0,21),
+	FLD_BB_DMA_TX_SIZE_IDX    	=	BIT_RNG(22,23),
+};
+
+
+#define reg_bb_dma_rx_wptr			    REG_ADDR8(BB_DMA_BASE_ADDR+0xf4)
+#define reg_bb_dma_tx_wptr			    REG_ADDR8(BB_DMA_BASE_ADDR+0x100)
+
+enum{
+	FLD_BB_DMA_WPTR_MASK =			BIT_RNG(0,4),
+};
+
+
+#define reg_bb_dma_rx_rptr			    REG_ADDR8(BB_DMA_BASE_ADDR+0xf5)
+#define reg_bb_dma_tx_rptr			    REG_ADDR8(BB_DMA_BASE_ADDR+0x101)
+enum{
+	FLD_BB_DMA_RPTR_MASK =			BIT_RNG(0,4),
+	FLD_BB_DMA_RPTR_SET =			BIT(5),
+	FLD_BB_DMA_RPTR_NEXT =			BIT(6),
+	FLD_BB_DMA_RPTR_CLR =			BIT(7),
+};
+
+
+
+#define reg_rf_bb_auto_ctrl				REG_ADDR8(0x17090c)
 enum{
 	FLD_RF_TX_MULTI_EN					=	BIT(0),
 	FLD_RF_RX_MULTI_EN					=	BIT(1),
@@ -42,34 +159,33 @@ enum{
 	FLD_RF_CH1_RX_ERR_EN				=	BIT(4),
 	FLD_RF_DMA_REQ_D1_EN				=	BIT(5),
 };
-#define reg_rf_bb_tx_chn_dep				REG_ADDR8(0x1004f3)
-#define reg_rf_bb_tx_size					REG_ADDR8(0x1004f0)
-#define reg_rf_bb_tx_size_h					REG_ADDR8(0x1004f1)
 
-#define reg_rf_dma_rx_wptr				REG_ADDR8(0x001004f4)
-#define reg_rf_dma_rx_rptr				REG_ADDR8(0x001004f5)
+#define reg_rf_bb_tx_chn_dep				REG_ADDR8(0x1708f3)
+#define reg_rf_bb_tx_size					REG_ADDR8(0x1708f0)
+#define reg_rf_bb_tx_size_h					REG_ADDR8(0x1708f1)
 
-#define reg_rf_dma_tx_rptr(i)			REG_ADDR8(0x00100501 + (i << 1))
-#define reg_rf_dma_tx_wptr(i)			REG_ADDR8(0x00100500 + (i << 1))
+#define reg_rf_dma_rx_wptr				REG_ADDR8(0x1708f4)
+#define reg_rf_dma_rx_rptr				REG_ADDR8(0x1708f5)
 
-#define reg_rf_bb_rx_size					REG_ADDR8(CHNADDR+0xf6)
-#define reg_rf_bb_rx_size_h					REG_ADDR8(CHNADDR+0xf7)
+#define reg_rf_dma_tx_rptr(i)			REG_ADDR8(0x170901 + (i << 1))
+#define reg_rf_dma_tx_wptr(i)			REG_ADDR8(0x170900 + (i << 1))
+
+#define reg_rf_bb_rx_size					REG_ADDR8(BB_DMA_BASE_ADDR+0xf6)
+#define reg_rf_bb_rx_size_h					REG_ADDR8(BB_DMA_BASE_ADDR+0xf7)
 
 
-#define reg_rf_rx_wptr_mask					REG_ADDR8(CHNADDR+0x10d)
-
+#define reg_rf_rx_wptr_mask					REG_ADDR8(BB_DMA_BASE_ADDR+0x10d)
 
 
 //******************************      RF_Register_list      ******************************/
-#define               REG_BASEBAND_BASE_ADDR          0x0170000
-
+#define    REG_BASEBAND_BASE_ADDR           0x170000
+#define    REG_TL_RADIO_BASE_ADDR			0X170600
 
 #define    reg_rf_tx_mode1				REG_ADDR8(REG_BASEBAND_BASE_ADDR)
 enum{
 	FLD_RF_DMA_EN				=	BIT(0),
 	FLD_RF_CRC_EN				=	BIT(1),
-	FLD_RF_TX_FMT				=	BIT_RNG(2,3),
-	FLD_RF_TX_XOR_MODE			=	BIT(4),
+	FLD_RF_TX_MODE				=	BIT_RNG(2,4),
 	FLD_RF_TX_TEST_DATA			=	BIT(5),
 	FLD_RF_TX_TEST_EN			=	BIT(6),
 	FLD_RF_BB_DEC    			=	BIT(7),
@@ -79,11 +195,13 @@ enum{
 #define    reg_rf_tx_mode2				REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x01)
 enum{
 	FLD_RF_ZB_PN_EN				=	BIT(0),
-	FLD_RF_RESERVED0			=	BIT_RNG(1,2),
+	FLD_RF_TLK_CRYPT_ENABLE		=	BIT(1),
+	FLD_RF_TLK_MST_SLV		    =	BIT(2),
 	FLD_RF_V_PN_EN				=	BIT(3),
 	FLD_RF_R_CUSTOM_MADE	    =	BIT(4),
-	FLD_RF_RESERVED1			=	BIT(5),
+	FLD_RF_V_INTLV_EN			=	BIT(5),
 	FLD_RF_TX_OUT_PLR	        =	BIT(6),
+	FLD_RF_TX_EN_TGL	        =	BIT(6),
 };
 
 
@@ -100,7 +218,7 @@ enum{
 	FLD_RF_SLOW_SEL				=	BIT(1),
 	FLD_RF_XMODE_EN				=	BIT(2),
 	FLD_RF_REV_ORDER			=	BIT(3),
-	FLD_RF_TX_MODE				=	BIT(4),
+	FLD_RF_TX_XOR_MODE			=	BIT(4),
 	FLD_RF_R_DBG_SEL0			=	BIT(5),
 	FLD_RF_MODEM1M_PAT			=	BIT(6),
 	FLD_RF_R_DBG_SEL1			=	BIT(7),
@@ -109,8 +227,7 @@ enum{
 
 #define    reg_rf_format			    REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x04)
 enum{
-	FLD_RF_HEAD_MODE			=   BIT_RNG(0,1),
-	FLD_RF_CRC_MODE 			=	BIT_RNG(2,3),
+	FLD_RF_HEAD_MODE			=   BIT_RNG(0,2),
 	FLD_RF_BLE_1M				=	BIT(4),
 	FLD_RF_BLE_WT				=	BIT(5),
 	FLD_RF_TX_NOACK				=	BIT(6),
@@ -118,11 +235,13 @@ enum{
 };
 
 
-#define  reg_rf_acc_len			        REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x05)
+#define  reg_rf_acclen			        REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x05)
 enum{
 	FLD_RF_ACC_LEN			    =   BIT_RNG(0,2),
+	FLD_LOW_RATE_EN             =	BIT(3),
 	FLD_RF_LR_TX_SEL 			=	BIT(4),
 	FLD_RF_BLE_LR				=	BIT(5),
+	FLD_RF_R_DBG_SEL2           =   BIT(6),
 };
 
 
@@ -144,38 +263,46 @@ enum{
 #define    reg_rf_access_2		    REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x0a)
 #define    reg_rf_access_3		    REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x0b)
 #define    reg_rf_access_4		    REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x0c)
+#define    reg_rf_access_5		    REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x0d)
+#define    reg_rf_access_6		    REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x0e)
+#define    reg_rf_access_7		    REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x0f)
+#define    reg_rf_access_8		    REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x10)
+#define    reg_rf_access_9		    REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x11)
+#define    reg_rf_access_10		    REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x12)
+#define    reg_rf_access_11		    REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x13)
+#define    reg_rf_access_12		    REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x14)
+#define    reg_rf_access_13		    REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x15)
+#define    reg_rf_access_14		    REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x16)
+#define    reg_rf_access_15		    REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x17)
+#define    reg_rf_access_16		    REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x18)
+#define    reg_rf_access_17		    REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x19)
+#define    reg_rf_access_18		    REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x1a)
+#define    reg_rf_access_19		    REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x1b)
+#define    reg_rf_access_20		    REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x1c)
+#define    reg_rf_access_21		    REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x1d)
 
 
-#define    reg_rf_pn		        REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x0d)
-enum{
-	FLD_RF_PN_INIT 			    =	BIT_RNG(0,5),
-};
-#define		reg_rf_iq_samp_num		REG_ADDR16(REG_BASEBAND_BASE_ADDR+0x0e)
-#define		reg_rf_iq_samp_num0		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x0e)
-#define		reg_rf_iq_samp_num1		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x0f)
 
-#define    reg_rf_access_5		    REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x10)
-#define    reg_rf_access_6		    REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x11)
-#define    reg_rf_access_7		    REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x12)
-#define    reg_rf_access_8		    REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x13)
-#define    reg_rf_access_9		    REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x14)
-#define    reg_rf_access_10		    REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x18)
-#define    reg_rf_access_11		    REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x19)
-#define    reg_rf_access_12		    REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x1a)
-#define    reg_rf_access_13		    REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x1b)
 #define    reg_rf_access_code_base_pipe0   0x170008
-#define    reg_rf_access_code_base_pipe2   0x170018
 
-#define    reg_rf_txfifo		    REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x1c)
+#define		reg_rf_tx_hlen_mode		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x1e)
+enum{
+	FLD_RF_TX_HLEN_MODE 		=	BIT_RNG(0,1),
+	FLD_RF_TX_HLEN_WIDTH    	=	BIT(2),
+	FLD_RF_RD_EMPTY_MUX    		=	BIT(3),
+	FLD_RF_TX_VLD_EN    		=	BIT(4),
+};
+
+#define    reg_rf_txfifo		    REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x1f)
 enum{
 	FLD_RF_TX_FIFO_FULL 		=	BIT(0),
 	FLD_RF_TX_ACT_2D    		=	BIT(1),
 };
 
-#define		reg_rf_aux_hl_adv		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x1d)
-
-#define		reg_rf_tx_hlen_mode		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x1e)
-
+#define    reg_rf_pn		        REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x20)
+enum{
+	FLD_RF_CH_IDX 			    =	BIT_RNG(0,5),
+};
 
 #define    reg_rf_rxgth1		    REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x21)
 enum{
@@ -193,11 +320,20 @@ enum{
 	FLD_RF_RXCHN_MAN 		    =	BIT_RNG(4,6),
 };
 
+#define		reg_rf_ant_num		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x23)
+enum{
+	FLD_RF_ANT_NUM 		    =	BIT_RNG(0,5),
+};
 
-#define    reg_rf_crc_init0		     REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x24)
-#define    reg_rf_crc_init1		     REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x25)
-#define    reg_rf_crc_init2		     REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x26)
+#define		reg_rf_ant_sel_man		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x24)
+enum{
+	FLD_RF_ANT_SEL_MAN 		    =	BIT_RNG(0,5),
+};
 
+#define		reg_rf_aux_hl_adv		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x25)
+enum{
+	FLD_RF_AUX_HL_ADV 		    =	BIT_RNG(0,3),
+};
 
 #define    reg_rf_ctrl_0		     REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x27)
 enum{
@@ -230,6 +366,14 @@ enum{
 	FLD_RF_RXDMA_HS       		=	BIT(0),
 };
 
+#define    reg_rf_latch_agc_gain	 	     REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x2d)
+enum{
+	FLD_RF_LAT_CNT       		=	BIT_RNG(0,3),
+	FLD_RF_LAT_AT_END       	=	BIT(4),
+};
+
+#define		reg_rf_iq_samp_num0		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x2e)
+#define		reg_rf_iq_samp_num1		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x2f)
 
 #define    reg_rf_rxtcrcpkt	 	     REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x30)
 enum{
@@ -262,7 +406,7 @@ enum{
 enum{
 	FLD_RF_DMA_BURST_SIZE          	=	BIT_RNG(0,1),
 	FLD_RF_RX_HLEN_MODE				=	BIT_RNG(2,3),
-	FLD_RF_SEL_MAN					=	BIT_RNG(4,7),
+	FLD_RF_HLEN_WIDTH				=	BIT(4),//FLD_RF_SEL_MAN					=	BIT_RNG(4,7),
 };
 
 #define		reg_rf_ant_interval		 REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x35)
@@ -281,7 +425,6 @@ enum{
 	FLD_RF_RX_SUPP_A_EN         =	BIT(1),
 	FLD_RF_TX_SUPP_D_EN         =	BIT(2),
 	FLD_RF_TX_SUPP_A_EN         =	BIT(3),
-	FLD_RF_ANT_NUM              =	BIT_RNG(4,7),
 };
 
 
@@ -382,63 +525,143 @@ enum
 {
 	FLD_RF_MATCH_REG_SYNC1					=	BIT(0),
 	FLD_RF_FILT_AGC_GAIN					=	BIT_RNG(4,6),
+	FLD_RF_S2_S8_FLAG                       =   BIT(7),
 };
-
-#define    reg_rf_ant_lut_0	         REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x68)
+/*******************rx pkt filter************************/
+#define	reg_rf_pkt_flt_cntl			  		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x60)
 enum{
-	FLD_RF_ANT_LUT0              =	BIT_RNG(0,3),
-	FLD_RF_ANT_LUT1              =	BIT_RNG(4,7),
+	FLD_RF_PKT_FLT_EN              =	BIT(0),
+	FLD_RF_PKT_FLT_INI             =	BIT(1),
+	FLD_RF_RXFIFO_CLR_EN           =    BIT(2),
+	FLD_RF_FLT_REV_BYTE_EN         =    BIT(3),
+	FLD_RF_FLT_BYTE_EN             =    BIT(4),
 };
 
-#if 0
-#define    reg_rf_ant_lut_1	         REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x69)
-enum{
-	FLD_RF_ANT_LUT0              =	BIT_RNG(0,3),
-	FLD_RF_ANT_LUT1              =	BIT_RNG(4,7),
+#define	reg_rf_pkt_flt_start			  		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x61)
+enum
+{
+	FLD_RF_PKT_START					=	BIT_RNG(0,7),
 };
 
-
-#define    reg_rf_ant_lut_2	         REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x6a)
-enum{
-	FLD_RF_ANT_LUT0              =	BIT_RNG(0,3),
-	FLD_RF_ANT_LUT1              =	BIT_RNG(4,7),
+#define	reg_rf_pkt_flt_end			  		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x62)
+enum
+{
+	FLD_RF_PKT_END					=	BIT_RNG(0,7),
 };
 
-
-#define    reg_rf_ant_lut_3	         REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x6b)
-enum{
-	FLD_RF_ANT_LUT0              =	BIT_RNG(0,3),
-	FLD_RF_ANT_LUT1              =	BIT_RNG(4,7),
+#define	reg_rf_pkt_match_threshold			  		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x63)
+enum
+{
+	FLD_RF_PKT_MATCH_TH				=	BIT_RNG(0,7),
 };
 
-
-#define    reg_rf_ant_lut_4	         REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x6c)
-enum{
-	FLD_RF_ANT_LUT0              =	BIT_RNG(0,3),
-	FLD_RF_ANT_LUT1              =	BIT_RNG(4,7),
+#define	reg_rf_pkt_flt_match0		  		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x64)
+enum
+{
+	FLD_RF_PKT_MATCH0				=	BIT_RNG(0,7),
 };
 
-
-#define    reg_rf_ant_lut_5	         REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x6d)
-enum{
-	FLD_RF_ANT_LUT0              =	BIT_RNG(0,3),
-	FLD_RF_ANT_LUT1              =	BIT_RNG(4,7),
+#define	reg_rf_pkt_flt_match1		  		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x65)
+enum
+{
+	FLD_RF_PKT_MATCH1				=	BIT_RNG(0,7),
 };
 
-
-#define    reg_rf_ant_lut_6	         REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x6e)
-enum{
-	FLD_RF_ANT_LUT0              =	BIT_RNG(0,3),
-	FLD_RF_ANT_LUT1              =	BIT_RNG(4,7),
+#define	reg_rf_pkt_flt_match2		  		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x66)
+enum
+{
+	FLD_RF_PKT_MATCH2				=	BIT_RNG(0,7),
 };
 
-
-#define    reg_rf_ant_lut_7	         REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x6f)
-enum{
-	FLD_RF_ANT_LUT0              =	BIT_RNG(0,3),
-	FLD_RF_ANT_LUT1              =	BIT_RNG(4,7),
+#define	reg_rf_pkt_flt_match3		  		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x67)
+enum
+{
+	FLD_RF_PKT_MATCH3				=	BIT_RNG(0,7),
 };
-#endif
+
+#define	reg_rf_pkt_flt_match4		  		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x68)
+enum
+{
+	FLD_RF_PKT_MATCH4				=	BIT_RNG(0,7),
+};
+
+#define	reg_rf_pkt_flt_match5		  		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x69)
+enum
+{
+	FLD_RF_PKT_MATCH5				=	BIT_RNG(0,7),
+};
+
+#define	reg_rf_pkt_flt_match6		  		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x6a)
+enum
+{
+	FLD_RF_PKT_MATCH6				=	BIT_RNG(0,7),
+};
+
+#define	reg_rf_pkt_flt_match7		  		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x6b)
+enum
+{
+	FLD_RF_PKT_MATCH7				=	BIT_RNG(0,7),
+};
+
+#define	reg_rf_pkt_flt_mask0		  		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x6c)
+enum
+{
+	FLD_RF_PKT_MASK0				=	BIT_RNG(0,7),
+};
+
+#define	reg_rf_pkt_flt_mask1		  		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x6d)
+enum
+{
+	FLD_RF_PKT_MASK1				=	BIT_RNG(0,7),
+};
+
+#define	reg_rf_pkt_flt_mask2		  		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x6e)
+enum
+{
+	FLD_RF_PKT_MASK2				=	BIT_RNG(0,7),
+};
+
+#define	reg_rf_pkt_flt_mask3		  		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x6f)
+enum
+{
+	FLD_RF_PKT_MASK3				=	BIT_RNG(0,7),
+};
+
+#define	reg_rf_pkt_flt_mask4		  		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x70)
+enum
+{
+	FLD_RF_PKT_MASK4				=	BIT_RNG(0,7),
+};
+
+#define	reg_rf_pkt_flt_mask5		  		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x71)
+enum
+{
+	FLD_RF_PKT_MASK5				=	BIT_RNG(0,7),
+};
+
+#define	reg_rf_pkt_flt_mask6		  		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x72)
+enum
+{
+	FLD_RF_PKT_MASK6				=	BIT_RNG(0,7),
+};
+
+#define	reg_rf_pkt_flt_mask7		  		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x73)
+enum
+{
+	FLD_RF_PKT_MASK7				=	BIT_RNG(0,7),
+};
+
+#define	reg_rf_pkt_match_idx		  		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x74)
+enum
+{
+	FLD_RF_PKT_MATCH_IDX				=	BIT_RNG(0,7),
+};
+
+#define	reg_rf_pkt_match_value		  		REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x75)
+enum
+{
+	FLD_RF_PKT_MATCH_VALUE				=	BIT_RNG(0,7),
+};
 
 #define	   reg_rf_rxdma_adr			 0x170080
 #define    reg_rf_rxdma_fifo0        REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x80)
@@ -535,10 +758,158 @@ enum{
 
 
 
+/**************************************AES-CCM***********************************************/
+#define reg_rf_tlk_crypt_skey(i)          	REG_ADDR8(REG_BASEBAND_BASE_ADDR+ 0xa4 + (i))
+#define reg_rf_tlk_crypt_iv(i)             	REG_ADDR8(REG_BASEBAND_BASE_ADDR+ 0xb4 + (i))
+
+#define reg_rf_aad_mask    				  	REG_ADDR8(REG_BASEBAND_BASE_ADDR + 0xbc)
+#define reg_rf_tlk_crypt_soft_rst    		REG_ADDR8(REG_BASEBAND_BASE_ADDR + 0xbd)
+enum{
+	FLD_RF_TLK_CRYPT_SOFT_RST           =	BIT(0), //tlk_crypt software reset, active high /**< W1C */
+	FLD_RF_TLK_CRYPT_DSB           		=	BIT(1),//TLK BLE encryption/decryption disable
+};
+
+
+/**************************************************************************************/
+
+/*********************************Freq_hopping***************************************************/
+
+/**************************************************************************************/
+
+/*******************************AOA/AOD_ANT 6bit******************************************************/
+#define    reg_rf_ant_lut_0	         REG_ADDR8(REG_BASEBAND_BASE_ADDR+0xe0)
+enum{
+	FLD_RF_ANT_LUT0              =	BIT_RNG(0,5),
+	FLD_RF_ANT_LUT1              =	BIT_RNG(6,7),
+};
+/***********************************************************************************************/
+
+
+/***************************************CRC********************************************************/
+#define    reg_rf_crc_config1         REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x110)
+enum{
+	FLD_RF_CRC_START_BYTE             =	BIT_RNG(0,5),
+};
+
+#define    reg_rf_crc_config2         REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x111)
+enum{
+	FLD_RF_CRC_LENGTH                 = BIT_RNG(0,2),
+	FLD_RF_CRC_BYTE_ORD               =	BIT(3),
+
+};
+#define    reg_rf_crc_init           REG_ADDR32(REG_BASEBAND_BASE_ADDR+0x114)
+#define    reg_rf_crc_init0		     REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x114)
+#define    reg_rf_crc_init1		     REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x115)
+#define    reg_rf_crc_init2		     REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x116)
+#define    reg_rf_crc_init3		     REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x117)
+
+#define    reg_rf_crc_xorout		 REG_ADDR32(REG_BASEBAND_BASE_ADDR+0x118)
+#define    reg_rf_crc_xorout0		 REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x118)
+#define    reg_rf_crc_xorout1		 REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x119)
+#define    reg_rf_crc_xorout2		 REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x11a)
+#define    reg_rf_crc_xorout3		 REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x11b)
+
+#define    reg_rf_crc_poly		     REG_ADDR32(REG_BASEBAND_BASE_ADDR+0x11c)
+#define    reg_rf_crc_poly0		     REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x11c)
+#define    reg_rf_crc_poly1		     REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x11d)
+#define    reg_rf_crc_poly2		     REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x11e)
+#define    reg_rf_crc_poly3		     REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x11f)
+
+/***********************************************************************************************/
+#define    reg_rf_tx_mic_val0        REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x120)
+#define    reg_rf_tx_mic_val1        REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x121)
+#define    reg_rf_tx_mic_val2        REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x122)
+#define    reg_rf_tx_mic_val3        REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x123)
+#define    reg_rf_rx_mic_val0        REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x124)
+#define    reg_rf_rx_mic_val1        REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x125)
+#define    reg_rf_rx_mic_val2        REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x126)
+#define    reg_rf_rx_mic_val3        REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x127)
+/*****************************************PN_CFG******************************************************/
+#define    reg_rf_pn_cfg         REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x128)
+enum{
+	FLD_RF_PN_LENGTH             =	BIT_RNG(0,4),
+};
+
+#define    reg_rf_pn_poly0         REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x129)
+#define    reg_rf_pn_poly1         REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x12a)
+#define    reg_rf_pn_poly2         REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x12b)
+
+#define    reg_rf_pn_init0         REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x12c)
+#define    reg_rf_pn_init1         REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x12d)
+#define    reg_rf_pn_init2         REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x12e)
+
+/***********************************************************************************************/
+
+#define    reg_rf_lr_cfg0         REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x130)
+enum{
+	FLD_RF_LR_CFG0             =	BIT_RNG(0,7),
+};
+
+#define    reg_rf_lr_cfg1         REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x131)
+enum{
+	FLD_RF_LR_CFG1             =	BIT_RNG(0,2),
+};
+
+#define    reg_rf_zb_cfg1         REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x132)
+enum{
+	FLD_RF_ZB_PHR_EN             =	BIT(0),
+	FLD_RF_ZB_PHR_EXTEND_EN      =	BIT(1),
+	FLD_RF_ZB_HYBEE_NEW          =	BIT(2),
+	FLD_RF_ZB_PHR_CRC_EN         =	BIT(3),
+	FLD_RF_ZB_SFD_ORD            =	BIT(4),
+	FLD_RF_ZB_PSDU_LENGTH_HIGH   =	BIT_RNG(5,7),
+};
+
+#define    reg_rf_zb_cfg2         REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x133)
+enum{
+	FLD_RF_ZB_PSDU_LENGTH_LOW   =	BIT_RNG(0,7),
+};
+
+#define    reg_rf_zb_cfg3         REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x134)
+enum{
+	FLD_RF_ZB_GAP_LENGTH   =	BIT_RNG(0,5),
+	FLD_RF_ZB_SFD_LENGTH   =	BIT_RNG(6,7),
+};
+
+#define    reg_rf_new_2g4_cfg0         REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x138)
+enum{
+	FLD_RF_NEW_2G4_H0_SIZE   =	BIT_RNG(0,4),
+};
+
+#define    reg_rf_new_2g4_cfg1         REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x139)
+enum{
+	FLD_RF_NEW_2G4_H1_SIZE   =	BIT_RNG(0,4),
+};
+
+#define    reg_rf_new_2g4_cfg2         REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x13a)
+enum{
+	FLD_RF_NEW_2G4_LENGTH_SIZE      =	BIT_RNG(0,4),
+	FLD_RF_NEW_2G4_LENGTH_BIT_ORD   =	BIT(7),
+};
+
+#define    reg_rf_new_2g4_cfg3         REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x13b)
+enum{
+	FLD_RF_NEW_2G4_PID_START_BIT      =	BIT_RNG(0,5),
+	FLD_RF_NEW_2G4_PID_EN             =	BIT(7),
+};
+
+#define    reg_rf_new_2g4_cfg4         REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x13c)
+enum{
+	FLD_RF_NEW_2G4_NOACK_START_BIT      =	BIT_RNG(0,5),
+	FLD_RF_NEW_2G4_NOACK_EN             =	BIT(7),
+};
+
+#define    reg_rf_new_2g4_cfg5         REG_ADDR8(REG_BASEBAND_BASE_ADDR+0x13d)
+enum{
+	FLD_RF_NEW_2G4_LENGTH_ADJ      =	BIT_RNG(0,5),
+};
+
+/***********************************************************************************************/
+
 /**
  * BB_LL
  */
-#define               REG_BB_LL_BASE_ADDR          0x0170200
+#define               REG_BB_LL_BASE_ADDR          0x170200
 
 
 #define    reg_rf_ll_cmd             REG_ADDR8(REG_BB_LL_BASE_ADDR)
@@ -565,6 +936,8 @@ enum{
 	FLD_RF_R_RESET_PID_3         =	BIT(3),
 	FLD_RF_R_RESET_PID_4         =	BIT(4),
 	FLD_RF_R_RESET_PID_5         =	BIT(5),
+	FLD_RF_R_CRC_CHECK_EN         =	BIT(6),
+	FLD_RF_R_CRC_LAT_RST         =	BIT(7),
 };
 
 
@@ -687,8 +1060,11 @@ enum{
 #define    reg_rf_ll_cmd_schedule2  REG_ADDR8(REG_BB_LL_BASE_ADDR+0x1a)
 #define    reg_rf_ll_cmd_schedule3  REG_ADDR8(REG_BB_LL_BASE_ADDR+0x1b)
 #define    reg_rf_ll_irq_mask_l     REG_ADDR8(REG_BB_LL_BASE_ADDR+0x1c)
-#define    reg_rf_ll_irq_mask_h     REG_ADDR8(REG_BB_LL_BASE_ADDR+0x1d)
-#define 	reg_rf_irq_mask			REG_ADDR16(REG_BB_LL_BASE_ADDR+0x1c)
+#define    reg_rf_ll_irq_mask_m     REG_ADDR8(REG_BB_LL_BASE_ADDR+0x1d)
+#define    reg_rf_ll_irq_mask_h     REG_ADDR8(REG_BB_LL_BASE_ADDR+0x4e)
+#define    reg_rf_ll_irq_mask_h1    REG_ADDR8(REG_BB_LL_BASE_ADDR+0x4f)
+#define    reg_rf_irq_mask			REG_ADDR16(REG_BB_LL_BASE_ADDR+0x1c)
+#define    reg_rf_irq_mask1			REG_ADDR16(REG_BB_LL_BASE_ADDR+0x4e)
 
 
 #define    reg_rf_ll_tx_id          REG_ADDR8(REG_BB_LL_BASE_ADDR+0x1e)
@@ -697,36 +1073,47 @@ enum{
 	FLD_RF_R_LL_IRQ_MASK		  = BIT(7),
 };
 
-
-#define    reg_rf_ll_tx_committed   REG_ADDR8(REG_BB_LL_BASE_ADDR+0x1f)
-enum{
-	FLD_RF_R_TX_COMMITTED         =	BIT_RNG(0,5),
-};
-
-
-
 #define    reg_rf_irq_status     REG_ADDR16(REG_BB_LL_BASE_ADDR+0x20)
+#define    reg_rf_irq_status_h   REG_ADDR8(REG_BB_LL_BASE_ADDR+0x4d)
+#define    reg_rf_irq_status_h1  REG_ADDR8(REG_BB_LL_BASE_ADDR+0x45)
 
 typedef enum{
-	FLD_RF_IRQ_RX                =	BIT(0),
-	FLD_RF_IRQ_TX                =	BIT(1),
-	FLD_RF_IRQ_RX_TIMEOUT        =	BIT(2),
-	FLD_RF_IRQ_RX_FIFO_FULL      =	BIT(3),
-	FLD_RF_IRQ_RX_CRC_2           =	BIT(4),
-	FLD_RF_IRQ_CMD_DONE          =	BIT(5),
-	FLD_RF_IRQ_FSM_TIMEOUT       =	BIT(6),
-	FLD_RF_IRQ_TX_RETRYCNT       =	BIT(7),
-	FLD_RF_IRQ_TX_DS             =	BIT(8),
-	FLD_RF_IRQ_RX_DR             =	BIT(9),
-	FLD_RF_IRQ_FIRST_TIMEOUT     =	BIT(10),
-	FLD_RF_IRQ_INVALID_PID       =	BIT(11),
-	FLD_RF_IRQ_STX_TIMEOUT       =	BIT(12),
-	FLD_RF_IRQ_WIFI_DENY         =	BIT(13),
-	FLD_RF_IRQ_SUPP_OF           =	BIT(14),
+	FLD_RF_IRQ_RX                =	BIT(0),/*Auto/Manual: an interrupt is generated after each packet is received.*/
+	FLD_RF_IRQ_TX                =	BIT(1),/*Auto/Manual: an interrupt is generated after each packet is sent*/
+	FLD_RF_IRQ_RX_TIMEOUT        =	BIT(2),/*Auto: If the packet is still not received within the time set from trigger to timeout,
+												   an interrupt is generated and the state machine returns to idle state.
+												   The timeout time is set by void rf_set_rx_timeout(); and the timeout starts from the trigger RX.*/
+	FLD_RF_IRQ_RX_FIFO_FULL      =	BIT(3),/*Auto/Manual:An interrupt is generated when the data size of the total received packets is exceeded to the allocated storage range of Rx SRAM
+	                                                     B95 chip unavailable, it will not work after configuration.(add by chenxi.wang, confirmed by jingyong 202402029)*/
+	FLD_RF_IRQ_RX_CRC_2          =	BIT(4),/*Auto:BTX,BRX,PTX,PRX will generate interrupt if CRC error is detected twice in a row during packet receiving (continuous packet receiving).*/
+	FLD_RF_IRQ_CMD_DONE          =	BIT(5),/*Auto:After completing a normal packet receiving or sending operation,
+											      the state machine returns to the IDLE state normally and generates an interrupt.*/
+	FLD_RF_IRQ_FSM_TIMEOUT       =	BIT(6),/*Auto:It contains the state machine used for switching from receive to send, specifying the time of the entire state machine, and determining
+												  whether the specified time is exceeded in the TX_WAIT state*/
+	FLD_RF_IRQ_TX_RETRYCNT       =	BIT(7),/*Auto:Generate an interrupt when the number of ptx retry exceeds the set r_max_retry_cnt.*/
+	FLD_RF_IRQ_TX_DS             =	BIT(8),/*Auto:Length of payload (sent by PTX, PRX) ! = 0, generate tx_ds interrupt.*/
+	FLD_RF_IRQ_RX_DR             =	BIT(9),/*Auto:PRX, PTX, SRX received packets detect the packet payload length ! = 0, generate rx_dr interrupt*/
+	FLD_RF_IRQ_FIRST_TIMEOUT     =	BIT(10),/*Auto:BRX, PRX, SRX, SRT first RX timeout, when the first packet receive timeout it will generate an interrupt*/
+	FLD_RF_IRQ_INVALID_PID       =	BIT(11),/*Auto:PTX or PRX receives invalid pid and generates interrupt*/
+	FLD_RF_IRQ_STX_TIMEOUT       =	BIT(12),/*Auto:The STX state does not wait for tx_done in the specified time, thus timeout, generating an interrupt.*/
+	FLD_RF_IRQ_WIFI_DENY         =	BIT(13),/*Auto:After the Bluetooth chip receives the wifi_deny signal from the WiFi chip when it is connected to the WiFi chip,
+												   the Bluetooth chip generates an interrupt*/
+	FLD_RF_IRQ_SUPP_OF           =	BIT(14),/*Auto/Manual:The interrupt is mainly used for AOA and AOD. If iq sampling frequency is too high the hardware FIFO will overflow error,
+														  generate interrupt iq sample and synchronize fifo overflow.*/
 	FLD_RF_IRQ_RXDMA_OF          =	BIT(15),
-	FLD_RF_IRQ_ALL 				 =  0XFFFF,
+	FLD_RF_IRQ_TR_TURNAROUND     =  BIT(16),
+	FLD_RF_IRQ_TLK_RXCRYPT_ERR   =  BIT(17),/*Auto/Manual:Indicates real time decryption error, happens when CCM decryption is too slow compared to receiving bitstream by Packet Controller. */
+	FLD_RF_IRQ_TLK_TXCRYPT_ERR   =  BIT(18),/*Auto/Manual:Indicates Real Time encryption error, happens when CCM encryption is too slow compared to transmitting requests by Packet Controller. */
+	FLD_RF_IRQ_HIT_SYNC          =  BIT(19),/*Auto/Manual:An interrupt is generated when sync up of one packet is detected in Rx mode*/
+	FLD_RF_IRQ_HEADER_DONE       =  BIT(20),/*Auto/Manual:Interrupt is generated when the Header Field of one packet has been received completely.*/
+	FLD_RF_IRQ_PKT_UNMATCH       =  BIT(21),/*Auto/Manual:An interrupt is generated when the certain bits of the received packet are not matched to the predefined ones within the packet filter registers in Rx mode.*/
+	FLD_RF_IRQ_PKT_MATCH         =  BIT(22),/*Auto/Manual:An interrupt is generated when the certain bits of the received packet are matched to the predefined ones within the packet filter registers in Rx mode. */
+	FLD_RF_IRQ_RX_ZB_FREQ_HOP    =  BIT(23),/*Auto/Manual:When Zigbee performs dual-channel detection, it switches channels at preset intervals, and the interrupt generated at this time*/
+	FLD_RF_IRQ_RX_FREQ_HOP_FIXED =  BIT(24),/*Auto/Manual:When Zigbee performs dual-channel detection, the interrupt is generated when it stays in one of the channels to successfully receive packets and fixes the interrupt when it continues to receive over-the-air packets in this channel.*/
+	FLD_RF_IRQ_TRX_FCAL_DONE     =  BIT(25),/*After RF is turned on, the interrupt generated at the moment of fcal calibration is completed at tx or rx (including switching channels during dual-channel detection by zigbee).*/
+	FLD_RF_IRQ_RADIO_DONE        =  BIT(26),/*TODO:TODO:This function interface is not available at this time, and will be updated in subsequent releases.(unverified)*/
+	FLD_RF_IRQ_ALL 				 =  0x7ffffff,
 }rf_irq_e;
-
 
 
 #define    reg_rf_ll_pid_l         REG_ADDR8(REG_BB_LL_BASE_ADDR+0x22)
@@ -787,7 +1174,6 @@ enum{
 #define    reg_rf_ll_fsm_timeout_m REG_ADDR8(REG_BB_LL_BASE_ADDR+0x2d)
 #define    reg_rf_ll_fsm_timeout_h REG_ADDR8(REG_BB_LL_BASE_ADDR+0x2e)
 
-#define    reg_rf_fsm_timeout		REG_ADDR32(0x80140a2c)
 
 #define    reg_rf_coex_enable      REG_ADDR8(REG_BB_LL_BASE_ADDR+0x30)
 enum{
@@ -799,19 +1185,25 @@ enum{
 	FLD_RF_TX_PRIO                =	BIT(5),
 	FLD_RF_RX_PRIO                =	BIT(6),
 };
-#define	  CLEAR_ALL_RFIRQ_STATUS   		(reg_rf_irq_status = 0xffff)
-//#define	  REG_TL_MODEM_BASE_ADDR				0x140c00//140c00//170200
+
+#define    reg_rf_on_ccm_control     REG_ADDR8(REG_BB_LL_BASE_ADDR+0x31)
+enum{
+	FLD_RF_ON_MANUAL              =	BIT(0),
+	FLD_RF_ON         			  =	BIT(1),
+	FLD_RF_DIS_TXLEN_FLG_UPD      =	BIT(2),
+	FLD_RF_DIS_TXCNT_UPDATE       =	BIT(3),
+	FLD_RF_DIS_RXCNT_UPDATE       =	BIT(4),
+};
+
+
 #define	  REG_TL_MODEM_BASE_ADDR					0x170400
 #define		reg_rf_modem_mode_cfg_rx1_0	REG_ADDR8(REG_TL_MODEM_BASE_ADDR+0x20)
 enum
 {
 	FLD_RF_LR_MODE					  =	BIT(0),
-	FLD_RF_BT_BLE_SEL_AUTO			  =	BIT(1),
-	FLD_RF_BT_BLE_SEL_EN_RX		  =	BIT(2),
 	FLD_RF_CONT_MODE				  =	BIT(3),
-	FLD_RF_NTL_CV					  =	BIT(4),
 	FLD_RF_RX_DATA_CLK_DBG			  =	BIT(5),
-	FLD_RF_LR_TRIG_MODE			  =	BIT(6),
+	FLD_RF_LR_TRIG_MODE			      =	BIT(6),
 	FLD_RF_FDC_DBG_SEL				  =	BIT(7),
 
 };
@@ -819,7 +1211,10 @@ enum
 enum
 {
 	FLD_RF_ZIGBEE_MODE_RX				= BIT(0),
-	FLD_RF_BT_MASK_EN					= BIT(1),
+	FLD_RF_LR_MODEM_SEL					= BIT(2),
+	FLD_RF_LR_VITERBI_SEL				= BIT(3),
+	FLD_RF_HYBEE_SEL					= BIT_RNG(4,6),
+	FLD_RF_ZIGBEE_SEL   				= BIT(7),
 };
 
 #define		reg_rf_modem_mode_ctrl_tx1_0	REG_ADDR8(REG_TL_MODEM_BASE_ADDR+0x22)
@@ -918,7 +1313,7 @@ enum
 {
 	FLD_RF_DIS_CLK_DIG_O			= BIT(0),
 	FLD_RF_VANT_PULLDN				= BIT(1),
-	FLD_RF_TX_IQ_MODE_EN_BT			= BIT(2),
+	FLD_RF_TX_IQ_MODE_EN_BT	    	= BIT(2),
 	FLD_RF_LDO_ANT_TRIM				= BIT_RNG(3,5),
 	FLD_RF_CBPF_TYPE				= BIT(6),
 	FLD_RF_TX_PA_PWR_L				= BIT(7),
@@ -1023,6 +1418,8 @@ enum
 	FLD_RF_DSM_INT_MODE				= BIT(7),
 };
 
+
+
 #define		reg_rf_lnm_pa_ow_ctrl_val	REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x178)
 enum
 {
@@ -1043,4 +1440,15 @@ enum
 	FLD_RF_TX_PA_PWR				= BIT_RNG(1,6),
 };
 
+#define		reg_rf_fcal_rdbk	REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x11e)
+
+#define		reg_rf_fcal_ctrl_tx(i)	 REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x1a0+i)//i range:0~7
+
+#define		reg_rf_fcal_ctrl_rx(i)	 REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x1a8+i)//i range:0~7
+
+#define		reg_rf_fcal_chn_range_ctn(i)	 REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x1b0+i)//i range:0~7
+
+#define		reg_rf_fcal_chn_range_ctf_low(i)	 REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x1b8 + (i << 1))//i range:0~7
+
+#define		reg_rf_fcal_chn_range_ctf_high(i)	 REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x1b9 + (i << 1))//i range:0~7
 #endif

@@ -4,9 +4,9 @@
  * @brief   This is the header file for B95
  *
  * @author  Driver Group
- * @date    2020
+ * @date    2023
  *
- * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2023, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -196,7 +196,7 @@ extern clk_32k_type_e g_clk_32k_src;
  * 			    because during the clock switching process, the system clock will be
  * 			    suspended for a period of time, which may cause data loss
  */
-_attribute_text_sec_
+_attribute_ram_code_sec_noinline_
 void clock_init(sys_clock_src_e src,
 				sys_clock_div_e cclk_div,
 				sys_cclk_div_to_hclk_e hclk_div,
@@ -266,6 +266,12 @@ void clock_cclk_hclk_pclk_config(sys_clock_src_e src, sys_clock_div_e cclk_div,
 /**
  * @brief		This function use to set all clock to default. 
  * @return		none.
+ * @note		After call this, the following clock will set to default source and value:
+ * 				-----------------------------------------------------------------------
+ * 				clock source |			clock
+ * 				-----------------------------------------------------------------------
+ * 				RC 24M		 | CCLK 24M, HCLK 24M, PCLK 24M, MSPI CLK 24M.
+ * 				-----------------------------------------------------------------------
  */
 void clock_set_all_clock_to_default(void);
 

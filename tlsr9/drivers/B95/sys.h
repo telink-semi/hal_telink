@@ -4,9 +4,9 @@
  * @brief   This is the header file for B95
  *
  * @author  Driver Group
- * @date    2024
+ * @date    2023
  *
- * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2023, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -44,8 +44,8 @@
 /**********************************************************************************************************************
  *                                           global macro                                                             *
  *********************************************************************************************************************/
-/*
- * brief instruction delay
+/**
+ * @brief instruction delay
  */
 
 #define	_ASM_NOP_					__asm__ __volatile__("nop")
@@ -60,6 +60,7 @@
 #define	CLOCK_DLY_8_CYC				_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_
 #define	CLOCK_DLY_9_CYC				_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_
 #define	CLOCK_DLY_10_CYC			_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_
+#define	CLOCK_DLY_64_CYC			CLOCK_DLY_10_CYC;CLOCK_DLY_10_CYC;CLOCK_DLY_10_CYC;CLOCK_DLY_10_CYC;CLOCK_DLY_10_CYC;CLOCK_DLY_10_CYC;CLOCK_DLY_4_CYC
 
 /**********************************************************************************************************************
  *                                         global data type                                                           *
@@ -70,8 +71,8 @@
  */
 typedef enum{
 	LDO_0P94_LDO_1P8 	= 0x00,	/**< 0.94V-LDO  & 1.8V-LDO  mode */
-	DCDC_0P94_LDO_1P8	= 0x01,	/**< 0.94V-DCDC & 1.8V-LDO  mode */
-	DCDC_0P94_DCDC_1P8	= 0x03,	/**< 0.94V-DCDC & 1.8V-DCDC mode */
+//	DCDC_0P94_LDO_1P8	= 0x01,	/**< 0.94V-DCDC & 1.8V-LDO  mode */
+//	 DCDC_0P94_DCDC_1P8	= 0x03,	/**< 0.94V-DCDC & 1.8V-DCDC mode */
 }power_mode_e;
 
 /**
@@ -119,14 +120,29 @@ _attribute_text_sec_ void sys_reboot(void);
  * @brief   	This function serves to initialize system.
  * @param[in]	power_mode	- power mode(LDO/DCDC/LDO_DCDC)
  * @param[in]	vbat_v		- This parameter is used to determine whether the VBAT voltage can be greater than 3.6V.
- * @param[in]	gpio_v		- This is the configuration of GPIO voltage.
- * 							  For some chip models the GPIO voltage is fixed 3.3V or fixed 1.8V,
- * 							  For other GPIO models the voltage is configurable:
- * 							  Requires hardware configuration: 3v3 (CFG_VIO connects to VSS) or 1V8 (CFG_VIO connects to VDDO3/AVDD3)),
- * 							  please configure this parameter correctly according to the chip data sheet and the corresponding board design.
  * @attention	If vbat_v is set to VBAT_MAX_VALUE_LESS_THAN_3V6, then gpio_v can only be set to GPIO_VOLTAGE_3V3.
  * @return  	none
  */
 void sys_init(power_mode_e power_mode, vbat_type_e vbat_v);
 
+/**
+ * @brief 		This function serves to set system power mode.
+ * @param[in]   power_mode	- power mode(LDO/DCDC/LDO_DCDC).
+ * @return		none.
+ * @note		pd_dcdc_ldo_sw<1:0>, dcdc & bypass ldo status bits:
+					dcdc_0p94	dcdc_1p8	 ldo_0p94	 ldo_1p8
+				00:		N			N			Y			Y
+				01:		Y			N			N			Y
+				10:		Y			N			N			N
+				11:		Y			Y			N			N
+ */
+void sys_set_power_mode(power_mode_e power_mode);
+
+/**
+ * @brief		This function serves to set vbat type. 
+ * @param[in]	vbat_v	- This parameter is used to determine whether the VBAT voltage can be greater than 3.6V.
+ * 						- Please refer to vbat_type_e for specific usage precautions.
+ * @return		none
+ */
+void sys_set_vbat_type(vbat_type_e vbat_v);
 #endif

@@ -4,9 +4,9 @@
  * @brief   This is the header file for B95
  *
  * @author  Driver Group
- * @date    2020
+ * @date    2023
  *
- * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2023, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -60,8 +60,14 @@
  * @brief analog register below can store information when MCU in deep sleep mode or deep sleep with SRAM retention mode.
  * 	      Reset these analog registers by power cycle, 32k watchdog, RESET Pin,vbus detect.
  */
-#define PM_ANA_REG_POWER_ON_CLR_BUF0	0x3a // initial value 0x00 [Bit0] is already occupied. The customer cannot change!
-											 //[Bit1] The crystal oscillator failed to start normally.The customer cannot change!
+/**
+ * Customers cannot use [bit0],[bit1],[bit2],[bit7] of analog register 0x3a because driver and chip functions are occupied, details are as follows:
+ * [Bit0]: If this bit is 1, it means that reboot has occurred.
+ * [Bit1]: If this bit is 1, it means that the software calls the function sys_reboot() when the crystal oscillator does not start up normally.
+ * [Bit2]: If this bit is 1, it means that the pm_sleep_wakeup function failed to clear the pm wake flag bit when using the deep wake source, and the software called sys_reboot().
+ * [Bit7]: The security boot function of the bootrom is used.
+ */
+#define PM_ANA_REG_POWER_ON_CLR_BUF0	0x3a // initial value 0x00
 #define PM_ANA_REG_POWER_ON_CLR_BUF1	0x3b // initial value 0x00
 #define PM_ANA_REG_POWER_ON_CLR_BUF2	0x3c // initial value 0xff
 
@@ -82,13 +88,28 @@ typedef enum {
 }pm_wakeup_tick_type_e;
 
 /**
- * @brief	suspend power weather to power down definition
+ * @brief	suspend power whether to power down definition
  */
 typedef enum {
-	 PM_POWER_BASEBAND  = BIT(0),	//weather to power on the BASEBAND before suspend.
-	 PM_POWER_USB  		= BIT(1),	//weather to power on the USB before suspend.
+	 PM_POWER_BASEBAND  = BIT(0),	//whether to power on the BASEBAND before suspend.
+	 PM_POWER_USB  		= BIT(1),	//whether to power on the USB before suspend.
 	 PM_POWER_AUDIO 	= BIT(2),	//weather to power on the AUDIO before suspend.
 }pm_suspend_power_cfg_e;
+
+/**
+ * @brief	active mode VDDO3 output trim definition
+ * @note	The voltage values of the following gears are all theoretical values, and there may be deviations between the actual and theoretical values.
+ */
+typedef enum {
+	PM_VDDO3_VOLTAGE_1V4_2V9	= 0x00, /**<LDO output 1.4V in 1.8V mode & 2.9V in 3.3V mode */
+	PM_VDDO3_VOLTAGE_1V5_3V0	= 0x01, /**<LDO output 1.5V in 1.8V mode & 3.0V in 3.3V mode */
+	PM_VDDO3_VOLTAGE_1V6_3V1	= 0x02, /**<LDO output 1.6V in 1.8V mode & 3.1V in 3.3V mode */
+	PM_VDDO3_VOLTAGE_1V7_3V2	= 0x03, /**<LDO output 1.7V in 1.8V mode & 3.2V in 3.3V mode */
+	PM_VDDO3_VOLTAGE_1V8_3V3	= 0x04, /**<LDO output 1.8V in 1.8V mode & 3.3V in 3.3V mode */
+	PM_VDDO3_VOLTAGE_1V9_3V4	= 0x05, /**<LDO output 1.9V in 1.8V mode & 3.4V in 3.3V mode */
+	PM_VDDO3_VOLTAGE_2V0_3V5	= 0x06, /**<LDO output 2.0V in 1.8V mode & 3.5V in 3.3V mode */
+	PM_VDDO3_VOLTAGE_2V1_3V6	= 0x07, /**<LDO output 2.1V in 1.8V mode & 3.6V in 3.3V mode */
+}pm_vddo3_voltage_e;
 
 /**
  * @brief	sleep mode.
@@ -96,12 +117,13 @@ typedef enum {
 typedef enum {
 	//available mode for customer
 	SUSPEND_MODE						= 0x00,
-	DEEPSLEEP_MODE						= 0x70,	//when use deep mode pad wakeup(low or high level), if the high(low) level always in the pad,
+	DEEPSLEEP_MODE						= 0xf0,	//when use deep mode pad wakeup(low or high level), if the high(low) level always in the pad,
 												//system will not enter sleep and go to below of pm API, will reboot by core_6f = 0x20.
 												//deep retention also had this issue, but not to reboot.
-	DEEPSLEEP_MODE_RET_SRAM_LOW32K  	= 0x61, //for boot from sram
-	DEEPSLEEP_MODE_RET_SRAM_LOW64K  	= 0x43, //for boot from sram
-	DEEPSLEEP_MODE_RET_SRAM_LOW96K  	= 0x07, //for boot from sram
+	DEEPSLEEP_MODE_RET_SRAM_LOW32K  	= 0x01, //for boot from sram
+	DEEPSLEEP_MODE_RET_SRAM_LOW64K  	= 0x03, //for boot from sram
+	DEEPSLEEP_MODE_RET_SRAM_LOW128K  	= 0x07, //for boot from sram
+	DEEPSLEEP_MODE_RET_SRAM_LOW256K  	= 0x0f, //for boot from sram
 	//not available mode
 	DEEPSLEEP_RETENTION_FLAG			= 0x0F,
 }pm_sleep_mode_e;
@@ -113,10 +135,13 @@ typedef enum {
 	 PM_WAKEUP_PAD   		= BIT(0),
 	 PM_WAKEUP_CORE  		= BIT(1),
 	 PM_WAKEUP_TIMER 		= BIT(2),
-	 PM_WAKEUP_COMPARATOR 	= BIT(3),
-//	 PM_WAKEUP_MDEC		 	= BIT(4),
-//	 PM_WAKEUP_CTB 			= BIT(5),
-//	 PM_WAKEUP_VAD 			= BIT(6),
+	 PM_WAKEUP_COMPARATOR 	= BIT(3),	/**<
+											There are two things to note when using LPC wake up:
+											1.After the LPC is configured, you need to wait 100 microseconds before go to sleep because the LPC need 1-2 32k tick to calculate the result.
+											  If you enter the sleep function at this time, you may not be able to sleep normally because the data in the result register is abnormal.
+
+											2.When entering sleep, keep the input voltage and reference voltage difference must be greater than 30mV, otherwise can not enter sleep normally, crash occurs.
+										  */
 //	 PM_WAKEUP_SHUTDOWN		= BIT(7),
 }pm_sleep_wakeup_src_e;
 
@@ -128,11 +153,10 @@ typedef enum {
 	WAKEUP_STATUS_CORE  			= BIT(1),
 	WAKEUP_STATUS_TIMER 			= BIT(2),
 	WAKEUP_STATUS_COMPARATOR    	= BIT(3),
-//	WAKEUP_STATUS_MDEC    			= BIT(4),
-//	WAKEUP_STATUS_CTB    			= BIT(5),
-//	WAKEUP_STATUS_VAD   			= BIT(6),
+	WAKEUP_STATUS_ALL  				= 0xff,
 
 	STATUS_GPIO_ERR_NO_ENTER_PM		= BIT(8), /**<Bit8 is used to determine whether the wake source is normal.*/
+	STATUS_CLEAR_FAIL	  			= BIT(29),
 	STATUS_ENTER_SUSPEND  			= BIT(30),
 }pm_wakeup_status_e;
 
@@ -151,51 +175,180 @@ typedef enum {
 }pm_zb_voltage_e;
 
 /**
- * @brief	digital core voltage definition.
- * @note	CORE_1V2 has the advantage of supporting higher system clock frequencies.
- * 			CORE_1V has the advantage of saving power.
- */
-typedef enum {
-/*
- * The naming of CORE_1V2 is to harmonize with the data sheet and actually corresponds to 1.1875V in the register table.
- */
-	CORE_1V2    =0x1F,
-	CORE_1V     =0x10,
-}pm_digital_core_voltage_e;
-
-/**
  * @brief	mcu status
  */
 typedef enum{
-	MCU_STATUS_POWER_ON                 = BIT(0), /**< power on or reset pin */
-	MCU_STATUS_REBOOT_BACK    	        = BIT(2), /**<
-                                                       the reboot specific categories,see pm_reboot_event_e:
-	                                                   1.If want to know which reboot it is, call the pm_get_mcu_reboot_status() interface to determine after calling sys_init().
-	                                                   2.If determine whether is 32k watchdog/timer watchdog,can also use the interface wd_32k_get_status()/wd_get_status() to determine.
-	                                                   3.If determine whether is vbus detect,can also be judged by the register 0x64(bit7), write 1 clear 0(needs to be placed after sys_init())(todo: interface name has not yet been decided).
-	                                                */
-	MCU_STATUS_DEEPRET_BACK  	        = BIT(3),
-	MCU_STATUS_DEEP_BACK		        = BIT(4),
+	MCU_STATUS_POWER_ON			= BIT(0), /**<	power on, vbus detect or reset pin */
+	MCU_STATUS_REBOOT_BACK		= BIT(2), /**<	the reboot specific categories,see pm_reboot_event_e:
+												1.If want to know which reboot it is, call the pm_get_mcu_reboot_status() interface to determine after calling sys_init().
+												2.If determine whether is 32k watchdog/timer watchdog,can also use the interface wd_32k_get_status()/wd_get_status() to determine.
+	 	 	 	 	 	 	 	 	 	 	 	*/
+	MCU_STATUS_DEEPRET_BACK		= BIT(3),
+	MCU_STATUS_DEEP_BACK		= BIT(4),
 }pm_mcu_status;
 
 /**
  * @brief  reboot status
  */
 typedef enum{
-	SW_SYSTEM_REBOOT              = BIT(0),
-	HW_TIMER_WATCHDOG_REBOOT      = BIT(1),
-	HW_32K_WATCHDOG_REBOOT        = BIT(2),
-	HW_VBUS_DETECT_REBOOT         = BIT(3),/**<
-	                                           1. When there is USB plugged in,if wd_turn_off_vbus_timer() is not used to turn off the 8s vbus timer,
-	                                              the MCU will be reset after 8s,and 0x64(bit7) is set to 1,before the mcu enters the next state,
-	                                              the register 0x64(bit7) need write 1 clear 0(needs to be placed after sys_init()),otherwise, the next status judgment of the mcu will be affected.
-	                                      <p>
-	                                           2.-# When the status is set to 1, if it is not cleared by calling wd_32k_clear_status():
-                                                    - vbus detect/software reboot(sys_reboot())/deep/deepretation/32k watchdog come back,the interface status remains;
-                                                    - power cyele/reset pin come back, the status of the interface is lost;
+	SW_SYSTEM_REBOOT			= BIT(0),/**< Clear the watchdog status flag in time, otherwise, the system reboot may be wrongly judged as the watchdog.*/
+	HW_TIMER_WATCHDOG_REBOOT	= BIT(1),
+	HW_32K_WATCHDOG_REBOOT		= BIT(2),/**< - When the 32k watchdog/timer watchdog status is set to 1, if it is not cleared:
+	                                          - power cyele/vbus detect/reset pin come back, the status is lost;
+                                              - but software reboot(sys_reboot())/deep/deepretation/32k watchdog come back,the status remains;
 	                                          */
 }pm_reboot_event_e;
 
+/**
+ * @brief digital module
+ * 
+ */
+typedef enum{
+	DIG_MODULE_ZB				= BIT(0),
+	DIG_MODULE_USB				= BIT(1),
+	DIG_MODULE_AUDIO			= BIT(2),
+}pm_dig_module_e;
+
+/**
+ * @brief power sel
+ * 
+ */
+typedef enum{
+	PM_POWER_UP 		= 0,
+	PM_POWER_DOWN	 	= 1,
+}pm_power_sel_e;
+
+/**
+ * @brief dcdc trim flash out
+ * 
+ */
+typedef enum{
+	TRIM_1P8V_TO_1P64V = 0,
+	TRIM_1P8V_TO_1P66V,
+	TRIM_1P8V_TO_1P68V,
+	TRIM_1P8V_TO_1P70V,
+	TRIM_1P8V_TO_1P72V,
+	TRIM_1P8V_TO_1P74V,
+	TRIM_1P8V_TO_1P76V,
+	TRIM_1P8V_TO_1P78V,
+	TRIM_1P8V_TO_1P80V,
+	TRIM_1P8V_TO_1P83V,
+	TRIM_1P8V_TO_1P86V,
+	TRIM_1P8V_TO_1P89V,
+	TRIM_1P8V_TO_1P92V,
+	TRIM_1P8V_TO_1P95V,
+	TRIM_1P8V_TO_1P98V,
+	TRIM_1P8V_TO_2P01V,
+}pm_trim_1p8v_e;
+
+/**
+ * @brief dcdc trim soc out
+ * 
+ */
+typedef enum{
+	TRIM_0P94V_TO_0P820V = 0,
+	TRIM_0P94V_TO_0P835V,
+	TRIM_0P94V_TO_0P850V,
+	TRIM_0P94V_TO_0P865V,
+	TRIM_0P94V_TO_0P880V,
+	TRIM_0P94V_TO_08950V,
+	TRIM_0P94V_TO_0P910V,
+	TRIM_0P94V_TO_0P925V,
+	TRIM_0P94V_TO_0P940V,
+	TRIM_0P94V_TO_0P963V,
+	TRIM_0P94V_TO_0P986V,
+	TRIM_0P94V_TO_1P009V,
+	TRIM_0P94V_TO_1P032V,
+	TRIM_0P94V_TO_1P055V,
+	TRIM_0P94V_TO_1P078V,
+	TRIM_0P94V_TO_1P101V,
+}pm_trim_0p94v_e;
+
+/**
+ * @brief trim dig ldo
+ * 
+ */
+typedef enum {
+    DIG_LDO_TRIM_0P550V = 0,
+    DIG_LDO_TRIM_0P575V,
+    DIG_LDO_TRIM_0P600V,
+    DIG_LDO_TRIM_0P625V,
+    DIG_LDO_TRIM_0P650V,
+    DIG_LDO_TRIM_0P675V,
+    DIG_LDO_TRIM_0P700V,
+    DIG_LDO_TRIM_0P725V,
+    DIG_LDO_TRIM_0P750V,
+    DIG_LDO_TRIM_0P775V,
+    DIG_LDO_TRIM_0P800V,
+    DIG_LDO_TRIM_0P825V,
+    DIG_LDO_TRIM_0P850V,
+    DIG_LDO_TRIM_0P875V,
+    DIG_LDO_TRIM_0P900V,
+    DIG_LDO_TRIM_0P925V,
+} pm_dig_ldo_trim_e;
+
+/**
+ * @brief trim suspend ldo
+ * 
+ */
+typedef enum {
+	SPD_LDO_TRIM_0P55V = 0,
+    SPD_LDO_TRIM_0P60V,
+    SPD_LDO_TRIM_0P65V,
+    SPD_LDO_TRIM_0P70V,
+    SPD_LDO_TRIM_0P75V,
+    SPD_LDO_TRIM_0P80V,
+    SPD_LDO_TRIM_0P85V,
+    SPD_LDO_TRIM_0P90V,
+} pm_spd_ldo_trim_e;
+
+/**
+ * @brief trim dcore ldo
+ * 
+ */
+typedef enum {
+    DCORE_LDO_TRIM_0P550V = 0,
+    DCORE_LDO_TRIM_0P575V,
+    DCORE_LDO_TRIM_0P600V,
+    DCORE_LDO_TRIM_0P625V,
+    DCORE_LDO_TRIM_0P650V,
+    DCORE_LDO_TRIM_0P675V,
+    DCORE_LDO_TRIM_0P700V,
+    DCORE_LDO_TRIM_0P725V,
+    DCORE_LDO_TRIM_0P750V,
+    DCORE_LDO_TRIM_0P775V,
+    DCORE_LDO_TRIM_0P800V,
+    DCORE_LDO_TRIM_0P825V,
+    DCORE_LDO_TRIM_0P850V,
+    DCORE_LDO_TRIM_0P875V,
+    DCORE_LDO_TRIM_0P900V,
+    DCORE_LDO_TRIM_0P925V,
+} pm_dcore_ldo_trim_e;
+
+/**
+ * @brief trim sram ldo
+ * 
+ */
+typedef enum {
+    SRAM_LDO_TRIM_0P60V = 0,
+    SRAM_LDO_TRIM_0P65V,
+    SRAM_LDO_TRIM_0P70V,
+    SRAM_LDO_TRIM_0P75V,
+    SRAM_LDO_TRIM_0P80V,
+    SRAM_LDO_TRIM_0P85V,
+    SRAM_LDO_TRIM_0P90V,
+    SRAM_LDO_TRIM_0P95V,
+} pm_sram_ldo_trim_e;
+
+/**
+ * @brief power config
+ * 
+ */
+typedef enum{
+	CORE_0P9V_SRAM_0P9V_BB_0P9V = 0x00,	/**< dig ldo mode  1.05V-LDO/DCDC 0.9V_CORE 0.9V_SRAM 0.9V BB*/
+	CORE_0P8V_SRAM_0P8V_BB_0P8V	= 0x01,	/**< dig ldo mode  0.94V-LDO/DCDC 0.8V_CORE 0.8V_SRAM 0.8V BB*/
+	CORE_0P7V_SRAM_0P8V_BB_0P7V	= 0x02,	/**< multi ldo mode  0.94V-LDO/DCDC 0.7V_CORE 0.8V_SRAM 0.7V BB*/
+}pm_power_cfg_e;
 
 /**
  * @brief	early wakeup time
@@ -214,7 +367,8 @@ extern volatile pm_early_wakeup_time_us_s g_pm_early_wakeup_time_us;
 typedef struct {
 	unsigned short  deep_r_delay_cycle ;			/**< hardware delay time ,deep_ret_r_delay_us = deep_r_delay_cycle * 1/16k */
 	unsigned short  suspend_ret_r_delay_cycle ;		/**< hardware delay time ,suspend_ret_r_delay_us = suspend_ret_r_delay_cycle * 1/16k */
-
+	unsigned short  deep_xtal_delay_cycle ;			/**< hardware delay time ,deep_ret_xtal_delay_us = deep_xtal_delay_cycle * 1/16k */
+	unsigned short  suspend_ret_xtal_delay_cycle ;	/**< hardware delay time ,suspend_ret_xtal_delay_us = suspend_ret_xtal_delay_cycle * 1/16k */
 }pm_r_delay_cycle_s;
 
 extern volatile pm_r_delay_cycle_s g_pm_r_delay_cycle;
@@ -245,7 +399,7 @@ static inline unsigned char pm_get_deep_retention_flag(void)
  * @brief		This function serves to get wakeup source.
  * @return		wakeup source.
  */
-static inline pm_wakeup_status_e pm_get_wakeup_src(void)
+static _always_inline pm_wakeup_status_e pm_get_wakeup_src(void)
 {
 	return (pm_wakeup_status_e)analog_read_reg8(0x64);
 }
@@ -258,6 +412,16 @@ static inline pm_wakeup_status_e pm_get_wakeup_src(void)
 static inline void pm_clr_irq_status(pm_wakeup_status_e status)
 {
 	analog_write_reg8(0x64, status);/*add by weihua.zhang, confirmed by jianzhi.chen*/
+}
+
+/**
+ * @brief		This function serves to set the wakeup source.
+ * @param[in]	wakeup_src	- wake up source select.
+ * @return		none.
+ */
+static inline void pm_set_wakeup_src(pm_sleep_wakeup_src_e wakeup_src)
+{
+	analog_write_reg8(0x4b, wakeup_src);
 }
 
 /**
@@ -292,7 +456,7 @@ void pm_set_xtal_stable_timer_param(unsigned int delay_us, unsigned int loopnum,
  * @brief		this function servers to wait bbpll clock lock.
  * @return		none.
  */
-_attribute_ram_code_sec_noinline_ void pm_wait_bbpll_done(void);
+_attribute_ram_code_sec_optimize_o2_ void pm_wait_bbpll_done(void);
 
 /**
  * @brief		This function serves to recover system timer.
@@ -301,6 +465,7 @@ _attribute_ram_code_sec_noinline_ void pm_wait_bbpll_done(void);
  */
 _attribute_ram_code_sec_noinline_ void pm_stimer_recover(void);
 
+#if 0
 /**
  * @brief		This function serves to set the working mode of MCU based on 32k crystal,e.g. suspend mode, deep sleep mode, deep sleep with SRAM retention mode and shutdown mode.
  * @param[in]	sleep_mode 			- sleep mode type select.
@@ -314,55 +479,18 @@ _attribute_ram_code_sec_noinline_ void pm_stimer_recover(void);
  * @return		indicate whether the cpu is wake up successful.
  */
 _attribute_text_sec_ int pm_sleep_wakeup(pm_sleep_mode_e sleep_mode,  pm_sleep_wakeup_src_e wakeup_src, pm_wakeup_tick_type_e wakeup_tick_type, unsigned int  wakeup_tick);
-
+#endif
 /**
  * @brief		This function serves to set baseband/usb/npe power on/off before suspend sleep,If power
  * 				on this module,the suspend current will increase;power down this module will save current,
  * 				but you need to re-init this module after suspend wakeup.All module is power down default
  * 				to save current.
- * @param[in]	value - weather to power on/off the baseband/usb/npe.
+ * @param[in]	value - whether to power on/off the baseband/usb/npe.
  * @param[in]	on_off - select power on or off, 0 - power off; other value - power on.
  * @return		none.
  */
 void pm_set_suspend_power_cfg(pm_suspend_power_cfg_e value, unsigned char on_off);
 
-/**
- * @brief  This function serves to set the zb voltage.
- * @param  zb_voltage - enum variable of zb voltage.
- * @return none.
- */
-static inline void pm_set_zb_voltage(pm_zb_voltage_e zb_voltage)
-{
-	analog_write_reg8(0x00, (analog_read_reg8(0x00) & 0x1F) | zb_voltage);
-}
-
-/**
- * @brief  This function serves to set the digital core voltage.
- * @param  dcore_voltage - enum variable of digital core voltage.
- * @return none.
- */
-//static inline void pm_set_digital_core_voltage(pm_digital_core_voltage_e dcore_voltage)
-//{
-///*    The supported frequencies for cclk, hclk, pclk, mspi and clkzbmst under different digital core voltages are as follows:
-// *
-// *	        digital_core      cclk      hclk      pclk      mspi      clkzbmst(BT)
-// *	            1.2V          96M       48M       48M       64M          32M
-// *	            1.0V          48M       24M       24M       24M          24M
-// *
-// *	  1.The highest frequency for BT group to use clkzbmst is 8M,
-// *	  and currently they are not concerned about the impact of digital core voltage on clkzbmst.(confirmed by junwei, 20230516)
-// *
-// *	  2.The built-in flash can support the maximum operating frequency of the mspi in the table above.
-// *	  (Because when selecting flash chips, the TCLQV indicators of Flash will be controlled
-// *	  according to the chip design requirements to ensure compliance with the requirements)(confirmed by junwen/shenyan, 20230516)
-// *
-// *	  3.The maximum operating frequency of the mspi that can be supported by the external Flash is
-// *	  related to the actual development board and the TCLQV indicator of the Flash.(confirmed by junwen/shenyan, 20230516)
-// *
-// */
-//
-//	analog_write_reg8(0x1d, (analog_read_reg8(0x1d) & 0xe0) | dcore_voltage);
-//}
 /**
  * @brief   	This function is used to determine the stability of the crystal oscillator.
  * 				To judge the stability of the crystal oscillator, xo_ready_ana is invalid, and use an alternative solution to judge.
@@ -372,9 +500,12 @@ static inline void pm_set_zb_voltage(pm_zb_voltage_e zb_voltage)
  * 				and then read the tick value actually increased by the stimer.
  * 				When it reaches 50% of the calculated value, it proves that the crystal oscillator has started.
  * 				If it is not reached for a long time, the system will reboot.
+ * @param[in]	all_ramcode_en	- Whether all processing in this function is required to be ram code. If this parameter is set to 1, it requires that:
+ * 				before calling this function, you have done the disable BTB, disable interrupt, mspi_stop_xip and other operations as the corresponding function configured to 0.
+ * @attention   This function can only be called with the 24M clock configuration
  * @return  	none.
  */
-_attribute_ram_code_sec_noinline_ void pm_wait_xtal_ready(void);
+_attribute_ram_code_sec_optimize_o2_ void pm_wait_xtal_ready(unsigned char all_ramcode_en);
 
 /**
  * @brief		This function serves to get reboot status.
@@ -385,3 +516,58 @@ _attribute_ram_code_sec_noinline_ void pm_wait_xtal_ready(void);
  *              -# the interface sys_init() must be called before this interface can be invoked;
  */
 pm_reboot_event_e pm_get_reboot_event(void);
+
+/**
+ * @brief		this function serves to clear all irq status.
+ * @return		Indicates whether clearing irq status was successful.
+ */
+_attribute_ram_code_sec_optimize_o2_ unsigned char pm_clr_all_irq_status(void);
+
+/**
+ * @brief 		This function serves to reboot system.
+ * @return 		none 
+ */
+_always_inline void sys_reset_all(void)
+{
+	reg_pwdn_en = 0x20;
+}
+
+/**
+ * @brief		This function serves to switch digital module power. 	
+ * @param[in]	module - digital module
+ * @param[in]	power_sel - power up or power down
+ * @return		none
+ * @note		After set digital module power switch register, it need some time to take effect.
+ * 				Call the pm_wait_dig_module_power_stable() to check the power switch finish and become stable. 
+ * 				The recommendation sequence of enable a module: power up module -> wait power stable -> clock enable.
+ */
+void pm_set_dig_module_power_switch(pm_dig_module_e module, pm_power_sel_e power_sel);
+
+/**
+ * @brief		This function serves to wait digital module stable.  
+ * @param[in]	module - digital module
+ * @return		none
+ */
+void pm_wait_dig_module_power_stable(void);
+
+/********************************************************************************************************
+ *											internal
+ *******************************************************************************************************/
+
+/********************************************************************************************************
+ * 				This is just for internal debug purpose, users are prohibited from calling.
+ *******************************************************************************************************/
+
+/**
+ * @brief 		This function serves to trim dig ldo voltage
+ * @param[in]	dig_ldo_trim - dig ldo trim voltage
+ * @return		none
+ */
+void pm_set_dig_ldo_voltage(pm_dig_ldo_trim_e dig_ldo_trim);
+
+/**
+ * @brief 		This function serves to trim spd ldo voltage
+ * @param[in]	spd_ldo_trim - spd ldo trim voltage
+ * @return		none
+ */
+void pm_set_spd_ldo_voltage(pm_spd_ldo_trim_e spd_ldo_trim);

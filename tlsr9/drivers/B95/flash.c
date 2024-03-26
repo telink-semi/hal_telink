@@ -31,8 +31,6 @@
 #include "stimer.h"
 #include "string.h"
 
-#define DISABLE_BTB     __asm__("csrci 	0x7D0,8")
-#define ENABLE_BTB      __asm__("csrsi 	0x7D0,8")
 /*
  *	If add flash type, need pay attention to the read uid command and the bit number of status register
  *  Flash trim scheme has been added for P25Q80U.If other types of flash adds this scheme, user need to modify "flash_trim" and "flash_trim_check" function.

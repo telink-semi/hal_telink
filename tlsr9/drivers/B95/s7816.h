@@ -1,27 +1,24 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
-
 /********************************************************************************************************
- * @file	s7816.h
+ * @file    s7816.h
  *
- * @brief	This is the header file for B95
+ * @brief   This is the header file for B95
  *
- * @author	Driver Group
+ * @author  Driver Group
+ * @date    2023
+ *
+ * @par     Copyright (c) 2023, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *
  *******************************************************************************************************/
 #ifndef S7816_H_
@@ -68,7 +65,7 @@ extern void s7816_init(uart_num_e uart_num,s7816_clock_e clock,int f,int d);
  * @return     	none.
  * @note        extra time is needed for initial-atr after the function.
  */
-extern void s7816_coldreset();
+extern void s7816_coldreset(void);
 
 /**
  * @brief      	This function is used to set all the pin of s7816 module.
@@ -85,7 +82,7 @@ extern void s7816_set_pin(gpio_pin_e rst_pin,gpio_pin_e vcc_pin,gpio_func_pin_e 
  * @param[in]  	none.
  * @return     	none.
  */
-extern void s7816_release_trig();
+extern void s7816_release_trig(void);
 
 /**
  * @brief      	This function is used to set the RST pin of s7816.
@@ -107,7 +104,7 @@ extern void s7816_set_vcc_pin(gpio_pin_e pin_7816_vcc);
  * @return     	none.
  * @note        the warmreset is required after the IC-CARD active,extra time is needed for initial-atr after the function.
  */
-extern void s7816_warmreset();
+extern void s7816_warmreset(void);
 
 /**
  * @brief      	This function is used to set the rst-wait time of the s7816 module.
@@ -126,3 +123,4 @@ extern void s7816_send_byte(uart_num_e uart_num, unsigned char tx_data);
 
 
 #endif /* S7816_H_ */
+

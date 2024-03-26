@@ -4,9 +4,9 @@
  * @brief   This is the source file for B95
  *
  * @author  Driver Group
- * @date    2020
+ * @date    2023
  *
- * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2023, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -70,11 +70,11 @@ unsigned char pll_vco_itrim = 0;
 /**********************************************************************************************************************
  *                                          local function prototype                                               *
  *********************************************************************************************************************/
+static unsigned char clock_calculate_div_clk(sys_clock_src_e src, sys_clock_div_e div);
 
 /**********************************************************************************************************************
  *                                         global function implementation                                             *
  *********************************************************************************************************************/
-
 
 /**
  * @brief   	This function serves to set 32k clock source.
@@ -161,17 +161,20 @@ unsigned char clock_kick_32k_xtal(unsigned char xtal_times)
  */
 void clock_cal_24m_rc(void)
 {
+	analog_write_reg8(areg_0xc8, 0x80);//wait 24m rc stable cycles
+
 	analog_write_reg8(areg_aon_0x4f, analog_read_reg8(areg_aon_0x4f) | FLD_RC_24M_CAP_SEL);
 
-	analog_write_reg8(areg_0x87, FLD_CAL_24M_RC_DISABLE);
-	analog_write_reg8(areg_0x87, FLD_CAL_24M_RC_ENABLE);
-    while((analog_read_reg8(areg_0xce) & FLD_CAL_24M_DONE) == 0){};
+	analog_write_reg8(areg_0xc7, FLD_CAL_24M_RC_DISABLE);
+	analog_write_reg8(areg_0xc7, FLD_CAL_24M_RC_ENABLE);
+
+    while((analog_read_reg8(areg_0xcf) & FLD_CAL_24M_DONE) == 0){};
 
     analog_write_reg8(areg_aon_0x52, analog_read_reg8(areg_0xcb));//write 24m cap into manual register
 
     analog_write_reg8(areg_aon_0x4f, analog_read_reg8(areg_aon_0x4f) & (~FLD_RC_24M_CAP_SEL));
 
-    analog_write_reg8(areg_0x87, FLD_CAL_24M_RC_DISABLE);
+    analog_write_reg8(areg_0xc7, FLD_CAL_24M_RC_DISABLE);
 	tl_24mrc_cal = analog_read_reg8(areg_aon_0x52);
 }
 
@@ -185,11 +188,10 @@ void clock_cal_32k_rc(void)
 
 	analog_write_reg8(areg_0xc6, FLD_CAL_32K_RC_DISABLE);
 	analog_write_reg8(areg_0xc6, FLD_CAL_32K_RC_ENABLE);
-    while(0 == (analog_read_reg8(0xcf) & FLD_CAL_32K_DONE)){};
+    while(0 == (analog_read_reg8(areg_0xcf) & FLD_CAL_32K_DONE)){};
 
 	analog_write_reg8(areg_aon_0x51, analog_read_reg8(areg_0xc9));//write 32k res[13:6] into manual register
 	analog_write_reg8(areg_aon_0x4f, (analog_read_reg8(areg_aon_0x4f) & 0xc0) | analog_read_reg8(areg_0xca));//write 32k res[5:0] into manual register
-	
 	analog_write_reg8(areg_0xc6, FLD_CAL_32K_RC_DISABLE);
 	analog_write_reg8(areg_aon_0x4f, analog_read_reg8(areg_aon_0x4f) & (~FLD_RC_32K_CAP_SEL));//manual on
 
@@ -204,21 +206,21 @@ void clock_cal_32k_rc(void)
  */
 void clock_set_32k_tick(unsigned int tick)
 {
-	reg_system_ctrl |= FLD_SYSTEM_32K_WR_EN;	//r_32k_wr = 1;
-	while(reg_system_st & FLD_SYSTEM_RD_BUSY);
-	reg_system_timer_set_32k = tick;
+	stimer_set_32k_write_mode();	//r_32k_wr = 1;
+	stimer_wait_read_32k_done();
+	stimer_set_32k_tick(tick);
 
-	reg_system_st = FLD_SYSTEM_CMD_SYNC;	//cmd_sync = 1,trig write
+	stimer_set_32k_tick_write_trig();	//cmd_sync = 1,trig write
 	/**
 	 * This delay time is about 1.38us under the calibrated 24M RC clock.
 	 * The minimum waiting time here is 3*pclk cycles+3*24M xtal cycles, a total of 0.25us,
 	 * wait 0.25us before you can use wr_busy signal for judgment, jianzhi suggested that this time to 1us is enough.
 	 * add by bingyu.li, confirmed by jianzhi.chen 20231115
+	 * Each new chip needs to confirm this time with chip design colleagues, which tercel has confirmed.
 	 */
 	core_cclk_delay_tick(sys_clk.cclk);//1us
 
-	while(reg_system_st & FLD_SYSTEM_CMD_SYNC);	//wait wr_busy = 0
-
+	stimer_wait_write_32k_done ();		//wait wr_busy = 0
 }
 
 /**
@@ -269,23 +271,6 @@ unsigned int clock_get_32k_tick(void)
 #endif
 
 /**
- * @brief       This function is used to calculate the clock after different clock sources, the unit is MHZ.
- * @param[in]	src - the clock source
- * @param[in]	div - the clock source divider
- * @return 		clk.
- */
-static unsigned char clock_calculate_div_clk(sys_clock_src_e src, sys_clock_div_e div)
-{
-    unsigned char clk = 0 ;
-    if(BASEBAND_PLL == src ){
-    	clk = sys_clk.pll_clk / div;
-    }else{
-    	clk = 24 / div;
-    }
-    return clk;
-}
-
-/**
  * @brief       This function use to select the system clock source.
  * @param[in]	src - cclk source.
  * @param[in]	cclk_div - the cclk divide from src.
@@ -301,7 +286,7 @@ static unsigned char clock_calculate_div_clk(sys_clock_src_e src, sys_clock_div_
  * 			    because during the clock switching process, the system clock will be
  * 			    suspended for a period of time, which may cause data loss
  */
-_attribute_text_sec_
+_attribute_ram_code_sec_noinline_
 void clock_init(sys_clock_src_e src,
 				sys_clock_div_e cclk_div,
 				sys_cclk_div_to_hclk_e hclk_div,
@@ -326,7 +311,7 @@ void clock_mspi_clk_config(sys_clock_src_e src, sys_clock_div_e div)
 }
 
 /**
- * @brief       This function used to configure the frequency of CCLK/HCLK/PCLK when the PLL is 240M.
+ * @brief       This function used to configure the frequency of CCLK/HCLK/PCLK.
  * 				You need to wait until all the peripherals that use these clocks are idle before you can switch frequencies.
  * @param[in]   src - clock source.
  * @param[in]   cclk_div - divider of CCLK.
@@ -355,14 +340,15 @@ void clock_cclk_hclk_pclk_config(sys_clock_src_e src, sys_clock_div_e cclk_div,
 /**
  * @brief		This function use to set all clock to default. 
  * @return		none.
+ * @note		After call this, the following clock will set to default source and value:
+ * 				-----------------------------------------------------------------------
+ * 				clock source |			clock
+ * 				-----------------------------------------------------------------------
+ * 				RC 24M		 | CCLK 24M, HCLK 24M, PCLK 24M, MSPI CLK 24M.
+ * 				-----------------------------------------------------------------------
  */
 void clock_set_all_clock_to_default(void)
 {
-	/*
-		cclk to 24M rc clock, div 1, 24MHz
-		hclk, div 1, 24MHz
-		pclk, div 1, 24MHz
-	*/
 	clock_cclk_hclk_pclk_config(RC_24M, CLK_DIV1, CCLK_DIV1_TO_HCLK, HCLK_DIV1_TO_PCLK);
 
 	clock_mspi_clk_config(RC_24M, CLK_DIV1);//mspi clk to 24M rc clock, div 1, 24MHz
@@ -415,10 +401,37 @@ void clock_restore_clock_config(void)
  */
 void clock_bbpll_config(sys_pll_clk_e pll_clk)
 {
+	/*
+	 * The default pll clk is 192MHz, now set to 240MHz. 
+	 * For safety reasons, power down the PLL first and then power up after the configuration is completed.
+	 * add by jilong.liu, confirmed by yangya 20240125
+	 */
+	analog_write_reg8(areg_aon_0x06, analog_read_reg8(areg_aon_0x06) | FLD_PD_BBPLL_LDO);//power down pll
+
 	//pll clk
 	analog_write_reg8(areg_0x85, (analog_read_reg8(areg_0x85) & 0x9f) | 0x60);//bpll_240M_refclk_sel
 	analog_write_reg8(areg_0x86, (analog_read_reg8(areg_0x86) & 0xe0) | (pll_clk & 0x1f));//bbpll_240M_div_ratio<4:0>
 	analog_write_reg8(areg_0x84, (analog_read_reg8(areg_0x84) & 0x1f) | (pll_clk & 0xe0));//vco_itrim<2:0>
+
+	analog_write_reg8(areg_aon_0x06, analog_read_reg8(areg_aon_0x06) & ~(FLD_PD_BBPLL_LDO));//power up pll
+
 	sys_clk.pll_clk = (pll_clk >> 8);
 	pll_vco_itrim = (pll_clk & 0xe0) >> 5;
+}
+
+/**
+ * @brief       This function is used to calculate the clock after different clock sources, the unit is MHZ.
+ * @param[in]	src - the clock source
+ * @param[in]	div - the clock source divider
+ * @return 		clk.
+ */
+static unsigned char clock_calculate_div_clk(sys_clock_src_e src, sys_clock_div_e div)
+{
+    unsigned char clk = 0 ;
+    if(BASEBAND_PLL == src ){
+    	clk = sys_clk.pll_clk / div;
+    }else{
+    	clk = 24 / div;
+    }
+    return clk;
 }

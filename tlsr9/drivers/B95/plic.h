@@ -6,7 +6,7 @@
  * @author  Driver Group
  * @date    2023
  *
- * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2023, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -147,7 +147,7 @@ extern _attribute_data_retention_sec_ volatile unsigned char g_plic_preempt_en;
 #define IRQ_GPIO_SRC7               41 /* GPIO_GROUP_IRQ[7], - gpio_src7_irq_handler */
 #define IRQ_TRNG                    42 /* TRNG_IRQ, - trng_irq_handler */
 #define IRQ_HASH                    43 /* HASH_IRQ, - hash_irq_handler */
-#define IRQ_PM_WKUP                 44 /* PM_WKUP_IRQ: PM wakeup interrupt, - pm_wkup_irq_handler */
+#define IRQ_PM_LVL                  44 /* PM_LVL_IRQ: PM level interrupt, - pm_level_irq_handler */
 #define IRQ_PM_IRQ                  45 /* PM_MIX_IRQ: PM mixed interrupt, - pm_irq_handler */
 #define IRQ_EMQ_IRQ                 46 /* EMQ_IRQ, - emq_irq_handler */
 #define IRQ_SKE                     47 /* SKE_IRQ, - ske_irq_handler */

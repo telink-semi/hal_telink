@@ -4,9 +4,9 @@
  * @brief   This is the header file for B95
  *
  * @author  Driver Group
- * @date    2020
+ * @date    2023
  *
- * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2023, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -87,6 +87,14 @@ enum{
 
 #define areg_aon_0x51           0x51
 #define areg_aon_0x52           0x52
+
+#define areg_aon_0x69           0x69
+enum{
+	FLD_PD_SM_BUSY			    = BIT(5),/*
+                                            The pd_sm_busy bit just represents the completion of power switch.
+                                            During power switch it will be 1, and after the switch is completed, it will become 0.
+                                        */
+};
 
 #define areg_aon_0x79           0x79
 

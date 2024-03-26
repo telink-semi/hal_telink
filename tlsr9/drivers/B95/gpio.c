@@ -4,9 +4,9 @@
  * @brief   This is the source file for B95
  *
  * @author  Driver Group
- * @date    2021
+ * @date    2023
  *
- * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2023, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -239,7 +239,7 @@ void gpio_shutdown(gpio_pin_e pin)
 			reg_gpio_pd_gpio = 0xff;
 			reg_gpio_pe_gpio = 0xff;
 			reg_gpio_pf_gpio = 0xff;
-			reg_gpio_pg_gpio = 0xff;
+//			reg_gpio_pg_gpio = 0xff;
 
 			//output disable
 			reg_gpio_pa_oen = 0xff;
@@ -248,7 +248,7 @@ void gpio_shutdown(gpio_pin_e pin)
 			reg_gpio_pd_oen = 0xff;
 			reg_gpio_pe_oen = 0xff;
 			reg_gpio_pf_oen = 0xff;
-			reg_gpio_pg_oen = 0xff;
+//			reg_gpio_pg_oen = 0xff;
 
 			//disable input
 			reg_gpio_pa_ie = 0x80;					//SWS
@@ -257,7 +257,7 @@ void gpio_shutdown(gpio_pin_e pin)
 			analog_write_reg8(areg_gpio_pd_ie, 0);
 			reg_gpio_pe_ie = 0x00;
 			reg_gpio_pf_ie = 0x00;
-			reg_gpio_pg_ie = 0x00;
+//			reg_gpio_pg_ie = 0x00;
 		}
 	}
 }
@@ -423,14 +423,15 @@ void gpio_set_src_irq(gpio_pin_e pin, gpio_irq_trigger_type_e trigger_type)
  */
 void gpio_set_up_down_res(gpio_pin_e pin, gpio_pull_type_e up_down_res)
 {
+	///////////////////////////////////////////////////////////
+	// 		  PA[3:0]	    	PA[7:4]			PB[3:0]			PB[7:4]  	PC[3:0]  	    PC[7:4]
+	// sel: ana_0x17<7:0>	 ana_0x18<7:0>  ana_0x19<7:0>  ana_0x1a<7:0>  ana_0x1b<7:0>  ana_0x1c<7:0>
+	// 		  PD[3:0]	    	PD[7:4]			PE[3:0]			PE[7:4]  	PF[3:0]  	    PF[7:4]
+	// sel: ana_0x1d<7:0>	 ana_0x1e<7:0>  ana_0x1f<7:0>  ana_0x20<7:0>  ana_0x21<7:0>  ana_0x22<7:0>
 	unsigned char r_val = up_down_res & 0x03;
 
 	unsigned char base_ana_reg = 0;
-	if((pin>>8)==6)//G
-	{
-		 base_ana_reg = 0x23 + ( (pin & 0xf0) ? 1 : 0 );
-	}
-	else if((pin>>8)<6)//A-E
+	if((pin>>8)<6)//A-E
 	{
 		 base_ana_reg = 0x17 + ((pin >> 8) << 1) + ((pin & 0xf0) ? 1 : 0 );
 	}
@@ -440,24 +441,24 @@ void gpio_set_up_down_res(gpio_pin_e pin, gpio_pull_type_e up_down_res)
 	unsigned char shift_num, mask_not;
 
 	if(pin & 0x11){
-			shift_num = 0;
-			mask_not = 0xfc;
-		}
-		else if(pin & 0x22){
-			shift_num = 2;
-			mask_not = 0xf3;
-		}
-		else if(pin & 0x44){
-			shift_num = 4;
-			mask_not = 0xcf;
-		}
-		else if(pin & 0x88){
-			shift_num = 6;
-			mask_not = 0x3f;
-		}
-		else{
-			return;
-		}
+		shift_num = 0;
+		mask_not = 0xfc;
+	}
+	else if(pin & 0x22){
+		shift_num = 2;
+		mask_not = 0xf3;
+	}
+	else if(pin & 0x44){
+		shift_num = 4;
+		mask_not = 0xcf;
+	}
+	else if(pin & 0x88){
+		shift_num = 6;
+		mask_not = 0x3f;
+	}
+	else{
+		return;
+	}
 	analog_write_reg8(base_ana_reg, (analog_read_reg8(base_ana_reg) & mask_not) | (r_val << shift_num));
 }
 

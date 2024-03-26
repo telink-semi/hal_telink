@@ -1,27 +1,24 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
-
 /********************************************************************************************************
- * @file	i2c.c
+ * @file    i2c.c
  *
- * @brief	This is the source file for B95
+ * @brief   This is the source file for B95
  *
- * @author	Driver Group
+ * @author  Driver Group
+ * @date    2023
+ *
+ * @par     Copyright (c) 2023, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *
  *******************************************************************************************************/
 #include "i2c.h"
@@ -44,6 +41,7 @@ dma_config_t i2c_tx_dma_config={
 	.write_num_en=0,
 	.auto_en=0,//must 0
 	};
+
 dma_config_t i2c_rx_dma_config={
 	.dst_req_sel= 0,
 	.src_req_sel=DMA_REQ_I2C_RX,
@@ -60,14 +58,11 @@ dma_config_t i2c_rx_dma_config={
 	.auto_en=0,//must 0
 };
 
-
-
 /**
  * This parameter is 0x20 by default, that is, each write or read API opens the stop command.
  * if g_i2c_stop_en=0x00,it means every write or read API will disable stop command.
  */
 unsigned char g_i2c_stop_en=0x20;
-
 
 /**
  * @brief      The function of this interface is equivalent to that after the user finishes calling the write or read interface, the stop signal is not sent,
@@ -85,9 +80,7 @@ void i2c_master_send_stop(unsigned char en)
 	}else{
 		g_i2c_stop_en=0x00;
 	}
-
 }
-
 
 /**
  * @brief      This function selects a pin port for I2C interface.
@@ -118,6 +111,8 @@ void i2c_set_pin(gpio_func_pin_e sda_pin,gpio_func_pin_e scl_pin)
  */
 void i2c_master_init(void)
 {
+	BM_SET(reg_rst0, FLD_RST0_I2C);
+	BM_SET(reg_clk_en0, FLD_CLK0_I2C_EN);
 	reg_i2c_ctrl2  |=  FLD_I2C_MASTER;       //i2c master enable.
 	i2c_master_detect_nack_en();
 	i2c_master_stretch_en();
@@ -132,14 +127,12 @@ void i2c_master_init(void)
  */
 void i2c_set_master_clk(unsigned char clock)
 {
-
 	//i2c frequency = pclk/(4*clock)
 	reg_i2c_sp = clock;
 
 	//set enable flag.
     reg_clk_en0 |= FLD_CLK0_I2C_EN;
 }
-
 
 /**
  * @brief      This function serves to enable slave mode.
@@ -149,11 +142,11 @@ void i2c_set_master_clk(unsigned char clock)
  */
 void i2c_slave_init(unsigned char id)
 {
+	BM_SET(reg_rst0, FLD_RST0_I2C);
+	BM_SET(reg_clk_en0, FLD_CLK0_I2C_EN);
 	reg_i2c_ctrl2 &= (~FLD_I2C_MASTER); //enable slave mode.
-
-	reg_i2c_id	  = id;                   //default eagle slave ID is 0x5a
+	reg_i2c_id	  = id;
 }
-
 
 /**
  *@brief   in no_dma master,check whether the master ID phase receives nack that slave returns,if nack is received, launch stop cycle.
@@ -164,7 +157,7 @@ static inline unsigned char i2c_master_id_nack_detect(void)
 	//After enabling master nack, I2C_MASTER_NAK_IRQ interrupt will be activated if master receives nack returned by slave.
 	if(i2c_get_irq_status(I2C_MASTER_NAK_STATUS))
 	{
-	    i2c_clr_irq_status(I2C_MASTER_NAK_CLR);
+	    i2c_clr_irq_status(I2C_MASTER_NAK_STATUS);
 	    reg_i2c_sct1 = (FLD_I2C_LS_STOP);
 	    while(i2c_master_busy());//wait for the STOP signal to finish sending.
 	    return 1;
@@ -180,16 +173,15 @@ static inline unsigned char i2c_master_data_nack_detect(void)
 {
 	if(i2c_get_irq_status(I2C_MASTER_NAK_STATUS))
 	{
-	    i2c_clr_irq_status(I2C_MASTER_NAK_CLR);
+	    i2c_clr_irq_status(I2C_MASTER_NAK_STATUS);
 	    reg_i2c_sct1 = (FLD_I2C_LS_STOP);
 	    //If configure stop once more, will no longer be busy as long as the current stop is sent.
 	    while(i2c_master_busy());//wait for the STOP signal to finish sending.
-	    i2c_clr_fifo(I2C_TX_BUFF_CLR);
+	    i2c_clr_irq_status(I2C_TX_BUF_STATUS);
 	    return 1;
     }
    return 0;
 }
-
 
 /**
  * @brief      The function of this API is to ensure that the data can be successfully sent out.
@@ -204,9 +196,9 @@ static inline unsigned char i2c_master_data_nack_detect(void)
  */
 unsigned char i2c_master_write(unsigned char id, unsigned char *data, unsigned int len)
 {
-	i2c_clr_fifo(I2C_TX_BUFF_CLR );
+	i2c_clr_irq_status(I2C_TX_BUF_STATUS);
 	reg_i2c_id = id & (~FLD_I2C_WRITE_READ_BIT); //BIT(0):R:High  W:Low
-	reg_i2c_sct1 = (FLD_I2C_LS_ID| FLD_I2C_LS_START);
+	reg_i2c_sct1 = (FLD_I2C_LS_ID | FLD_I2C_LS_START);
 	while(i2c_master_busy());
 	if(i2c_master_id_nack_detect()){
 		return 0;
@@ -231,7 +223,6 @@ unsigned char i2c_master_write(unsigned char id, unsigned char *data, unsigned i
 			  reg_i2c_sct1 = ( FLD_I2C_LS_DATAW|g_i2c_stop_en ); //launch stop cycle
 			}
 		}
-
 	}
 	while(i2c_get_tx_buf_cnt())
 	{
@@ -239,13 +230,11 @@ unsigned char i2c_master_write(unsigned char id, unsigned char *data, unsigned i
 		{
 			return 0;
 		}
-
 	}
 	while(i2c_master_busy());
 
 	return 1;
 }
-
 
 /**
  * @brief      This function serves to read a packet of data from the specified address of slave device.
@@ -259,7 +248,7 @@ unsigned char i2c_master_write(unsigned char id, unsigned char *data, unsigned i
  */
 unsigned char  i2c_master_read(unsigned char id, unsigned char *data, unsigned int len)
 {
-	i2c_clr_fifo(I2C_RX_BUFF_CLR );
+	i2c_clr_irq_status(I2C_RX_BUF_STATUS );
 	reg_i2c_id = id | FLD_I2C_WRITE_READ_BIT; //BIT(0):R:High  W:Low
 	reg_i2c_ctrl3 |= FLD_I2C_RNCK_EN;//i2c rnck enable.
     reg_i2c_sct1 = (FLD_I2C_LS_ID| FLD_I2C_LS_START );
@@ -330,15 +319,15 @@ unsigned char i2c_master_write_read(unsigned char id, unsigned char *wr_data, un
  *             can choose whether to send stop,if i2c stop is not configured, the next time a start signal is sent, it will be a restart signal,
  *             but if a nack exception is received in id or data phase, during exception handling, a stop signal will be sent.
  * @param[in]  id   - to set the slave ID.
- * @param[in]  data - The data to be sent.
+ * @param[in]  data - The data to be sent,must be aligned by word (4 bytes).
  * @param[in]  len  - This length is the total length, including both the length of the slave RAM address and the length of the data to be sent,
  *                    the maximum transmission length of DMA is 0xFFFFFC bytes, so dont'n over this length.
  * @return     none.
- * @note       data: must be aligned by word (4 bytes), otherwise the program will enter an exception.
+ * @note       After the DMA transfer is complete, the interface needs to be re-invoked to write the next batch of data.
  */
 void i2c_master_write_dma(unsigned char id, unsigned char *data, unsigned int len)
 {
-	i2c_clr_fifo(I2C_TX_BUFF_CLR );
+	i2c_clr_irq_status(I2C_TX_BUF_STATUS );
 	reg_i2c_id = (id & (~FLD_I2C_WRITE_READ_BIT)); //BIT(0):R:High  W:Low
 
     dma_set_size(i2c_dma_tx_chn,len,DMA_WORD_WIDTH);
@@ -350,24 +339,23 @@ void i2c_master_write_dma(unsigned char id, unsigned char *data, unsigned int le
 	reg_i2c_sct1 = (FLD_I2C_LS_ID|FLD_I2C_LS_START|FLD_I2C_LS_DATAW |g_i2c_stop_en);
 }
 
-
 /**
  * @brief      This function serves to read a packet of data from the specified address of slave device by dma.
  *             can choose whether to send stop,if i2c stop is not configured, the next time a start signal is sent, it will be a restart signal,
  *             but if a nack exception is received in id phase, during exception handling, a stop signal will be sent.
  * @param[in]  id      - to set the slave ID.
- * @param[in]  rx_data - Store the read data.
+ * @param[in]  rx_data - Store the read data,must be aligned by word (4 bytes).
  * @param[in]  len     - The total length of the data read back,the maximum transmission length of DMA is 0xFFFFFC bytes, so dont'n over this length.
  * @return     none
- * @note       rx_data: must be aligned by word (4 bytes), otherwise the program will enter an exception.
+ * @note       After the DMA transfer is complete, the interface needs to be re-invoked to read the next batch of data.
  */
 void i2c_master_read_dma(unsigned char id, unsigned char *rx_data, unsigned int len)
 {
-	i2c_clr_fifo(I2C_RX_BUFF_CLR );
+	i2c_clr_irq_status(I2C_RX_BUF_STATUS );
 	reg_i2c_id = id | FLD_I2C_WRITE_READ_BIT; //BIT(0):R:High  W:Low
 	reg_i2c_ctrl3 |= FLD_I2C_RNCK_EN;//i2c rnck enable.
 
-	dma_set_wnum_dis(i2c_dma_rx_chn);
+	dma_set_wnum_dis(i2c_dma_rx_chn); //The data received by the master is the same length as the data sent, so there is no need for a writer_num.
 	dma_set_size(i2c_dma_rx_chn,len,DMA_WORD_WIDTH);
 	dma_set_address(i2c_dma_rx_chn,reg_i2c_data_buf0_addr,(unsigned int)(rx_data));
 	dma_chn_en(i2c_dma_rx_chn);
@@ -377,36 +365,39 @@ void i2c_master_read_dma(unsigned char id, unsigned char *rx_data, unsigned int 
 	reg_i2c_sct1 = ( FLD_I2C_LS_ID | FLD_I2C_LS_DATAR | FLD_I2C_LS_START | FLD_I2C_LS_ID_R | g_i2c_stop_en);
 
 }
+
 /**
- * @brief      Send an amount of data in DMA mode
+ * @brief      This function serves to write a packet of data to master device in DMA mode.
  * @param[in]  data -  Pointer to data buffer, it must be 4-bytes aligned address
  * @param[in]  len  -  Amount of data to be sent in bytes, range from 1 to 0xFFFFFC
  * @return     none.
+ * @note       After the DMA transfer is complete, the interface needs to be re-invoked to write the next batch of data.
  */
 void i2c_slave_set_tx_dma( unsigned char *data, unsigned int len)
 {
-	i2c_clr_fifo(I2C_TX_BUFF_CLR );
+	i2c_clr_irq_status(I2C_TX_BUF_STATUS );
 	dma_set_address(i2c_dma_tx_chn,(unsigned int)(data),reg_i2c_data_buf0_addr);
 	dma_set_size(i2c_dma_tx_chn,len,DMA_WORD_WIDTH);
 	dma_chn_en(i2c_dma_tx_chn);
 }
 
-
 /**
- * @brief      Receive an amount of data in DMA mode
- * @param[in]  data - Pointer to data buffer, it must be 4-bytes aligned address
- * @param[in]  len  - Length of DMA in bytes. It must be set to 0xFFFFFC.
- * @attention  The first four bytes in the buffer of the received data are the length of the received data.
- *             The actual buffer size that the user needs to set needs to be noted on two points:
- *			   -# you need to leave 4bytes of space for the length information.
- *			   -# dma is transmitted in accordance with 4bytes, so the length of the buffer needs to be a multiple of 4. Otherwise, there may be an out-of-bounds problem
- *			   For example, the actual received data length is 5bytes, the minimum value of the actual buffer size that the user needs to set is 12bytes, and the calculation of 12bytes is explained as follows:
- *			   4bytes (length information) + 5bytes (data) + 3bytes (the number of additional bytes to prevent out-of-bounds)
- * @return     none.
- */
+@brief         This function serves to receive a packet of data from master device.
+@param[in]     data - the pointer of rx_buff, it must be 4-bytes aligned address
+@param[in]     len - length in bytes, must be a multiple of 4, with a maximum value of 0xFFFFFC.
+@return        none.
+@note
+               -# If write_num is enabled, the length of data received by DMA will be written into the first four bytes of the address.
+               -# A length greater than XX_len itself and a multiple of 4 is denoted as CEILING(XX_len,4). For example: XX_len=3 ,CEILING(XX_len,4)=4; XX_len=21 ,CEILING(Tx_length, 4)=24.
+                  The actual length sent by master  is denoted as Tx_len, The length (param[in]-len) of the interface configuration is denoted as Rx_len.
+                  when CEILING(Tx_len,4) > CEILING(Rx_len,4), When the length of the DMA carry reaches Rx_len, the DMA will not stop working and the excess data will not be carried into the buff.
+                  for example:Tx_len=21,Rx_len=20,When the DMA stops working the buff is written with a length of 21 and only 20 bytes of data are stored.It is recommended to configure the appropriate Rx_len to avoid this situation.
+                -# After DMA transfer completion, the interface needs to be invoked again to read the next batch of data.
+*/
 void i2c_slave_set_rx_dma(unsigned char *data, unsigned int len)
 {
-	i2c_clr_fifo(I2C_RX_BUFF_CLR );
+	dma_chn_dis(i2c_dma_rx_chn);
+	i2c_clr_irq_status(I2C_RX_BUF_STATUS );
 	dma_set_address(i2c_dma_rx_chn,reg_i2c_data_buf0_addr,(unsigned int)(data));
 	dma_set_size(i2c_dma_rx_chn,len,DMA_WORD_WIDTH);
 	dma_chn_en(i2c_dma_rx_chn);
@@ -442,7 +433,7 @@ void i2c_slave_read(unsigned char* data , unsigned int len )
  */
 void i2c_slave_write(unsigned char* data , unsigned int len)
 {
-	i2c_clr_fifo(I2C_TX_BUFF_CLR );
+	i2c_clr_irq_status(I2C_TX_BUF_STATUS );
 	unsigned int cnt = 0;
 	while(cnt<len)
 	{
@@ -453,7 +444,6 @@ void i2c_slave_write(unsigned char* data , unsigned int len)
 		}
 	}
 }
-
 
 /**
  * @brief     This function serves to set i2c tx_dma channel and config dma tx default.
@@ -477,8 +467,6 @@ void i2c_set_rx_dma_config(dma_chn_e chn)
 	dma_config(chn, &i2c_rx_dma_config);
 }
 
-
-
 /**
  * @brief     This function serves to configure the master i2c send and receive byte length,the hardware needs to know what the length is.
  * @param[in] len - the maximum transmission length of i2c is 0xffffff bytes, so dont'n over this length.
@@ -495,7 +483,7 @@ void i2c_master_set_len(unsigned int len){
  *@return    1:if return 1,it means that the slave is to get master read cmd.
  *           0:if return 0,it means that the slave is to get master write cmd.
  */
-i2c_slave_wr_e i2c_slave_get_cmd()
+i2c_slave_wr_e i2c_slave_get_cmd(void)
 {
      return (i2c_slave_status1&FLD_I2C_SLAVE_READ);
 }
@@ -505,11 +493,10 @@ i2c_slave_wr_e i2c_slave_get_cmd()
  * @return    1:if return 1,it means that the state of the master is read status.
  *            0:if return 0,it means that the state of the master is not read status.
  */
-i2c_master_wr_e i2c_get_master_wr_status()
+i2c_master_wr_e i2c_get_master_wr_status(void)
 {
     return (reg_i2c_sct1 & FLD_I2C_LS_ID_R);
 }
-
 
 /********************************************************************************************
  *****|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|*****
@@ -521,7 +508,6 @@ i2c_master_wr_e i2c_get_master_wr_status()
  * if g_i2c_stop_en=0x00,it means every write or read API will disable stop command.
  */
 unsigned char g_i2c1_m_stop_en=0x20;
-
 
 /**
  * @brief      The function of this interface is equivalent to that after the user finishes calling the write or read interface, the stop signal is not sent,
@@ -539,7 +525,6 @@ void i2c1_m_master_send_stop(unsigned char en)
 	}else{
 		g_i2c1_m_stop_en=0x00;
 	}
-
 }
 
 /**
@@ -561,9 +546,6 @@ void i2c1_m_set_pin(gpio_func_pin_e sda_pin,gpio_func_pin_e scl_pin)
 	gpio_function_dis((gpio_pin_e)sda_pin);
 	gpio_set_mux_function(scl_pin,I2C1_SCL_IO);
 	gpio_set_mux_function(sda_pin,I2C1_SDA_IO);
-
-
-
 }
 
 /**
@@ -572,9 +554,10 @@ void i2c1_m_set_pin(gpio_func_pin_e sda_pin,gpio_func_pin_e scl_pin)
  */
 void i2c1_m_master_init(void)
 {
+	BM_SET(reg_rst2, FLD_RST2_I2C1);
+	BM_SET(reg_clk_en2, FLD_CLK2_I2C1_EN);
 	reg_i2c1_m_sct0  |=  FLD_I2C1_M_MASTER;       //i2c master enable.
 }
-
 
 /**
  * @brief      This function serves to set the i2c1_m clock frequency.The i2c1_m clock is consistent with the pclk.
@@ -584,7 +567,6 @@ void i2c1_m_master_init(void)
  */
 void i2c1_m_set_master_clk(unsigned char clock)
 {
-
 	//i2c1_m frequency = system_clock/(4*clock)
 	reg_i2c1_m_sp = clock;
 
@@ -625,7 +607,6 @@ unsigned char i2c1_m_master_write(unsigned char id, unsigned char * data_buf, un
 			while(i2c1_m_master_busy());
 			return 0;
 		}
-
 	}
     //stop
     reg_i2c1_m_ctrl = g_i2c1_m_stop_en; //launch stop cycle
@@ -671,7 +652,6 @@ unsigned char i2c1_m_master_read(unsigned char id, unsigned char * data_buf, uns
 	while(i2c1_m_master_busy());
 	return 1;
 }
-
 
 /**
  * @brief      This function serves to read a packet of data from the specified address of slave device.

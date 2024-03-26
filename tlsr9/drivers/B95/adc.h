@@ -1,34 +1,46 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
-
 /********************************************************************************************************
- * @file	adc.h
+ * @file    adc.h
  *
- * @brief	This is the header file for B95
+ * @brief   This is the header file for B95
  *
- * @author	Driver Group
+ * @author  Driver Group
+ * @date    2023
+ *
+ * @par     Copyright (c) 2023, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *
  *******************************************************************************************************/
 /**	@page ADC
  *
  *	Introduction
  *	===============
- *	TLSRB95 supports hardware ADC function.
+ *	B92 supports hardware ADC function.
+ *
+ *  When the voltage to be sampled exceeds the ADC sampling range, an external voltage divider circuit must be used
+ *  to divide the original voltage into the sampling range and then input to the sampling point and sample through the GPIO.
+ *  The recommended configuration of the external divider circuit is as follows:
+ *  Hardware Configuration: The 500k resistor and 1M resistor are combined to form 1/3 of the external partial voltage circuit (M level).
+ *  Software Configuration: Recommended initial settings are  Vref = 1.2V, pre_scale = 1/4, sample_freq =23K.
+ *  The difference in sampling steps between normal mode and sleep mode is as follows:
+ *  -# Normal mode:
+ *     a. Power on the ADC for immediate sampling and then immediately power off the ADC;
+ *     b. Delay time greater than 50ms;(Less than this time, the sampling bias will be larger.)
+ *     c. Proceed to the next sampling, following the same steps as a and b.
+ *  -# Deep mode or deep retention mode:
+ *     After adc sampling, it will enter deep mode or deep retention mode and no additional operation is required.
+ *  -# Suspend mode:
+ *     After adc sampling, it will enter suspend mode and you need to configure the suspend time to be greater than 200ms.
  *
  *	API Reference
  *	===============

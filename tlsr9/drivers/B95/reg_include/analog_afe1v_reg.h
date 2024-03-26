@@ -4,9 +4,9 @@
  * @brief   This is the header file for B95
  *
  * @author  Driver Group
- * @date    2020
+ * @date    2023
  *
- * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2023, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -37,10 +37,6 @@ enum{
 };
 
 #define areg_0x87               0x87
-enum{
-    FLD_CAL_24M_RC_DISABLE   =  0x0e,
-    FLD_CAL_24M_RC_ENABLE    =  0x0f,
-};
 
 #define areg_0x88               0x88
 enum {
@@ -65,11 +61,18 @@ enum{
     FLD_CAL_32K_RC_ENABLE    =  0xf7,
 };
 
+#define areg_0xc7               0xc7
+enum{
+    FLD_CAL_24M_RC_DISABLE   =  0x0e,
+    FLD_CAL_24M_RC_ENABLE    =  0x0f,
+};
+
+#define areg_0xc8               0xc8
 #define areg_0xc9               0xc9
 #define areg_0xca               0xca
 #define areg_0xcb               0xcb
 
-#define areg_0xce               0xce
+#define areg_0xcf               0xcf
 enum{
     FLD_CAL_32K_DONE         =  BIT(6),
     FLD_CAL_24M_DONE         =  BIT(7),
