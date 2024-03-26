@@ -1,27 +1,24 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
-
 /********************************************************************************************************
- * @file	pwm.h
+ * @file    pwm.h
  *
- * @brief	This is the header file for B95
+ * @brief   This is the header file for B95
  *
- * @author	Driver Group
+ * @author  Driver Group
+ * @date    2023
+ *
+ * @par     Copyright (c) 2023, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *
  *******************************************************************************************************/
 #ifndef PWM_H_
@@ -42,6 +39,7 @@ typedef enum {
 	PWM3_ID,
 	PWM4_ID,
 	PWM5_ID,
+	PWM6_ID,
 }pwm_id_e;
 
 
@@ -67,12 +65,9 @@ typedef enum {
 	PWM_CLOCK_32K_CHN_PWM2 = 0x04,
 	PWM_CLOCK_32K_CHN_PWM3 = 0x08,
 	PWM_CLOCK_32K_CHN_PWM4 = 0x10,
-	PWM_CLOCK_32K_CHN_PWM5 = 0x20
+	PWM_CLOCK_32K_CHN_PWM5 = 0x20,
+	PWM_CLOCK_32K_CHN_PWM6 = 0x40,
 }pwm_clk_32k_en_chn_e;
-
-
-
-
 
 
 /**
@@ -110,9 +105,11 @@ void pwm_set_pin(gpio_func_pin_e pin,gpio_func_e func);
 
 /**
  * @brief     This function servers to set pwm count status(CMP) time.
- * @param[in] id   - variable of enum to select the pwm number,Value range 1~8.
+ * @param[in] id   - variable of enum to select the pwm number,Value range 0~6.
  * @param[in] tcmp - variable of the CMP.
  * @return	  none.
+ * @note      When pwm is in the process of sending and the pwm_set_tcmp() interface is called,
+ *            the new value of PWM_TCMP will be valid at the beginning of the next cycle.
  */
 static inline void pwm_set_tcmp(pwm_id_e id, unsigned short tcmp)
 {
@@ -122,9 +119,11 @@ static inline void pwm_set_tcmp(pwm_id_e id, unsigned short tcmp)
 
 /**
  * @brief     This function servers to set pwm cycle time.
- * @param[in] id   - variable of enum to select the pwm number,Value range 1~8.
+ * @param[in] id   - variable of enum to select the pwm number,Value range 0~6.
  * @param[in] tmax - variable of the cycle time.
  * @return	  none.
+ * @note      When pwm is in the process of sending and the pwm_set_tmax() interface is called,
+ *            the new value of PWM_TMAX will be valid at the beginning of the next cycle.
  */
 static inline void pwm_set_tmax(pwm_id_e id, unsigned short tmax){
 	reg_pwm_max(id) = tmax;
@@ -132,36 +131,32 @@ static inline void pwm_set_tmax(pwm_id_e id, unsigned short tmax){
 
 /**
  * @brief     This function servers to start the pwm,can have more than one PWM open at the same time.
- * @param[in] id - variable of enum to select the pwm number.
+ * @param[in] en - variable of enum to select the pwm.
  * @return	  none.
  */
-static inline void pwm_start(pwm_id_e id){
-	if(PWM0_ID == id){
-		BM_SET(reg_pwm0_enable, BIT(PWM0_ID));
-	}
-	else{
-		BM_SET(reg_pwm_enable, BIT(id));
-	}
+static inline void pwm_start(pwm_en_e en){
+
+		reg_pwm_enable|=en;
 }
+
+
 
 /**
  * @brief     This function servers to stop the pwm,can have more than one PWM stop at the same time.
- * @param[in] id - variable of enum to select the pwm number.
+ * @param[in] en - variable of enum to select the pwm.
  * @return	  none.
+ * @note      When pwm_stop() is called, the PWMx immediately changes the transmit signal to low.
  */
-static inline void pwm_stop(pwm_id_e id){
-	if(PWM0_ID == id){
-		BM_CLR(reg_pwm0_enable, BIT(PWM0_ID));
-	}
-	else{
-		BM_CLR(reg_pwm_enable, BIT(id));
-	}
+static inline void pwm_stop(pwm_en_e en){
+
+		reg_pwm_enable&=~en;
+
 }
 
 
 /**
  * @brief     This function servers to revert the PWMx.
- * @param[in] id - variable of enum to select the pwm number,Value range 1~8.
+ * @param[in] id - variable of enum to select the pwm number,Value range 0~6.
  * @return	  none.
  */
 static inline void pwm_invert_en(pwm_id_e id){
@@ -171,7 +166,7 @@ static inline void pwm_invert_en(pwm_id_e id){
 
 /**
  * @brief     This function servers to disable the PWM revert function.
- * @param[in] id - variable of enum to select the pwm number,Value range 1~8.
+ * @param[in] id - variable of enum to select the pwm number,Value range 0~6.
  * @return	  none.
  */
 static inline void pwm_invert_dis(pwm_id_e id){
@@ -181,7 +176,7 @@ static inline void pwm_invert_dis(pwm_id_e id){
 
 /**
  * @brief     This function servers to revert the PWMx_N.
- * @param[in] id - variable of enum to select the pwm number,Value range 1~8.
+ * @param[in] id - variable of enum to select the pwm number,Value range 0~6.
  * @return	  none.
  */
 static inline void pwm_n_invert_en(pwm_id_e id){
@@ -191,7 +186,7 @@ static inline void pwm_n_invert_en(pwm_id_e id){
 
 /**
  * @brief     This function servers to disable the PWM revert function.
- * @param[in] id - variable of enum to select the pwm number,Value range 1~8.
+ * @param[in] id - variable of enum to select the pwm number,Value range 0~6.
  * @return	  none.
  */
 static inline void pwm_n_invert_dis(pwm_id_e id){
@@ -201,7 +196,7 @@ static inline void pwm_n_invert_dis(pwm_id_e id){
 
 /**
  * @brief     This function servers to enable the pwm polarity.
- * @param[in] id - variable of enum to select the pwm number,Value range 1~8.
+ * @param[in] id - variable of enum to select the pwm number,Value range 0~6.
  * @return	  none.
  */
 static inline void pwm_set_polarity_en(pwm_id_e id){
@@ -211,7 +206,7 @@ static inline void pwm_set_polarity_en(pwm_id_e id){
 
 /**
  * @brief     This function servers to disable the pwm polarity.
- * @param[in] id - variable of enum to select the pwm number,Value range 1~8.
+ * @param[in] id - variable of enum to select the pwm number,Value range 0~6.
  * @return	  none.
  */
 static inline void pwm_set_polarity_dis(pwm_id_e id){
@@ -246,11 +241,12 @@ static inline void pwm_clr_irq_mask(pwm_irq_e mask){
 /**
  * @brief     This function servers to get the pwm interrupt status.
  * @param[in] status - variable of enum to select the pwm interrupt source.
- * @return	  none.
+ * @retval      non-zero      -  the interrupt occurred.
+ * @retval      zero  -  the interrupt did not occur.
  */
-static inline unsigned char pwm_get_irq_status(pwm_irq_e status){
+static inline unsigned short pwm_get_irq_status(pwm_irq_e status){
 
-	return reg_pwm_irq_sta |=status;
+	return (reg_pwm_irq_sta & status);
 
 }
 
@@ -383,7 +379,6 @@ static inline void pwm_set_pwm0_ir_fifo_cfg_data(unsigned short pulse_num, unsig
 	index&=0x01;
 }
 
-
 /**
  * @brief     This function servers to configure DMA channel and some configures.
  * @param[in] chn - to select the DMA channel.
@@ -440,21 +435,26 @@ void pwm_set_tx_dma_add_list_element(dma_chn_e chn,dma_chain_config_t *config_ad
 
 
 /**
- * @brief     This function servers to set pwm shift time.
- * @param[in] id   - variable of enum to select the pwm number,Value range 1~8.
- * @param[in] shift_clk_num - pwm_pclk_speed(M)*pwm_shift_time(US),pwm_shift_time=tmax/2.
- * @return	  none.
+ * @brief       This function servers to set pwm shift time.
+ * @param[in]   id   - variable of enum to select the pwm number,Value range 0~6.
+ * @param[in]   shift_clk_num - pwm_pclk_speed(M)*pwm_shift_time(US),pwm_shift_time=tmax/2.
+ * @return	    none.
+ * @attention   1: must: shift time must be set before setting the duty and cycle.
+ *              2: If you want to reconfigure shift time, you must reconfiguretcmp and tmax (Whether the tcmp value and tmax value need to be modified or not) again
+ *               after reconfiguring shift time.
+ *              3: If you only want to reconfigure tcmp and tmax, you only need to configure tcmp and tmax without first configuring shift time.
  */
 static inline void pwm_set_shift_time(pwm_id_e id, unsigned short shift_clk_num){
     reg_pwm_phase(id)=shift_clk_num;
 }
 
 
+
 /**
  * @brief     This function servers to enable the pwm center align,the pwm defaults to edge alignment.
  *            Edge alignment:In this mode, the pulse counter is a cyclic increment count,the duty cycle count is determined at the beginning,count initial value is 0.
  *            Center alignment: In this mode, the pulse counter is a two-way count,the duty cycle count is determined at the center,count initial value is 0.
- * @param[in] id -  select the pwm id,Value range 1~8.
+ * @param[in] id -  select the pwm id,Value range 0~6.
  * @return	  none.
  */
 static inline void pwm_set_align_en(pwm_id_e id){
@@ -463,7 +463,7 @@ static inline void pwm_set_align_en(pwm_id_e id){
 }
 /**
  * @brief     This function servers to disable the pwm align.
- * @param[in] id -  select the pwm id,Value range 1~8.
+ * @param[in] id -  select the pwm id,Value range 0~6.
  * @return	  none.
  */
 static inline void pwm_set_align_dis(pwm_id_e id){
@@ -483,3 +483,8 @@ static inline void pwm_32k_chn_dis(pwm_clk_32k_en_chn_e pwm_32K_en_chn)
     BM_CLR(reg_pwm_mode32k, pwm_32K_en_chn);
 }
 #endif
+
+
+
+
+
