@@ -1,34 +1,31 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
-
 /********************************************************************************************************
- * @file	mspi_reg.h
+ * @file    mspi_reg.h
  *
- * @brief	This is the header file for B95
+ * @brief   This is the header file for B95
  *
- * @author	Driver Group
+ * @author  Driver Group
+ * @date    2023
+ *
+ * @par     Copyright (c) 2023, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *
  *******************************************************************************************************/
 #pragma once
 
 #include "soc.h"
 
-#define    MSPI_BASE_ADDR			  	0x23FFFF00
+#define    MSPI_BASE_ADDR			  	0xA3FFFF00
 
 /**
  * BIT[0:7]   data0[7:0] to transmit or received.
@@ -67,6 +64,8 @@ enum{
 	FLD_MSPI_TX_DMA_EN					= BIT(7),
 };
 
+#define reg_mspi_cmd1                   REG_ADDR8(MSPI_BASE_ADDR+0x06)
+
 #define reg_mspi_timing		 		 	REG_ADDR8(MSPI_BASE_ADDR+0x07)
 enum{
 	FLD_MSPI_CS2SCLK 	        		= BIT_RNG(0,2),
@@ -95,22 +94,34 @@ enum{
 #define reg_mspi_ctrl 				REG_ADDR16(MSPI_BASE_ADDR+0x08)
 
 /**
- * BIT[0:7]  hspi_addr0.
+ * This is a special control register for register reading flash, XIP read flash can not be used, so "_reg" is added.
+ */
+#define reg_mspi_reg_ctrl0           REG_ADDR8(MSPI_BASE_ADDR+0x0a)
+enum{
+	FLD_MSPI_CMD1_EN        =BIT(0),
+};
+
+#define  reg_mspi_xip_wr_tcem_set        REG_ADDR8(MSPI_BASE_ADDR+0x0b)
+
+#define reg_mspi_xip_rd_tcem_set         REG_ADDR8(MSPI_BASE_ADDR+0x1f)
+
+/**
+ * BIT[0:7]  mspi_addr0.
  */
 #define reg_mspi_addr0					REG_ADDR8(MSPI_BASE_ADDR+0x0c)
 
 /**
- * BIT[0:7]  hspi_addr1.
+ * BIT[0:7]  mspi_addr1.
  */
 #define reg_mspi_addr1					REG_ADDR8(MSPI_BASE_ADDR+0x0d)
 
 /**
- * BIT[0:7]  hspi_addr2.
+ * BIT[0:7]  mspi_addr2.
  */
 #define reg_mspi_addr2					REG_ADDR8(MSPI_BASE_ADDR+0x0e)
 
 /**
- * BIT[0:7]  hspi_addr3.
+ * BIT[0:7]  mspi_addr3.
  */
 #define reg_mspi_addr3					REG_ADDR8(MSPI_BASE_ADDR+0x0f)
 
@@ -125,9 +136,6 @@ enum{
  * BIT[0:7]   transfer count0 for read data.master only
  */
 #define reg_mspi_rx_cnt 				REG_ADDR32(MSPI_BASE_ADDR+0x14)
-
-
-
 
 #define reg_mspi_ctrl3 					REG_ADDR8(MSPI_BASE_ADDR+0x18)
 enum{
@@ -153,11 +161,9 @@ enum{
 
 #define reg_mspi_ctrl4 					REG_ADDR8(MSPI_BASE_ADDR+0x1c)
 enum{
-	FLD_MSPI_XIP_PAGE_MODE_EN			= BIT(0),
-	FLD_MSPI_XIP_TIMEOUT_MODE_EN		= BIT(1),
 	FLD_MSPI_XIP_STOP		    		= BIT(2),
 	FLD_MSPI_XIP_ENABLE		    		= BIT(3),
-	FLD_MSPI_DUMMY_CNT_ADD		    	= BIT(4),
+	FLD_MSPI_DUMMY_CNT_ADD		    	= BIT_RNG(4,7),
 };
 
 /**
@@ -166,22 +172,6 @@ enum{
 #define reg_mspi_page_size		 		REG_ADDR8(MSPI_BASE_ADDR+0x1d)
 
 #define reg_mspi_xip_timeout_cnt		REG_ADDR8(MSPI_BASE_ADDR+0x1e)
-
-#define reg_mspi_xip_trans_mod		 	REG_ADDR8(MSPI_BASE_ADDR+0x1f)
-enum{
-	FLD_MSPI_XIP_WR_TRANS_MODE			= BIT_RNG(0,3),
-	FLD_MSPI_XIP_RD_TRANS_MODE		   	= BIT_RNG(4,7),
-};
-
-#define reg_mspi_set_l		 			REG_ADDR8(MSPI_BASE_ADDR+0x20)
-enum{
-	FLD_MSPI_XIP_SET_L					= BIT_RNG(0,2),
-};
-
-#define reg_mspi_set_h		 			REG_ADDR8(MSPI_BASE_ADDR+0x21)
-enum{
-	FLD_MSPI_XIP_SET_H					= BIT_RNG(0,6),
-};
 
 /**
  * BIT[0:7]  xip_addr_offset0.
@@ -223,10 +213,9 @@ enum{
 	FLD_MSPI_TRANS_END_INT_STA          = BIT(4),
 };
 
+#define reg_mspi_xip_rd_config(i)		REG_ADDR32(MSPI_BASE_ADDR + 0x90+8*i)
 
-#define reg_mspi_xip_config				REG_ADDR32(MSPI_BASE_ADDR + 0x90)
-
-#define reg_mspi_xip_rd_fmt				REG_ADDR8(MSPI_BASE_ADDR + 0x90)
+#define reg_mspi_xip_rd_fmt(i)			REG_ADDR8(MSPI_BASE_ADDR + 0x90+8*i)
 enum{
 	FLD_MSPI_XIP_RD_DUAL	       		= BIT(0),
 	FLD_MSPI_XIP_RD_QUAD	       		= BIT(1),
@@ -237,8 +226,62 @@ enum{
 	FLD_MSPI_XIP_CMD_EN		       		= BIT(7),
 };
 
-#define reg_mspi_xip_rd_trnsmode		REG_ADDR8(MSPI_BASE_ADDR + 0x91)
+#define reg_mspi_xip_rd_trnsmode(i)		REG_ADDR8(MSPI_BASE_ADDR + 0x91+8*i)
 enum{
 	FLD_MSPI_XIP_RD_DUMMY_CNT	       	= BIT_RNG(0,3),
 	FLD_MSPI_XIP_RD_TRANSMODE	       	= BIT_RNG(4,7),
 };
+#define reg_mspi_xip_rd_ctrl0(i)        REG_ADDR8(MSPI_BASE_ADDR + 0x92+8*i)
+enum{
+	FLD_XIP_CMD1_EN                    = BIT(0),
+	FLD_XIP_TOKEN_VAL_SEL               = BIT(1),
+	FLD_XIP_TOKEN_EN                    = BIT(2),
+	FLD_XIP_RD_DUMMY_CNT_ADD            = BIT(3),
+	FLD_XIP_PAGE_MODE_EN                = BIT(5),
+	FLD_XIP_TIMEOUT_MODE_EN             = BIT(6),
+	FLD_XIP_TCEM_MODE_EN                = BIT(7),
+};
+#define reg_mspi_xip_rd_cmd(i)             REG_ADDR8(MSPI_BASE_ADDR+0x93+8*i)
+
+#define reg_mspi_xip_wr_config(i)         REG_ADDR32(MSPI_BASE_ADDR + 0x94+8*i)
+#define reg_mspi_xip_wr_fmt(i)            REG_ADDR8(MSPI_BASE_ADDR + 0x94+8*i)
+enum{
+	FLD_MSPI_XIP_WR_DUAL                 = BIT(0),
+	FLD_MSPI_XIP_WR_QUAD                 = BIT(1),
+	FLD_MSPI_XIP_WR_ADDR_LEN             = BIT_RNG(2,3),
+	FLD_MSPI_XIP_WR_ADDR_FMT             = BIT(4),
+	FLD_MSPI_XIP_WR_ADDR_EN              = BIT(5),
+	FLD_MSPI_XIP_WR_CMD_FMT              = BIT(6),
+	FLD_MSPI_XIP_WR_CMD_EN               = BIT(7),
+};
+#define reg_mspi_xip_wr_transmode(i)        REG_ADDR8(MSPI_BASE_ADDR + 0x95+8*i)
+enum{
+	FLD_MSPI_XIP_WR_DUMMY_CNT            = BIT_RNG(0,3),
+	FLD_MSPI_XIP_WR_TRANSMODE            = BIT_RNG(4,7),
+};
+#define reg_mspi_xip_wr_ctrl0(i)		REG_ADDR8(MSPI_BASE_ADDR + 0x96+8*i)
+enum{
+	FLD_MSPI_XIP_CMD1_EN                = BIT(0),
+};
+
+#define reg_mspi_xip_wr_cmd(i)			REG_ADDR8(MSPI_BASE_ADDR+0x97+8*i)
+
+#define reg_mspi_xip_size_set			REG_ADDR8(MSPI_BASE_ADDR + 0xb0)
+enum{
+	FLD_MSPI_XIP0_END_ADDR				= BIT_RNG(0,1),
+	FLD_MSPI_XIP1_END_ADDR				= BIT_RNG(2,3),
+	FLD_MSPI_XIP2_END_ADDR				= BIT_RNG(4,5),
+	FLD_MSPI_XIP3_END_ADDR				= BIT_RNG(6,7),
+};
+
+#define reg_mspi_xip_rd_cmd1(i)			REG_ADDR8(MSPI_BASE_ADDR+0xb4+2*i)
+
+#define reg_mspi_xip_wr_cmd1(i)			REG_ADDR8(MSPI_BASE_ADDR+0xb5+2*i)
+
+#define reg_mspi_xip_core_start			REG_ADDR16(MSPI_BASE_ADDR+0xc0)
+
+#define reg_mspi_xip_core_size			REG_ADDR16(MSPI_BASE_ADDR+0xc2)
+
+#define reg_mspi_xip_core_offset		REG_ADDR16(MSPI_BASE_ADDR+0xc4)
+
+

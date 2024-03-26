@@ -1,12 +1,12 @@
 /********************************************************************************************************
- * @file    stimer.c
+ * @file    core.c
  *
  * @brief   This is the source file for B95
  *
  * @author  Driver Group
- * @date    2020
+ * @date    2024
  *
- * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -21,27 +21,17 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-#include "stimer.h"
+#include "core.h"
+/**********************************************************************************************************************
+ *                                         global function implementation                                             *
+ *********************************************************************************************************************/
 /**
- * @brief     This function performs to set delay time by us.
- * @param[in] microsec - need to delay.
- * @return    none
-*/
- void delay_us(unsigned int microsec)
+ * @brief       This function performs to set delay time by cclk tick.
+ * @param[in]   core_cclk_tick - Number of ticks in cclk
+ * @return      none
+ */
+_attribute_ram_code_sec_optimize_o2_noinline_ void core_cclk_delay_tick(unsigned long long core_cclk_tick)
 {
-	unsigned long t = stimer_get_tick();
-	while(!clock_time_exceed(t, microsec)){
-	}
-}
-
-/*
- * @brief     This function performs to set delay time by ms.
- * @param[in] millisec - need to delay.
- * @return    none
-*/
- void delay_ms(unsigned int millisec)
-{
-	unsigned long t = stimer_get_tick();
-	while(!clock_time_exceed(t, millisec*1000)){
-	}
+	unsigned long long start = rdmcycle();
+	while (rdmcycle() - start < core_cclk_tick) {}
 }
