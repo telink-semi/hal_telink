@@ -1,45 +1,66 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
-
 /********************************************************************************************************
- * @file	dma_reg.h
+ * @file    dma_reg.h
  *
- * @brief	This is the header file for B95
+ * @brief   This is the header file for B95
  *
- * @author	Driver Group
+ * @author  Driver Group
+ * @date    2020
+ *
+ * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *
  *******************************************************************************************************/
 #ifndef DMA_REG_H
 #define DMA_REG_H
 #include "soc.h"
 /*******************************    dma registers:  0x100400     ******************************/
-#define REG_DMA_BASE                 0x100400
+#define DMA_BASE_ADDR			       0x100400
+#define reg_dma_id					REG_ADDR32(0x100400)
+#define reg_dma_cfg					REG_ADDR32(0x100410)
+#define	FLD_DMA_CHANNEL_NUM		BIT_RNG(0,3),
+#define	FLD_DMA_FIFO_DEPTH		BIT_RNG(4,9),
+#define	FLD_DMA_REQ_NUM			BIT_RNG(10,15),
+#define	FLD_DMA_REQ_SYNC		BIT(30),
+#define	FLD_DMA_CHANINXFR		BIT(31),
 
-
-#define reg_dma_soft_reset       REG_ADDR8(0x100420)
+#define reg_dma_err_mask				REG_ADDR8(DMA_BASE_ADDR+0x29)
 enum{
-	FLD_DMA_SOFT_RESET        = BIT(0),
+	FLD_DMA_CHANNEL0_ERR_MASK	= BIT(0),
+	FLD_DMA_CHANNEL1_ERR_MASK	= BIT(1),
+    FLD_DMA_CHANNEL2_ERR_MASK	= BIT(2),
+	FLD_DMA_CHANNEL3_ERR_MASK	= BIT(3),
+	FLD_DMA_CHANNEL4_ERR_MASK	= BIT(4),
+	FLD_DMA_CHANNEL5_ERR_MASK	= BIT(5),
+	FLD_DMA_CHANNEL6_ERR_MASK	= BIT(6),
+	FLD_DMA_CHANNEL7_ERR_MASK	= BIT(7),
 };
 
-#define reg_dma_err_isr					REG_ADDR8(0x100430)
-#define reg_dma_abt_isr					REG_ADDR8(0x100431)
-#define reg_dma_tc_isr					REG_ADDR8(0x100432)
+#define reg_dma_abt_mask				REG_ADDR8(DMA_BASE_ADDR+0x2a)
+enum{
+	FLD_DMA_CHANNEL0_ABT_MASK	= BIT(0),
+	FLD_DMA_CHANNEL1_ABT_MASK	= BIT(1),
+    FLD_DMA_CHANNEL2_ABT_MASK	= BIT(2),
+	FLD_DMA_CHANNEL3_ABT_MASK	= BIT(3),
+	FLD_DMA_CHANNEL4_ABT_MASK	= BIT(4),
+	FLD_DMA_CHANNEL5_ABT_MASK	= BIT(5),
+	FLD_DMA_CHANNEL6_ABT_MASK	= BIT(6),
+	FLD_DMA_CHANNEL7_ABT_MASK	= BIT(7),
+};
 
+#define reg_dma_err_isr					REG_ADDR8(DMA_BASE_ADDR+0x30)
+#define reg_dma_abt_isr					REG_ADDR8(DMA_BASE_ADDR+0x31)
+#define reg_dma_tc_isr					REG_ADDR8(DMA_BASE_ADDR+0x32)
 enum{
 	FLD_DMA_CHANNEL0_IRQ		= BIT(0),
 	FLD_DMA_CHANNEL1_IRQ		= BIT(1),
@@ -51,29 +72,13 @@ enum{
 	FLD_DMA_CHANNEL7_IRQ		= BIT(7),
 };
 
-
-
-#define reg_dma_car       REG_ADDR8(REG_DMA_BASE+0x40)
-enum{
-    FLD_DMA_ABT_CHN0     =  BIT(0),
-	FLD_DMA_ABT_CHN1     =  BIT(1),
-	FLD_DMA_ABT_CHN2     =  BIT(2),
-	FLD_DMA_ABT_CHN3     =  BIT(3),
-	FLD_DMA_ABT_CHN4     =  BIT(4),
-	FLD_DMA_ABT_CHN5     =  BIT(5),
-	FLD_DMA_ABT_CHN6     =  BIT(6),
-	FLD_DMA_ABT_CHN7     =  BIT(7),
-};
-
-
-#define reg_dma_ctrl(i)				REG_ADDR32(( 0x00100444 +(i)*0x14))
+#define reg_dma_ctr0(i)			    REG_ADDR8(( DMA_BASE_ADDR+0x44 +(i)*0x14))
+#define reg_dma_ctrl(i)				REG_ADDR32(DMA_BASE_ADDR+0x44 +(i)*0x14)
 enum{
 	FLD_DMA_CHANNEL_ENABLE			= BIT(0),
 	FLD_DMA_CHANNEL_TC_MASK			= BIT(1),
-	FLD_DMA_CHANNEL_ERR_MASK		= BIT(2),
-	FLD_DMA_CHANNEL_ABT_MASK		= BIT(3),
-	FLD_DMA_CHANNEL_DST_REQ_SEL		= BIT_RNG(4,8),
-	FLD_DMA_CHANNEL_SRC_REQ_SEL		= BIT_RNG(9,13),
+	FLD_DMA_CHANNEL_DST_REQ_SEL		= BIT_RNG(2,7),
+	FLD_DMA_CHANNEL_SRC_REQ_SEL		= BIT_RNG(8,13),
 	FLD_DMA_CHANNEL_DST_ADDR_CTRL	= BIT_RNG(14,15),
 	FLD_DMA_CHANNEL_SRC_ADDR_CTRL	= BIT_RNG(16,17),
 	FLD_DMA_CHANNEL_DST_MODE		= BIT(18),
@@ -82,12 +87,7 @@ enum{
 	FLD_DMA_CHANNEL_SRC_WIDTH		= BIT_RNG(22,23),
 };
 
-#define reg_dma_ctr0(i)			    REG_ADDR8(( 0x00100444 +(i)*0x14))
-
-#define reg_dma_ch_cr3(i)          REG_ADDR8(( 0x00100447 +(i)*0x14))
-
-#define reg_dma_ctr3(i)			    REG_ADDR8((0x00100447 +(i)*0x14))
-
+#define reg_dma_ctr3(i)			    REG_ADDR8(DMA_BASE_ADDR+0x47+(i)*0x14)
 enum{
 	FLD_DMA_SRC_BURST_SIZE    		=	BIT_RNG(0,2),
 	FLD_DMA_R_NUM_EN    	        =	BIT(4),
@@ -96,52 +96,42 @@ enum{
 	FLD_DMA_AUTO_ENABLE_EN           =	BIT(7),
 };
 
+#define reg_dma_src_addr(i)			REG_ADDR32(DMA_BASE_ADDR+0x48+(i)*0x14)
+#define reg_dma_dst_addr(i)			REG_ADDR32(DMA_BASE_ADDR+0x4c+(i)*0x14)
 
+#define reg_dma_size0(i)			REG_ADDR16(DMA_BASE_ADDR+0x50+(i)*0x14)
+enum{
+	FLD_DMA_TANS_SIZE0    		    = BIT_RNG(0,15),
+};
 
-#define reg_dma_src_addr(i)			REG_ADDR32 (( 0x00100448 +(i)*0x14))
-#define reg_dma_dst_addr(i)			REG_ADDR32 (( 0x0010044c +(i)*0x14))
+#define reg_dma_size1(i)			REG_ADDR8(DMA_BASE_ADDR+0x52+(i)*0x14)
+enum{
+	FLD_DMA_TANS_SIZE1    		    = BIT_RNG(0,5),
+	FLD_DMA_TANS_IDX    	        = BIT_RNG(6,7),
+};
 
-
-/**
- * Due to the design constraints of the peripheral, the DMA must be transferred by word.
- * When the peripheral is used as receiver, FLD_DMA_TX_SIZE_IDX is invalid, the byte length of the DMA = FLD_DMA_TX_SIZE*4;
- * When the peripheral is used as transmitter, FLD_DMA_TX_SIZE_IDX is valid. If FLD_DMA_TX_SIZE_IDX is not equal to 0, the byte length of the DMA = (FLD_DMA_TX_SIZE-1)*4 + FLD_DMA_TX_SIZE_IDX;
- * If FLD_DMA_TX_SIZE_IDX is equal to 0, the byte length of DMA = FLD_DMA_TX_SIZE*4.
- */
-#define reg_dma_size(i)			    REG_ADDR32 (( 0x00100450 +(i)*0x14))
+#define reg_dma_size(i)			    REG_ADDR32 (DMA_BASE_ADDR+0x50+(i)*0x14)
 enum{
 	FLD_DMA_TX_SIZE    		=	BIT_RNG(0,21),
 	FLD_DMA_TX_SIZE_IDX    	=	BIT_RNG(22,23),
 };
 
-#define reg_dma_cr3_size(i)			(*(volatile unsigned long*) ( 0x00100452 +(i)*0x14))
+#define reg_dma_llp(i)			    REG_ADDR32 (DMA_BASE_ADDR+0x54+(i)*0x14)
+#define reg_dma_llp_int_mode(i)	REG_ADDR8(DMA_BASE_ADDR+0x113+(((i)>3) ? 1 : 0))
 
-enum{
-	FLD_DMA_TSR2_SIZE_IDX    	=	BIT_RNG(6,7),
-};
-
-#define reg_dma_llp(i)			    REG_ADDR32 (( 0x00100454 +(i)*0x14))
-
-
-#define reg_dma_llp_int_mode(i)	REG_ADDR8(REG_DMA_BASE+0x113+(((i)>3) ? 1 : 0))
-
-#if 1	//BLE SDK use: for B91/B92/B95 compatible, may modify next driver release
-//#define reg_dma_rx_wptr			REG_ADDR8(0x801004f4)
-#define reg_dma_tx_wptr			REG_ADDR8(0x80100500)		//rf_get_tx_wptr(0)
-
+#define reg_dma_rx_wptr			    REG_ADDR8(DMA_BASE_ADDR+0xf4)
+#define reg_dma_tx_wptr			    REG_ADDR8(DMA_BASE_ADDR+0x100)
 enum{
 	FLD_DMA_WPTR_MASK =			BIT_RNG(0,4),
 };
 
-
-#define reg_dma_rx_rptr			REG_ADDR8(0x801004f5)
-#define reg_dma_tx_rptr			REG_ADDR8(0x80100501)
+#define reg_dma_rx_rptr			    REG_ADDR8(DMA_BASE_ADDR+0xf5)
+#define reg_dma_tx_rptr			    REG_ADDR8(DMA_BASE_ADDR+0x101)
 enum{
 	FLD_DMA_RPTR_MASK =			BIT_RNG(0,4),
 	FLD_DMA_RPTR_SET =			BIT(5),
 	FLD_DMA_RPTR_NEXT =			BIT(6),
 	FLD_DMA_RPTR_CLR =			BIT(7),
 };
-#endif
 
 #endif

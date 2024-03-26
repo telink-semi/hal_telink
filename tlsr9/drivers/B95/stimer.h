@@ -1,34 +1,31 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
-
 /********************************************************************************************************
- * @file	stimer.h
+ * @file    stimer.h
  *
- * @brief	This is the header file for B95
+ * @brief   This is the header file for B95
  *
- * @author	Driver Group
+ * @author  Driver Group
+ * @date    2020
+ *
+ * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *
  *******************************************************************************************************/
 /**	@page STIMER
  *
  *	Introduction
  *	===============
- *	B95 stimer use 16M clock count, have stimer irq.
+ *	B92 stimer use 16M clock count, have stimer irq.
  *
  *	API Reference
  *	===============
@@ -49,7 +46,7 @@
  *                                           global macro                                                             *
  *********************************************************************************************************************/
 #ifndef SYS_TIMER_AUTO_MODE
-#define SYS_TIMER_AUTO_MODE     			0
+#define SYS_TIMER_AUTO_MODE     			1
 #endif
 /**********************************************************************************************************************
  *                                         global data type                                                           *
@@ -107,7 +104,8 @@ static inline void stimer_clr_irq_status(stimer_irq_e status)
 /**
  * @brief This function servers to get stimer irq status.
  * @param[in] 	status - the irq status.
- * @return      none.
+ * @retval      non-zero      -  the interrupt occurred.
+ * @retval      zero  -  the interrupt did not occur.
  */
 static inline unsigned char stimer_get_irq_status(stimer_irq_e status)
 {

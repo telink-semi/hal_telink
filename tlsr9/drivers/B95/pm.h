@@ -1,27 +1,24 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
-
 /********************************************************************************************************
- * @file	pm.h
+ * @file    pm.h
  *
- * @brief	This is the header file for B95
+ * @brief   This is the header file for B95
  *
- * @author	Driver Group
+ * @author  Driver Group
+ * @date    2020
+ *
+ * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *
  *******************************************************************************************************/
 #pragma once
@@ -51,7 +48,7 @@
 
 /**
  * @brief these analog register can store data in deep sleep mode or deep sleep with SRAM retention mode.
- * 	      Reset these analog registers by watchdog, chip reset, RESET Pin, power cycle, 32k watchdog.
+ * 	      Reset these analog registers by watchdog, software reboot (sys_reboot()), RESET Pin, power cycle, 32k watchdog, vbus detect.
  */
 #define PM_ANA_REG_WD_CLR_BUF0			0x35 // initial value 0xff. [Bit0] is already occupied. The customer cannot change!
 #define PM_ANA_REG_WD_CLR_BUF1			0x36 // initial value 0x00.
@@ -61,7 +58,7 @@
 
 /**
  * @brief analog register below can store information when MCU in deep sleep mode or deep sleep with SRAM retention mode.
- * 	      Reset these analog registers by power cycle, 32k watchdog.
+ * 	      Reset these analog registers by power cycle, 32k watchdog, RESET Pin,vbus detect.
  */
 #define PM_ANA_REG_POWER_ON_CLR_BUF0	0x3a // initial value 0x00 [Bit0] is already occupied. The customer cannot change!
 											 //[Bit1] The crystal oscillator failed to start normally.The customer cannot change!
@@ -135,7 +132,7 @@ typedef enum {
 //	WAKEUP_STATUS_CTB    			= BIT(5),
 //	WAKEUP_STATUS_VAD   			= BIT(6),
 
-	STATUS_GPIO_ERR_NO_ENTER_PM		= BIT(8),
+	STATUS_GPIO_ERR_NO_ENTER_PM		= BIT(8), /**<Bit8 is used to determine whether the wake source is normal.*/
 	STATUS_ENTER_SUSPEND  			= BIT(30),
 }pm_wakeup_status_e;
 
@@ -170,11 +167,35 @@ typedef enum {
  * @brief	mcu status
  */
 typedef enum{
-	MCU_STATUS_POWER_ON  		= BIT(0),
-	MCU_STATUS_REBOOT_BACK    	= BIT(2),
-	MCU_STATUS_DEEPRET_BACK  	= BIT(3),
-	MCU_STATUS_DEEP_BACK		= BIT(4),
+	MCU_STATUS_POWER_ON                 = BIT(0), /**< power on or reset pin */
+	MCU_STATUS_REBOOT_BACK    	        = BIT(2), /**<
+                                                       the reboot specific categories,see pm_reboot_event_e:
+	                                                   1.If want to know which reboot it is, call the pm_get_mcu_reboot_status() interface to determine after calling sys_init().
+	                                                   2.If determine whether is 32k watchdog/timer watchdog,can also use the interface wd_32k_get_status()/wd_get_status() to determine.
+	                                                   3.If determine whether is vbus detect,can also be judged by the register 0x64(bit7), write 1 clear 0(needs to be placed after sys_init())(todo: interface name has not yet been decided).
+	                                                */
+	MCU_STATUS_DEEPRET_BACK  	        = BIT(3),
+	MCU_STATUS_DEEP_BACK		        = BIT(4),
 }pm_mcu_status;
+
+/**
+ * @brief  reboot status
+ */
+typedef enum{
+	SW_SYSTEM_REBOOT              = BIT(0),
+	HW_TIMER_WATCHDOG_REBOOT      = BIT(1),
+	HW_32K_WATCHDOG_REBOOT        = BIT(2),
+	HW_VBUS_DETECT_REBOOT         = BIT(3),/**<
+	                                           1. When there is USB plugged in,if wd_turn_off_vbus_timer() is not used to turn off the 8s vbus timer,
+	                                              the MCU will be reset after 8s,and 0x64(bit7) is set to 1,before the mcu enters the next state,
+	                                              the register 0x64(bit7) need write 1 clear 0(needs to be placed after sys_init()),otherwise, the next status judgment of the mcu will be affected.
+	                                      <p>
+	                                           2.-# When the status is set to 1, if it is not cleared by calling wd_32k_clear_status():
+                                                    - vbus detect/software reboot(sys_reboot())/deep/deepretation/32k watchdog come back,the interface status remains;
+                                                    - power cyele/reset pin come back, the status of the interface is lost;
+	                                          */
+}pm_reboot_event_e;
+
 
 /**
  * @brief	early wakeup time
@@ -207,19 +228,9 @@ typedef struct{
 	unsigned char rsvd;
 }pm_status_info_s;
 
-
 extern _attribute_aligned_(4) pm_status_info_s g_pm_status_info;
 extern _attribute_data_retention_sec_ unsigned char g_pm_vbat_v;
 
-/**
- * @brief		This function servers to set the match value for MDEC wakeup.
- * @param[in]	value - the MDEC match value for wakeup.
- * @return		none.
- */
-static inline void pm_set_mdec_value_wakeup(unsigned char value)
-{
-	analog_write_reg8(mdec_ctrl,((analog_read_reg8(mdec_ctrl) & (~0x0f)) | value));
-}
 
 /**
  * @brief		This function serves to get deep retention flag.
@@ -246,7 +257,7 @@ static inline pm_wakeup_status_e pm_get_wakeup_src(void)
  */
 static inline void pm_clr_irq_status(pm_wakeup_status_e status)
 {
-	analog_write_reg8(0x64, (analog_read_reg8(0x64) | status));
+	analog_write_reg8(0x64, status);/*add by weihua.zhang, confirmed by jianzhi.chen*/
 }
 
 /**
@@ -364,3 +375,13 @@ static inline void pm_set_zb_voltage(pm_zb_voltage_e zb_voltage)
  * @return  	none.
  */
 _attribute_ram_code_sec_noinline_ void pm_wait_xtal_ready(void);
+
+/**
+ * @brief		This function serves to get reboot status.
+ * @return		reboot enum element of pm_reboot_event_e.
+ * @note        -# if return HW_TIMER_WATCHDOG_REBOOT, need call wd_clear_status() to avoid affecting the next detection of the mcu status;
+ *              -# if return HW_32K_WATCHDOG_REBOOT,need call wd_32k_clear_status() to avoid affecting the next detection of the mcu status;
+ *              -# if return HW_VBUS_DETECT_REBOOT,need to write 1 and 0 for 0x64(bit7) to avoid affecting the next detection of the mcu status;
+ *              -# the interface sys_init() must be called before this interface can be invoked;
+ */
+pm_reboot_event_e pm_get_reboot_event(void);
