@@ -24,8 +24,8 @@
 #ifndef     RF_H
 #define     RF_H
 
-#include "lib/include/sys.h"
-#include "lib/include/rf_dma.h"
+#include "sys.h"
+#include "rf_dma.h"
 #include "gpio.h"
 #include "stimer.h"
 /**********************************************************************************************************************
