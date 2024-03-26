@@ -444,7 +444,7 @@ _attribute_text_sec_ void flash_quad_page_program_encrypt(unsigned long addr, un
  * @brief	  	This function serves to read MID of flash(MAC id). Before reading UID of flash,
  * 				you must read MID of flash. and then you can look up the related table to select
  * 				the idcmd and read UID of flash.
- * @param[in]   none.
+ * @param[in]   device_num - the number of slave device.
  * @return    	MID of the flash.
  * @note        Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
  *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.
@@ -456,7 +456,7 @@ _attribute_text_sec_ void flash_quad_page_program_encrypt(unsigned long addr, un
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-_attribute_text_sec_ unsigned int flash_read_mid();
+_attribute_text_sec_ unsigned int flash_read_mid(mspi_slave_device_num_e device_num);
 
 /**
  * @brief	  	This function serves to read UID of flash.Before reading UID of flash, you must read MID of flash.
