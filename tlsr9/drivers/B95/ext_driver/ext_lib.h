@@ -1,22 +1,30 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
+/********************************************************************************************************
+ * @file	ext_lib.h
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * @brief	This is the header file for BLE SDK
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * @author	BLE GROUP
+ * @date	06,2022
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @par		Copyright (c) 2022, Telink Semiconductor (Shanghai) Co., Ltd.
+ *			All rights reserved.
  *
- *****************************************************************************/
-
-
+ *          The information contained herein is confidential property of Telink
+ *          Semiconductor (Shanghai) Co., Ltd. and is available under the terms
+ *          of Commercial License Agreement between Telink Semiconductor (Shanghai)
+ *          Co., Ltd. and the licensee or the terms described here-in. This heading
+ *          MUST NOT be removed from this file.
+ *
+ *          Licensee shall not delete, modify or alter (or permit any third party to delete, modify, or
+ *          alter) any information contained herein in whole or in part except as expressly authorized
+ *          by Telink semiconductor (shanghai) Co., Ltd. Otherwise, licensee shall be solely responsible
+ *          for any claim to the extent arising out of or relating to such deletion(s), modification(s)
+ *          or alteration(s).
+ *
+ *          Licensees are granted free, non-transferable use of the information in this
+ *          file under Mutual Non-Disclosure Agreement. NO WARRANTY of ANY KIND is provided.
+ *
+ *******************************************************************************************************/
 #ifndef DRIVERS_B95_EXT_DRIVER_EXT_LIB_H_
 #define DRIVERS_B95_EXT_DRIVER_EXT_LIB_H_
 
@@ -38,10 +46,11 @@ void sub_wr(unsigned int addr, unsigned char value, unsigned char e, unsigned ch
 
 
 /******************************* dbgport start ******************************************************************/
-#define reg_bb_dbg_sel      REG_ADDR16(0x140378)
-#define reg_bb_dbg_sel_l    REG_ADDR8(0x140378)
-#define reg_bb_dbg_sel_h    REG_ADDR8(0x140379)
+#define reg_bb_dbg_sel      REG_ADDR16(0x140ca0)
+#define reg_bb_dbg_sel_l    REG_ADDR8(0x140ca0)
+#define reg_bb_dbg_sel_h    REG_ADDR8(0x140ca1)
 #define	bt_dbg_set_pin		dbg_bb_set_pin
+
 
 void ble_dbg_port_init(int deg_sel0);
 
@@ -67,7 +76,7 @@ void rf_enable_bb_debug(void);
 
 
 /******************************* ext_aes start ******************************************************************/
-#define HW_AES_CCM_ALG_EN										0  //TODO
+#define HW_AES_CCM_ALG_EN										0
 
 extern unsigned int aes_data_buff[8];
 
@@ -110,7 +119,7 @@ enum{
 
 };
 
-
+void aes_decryption_le(u8* key, u8* plaintext, u8 *encrypted_data);
 void aes_encryption_le(u8* key, u8* plaintext, u8 *encrypted_data);
 void aes_encryption_be(u8* key, u8* plaintext, u8 *encrypted_data);
 
@@ -169,11 +178,17 @@ void blt_ll_setAesCcmPara(u8 role, u8 *sk, u8 *iv, u8 aad, u64 enc_pno, u64 dec_
 #define	SSLOT_TICK_NUM					1875/4    //attention: not use "()" for purpose !!!    625uS*24/32=625*3/4=1875/4=468.75
 #define	SSLOT_TICK_REVERSE				4/1875	  //attention: not use "()" for purpose !!!
 
+/*
+ * @brief     This function performs to get system timer tick.
+ * @return    system timer tick value.
+ * @author	  BLE group .
+ */
+#define  bb_clock_time          rf_bb_timer_get_tick
 
 typedef enum {
 	STIMER_IRQ_MASK     		=   BIT(0),
 	STIMER_32K_CAL_IRQ_MASK     =   BIT(1),
-}stimer_irq_mask_e;
+}ext_stimer_irq_mask_e;
 
 typedef enum {
 	FLD_IRQ_SYSTEM_TIMER     		=   BIT(0),
@@ -189,6 +204,19 @@ typedef enum {
  * @brief define system clock tick per us/ms/s.
  */
 enum{
+	SYSTEM_BB_TIMER_TICK_1US 		= 8,
+	SYSTEM_BB_TIMER_TICK_1MS 		= 8000,
+	SYSTEM_BB_TIMER_TICK_1S 		= 8000000,
+
+	SYSTEM_BB_TIMER_TICK_625US  	= 5000,  //625*8
+	SYSTEM_BB_TIMER_TICK_1250US 	= 10000,  //1250*8
+};
+
+
+/**
+ * @brief define system clock tick per us/ms/s.
+ */
+enum{
 	SYSTEM_TIMER_TICK_125US 	= 2000,   //125*16
 };
 
@@ -198,8 +226,8 @@ enum{
  */
 static inline void systimer_irq_enable(void)
 {
-	reg_irq_src0 |= BIT(IRQ1_SYSTIMER);
-	//plic_interrupt_enable(IRQ1_SYSTIMER);
+	reg_irq_src0 |= BIT(IRQ_SYSTIMER);
+	//plic_interrupt_enable(IRQ_SYSTIMER);
 }
 
 /**
@@ -208,8 +236,8 @@ static inline void systimer_irq_enable(void)
  */
 static inline void systimer_irq_disable(void)
 {
-	reg_irq_src0 &= ~BIT(IRQ1_SYSTIMER);
-	//plic_interrupt_disable(IRQ1_SYSTIMER);
+	reg_irq_src0 &= ~BIT(IRQ_SYSTIMER);
+	//plic_interrupt_disable(IRQ_SYSTIMER);
 }
 
 static inline void systimer_set_irq_mask(void)
@@ -272,7 +300,7 @@ static inline int tick1_out_range_of_tick2(unsigned int tick1, unsigned int tick
 #define WAKEUP_STATUS_TIMER_PAD		        ( WAKEUP_STATUS_TIMER | WAKEUP_STATUS_PAD)
 
 /**
- * @brief analog register below can store infomation when MCU in deepsleep mode
+ * @brief analog register below can store information when MCU in deepsleep mode
  * 	      store your information in these ana_regs before deepsleep by calling analog_write function
  * 	      when MCU wakeup from deepsleep, read the information by by calling analog_read function
  * 	      Reset these analog registers only by power cycle
@@ -316,7 +344,7 @@ extern unsigned int	ota_program_offset;
 /**
  * @brief   pm 32k rc calibration algorithm.
  */
-typedef struct  pm_clock_drift
+typedef struct __attribute__((packed))   pm_clock_drift
 {
 	unsigned int	ref_tick;
 	unsigned int	ref_tick_32k;
@@ -354,7 +382,7 @@ _attribute_ram_code_sec_noinline_ void pm_ble_cal_32k_rc_offset (int offset_tick
  * @return		none.
  */
 void pm_ble_32k_rc_cal_reset(void);
-#define PM_MIN_SLEEP_US			1500  //B95 todo
+#define PM_MIN_SLEEP_US			1500  //B92 todo
 
 /**
  * @brief   internal oscillator or crystal calibration for environment change such as voltage, temperature
@@ -383,8 +411,10 @@ extern  pm_tim_recover_handler_t 	pm_tim_recover;
 /******************************* ext_rf start ******************************************************************/
 
 #ifndef FAST_SETTLE
-#define FAST_SETTLE			1
+#define FAST_SETTLE			0
 #endif
+
+
 
 enum{
 	//BLE mode
@@ -456,30 +486,30 @@ enum
 };
 
 
-#define	reg_cv_llbt_irk_ptr								REG_ADDR32(REG_CV_LLBT_BASE_ADDR+0x290)
+#define	reg_cv_llbt_irk_ptr					REG_ADDR32(REG_CV_LLBT_BASE_ADDR+0x290)
 
-#define			STOP_RF_STATE_MACHINE							( REG_ADDR8(0x80170200) = 0x80 )
-
-
+#define	STOP_RF_STATE_MACHINE				( REG_ADDR8(0x80170200) = 0x80 )
+#define	CLEAR_ALL_RFIRQ_STATUS   		    reg_rf_irq_status = 0xffff;reg_rf_irq_status_h = 0xff; reg_rf_irq_status_h1 = 0x07
+#define RF_CLEAR_ALL_IRQ_MASK               reg_rf_irq_mask = 0;reg_rf_irq_mask1=0
 #define DMA_RFRX_LEN_HW_INFO				0	// 826x: 8
 #define DMA_RFRX_OFFSET_HEADER				4	// 826x: 12
 #define DMA_RFRX_OFFSET_RFLEN				5   // 826x: 13
 #define DMA_RFRX_OFFSET_DATA				6	// 826x: 14
 
-#define RF_TX_PAKET_DMA_LEN(rf_data_len)		(((rf_data_len)+3)/4)|(((rf_data_len) % 4)<<22)
+#define RF_TX_PACKET_DMA_LEN(rf_data_len)		(((rf_data_len)+3)/4)|(((rf_data_len) % 4)<<22)
 #define DMA_RFRX_OFFSET_CRC24(p)			(p[DMA_RFRX_OFFSET_RFLEN]+6)  //data len:3
 #define DMA_RFRX_OFFSET_TIME_STAMP(p)		(p[DMA_RFRX_OFFSET_RFLEN]+9)  //data len:4
 #define DMA_RFRX_OFFSET_FREQ_OFFSET(p)		(p[DMA_RFRX_OFFSET_RFLEN]+13) //data len:2
 #define DMA_RFRX_OFFSET_RSSI(p)				(p[DMA_RFRX_OFFSET_RFLEN]+15) //data len:1, signed
 #define DMA_RFRX_OFFSET_STATUS(p)			(p[DMA_RFRX_OFFSET_RFLEN]+16)
 
-#define	RF_BLE_RF_PAYLOAD_LENGTH_OK(p)					( *((unsigned int*)p) == p[5]+13)    			//dma_len must 4 byte aligned
+#define	RF_BLE_RF_PAYLOAD_LENGTH_OK(p)					( *((unsigned int*)p) == (unsigned int)(p[5]+13))    			//dma_len must 4 byte aligned
 #define	RF_BLE_RF_PACKET_CRC_OK(p)						((p[(p[5]+5 + 11)] & 0x01) == 0x0)
 #define	RF_BLE_PACKET_VALIDITY_CHECK(p)					(RF_BLE_RF_PAYLOAD_LENGTH_OK(p) && RF_BLE_RF_PACKET_CRC_OK(p))
 
 #define	RF_BLE_RF_PACKET_CRC_OK_HW_ECC(p)						((p[p[5]+5+11-4] & 0x01) == 0x0)
 
-#define rf_set_tx_packet_address(addr)		(dma_set_src_address(DMA0, convert_ram_addr_cpu2bus(addr)))
+#define rf_set_tx_packet_address(addr)		rf_dma_set_src_address(RF_TX_DMA,(unsigned int)(addr));
 
 
 //RF BLE Minimum TX Power LVL (unit: 1dBm)
@@ -507,8 +537,6 @@ extern signed char ble_txPowerLevel;
 _attribute_ram_code_ void ble_rf_set_rx_dma(unsigned char *buff, unsigned char size_div_16);
 
 _attribute_ram_code_ void ble_rf_set_tx_dma(unsigned char fifo_dep, unsigned char size_div_16);
-
-_attribute_ram_code_ void ble_tx_dma_config(void);
 
 _attribute_ram_code_ void ble_rx_dma_config(void);
 
@@ -600,7 +628,7 @@ static inline void rf_set_ble_access_code_adv (void)
 
 
 /**
- * @brief   This function serves to triggle accesscode in coded Phy mode.
+ * @brief   This function serves to trigger accesscode in coded Phy mode.
  * @param   none.
  * @return  none.
  */
@@ -614,7 +642,7 @@ static inline void rf_trigger_codedPhy_accesscode(void)
  * @param[in] none.
  * @return    none.
  */
-static inline void rf_ble_tx_on ()
+static inline void rf_ble_tx_on (void)
 {
 	write_reg8  (0x80170202, 0x45 | BIT(4));	// TX enable
 }
@@ -624,7 +652,7 @@ static inline void rf_ble_tx_on ()
  * @param[in] none.
  * @return    none.
  */
-static inline void rf_ble_tx_done ()
+static inline void rf_ble_tx_done (void)
 {
 	write_reg8  (0x80170202, 0x45);
 }
@@ -667,14 +695,15 @@ static inline int rf_ble_get_preamble_len(void)
 
 static inline void rf_set_dma_tx_addr(unsigned int src_addr)//Todo:need check by sunwei
 {
-	reg_dma_src_addr(DMA0)=convert_ram_addr_cpu2bus(src_addr);
+	/*fix me*/
+	//reg_dma_src_addr(DMA0)=convert_ram_addr_cpu2bus(src_addr);
 }
 
 typedef enum{
 	FSM_BTX 	= 0x81,
 	FSM_BRX 	= 0x82,
-	FSM_PTX	= 0x83,
-	FSM_PRX    = 0x84,
+	FSM_PTX	    = 0x83,
+	FSM_PRX     = 0x84,
 	FSM_STX 	= 0x85,
 	FSM_SRX 	= 0x86,
 	FSM_TX2RX	= 0x87,
@@ -735,13 +764,13 @@ enum{
  */
 static inline void zb_rt_irq_enable(void)
 {
-	plic_interrupt_enable(IRQ15_ZB_RT);
+	plic_interrupt_enable(IRQ_ZB_RT);
 }
 
 
 /*
  * SiHui & QingHua & SunWei sync with Xuqiang.Zhang & Zhiwei.Wang & Kaixin.Chen & Shujuan.chu
- * B91/B92/B95
+ * B91/B92
  * TX settle recommend value by digital team: 108.5uS without fast settle;   108.5-58.5=50 with fast settle
  * we BLE use 110 without fast settle; 110-57=53 with fast settle, here 53 = real settle 45uS + extra 1 preamble 8uS(1M for example)
  *
@@ -778,7 +807,7 @@ static inline void zb_rt_irq_enable(void)
 	#if (FAST_SETTLE)
 		#define			TX_STL_TIFS_REAL_COMMON						53	//can change, consider TX packet quality
 	#else
-		#define			TX_STL_TIFS_REAL_COMMON						110	//can change, consider TX packet quality
+		#define			TX_STL_TIFS_REAL_COMMON						113	//can change, consider TX packet quality
 	#endif
 
 	#define 		TX_STL_TIFS_REAL_1M								TX_STL_TIFS_REAL_COMMON  //can not change !!!
@@ -794,7 +823,7 @@ static inline void zb_rt_irq_enable(void)
 	#if (FAST_SETTLE)
 		#define			TX_STL_ADV_REAL_COMMON						53	//can change, consider TX packet quality
 	#else
-		#define			TX_STL_ADV_REAL_COMMON						110	//can change, consider TX packet quality
+		#define			TX_STL_ADV_REAL_COMMON						113	//can change, consider TX packet quality
 	#endif
 	#define			TX_STL_ADV_REAL_1M								TX_STL_ADV_REAL_COMMON
 	#define 		TX_STL_ADV_SET_1M								(TX_STL_ADV_REAL_1M - PRMBL_EXTRA_1M * 8)  //can not change !!!
@@ -847,64 +876,113 @@ static inline void zb_rt_irq_enable(void)
 
 static inline void rf_ble_set_1m_phy(void)
 {
-	write_reg8(0x17063d,0x61);
-	write_reg32(0x170620,0x23200a16);
-	write_reg8(0x170420,0x8c);// script cc.BIT[3]continue mode.After syncing to the preamble, it will immediately enter
-							  //the sync state again, reducing the probability of mis-syncing.modified by zhiwei,confirmed
-							  //by qiangkai and xuqiang.20221205
-	write_reg8(0x170422,0x00);
-	write_reg8(0x17044d,0x01);
-	write_reg8(0x17044e,0x1e);
-	write_reg16(0x170436,0x0eb7);
-	write_reg16(0x170438,0x71c4);
-	write_reg8(0x170473,0x01);
+	//aura_1m
+	write_reg8(0x17063d,0x61);//ble:bw_code.
+	write_reg8(0x170620,0x10);//sc_code.
+	write_reg8(0x170621,0x0a);//if_freq,IF = 1Mhz,BW = 1Mhz.
+	write_reg8(0x170622,0x20);//RADIO BLE_MODE_TX,1MBPS:bit<0>;VCO_TRIM_KV:bit<1-3>;HPMC_EXP_DIFF_COUNT_L:bit<4-7>.
+	write_reg8(0x170623,0x23);//HPMC_EXP_DIFF_COUNT_H.
+	write_reg8(0x170422,0x00);//modem:BLE_MODE_TX,1MBPS.
+	write_reg8(0x17044e,0x1e);//ble sync threshold:To modem.
 
+	write_reg8(0x17063f,0x00);//250k modulation index:telink add rx for 250k/500k.
+
+	//rx_cont_mode
+	write_reg8(0x170420,0xc8);// script cc. rx continue mode on:bit<3>
+
+	write_reg8(0x17044d,0x01);//r_rxchn_en_i:To modem.
+	write_reg8(0x170421,0x00);//modem:ZIGBEE_MODE:01
+	write_reg8(0x170423,0x00);//modem:ZIGBEE_MODE_TX.
+	write_reg8(0x170426,0x00);//modem:sync rst sel,for zigbee access code sync.
+	write_reg8(0x17042a,0x10);//modem:disable MSK.
+	write_reg8(0x17043d,0x00);//modem:zb_sfd_frm_ll.
+	write_reg8(0x17042c,0x38);//modem:zb_dis_rst_pdet_isfd.
+	write_reg8(0x170436,0xb7);//LR_NUM_GEAR_L.
+	write_reg8(0x170437,0x0e);//LR_NUM_GEAR_H.
+	write_reg8(0x170438,0xb6);//LR_TIM_EDGE_DEV.0xc4->0xb6
+	write_reg8(0x170439,0x71);//LR_TIM_REC_CFG_1.
+	write_reg8(0x170473,0x01);//TOT_DEV_RST.
 	write_reg8(0x17049a,0x00);//tx_tp_align.
-	write_reg16(0x1704c2,0x4b3a);
-	write_reg32(0x1704c4,0x7a6e6356);
-	write_reg8(0x1704c8,0x39);//bit[0:5]grx_fix
-#if 1
-	write_reg32(0x170000,0x4440081f | PRMBL_LENGTH_1M<<16);
-#else
-	write_reg32(0x170000,0x4446081f);
-#endif
 
-	write_reg16(0x170004,0x04f5);
+	//agc_table_1m
+	write_reg8(0x1704c2,0x39);//grx_0.
+	write_reg8(0x1704c3,0x4b);//grx_1.
+	write_reg8(0x1704c4,0x56);//grx_2.
+	write_reg8(0x1704c5,0x62);//grx_3.
+	write_reg8(0x1704c6,0x6e);//grx_4.
+	write_reg8(0x1704c7,0x79);//grx_5.
 
-	write_reg8(0x1704bb,0x50);//BIT[5]:rxc_chf_sel_ble;1M:0(default) 2M:1 open two stage filter to improve
-							  //the sensitivity.modified by zhiwei,confirmed by wenfeng and xuqiang,20230106.
+	//ble1m_setup
+	write_reg32(0x170000,0x5440080f|PRMBL_LENGTH_1M<<16);//tx_mode.
+//	write_reg8(0x170001,0x08);//PN.
+//	write_reg8(0x170002,0x40| PRMBL_LENGTH_1M<<16);//preamble length
+//	write_reg8(0x170003,0x54);//bit<0:1>private mode control.
+	write_reg8(0x170004,0xf1);//bit<4>mode:1->1m;bit<0:3>:ble head.
+	write_reg8(0x170005,0x04);//lr mode bit<4:5>
+
+	write_reg8(0x170021,0xa1);//rx packet len 0 enable.
+							  //bit<5>:write packet length filed into sram
+	write_reg8(0x170022,0x00);//rxchn_man_en.
+
+	write_reg8(0x17044c,0x0c);//RX:acc_len modem.0x4c->0x0c
+
 }
 
 
 static inline void rf_ble_set_2m_phy(void)
 {
-	write_reg8(0x17063d,0x41);
-	write_reg32(0x170620,0x26432a06);
-	write_reg8(0x170420,0x8c);// script cc.BIT[3]continue mode.After syncing to the preamble, it will immediately enter
-							  //the sync state again, reducing the probability of mis-syncing.modified by zhiwei,confirmed
-							  //by qiangkai and xuqiang.20221205
-	write_reg8(0x170422,0x01);
-	write_reg8(0x17044d,0x01);
-	write_reg8(0x17044e,0x1e);
-	write_reg16(0x170436,0x0eb7);
-	write_reg16(0x170438,0x71c4);
-	write_reg8(0x170473,0x01);
+//	rf_set_ble_2M_mode();
+	//aura_2m
+	write_reg8(0x17063d,0x41);//ble:bw_code.
+	write_reg8(0x170620,0x00);//sc_code.
+	write_reg8(0x170621,0x2a);//if_freq,IF = 1Mhz,BW = 1Mhz.
+	write_reg8(0x170622,0x43);//HPMC_EXP_DIFF_COUNT_L.
+	write_reg8(0x170623,0x26);//HPMC_EXP_DIFF_COUNT_H.
+	write_reg8(0x170422,0x01);//modem:BLE_MODE_TX,2MBPS.
+	write_reg8(0x17044e,0x1e);//ble sync threshold:To modem.0x20->0x1e
 
+
+	write_reg8(0x17063f,0x00);//250k modulation index:telink add rx for 250k/500k.
+
+	write_reg8(0x1704bb,0x20);//2 stage filter,
+
+	//rx_cont_mode
+    write_reg8(0x170420,0xc8);
+
+	write_reg8(0x17044d,0x01);//r_rxchn_en_i:To modem.
+	write_reg8(0x170421,0x00);//modem:ZIGBEE_MODE:01.
+	write_reg8(0x170423,0x00);//modem:ZIGBEE_MODE_TX.
+	write_reg8(0x170426,0x00);//modem:sync rst sel,for zigbee access code sync.
+	write_reg8(0x17042a,0x10);//modem:disable MSK.
+	write_reg8(0x17043d,0x00);//modem:zb_sfd_frm_ll.
+	write_reg8(0x17042c,0x38);//modem:zb_dis_rst_pdet_isfd.
+	write_reg8(0x170436,0xb7);//LR_NUM_GEAR_L.
+	write_reg8(0x170437,0x0e);//LR_NUM_GEAR_H.
+	write_reg8(0x170438,0xb6);//LR_TIM_EDGE_DEV.0xc4->0xb6
+	write_reg8(0x170439,0x71);//LR_TIM_REC_CFG_1.
+	write_reg8(0x170473,0x01);//TOT_DEV_RST.
 	write_reg8(0x17049a,0x00);//tx_tp_align.
 
-	write_reg16(0x1704c2,0x4c3b);
-	write_reg32(0x1704c4,0x7b726359);
-	write_reg8(0x1704c8,0x39);//bit[0:5]grx_fix
-	#if 1
-		write_reg32(0x170000,0x4440081f | PRMBL_LENGTH_2M<<16);
-	#else
-		write_reg32(0x170000,0x4446081f);
-	#endif
+	//agc_table
+	write_reg8(0x1704c2,0x3b);//grx_0.
+	write_reg8(0x1704c3,0x4c);//grx_1.
+	write_reg8(0x1704c4,0x58);//grx_2.
+	write_reg8(0x1704c5,0x64);//grx_3.
+	write_reg8(0x1704c6,0x6e);//grx_4.
+	write_reg8(0x1704c7,0x7a);//grx_5.
 
-	write_reg16(0x170004,0x04e5);
+	write_reg32(0x170000,0x5440080f|PRMBL_LENGTH_1M<<16);//tx_mode.
+//	write_reg8(0x170001,0x08);//PN.
+//	write_reg8(0x170002,0x43);//preamble len.
+//	write_reg8(0x170003,0x54);//bit<0:1>private mode control.
+	write_reg8(0x170004,0xe1);//bit<4>mode:1->1m;bit<0:3>:ble head.
+	write_reg8(0x170005,0x04);//lr mode bit<4:5>
 
-	write_reg8(0x1704bb,0x70);//BIT[5]:rxc_chf_sel_ble;1M:0(default) 2M:1 open two stage filter to improve
-								  //the sensitivity.modified by zhiwei,confirmed by wenfeng and xuqiang,20230106.
+	write_reg8(0x170021,0xa1);//rx packet len 0 enable.
+	write_reg8(0x170022,0x00);//rxchn_man_en.
+
+	write_reg8(0x17044c,0x0c);//RX:acc_len modem.
+
 }
 
 
@@ -912,45 +990,66 @@ static inline void rf_ble_set_2m_phy(void)
 
 static inline void rf_ble_set_coded_phy_common(void)
 {
-	write_reg8(0x17063d,0x61);
-	write_reg32(0x170620,0x23200a16);
-	write_reg8(0x170420,0xcd);// script cc.BIT[3]continue mode.After syncing to the preamble, it will immediately enter
-							  //the sync state again, reducing the probability of mis-syncing.modified by zhiwei,confirmed
-							  //by qiangkai and xuqiang.20221205
-	write_reg8(0x170422,0x00);
-	write_reg8(0x17044d,0x01);
-	write_reg8(0x17044e,0xf0);
-	write_reg16(0x170438,0x7dc8);
-	write_reg8(0x170473,0xa1);
+	write_reg8(0x17063d,0x61);//ble:bw_code.
+	write_reg8(0x170620,0x10);//sc_code.
+	write_reg8(0x170621,0x0a);//if_freq,IF = 1Mhz,BW = 1Mhz.
+	write_reg8(0x170622,0x20);//HPMC_EXP_DIFF_COUNT_L.
+	write_reg8(0x170623,0x23);//HPMC_EXP_DIFF_COUNT_H.
+	write_reg8(0x170422,0x00);//modem:BLE_MODE_TX,2MBPS.
+	write_reg8(0x17044e,0xf0);//ble sync threshold:To modem.
 
+
+	write_reg8(0x17063f,0x00);//250k modulation index:telink add rx for 250k/500k.
+
+	write_reg8(0x170473,0xa1);//TOT_DEV_RST.
+	write_reg8(0x170437,0x0c);//LR_NUM_GEAR_H.
+	write_reg8(0x170438,0xb8);//LR_TIM_EDGE_DEV.
+	write_reg8(0x170439,0x7d);//LR_TIM_REC_CFG_1.
+
+	write_reg8(0x170420,0xc9);// script cc.
+
+	write_reg8(0x17044d,0x01);//r_rxchn_en_i:To modem.
+	write_reg8(0x170423,0x00);//modem:ZIGBEE_MODE_TX.
+	write_reg8(0x17043e,0x81);//BIT<7>:0 new ,1 old  pm2fm suppress more than pi/4
+	write_reg8(0x170426,0x00);//modem:sync rst sel,for zigbee access code sync.
+	write_reg8(0x17042a,0x10);//modem:disable MSK.
+	write_reg8(0x17043d,0x00);//modem:zb_sfd_frm_ll.
+	write_reg8(0x17042c,0x38);//modem:zb_dis_rst_pdet_isfd.
 	write_reg8(0x17049a,0x00);//tx_tp_align.
 
-	write_reg16(0x1704c2,0x4b3a);
-	write_reg32(0x1704c4,0x7a6e6356);
-	write_reg8(0x1704c8,0x39);//bit[0:5]grx_fix
-	#if 1
-		write_reg32(0x170000,0x4440081f | PRMBL_LENGTH_Coded<<16);
-	#else
-		write_reg32(0x170000,0x444a081f);
-	#endif
+	write_reg8(0x1704c2,0x36);//grx_0.
+	write_reg8(0x1704c3,0x48);//grx_1.
+	write_reg8(0x1704c4,0x54);//grx_2.
+	write_reg8(0x1704c5,0x62);//grx_3.
+	write_reg8(0x1704c6,0x6e);//grx_4.
+	write_reg8(0x1704c7,0x79);//grx_5.
 
-	write_reg8(0x1704bb,0x50);//BIT[5]:rxc_chf_sel_ble;1M:0(default) 2M:1 open two stage filter to improve
-							  //the sensitivity.modified by zhiwei,confirmed by wenfeng and xuqiang,20230106.
+	write_reg32(0x170000,0x5440000f| PRMBL_LENGTH_Coded<<16);
+//	write_reg8(0x170001,0x00);//PN.
+//	write_reg8(0x170002,0x4a);//preamble len.
+//	write_reg8(0x170003,0x54);//bit<0:1>private mode control.
+	write_reg8(0x170004,0xf1);//bit<4>mode:1->1m;bit<0:3>:ble head.
+
+	write_reg8(0x170021,0xa1);//rx packet len 0 enable.
+	write_reg8(0x170022,0x00);//rxchn_man_en.
+
+	write_reg8(0x17044c,0x0c);//RX:acc_len modem.
 }
 
 
 static inline void rf_ble_set_coded_phy_s2(void)
 {
-	write_reg16(0x170436,0x0cee);
-	write_reg16(0x170004,0xa4f5);
-
+	write_reg8(0x170436,0xee);//LR_NUM_GEAR_L.
+	write_reg8(0x170421,0x00);//modem:ZIGBEE_MODE:01.
+	write_reg8(0x170005,0x24);//lr mode bit<4:5>
 }
 
 
 static inline void rf_ble_set_coded_phy_s8(void)
 {
-	write_reg16(0x170436,0x0cf6);
-	write_reg16(0x170004,0xb4f5);
+	write_reg8(0x170436,0xf6);//LR_NUM_GEAR_L.
+	write_reg8(0x170421,0x80);//modem:bit<2> LR_MODEM_SEL,bit<3> LR_VITERBI_SEL
+	write_reg8(0x170005,0x34);//lr mode bit<4:5>
 }
 
 //This is to be compatible in older versions. If you don't use them, you can delete them.
@@ -958,7 +1057,7 @@ static inline void rf_ble_set_coded_phy_s8(void)
 
 
 #if FAST_SETTLE
-	typedef struct
+	typedef struct __attribute__((packed)) 
 	{
 		u8 LDO_CAL_TRIM;	//0xea[5:0]
 		u8 LDO_RXTXHF_TRIM;	//0xee[5:0]
@@ -968,7 +1067,7 @@ static inline void rf_ble_set_coded_phy_s8(void)
 		u8 rsvd;
 	}Ldo_Trim;
 
-	typedef struct
+	typedef struct __attribute__((packed)) 
 	{
 		unsigned char tx_fast_en;
 		unsigned char rx_fast_en;
@@ -1022,27 +1121,29 @@ static inline void rf_ble_set_coded_phy_s8(void)
 
 #endif
 
+
+
 static inline u8 rf_ble_get_tx_pwr_idx(s8 rfTxPower)
 {
     rf_power_level_index_e rfPwrLvlIdx;
-
-    /*VBAT*/
-    if      (rfTxPower >=   9)  {  rfPwrLvlIdx = RF_POWER_INDEX_P9p15dBm;  }
-    else if (rfTxPower >=   8)  {  rfPwrLvlIdx = RF_POWER_INDEX_P8p25dBm;  }
-    else if (rfTxPower >=   7)  {  rfPwrLvlIdx = RF_POWER_INDEX_P7p00dBm;  }
-    else if (rfTxPower >=   6)  {  rfPwrLvlIdx = RF_POWER_INDEX_P6p32dBm;  }
-    /*VANT*/
-    else if (rfTxPower >=   5)  {  rfPwrLvlIdx = RF_POWER_INDEX_P5p21dBm;  }
-    else if (rfTxPower >=   4)  {  rfPwrLvlIdx = RF_POWER_INDEX_P4p02dBm;  }
-    else if (rfTxPower >=   3)  {  rfPwrLvlIdx = RF_POWER_INDEX_P3p00dBm;  }
-    else if (rfTxPower >=   2)  {  rfPwrLvlIdx = RF_POWER_INDEX_P2p01dBm;  }
-    else if (rfTxPower >=   1)  {  rfPwrLvlIdx = RF_POWER_INDEX_P1p03dBm;  }
-    else if (rfTxPower >=   0)  {  rfPwrLvlIdx = RF_POWER_INDEX_P0p01dBm;  }
-    else if (rfTxPower >=  -4)  {  rfPwrLvlIdx = RF_POWER_INDEX_N3p95dBm;  }
-    else if (rfTxPower >=  -6)  {  rfPwrLvlIdx = RF_POWER_INDEX_N5p94dBm;  }
-    else if (rfTxPower >= -10)  {  rfPwrLvlIdx = RF_POWER_INDEX_N9p03dBm; }
-    else if (rfTxPower >= -14)  {  rfPwrLvlIdx = RF_POWER_INDEX_N13p42dBm; }
-    else                        {  rfPwrLvlIdx = RF_POWER_INDEX_N22p53dBm; }
+//
+//    /*VBAT*/
+//    if      (rfTxPower >=   9)  {  rfPwrLvlIdx = RF_POWER_INDEX_P9p15dBm;  }
+//    else if (rfTxPower >=   8)  {  rfPwrLvlIdx = RF_POWER_INDEX_P8p25dBm;  }
+//    else if (rfTxPower >=   7)  {  rfPwrLvlIdx = RF_POWER_INDEX_P7p00dBm;  }
+//    else if (rfTxPower >=   6)  {  rfPwrLvlIdx = RF_POWER_INDEX_P6p32dBm;  }
+//    /*VANT*/
+//    else if (rfTxPower >=   5)  {  rfPwrLvlIdx = RF_POWER_INDEX_P5p21dBm;  }
+//    else if (rfTxPower >=   4)  {  rfPwrLvlIdx = RF_POWER_INDEX_P4p02dBm;  }
+//    else if (rfTxPower >=   3)  {  rfPwrLvlIdx = RF_POWER_INDEX_P3p00dBm;  }
+//    else if (rfTxPower >=   2)  {  rfPwrLvlIdx = RF_POWER_INDEX_P2p01dBm;  }
+//    else if (rfTxPower >=   1)  {  rfPwrLvlIdx = RF_POWER_INDEX_P1p03dBm;  }
+//    else if (rfTxPower >=   0)  {  rfPwrLvlIdx = RF_POWER_INDEX_P0p01dBm;  }
+//    else if (rfTxPower >=  -4)  {  rfPwrLvlIdx = RF_POWER_INDEX_N3p95dBm;  }
+//    else if (rfTxPower >=  -6)  {  rfPwrLvlIdx = RF_POWER_INDEX_N5p94dBm;  }
+//    else if (rfTxPower >= -10)  {  rfPwrLvlIdx = RF_POWER_INDEX_N9p03dBm; }
+//    else if (rfTxPower >= -14)  {  rfPwrLvlIdx = RF_POWER_INDEX_N13p42dBm; }
+//    else                        {  rfPwrLvlIdx = RF_POWER_INDEX_N22p53dBm; }
 
     return rfPwrLvlIdx;
 }
@@ -1051,36 +1152,28 @@ static inline s8 rf_ble_get_tx_pwr_level(rf_power_level_index_e rfPwrLvlIdx)
 {
     s8 rfTxPower;
 
-    /*VBAT*/
-    if      (rfPwrLvlIdx <= RF_POWER_INDEX_P9p15dBm)  {  rfTxPower =   9;  }
-    else if (rfPwrLvlIdx <= RF_POWER_INDEX_P8p25dBm)  {  rfTxPower =   8;  }
-    else if (rfPwrLvlIdx <= RF_POWER_INDEX_P7p00dBm)  {  rfTxPower =   7;  }
-    else if (rfPwrLvlIdx <= RF_POWER_INDEX_P6p32dBm)  {  rfTxPower =   6;  }
-    /*VANT*/
-    else if (rfPwrLvlIdx <= RF_POWER_INDEX_P5p21dBm)  {  rfTxPower =   5;  }
-    else if (rfPwrLvlIdx <= RF_POWER_INDEX_P4p02dBm)  {  rfTxPower =   4;  }
-    else if (rfPwrLvlIdx <= RF_POWER_INDEX_P3p00dBm)  {  rfTxPower =   3;  }
-    else if (rfPwrLvlIdx <= RF_POWER_INDEX_P2p01dBm)  {  rfTxPower =   2;  }
-    else if (rfPwrLvlIdx <= RF_POWER_INDEX_P1p03dBm)  {  rfTxPower =   1;  }
-    else if (rfPwrLvlIdx <= RF_POWER_INDEX_P0p01dBm)  {  rfTxPower =   0;  }
-    else if (rfPwrLvlIdx <= RF_POWER_INDEX_N3p95dBm)  {  rfTxPower =  -4;  }
-    else if (rfPwrLvlIdx <= RF_POWER_INDEX_N5p94dBm)  {  rfTxPower =  -6;  }
-    else if (rfPwrLvlIdx <= RF_POWER_INDEX_N9p03dBm)  {  rfTxPower = -10;  }
-    else if (rfPwrLvlIdx <= RF_POWER_INDEX_N13p42dBm) {  rfTxPower = -14;  }
-    else                                              {  rfTxPower = -23;  }
+//    /*VBAT*/
+//    if      (rfPwrLvlIdx <= RF_POWER_INDEX_P9p15dBm)  {  rfTxPower =   9;  }
+//    else if (rfPwrLvlIdx <= RF_POWER_INDEX_P8p25dBm)  {  rfTxPower =   8;  }
+//    else if (rfPwrLvlIdx <= RF_POWER_INDEX_P7p00dBm)  {  rfTxPower =   7;  }
+//    else if (rfPwrLvlIdx <= RF_POWER_INDEX_P6p32dBm)  {  rfTxPower =   6;  }
+//    /*VANT*/
+//    else if (rfPwrLvlIdx <= RF_POWER_INDEX_P5p21dBm)  {  rfTxPower =   5;  }
+//    else if (rfPwrLvlIdx <= RF_POWER_INDEX_P4p02dBm)  {  rfTxPower =   4;  }
+//    else if (rfPwrLvlIdx <= RF_POWER_INDEX_P3p00dBm)  {  rfTxPower =   3;  }
+//    else if (rfPwrLvlIdx <= RF_POWER_INDEX_P2p01dBm)  {  rfTxPower =   2;  }
+//    else if (rfPwrLvlIdx <= RF_POWER_INDEX_P1p03dBm)  {  rfTxPower =   1;  }
+//    else if (rfPwrLvlIdx <= RF_POWER_INDEX_P0p01dBm)  {  rfTxPower =   0;  }
+//    else if (rfPwrLvlIdx <= RF_POWER_INDEX_N3p95dBm)  {  rfTxPower =  -4;  }
+//    else if (rfPwrLvlIdx <= RF_POWER_INDEX_N5p94dBm)  {  rfTxPower =  -6;  }
+//    else if (rfPwrLvlIdx <= RF_POWER_INDEX_N9p03dBm)  {  rfTxPower = -10;  }
+//    else if (rfPwrLvlIdx <= RF_POWER_INDEX_N13p42dBm) {  rfTxPower = -14;  }
+//    else                                              {  rfTxPower = -23;  }
 
     return rfTxPower;
 }
 
-void ble_rf_tx_channel_sounding_mode_en(void);
 
-void ble_rf_tx_channel_sounding_mode_dis(void);
-
-void ble_rf_rx_channel_sounding_mode_en(unsigned char interval, rf_iq_data_mode_e suppmode);
-
-void ble_rf_rx_channel_sounding_mode_dis(void);
-
-void ble_rf_channel_sounding_iq_sample_config(unsigned short sample_num, unsigned char start_point, rf_hadm_iq_sample_mode_e sample_mode);
 
 /******************************* ext_rf end ********************************************************************/
 
@@ -1100,7 +1193,7 @@ void ble_rf_channel_sounding_iq_sample_config(unsigned short sample_num, unsigne
 
 #define DESCRIPTOR_WATCHDOG_OFFSET	0x108A
 
-typedef struct {
+typedef struct __attribute__((packed))  {
 	unsigned char vendor_mark[4];
 } sb_desc_1st_sector_t;
 
@@ -1108,7 +1201,7 @@ typedef struct {
 #define DESC_2ND_SECTOR_DATA_LEN	146  //16*9 + 2 = 144 + 2
 
 
-typedef struct {
+typedef struct __attribute__((packed))  {
 	unsigned short	multi_boot;
 	unsigned char	public_key[64];
 	unsigned char	signature[64];
@@ -1119,7 +1212,7 @@ typedef struct {
 } sb_desc_2nd_sector_t;
 
 
-typedef struct {
+typedef struct __attribute__((packed))  {
 	unsigned char	fw_enc_en;
 	unsigned char	secboot_en;
 	unsigned short  sb_desc_adr_k; //unit: 4KB

@@ -186,6 +186,7 @@ static void b9x_bt_irq_init()
 	flash_plic_preempt_config(0,1);
 #endif
 
+#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92
 	/* Init STimer IRQ */
 	IRQ_CONNECT(IRQ1_SYSTIMER + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 2, stimer_irq_handler, 0, 0);
 	/* Init RF IRQ */
@@ -196,6 +197,18 @@ static void b9x_bt_irq_init()
 #endif
 	riscv_plic_set_priority(IRQ1_SYSTIMER, 2);
 	riscv_plic_set_priority(IRQ15_ZB_RT, 2);
+#elif CONFIG_SOC_RISCV_TELINK_B95
+	/* Init STimer IRQ */
+	IRQ_CONNECT(IRQ_SYSTIMER + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 2, stimer_irq_handler, 0, 0);
+	/* Init RF IRQ */
+	#if CONFIG_DYNAMIC_INTERRUPTS
+	irq_connect_dynamic(IRQ_ZB_RT + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 2, rf_irq_handler, 0, 0);
+	#else
+	IRQ_CONNECT(IRQ_ZB_RT + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 2, rf_irq_handler, 0, 0);
+	#endif
+	riscv_plic_set_priority(IRQ_SYSTIMER, 2);
+	riscv_plic_set_priority(IRQ_ZB_RT, 2);
+#endif
 }
 
 /**
@@ -274,8 +287,13 @@ void b9x_bt_controller_deinit()
 	(void)k_thread_join(&b9x_bt_controller_thread_data, K_FOREVER);
 
 	/* disable interrupts */
-	plic_interrupt_disable(IRQ1_SYSTIMER);
-	plic_interrupt_disable(IRQ15_ZB_RT);
+#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92
+ 	plic_interrupt_disable(IRQ1_SYSTIMER);
+	plic_interrupt_disable(IRQ15_ZB_RT);	
+#elif CONFIG_SOC_RISCV_TELINK_B95
+	plic_interrupt_disable(IRQ_SYSTIMER);
+	plic_interrupt_disable(IRQ_ZB_RT);
+#endif
 
 	/* Reset Radio */
 	rf_radio_reset();
