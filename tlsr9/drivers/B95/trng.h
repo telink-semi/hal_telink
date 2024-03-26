@@ -34,7 +34,7 @@
 #ifndef TRNG_H_
 #define TRNG_H_
 
-#include "lib/include/sys.h"
+#include "sys.h"
 #include "reg_include/register.h"
 #include "stimer.h"
 
