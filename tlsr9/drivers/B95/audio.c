@@ -1,34 +1,31 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
-
 /********************************************************************************************************
- * @file	audio.c
+ * @file    audio.c
  *
- * @brief	This is the source file for B95
+ * @brief   This is the source file for B95
  *
- * @author	Driver Group
+ * @author  Driver Group
+ * @date    2023
+ *
+ * @par     Copyright (c) 2023, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *
  *******************************************************************************************************/
 #include "audio.h"
 #include "clock.h"
 #include "pwm.h"
 #include "stimer.h"
-#include "pm.h"
+#include "lib/include/pm.h"
 
 
 unsigned char audio_codec_rate[AUDIO_RATE_SIZE] = {	0x06,/*8k*/                 //12Mhz/1500=8K
@@ -164,13 +161,13 @@ void audio_set_stream0_dmic_pin(gpio_func_pin_e dmic0_data,gpio_func_pin_e dmic0
 void audio_set_stream1_dmic_pin(gpio_func_pin_e dmic1_data,gpio_func_pin_e dmic1_clk1,gpio_func_pin_e dmic1_clk2)
 {
 	gpio_input_en((gpio_pin_e)dmic1_data);
-	gpio_set_mux_function(dmic1_data,DMIC1_DAT_I);
+//	gpio_set_mux_function(dmic1_data,DMIC1_DAT_I);
 	gpio_function_dis((gpio_pin_e)dmic1_data);
-	gpio_set_mux_function(dmic1_clk1,DMIC1_CLK);
+//	gpio_set_mux_function(dmic1_clk1,DMIC1_CLK);
 	gpio_function_dis((gpio_pin_e)dmic1_clk1);
 	if( dmic1_clk2 != GPIO_NONE_PIN)
 	{
-		gpio_set_mux_function(dmic1_clk2,DMIC1_CLK);
+//		gpio_set_mux_function(dmic1_clk2,DMIC1_CLK);
 		gpio_function_dis((gpio_pin_e)dmic1_clk2);
 	}
 }
@@ -220,7 +217,7 @@ void audio_set_stream1_dmic_pin(gpio_func_pin_e dmic1_data,gpio_func_pin_e dmic1
  * @param[in] chn          - dma channel
  * @param[in] dst_addr     - Pointer to data buffer, it must be 4-bytes aligned address.
  *                           and the actual buffer size defined by the user needs to be not smaller than the data_len, otherwise there may be an out-of-bounds problem.
- * @param[in] data_len     - Length of DMA in bytes,it must be set to a multiple of 4. The maximum value that can be set is 0x10000. 
+ * @param[in] data_len     - Length of DMA in bytes, it must be set to a multiple of 4. The maximum value that can be set is 0x10000. 
  * @param[in] head_of_list - the head address of dma llp.
  * @return    none
  */
@@ -231,7 +228,7 @@ void audio_rx_dma_config(dma_chn_e chn,unsigned short *dst_addr,unsigned int dat
 	dma_config(chn,&audio_dma_rx_config[audio_rx_fifo_chn]);
 	dma_set_address( chn,REG_AUDIO_FIFO_ADDR(audio_rx_fifo_chn),(unsigned int)(dst_addr));
 	dma_set_size(chn,data_len,DMA_WORD_WIDTH);
-	reg_dma_llp(chn)=(unsigned int)convert_ram_addr_cpu2bus(head_of_list);
+	reg_dma_llp(chn)=(unsigned int)(head_of_list);
 }
 
 /**
@@ -240,16 +237,16 @@ void audio_rx_dma_config(dma_chn_e chn,unsigned short *dst_addr,unsigned int dat
  * @param[in] llpointer   - the next element of llp_pointer.
  * @param[in] dst_addr    - Pointer to data buffer, it must be 4-bytes aligned address and the actual buffer size defined by the user needs to
  *							be not smaller than the data_len, otherwise there may be an out-of-bounds problem.
- * @param[in] data_len    - Length of DMA in bytes,it must be set to a multiple of 4. The maximum value that can be set is 0x10000.
+ * @param[in] data_len    - Length of DMA in bytes, it must be set to a multiple of 4. The maximum value that can be set is 0x10000.
  * @return 	  none
  */
 void audio_rx_dma_add_list_element(dma_chain_config_t *config_addr,dma_chain_config_t *llpointer ,unsigned short * dst_addr,unsigned int data_len)
 {
 	config_addr->dma_chain_ctl=reg_dma_ctrl(audio_rx_dma_chn)|BIT(0);
 	config_addr->dma_chain_src_addr=REG_AUDIO_FIFO_ADDR(audio_rx_fifo_chn);
-	config_addr->dma_chain_dst_addr=(unsigned int)convert_ram_addr_cpu2bus(dst_addr);
+	config_addr->dma_chain_dst_addr=(unsigned int)(dst_addr);
 	config_addr->dma_chain_data_len=dma_cal_size(data_len,4);
-	config_addr->dma_chain_llp_ptr=(unsigned int)convert_ram_addr_cpu2bus(llpointer);
+	config_addr->dma_chain_llp_ptr=(unsigned int)(llpointer);
 }
 
 /**
@@ -258,7 +255,7 @@ void audio_rx_dma_add_list_element(dma_chain_config_t *config_addr,dma_chain_con
  * @param[in] chn         - dma channel
  * @param[in] in_buff     - Pointer to data buffer, it must be 4-bytes aligned address and the actual buffer size defined by the user needs to
  *						 	be not smaller than the data_len, otherwise there may be an out-of-bounds problem.
- * @param[in] buff_size   - Length of DMA in bytes,it must be set to a multiple of 4. The maximum value that can be set is 0x10000.
+ * @param[in] buff_size   - Length of DMA in bytes, it must be set to a multiple of 4. The maximum value that can be set is 0x10000.
  * @return 	  none
  */
 void audio_rx_dma_chain_init (audio_fifo_chn_e rx_fifo_chn,dma_chn_e chn,unsigned short * in_buff,unsigned int buff_size)
@@ -283,7 +280,7 @@ void audio_tx_dma_config(dma_chn_e chn,unsigned short * src_addr, unsigned int d
 	 dma_config(chn,&audio_dma_tx_config[audio_tx_fifo_chn]);
 	 dma_set_address(chn,(unsigned int)(src_addr),REG_AUDIO_FIFO_ADDR(audio_tx_fifo_chn));
 	 dma_set_size(chn,data_len,DMA_WORD_WIDTH);
-	 reg_dma_llp(chn)=(unsigned int)convert_ram_addr_cpu2bus(head_of_list);
+	 reg_dma_llp(chn)=(unsigned int)(head_of_list);
 }
 
 /**
@@ -297,10 +294,10 @@ void audio_tx_dma_config(dma_chn_e chn,unsigned short * src_addr, unsigned int d
 void audio_tx_dma_add_list_element(dma_chain_config_t *config_addr,dma_chain_config_t *llpointer ,unsigned short * src_addr,unsigned int data_len)
 {
 	config_addr->dma_chain_ctl=reg_dma_ctrl(audio_tx_dma_chn)|BIT(0);
-	config_addr->dma_chain_src_addr=(unsigned int)convert_ram_addr_cpu2bus(src_addr);
+	config_addr->dma_chain_src_addr=(unsigned int)(src_addr);
 	config_addr->dma_chain_dst_addr=REG_AUDIO_FIFO_ADDR(audio_tx_fifo_chn);
 	config_addr->dma_chain_data_len=dma_cal_size(data_len,4);
-	config_addr->dma_chain_llp_ptr=(unsigned int)convert_ram_addr_cpu2bus(llpointer);
+	config_addr->dma_chain_llp_ptr=(unsigned int)(llpointer);
 }
 
 /**
@@ -1093,7 +1090,8 @@ void audio_codec_stream_output_init(audio_codec_output_t *audio_codec_output)
 void audio_i2s_set_mclk(gpio_func_pin_e mclk_pin,unsigned short div_numerator,unsigned short div_denominator)
 {
     audio_set_codec_clk(div_numerator,div_denominator);
-	gpio_set_probe_clk_function(mclk_pin,PROBE_CODEC_MCLK);
+//	gpio_set_probe_clk_function(mclk_pin,PROBE_CODEC_MCLK);
+    gpio_input_en((gpio_pin_e)mclk_pin);
 }
 
 /**
@@ -1111,25 +1109,25 @@ void i2s_set_pin(audio_i2s_select_e i2s_select,i2s_pin_config_t *config)
 	if(config->adc_lr_clk_pin!=GPIO_NONE_PIN)
 	{
 		gpio_input_en((gpio_pin_e)config->adc_lr_clk_pin);
-		gpio_set_mux_function(config->adc_lr_clk_pin,I2S0_LR_IN_IO+(i2s_select)*6);
+//		gpio_set_mux_function(config->adc_lr_clk_pin,I2S0_LR_IN_IO+(i2s_select)*6);
 		gpio_function_dis((gpio_pin_e)config->adc_lr_clk_pin);
 	}
 	if(config->dac_lr_clk_pin!=GPIO_NONE_PIN)
 	{
 		gpio_input_en((gpio_pin_e)config->dac_lr_clk_pin);
-		gpio_set_mux_function(config->dac_lr_clk_pin,I2S0_LR_OUT_IO+(i2s_select)*6);
+//		gpio_set_mux_function(config->dac_lr_clk_pin,I2S0_LR_OUT_IO+(i2s_select)*6);
 		gpio_function_dis((gpio_pin_e)config->dac_lr_clk_pin);
 	}
 	if(config->adc_dat_pin!=GPIO_NONE_PIN)
 	{
 		gpio_input_en((gpio_pin_e)config->adc_dat_pin);
-		gpio_set_mux_function(config->adc_dat_pin,I2S0_DAT_IN_I+(i2s_select)*6);
+//		gpio_set_mux_function(config->adc_dat_pin,I2S0_DAT_IN_I+(i2s_select)*6);
 		gpio_function_dis((gpio_pin_e)config->adc_dat_pin);
 	}
 	if(config->dac_dat_pin!=GPIO_NONE_PIN)
 	{
 		gpio_input_en((gpio_pin_e)config->dac_dat_pin);
-		gpio_set_mux_function(config->dac_dat_pin,I2S0_DAT_OUT+(i2s_select)*6);
+//		gpio_set_mux_function(config->dac_dat_pin,I2S0_DAT_OUT+(i2s_select)*6);
 		gpio_function_dis((gpio_pin_e)config->dac_dat_pin);
 	}
 }
@@ -1209,7 +1207,7 @@ void audio_i2s_config(audio_i2s_select_e i2s_sel,i2s_mode_select_e i2s_format,au
  *                           ||                                       ||
  *           i2s_clk_config[0]/i2s_clk_config[1]                 i2s_clk_config[4]-->lrclk_dac (sampling rate)
  *
- For example:sampling rate=16K,i2s_clk_config[5]={ 8,125,6,64,64}, sampling rate=192M*(8/125)/(2*6)/64=16K
+ For example:sampling rate=16K, i2s_clk_config[5]={ 8,125,6,64,64}, sampling rate=192M*(8/125)/(2*6)/64=16K
 
  * @return    none
  * @attention The default is from pll 192M(default). If the pll is changed, the clk will be changed accordingly.
