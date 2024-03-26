@@ -4,9 +4,9 @@
  * @brief   This is the header file for B95
  *
  * @author  Driver Group
- * @date    2020
+ * @date    2023
  *
- * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2023, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@
 #ifndef TIMER_REG_H
 #define TIMER_REG_H
 #include "soc.h"
-
 
 /*******************************      timer registers: 0x140140     ******************************/
 #define TIMER_BASE_ADDR			0x140140
@@ -119,6 +118,5 @@ enum{
 	FLD_PEM_TASK_6_EN     =		BIT(6),
 	FLD_PEM_TASK_7_EN     =		BIT(7),
 };
-
 
 #endif

@@ -81,8 +81,8 @@ typedef enum{
 	// other command called by flash_send_cmd() function
 	FLASH_WRITE_DISABLE_CMD 			        = 0x04007080,
 	FLASH_WRITE_ENABLE_CMD 			         	= 0x06007080,
-
-
+	FLASH_WRITE_DEEP_CMD 			         	= 0xb9007080,
+	FLASH_WRITE_RELEASE_CMD 			        = 0xab007080,
 }flash_command_e;
 
 /**
@@ -444,7 +444,7 @@ _attribute_text_sec_ void flash_quad_page_program_encrypt(unsigned long addr, un
  * @brief	  	This function serves to read MID of flash(MAC id). Before reading UID of flash,
  * 				you must read MID of flash. and then you can look up the related table to select
  * 				the idcmd and read UID of flash.
- * @param[in]   device_num - the number of slave device.
+ * @param[in]   device_num	- the number of slave device.
  * @return    	MID of the flash.
  * @note        Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
  *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.

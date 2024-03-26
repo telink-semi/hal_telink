@@ -1,30 +1,27 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
-
 /********************************************************************************************************
- * @file	s7816.c
+ * @file    s7816.c
  *
- * @brief	This is the source file for B95
+ * @brief   This is the source file for B95
  *
- * @author	Driver Group
+ * @author  Driver Group
+ * @date    2023
+ *
+ * @par     Copyright (c) 2023, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *
  *******************************************************************************************************/
-#include "plic.h"
+#include "lib/include/plic.h"
 #include "s7816.h"
 #include "dma.h"
 
@@ -146,7 +143,7 @@ void s7816_set_pin(gpio_pin_e rst_pin,gpio_pin_e vcc_pin,gpio_func_pin_e clk_pin
  * @return     	none.
  * @note        extra time is needed for initial-atr after the function.
  */
-void s7816_coldreset()
+void s7816_coldreset(void)
 {
 	gpio_set_high_level(s7816_vcc_pin);
 	delay_us(20);//wait for the vcc  stable.
@@ -161,7 +158,7 @@ void s7816_coldreset()
  * @param[in]  	none.
  * @return     	none.
  */
-void s7816_release_trig()
+void s7816_release_trig(void)
 {
 	gpio_set_low_level(s7816_rst_pin);
 	reg_7816_clk_div&=(BIT(7)-1);
@@ -174,7 +171,7 @@ void s7816_release_trig()
  * @return     	none.
  * @note        the warmreset is required after the IC-CARD active,extra time is needed for initial-atr after the function.
  */
-void s7816_warmreset()
+void s7816_warmreset(void)
 {
     gpio_set_low_level(s7816_rst_pin);
     delay_us(s7816_rst_time);

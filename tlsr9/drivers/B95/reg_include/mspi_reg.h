@@ -201,8 +201,8 @@ enum{
 enum{
 	FLD_MSPI_SOFT_RESET	           		= BIT(2),
 	FLD_MSPI_XIP_REG_ARB_ERR	        = BIT(3),
-	FLD_MSPI_TXFIFO_CLR_LEVEL 	 		= BIT(4),
-	FLD_MSPI_RXFIFO_CLR_LEVEL           = BIT(5),
+	FLD_MSPI_RXFIFO_CLR_LEVEL 	 		= BIT(4),
+	FLD_MSPI_TXFIFO_CLR_LEVEL           = BIT(5),
 	FLD_MSPI_BUSY                  		= BIT(7),
 };
 

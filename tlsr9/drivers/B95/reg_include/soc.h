@@ -4,9 +4,9 @@
  * @brief   This is the header file for B95
  *
  * @author  Driver Group
- * @date    2021
+ * @date    2023
  *
- * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2023, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -69,8 +69,8 @@
 #define CPU_ILM_BASE                   (0x00000000)
 #define CPU_DLM_BASE                   (0x00080000)
 
-#define   SC_BASE_ADDR			          0x140800
-#define   SC_BB_BASE_ADDR			      0xD4400000
+#define   SC_BASE_ADDR			          0x80140800
+#define   SC_BB_BASE_ADDR			      0x80170C00
 #define reg_lspi_clk_set			REG_ADDR8(SC_BASE_ADDR + 0x01)
 enum{
 	FLD_LSPI_CLK_MOD 		= 	BIT_RNG(0,5),
@@ -218,6 +218,14 @@ enum{
 	//RSVD
 };
 
+#define reg_pwdn_en					REG_ADDR8(SC_BASE_ADDR+0x2f)
+enum{
+	FLD_SUSPEND_EN_O 		=	BIT(0),
+	FLD_RAMCRC_CLREN_TGL    =   BIT(4),
+	FLD_RST_ALL        		=   BIT(5),
+	FLD_STALL_EN_TRG      	=   BIT(7),
+};
+
 #define reg_clk_en_1			    REG_ADDR32(SC_BASE_ADDR+0x44)
 #define reg_clk_en4					REG_ADDR8(SC_BASE_ADDR+0x44)
 enum{
@@ -294,28 +302,34 @@ typedef enum{
 }wakeup_status_e;
 
 
-#define reg_n22_rst_vector			    REG_ADDR32(SC_BB_BASE_ADDR+0x14)
+
 
 #define reg_n22_rst						REG_ADDR16(SC_BB_BASE_ADDR+0x18)
 #define reg_n22_rst0					REG_ADDR8(SC_BB_BASE_ADDR+0x18)
 enum{
-	FLD_RST0_N22_CORE 		=	BIT(0),
-	FLD_RST0_N22_LM		    =	BIT(1),
-	FLD_RST0_ZB 			=	BIT(2),
-	FLD_RST0_ZB_MSTCLK 		=	BIT(3),
-	FLD_RST0_ZB_LPCLK 	    =	BIT(4),
-	FLD_RST0_ZB_CRYPT  		=	BIT(5),
-	FLD_RST0_ZB_PON			= 	BIT(6),
-	FLD_RST0_DMA_BB			=	BIT(7),
+	FLD_RST0_ZB 				=	BIT(2),
+	FLD_RST0_ZB_PON				= 	BIT(6),
+	FLD_RST0_DMA_BB				=	BIT(7),
+};
+
+#define reg_n22_rst1					REG_ADDR8(SC_BB_BASE_ADDR+0x19)
+enum{
+	FLD_RST1_RSTL_ZB 			=	BIT(2),
+	FLD_RST1_RST_MDM			=	BIT(3),
+	FLD_RST1_RSTL_STIMER		= 	BIT(4),
 };
 
 #define reg_n22_clk_en					REG_ADDR16(SC_BB_BASE_ADDR+0x1a)
 #define reg_n22_clk_en0					REG_ADDR8(SC_BB_BASE_ADDR+0x1a)
 enum{
-	FLD_CLK0_N22_CORE_EN 		=	BIT(0),
-	FLD_CLK0_N22_LM_EN		    =	BIT(1),
 	FLD_CLK0_ZB_HCLK_EN 		=	BIT(2),
-	FLD_CLK0_ZB_MSTCLK 		    =	BIT(3),
-	FLD_CLK0_ZB_LPCLK 	        =	BIT(4),
 	FLD_CLK0_DMA_BB_EN			=	BIT(7),
 };
+
+#define reg_n22_clk_en1					REG_ADDR8(SC_BB_BASE_ADDR+0x1b)
+enum{
+	FLD_CLK1_CLK_BB 			=	BIT(3),
+	FLD_CLK1_CLKZB32K_LP		=	BIT(4),
+};
+
+

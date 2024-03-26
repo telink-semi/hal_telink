@@ -1,5 +1,5 @@
 /********************************************************************************************************
- * @file    swire_reg.h
+ * @file    driver.h
  *
  * @brief   This is the header file for B95
  *
@@ -21,38 +21,46 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-#ifndef SWIRE_REG_H
-#define SWIRE_REG_H
-#include "soc.h"
+#pragma once
 
 
 
 
-#define    SWIRE_BASE_ADDR			        0x100c00
+#include "lib/include/plic.h"
+#include "lib/include/pm.h"
+#include "lib/include/rf.h"
+#include "lib/include/swire.h"
+#include "lib/include/sys.h"
+#include "lib/include/trng/trng_algorithm.h"
+#include "lib/include/pke/pke_algorithm.h"
+#include "lib/include/hash/hash_algorithm.h"
+#include "lib/include/ske/ske_algorithm.h"
+#include "lib/include/chacha20_poly1305/chacha20_poly1305_algorithm.h"
 
+#include "emi.h"
+#include "audio.h"
+#include "analog.h"
+#include "dma.h"
+#include "gpio.h"
+#include "i2c.h"
+#include "spi.h"
+#include "pwm.h"
+#include "timer.h"
+#include "flash.h"
+#include "usbhw.h"
+#include "watchdog.h"
+#include "s7816.h"
+#include "nds_intrinsic.h"
 
-#define   reg_swire_data      		    REG_ADDR8(SWIRE_BASE_ADDR)
+#include "uart.h"
+#include "stimer.h"
 
-#define   reg_swire_ctl				    REG_ADDR8(SWIRE_BASE_ADDR+1)
-enum{
-	FLD_SWIRE_WR	        	= BIT(0),
-	FLD_SWIRE_RD 	     	    = BIT(1),
-	FLD_SWIRE_CMD 		        = BIT(2),
-	FLD_SWIRE_ERR_FLAG			= BIT(3),
-	// default :FLD_SWIRE_EOP = 1: 1byte format--- 1bit cmd + 8bit data +1 clock end(0)
-	// FLD_SWIRE_EOP = 0: 1byte format--- 1bit cmd + 8bit data +1bit(1) + 1 clock end(0)
-	FLD_SWIRE_EOP     			= BIT(4),
-	FLD_SWIRE_USB_DET    	  	= BIT(6),
-	FLD_SWIRE_USB_EN      		= BIT(7),
-};
-#define   reg_swire_ctl2				 REG_ADDR8(SWIRE_BASE_ADDR+2)
-enum{
-	FLD_SWIRE_CLK_DIV	        = BIT_RNG(0,6),
-};
-
-#define   reg_swire_id				    REG_ADDR8(SWIRE_BASE_ADDR+3)
-enum{
-	FLD_SWIRE_ID_VALID	        = BIT_RNG(0,4),
-	FLD_SWIRE_FIFO_MODE	        = BIT(7),
-};
-#endif
+#include "lpc.h"
+#include "clock.h"
+#include "mspi.h"
+#include "adc.h"
+#include "qdec.h"
+#include "plic_sw.h"
+#include "plmt.h"
+#include "flash/flash_type.h"
+#include "flash/flash_common.h"

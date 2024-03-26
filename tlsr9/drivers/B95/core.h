@@ -4,9 +4,9 @@
  * @brief   This is the header file for B95
  *
  * @author  Driver Group
- * @date    2021
+ * @date    2023
  *
- * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2023, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -24,6 +24,9 @@
 #ifndef CORE_H
 #define CORE_H
 #include "sys.h"
+
+#define DISABLE_BTB __asm__("csrci 0x7D0, 8")
+#define ENABLE_BTB  __asm__("csrsi 0x7D0, 8")
 
 /**
  * @brief Machine mode MHSP_CTL
@@ -58,11 +61,12 @@ typedef enum
  */
 typedef enum {
     CORE_PREEMPT_PRI_MODE0 = FLD_MIE_MSIE | FLD_MIE_MTIE, /**< MTI and MSI cannot interrupt MEI, MSI and MTI can be nested within each other. */
-    CORE_PREEMPT_PRI_MODE1 = FLD_MIE_MTIE,                /**< MTI cannot interrupt MEI, MSI and MTI can be nested within each other. */
-    CORE_PREEMPT_PRI_MODE2 = FLD_MIE_MSIE,                /**< MSI cannot interrupt MEI, MSI and MTI can be nested within each other. */
+    CORE_PREEMPT_PRI_MODE1 = FLD_MIE_MTIE,                /**< MTI cannot interrupt MEI, MSI and MTI can be nested within each other, MSI and MEI can be nested within each other. */
+    CORE_PREEMPT_PRI_MODE2 = FLD_MIE_MSIE,                /**< MSI cannot interrupt MEI, MSI and MTI can be nested within each other, MTI and MEI can be nested within each other. */
     CORE_PREEMPT_PRI_MODE3 = BIT(1),                      /**< MEI, MSI and MTI can be nested within each other(MIE register bit1 is an invalid bit). */
 }core_preempt_pri_e;
 
+#define NDS_MXSTATUS            0x7C4
 #define NDS_MSTATUS             0x300
 #define NDS_MIE                 0x304
 #define NDS_MEPC                0x341
@@ -75,12 +79,6 @@ typedef enum {
 #define NDS_MCYCLE              0xB00
 #define NDS_MCYCLEH             0xB80
 
-//#define read_csr(reg)		        __nds__csrr(reg)
-//#define write_csr(reg, val)	        __nds__csrw(val, reg)
-//#define set_csr(reg, bit)	        __nds__csrrs(bit, reg)
-//#define clear_csr(reg, bit)	        __nds__csrrc(bit, reg)
-
-//#define read_csr(var, csr)      __asm__ volatile ("csrr %0, %1" : "=r" (var) : "i" (csr))
 #define write_csr(csr, val)     __asm__ volatile ("csrw %0, %1" :: "i" (csr), "r" (val))
 #define set_csr(csr, bit)       __asm__ volatile ("csrs %0, %1" :: "i" (csr), "r" (bit))
 #define clear_csr(csr, bit)     __asm__ volatile ("csrc %0, %1" :: "i" (csr), "r" (bit))
