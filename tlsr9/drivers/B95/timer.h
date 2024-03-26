@@ -1,34 +1,31 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
-
 /********************************************************************************************************
- * @file	timer.h
+ * @file    timer.h
  *
- * @brief	This is the header file for B95
+ * @brief   This is the header file for B95
  *
- * @author	Driver Group
+ * @author  Driver Group
+ * @date    2023
+ *
+ * @par     Copyright (c) 2023, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *
  *******************************************************************************************************/
 /**	@page TIMER
  *
  *	Introduction
  *	===============
- *	B95 supports two timers: Timer0~ Timer1. The two timers all support four modes:
+ *  Supports two timers: Timer0~ Timer1. The two timers all support four modes:
  *		- Mode 0 (System Clock Mode),
  *		- Mode 1 (GPIO Trigger Mode),
  *		- Mode 2 (GPIO Pulse Width Mode),
@@ -46,6 +43,7 @@
 #include "analog.h"
 #include "gpio.h"
 #include "reg_include/register.h"
+#include "dma.h"
 
 
 /**********************************************************************************************************************
@@ -75,10 +73,14 @@ typedef enum{
 	TIMER_MODE_TICK			=3,
 }timer_mode_e;
 
+/**
+ * @brief   IRQ of Timer
+ */
 typedef enum{
-	TMR_STA_TMR0   =		BIT(0),
-    TMR_STA_TMR1   =		BIT(1),
-}time_irq_e;
+	TMR_STA_TMR0      =	    BIT(0),
+	TMR_STA_TMR1      =		BIT(3),
+}timer_irq_e;
+
 
 /**********************************************************************************************************************
  *                                      global function prototype                                                     *
@@ -87,21 +89,22 @@ typedef enum{
 /*
  * @brief    This function refer to get timer irq status.
  * @param[in] status - variable of enum to select the timer interrupt source.
- * @return   the status of timer0/timer1.
+ * @retval      non-zero      -  the interrupt occurred.
+ * @retval      zero  -  the interrupt did not occur.
  */
-static inline unsigned char timer_get_irq_status(time_irq_e status)
+static inline unsigned char timer_get_irq_status(timer_irq_e status)
 {
-    return  reg_tmr_sta&status ;
+    return  reg_tmr_sta1&status ;
 }
 
 /*
- * @brief     This function refer to clr timer0 irq status.
- * @param[in] status - variable of enum to select the timerinterrupt source.
+ * @brief     This function refer to clear timer0 irq status.
+ * @param[in] status - variable of enumeration to select the timer interrupt source.
  * @return    none
  */
-static inline void timer_clr_irq_status(time_irq_e status)
+static inline void timer_clr_irq_status(timer_irq_e status)
 {
-		reg_tmr_sta= status;
+	     reg_tmr_sta1 = status;
 }
 
 
@@ -179,7 +182,7 @@ static inline void timer_set_init_tick(timer_type_e type, unsigned int init_tick
 /*
  * @brief     This function set to capture tick for timer0/timer1.
  * @param[in] type - timer0/timer1.
- * @param[in] cap_tick - initial tick value.
+ * @param[in] cap_tick - set capture tick value.
  * @return    none
  */
 static inline void timer_set_cap_tick(timer_type_e type, unsigned int cap_tick)
@@ -188,6 +191,23 @@ static inline void timer_set_cap_tick(timer_type_e type, unsigned int cap_tick)
 }
 
 
+/*
+ * @brief     This function set timer irq mask.
+ * @return    none.
+ */
+static inline void timer_set_irq_mask(timer_irq_e mask)
+{
+	reg_tmr_ctrl3 |= mask;
+}
+
+/*
+ * @brief     This function clear timer irq mask.
+ * @return    none.
+ */
+static inline void timer_clr_irq_mask(timer_irq_e mask)
+{
+	reg_tmr_ctrl3 &= ~mask;
+}
 
 /**
  * @brief     the specified timer start working.
@@ -213,8 +233,6 @@ void timer_set_mode(timer_type_e type, timer_mode_e mode);
  */
 void timer_gpio_init(timer_type_e type, gpio_pin_e pin, gpio_pol_e pol );
 
-
-
 /**
  * @brief     the specified timer stop working.
  * @param[in] type - select the timer to stop.
@@ -222,6 +240,49 @@ void timer_gpio_init(timer_type_e type, gpio_pin_e pin, gpio_pol_e pol );
  */
 void timer_stop(timer_type_e type);
 
+/*
+ * @brief     This function serves to set timer rx_dam channel and config dma rx default.
+ * @param[in] type - TIMER0 or TIMER1.
+ * @param[in] chn  - dma channel.
+ * @return    none
+ */
+void timer_set_rx_dma_config(timer_type_e type, dma_chn_e chn);
+
+/*
+ * @brief     	This function serves to receive data function by DMA, this function tell the DMA to get data from the timer data fifo.
+ *              1. if the receiving length information of DMA is set to 0xFFFFFC byte(max_value), and write_num is turned on,
+ *                 then The length of the data received by dma will be written back to the first four bytes of addr.
+ *              2. if the receiving length information of DMA is set to less than 0xFFFFFC byte, and write_num is turned on,
+ *                 then the length of data received by DMA will not be written to the first four bytes of addr.
+ * @param[in]   type     - TIMER0 or TIMER1.
+ * @param[in] 	addr     - pointer to the buffer receive data.
+ * @param[in]   rev_size - the receive length of DMA,The maximum transmission length of DMA is 0xFFFFFC bytes, so dont'n over this length.
+ * @return    	none
+ */
+void timer_receive_dma(timer_type_e type, unsigned char * addr,unsigned int rev_size);
+
+
+/*
+ * @brief     This function servers to configure DMA head node,the chain function only applies to data_len = 0xFFFFFC.
+ * @param[in] type - TIMER0/TIMER1.
+ * @param[in] chn          - to select the DMA channel.
+ * @param[in] dst_addr     - the dma address of destination
+ * @param[in] data_len     - to configure DMA length.
+ * @param[in] head_of_list - the head address of dma llp.
+ * @return    none
+ */
+void timer_set_dma_chain_llp(timer_type_e type, dma_chn_e chn,unsigned char * dst_addr,unsigned int data_len,dma_chain_config_t *head_of_list);
+
+/*
+ * @brief     This function servers to configure DMA cycle chain node.
+ * @param[in] chn - to select the DMA channel.
+ * @param[in] config_addr  - to servers to configure the address of the current node.
+ * @param[in] llpoint - to configure the address of the next node configure.
+ * @param[in] src_addr - to configure DMA source address.
+ * @param[in] data_len - to configure DMA length.
+ * @return    none
+ */
+void timer_set_rx_dma_add_list_element(timer_type_e type,dma_chn_e chn,dma_chain_config_t *config_addr,dma_chain_config_t *llpoint ,unsigned short * dst_addr,unsigned int data_len);
 
 
 #endif /* TIMER_H_ */

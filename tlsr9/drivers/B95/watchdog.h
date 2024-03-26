@@ -4,9 +4,9 @@
  * @brief   This is the header file for B95
  *
  * @author  Driver Group
- * @date    2020
+ * @date    2023
  *
- * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2023, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -63,7 +63,7 @@
  */
 static inline void wd_start(void){
 
-	BM_SET(reg_tmr_ctrl2, FLD_TMR_WD_EN);
+	BM_SET(reg_tmr_wd_en, FLD_TMR_WD_EN);
 }
 
 
@@ -72,7 +72,7 @@ static inline void wd_start(void){
  * @return    none
  */
 static inline void wd_stop(void){
-	BM_CLR(reg_tmr_ctrl2, FLD_TMR_WD_EN);
+	BM_CLR(reg_tmr_wd_en, FLD_TMR_WD_EN);
 }
 
 /**
@@ -86,7 +86,7 @@ static inline void wd_stop(void){
  */
 static inline unsigned char wd_get_status(void)
 {
-	return (reg_tmr_sta & FLD_TMR_STA_WD);
+	return (reg_tmr_sta0 & FLD_TMR_STA_WD);
 }
 
 /**
@@ -96,7 +96,7 @@ static inline unsigned char wd_get_status(void)
  */
 static inline void wd_clear_status(void)
 {
-	reg_tmr_sta = FLD_TMR_STA_WD;
+	reg_tmr_sta0 = FLD_TMR_STA_WD;
 }
 
 /**
@@ -105,7 +105,7 @@ static inline void wd_clear_status(void)
  */
 static inline void wd_clear(void)
 {
-	reg_tmr_sta = FLD_TMR_WD_CNT_CLR;
+	reg_tmr_sta0 = FLD_TMR_WD_CNT_CLR;
 }
 
 /**
@@ -162,4 +162,16 @@ _attribute_ram_code_sec_noinline_ void wd_32k_clear_status(void);
  */
 _attribute_ram_code_sec_noinline_ void wd_32k_set_interval_ms(unsigned int period_ms);
 
+
+/**
+ * @brief      This function is used to turn off the 8s vbus timer.
+ * @attention  When using the vbus (not vbat) power supply, you must turn off the vbus timer,
+ *             otherwise the MCU will be reset after 8s.
+ * @return     none.
+ * @note       TODO:This function interface is not available at this time, and will be updated in subsequent releases.(unverified)
+ */
+static inline void wd_turn_off_vbus_timer(void)
+{
+	analog_write_reg8(0x69, 0x40);
+}
 #endif
