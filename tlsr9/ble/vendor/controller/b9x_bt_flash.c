@@ -36,6 +36,7 @@ static const struct device *flash_device =
 	DEVICE_DT_GET(DT_CHOSEN(zephyr_flash_controller));
 #endif
 
+#if CONFIG_B9X_BLE_CTRL_MAC_TYPE_PUBLIC
 static int get_bytes_from_str(uint8_t *buf, int buf_len, const char *src)
 {
 	unsigned int i;
@@ -63,6 +64,7 @@ static int get_bytes_from_str(uint8_t *buf, int buf_len, const char *src)
 
 	return 0;
 }
+#endif
 
 /**
  * @brief		This function is used to initialize the MAC address
