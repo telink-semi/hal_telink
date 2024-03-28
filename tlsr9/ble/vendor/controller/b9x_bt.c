@@ -153,7 +153,7 @@ static int b9x_bt_hci_rx_handler(void)
 	if (p) {
 		/* Send data to the controller */
 		blc_hci_handler(&p[0], 0);
-#if CONFIG_SOC_RISCV_TELINK_B92||CONFIG_SOC_RISCV_TELINK_B95
+#if CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B95
 		if (p[0] == HCI_TYPE_ACL_DATA) {
 			k_sem_give(&controller_sem);
 		}
