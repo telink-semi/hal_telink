@@ -58,6 +58,11 @@
 
 #define ARRAY_SIZE(array)	(sizeof(array) / sizeof(array)[0])
 
+extern int ecp_mul_mxz( mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
+                        const mbedtls_mpi *m, const mbedtls_ecp_point *P,
+                        int (*f_rng)(void *, unsigned char *, size_t),
+                        void *p_rng );
+
 /****************************************************************
  * HW unit curve data constants definition
  ****************************************************************/
@@ -393,7 +398,9 @@ int ecp_alt_b9x_backend_check_pubkey(
 
 int ecp_alt_b9x_backend_mul(
 	mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
-	const mbedtls_mpi *m, const mbedtls_ecp_point *P)
+	const mbedtls_mpi *m, const mbedtls_ecp_point *P,
+	int (*f_rng)(void *, unsigned char *, size_t), void *p_rng,
+    mbedtls_ecp_restart_ctx *rs_ctx)
 {
 	int result = MBEDTLS_ERR_ECP_BAD_INPUT_DATA;
 
@@ -453,6 +460,7 @@ int ecp_alt_b9x_backend_mul(
 			if (mbedtls_ecp_get_type(grp) ==
 				MBEDTLS_ECP_TYPE_MONTGOMERY) {
 
+#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92
 				mont_curve_t *mont_curve = mont_curve_get(grp);
 
 				if (mont_curve != NULL) {
@@ -484,6 +492,9 @@ int ecp_alt_b9x_backend_mul(
 					}
 					mbedtls_ecp_unlock();
 				}
+#elif CONFIG_SOC_RISCV_TELINK_B95
+				result = ecp_mul_mxz( grp, R, m, P, f_rng, p_rng );
+#endif
 			}
 #endif /* MBEDTLS_ECP_MONTGOMERY_ENABLED */
 

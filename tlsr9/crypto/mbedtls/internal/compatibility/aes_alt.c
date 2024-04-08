@@ -53,6 +53,10 @@
 
 #include "../multithread.h"
 #include "aes.h"
+#if CONFIG_SOC_RISCV_TELINK_B95
+#include "ske.h"
+#include "ske_portable.h"
+#endif
 
 /* Parameter validation macros based on platform_util.h */
 #define AES_VALIDATE_RET( cond )    \
@@ -861,7 +865,13 @@ int mbedtls_internal_aes_encrypt( mbedtls_aes_context *ctx,
 {
     if ( ctx->nr == 10 ) {
         mbedtls_aes_lock();
+#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92
         ( void ) aes_encrypt( ( unsigned char * )ctx->buf, ( unsigned char * )input, output );
+#elif CONFIG_SOC_RISCV_TELINK_B95
+        ( void ) ske_lp_crypto(SKE_ALG_AES_128, SKE_MODE_ECB,
+	    SKE_CRYPTO_ENCRYPT, ( unsigned char * )ctx->buf, 0,
+        NULL, ( unsigned char * )input, output, 16 );
+#endif
         mbedtls_aes_unlock();
         return 0;
     }
@@ -932,7 +942,13 @@ int mbedtls_internal_aes_decrypt( mbedtls_aes_context *ctx,
 {
     if ( ctx->nr == 10 ) {
         mbedtls_aes_lock();
+#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92
         ( void ) aes_decrypt( ( unsigned char * )ctx->buf, ( unsigned char * )input, output );
+#elif CONFIG_SOC_RISCV_TELINK_B95
+        ( void ) ske_lp_crypto(SKE_ALG_AES_128, SKE_MODE_ECB,
+	    SKE_CRYPTO_DECRYPT, ( unsigned char * )ctx->buf, 0,
+        NULL, ( unsigned char * )input, output, 16 );
+#endif
         mbedtls_aes_unlock();
         return 0;
     }
@@ -1022,6 +1038,9 @@ int mbedtls_aes_crypt_ecb( mbedtls_aes_context *ctx,
         // unaccelerated mode
         //
     }
+#endif
+#ifdef CONFIG_SOC_RISCV_TELINK_B95
+    ske_dig_en();
 #endif
 
     if( mode == MBEDTLS_AES_ENCRYPT )

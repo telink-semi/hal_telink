@@ -92,7 +92,9 @@
 /* HW accelerator functionality */
 extern int ecp_alt_b9x_backend_check_pubkey( const mbedtls_ecp_group *grp, const mbedtls_ecp_point *pt );
 extern int ecp_alt_b9x_backend_mul( mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
-                                    const mbedtls_mpi *m, const mbedtls_ecp_point *P );
+                                    const mbedtls_mpi *m, const mbedtls_ecp_point *P,
+                                    int (*f_rng)(void *, unsigned char *, size_t), void *p_rng,
+                                    mbedtls_ecp_restart_ctx *rs_ctx );
 extern int ecp_alt_b9x_backend_muladd( mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
                                        const mbedtls_mpi *m, const mbedtls_ecp_point *P,
                                        const mbedtls_mpi *n, const mbedtls_ecp_point *Q );
@@ -2390,7 +2392,7 @@ cleanup:
  * Multiplication with Montgomery ladder in x/z coordinates,
  * for curves in Montgomery form
  */
-static int ecp_mul_mxz( mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
+int ecp_mul_mxz( mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
                         const mbedtls_mpi *m, const mbedtls_ecp_point *P,
                         int (*f_rng)(void *, unsigned char *, size_t),
                         void *p_rng )
@@ -2545,7 +2547,7 @@ int mbedtls_ecp_mul_restartable( mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
         return( MBEDTLS_ERR_ECP_BAD_INPUT_DATA );
 
     if( GET_WORD_LEN( grp->pbits ) <= PKE_OPERAND_MAX_WORD_LEN )
-        return( ecp_alt_b9x_backend_mul( grp, R, m, P ) );
+        return( ecp_alt_b9x_backend_mul( grp, R, m, P, f_rng, p_rng, rs_ctx ) );
 
     return( ecp_mul_restartable_internal( grp, R, m, P, f_rng, p_rng, rs_ctx ) );
 }

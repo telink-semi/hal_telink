@@ -32,7 +32,20 @@ extern "C" {
 #include "reg_include/pke_reg.h"
 //#include "pke_common.h"
 #include "eccp_curve.h"
+#include "utility.h"
 
+#define pke_clr_irq_status			pke_clear_interrupt
+#define pke_get_irq_status			pke_wait_till_done
+#define pke_opr_start				pke_start
+#define pke_mod_add					pke_modadd
+#define pke_mod_sub					pke_modsub
+#define pke_mod_mul					pke_modmul
+#define pke_mod_inv					pke_modinv
+#define div2n_u32					Big_Div2n
+#define sub_u32						pke_sub
+#define pke_eccp_point_mul			eccp_pointMul
+#define pke_eccp_point_add			eccp_pointAdd
+#define pke_eccp_point_verify		eccp_pointVerify
 
 //#define SUPPORT_SM2
 //#define SUPPORT_C25519
