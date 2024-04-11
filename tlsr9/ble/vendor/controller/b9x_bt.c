@@ -291,6 +291,12 @@ void b9x_bt_controller_deinit()
 #endif
 	rf_baseband_reset();
 
+#if CONFIG_SOC_RISCV_TELINK_B95 && CONFIG_IEEE802154_2015
+	ske_dig_en();
+#endif
+	rf_mode_init();
+	rf_set_zigbee_250K_mode();
+
 #if CONFIG_PM && CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION
 	pm_policy_state_lock_put(PM_STATE_STANDBY, PM_ALL_SUBSTATES);
 #endif /* CONFIG_PM && CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION */
