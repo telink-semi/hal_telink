@@ -216,11 +216,13 @@ int b9x_bt_controller_init()
 #endif /* CONFIG_PM && CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION */
 
 	/* Reset Radio */
-#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92
 	rf_radio_reset();
 	rf_reset_dma();
+#if  CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92
+		rf_baseband_reset();
+#elif CONFIG_SOC_RISCV_TELINK_B95
+		rf_baseband_restore();
 #endif
-	rf_baseband_reset();
 
 	/* Init RF driver */
 	rf_drv_ble_init();
@@ -285,11 +287,13 @@ void b9x_bt_controller_deinit()
 	plic_interrupt_disable(IRQ_ZB_RT);
 
 	/* Reset Radio */
-#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92
 	rf_radio_reset();
 	rf_reset_dma();
+#if  CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92
+		rf_baseband_reset();
+#elif CONFIG_SOC_RISCV_TELINK_B95
+		rf_baseband_restore();
 #endif
-	rf_baseband_reset();
 
 #if CONFIG_PM && CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION
 	pm_policy_state_lock_put(PM_STATE_STANDBY, PM_ALL_SUBSTATES);
