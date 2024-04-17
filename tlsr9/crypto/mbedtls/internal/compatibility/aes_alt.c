@@ -868,9 +868,11 @@ int mbedtls_internal_aes_encrypt( mbedtls_aes_context *ctx,
 #if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92
         ( void ) aes_encrypt( ( unsigned char * )ctx->buf, ( unsigned char * )input, output );
 #elif CONFIG_SOC_RISCV_TELINK_B95
+        unsigned int r = core_interrupt_disable();
         ( void ) ske_lp_crypto(SKE_ALG_AES_128, SKE_MODE_ECB,
 	    SKE_CRYPTO_ENCRYPT, ( unsigned char * )ctx->buf, 0,
         NULL, ( unsigned char * )input, output, 16 );
+        core_restore_interrupt(r);
 #endif
         mbedtls_aes_unlock();
         return 0;
@@ -945,9 +947,11 @@ int mbedtls_internal_aes_decrypt( mbedtls_aes_context *ctx,
 #if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92
         ( void ) aes_decrypt( ( unsigned char * )ctx->buf, ( unsigned char * )input, output );
 #elif CONFIG_SOC_RISCV_TELINK_B95
+        unsigned int r = core_interrupt_disable();
         ( void ) ske_lp_crypto(SKE_ALG_AES_128, SKE_MODE_ECB,
 	    SKE_CRYPTO_DECRYPT, ( unsigned char * )ctx->buf, 0,
         NULL, ( unsigned char * )input, output, 16 );
+        core_restore_interrupt(r);
 #endif
         mbedtls_aes_unlock();
         return 0;
