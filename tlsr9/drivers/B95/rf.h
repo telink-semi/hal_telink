@@ -1355,17 +1355,24 @@ void rf_set_fcal_cal_val(unsigned char *fcal_tx_group,unsigned char *fcal_rx_gro
 */
 void rf_set_fcal_chn_group_range_ctf(unsigned short *fcal_chn_range);
 
-
 /**
- * @brief       This function do radio baseband reset
- * @param       none
- * @return      none
+ * @brief      This function serves to reset baseband.
+ * @param      none
+ * @return     none
+ * @note       Maintain RF register configuration; Reset RF status, buf of modem, and system_timer_bb.
  */
 void rf_baseband_reset(void);
 
+/**
+ * @brief      This function serves to restore baseband to default values.
+ * @param      none
+ * @return     none
+ * @note       Restore all RF related registers to default values.
+ */
+void rf_baseband_restore(void);
 
 /**
- * @brief This function reset dma registrs to default (reset values)
+ * @brief This function reset baseband DMA, the DMA logic and registers will be reset.
  * @param none
  * @return none
  */
@@ -1373,9 +1380,10 @@ void rf_reset_dma(void);
 
 
 /**
- * @brief This function reset radio registrs to default (reset values)
+ * @brief This function serves to reset radio (empty for B95)
  * @param none
  * @return none
  */
 void rf_radio_reset(void);
+
 #endif
