@@ -38,7 +38,7 @@
 #include "analog.h"
 #include "gpio.h"
 #include "pm.h"
-#include "reg_include/register.h"
+#include "register.h"
 
 typedef enum
 {
@@ -337,7 +337,7 @@ static inline void usbhw_set_eps_en(usb_ep_en_e ep)
     }
     else
     {
-        reg_usb_edp_en |= ep;
+        reg_usb_edp_en = ep;
     }
 }
 

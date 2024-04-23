@@ -1,20 +1,26 @@
-/******************************************************************************
- * Copyright (c) 2022 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
+/********************************************************************************************************
+ * @file    crypto_alg.h
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * @brief   This is the header file for BLE SDK
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * @author  BLE GROUP
+ * @date    06,2022
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @par     Copyright (c) 2022, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *****************************************************************************/
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
+ *
+ *******************************************************************************************************/
 #ifndef CRYPTO_ALG_H_
 #define CRYPTO_ALG_H_
 
@@ -95,51 +101,7 @@ void blc_crypto_alg_aes_cmac_block(blc_aes_cmac_context_t* aesCmac, unsigned cha
  * @return	aesCmac->mac: AES-CMAC calculation result.
  */
 void blc_crpto_alg_aes_cmac_finsh(blc_aes_cmac_context_t* aesCmac, unsigned char* endBlock, unsigned char blockSize);
-
-/**
- * @brief	This function is used to convert keys of a given size from one key type to another
- * 			key type with equivalent strength
- * 			--- s1(M) = AES-CMACzero(M) ---
- * @param[in]   key:	is the 128-bits, 		big--endian.
- * @param[in]   key_size:	u8,key length
- * @param[out]  r: the output of h7:128-bits, 	big--endian.
- * @return	none.
- */
-void blt_crypto_alg_csip_s1 (unsigned char key[], unsigned char key_size, unsigned char *r);
-
-/**
- * @brief   	This function is used to initialize the aes_ccm initial value for Encrypted Advertising Data
- * @param[in]   sk -, little--endian.
- * @param[in]   iv -, little--endian.
- * @param[in]   pd - Reference structure ble_crypt_para_t
- * @return  	none
- */
-void blt_crypto_init_ccm_adv(u8 sk[16], u8 iv[8], blc_aes_ccm_crypt_t *pd);
-
-/**
- * @brief       This function is used to encrypt the aes_ccm value for Encrypted Advertising Data
- * @param[in]   randomizer - Randomizer, little--endian.
- * @param[in]   payload - Payload Data, little--endian.
- * @param[in]   payloadLen - Payload Data length
- * @param[in]   pd - Reference structure ble_crypt_para_t
- * @param[out]  outEncData - Encrypted Data (contain Randomizer, encrypted Payload, MIC), little--endian.
- * @param[out]  outEncDataLen - Encrypted Data length
- * @return      none
- */
-void blt_crypto_ccm_enc_adv(u8 randomizer[5], u8 *payload, u8 payloadLen, blc_aes_ccm_crypt_t *pd, u8 *outEncData, u8 *outEncDataLen);
-
-/**
- * @brief       This function is used to decrypt the aes_ccm value for Encrypted Advertising Data
- * @param[in]   encData - Encrypted Data(contain Randomizer, encrypted Payload, MIC), little--endian.
- * @param[in]   encDataLen - Encrypted Data length
- * @param[in]   pd - Reference structure ble_crypt_para_t
- * @param[out]  outRawPayload - Payload, little--endian.
- * @param[out]  outRawPayloadLen - Payload length
- * @return      0: decryption succeeded; 1: decryption failed
- */
-int blt_crypto_ccm_dec_adv(u8 *encData, u8 encDataLen, blc_aes_ccm_crypt_t *pd, u8 *outRawPayload, u8 *outRawPayloadLen);
 #endif
-
 /**
  * @brief   	This function is used to generate the confirm values
  * @param[out]  c1: the confirm value, 	little--endian.
@@ -254,7 +216,48 @@ void 			blt_crypto_alg_h7 (unsigned char *r, unsigned char salt[16], unsigned ch
  */
 void 			blt_crypto_alg_h8 (unsigned char *r, unsigned char k[16], unsigned char s[16], unsigned char keyId[4]);
 
+/**
+ * @brief	This function is used to convert keys of a given size from one key type to another
+ * 			key type with equivalent strength
+ * 			--- s1(M) = AES-CMACzero(M) ---
+ * @param[in]   key:	is the 128-bits, 		big--endian.
+ * @param[in]   key_size:	u8,key length
+ * @param[out]  r: the output of h7:128-bits, 	big--endian.
+ * @return	none.
+ */
+void			blt_crypto_alg_csip_s1 (unsigned char key[], unsigned char key_size, unsigned char *r);
 
+/**
+ * @brief   	This function is used to initialize the aes_ccm initial value for Encrypted Advertising Data
+ * @param[in]   sk -, little--endian.
+ * @param[in]   iv -, little--endian.
+ * @param[in]   pd - Reference structure ble_crypt_para_t
+ * @return  	none
+ */
+void			blt_crypto_init_ccm_adv(u8 sk[16], u8 iv[8], blc_aes_ccm_crypt_t *pd);
+
+/**
+ * @brief       This function is used to encrypt the aes_ccm value for Encrypted Advertising Data
+ * @param[in]   randomizer - Randomizer, little--endian.
+ * @param[in]   payload - Payload Data, little--endian.
+ * @param[in]   payloadLen - Payload Data length
+ * @param[in]   pd - Reference structure ble_crypt_para_t
+ * @param[out]  outEncData - Encrypted Data (contain Randomizer, encrypted Payload, MIC), little--endian.
+ * @param[out]  outEncDataLen - Encrypted Data length
+ * @return      none
+ */
+void			blt_crypto_ccm_enc_adv(u8 randomizer[5], u8 *payload, u8 payloadLen, blc_aes_ccm_crypt_t *pd, u8 *outEncData, u8 *outEncDataLen);
+
+/**
+ * @brief       This function is used to decrypt the aes_ccm value for Encrypted Advertising Data
+ * @param[in]   encData - Encrypted Data(contain Randomizer, encrypted Payload, MIC), little--endian.
+ * @param[in]   encDataLen - Encrypted Data length
+ * @param[in]   pd - Reference structure ble_crypt_para_t
+ * @param[out]  outRawPayload - Payload, little--endian.
+ * @param[out]  outRawPayloadLen - Payload length
+ * @return      0: decryption succeeded; 1: decryption failed
+ */
+int				blt_crypto_ccm_dec_adv(u8 *encData, u8 encDataLen, blc_aes_ccm_crypt_t *pd, u8 *outRawPayload, u8 *outRawPayloadLen);
 
 
 #endif /* CRYPTO_ALG_H_ */

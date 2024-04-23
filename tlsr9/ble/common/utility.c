@@ -1,26 +1,32 @@
-/******************************************************************************
- * Copyright (c) 2022 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
+/********************************************************************************************************
+ * @file    utility.c
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * @brief   This is the source file for BLE SDK
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * @author  BLE GROUP
+ * @date    06,2022
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @par     Copyright (c) 2022, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *****************************************************************************/
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
+ *
+ *******************************************************************************************************/
 #include "tl_common.h"
 #include "drivers.h"
 #include "utility.h"
 
 
-// general swap/endianess utils
+// general swap/endianness utils
 
 void swapN(unsigned char *p, int n)
 {
@@ -122,7 +128,7 @@ int my_fifo_push (my_fifo_t *f, u8 *p, int n)
 		return -1;
 	}
 
-	if (n >= f->size)
+	if (n >= (int)f->size)
 	{
 		return -1;
 	}
@@ -148,3 +154,117 @@ u8 * my_fifo_get (my_fifo_t *f)
 	return 0;
 }
 
+void my_ring_buffer_init (my_ring_buf_t *f,u8 *p, int s)
+{
+	f->size = s;  //size
+	f->mask = s -1;
+	f->wptr = 0;  //head
+	f->rptr = 0;  //tail
+	f->p = p;     //Actual cache
+}
+
+bool my_ring_buffer_is_empty(my_ring_buf_t *f) {
+  return (f->wptr == f->rptr) ? true : false;
+}
+
+u8 my_ring_buffer_is_full(my_ring_buf_t*f) {
+  return ((f->wptr - f->rptr) & f->mask) == f->mask;
+}
+
+void my_ring_buffer_flush(my_ring_buf_t*f) {
+	f->rptr = f->wptr;
+}
+
+/**
+ * @brief   Cache free space
+ * @param  ring_buf
+ * @return number.
+ */
+u16 my_ring_buffer_free_len(my_ring_buf_t *f)
+{
+	u16 size;
+	size = (f->wptr - f->rptr) & f->mask;
+	size = f->size - size;
+  return size;
+}
+
+u16 my_ring_buffer_data_len(my_ring_buf_t *f)
+{
+	 return (f->wptr - f->rptr) & f->mask;
+}
+
+bool my_ring_buffer_push_byte(my_ring_buf_t *f, u8 data)
+{
+  f->p[f->wptr] = data;
+  f->wptr = ((f->wptr + 1) & f->mask);
+  return true;
+}
+
+void my_ring_buffer_push_bytes(my_ring_buf_t *f, u8 *data, u16 size)
+{
+	u16 i;
+	for(i = 0; i < size; i++) {
+	  my_ring_buffer_push_byte(f, data[i]);
+	}
+}
+
+u8 my_ring_buffer_pull_byte(my_ring_buf_t *f)
+{
+	u8 data;
+	data = f->p[f->rptr];
+	f->rptr = ((f->rptr + 1) & f->mask);
+	return data;
+}
+
+void my_ring_buffer_pull_bytes(my_ring_buf_t *f, u8 *data, u16 size)
+{
+	u16 i;
+	for(i = 0; i < size; i++) {
+		data[i] = f->p[f->rptr];
+		f->rptr = ((f->rptr + 1) & f->mask);
+	}
+}
+
+void my_ring_buffer_delete(my_ring_buf_t *f, u16 size)
+{
+	f->rptr = ((f->rptr + size) & f->mask);
+}
+
+u8 my_ring_buffer_get(my_ring_buf_t *f, u16 offset)
+{
+	u8 data;
+	u16 rptr = ((f->rptr + offset) & f->mask);
+	data = f->p[rptr];
+	return data;
+}
+
+
+
+
+const char *hex_to_str(const void *buf, u8 len)
+{
+	static const char hex[] = "0123456789abcdef";
+	static char str[301];
+	const uint8_t *b = buf;
+	u8 i;
+
+	len = min(len, (sizeof(str) - 1) / 3);
+
+	for (i = 0; i < len; i++) {
+		str[i * 3]     = hex[b[i] >> 4];
+		str[i * 3 + 1] = hex[b[i] & 0xf];
+		str[i * 3 + 2] = ' ';
+	}
+
+	str[i * 3] = '\0';
+
+	return str;
+}
+
+const char *addr_to_str(u8* addr)
+{
+#define BDADDR_STR_LEN		18
+	static char addrStr[BDADDR_STR_LEN];
+	snprintf(addrStr, sizeof(addrStr), "%02X:%02X:%02X:%02X:%02X:%02X", addr[5], addr[4], addr[3], addr[2], addr[1], addr[0]);
+	return addrStr;
+}

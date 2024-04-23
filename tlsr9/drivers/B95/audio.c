@@ -25,7 +25,7 @@
 #include "clock.h"
 #include "pwm.h"
 #include "stimer.h"
-#include "lib/include/pm.h"
+#include "pm.h"
 
 
 unsigned char audio_codec_rate[AUDIO_RATE_SIZE] = {	0x06,/*8k*/                 //12Mhz/1500=8K
@@ -632,7 +632,7 @@ void audio_power_on(void)
 	 * 4.power on audio power
 	 * 5.wait audio power stabilization
 	 * */
-	pm_set_suspend_power_cfg(PM_POWER_AUDIO, 1);
+//	pm_set_suspend_power_cfg(PM_POWER_AUDIO, 1);
 	analog_write_reg8(0x7d,analog_read_reg8(0x7d)|(BIT(2)));   //1.audio power down  ,     1:power down 0:power on
 	delay_us(6);                                               //2.wait audio power stabilization
 	analog_write_reg8(0x1e,analog_read_reg8(0x1e) & (~BIT(5)));//3.power switch default 1, 1:switch off 0:switch on
@@ -652,7 +652,7 @@ void audio_power_down(void)
 	 * 1.power down audio power
 	 * 2.switch off audio power switch
 	 * */
-	pm_set_suspend_power_cfg(PM_POWER_AUDIO, 0);
+//	pm_set_suspend_power_cfg(PM_POWER_AUDIO, 0);
 	analog_write_reg8(0x7d,analog_read_reg8(0x7d) |BIT(2));//audio power        default 1, 1:power down 0:power on
 	analog_write_reg8(0x1e,analog_read_reg8(0x1e) |BIT(5));//codec power switch default 1, 1:switch off 0:switch on
 	audio_codec_adc_power_down();

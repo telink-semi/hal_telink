@@ -21,7 +21,7 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-#include "lib/include/plic.h"
+#include "plic.h"
 #include "s7816.h"
 #include "dma.h"
 

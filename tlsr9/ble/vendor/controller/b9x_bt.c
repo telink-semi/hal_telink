@@ -221,7 +221,7 @@ int b9x_bt_controller_init()
 #if  CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92
 		rf_baseband_reset();
 #elif CONFIG_SOC_RISCV_TELINK_B95
-		rf_baseband_restore();
+		rf_baseband_reset();
 #endif
 
 	/* Init RF driver */
@@ -292,7 +292,7 @@ void b9x_bt_controller_deinit()
 #if  CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92
 		rf_baseband_reset();
 #elif CONFIG_SOC_RISCV_TELINK_B95
-		rf_baseband_restore();
+		rf_baseband_reset();
 #endif
 
 #if CONFIG_PM && CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION

@@ -125,6 +125,7 @@ enum{
 	FLD_DMA_WPTR_MASK =			BIT_RNG(0,4),
 };
 
+
 #define reg_dma_rx_rptr			    REG_ADDR8(DMA_BASE_ADDR+0xf5)
 #define reg_dma_tx_rptr			    REG_ADDR8(DMA_BASE_ADDR+0x101)
 enum{

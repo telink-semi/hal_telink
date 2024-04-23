@@ -1,32 +1,31 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
+/********************************************************************************************************
+ * @file    ext_pm.h
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * @brief   This is the header file for BLE SDK
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * @author  BLE GROUP
+ * @date    06,2022
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @par     Copyright (c) 2022, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *****************************************************************************/
-
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
+ *
+ *******************************************************************************************************/
 #ifndef DRIVERS_B95_DRIVER_EXT_EXT_PM_H_
 #define DRIVERS_B95_DRIVER_EXT_EXT_PM_H_
 
-#include <zephyr/kernel.h>
-#undef irq_enable
-#undef irq_disable
-#undef ARRAY_SIZE
-
-#include "../pm.h"
+#include "pm.h"
 #include "types.h"
-#include "ext_misc.h"
 
 
 
@@ -38,7 +37,7 @@ extern 	cpu_pm_handler_t  		 	cpu_sleep_wakeup;
 /**
  * @brief   deepsleep wakeup by external xtal
  */
-typedef struct{
+typedef struct __attribute__((packed)) {
 	unsigned char ext_cap_en;    //24xtal  cap
 	unsigned char pad32k_en;
 	unsigned char pm_enter_en;
@@ -132,7 +131,7 @@ int cpu_long_sleep_wakeup_32k_rc(pm_sleep_mode_e sleep_mode,  pm_sleep_wakeup_sr
  */
 static inline int pm_is_MCU_deepRetentionWakeup(void)
 {
-	return (g_pm_status_info.mcu_status & MCU_STATUS_DEEPRET_BACK);
+	return 0;//(g_pm_status_info.mcu_status & MCU_STATUS_DEEPRET_BACK);
 }
 
 /**

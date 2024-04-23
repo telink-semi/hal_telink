@@ -22,6 +22,7 @@
  *
  *******************************************************************************************************/
 #include <stddef.h>
+//#include <wchar.h>
 #include "usbhw.h"
 
 /**
@@ -30,8 +31,7 @@
  */
 void usbhw_init(void)
 {
-    pm_set_dig_module_power_switch(DIG_MODULE_USB, PM_POWER_UP);
-    pm_wait_dig_module_power_stable();
+    pm_set_dig_module_power_switch(FLD_PD_USB_EN, PM_POWER_UP);
 
     BM_SET(reg_rst0, FLD_RST0_USB);
     BM_SET(reg_clk_en0, FLD_CLK0_USB_EN);

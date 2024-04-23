@@ -456,7 +456,7 @@ _attribute_text_sec_ void flash_quad_page_program_encrypt(unsigned long addr, un
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-_attribute_text_sec_ unsigned int flash_read_mid(mspi_slave_device_num_e device_num);
+_attribute_text_sec_ unsigned int flash_read_mid(void);
 
 /**
  * @brief	  	This function serves to read UID of flash.Before reading UID of flash, you must read MID of flash.
@@ -533,7 +533,7 @@ _attribute_text_sec_ void flash_set_wr_xip_config(mspi_slave_device_num_e device
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-_attribute_text_sec_ int flash_read_mid_uid_with_check(mspi_slave_device_num_e device_num, unsigned int *flash_mid, unsigned char *flash_uid);
+_attribute_text_sec_ int flash_read_mid_uid_with_check(unsigned int *flash_mid, unsigned char *flash_uid);
 
 /**
  * @brief		This function serves to get flash vendor.
