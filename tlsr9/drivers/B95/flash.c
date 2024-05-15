@@ -21,16 +21,16 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-#include "sys.h"
-#include "flash_base.h"
+#include "lib/include/sys.h"
+#include "lib/include/flash_base.h"
 #include "flash.h"
 
 #include "mspi.h"
 #include "timer.h"
 #include "core.h"
 #include "stimer.h"
-#include "string.h"
-
+#include "types.h"
+#include "watchdog.h"				//BLE SDK use
 /*
  *	If add flash type, need pay attention to the read uid command and the bit number of status register
  *  Flash trim scheme has been added for P25Q80U.If other types of flash adds this scheme, user need to modify "flash_trim" and "flash_trim_check" function.
@@ -104,6 +104,7 @@ void flash_plic_preempt_config(unsigned char preempt_en,unsigned char threshold)
  */
 _attribute_text_sec_ void flash_erase_sector(unsigned long addr)
 {
+	wd_clear(); //BLE SDK use: clear watch dog
 	DISABLE_BTB;
 	flash_mspi_write_ram(FLASH_SECT_ERASE_CMD, addr, 0, 0, FLASH_WRITE_ENABLE_CMD, FLASH_READ_STATUS_CMD_LOWBYTE);
 	ENABLE_BTB;
@@ -584,7 +585,7 @@ _attribute_text_sec_ void flash_erase_otp(mspi_slave_device_num_e device_num, un
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-_attribute_text_sec_ unsigned int flash_read_mid(mspi_slave_device_num_e device_num)
+_attribute_text_sec_ unsigned int flash_read_mid_with_device_num(mspi_slave_device_num_e device_num)
 {
 	unsigned int flash_mid = 0;
 	DISABLE_BTB;
@@ -593,6 +594,10 @@ _attribute_text_sec_ unsigned int flash_read_mid(mspi_slave_device_num_e device_
 	return flash_mid;
 }
 
+_attribute_text_sec_ unsigned int flash_read_mid(void)
+{
+	return flash_read_mid_with_device_num(SLAVE0);
+}
 /**
  * @brief	  	This function serves to read UID of flash.Before reading UID of flash, you must read MID of flash.
  * 				and then you can look up the related table to select the idcmd and read UID of flash.
@@ -610,7 +615,7 @@ _attribute_text_sec_ unsigned int flash_read_mid(mspi_slave_device_num_e device_
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-_attribute_text_sec_ void flash_read_uid(mspi_slave_device_num_e device_num, unsigned char idcmd, unsigned char *buf)
+_attribute_text_sec_ void flash_read_uid_with_device_num(mspi_slave_device_num_e device_num, unsigned char idcmd, unsigned char *buf)
 {
 	DISABLE_BTB;
 	if(idcmd==((FLASH_READ_UID_CMD_GD_PUYA_ZB_TH>>16)&0xff))
@@ -626,9 +631,10 @@ _attribute_text_sec_ void flash_read_uid(mspi_slave_device_num_e device_num, uns
  * 				this parameter needs to be consistent with the corresponding parameters in the flash datasheet.
  * @param[in]   device_num	- the number of slave device.
  * @param[in]	config	- xip configuration,reference structure flash_rd_xip_config_t
+ *              note:the config parameter can be flash_common_cmd/flash_rd_xip_config_t to know the definition of each bit of config.
  * @return none
  */
-_attribute_text_sec_ void flash_set_rd_xip_config(mspi_slave_device_num_e device_num, flash_command_e config)
+_attribute_text_sec_ void flash_set_rd_xip_config_with_device_num(mspi_slave_device_num_e device_num, unsigned int config)
 {
 	DISABLE_BTB;
 	flash_set_rd_xip_config_sram(device_num, config);
@@ -642,7 +648,7 @@ _attribute_text_sec_ void flash_set_rd_xip_config(mspi_slave_device_num_e device
  * @param[in]	config	- xip configuration,reference structure flash_wr_xip_config_t
  * @return none
  */
-_attribute_text_sec_ void flash_set_wr_xip_config(mspi_slave_device_num_e device_num, flash_wr_xip_config_t config)
+_attribute_text_sec_ void flash_set_wr_xip_config_with_device_num(mspi_slave_device_num_e device_num, flash_wr_xip_config_t config)
 {
 	DISABLE_BTB;
 	flash_set_wr_xip_config_sram(device_num, config);
@@ -720,15 +726,15 @@ _attribute_text_sec_ unsigned char  flash_read_config(mspi_slave_device_num_e de
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-_attribute_text_sec_ int flash_read_mid_uid_with_check(mspi_slave_device_num_e device_num, unsigned int *flash_mid ,unsigned char *flash_uid)
+_attribute_text_sec_ int flash_read_mid_uid_with_check_with_device_num(mspi_slave_device_num_e device_num, unsigned int *flash_mid ,unsigned char *flash_uid)
 {
 	unsigned char no_uid[16]={0x51,0x01,0x51,0x01,0x51,0x01,0x51,0x01,0x51,0x01,0x51,0x01,0x51,0x01,0x51,0x01};
 	unsigned int i,f_cnt=0;
-	*flash_mid = flash_read_mid(device_num);
+	*flash_mid = flash_read_mid_with_device_num(device_num);
 
 	for(i=0; i<FLASH_CNT; i++){
 		if(flash_support_mid[i] == *flash_mid){
-			flash_read_uid(device_num, ((FLASH_READ_UID_CMD_GD_PUYA_ZB_TH>>16)&0xff), (unsigned char *)flash_uid);
+			flash_read_uid_with_device_num(device_num, ((FLASH_READ_UID_CMD_GD_PUYA_ZB_TH>>16)&0xff), (unsigned char *)flash_uid);
 			break;
 		}
 	}
@@ -748,7 +754,10 @@ _attribute_text_sec_ int flash_read_mid_uid_with_check(mspi_slave_device_num_e d
 		return 1;
 	}
 }
-
+_attribute_text_sec_ int flash_read_mid_uid_with_check(unsigned int *flash_mid ,unsigned char *flash_uid)
+{
+	return flash_read_mid_uid_with_check_with_device_num(SLAVE0, flash_mid, flash_uid);
+}
 /**
  * @brief		This function serves to get flash vendor.
  * @param[in]	none.

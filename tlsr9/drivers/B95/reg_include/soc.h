@@ -71,17 +71,22 @@
 
 #define   SC_BASE_ADDR			          0x80140800
 #define   SC_BB_BASE_ADDR			      0x80170C00
+#define reg_mspi_clk_set			REG_ADDR8(SC_BASE_ADDR + 0x00)
+enum{
+	FLD_MSPI_CLK_MOD		=	BIT_RNG(0, 3),
+	FLD_MSPI_DIV_IN_SEL		=	BIT_RNG(4, 5),//0:rc24m 1:xtl48m 2:pll0 3:pll1
+};
+
+
 #define reg_lspi_clk_set			REG_ADDR8(SC_BASE_ADDR + 0x01)
 enum{
-	FLD_LSPI_CLK_MOD 		= 	BIT_RNG(0,5),
-	FLD_LSPI_DIV_IN_SEL 	= 	BIT(6),//0:rc24m   1:hs_mux
-	FLD_LSPI_DIV_RSTN 		= 	BIT(7),//0:rset clkdiv  1:release
+	FLD_LSPI_CLK_MOD 		= 	BIT_RNG(0,3),
+	FLD_LSPI_DIV_IN_SEL 	= 	BIT_RNG(4,5),//0:rc24m   1:xtl 24m  2:pll
 };
 #define reg_gspi_clk_set			REG_ADDR16(SC_BASE_ADDR + 0x2)
 enum{
 	FLD_GSPI_CLK_MOD 		= 	BIT_RNG(0,7),
-	FLD_GSPI_DIV_IN_SEL 	= 	BIT(14),//0:rc24m   1:hs_mux
-	FLD_GSPI_DIV_RSTN 		= 	BIT(15),//0:rset clkdiv  1:release
+	FLD_GSPI_DIV_IN_SEL 	= 	BIT_RNG(8,9),//0:rc24m   1:xtl 24m  2:pll
 };
 
 #define reg_probe_clk_sel			REG_ADDR16(SC_BASE_ADDR + 0x1a)
@@ -291,33 +296,25 @@ enum{
 	FLD_STANDBY_EX        	=	BIT(5),
 };
 
-#define reg_wakeup_status			0x64
-typedef enum{
-	FLD_WKUP_CMP			=	BIT(0),
-	FLD_WKUP_TIMER			=	BIT(1),
-	FLD_WKUP_DIG			=	BIT(2),
-	FLD_WKUP_PAD			=	BIT(3),
-	// FLD_WKUP_MDEC			=	BIT(4),
-	// FLD_MDEC_RSVD			=	BIT_RNG(5,7),
-}wakeup_status_e;
-
-
-
-
+/**
+ * this register is to configure RF related reset.
+*/
 #define reg_n22_rst						REG_ADDR16(SC_BB_BASE_ADDR+0x18)
 #define reg_n22_rst0					REG_ADDR8(SC_BB_BASE_ADDR+0x18)
-enum{
-	FLD_RST0_ZB 				=	BIT(2),
-	FLD_RST0_ZB_PON				= 	BIT(6),
-	FLD_RST0_DMA_BB				=	BIT(7),
+enum {
+    FLD_RST0_ZB 				=	BIT(2), // Clears IRQ status and some internal states of the link layer.
+    FLD_RST0_ZB_PON				= 	BIT(6), // Restores all RF-related registers to their default value.
+											// RF related registers include£ºbaseband, linklayer, modem, radio, bb_dma, bb_timer, pdzb.
+    FLD_RST0_DMA_BB				=	BIT(7), // Resets the BB DMA status, and related registers will be cleared. After configuration, BB DMA needs to be reconfigured.
 };
 
 #define reg_n22_rst1					REG_ADDR8(SC_BB_BASE_ADDR+0x19)
-enum{
-	FLD_RST1_RSTL_ZB 			=	BIT(2),
-	FLD_RST1_RST_MDM			=	BIT(3),
-	FLD_RST1_RSTL_STIMER		= 	BIT(4),
+enum {
+    FLD_RST1_RSTL_BB 			=	BIT(2), // Clears RF state machine and some internal states of the link layer.
+    FLD_RST1_RST_MDM			=	BIT(3), // Clears all digital logic states related to mdm, the related configuration will not be lost after reset.
+    FLD_RST1_RSTL_STIMER		= 	BIT(4),	// Resets BB STIMER status. RW registers remain, read-only registers will be cleared, and BB timer tick will be restarted.
 };
+
 
 #define reg_n22_clk_en					REG_ADDR16(SC_BB_BASE_ADDR+0x1a)
 #define reg_n22_clk_en0					REG_ADDR8(SC_BB_BASE_ADDR+0x1a)

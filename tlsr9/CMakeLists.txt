@@ -20,6 +20,12 @@ zephyr_library()
 zephyr_include_directories(common)
 zephyr_include_directories(drivers/${SOC}/compatibility_pack)
 zephyr_include_directories(drivers/${SOC}/reg_include)
+# add for B95 headers
+zephyr_include_directories(drivers/${SOC}/lib/include)
+zephyr_include_directories(drivers/${SOC}/lib/include/rf)
+zephyr_include_directories(drivers/${SOC}/lib/include/ske)
+zephyr_include_directories(drivers/${SOC}/lib/include/pke)
+zephyr_include_directories(drivers/${SOC}/lib/include/trng)
 zephyr_include_directories(drivers/${SOC})
 
 # soc.c reference sources

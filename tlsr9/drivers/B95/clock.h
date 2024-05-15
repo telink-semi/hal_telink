@@ -51,21 +51,33 @@
  *  		the maximum speed needs to be tested at the highest and lowest voltage of the board,
  *  		and the high and low temperature long-term stability test speed is no problem.
  */
-#define PLL_240M_CCLK_120M_HCLK_60M_PCLK_60M_MSPI_48M			clock_init(BASEBAND_PLL, CLK_DIV2, CCLK_DIV2_TO_HCLK, HCLK_DIV1_TO_PCLK, CLK_DIV5)
-#define PLL_240M_CCLK_120M_HCLK_60M_PCLK_30M_MSPI_48M			clock_init(BASEBAND_PLL, CLK_DIV2, CCLK_DIV2_TO_HCLK, HCLK_DIV2_TO_PCLK, CLK_DIV5)
+//clock_bbpll_config(PLL_CLK_240M);TODO:According to whether A1 chip can use 240M decide whether to modify here.(added by weihua.zhang 20240318)
+#define PLL_240M_CCLK_120M_HCLK_60M_PCLK_60M_MSPI_48M			clock_init(BASEBAND_PLL, CLK_DIV2, CCLK_DIV2_TO_HCLK_DIV2_TO_PCLK, CLK_DIV5)
+#define PLL_240M_CCLK_120M_HCLK_60M_PCLK_30M_MSPI_48M			clock_init(BASEBAND_PLL, CLK_DIV2, CCLK_DIV2_TO_HCLK_DIV4_TO_PCLK, CLK_DIV5)
 
-#define PLL_240M_CCLK_80M_HCLK_40M_PCLK_40M_MSPI_48M			clock_init(BASEBAND_PLL, CLK_DIV3, CCLK_DIV2_TO_HCLK, HCLK_DIV1_TO_PCLK, CLK_DIV5)
-#define PLL_240M_CCLK_80M_HCLK_40M_PCLK_20M_MSPI_48M			clock_init(BASEBAND_PLL, CLK_DIV3, CCLK_DIV2_TO_HCLK, HCLK_DIV2_TO_PCLK, CLK_DIV5)
+#define PLL_240M_CCLK_80M_HCLK_40M_PCLK_40M_MSPI_48M			clock_init(BASEBAND_PLL, CLK_DIV3, CCLK_DIV2_TO_HCLK_DIV2_TO_PCLK, CLK_DIV5)
+#define PLL_240M_CCLK_80M_HCLK_40M_PCLK_20M_MSPI_48M			clock_init(BASEBAND_PLL, CLK_DIV3, CCLK_DIV2_TO_HCLK_DIV4_TO_PCLK, CLK_DIV5)
 
-#define PLL_240M_CCLK_60M_HCLK_60M_PCLK_60M_MSPI_48M			clock_init(BASEBAND_PLL, CLK_DIV4, CCLK_DIV1_TO_HCLK, HCLK_DIV1_TO_PCLK, CLK_DIV5)
-#define PLL_240M_CCLK_60M_HCLK_60M_PCLK_30M_MSPI_48M			clock_init(BASEBAND_PLL, CLK_DIV4, CCLK_DIV1_TO_HCLK, HCLK_DIV2_TO_PCLK, CLK_DIV5)
-#define PLL_240M_CCLK_60M_HCLK_60M_PCLK_15M_MSPI_48M			clock_init(BASEBAND_PLL, CLK_DIV4, CCLK_DIV1_TO_HCLK, HCLK_DIV4_TO_PCLK, CLK_DIV5)
+#define PLL_240M_CCLK_60M_HCLK_60M_PCLK_60M_MSPI_48M			clock_init(BASEBAND_PLL, CLK_DIV4, CCLK_DIV1_TO_HCLK_DIV1_TO_PCLK, CLK_DIV5)
+#define PLL_240M_CCLK_60M_HCLK_60M_PCLK_30M_MSPI_48M			clock_init(BASEBAND_PLL, CLK_DIV4, CCLK_DIV1_TO_HCLK_DIV2_TO_PCLK, CLK_DIV5)
+#define PLL_240M_CCLK_60M_HCLK_60M_PCLK_15M_MSPI_48M			clock_init(BASEBAND_PLL, CLK_DIV4, CCLK_DIV1_TO_HCLK_DIV4_TO_PCLK, CLK_DIV5)
 
-#define PLL_240M_CCLK_60M_HCLK_30M_PCLK_30M_MSPI_48M			clock_init(BASEBAND_PLL, CLK_DIV4, CCLK_DIV2_TO_HCLK, HCLK_DIV1_TO_PCLK, CLK_DIV5)
-#define PLL_240M_CCLK_60M_HCLK_30M_PCLK_15M_MSPI_48M			clock_init(BASEBAND_PLL, CLK_DIV4, CCLK_DIV2_TO_HCLK, HCLK_DIV2_TO_PCLK, CLK_DIV5)
+#define PLL_240M_CCLK_60M_HCLK_30M_PCLK_30M_MSPI_48M			clock_init(BASEBAND_PLL, CLK_DIV4, CCLK_DIV2_TO_HCLK_DIV2_TO_PCLK, CLK_DIV5)
+#define PLL_240M_CCLK_60M_HCLK_30M_PCLK_15M_MSPI_48M			clock_init(BASEBAND_PLL, CLK_DIV4, CCLK_DIV2_TO_HCLK_DIV4_TO_PCLK, CLK_DIV5)
 
-#define PLL_240M_CCLK_120M_HCLK_60M_PCLK_60M_MSPI_40M			clock_init(BASEBAND_PLL, CLK_DIV2, CCLK_DIV2_TO_HCLK, HCLK_DIV1_TO_PCLK, CLK_DIV6)
-#define PLL_240M_CCLK_120M_HCLK_60M_PCLK_30M_MSPI_40M			clock_init(BASEBAND_PLL, CLK_DIV2, CCLK_DIV2_TO_HCLK, HCLK_DIV2_TO_PCLK, CLK_DIV6)
+#define PLL_240M_CCLK_120M_HCLK_60M_PCLK_60M_MSPI_40M			clock_init(BASEBAND_PLL, CLK_DIV2, CCLK_DIV2_TO_HCLK_DIV2_TO_PCLK, CLK_DIV6)
+#define PLL_240M_CCLK_120M_HCLK_60M_PCLK_30M_MSPI_40M			clock_init(BASEBAND_PLL, CLK_DIV2, CCLK_DIV2_TO_HCLK_DIV4_TO_PCLK, CLK_DIV6)
+
+/**********************************************************************************************************************
+ *											internal
+ *********************************************************************************************************************/
+/**********************************************************************************************************************
+ * 					This is just for internal debug purpose, users are prohibited from calling.
+ *********************************************************************************************************************/
+//clock_bbpll_config(PLL_CLK_192M);
+#define PLL_192M_CCLK_96M_HCLK_48M_PCLK_48M_MSPI_48M			clock_init(BASEBAND_PLL, CLK_DIV2, CCLK_DIV2_TO_HCLK_DIV2_TO_PCLK, CLK_DIV4)
+
+
 /**********************************************************************************************************************
  *                                         global data type                                                           *
  *********************************************************************************************************************/
@@ -86,13 +98,11 @@ typedef struct {
  */
 typedef struct {
 	unsigned char cclk_cfg;			/* cpu clk cfg */
-	unsigned char hclk_cfg;			/* hclk cfg */
-	unsigned char pclk_cfg;			/* pclk cfg */
-
+	unsigned char hclk_pclk_cfg;	/* hclk and pclk cfg */
 	unsigned char mspi_clk_cfg;		/* mspi_clk cfg */
-
-	unsigned char is_saved;		/* is saved */
 }sys_clk_config_t;
+
+extern sys_clk_config_t sys_clk_config;
 
 /**
  * @brief system clock type
@@ -125,7 +135,7 @@ typedef enum{
 }clk_32k_type_e;
 
 /**
- * @brief clock div type.
+ * @brief clock div type. PLL div to cclk. PLL div to clk_mspi. PLL div to clk_lspi. PLL div to clk_zb.
  */
 typedef enum{
 	CLK_DIV1 = 1,
@@ -146,21 +156,15 @@ typedef enum{
 }sys_clock_div_e;
 
 /**
- * @brief cclk div to hclk.
+ * @brief cclk div to hclk. cclk div to pclk.
  */
 typedef enum{
-	CCLK_DIV1_TO_HCLK    =    0,
-	CCLK_DIV2_TO_HCLK    =    1,
-}sys_cclk_div_to_hclk_e;
-
-/**
- * @brief hclk div to pclk.
- */
-typedef enum{
-	HCLK_DIV1_TO_PCLK    =    0,
-	HCLK_DIV2_TO_PCLK    =    1,
-	HCLK_DIV4_TO_PCLK    =    2,
-}sys_hclk_div_to_pclk_e;
+	CCLK_DIV1_TO_HCLK_DIV1_TO_PCLK	= 0,	//cclk:hclk:pclk = 1:1:1;
+	CCLK_DIV1_TO_HCLK_DIV2_TO_PCLK	= 1,	//cclk:hclk:pclk = 1:1:2;
+	CCLK_DIV1_TO_HCLK_DIV4_TO_PCLK	= 2,	//cclk:hclk:pclk = 1:1:4;
+	CCLK_DIV2_TO_HCLK_DIV2_TO_PCLK	= 4,	//cclk:hclk:pclk = 1:2:2;
+	CCLK_DIV2_TO_HCLK_DIV4_TO_PCLK	= 5,	//cclk:hclk:pclk = 1:2:4;
+}sys_cclk_div_to_hclk_pclk_e;
 
 /**
  *  @brief  Define rc_24M_cal enable/disable.
@@ -182,15 +186,17 @@ extern clk_32k_type_e g_clk_32k_src;
 
 /**
  * @brief       This function use to select the system clock source.
- * @param[in]	src - cclk source.
- * @param[in]	cclk_div - the cclk divide from src.
- * @param[in]	hclk_div - the hclk divide from cclk.
- * @param[in]	pclk_div - the pclk divide from hclk.
- * @param[in]	mspi_clk_div - mspi_clk has two source - pll div and 24M rc. If it is built-in flash, the maximum speed of mspi is 64M.
-							   If it is an external flash, the maximum speed of mspi needs to be based on the board test.
-							   Because the maximum speed is related to the wiring of the board, and is also affected by temperature and GPIO voltage,
-							   the maximum speed needs to be tested at the highest and lowest voltage of the board,
-							   and the high and low temperature long-term stability test speed is no problem.
+ * @param[in]	src 		 - cclk source.
+ * @param[in]	cclk_div	 - the cclk divide from src.
+ * @param[in]	hclk_div	 - the hclk divide from cclk.
+ * @param[in]	pclk_div	 - the pclk divide from hclk.
+ * @param[in]	mspi_clk_div - mspi_clk can be divided from pll, rc and xtal. 
+ *							   When selecting pll as the clock source, in order to not exceed the maximum frequency, the division coefficient can not less than 4.
+ *							   If it is built-in flash, the maximum speed of mspi is 64M.
+ *							   If it is an external flash, the maximum speed of mspi needs to be based on the board test.
+ *							   Because the maximum speed is related to the wiring of the board, and is also affected by temperature and GPIO voltage,
+ *							   the maximum speed needs to be tested at the highest and lowest voltage of the board,
+ *							   and the high and low temperature long-term stability test speed is no problem.
  * @return      none
  * @note		Do not switch the clock during the DMA sending and receiving process;
  * 			    because during the clock switching process, the system clock will be
@@ -199,8 +205,7 @@ extern clk_32k_type_e g_clk_32k_src;
 _attribute_ram_code_sec_noinline_
 void clock_init(sys_clock_src_e src,
 				sys_clock_div_e cclk_div,
-				sys_cclk_div_to_hclk_e hclk_div,
-				sys_hclk_div_to_pclk_e pclk_div,
+				sys_cclk_div_to_hclk_pclk_e hclk_pclk_div,
 				sys_clock_div_e mspi_clk_div);
 
 /**
@@ -260,8 +265,7 @@ void clock_mspi_clk_config(sys_clock_src_e src, sys_clock_div_e div);
  * @return      none
  */
 void clock_cclk_hclk_pclk_config(sys_clock_src_e src, sys_clock_div_e cclk_div,
-								sys_cclk_div_to_hclk_e hclk_div,
-								sys_hclk_div_to_pclk_e pclk_div);
+									sys_cclk_div_to_hclk_pclk_e hclk_pclk_div);
 
 /**
  * @brief		This function use to set all clock to default. 
@@ -288,5 +292,6 @@ void clock_save_clock_config(void);
  * @note		This function needs to be used in conjunction with clock_save_clock_config().
  */
 void clock_restore_clock_config(void);
+
 #endif
 

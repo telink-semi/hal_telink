@@ -92,10 +92,13 @@ void stimer_enable(stimer_enable_mode_e mode, unsigned int tick)
 		stimer_set_auto_enable_mode();
 		stimer_set_tick(tick);
 	}
-	else if(STIMER_AUTO_MODE_W_AND_NXT_32K == mode)
+	else if(STIMER_AUTO_MODE_W_AND_NXT_32K_START == mode)
 	{
 		stimer_set_run_upon_nxt_32k_enable();	//system tick set upon next 32k posedge.
 		stimer_set_auto_enable_mode();
+	}
+	else if(STIMER_AUTO_MODE_W_AND_NXT_32K_DONE == mode)
+	{
 		stimer_set_tick(tick);
 		//wait command set delay done upon next 32k posedge.
 		//if not using status bit, wait at least 1 32k cycle to set register r_run_upon_next_32k back to 0, or before next normal set

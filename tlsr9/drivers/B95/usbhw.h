@@ -37,7 +37,7 @@
 
 #include "analog.h"
 #include "gpio.h"
-#include "pm.h"
+#include "lib/include/pm.h"
 #include "reg_include/register.h"
 
 typedef enum

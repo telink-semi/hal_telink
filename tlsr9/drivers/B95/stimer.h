@@ -25,7 +25,7 @@
  *
  *	Introduction
  *	===============
- *	B92 stimer use 16M clock count, have stimer irq.
+ *	stimer use 24M clock count, have stimer irq.
  *
  *	API Reference
  *	===============
@@ -95,11 +95,13 @@ typedef enum{
 }stimer_track_cnt_e;
 
 typedef enum{
-	STIMER_MANUAL_MODE				= 0x00, /**< Write a register to start the system timer. */
-	STIMER_AUTO_MODE_W_TRIG			= 0x01, /**< When you write the tick value of the system timer,
-											the system timer starts automatically. */
-	STIMER_AUTO_MODE_W_AND_NXT_32K	= 0x02, /**< After the tick value is written to the system timer,
-											the system timer automatically starts when the first 32k tick rises. */
+	STIMER_MANUAL_MODE					= 0x00, /**< Write a register to start the system timer. */
+	STIMER_AUTO_MODE_W_TRIG				= 0x01, /**< When you write the tick value of the system timer,
+												the system timer starts automatically. */
+	STIMER_AUTO_MODE_W_AND_NXT_32K_START= 0x02, /**< Configure this mode:
+	 	 	 	 	 	 	 	 	 	 	 	When the first 32k scale rises, the system timer starts automatically.*/
+	STIMER_AUTO_MODE_W_AND_NXT_32K_DONE	= 0x03, /**< After the tick value is written to the system timer,
+												the system timer automatically starts when the first 32k tick rises. */
 }stimer_enable_mode_e;
 
 /**********************************************************************************************************************
@@ -191,19 +193,20 @@ static inline _Bool clock_time_exceed(unsigned int ref, unsigned int us)
 {
 	return ((unsigned int)(stimer_get_tick() - ref) > us * SYSTEM_TIMER_TICK_1US);
 }
+
 /**
  * @brief     This function performs to set delay time by us.
  * @param[in] microsec - need to delay.
  * @return    none
  */
-_attribute_ram_code_sec_noinline_   void delay_us(unsigned int microsec);
+_attribute_ram_code_sec_noinline_ void delay_us(unsigned int microsec);
 
 /**
  * @brief     This function performs to set delay time by ms.
  * @param[in] millisec - need to delay.
  * @return    none
  */
-_attribute_ram_code_sec_noinline_  void  delay_ms(unsigned int millisec);
+_attribute_ram_code_sec_noinline_ void delay_ms(unsigned int millisec);
 
 /**
  * @brief     This function servers to enable system timer input capture mode.

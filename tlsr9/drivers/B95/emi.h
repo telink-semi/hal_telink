@@ -24,8 +24,8 @@
 #ifndef  EMI_H_
 #define  EMI_H_
 
-#include "rf.h"
-#include "rf_internal.h"
+#include "lib/include/rf/rf_common.h"
+#include "lib/include/rf/rf_internal.h"
 
 /**********************************************************************************************************************
  *                                           global macro                                                             *

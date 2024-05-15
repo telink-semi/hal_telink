@@ -59,9 +59,15 @@
  */
 typedef enum{
 	//The command called by the flash_mspi_read_ram() function.
-	FLASH_READ_CMD                             = 0x030020a8,
-	FLASH_DREAD_CMD							   = 0x3b0097a9,
-    FLASH_X4READ_CMD						   = 0xeb0493ba,
+/*
+ * FLASH_READ_CMD/FLASH_DREAD_CMD/FLASH_X4READ_CMD/FLASH_X8READ_CMD,bit[22] Set to 1:
+ * the configuration of flash xip in the S file refers to the read cmd here, bit[22] is invalid in the interface configuration;
+ * In xip configuration, bit[22] is timeout enable (the function of this bit: when xip reaches a certain time without taking instructions,
+ * cs will not be pulled down, saving power consumption).
+ */
+	FLASH_READ_CMD                             = 0x034020a8,
+	FLASH_DREAD_CMD							   = 0x3b4097a9,
+    FLASH_X4READ_CMD						   = 0xeb4493ba,
 	FLASH_READ_SECURITY_REGISTERS_CMD          = 0x480097a8,
 	FLASH_READ_UID_CMD_GD_PUYA_ZB_TH           = 0x4b0097a8,
 	FLASH_GET_JEDEC_ID                         = 0x9f002080,
@@ -456,7 +462,7 @@ _attribute_text_sec_ void flash_quad_page_program_encrypt(unsigned long addr, un
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-_attribute_text_sec_ unsigned int flash_read_mid(mspi_slave_device_num_e device_num);
+_attribute_text_sec_ unsigned int flash_read_mid(void);
 
 /**
  * @brief	  	This function serves to read UID of flash.Before reading UID of flash, you must read MID of flash.
@@ -475,7 +481,7 @@ _attribute_text_sec_ unsigned int flash_read_mid(mspi_slave_device_num_e device_
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-_attribute_text_sec_ void flash_read_uid(mspi_slave_device_num_e device_num, unsigned char idcmd, unsigned char *buf);
+_attribute_text_sec_ void flash_read_uid_with_device_num(mspi_slave_device_num_e device_num, unsigned char idcmd, unsigned char *buf);
 
 /**
  * @brief 		This function serves to set priority threshold. When the interrupt priority is greater than
@@ -500,9 +506,10 @@ _attribute_text_sec_ void flash_plic_preempt_config(unsigned char preempt_en, un
  * 				this parameter needs to be consistent with the corresponding parameters in the flash datasheet.
  * @param[in]   device_num	- the number of slave device.
  * @param[in]	config	- xip configuration,reference structure flash_rd_xip_config_t
+ *              note:the config parameter can be flash_common_cmd/flash_rd_xip_config_t to know the definition of each bit of config.
  * @return none
  */
-_attribute_text_sec_ void flash_set_rd_xip_config(mspi_slave_device_num_e device_num, flash_command_e config);
+_attribute_text_sec_ void flash_set_rd_xip_config_with_device_num(mspi_slave_device_num_e device_num, unsigned int config);
 
 /**
  * @brief 		This function is used to update the write configuration parameters of xip(eXecute In Place),
@@ -511,7 +518,7 @@ _attribute_text_sec_ void flash_set_rd_xip_config(mspi_slave_device_num_e device
  * @param[in]	config	- xip configuration,reference structure flash_wr_xip_config_t
  * @return none
  */
-_attribute_text_sec_ void flash_set_wr_xip_config(mspi_slave_device_num_e device_num, flash_wr_xip_config_t config);
+_attribute_text_sec_ void flash_set_wr_xip_config_with_device_num(mspi_slave_device_num_e device_num, flash_wr_xip_config_t config);
 
 /*******************************************************************************************************************
  *												Secondary interface
@@ -533,7 +540,7 @@ _attribute_text_sec_ void flash_set_wr_xip_config(mspi_slave_device_num_e device
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-_attribute_text_sec_ int flash_read_mid_uid_with_check(mspi_slave_device_num_e device_num, unsigned int *flash_mid, unsigned char *flash_uid);
+_attribute_text_sec_ int flash_read_mid_uid_with_check(unsigned int *flash_mid, unsigned char *flash_uid);
 
 /**
  * @brief		This function serves to get flash vendor.

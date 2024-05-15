@@ -45,6 +45,7 @@ enum {
     FLD_XO_READY_ANA         =  BIT(7),
 };
 
+#define areg_0x8b               0x8b
 #define areg_0x8c               0x8c
 enum{
     FLD_XO_EN_CLK_ANA        =  BIT(1),//xtal_24M clock to analog   0:turn off  1:turn on   default :0
