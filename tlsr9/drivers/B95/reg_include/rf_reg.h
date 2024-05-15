@@ -1419,6 +1419,470 @@ enum
 };
 
 
+#define		reg_rf_cal_ow_ctrl_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x80)
+enum
+{
+	FLD_RF_DSM_RUN_OW				  = BIT(0),
+	FLD_RF_LDOT_TX_RUN_OW				  = BIT(1),
+	FLD_RF_RCCAL_RUN_OW				  = BIT(2),
+	FLD_RF_FCAL_TX_RUN_OW				  = BIT(3),
+	FLD_RF_RXDCOC_RUN_OW				  = BIT(4),
+	FLD_RF_HPMC_RUN_OW				  = BIT(5),
+	FLD_RF_LOCD_RUN_OW				  = BIT(6),
+};
+
+#define		reg_rf_cal_ow_ctrl_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x81)
+enum
+{
+	FLD_RF_LDOT_RX_RUN_OW				  = BIT(0),
+	FLD_RF_FCAL_RX_RUN_OW				  = BIT(1),
+	FLD_RF_LDOT_DEBUG_RUN_OW			  = BIT(2),
+	FLD_RF_FCAL_DEBUG_RUN_OW		      = BIT(3),
+	FLD_RF_TIM_REC_REST_BLE				  = BIT(6),
+	FLD_RF_HOLD0				          = BIT(7),
+};
+
+#define		reg_rf_cal_ow_val_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x82)
+
+#define		reg_rf_cal_ow_val_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x83)
+enum
+{
+	FLD_RF_LDOT_RX_RUN				      = BIT(0),
+	FLD_RF_FCAL_RX_RUN				      = BIT(1),
+	FLD_RF_LDOT_DEBUG_RUN				  = BIT(2),
+	FLD_RF_FCAL_DEBUG_RUN				  = BIT(3),
+};
+
+#define		reg_rf_txrx_cb_cal_ctrl		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x84)
+enum
+{
+	FLD_RF_LDOT_TX_RUN_CB				  = BIT(0),
+	FLD_RF_FCAL_TX_RUN_CB				  = BIT(1),
+	FLD_RF_HPMC_RUN_CB				      = BIT(2),
+	//
+	FLD_RF_LDOT_RX_RUN_CB				  = BIT(4),
+	FLD_RF_FCAL_RX_RUN_CB				  = BIT(5),
+	FLD_RF_RCCAL_RUN_CB				      = BIT(6),
+	FLD_RF_RXDCOC_RUN_CB				  = BIT(7),
+};
+
+#define		reg_rf_txrx_en_dbg_ow_ctrl0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x86)
+enum
+{
+	FLD_RF_DCOC_GAIN_CFG_OW				  = BIT(0),
+	FLD_RF_RX_DIG_EN_OW				      = BIT(1),
+	FLD_RF_TXC_TX_EN_OW				      = BIT(2),
+	FLD_RF_TX_HPM_CAL_EN_OW				  = BIT(3),
+	FLD_RF_TX_MOD_EN_OW				      = BIT(4),
+	FLD_RF_RESTART_TIM_SEL				  = BIT_RNG(5,7),
+};
+
+#define		reg_rf_txrx_en_dbg_ow_ctrl1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x87)
+
+#define		reg_rf_txrx_en_dbg_val		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x88)
+enum
+{
+	FLD_RF_DCOC_GAIN_CFG				  = BIT(0),
+	FLD_RF_RX_DIG_EN				      = BIT(1),
+	FLD_RF_TXC_TX_EN				      = BIT(2),
+	FLD_RF_TX_HPM_CAL_EN				  = BIT(3),
+	FLD_RF_TX_MOD_EN				      = BIT(4),
+	FLD_RF_EN_DCOC_ADC_DATA				  = BIT(5),
+};
+
+#define		reg_rf_idle_txfsk_ss1_ss2_strt_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x8a)
+
+#define		reg_rf_idle_txfsk_ss1_ss2_strt_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x8b)
+
+#define		reg_rf_idle_txfsk_ss3_ss4_strt_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x8c)
+
+#define		reg_rf_idle_txfsk_ss3_ss4_strt_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x8d)
+
+#define		reg_rf_idle_txfsk_ss6_ss7_strt_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x8e)
+
+#define		reg_rf_idle_txfsk_ss6_ss7_strt_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x8f)
+
+#define		reg_rf_idle_rx_ss1_ss2_strt_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x90)
+
+#define		reg_rf_idle_rx_ss1_ss2_strt_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x91)
+
+#define		reg_rf_idle_rx_ss3_ss4_strt_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x92)
+
+#define		reg_rf_idle_rx_ss3_ss4_strt_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x93)
+
+#define		reg_rf_idle_rx_ss5_ss6_strt_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x94)
+
+#define		reg_rf_idle_rx_ss5_ss6_strt_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x95)
+
+#define		reg_rf_idle_txfsk_ss1_ss2_strt_cb_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x96)
+
+#define		reg_rf_idle_txfsk_ss1_ss2_strt_cb_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x97)
+
+#define		reg_rf_idle_txfsk_ss3_ss4_strt_cb0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x98)
+
+#define		reg_rf_idle_txfsk_ss3_ss4_strt_cb1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x99)
+
+#define		reg_rf_idle_txfsk_ss6_ss7_strt_cb_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x9a)
+
+#define		reg_rf_idle_txfsk_ss6_ss7_strt_cb_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x9b)
+
+#define		reg_rf_idle_rx_ss1_ss2_strt_cb_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x9c)
+
+#define		reg_rf_idle_rx_ss1_ss2_strt_cb_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x9d)
+
+#define		reg_rf_idle_rx_ss3_ss4_strt_cb_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x9e)
+
+#define		reg_rf_idle_rx_ss3_ss4_strt_cb_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x9f)
+
+#define		reg_rf_idle_rx_ss5_ss6_strt_cb_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xa0)
+
+#define		reg_rf_idle_rx_ss5_ss6_strt_cb_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xa1)
+
+#define		reg_rf_locd_trig		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xae)
+enum
+{
+	FLD_RF_LOCD_TRIG				  = BIT(0),
+};
+
+#define		reg_rf_idle_txfsk_ss4_ss5_strt_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xbc)
+
+
+#define		reg_rf_idle_txfsk_ss4_ss5_strt_cb_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xbd)
+
+
+#define		reg_rf_fcal_rdbk_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xc0)
+
+
+#define		reg_rf_fcal_rdbk_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xc1)
+enum
+{
+	FLD_RF_FCAL_DEBUG_COUNT_H				  = BIT_RNG(0,4),
+	FLD_RF_FCAL_PASS				  = BIT(5),
+};
+
+#define		reg_rf_fcal_dbg2_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xc2)
+enum
+{
+	FLD_RF_BYPASS				  = BIT(0),
+	FLD_RF_DCAP_COARSE_OVERWRITE				  = BIT_RNG(1,6),
+	FLD_RF_DCAP_FINE_OVERWRITE_L				  = BIT(7),
+};
+
+#define		reg_rf_fcal_dbg2_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xc3)
+enum
+{
+	FLD_RF_DCAP_FINE_OVERWRITE_H				  = BIT(0),
+	FLD_RF_COUNT_POL				  = BIT(1),
+	FLD_RF_DEBUG_CNT_SEL				  = BIT_RNG(2,5),
+};
+
+#define		reg_rf_txrx_cal_ctrl_norm0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xc4)
+
+#define		reg_rf_txrx_cal_ctrl_norm1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xc5)
+enum
+{
+	FLD_RF_BANDGAP_TX_RUN				  = BIT(0),
+	FLD_RF_PDSTL_TX_RUN				  = BIT(1),
+	FLD_RF_BANDGAP_RX_RUN				  = BIT(2),
+	FLD_RF_PDSTL_RX_RUN				  = BIT(3),
+};
+
+#define		reg_rf_rccal_dbg1_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xc6)
+enum
+{
+	FLD_RF_RCCAL_OVERWRITE				  = BIT_RNG(0,5),
+	FLD_RF_CBPF_CCODE_BYPASS				  = BIT(6),
+	FLD_RF_CBPF_CCODE_OVERWRITE_L				  = BIT(7),
+};
+
+#define		reg_rf_rccal_dbg1_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xc7)
+enum
+{
+	FLD_RF_CBPF_CCODE_OVERWRITE_H				  = BIT_RNG(0,5),
+	FLD_RF_COMP_POL				  = BIT(6),
+	FLD_RF_BYPASS_RCCAL				  = BIT(7),
+};
+
+#define		reg_rf_rccal_dbg2		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xc8)
+enum
+{
+	FLD_RF_RCCAL_CBPF_OFFSET				  = BIT_RNG(0,2),
+	FLD_RF_RCCAL_ACCUM_INIT				  = BIT_RNG(3,7),
+};
+
+#define		reg_rf_rccal_dbg3		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xc9)
+enum
+{
+	FLD_RF_RCCAL_CBPF_CCODE_PRT				  = BIT(0),
+};
+
+#define		reg_rf_rccal_rdbk_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xca)
+enum
+{
+	FLD_RF_RCCAL_CODE				  = BIT_RNG(0,5),
+	FLD_RF_CBPF_CCODE_L				  = BIT_RNG(6,7),
+};
+
+#define		reg_rf_rccal_rdbk_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xcb)
+enum
+{
+	FLD_RF_CBPF_CCODE_H				  = BIT_RNG(0,4),
+};
+
+#define		reg_rf_dcoc_bypass_adc_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xce)
+enum
+{
+	FLD_RF_DCOC_BYPASS_ADC				  = BIT(0),
+	FLD_RF_DCOC_IADC_OFFSET_OVERWRITE				  = BIT_RNG(1,7),
+};
+
+#define		reg_rf_dcoc_bypass_adc_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xcf)
+enum
+{
+	FLD_RF_DCOC_QADC_OFFSET_OVERWRITE				  = BIT_RNG(0,6),
+};
+
+#define		reg_rf_dcoc_bypass_dac_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xd0)
+enum
+{
+	FLD_RF_DCOC_BYPASS_DAC				  = BIT(0),
+	FLD_RF_DCOC_IDAC_CODE_OVERWRITE				  = BIT_RNG(1,6),
+	FLD_RF_DCOC_QDAC_CODE_OVERWRITE_L				  = BIT(7),
+};
+
+#define		reg_rf_dcoc_bypass_dac_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xd1)
+enum
+{
+	FLD_RF_DCOC_QDAC_CODE_OVERWRITE_H				  = BIT_RNG(0,4),
+};
+
+#define		reg_rf_dcoc_dbg0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xd2)
+enum
+{
+	FLD_RF_DCOC_SFIQ				  = BIT(0),
+	FLD_RF_DCOC_SFQI				  = BIT(1),
+	FLD_RF_DCOC_IDAC_SRC_POL				  = BIT(2),
+	FLD_RF_DCOC_QDAC_SRC_POL				  = BIT(3),
+	FLD_RF_DCOC_SFIIP				  = BIT(4),
+	FLD_RF_DCOC_SFQQP				  = BIT(5),
+	FLD_RF_DCOC_SFII_L				  = BIT_RNG(6,7),
+};
+
+#define		reg_rf_dcoc_dbg1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xd3)
+enum
+{
+	FLD_RF_DCOC_SFII_H				  = BIT_RNG(0,1),
+	FLD_RF_DCOC_SFQQ				  = BIT_RNG(2,5),
+	FLD_RF_DCOC_DAC_ORDER				  = BIT(6),
+};
+
+#define		reg_rf_dcoc_lna_offset_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xd4)
+enum
+{
+	FLD_RF_DCOC_ILNA_OFFSET				  = BIT_RNG(0,5),
+	FLD_RF_DCOC_QLNA_OFFSET_L				  = BIT_RNG(6,7),
+};
+
+#define		reg_rf_dcoc_lna_offset_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xd5)
+enum
+{
+	FLD_RF_DCOC_QLNA_OFFSET_H				  = BIT_RNG(0,3),
+};
+
+#define		reg_rf_dcoc_cbpf_offset_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xd6)
+enum
+{
+	FLD_RF_DCOC_ICBPF_OFFSET				  = BIT_RNG(0,5),
+	FLD_RF_DCOC_QCBPF_OFFSET_L				  = BIT_RNG(6,7),
+};
+
+#define		reg_rf_dcoc_cbpf_offset_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xd7)
+enum
+{
+	FLD_RF_DCOC_QCBPF_OFFSET_H				  = BIT_RNG(0,3),
+};
+
+#define		reg_rf_dcoc_rdbk1_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xd8)
+enum
+{
+	FLD_RF_DCOC_IDAC_CODE				  = BIT_RNG(0,5),
+	FLD_RF_SPARE_3				  = BIT_RNG(6,7),
+};
+
+#define		reg_rf_dcoc_rdbk1_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xd9)
+enum
+{
+	FLD_RF_SPARE_4				  = BIT_RNG(0,3),
+};
+
+#define		reg_rf_dcoc_rdbk2		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xda)
+enum
+{
+	FLD_RF_DCOC_QDAC_CODE				  = BIT_RNG(0,5),
+};
+
+#define		reg_rf_dcoc_rdbk3_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xdc)
+enum
+{
+	FLD_RF_DCOC_IADC_OFFSET				  = BIT_RNG(0,6),
+	FLD_RF_DCOC_QADC_OFFSET_L				  = BIT(7),
+};
+
+#define		reg_rf_dcoc_rdbk3_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xdd)
+enum
+{
+	FLD_RF_DCOC_QADC_OFFSET_H				  = BIT_RNG(0,5),
+};
+
+#define		reg_rf_ldot_dbg1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xe2)
+enum
+{
+	FLD_RF_LDOT_LDO_CAL_BYPASS				  = BIT(0),
+	FLD_RF_LDOT_LDO_CAL_TRIM_OVERWRITE				  = BIT_RNG(1,6),
+};
+
+#define		reg_rf_ldot_dbg2_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xe4)
+enum
+{
+	FLD_RF_LDOT_LDO_RXTXHF_BYPASS				  = BIT(0),
+	FLD_RF_LDOT_LDO_RXTXLF_BYPASS				  = BIT(1),
+	FLD_RF_LDOT_LDO_RXTXHF_TRIM_OVERWRITE				  = BIT_RNG(2,7),
+};
+
+#define		reg_rf_ldot_dbg2_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xe5)
+enum
+{
+	FLD_RF_LDOT_LDO_RXTXLF_TRIM_OVERWRITE				  = BIT_RNG(0,5),
+};
+
+#define		reg_rf_ldot_dbg3_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xe6)
+enum
+{
+	FLD_RF_LDOT_LDO_PLL_BYPASS				  = BIT(0),
+	FLD_RF_LDOT_LDO_VCO_BYPASS				  = BIT(1),
+	FLD_RF_LDOT_LDO_PLL_TRIM_OVERWRITE				  = BIT_RNG(2,7),
+};
+
+#define		reg_rf_ldot_dbg3_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xe7)
+enum
+{
+	FLD_RF_LDOT_LDO_VCO_TRIM_OVERWRITE				  = BIT_RNG(0,5),
+};
+
+#define		reg_rf_ldot_dbg4_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xe8)
+enum
+{
+	FLD_RF_LDOT_INCCAL_DIS				  = BIT(0),
+	FLD_RF_LDOT_LDO_RXTXHF_OFFSET				  = BIT_RNG(1,2),
+	FLD_RF_LDOT_LDO_RXTXLF_OFFSET				  = BIT_RNG(3,4),
+	FLD_RF_LDOT_LDO_PLL_OFFSET				  = BIT_RNG(5,6),
+	FLD_RF_LDOT_LDO_VCO_OFFSET_L				  = BIT(7),
+};
+
+#define		reg_rf_ldot_dbg4_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xe9)
+enum
+{
+	FLD_RF_LDOT_LDO_VCO_OFFSET_H				  = BIT(0),
+};
+
+#define		reg_rf_ldot_rdbk1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xea)
+enum
+{
+	FLD_RF_LDOT_LDO_CAL_TRIM				  = BIT_RNG(0,5),
+};
+
+#define		reg_rf_ldot_rdbk2_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xec)
+enum
+{
+	FLD_RF_LDOT_LDO_RXTXHF_TRIM				  = BIT_RNG(0,5),
+	FLD_RF_LDOT_LDO_RXTXLF_TRIM_L				  = BIT_RNG(6,7),
+};
+
+#define		reg_rf_ldot_rdbk2_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xed)
+enum
+{
+	FLD_RF_LDOT_LDO_RXTXLF_TRIM_H				  = BIT_RNG(0,3),
+};
+
+#define		reg_rf_ldot_rdbk3_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xee)
+enum
+{
+	FLD_RF_LDOT_LDO_PLL_TRIM				  = BIT_RNG(0,5),
+	FLD_RF_LDOT_LDO_VCO_TRIM_L				  = BIT_RNG(6,7),
+};
+
+#define		reg_rf_ldot_rdbk3_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xef)
+enum
+{
+	FLD_RF_LDOT_LDO_VCO_TRIM_H				  = BIT_RNG(0,3),
+};
+
+#define		reg_rf_hpmc_cfg		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xf4)
+enum
+{
+	FLD_RF_HPMC_DAC_SWING				  = BIT(0),
+	FLD_RF_HPMC_SLOW_MODE				  = BIT(1),
+	FLD_RF_HPMC_COUNT_POL				  = BIT(2),
+};
+
+#define		reg_rf_hpmc_debug_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xf6)
+enum
+{
+	FLD_RF_HPMC_BYPASS				  = BIT(0),
+	FLD_RF_HPMC_GAIN_OVERWRITE_L				  = BIT_RNG(1,7),
+};
+
+#define		reg_rf_hpmc_debug_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xf7)
+enum
+{
+	FLD_RF_HPMC_GAIN_OVERWRITE_H				  = BIT_RNG(0,3),
+};
+
+#define		reg_rf_hpmc_rdbk1_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xf8)
+
+
+#define		reg_rf_hpmc_rdbk1_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xf9)
+
+
+#define		reg_rf_hpmc_rdbk2_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xfa)
+
+
+#define		reg_rf_hpmc_rdbk2_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xfb)
+
+
+#define		reg_rf_hpmc_rdbk3_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xfc)
+enum
+{
+	FLD_RF_HPMC_COUNT1_LSW				  = BIT_RNG(0,2),
+	FLD_RF_HPMC_COUNT2_LSW				  = BIT_RNG(3,5),
+	FLD_RF_HPMC_MEAS_DIFF_COUNT_L				  = BIT_RNG(6,7),
+};
+
+#define		reg_rf_hpmc_rdbk3_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xfd)
+enum
+{
+	FLD_RF_HPMC_MEAS_DIFF_COUNT_H				  = BIT_RNG(0,6),
+	FLD_RF_HPMC_PASS				  = BIT(7),
+};
+
+#define		reg_rf_hpmc_rdbk4_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xfe)
+
+
+#define		reg_rf_hpmc_rdbk4_1		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0xff)
+enum
+{
+	FLD_RF_HPMC_GAIN_H				  = BIT_RNG(0,2),
+};
+
+#define		reg_rf_locd_cfg_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x104)
+enum
+{
+	FLD_RF_LOCD_DUR				  = BIT_RNG(0,6),
+	FLD_RF_LOCD_WAIT_L				  = BIT(7),
+};
+
+
+#define		reg_rf_locd_cfg_0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x104)
 
 #define		reg_rf_lnm_pa_ow_ctrl_val	REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x178)
 enum
@@ -1441,6 +1905,24 @@ enum
 };
 
 #define		reg_rf_fcal_rdbk	REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x11e)
+enum
+{
+	FLD_RF_FCAL_DCAP_COARSE				  = BIT_RNG(0,5),
+	FLD_RF_FCAL_DCAP_FINE				  = BIT_RNG(6,7),
+};
+
+#define		reg_rf_tx_frac_ctrl0		REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x198)
+enum
+{
+	FLD_RF_TX_FRAC_TIME_MUX				       = BIT(0),
+	FLD_RF_TXC_DSM_INT_OVERWRITE			   = BIT(1),
+	FLD_RF_FCAL_STL_DCAP_EN				       = BIT(2), //FCAL fast settle enable
+	FLD_RF_FCAL_RVT_T1				           = BIT(3),
+	FLD_RF_CH_FREQ_RVT_T1				       = BIT(4),
+	FLD_RF_TX_MI_SWITCH_TONE_EN				   = BIT(5),
+	FLD_RF_TX_HAFM_RAMP_DOWN_EN				   = BIT(6),
+	FLD_RF_TX_RAMP_DOWN_TONE_EN				   = BIT(7),
+};
 
 #define		reg_rf_fcal_ctrl_tx(i)	 REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x1a0+i)//i range:0~7
 
@@ -1451,4 +1933,5 @@ enum
 #define		reg_rf_fcal_chn_range_ctf_low(i)	 REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x1b8 + (i << 1))//i range:0~7
 
 #define		reg_rf_fcal_chn_range_ctf_high(i)	 REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x1b9 + (i << 1))//i range:0~7
+
 #endif

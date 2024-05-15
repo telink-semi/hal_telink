@@ -84,10 +84,13 @@
 
 #if defined(MBEDTLS_ECP_ALT)
 #include <pke.h>
-#if (CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B95)
+
+#if CONFIG_SOC_RISCV_TELINK_B92
 #include <ext_driver/ext_lib.h>
-#include <ext_driver/ext_misc.h>
+#elif CONFIG_SOC_RISCV_TELINK_B95
+#include <ext_driver/driver_lib/ext_lib.h>
 #endif
+#include <ext_driver/ext_misc.h>
 
 /* HW accelerator functionality */
 extern int ecp_alt_b9x_backend_check_pubkey( const mbedtls_ecp_group *grp, const mbedtls_ecp_point *pt );

@@ -21,10 +21,11 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-#include "sys.h"
+#include "lib/include/sys.h"
 #include "clock.h"
 #include "mspi.h"
 #include "stimer.h"
+#include "lib/include/pm.h"
 
 
 unsigned char rc_24m_power;
@@ -57,7 +58,9 @@ sys_clk_t sys_clk = {
 };
 
 sys_clk_config_t sys_clk_config = {
-	.is_saved = 0,
+	.cclk_cfg = 0x01,
+	.hclk_pclk_cfg = 0x00,
+	.mspi_clk_cfg = 0x01,
 };
 
 _attribute_data_retention_sec_ unsigned char tl_24mrc_cal;
@@ -245,6 +248,10 @@ unsigned int clock_get_32k_tick(void)
 	return timer_32k_tick;
 }
 #else
+#if(PM_DEBUG)
+volatile unsigned int debug_get_32k_tick_t0;
+volatile unsigned int debug_get_32k_tick_t1;
+#endif
 unsigned int clock_get_32k_tick(void)
 {
     unsigned int t0 = 0;
@@ -255,9 +262,15 @@ unsigned int clock_get_32k_tick(void)
     //first wait for the rising edge to pass to avoid overlap with the subsequent write tick value operation.
     //modify by weihua.zhang, confirmed by jianzhi at 20210126
 	t0 = analog_read_reg32(0x60);
+#if(PM_DEBUG)
+	debug_get_32k_tick_t0 = t0;
+#endif
 	while(1)
 	{
 		t1 = analog_read_reg32(0x60);
+#if(PM_DEBUG)
+		debug_get_32k_tick_t1 = t1;
+#endif
 		if((t1-t0) == 1)
 		{
 			return t1;
@@ -265,6 +278,9 @@ unsigned int clock_get_32k_tick(void)
 		else if(t1-t0)
 		{
 			t0 = t1;
+#if(PM_DEBUG)
+			debug_get_32k_tick_t0 = t0;
+#endif
 		}
 	}
 }
@@ -272,15 +288,17 @@ unsigned int clock_get_32k_tick(void)
 
 /**
  * @brief       This function use to select the system clock source.
- * @param[in]	src - cclk source.
- * @param[in]	cclk_div - the cclk divide from src.
- * @param[in]	hclk_div - the hclk divide from cclk.
- * @param[in]	pclk_div - the pclk divide from hclk.
- * @param[in]	mspi_clk_div - mspi_clk has two source - pll div and 24M rc. If it is built-in flash, the maximum speed of mspi is 64M.
-							   If it is an external flash, the maximum speed of mspi needs to be based on the board test.
-							   Because the maximum speed is related to the wiring of the board, and is also affected by temperature and GPIO voltage,
-							   the maximum speed needs to be tested at the highest and lowest voltage of the board,
-							   and the high and low temperature long-term stability test speed is no problem.
+ * @param[in]	src 		 - cclk source.
+ * @param[in]	cclk_div	 - the cclk divide from src.
+ * @param[in]	hclk_div	 - the hclk divide from cclk.
+ * @param[in]	pclk_div	 - the pclk divide from hclk.
+ * @param[in]	mspi_clk_div - mspi_clk can be divided from pll, rc and xtal. 
+ *							   When selecting pll as the clock source, in order to not exceed the maximum frequency, the division coefficient can not less than 4.
+ *							   If it is built-in flash, the maximum speed of mspi is 64M.
+ *							   If it is an external flash, the maximum speed of mspi needs to be based on the board test.
+ *							   Because the maximum speed is related to the wiring of the board, and is also affected by temperature and GPIO voltage,
+ *							   the maximum speed needs to be tested at the highest and lowest voltage of the board,
+ *							   and the high and low temperature long-term stability test speed is no problem.
  * @return      none
  * @note		Do not switch the clock during the DMA sending and receiving process;
  * 			    because during the clock switching process, the system clock will be
@@ -289,13 +307,12 @@ unsigned int clock_get_32k_tick(void)
 _attribute_ram_code_sec_noinline_
 void clock_init(sys_clock_src_e src,
 				sys_clock_div_e cclk_div,
-				sys_cclk_div_to_hclk_e hclk_div,
-				sys_hclk_div_to_pclk_e pclk_div,
+				sys_cclk_div_to_hclk_pclk_e hclk_pclk_div,
 				sys_clock_div_e mspi_clk_div)
 {
 	clock_mspi_clk_config(src, mspi_clk_div);
 
-	clock_cclk_hclk_pclk_config(src, cclk_div, hclk_div, pclk_div);
+	clock_cclk_hclk_pclk_config(src, cclk_div, hclk_pclk_div);
 }
 
 /**
@@ -320,21 +337,20 @@ void clock_mspi_clk_config(sys_clock_src_e src, sys_clock_div_e div)
  * @return      none
  */
 void clock_cclk_hclk_pclk_config(sys_clock_src_e src, sys_clock_div_e cclk_div,
-								sys_cclk_div_to_hclk_e hclk_div,
-								sys_hclk_div_to_pclk_e pclk_div)
+								sys_cclk_div_to_hclk_pclk_e hclk_pclk_div)
 {
 	//change to 24M rc first.
 	write_reg8(0x140828, (read_reg8(0x140828) & 0xc0) | RC_24M | CLK_DIV1);
 
 	//HCLK and PCLK should be set ahead of CCLK, ensure the HCLK and PCLK not exceed the max CCLK(CCLK max 120M, HCLK max 60M, PCLK max 60M)
-	write_reg8(0x140818, (read_reg8(0x140818) & 0xf8) | (hclk_div << 2) | pclk_div);
+	write_reg8(0x140818, (read_reg8(0x140818) & 0xf8) | hclk_pclk_div);
 
 	//Configure the CCLK clock frequency.
 	write_reg8(0x140828, (read_reg8(0x140828) & 0xc0) | src | cclk_div);//clock source. 0:rc 24m, 1:xtl_24m, 2:pll
 
 	sys_clk.cclk = clock_calculate_div_clk(src, cclk_div);
-	sys_clk.hclk = sys_clk.cclk / (1 << hclk_div);
-	sys_clk.pclk = sys_clk.hclk / (1 << pclk_div);
+	sys_clk.hclk = sys_clk.cclk / (1 << (hclk_pclk_div>>2));
+	sys_clk.pclk = sys_clk.hclk / (1 << (hclk_pclk_div&0x03));
 }
 
 /**
@@ -349,7 +365,7 @@ void clock_cclk_hclk_pclk_config(sys_clock_src_e src, sys_clock_div_e cclk_div,
  */
 void clock_set_all_clock_to_default(void)
 {
-	clock_cclk_hclk_pclk_config(RC_24M, CLK_DIV1, CCLK_DIV1_TO_HCLK, HCLK_DIV1_TO_PCLK);
+	clock_cclk_hclk_pclk_config(RC_24M, CLK_DIV1, CCLK_DIV1_TO_HCLK_DIV1_TO_PCLK);
 
 	clock_mspi_clk_config(RC_24M, CLK_DIV1);//mspi clk to 24M rc clock, div 1, 24MHz
 }
@@ -363,13 +379,9 @@ void clock_save_clock_config(void)
 {
 	sys_clk_config.cclk_cfg = read_reg8(0x140828);
 
-	unsigned char hclk_pclk_cfg = read_reg8(0x140818);
-	sys_clk_config.hclk_cfg = (hclk_pclk_cfg & 0x04) >> 2;
-	sys_clk_config.pclk_cfg = hclk_pclk_cfg & 0x03;
+	sys_clk_config.hclk_pclk_cfg = read_reg8(0x140818);
 
 	sys_clk_config.mspi_clk_cfg = read_reg8(0x140800);
-
-	sys_clk_config.is_saved = 1;
 }
 
 /**
@@ -379,17 +391,12 @@ void clock_save_clock_config(void)
  */
 void clock_restore_clock_config(void)
 {
-	if (sys_clk_config.is_saved == 1) {
-		sys_clk_config.is_saved = 0;
+	clock_cclk_hclk_pclk_config(sys_clk_config.cclk_cfg & BIT_RNG(4, 5),
+								sys_clk_config.cclk_cfg & BIT_RNG(0, 3),
+								sys_clk_config.hclk_pclk_cfg);
 
-		clock_cclk_hclk_pclk_config(sys_clk_config.cclk_cfg & BIT_RNG(4, 5), 
-									sys_clk_config.cclk_cfg & BIT_RNG(0, 3),
-									sys_clk_config.hclk_cfg, 
-									sys_clk_config.pclk_cfg);
-
-		clock_mspi_clk_config(sys_clk_config.mspi_clk_cfg & BIT_RNG(4, 5), 		//src
-							sys_clk_config.mspi_clk_cfg & BIT_RNG(0, 3));		//mspiclk_div
-	}
+	clock_mspi_clk_config(sys_clk_config.mspi_clk_cfg & BIT_RNG(4, 5), 		//src
+						sys_clk_config.mspi_clk_cfg & BIT_RNG(0, 3));		//mspiclk_div
 }
 /**********************************************************************************************************************
  *                    						local function implementation                                             *

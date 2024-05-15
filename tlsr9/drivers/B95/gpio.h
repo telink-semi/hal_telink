@@ -35,7 +35,7 @@
 #define DRIVERS_GPIO_H_
 
 
-#include "plic.h"
+#include "lib/include/plic.h"
 #include "analog.h"
 #include "reg_include/gpio_reg.h"
 /**********************************************************************************************************************
@@ -496,10 +496,10 @@ static inline void gpio_set_level(gpio_pin_e pin, unsigned char value)
 }
 
 /**
- * @brief     This function read the pin's input/output level.
- * @param[in] pin - the pin needs to read its level.
- * @return    1: the pin's level is high.
- * 			  0: the pin's level is low.
+ * @brief     This function read the pin's input level.
+ * @param[in] pin - the pin needs to read its input level.
+ * @return    1: the pin's input level is high.
+ * 			  0: the pin's input level is low.
  */
 static inline _Bool gpio_get_level(gpio_pin_e pin)
 {

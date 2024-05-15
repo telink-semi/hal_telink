@@ -23,10 +23,11 @@
  *******************************************************************************************************/
 #ifndef CORE_H
 #define CORE_H
-#include "sys.h"
+#include "lib/include/sys.h"
+//#include "nds_intrinsic.h"
 
-#define DISABLE_BTB __asm__("csrci 0x7D0, 8")
-#define ENABLE_BTB  __asm__("csrsi 0x7D0, 8")
+#define DISABLE_BTB __asm__("csrci 0x7d0,8")
+#define ENABLE_BTB  __asm__("csrsi 0x7d0,8")
 
 /**
  * @brief Machine mode MHSP_CTL
@@ -79,23 +80,36 @@ typedef enum {
 #define NDS_MCYCLE              0xB00
 #define NDS_MCYCLEH             0xB80
 
+
+#define read_csr(var, csr)      __asm__ volatile ("csrr %0, %1" : "=r" (var) : "i" (csr))
 #define write_csr(csr, val)     __asm__ volatile ("csrw %0, %1" :: "i" (csr), "r" (val))
+
+#define  swap_csr(reg, val)	    
 #define set_csr(csr, bit)       __asm__ volatile ("csrs %0, %1" :: "i" (csr), "r" (bit))
 #define clear_csr(csr, bit)     __asm__ volatile ("csrc %0, %1" :: "i" (csr), "r" (bit))
 
 /*
  * Inline nested interrupt entry/exit macros
  */
-/* Save/Restore macro */
-#define save_csr(r)              long __##r = read_csr(r);
-#define restore_csr(r)           write_csr(r, __##r);
+/* Svae/Restore macro */
+#define save_csr(r)             long __##r;          \
+                                read_csr(__##r,r);
+#define restore_csr(r)          write_csr(r, __##r);
 /* Support PowerBrake (Performance Throttling) feature */
 
 
 #define save_mxstatus()         save_csr(NDS_MXSTATUS)
 #define restore_mxstatus()      restore_csr(NDS_MXSTATUS)
 
- /* Nested IRQ entry macro : Save CSRs and enable global interrupt. */
+/* Nested external IRQ entry macro : Save CSRs and enable global interrupt.
+ * - If mei does not want to be interrupted by msi and mti, can do the following
+ *     save_csr(NDS_MIE)                                 \
+ *     save_csr(NDS_MEPC)                                \
+ *     save_csr(NDS_MSTATUS)                             \
+ *     save_mxstatus()                                   \
+ *     clear_csr(NDS_MIE, FLD_MIE_MTIE | FLD_MIE_MSIE);  \
+ *     set_csr(NDS_MSTATUS, FLD_MSTATUS_MIE);
+ */
 #define core_save_nested_context()                              \
 	 save_csr(NDS_MEPC)                              \
 	 save_csr(NDS_MSTATUS)                           \
@@ -109,7 +123,7 @@ typedef enum {
 	 restore_csr(NDS_MEPC)                           \
 	 restore_mxstatus()
 
-#define fence_iorw  __asm__ volatile ("fence iorw,iorw" ::: "memory")
+#define fence_iorw	      	//__nds__fence(FENCE_IORW,FENCE_IORW)
 
 typedef enum{
 	FLD_FEATURE_PREEMPT_PRIORITY_INT_EN = BIT(0),
@@ -117,14 +131,6 @@ typedef enum{
 }
 feature_e;
 
-static inline unsigned int read_csr(unsigned int csr)
-{
-	unsigned int r;
-
-	__asm__ __volatile__("csrr %0, %1" : "=r"(r) : "i"(csr));
-	
-	return r;
-}
 
 /**
  * @brief Disable interrupts globally in the system.
@@ -133,12 +139,12 @@ static inline unsigned int read_csr(unsigned int csr)
  * @return     none
  */
 static inline unsigned int core_interrupt_disable(void){
-	unsigned int r = read_csr (NDS_MSTATUS)&FLD_MSTATUS_MIE;
-	if(r)
-	{
-		clear_csr(NDS_MSTATUS,FLD_MSTATUS_MIE);//global interrupts disable
-        fence_iorw; /* Hardware may change this value, fence IO ensures that software changes are valid. */
-	}
+
+	unsigned int r;
+	read_csr (r, NDS_MIE);
+  
+	clear_csr(NDS_MIE, BIT(3)| BIT(7)| BIT(11));
+  
 	return r;
 }
 
@@ -150,11 +156,7 @@ static inline unsigned int core_interrupt_disable(void){
  * @note this function must be used when the system wants to restore all the interrupt.
  */
 static inline unsigned int core_restore_interrupt(unsigned int en){
-	if(en)
-	{
-		set_csr(NDS_MSTATUS,en);//global interrupts enable
-        fence_iorw; /* Hardware may change this value, fence IO ensures that software changes are valid. */
-	}
+	set_csr(NDS_MIE, en);
 	return 0;
 }
 
@@ -243,7 +245,9 @@ static inline void core_set_msp_base(unsigned int base)
  */
 static inline unsigned int core_get_msp_bound(void)
 {
-	return read_csr(NDS_MSP_BOUND);
+	unsigned int i=0;
+    read_csr(i ,NDS_MSP_BOUND);
+	return i;
 }
 
 /**
@@ -252,19 +256,22 @@ static inline unsigned int core_get_msp_bound(void)
  */
 static inline unsigned int core_get_msp_base(void)
 {
-	return read_csr(NDS_MSP_BASE);
+	unsigned int i=0;
+    read_csr(i,NDS_MSP_BASE);
+	return i;
 }
 
+#if 0
 /**
  * @brief This function serves to get current sp(Stack pointer).
  * @return     none
  */
-#if 0
 static inline unsigned int core_get_current_sp(void)
 {
     return __nds__get_current_sp();
 }
-#endif 
+#endif
+
 /**
  * @brief This function serves to get mcause(Machine Cause) value.
  * This register indicates the cause of trap, reset, NMI or the interrupt source ID of a vector interrupt.
@@ -273,7 +280,9 @@ static inline unsigned int core_get_current_sp(void)
  */
 static inline unsigned int core_get_mcause(void)
 {
-	return read_csr(NDS_MCAUSE);
+  unsigned int r;
+  read_csr (r, NDS_MCAUSE);
+  return r;
 }
 
 /**
@@ -284,7 +293,9 @@ static inline unsigned int core_get_mcause(void)
  */
 static inline unsigned int core_get_mepc(void)
 {
-	return read_csr(NDS_MEPC);
+  unsigned int r;
+  read_csr (r, NDS_MEPC);
+  return r;
 }
 
 /**
@@ -335,16 +346,20 @@ static inline unsigned int core_get_current_pc(void)
  */
 __attribute__((always_inline)) static inline unsigned long long rdmcycle(void)
 {
+	int r=0;
 #if __riscv_xlen == 32
 	do {
-		unsigned long hi = read_csr(NDS_MCYCLEH);
-		unsigned long lo = read_csr(NDS_MCYCLE);
-
-		if (hi == read_csr(NDS_MCYCLEH))
+		unsigned long hi ;
+		unsigned long lo ;
+		read_csr(hi,NDS_MCYCLEH);
+		read_csr(lo,NDS_MCYCLE);
+		read_csr(r,NDS_MCYCLEH);
+		if (hi == r)
 			return ((unsigned long long)hi << 32) | lo;
 	} while(1);
 #else
-	return read_csr(NDS_MCYCLE);
+	read_csr(r,NDS_MCYCLE);
+	return r;
 #endif
 }
 
@@ -353,6 +368,6 @@ __attribute__((always_inline)) static inline unsigned long long rdmcycle(void)
  * @param[in]   core_cclk_tick - Number of ticks in cclk
  * @return      none
  */
-_attribute_ram_code_sec_optimize_o2_noinline_ void core_cclk_delay_tick(unsigned long long core_cclk_tick);
+_attribute_ram_code_sec_noinline_ void core_cclk_delay_tick(unsigned long long core_cclk_tick);
 
 #endif
