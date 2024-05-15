@@ -46,6 +46,8 @@ enum{
 	FLD_DMA_CHANNEL7_ERR_MASK	= BIT(7),
 };
 
+#define reg_dma_ctrl_llp			REG_ADDR8(DMA_BASE_ADDR+0x25)
+
 #define reg_dma_abt_mask				REG_ADDR8(DMA_BASE_ADDR+0x2a)
 enum{
 	FLD_DMA_CHANNEL0_ABT_MASK	= BIT(0),

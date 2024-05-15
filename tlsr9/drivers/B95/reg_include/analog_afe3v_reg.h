@@ -88,6 +88,15 @@ enum{
 #define areg_aon_0x51           0x51
 #define areg_aon_0x52           0x52
 
+#define areg_aon_0x64           0x64
+typedef enum {
+	FLD_WAKEUP_STATUS_PAD			= BIT(0),
+	FLD_WAKEUP_STATUS_CORE			= BIT(1),
+	FLD_WAKEUP_STATUS_TIMER			= BIT(2),
+	FLD_WAKEUP_STATUS_COMPARATOR	= BIT(3),
+	FLD_WAKEUP_STATUS_ALL			= 0x0f,
+}pm_wakeup_status_e;
+
 #define areg_aon_0x69           0x69
 enum{
 	FLD_PD_SM_BUSY			    = BIT(5),/*
@@ -99,12 +108,13 @@ enum{
 #define areg_aon_0x79           0x79
 
 #define areg_aon_0x7d           0x7d
-enum{
-    FLD_PG_ZB_EN                = BIT(0),//power down baseband
-    FLD_PG_USB_EN               = BIT(1),//power down usb
-    FLD_PG_AUDIO_EN             = BIT(2),//power down audio
+typedef enum{
+    FLD_PD_ZB_EN                = BIT(0),//power down baseband
+    FLD_PD_USB_EN               = BIT(1),//power down usb
+    FLD_PD_AUDIO_EN             = BIT(2),//power down audio
     //RSVD
     FLD_PG_CLK_EN               = BIT(7),//enable change power sequence clk
-};
+}pm_pd_module_e;
+
 
 #endif

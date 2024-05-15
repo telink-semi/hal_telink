@@ -17,7 +17,11 @@
  *****************************************************************************/
 
 #include "b9x_rf_power.h"
-#include <rf.h>
+#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92
+ #include <rf.h>
+#elif CONFIG_SOC_RISCV_TELINK_B95
+#include <rf_common.h>
+#endif
 
 #if CONFIG_SOC_RISCV_TELINK_B91
 /* TX power B91 lookup table */

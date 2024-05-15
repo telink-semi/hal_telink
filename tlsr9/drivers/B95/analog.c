@@ -21,7 +21,7 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-#include "plic.h"
+#include "lib/include/plic.h"
 #include "analog.h"
 #include "compiler.h"
 #include "stimer.h"
@@ -86,7 +86,7 @@ static _always_inline void analog_wait_txbuf_no_empty(void)
  * @param[in]  addr - address need to be read.
  * @return     the result of read.
  */
-_attribute_ram_code_sec_optimize_o2_ unsigned char analog_read_reg8(unsigned char addr){
+_attribute_ram_code_sec_ unsigned char analog_read_reg8(unsigned char addr){
 	unsigned int r=core_interrupt_disable();
 	reg_ana_addr = addr;
 	reg_ana_len=0x1;
@@ -104,7 +104,7 @@ _attribute_ram_code_sec_optimize_o2_ unsigned char analog_read_reg8(unsigned cha
  * @param[in]  data - the value need to be write.
  * @return     none.
  */
-_attribute_ram_code_sec_optimize_o2_ void analog_write_reg8(unsigned char addr, unsigned char data){
+_attribute_ram_code_sec_ void analog_write_reg8(unsigned char addr, unsigned char data){
 	unsigned int r=core_interrupt_disable();
 	reg_ana_len = 1;
 	reg_ana_addr = addr;
@@ -122,7 +122,7 @@ _attribute_ram_code_sec_optimize_o2_ void analog_write_reg8(unsigned char addr, 
  * @param[in]  data - the value need to be write.
  * @return     none.
  */
-_attribute_ram_code_sec_optimize_o2_ void analog_write_reg16(unsigned char addr, unsigned short data)
+_attribute_ram_code_sec_ void analog_write_reg16(unsigned char addr, unsigned short data)
 {
 	unsigned int r=core_interrupt_disable();
 	reg_ana_len=2;
@@ -140,7 +140,7 @@ _attribute_ram_code_sec_optimize_o2_ void analog_write_reg16(unsigned char addr,
  * @param[in]  addr - address need to be read.
  * @return     the result of read.
  */
-_attribute_ram_code_sec_optimize_o2_ unsigned short analog_read_reg16(unsigned char addr)
+_attribute_ram_code_sec_ unsigned short analog_read_reg16(unsigned char addr)
 {
 	unsigned int r=core_interrupt_disable();
 	reg_ana_len=2;
@@ -159,7 +159,7 @@ _attribute_ram_code_sec_optimize_o2_ unsigned short analog_read_reg16(unsigned c
  * @param[in]  addr - address need to be read.
  * @return     the result of read.
  */
-_attribute_ram_code_sec_optimize_o2_ unsigned int analog_read_reg32(unsigned char addr)
+_attribute_ram_code_sec_ unsigned int analog_read_reg32(unsigned char addr)
 {
 	unsigned int r=core_interrupt_disable();
 	reg_ana_len = 4;
@@ -178,7 +178,7 @@ _attribute_ram_code_sec_optimize_o2_ unsigned int analog_read_reg32(unsigned cha
  * @param[in]  data - the value need to be write.
  * @return     none.
  */
-_attribute_ram_code_sec_optimize_o2_ void analog_write_reg32(unsigned char addr, unsigned int data)
+_attribute_ram_code_sec_ void analog_write_reg32(unsigned char addr, unsigned int data)
 {
 	unsigned int r=core_interrupt_disable();
 	reg_ana_len = 4;
