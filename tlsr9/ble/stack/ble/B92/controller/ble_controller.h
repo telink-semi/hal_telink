@@ -36,11 +36,6 @@
 #include "stack/ble/B92/controller/ll/acl_conn/acl_peripheral.h"
 #include "stack/ble/B92/controller/ll/acl_conn/acl_central.h"
 
-#include "stack/ble/B92/controller/ll/past/past.h"
-
-#include "stack/ble/B92/controller/ll/pcl/pcl.h"
-
-#include "stack/ble/B92/controller/ll/chn_class/chn_class.h"
 
 #include "stack/ble/B92/controller/ll/adv/adv.h"
 #include "stack/ble/B92/controller/ll/adv/leg_adv.h"
@@ -61,16 +56,6 @@
 #include "stack/ble/B92/controller/ll/prdadv/pda_sync.h"
 
 
-#include "stack/ble/B92/controller/ial/ial.h"
-#include "stack/ble/B92/controller/ll/iso/iso.h"
-
-#include "stack/ble/B92/controller/ll/iso/bis.h"
-#include "stack/ble/B92/controller/ll/iso/bis_bcst.h"
-#include "stack/ble/B92/controller/ll/iso/bis_sync.h"
-#include "stack/ble/B92/controller/ll/iso/cis.h"
-#include "stack/ble/B92/controller/ll/iso/cis_central.h"
-#include "stack/ble/B92/controller/ll/iso/cis_peripheral.h"
-#include "stack/ble/B92/controller/ll/aoa_aod/aoa_aod.h"
 
 
 #include "stack/ble/B92/controller/whitelist/whitelist.h"
@@ -82,7 +67,6 @@
 #include "stack/ble/B92/controller/phy/phy_test.h"
 
 
-#include "stack/ble/B92/controller/ll/subrate/subrate.h"
 
 #include "stack/ble/B92/controller/contr_comp.h"
 

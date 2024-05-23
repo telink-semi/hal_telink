@@ -43,16 +43,6 @@
 #endif
 
 
-///////////////////  Feature ////////////////////////////
-#ifndef		MULTIPLE_LOCAL_DEVICE_ENABLE
-#define		MULTIPLE_LOCAL_DEVICE_ENABLE				    		0
-#endif
-
-#ifndef     LL_EXT_ADV_DURATION_OPTIMIZE_EN
-#define     LL_EXT_ADV_DURATION_OPTIMIZE_EN                         0
-#endif
-//////////////////////////////////////////////////////////////////////
-
 
 
 /* Different process for different MCU: ****************************/
@@ -85,33 +75,6 @@
 #ifndef STACK_SUPPORT_FLASH_PROTECTION_ENABLE
 #define STACK_SUPPORT_FLASH_PROTECTION_ENABLE				1
 #endif
-
-
-
-/*
- * for single priority interrupt IC, such as B85m, not support break nesting, generally use GD flash,  add Zbit flash vendor
- * defect:
- * when temperature rise, writing 16B flash(particular for OTA) time may bigger than 200uS, or even greater than 300uS, this time
- * of IRQ disabling will cost BLE stack data errors(e.g. RX data loss cause decryption MIC fail, then BLE disconnect)
- *
- */
-#ifndef ZBIT_FLASH_ON_SINGLE_PRIORITY_IRQ_IC_WORKAROUND_EN
-#define ZBIT_FLASH_ON_SINGLE_PRIORITY_IRQ_IC_WORKAROUND_EN						0
-#endif
-
-/*
- * for single priority interrupt IC, such as B85m, not support break nesting, generally use GD flash,  add second flash vendor which
- * provide Sonos architecture flash(such as PUYA)
- * feature:
- * write 1B, 2B, ... 255B timing cost equal to write a page(256B),
- * about 1~2 mS. In flash_write_page function, disable IRQ may lead to RX packet loss for BTX/BRX
- * so we should take some action to workaround this problem
- */
-#ifndef SONOS_ARCH_FLASH_ON_SINGLE_PRIORITY_IRQ_IC_WORKAROUND_EN
-#define SONOS_ARCH_FLASH_ON_SINGLE_PRIORITY_IRQ_IC_WORKAROUND_EN				0
-#endif
-
-
 
 
 //Link layer feature enable flag default setting
@@ -249,76 +212,6 @@
 //core_5.2 feature end
 
 
-//core_5.3 feature begin
-#ifndef	LL_FEATURE_SUPPORT_PERIODIC_ADV_ADI_SUPPORT
-#define	LL_FEATURE_SUPPORT_PERIODIC_ADV_ADI_SUPPORT					0
-#endif
-
-#ifndef	LL_FEATURE_SUPPORT_CONNECTION_SUBRATING
-#define	LL_FEATURE_SUPPORT_CONNECTION_SUBRATING						0
-#endif
-
-#ifndef	LL_FEATURE_SUPPORT_CONNECTION_SUBRATING_HOST
-#define	LL_FEATURE_SUPPORT_CONNECTION_SUBRATING_HOST				1
-#endif
-
-#ifndef	LL_FEATURE_SUPPORT_CHANNEL_CLASSIFICATION
-#define	LL_FEATURE_SUPPORT_CHANNEL_CLASSIFICATION					1
-#endif
-
-
-
-//core_5.4 begin
-#ifndef	LL_FEATURE_SUPPORT_ADVERTISING_CODING_SELECTION
-#define	LL_FEATURE_SUPPORT_ADVERTISING_CODING_SELECTION						0
-#endif
-
-#ifndef	LL_FEATURE_SUPPORT_ADVERTISING_CODING_SELECT_HOST_SUPPORT
-#define	LL_FEATURE_SUPPORT_ADVERTISING_CODING_SELECT_HOST_SUPPORT			0
-#endif
-
-#ifndef	LL_FEATURE_SUPPORT_PERIODIC_ADVERTISING_WITH_RESPONSES_ADVERTISER
-#define	LL_FEATURE_SUPPORT_PERIODIC_ADVERTISING_WITH_RESPONSES_ADVERTISER	1
-#endif
-
-#ifndef	LL_FEATURE_SUPPORT_PERIODIC_ADVERTISING_WITH_RESPONSES_SCANNER
-#define	LL_FEATURE_SUPPORT_PERIODIC_ADVERTISING_WITH_RESPONSES_SCANNER		0
-#endif
-//core_5.4 end
-
-//core_5.4+  begin
-#ifndef	LL_FEATURE_SUPPORT_CHANNEL_SOUNDING_INITIATOR
-#define	LL_FEATURE_SUPPORT_CHANNEL_SOUNDING_INITIATOR						1
-#endif
-
-#ifndef	LL_FEATURE_SUPPORT_CHANNEL_SOUNDING_REFLECTOR
-#define	LL_FEATURE_SUPPORT_CHANNEL_SOUNDING_REFLECTOR						1
-#endif
-//core_5.4+  end
-
-
-
-
-#if LL_FEATURE_SUPPORT_SYNCHRONIZED_RECEIVER
-	//BIS sync, no matter either by extended scanning or by PAST procedure, both require periodic sync.
-	#if (!LL_FEATURE_SUPPORT_LE_PERIODIC_ADVERTISING_SYNC)
-		#error "must support periodic sync"
-	#endif
-#endif
-
-//core_5.3 feature end
-
-
-/* 2 CIS slave allocate on same one ACL slave, BQB 5.2 need  */
-#ifndef	ONE_ACL_SLAVE_MATCH_2_CIS_SLAVE_ENABLE
-#define	ONE_ACL_SLAVE_MATCH_2_CIS_SLAVE_ENABLE						0
-#endif
-
-#ifndef	CIS_WINDOW_WIDENING_FOR_BIG_PPM
-#define	CIS_WINDOW_WIDENING_FOR_BIG_PPM								0
-#endif
-
-
 #ifndef HCI_SEND_NUM_OF_CMP_AFT_ACK
 #define HCI_SEND_NUM_OF_CMP_AFT_ACK									0
 #endif
@@ -331,110 +224,10 @@
 #define HCI_CONTROLLER_TO_HOST_FLOW_CTRL_EN							0
 #endif
 
-#ifndef L2CAP_DATA_2_HCI_DATA_BUFFER_ENABLE
-#define L2CAP_DATA_2_HCI_DATA_BUFFER_ENABLE							0  //SiHui: just for debug
-#endif
-
-#ifndef L2CAP_CREDIT_BASED_FLOW_CONTROL_MODE_EN
-#define L2CAP_CREDIT_BASED_FLOW_CONTROL_MODE_EN     				1
-#endif
-
-#ifndef L2CAP_SERVER_FEATURE_SUPPORTED_EATT
-#define L2CAP_SERVER_FEATURE_SUPPORTED_EATT							0
-#endif
-
-//gen p256, dhkey supported by controller
-#ifndef	CONTROLLER_GEN_P256KEY_ENABLE
-#define	CONTROLLER_GEN_P256KEY_ENABLE								0
-#endif
-
-#ifndef SMP_SEC_LEVEL_CHECK_EN
-#define	SMP_SEC_LEVEL_CHECK_EN										0
-#endif
-
-
-
-#ifndef  LE_AUTHENTICATED_PAYLOAD_TIMEOUT_SUPPORT_EN
-#define  LE_AUTHENTICATED_PAYLOAD_TIMEOUT_SUPPORT_EN                0
-#endif
-
-
-
-
-
-
-#if (LL_FEATURE_SUPPORT_PRIVACY)
-	/* privacy relative */
-	#ifndef LL_FEATURE_SUPPORT_LOCAL_RPA
-	#define LL_FEATURE_SUPPORT_LOCAL_RPA								1
-	#endif
-
-	//if network privacy mode ignore IDA
-	#ifndef NETWORK_PRIVACY_IGNORE_IDA_CHECK
-	#define NETWORK_PRIVACY_IGNORE_IDA_CHECK							0   //BQB need enable, can be disable in SDK
-	#endif
-
-
-	#ifndef	LL_FEATURE_SUPPORT_RPA_ADV_DATA_RELATED_ADDRESS_CHANGE
-	#define LL_FEATURE_SUPPORT_RPA_ADV_DATA_RELATED_ADDRESS_CHANGE		0   //BQB need enable, can be disable in SDK
-	#endif
-
-
-	#ifndef	EXTADV_DATA_CHANGE_MANUAL_DATA_BUFFER
-	#define EXTADV_DATA_CHANGE_MANUAL_DATA_BUFFER						0	//BQB need enable, can be disable in SDK
-	#endif
-
-
-	#ifndef	SMP_LOCAL_IRK_MATCH_CONTROLLER_NEW_PRIVACY
-	#define SMP_LOCAL_IRK_MATCH_CONTROLLER_NEW_PRIVACY					0
-	#endif
-#endif
-
-
 
 /* 1: multiple connection SDK; 0 : single connection SDK */
 #define	BLE_MULTIPLE_CONNECTION_ENABLE								1
 
-// fanqh start
-#ifndef		FIX_CIS_EVT_OVERFLOW
-#define		FIX_CIS_EVT_OVERFLOW									0
-#endif
 
-
-
-#ifndef	CIS_ADD_CIE
-#define	CIS_ADD_CIE													1
-#endif
-
-#ifndef	CIS_CIE_CENTRAL_OPTIMIZE
-#define	CIS_CIE_CENTRAL_OPTIMIZE									1
-#endif
-
-#ifndef	BIS_BRD_SET_PARAM
-#define BIS_BRD_SET_PARAM											0
-#endif
-
-
-#ifndef CIS_TSK_JUMP_ADD_PDU
-#define	CIS_TSK_JUMP_ADD_PDU										1
-#endif
-
-
-#ifndef BQB_LOWER_TESTER_ENABLE
-#define BQB_LOWER_TESTER_ENABLE										0
-#endif
-
-#ifndef BQB_UPPER_TESTER_ENABLE
-#define BQB_UPPER_TESTER_ENABLE										0
-#endif
-
-
-#ifndef	CUSTOM_CONNECTION_ESTABLISH_EVT_ENABLE
-#define	CUSTOM_CONNECTION_ESTABLISH_EVT_ENABLE						0
-#endif
-
-#ifndef	FANQH_OPTIMIZE_BIS_API
-#define FANQH_OPTIMIZE_BIS_API										1
-#endif
 
 

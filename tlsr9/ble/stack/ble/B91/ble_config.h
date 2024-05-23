@@ -46,26 +46,8 @@
 #define		LL_MULTI_SLAVE_MAC_ENABLE				    			0
 #endif
 
-//////////////////////////////////////////////////////////////////////
-//note both the following two macro XXX_PRIVATE_XXX and XXX_NORMAL_XXX
-//CAN NOT be set 1 at the same time.One is private,another is standard.
-#ifndef		LL_FEATURE_PRIVATE_BIS_SYNC_RECEIVER
-#define 	LL_FEATURE_PRIVATE_BIS_SYNC_RECEIVER					0
-#endif
 
-#ifndef		LL_FEATURE_NORMAL_BIS_SYNC_RECEIVER
-#define		LL_FEATURE_NORMAL_BIS_SYNC_RECEIVER						1
-#endif
-//////////////////////////////////////////////////////////////////////
-
-
-#if(MCU_CORE_TYPE == MCU_CORE_825x)
-	#define	FIX_HW_CRC24_EN											1
-	#define HW_ECDH_EN                                     			0
-#elif(MCU_CORE_TYPE == MCU_CORE_827x)
-	#define	FIX_HW_CRC24_EN											0
-	#define HW_ECDH_EN                                      		1
-#elif(MCU_CORE_TYPE == MCU_CORE_B91)
+#if(MCU_CORE_TYPE == MCU_CORE_B91)
 	#define	FIX_HW_CRC24_EN											0
 	#define HW_ECDH_EN                                      		1
 #else
@@ -104,25 +86,6 @@
 #define LL_FEATURE_SUPPORT_LE_AOA_AOD								0
 #endif
 
-#ifndef LL_FEATURE_SUPPORT_LE_EXTENDED_ADVERTISING
-#define LL_FEATURE_SUPPORT_LE_EXTENDED_ADVERTISING					1
-#endif
-
-#ifndef LL_FEATURE_SUPPORT_LE_EXTENDED_SCANNING
-#define LL_FEATURE_SUPPORT_LE_EXTENDED_SCANNING						1
-#endif
-
-#ifndef LL_FEATURE_SUPPORT_LE_EXTENDED_INITIATE
-#define LL_FEATURE_SUPPORT_LE_EXTENDED_INITIATE						1
-#endif
-
-#ifndef LL_FEATURE_SUPPORT_LE_PERIODIC_ADVERTISING
-#define LL_FEATURE_SUPPORT_LE_PERIODIC_ADVERTISING					1
-#endif
-
-#ifndef LL_FEATURE_SUPPORT_LE_PERIODIC_ADVERTISING_SYNC
-#define LL_FEATURE_SUPPORT_LE_PERIODIC_ADVERTISING_SYNC				1
-#endif
 
 #ifndef LL_FEATURE_SUPPORT_CHANNEL_SELECTION_ALGORITHM2
 #define LL_FEATURE_SUPPORT_CHANNEL_SELECTION_ALGORITHM2				1
@@ -181,9 +144,6 @@
 #define L2CAP_DATA_2_HCI_DATA_BUFFER_ENABLE							0  //just for debug
 #endif
 
-#ifndef L2CAP_CREDIT_BASED_FLOW_CONTROL_MODE_EN
-#define L2CAP_CREDIT_BASED_FLOW_CONTROL_MODE_EN     				0
-#endif
 
 
 #ifndef UPPER_TESTER_DBG_EN
