@@ -56,16 +56,6 @@
 #include "stack/ble/B91/controller/ll/prdadv/pda_sync.h"
 
 
-#include "stack/ble/B91/controller/ial/ial.h"
-#include "stack/ble/B91/controller/ll/iso/iso.h"
-
-#include "stack/ble/B91/controller/ll/iso/bis.h"
-#include "stack/ble/B91/controller/ll/iso/bis_bcst.h"
-#include "stack/ble/B91/controller/ll/iso/bis_sync.h"
-#include "stack/ble/B91/controller/ll/iso/cis.h"
-#include "stack/ble/B91/controller/ll/iso/cis_master.h"
-#include "stack/ble/B91/controller/ll/iso/cis_slave.h"
-#include "stack/ble/B91/controller/ll/aoa_aod/aoa_aod.h"
 
 
 #include "stack/ble/B91/controller/whitelist/whitelist.h"
