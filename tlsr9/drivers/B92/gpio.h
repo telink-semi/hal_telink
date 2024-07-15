@@ -1,27 +1,24 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
-
 /********************************************************************************************************
- * @file	gpio.h
+ * @file    gpio.h
  *
- * @brief	This is the header file for B92
+ * @brief   This is the header file for B92
  *
- * @author	Driver Group
+ * @author  Driver Group
+ * @date    2020
+ *
+ * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *
  *******************************************************************************************************/
 /**	@page GPIO
@@ -38,7 +35,7 @@
 #define DRIVERS_GPIO_H_
 
 #include <stdbool.h>
-#include "plic.h"
+#include "lib/include/plic.h"
 #include "analog.h"
 #include "reg_include/gpio_reg.h"
 /**********************************************************************************************************************
@@ -416,7 +413,7 @@ static inline void gpio_function_dis(gpio_pin_e pin)
  * @param[in] pin - the pin needs to set its output level.
  * @return    none.
  */
-static inline void gpio_set_high_level(gpio_pin_e pin)
+static _always_inline void gpio_set_high_level(gpio_pin_e pin)
 {
 	unsigned char	bit = pin & 0xff;
 	BM_SET(reg_gpio_out(pin), bit);
@@ -428,7 +425,7 @@ static inline void gpio_set_high_level(gpio_pin_e pin)
  * @param[in] pin - the pin needs to set its output level.
  * @return    none.
  */
-static inline void gpio_set_low_level(gpio_pin_e pin)
+static _always_inline void gpio_set_low_level(gpio_pin_e pin)
 {
 	unsigned char	bit = pin & 0xff;
 	BM_CLR(reg_gpio_out(pin), bit);
@@ -441,7 +438,7 @@ static inline void gpio_set_low_level(gpio_pin_e pin)
  * @param[in] value - value of the output level(1: high 0: low)
  * @return    none
  */
-static inline void gpio_set_level(gpio_pin_e pin, unsigned char value)
+static _always_inline void gpio_set_level(gpio_pin_e pin, unsigned char value)
 {
 	if(value)
 	{
@@ -485,7 +482,7 @@ static inline void gpio_get_level_all(unsigned char *p)
  * @param[in] pin - the pin needs to toggle.
  * @return    none.
  */
-static inline void gpio_toggle(gpio_pin_e pin)
+static _always_inline void gpio_toggle(gpio_pin_e pin)
 {
 	reg_gpio_out(pin) ^= (pin & 0xFF);
 }
@@ -725,10 +722,10 @@ void gpio_set_gpio2risc1_irq(gpio_pin_e pin, gpio_irq_trigger_type_e trigger_typ
  * 							  1: falling edge.
  * 							  2: high level.
  * 							  3: low level
- * @attention <p> GPIO_PX0 (GPIO_PA0/GPIO_PB0/... /GPIO_PF0) corresponds to the interrupt source IRQ34_GPIO_SRC0
- *			  <p> GPIO_PX1 (GPIO_PA1/GPIO_PB1/... /GPIO_PF1) corresponds to the interrupt source IRQ35_GPIO_SRC1
+ * @attention <p> GPIO_PX0 (GPIO_PA0/GPIO_PB0/... /GPIO_PF0) corresponds to the interrupt source IRQ_GPIO_SRC0
+ *			  <p> GPIO_PX1 (GPIO_PA1/GPIO_PB1/... /GPIO_PF1) corresponds to the interrupt source IRQ_GPIO_SRC1
  *			  <p> ...
- *			  <p> GPIO_PX7 (GPIO_PA7/GPIO_PB7/... /GPIO_PF7) corresponds to the interrupt source IRQ41_GPIO_SRC7
+ *			  <p> GPIO_PX7 (GPIO_PA7/GPIO_PB7/... /GPIO_PF7) corresponds to the interrupt source IRQ_GPIO_SRC7
  * @return    none.
  */
 void gpio_set_src_irq(gpio_pin_e pin, gpio_irq_trigger_type_e trigger_type);
@@ -792,6 +789,24 @@ void gpio_set_pullup_res_30k(gpio_pin_e pin);
  * @return    none.
  */
 void  gpio_set_probe_clk_function(gpio_func_pin_e pin,probe_clk_sel_e sel_clk);
+
+/**
+ * @brief     This function serves to set jtag(4 wires) pin , Where, PC[4]; PC[5]; PC[6]; PC[7] correspond to TDI; TDO; TMS; TCK functions mux respectively.
+ * @param[in] none
+ * @return    none.
+ * @note      Power-on or hardware reset will detect the level of PB0 (reboot will not detect it), detecting a low level is configured as jtag, 
+               detecting a high level is configured as sdp.  the level of PB0 can not be configured internally by the software, and can only be input externally.
+ */
+ void jtag_set_pin_en(void);
+
+/**
+ * @brief     This function serves to set sdp(2 wires) pin ,where, PC[6]; PC[7] correspond to TMS and TCK functions mux respectively.
+ * @param[in] none
+ * @return    none.
+ * @note      Power-on or hardware reset will detect the level of PB0 (reboot will not detect it), detecting a low level is configured as jtag, 
+               detecting a high level is configured as sdp.  the level of PB0 can not be configured internally by the software, and can only be input externally.
+ */
+ void sdp_set_pin_en(void);
 
 /**
  * @brief     This function select the irq group source.
