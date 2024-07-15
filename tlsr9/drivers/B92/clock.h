@@ -1,34 +1,31 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
-
 /********************************************************************************************************
- * @file	clock.h
+ * @file    clock.h
  *
- * @brief	This is the header file for B92
+ * @brief   This is the header file for B92
  *
- * @author	Driver Group
+ * @author  Driver Group
+ * @date    2020
+ *
+ * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *
  *******************************************************************************************************/
 /**	@page CLOCK
  *
  *	Introduction
  *	===============
- *	TLSRB92 clock setting.
+ *	B92 clock setting.
  *
  *	API Reference
  *	===============
@@ -37,6 +34,8 @@
 
 #ifndef CLOCK_H_
 #define CLOCK_H_
+
+#define RC_4M_FUNCTION           0 //for internal testing only
 
 #include "compiler.h"
 #include "reg_include/register.h"
@@ -48,11 +47,18 @@
 /**********************************************************************************************************************
  *                                           global macro                                                             *
  *********************************************************************************************************************/
+/**
+ *  @note	If it is an external flash, the maximum speed of mspi needs to be based on the board test.
+ *  		Because the maximum speed is related to the wiring of the board, and is also affected by temperature and GPIO voltage,
+ *  		the maximum speed needs to be tested at the highest and lowest voltage of the board,
+ *  		and the high and low temperature long-term stability test speed is no problem.
+ */
 #define CCLK_16M_HCLK_16M_PCLK_16M			clock_init(PLL_CLK_192M, PAD_PLL_DIV, PLL_DIV12_TO_CCLK, CCLK_DIV1_TO_HCLK, HCLK_DIV1_TO_PCLK, PLL_DIV4_TO_MSPI_CLK)
 #define CCLK_24M_HCLK_24M_PCLK_24M			clock_init(PLL_CLK_192M, PAD_PLL_DIV, PLL_DIV8_TO_CCLK, CCLK_DIV1_TO_HCLK, HCLK_DIV1_TO_PCLK, PLL_DIV4_TO_MSPI_CLK)
 #define CCLK_32M_HCLK_32M_PCLK_16M			clock_init(PLL_CLK_192M, PAD_PLL_DIV, PLL_DIV6_TO_CCLK, CCLK_DIV1_TO_HCLK, HCLK_DIV2_TO_PCLK, PLL_DIV4_TO_MSPI_CLK)
 #define CCLK_48M_HCLK_48M_PCLK_24M			clock_init(PLL_CLK_192M, PAD_PLL_DIV, PLL_DIV4_TO_CCLK, CCLK_DIV1_TO_HCLK, HCLK_DIV2_TO_PCLK, PLL_DIV4_TO_MSPI_CLK)
 #define CCLK_96M_HCLK_48M_PCLK_24M			clock_init(PLL_CLK_192M, PAD_PLL_DIV, PLL_DIV2_TO_CCLK, CCLK_DIV2_TO_HCLK, HCLK_DIV2_TO_PCLK, PLL_DIV4_TO_MSPI_CLK)
+
 /**********************************************************************************************************************
  *                                         global data type                                                           *
  *********************************************************************************************************************/
@@ -156,7 +162,7 @@ typedef enum{
 typedef enum{
 	HCLK_DIV1_TO_PCLK    =    1,
 	HCLK_DIV2_TO_PCLK    =    2,
-	HCLK_DIV4_TO_PCLK    =    4,
+	HCLK_DIV4_TO_PCLK    =    4,	//if hclk = 1/2 * cclk, the pclk can not be 1/4 of hclk.
 }sys_hclk_div_to_pclk_e;
 
 /**
@@ -164,7 +170,7 @@ typedef enum{
  */
 typedef enum{
 	CCLK_DIV1_TO_HCLK    =    1,
-	CCLK_DIV2_TO_HCLK    =    2,  /*< can not use in A0. if use reboot when hclk = 1/2cclk will cause problem */
+	CCLK_DIV2_TO_HCLK    =    2,
 }sys_cclk_div_to_hclk_e;
 
 /**
@@ -175,6 +181,17 @@ typedef enum {
 	RC_24M_CAL_ENABLE,
 }rc_24M_cal_e;
 
+
+#if RC_4M_FUNCTION
+/**
+ * @brief     CLK type for different application .
+ */
+typedef enum{
+	RC_24M,
+	RC_4M,
+}sys_clock_src_sel_e;
+#endif
+
 /**
  *  @brief  Enumerate the configurable cclk/hclk/pclk frequencies when the PLL is 192M.
  */
@@ -184,28 +201,28 @@ typedef enum{
 	PLL_192M_DIV_CCLK_16M_HCLK_16M_PCLK_8M	= (2 | (1 << 4) | (12 << 8)),
 	PLL_192M_DIV_CCLK_32M_HCLK_16M_PCLK_8M	= (2 | (2 << 4) | (6 << 8)),
 	PLL_192M_DIV_CCLK_16M_HCLK_16M_PCLK_4M	= (4 | (1 << 4) | (12 << 8)),
-	PLL_192M_DIV_CCLK_32M_HCLK_16M_PCLK_4M	= (4 | (2 << 4) | (6 << 8)),
+//	PLL_192M_DIV_CCLK_32M_HCLK_16M_PCLK_4M	= (4 | (2 << 4) | (6 << 8)),//no support
 
 	PLL_192M_DIV_CCLK_24M_HCLK_24M_PCLK_24M	= (1 | (1 << 4) | (8 << 8)),
 	PLL_192M_DIV_CCLK_48M_HCLK_24M_PCLK_24M	= (1 | (2 << 4) | (4 << 8)),
 	PLL_192M_DIV_CCLK_24M_HCLK_24M_PCLK_12M	= (2 | (1 << 4) | (8 << 8)),
 	PLL_192M_DIV_CCLK_48M_HCLK_24M_PCLK_12M	= (2 | (2 << 4) | (4 << 8)),
 	PLL_192M_DIV_CCLK_24M_HCLK_24M_PCLK_6M	= (4 | (1 << 4) | (8 << 8)),
-	PLL_192M_DIV_CCLK_48M_HCLK_24M_PCLK_6M	= (4 | (2 << 4) | (4 << 8)),
+//	PLL_192M_DIV_CCLK_48M_HCLK_24M_PCLK_6M	= (4 | (2 << 4) | (4 << 8)),//no support
 
 	PLL_192M_DIV_CCLK_32M_HCLK_32M_PCLK_32M	= (1 | (1 << 4) | (6 << 8)),
 	PLL_192M_DIV_CCLK_64M_HCLK_32M_PCLK_32M	= (1 | (2 << 4) | (3 << 8)),
 	PLL_192M_DIV_CCLK_32M_HCLK_32M_PCLK_16M	= (2 | (1 << 4) | (6 << 8)),
 	PLL_192M_DIV_CCLK_64M_HCLK_32M_PCLK_16M	= (2 | (2 << 4) | (3 << 8)),
 	PLL_192M_DIV_CCLK_32M_HCLK_32M_PCLK_8M	= (4 | (1 << 4) | (6 << 8)),
-	PLL_192M_DIV_CCLK_64M_HCLK_32M_PCLK_8M	= (4 | (2 << 4) | (3 << 8)),
+//	PLL_192M_DIV_CCLK_64M_HCLK_32M_PCLK_8M	= (4 | (2 << 4) | (3 << 8)),//no support
 
 	PLL_192M_DIV_CCLK_48M_HCLK_48M_PCLK_48M	= (1 | (1 << 4) | (4 << 8)),
 	PLL_192M_DIV_CCLK_96M_HCLK_48M_PCLK_48M	= (1 | (2 << 4) | (2 << 8)),
 	PLL_192M_DIV_CCLK_48M_HCLK_48M_PCLK_24M	= (2 | (1 << 4) | (4 << 8)),
 	PLL_192M_DIV_CCLK_96M_HCLK_48M_PCLK_24M	= (2 | (2 << 4) | (2 << 8)),
 	PLL_192M_DIV_CCLK_48M_HCLK_48M_PCLK_12M	= (4 | (1 << 4) | (4 << 8)),
-	PLL_192M_DIV_CCLK_96M_HCLK_48M_PCLK_12M	= (4 | (2 << 4) | (2 << 8)),
+//	PLL_192M_DIV_CCLK_96M_HCLK_48M_PCLK_12M	= (4 | (2 << 4) | (2 << 8)),//no support
 }pll_div_cclk_hclk_pclk_e;
 
 
@@ -261,7 +278,7 @@ unsigned char clock_kick_32k_xtal(unsigned char xtal_times);
  * @brief     	This function performs to select 24M as the system clock source.
  * @return		none.
  */
-_attribute_ram_code_sec_noinline_ void clock_cal_24m_rc (void);
+_attribute_ram_code_com_sec_noinline_ void clock_cal_24m_rc (void);
 
 /**
  * @brief     This function performs to select 32K as the system clock source.
@@ -273,14 +290,14 @@ void clock_cal_32k_rc (void);
  * @brief  This function serves to get the 32k tick.
  * @return none.
  */
-_attribute_ram_code_sec_noinline_  unsigned int clock_get_32k_tick (void);
+_attribute_ram_code_sec_optimize_o2_ unsigned int clock_get_32k_tick (void);
 
 /**
  * @brief  This function serves to set the 32k tick.
  * @param  tick - the value of to be set to 32k.
  * @return none.
  */
-_attribute_ram_code_sec_noinline_ void clock_set_32k_tick(unsigned int tick);
+_attribute_ram_code_sec_optimize_o2_ void clock_set_32k_tick(unsigned int tick);
 
 /**
  * @brief       This function used to configure the frequency of CCLK/HCLK/PCLK when the PLL is 192M.
@@ -289,6 +306,15 @@ _attribute_ram_code_sec_noinline_ void clock_set_32k_tick(unsigned int tick);
  * @return      none
  */
 void cclk_hclk_pclk_config(pll_div_cclk_hclk_pclk_e div);
+
+#if RC_4M_FUNCTION
+/**
+ * @brief   	This function performs to select 4M or 24M as the system clock .
+ * @param[in]	clk_type	-sel 4MHz/24MHz RC mode.
+ * @return  	none
+ */
+void sys_clock_src_sel(sys_clock_src_sel_e sys_clock_src_sel);
+#endif
 
 #endif
 

@@ -1,27 +1,24 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
-
 /********************************************************************************************************
- * @file	gpio.c
+ * @file    gpio.c
  *
- * @brief	This is the source file for B92
+ * @brief   This is the source file for B92
  *
- * @author	Driver Group
+ * @author  Driver Group
+ * @date    2020
+ *
+ * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *
  *******************************************************************************************************/
 #include "gpio.h"
@@ -402,10 +399,10 @@ void gpio_set_gpio2risc1_irq(gpio_pin_e pin, gpio_irq_trigger_type_e trigger_typ
  * 							  1: falling edge.
  * 							  2: high level.
  * 							  3: low level
- * @attention <p> GPIO_PX0 (GPIO_PA0/GPIO_PB0/... /GPIO_PF0) corresponds to the interrupt source IRQ34_GPIO_SRC0
- *			  <p> GPIO_PX1 (GPIO_PA1/GPIO_PB1/... /GPIO_PF1) corresponds to the interrupt source IRQ35_GPIO_SRC1
+ * @attention <p> GPIO_PX0 (GPIO_PA0/GPIO_PB0/... /GPIO_PF0) corresponds to the interrupt source IRQ_GPIO_SRC0
+ *			  <p> GPIO_PX1 (GPIO_PA1/GPIO_PB1/... /GPIO_PF1) corresponds to the interrupt source IRQ_GPIO_SRC1
  *			  <p> ...
- *			  <p> GPIO_PX7 (GPIO_PA7/GPIO_PB7/... /GPIO_PF7) corresponds to the interrupt source IRQ41_GPIO_SRC7
+ *			  <p> GPIO_PX7 (GPIO_PA7/GPIO_PB7/... /GPIO_PF7) corresponds to the interrupt source IRQ_GPIO_SRC7
  * @return    none.
  */
 void gpio_set_src_irq(gpio_pin_e pin, gpio_irq_trigger_type_e trigger_type)
@@ -521,6 +518,46 @@ void  gpio_set_probe_clk_function(gpio_func_pin_e pin,probe_clk_sel_e sel_clk)
 	reg_probe_clk_sel= (reg_probe_clk_sel&0xe0)|sel_clk;	//probe_clk_sel_e
 	gpio_set_mux_function(pin,DBG_PROBE_CLK);		        //sel probe_clk function
 	gpio_function_dis((gpio_pin_e)pin);
+}
+
+/**
+ * @brief     This function set jtag or sdp function.
+ * @param[in] pin
+ * @return    none.
+ */
+void jtag_sdp_set_pin(gpio_pin_e pin)
+{
+    gpio_input_en(pin);
+    reg_gpio_func_mux(pin) = 0;
+    gpio_function_dis(pin);
+}
+
+/**
+ * @brief     This function serves to set jtag(4 wires) pin . Where, PC[4]; PC[5]; PC[6]; PC[7] correspond to TDI; TDO; TMS; TCK functions mux respectively.
+ * @param[in] none
+ * @return    none.
+ * @note      Power-on or hardware reset will detect the level of PB0 (reboot will not detect it), detecting a low level is configured as jtag, 
+               detecting a high level is configured as sdp.  the level of PB0 can not be configured internally by the software, and can only be input externally.
+ */
+void jtag_set_pin_en(void)
+{
+	jtag_sdp_set_pin(GPIO_PC4);//TDI
+    jtag_sdp_set_pin(GPIO_PC5);//TDO
+    jtag_sdp_set_pin(GPIO_PC6);//TMS
+    jtag_sdp_set_pin(GPIO_PC7);//TCK
+}
+
+/**
+ * @brief     This function serves to set sdp(2 wires) pin . where, PC[6]; PC[7] correspond to TMS and TCK functions mux respectively.
+ * @param[in] none
+ * @return    none.
+ * @note      Power-on or hardware reset will detect the level of PB0 (reboot will not detect it), detecting a low level is configured as jtag, 
+               detecting a high level is configured as sdp.  the level of PB0 can not be configured internally by the software, and can only be input externally.
+ */
+void sdp_set_pin_en(void)
+{
+    jtag_sdp_set_pin(GPIO_PC6);//TMS
+    jtag_sdp_set_pin(GPIO_PC7);//TCK
 }
 
 /**********************************************************************************************************************

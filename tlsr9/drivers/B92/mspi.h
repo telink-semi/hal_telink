@@ -1,27 +1,24 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
-
 /********************************************************************************************************
- * @file	mspi.h
+ * @file    mspi.h
  *
- * @brief	This is the header file for B92
+ * @brief   This is the header file for B92
  *
- * @author	Driver Group
+ * @author  Driver Group
+ * @date    2020
+ *
+ * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *
  *******************************************************************************************************/
 #pragma once
@@ -101,13 +98,21 @@ typedef enum{
 }mspi_func_e;
 
 /**
- * @brief 		This function to determine whether the bus is busy.
+ * @brief 		This function servers to set the spi wait.
  * @param[in] 	none.
- * @return   	1:Indicates that the bus is busy. 0:Indicates that the bus is free.
+ * @return   	none.
  */
-_attribute_ram_code_sec_ static inline unsigned char mspi_is_busy(void)
+_attribute_ram_code_sec_optimize_o2_ static void mspi_wait(void)
 {
-	return  (reg_mspi_status & FLD_MSPI_BUSY);
+	unsigned long long start = rdmcycle();
+	while (reg_mspi_status & FLD_MSPI_BUSY)
+	{
+		if(rdmcycle() - start > TIMEOUT_US * sys_clk.cclk)
+		{
+			timeout_handler(ERROR_TIMEOUT_MSPI_WAIT);
+			return;
+		}
+	}
 }
 
 /**
@@ -115,7 +120,7 @@ _attribute_ram_code_sec_ static inline unsigned char mspi_is_busy(void)
  * @param[in] 	cmd 		- command content.
  * @return 		none
  */
-_attribute_ram_code_sec_ static inline void mspi_set_cmd(unsigned char cmd)
+_attribute_ram_code_com_sec_ static _always_inline void mspi_set_cmd(unsigned char cmd)
 {
 	reg_mspi_cmd = cmd;
 }
@@ -125,7 +130,7 @@ _attribute_ram_code_sec_ static inline void mspi_set_cmd(unsigned char cmd)
  * @param[in] 	none.
  * @return 		none
  */
-_attribute_ram_code_sec_ static inline void mspi_cmd_en()
+_attribute_ram_code_com_sec_ static inline void mspi_cmd_en(void)
 {
 	BM_SET(	reg_mspi_ctrl1, FLD_MSPI_CMD_EN);
 }
@@ -135,7 +140,7 @@ _attribute_ram_code_sec_ static inline void mspi_cmd_en()
  * @param[in] 	none.
  * @return 		none
  */
-_attribute_ram_code_sec_ static inline void mspi_cmd_dis()
+_attribute_ram_code_com_sec_ static inline void mspi_cmd_dis(void)
 {
 
 	BM_CLR(reg_mspi_ctrl1, FLD_MSPI_CMD_EN);
@@ -146,7 +151,7 @@ _attribute_ram_code_sec_ static inline void mspi_cmd_dis()
  * @param[in] 	none.
  * @return 		none
  */
-_attribute_ram_code_sec_ static inline void mspi_cmd_fmt_en()
+_attribute_ram_code_com_sec_ static inline void mspi_cmd_fmt_en(void)
 {
 	BM_SET(	reg_mspi_ctrl1, FLD_MSPI_CMD_FMT);
 }
@@ -156,7 +161,7 @@ _attribute_ram_code_sec_ static inline void mspi_cmd_fmt_en()
  * @param[in] 	none.
  * @return 		none
  */
-_attribute_ram_code_sec_ static inline void mspi_cmd_fmt_dis()
+_attribute_ram_code_com_sec_ static inline void mspi_cmd_fmt_dis(void)
 {
 	BM_CLR(reg_mspi_ctrl1, FLD_MSPI_CMD_FMT);
 }
@@ -166,7 +171,7 @@ _attribute_ram_code_sec_ static inline void mspi_cmd_fmt_dis()
  * @param[in] 	none.
  * @return 		none
  */
-_attribute_ram_code_sec_ static inline void mspi_quad_mode_en()
+_attribute_ram_code_com_sec_ static inline void mspi_quad_mode_en(void)
 {
 	BM_SET(reg_mspi_ctrl1, FLD_MSPI_DUAD);
 }
@@ -176,7 +181,7 @@ _attribute_ram_code_sec_ static inline void mspi_quad_mode_en()
  * @param[in] 	none.
  * @return 		none
  */
-_attribute_ram_code_sec_ static inline void mspi_quad_mode_dis()
+_attribute_ram_code_com_sec_ static inline void mspi_quad_mode_dis(void)
 {
 	BM_CLR(reg_mspi_ctrl1, FLD_MSPI_DUAD);
 }
@@ -186,7 +191,7 @@ _attribute_ram_code_sec_ static inline void mspi_quad_mode_dis()
  * @param[in] 	none.
  * @return 		none
  */
-_attribute_ram_code_sec_ static inline void mspi_dual_mode_en()
+_attribute_ram_code_com_sec_ static inline void mspi_dual_mode_en(void)
 {
 	BM_SET(reg_mspi_ctrl1, FLD_MSPI_DUAL);
 }
@@ -196,7 +201,7 @@ _attribute_ram_code_sec_ static inline void mspi_dual_mode_en()
  * @param[in] 	none.
  * @return 		none
  */
-_attribute_ram_code_sec_ static inline void mspi_dual_mode_dis()
+_attribute_ram_code_com_sec_ static inline void mspi_dual_mode_dis(void)
 {
 	BM_CLR(reg_mspi_ctrl1, FLD_MSPI_DUAL);
 }
@@ -206,7 +211,7 @@ _attribute_ram_code_sec_ static inline void mspi_dual_mode_dis()
  * @param[in] 	none.
  * @return 		none
  */
-_attribute_ram_code_sec_ static inline void mspi_3line_mode_en()
+_attribute_ram_code_com_sec_ static inline void mspi_3line_mode_en(void)
 {
 	BM_SET(reg_mspi_ctrl3, FLD_MSPI_3LINE);
 }
@@ -216,7 +221,7 @@ _attribute_ram_code_sec_ static inline void mspi_3line_mode_en()
  * @param[in] 	none.
  * @return 		none.
  */
-_attribute_ram_code_sec_ static inline void mspi_3line_mode_dis()
+_attribute_ram_code_com_sec_ static inline void mspi_3line_mode_dis(void)
 {
 	BM_CLR(reg_mspi_ctrl3, FLD_MSPI_3LINE);
 }
@@ -226,7 +231,7 @@ _attribute_ram_code_sec_ static inline void mspi_3line_mode_dis()
  * @param[in] 	none.
  * @return 		none
  */
-_attribute_ram_code_sec_ static inline void mspi_addr_fmt_en(void)
+_attribute_ram_code_com_sec_ static inline void mspi_addr_fmt_en(void)
 {
 	BM_SET(reg_mspi_ctrl1, FLD_MSPI_ADDR_FMT);
 
@@ -237,7 +242,7 @@ _attribute_ram_code_sec_ static inline void mspi_addr_fmt_en(void)
  * @param[in] 	none.
  * @return 		none
  */
-_attribute_ram_code_sec_ static inline void mspi_addr_fmt_dis(void)
+_attribute_ram_code_com_sec_ static inline void mspi_addr_fmt_dis(void)
 {
 	BM_CLR(	reg_mspi_ctrl1, FLD_MSPI_ADDR_FMT);
 
@@ -248,7 +253,7 @@ _attribute_ram_code_sec_ static inline void mspi_addr_fmt_dis(void)
  * @param[in] 	none.
  * @return 		none
  */
-_attribute_ram_code_sec_ static inline void mspi_addr_en(void)
+_attribute_ram_code_com_sec_ static inline void mspi_addr_en(void)
 {
 	BM_SET(reg_mspi_ctrl1, FLD_MSPI_ADDR_EN);
 }
@@ -258,7 +263,7 @@ _attribute_ram_code_sec_ static inline void mspi_addr_en(void)
  * @param[in] 	none.
  * @return 		none
  */
-_attribute_ram_code_sec_ static inline void mspi_addr_dis(void)
+_attribute_ram_code_com_sec_ static inline void mspi_addr_dis(void)
 {
 	BM_CLR(reg_mspi_ctrl1, FLD_MSPI_ADDR_EN);
 }
@@ -268,7 +273,7 @@ _attribute_ram_code_sec_ static inline void mspi_addr_dis(void)
  * @param[in] 	len 	- 2'b00:1bye  2'b01:2bytes  2'b10:3bytes  2'b11:4bytes
  * @return 		none
  */
-_attribute_ram_code_sec_ static inline void mspi_set_addr_len(unsigned char len)
+_attribute_ram_code_com_sec_ static inline void mspi_set_addr_len(unsigned char len)
 {
 	reg_mspi_ctrl1 |= ((len - 1) & 0x3) << 2;
 }
@@ -280,7 +285,7 @@ _attribute_ram_code_sec_ static inline void mspi_set_addr_len(unsigned char len)
  * 				the actual duration is (SPI_CLK period*(cs2sclk+1)).
  * @return		none.
  */
-_attribute_ram_code_sec_ static inline void mspi_set_cs2clk_time(unsigned char time)
+_attribute_ram_code_com_sec_ static inline void mspi_set_cs2clk_time(unsigned char time)
 {
 	reg_mspi_timing |= (time & FLD_MSPI_CS2SCLK);
 }
@@ -291,7 +296,7 @@ _attribute_ram_code_sec_ static inline void mspi_set_cs2clk_time(unsigned char t
  * 				the actual duration is (SPI_CLK period*(csht+1))
  * @return		none.
  */
-_attribute_ram_code_sec_ static inline void mspi_set_cs_high_time(unsigned char time)
+_attribute_ram_code_com_sec_ static inline void mspi_set_cs_high_time(unsigned char time)
 {
 	reg_mspi_timing |= ((time << 3) & FLD_MSPI_CSHT);
 }
@@ -301,7 +306,7 @@ _attribute_ram_code_sec_ static inline void mspi_set_cs_high_time(unsigned char 
  * @param[in] 	addr - address.
  * @return    	none
  */
-_attribute_ram_code_sec_ static inline void mspi_set_address(unsigned int addr)
+_attribute_ram_code_com_sec_ static inline void mspi_set_address(unsigned int addr)
 {
 	reg_mspi_addr = addr;
 }
@@ -311,7 +316,7 @@ _attribute_ram_code_sec_ static inline void mspi_set_address(unsigned int addr)
  * @param[in] 	cnt 		- rx amount of data.
  * @return 		none
  */
-_attribute_ram_code_sec_ static inline void mspi_rx_cnt(unsigned int cnt)
+_attribute_ram_code_com_sec_ static inline void mspi_rx_cnt(unsigned int cnt)
 {
 	reg_mspi_rx_cnt = (cnt - 1) & 0xffffff;
 }
@@ -321,7 +326,7 @@ _attribute_ram_code_sec_ static inline void mspi_rx_cnt(unsigned int cnt)
  * @param[in] 	cnt 		- tx amount of data.
  * @return 		none
  */
-_attribute_ram_code_sec_ static inline void mspi_tx_cnt(unsigned int cnt)
+_attribute_ram_code_com_sec_ static inline void mspi_tx_cnt(unsigned int cnt)
 {
     reg_mspi_tx_cnt = (cnt - 1) & 0xffffff;
 
@@ -332,7 +337,7 @@ _attribute_ram_code_sec_ static inline void mspi_tx_cnt(unsigned int cnt)
  * @param[in]	thres 	- the mspi txfifo threshold.
  * @return 		none
  */
-_attribute_ram_code_sec_ static inline void mspi_set_txfifo_thres(unsigned char thres)
+_attribute_ram_code_com_sec_ static inline void mspi_set_txfifo_thres(unsigned char thres)
 {
 	reg_mspi_txfifo_thres = (thres & FLD_MSPI_TXFIFO_THRES);
 }
@@ -342,7 +347,7 @@ _attribute_ram_code_sec_ static inline void mspi_set_txfifo_thres(unsigned char 
  * @param[in]	thres 	- the mspi rxfifo threshold.
  * @return 		none
  */
-_attribute_ram_code_sec_ static inline void mspi_set_rxfifo_thres(unsigned char thres)
+_attribute_ram_code_com_sec_ static inline void mspi_set_rxfifo_thres(unsigned char thres)
 {
 	reg_mspi_rxfifo_thres = (thres & FLD_MSPI_RXFIFO_THRES);
 }
@@ -352,7 +357,7 @@ _attribute_ram_code_sec_ static inline void mspi_set_rxfifo_thres(unsigned char 
  * @param[in] 	none.
  * @return 		none
  */
-_attribute_ram_code_sec_ static inline void mspi_set_xip_en(void)
+_attribute_ram_code_com_sec_ static _always_inline void mspi_set_xip_en(void)
 {
 	reg_mspi_ctrl4 |= FLD_MSPI_XIP_ENABLE;
 }
@@ -362,7 +367,7 @@ _attribute_ram_code_sec_ static inline void mspi_set_xip_en(void)
  * @param[in] 	none.
  * @return 		none
  */
-_attribute_ram_code_sec_ static inline void mspi_set_xip_dis(void)
+_attribute_ram_code_com_sec_ static _always_inline void mspi_set_xip_dis(void)
 {
 	reg_mspi_ctrl4 &= (~FLD_MSPI_XIP_ENABLE);
 }
@@ -372,7 +377,7 @@ _attribute_ram_code_sec_ static inline void mspi_set_xip_dis(void)
  * @param[in]	en 	- 1: stop xip; 0: not stop xip
  * @return 		none
  */
-_attribute_ram_code_sec_ static inline void mspi_set_xip_stop(unsigned char en)
+_attribute_ram_code_com_sec_ static _always_inline void mspi_set_xip_stop(unsigned char en)
 {
     reg_mspi_ctrl4 |= ((en << 2) & FLD_MSPI_XIP_STOP);
 }
@@ -382,13 +387,13 @@ _attribute_ram_code_sec_ static inline void mspi_set_xip_stop(unsigned char en)
  * @param[in] 	none.
  * @return 		none
  */
-_attribute_ram_code_sec_ static inline void mspi_stop_xip(void)
+_attribute_ram_code_sec_optimize_o2_ static inline void mspi_stop_xip(void)
 {
 	mspi_set_xip_stop(1);
 
 	while(0 != (reg_mspi_status & 0x30));
 
-	while (mspi_is_busy());
+	mspi_wait();
 	mspi_set_xip_dis();
 }
 
@@ -397,7 +402,7 @@ _attribute_ram_code_sec_ static inline void mspi_stop_xip(void)
  * para[in]		en - 1: enable xip page mode; 0: disable xip page mode.
  * @return 		none
  */
-_attribute_ram_code_sec_ static inline void mspi_set_xip_page_mode(unsigned char en)
+_attribute_ram_code_com_sec_ static inline void mspi_set_xip_page_mode(unsigned char en)
 {
 	reg_mspi_ctrl4 |= (en & FLD_MSPI_XIP_PAGE_MODE_EN);
 }
@@ -407,7 +412,7 @@ _attribute_ram_code_sec_ static inline void mspi_set_xip_page_mode(unsigned char
  * para[in]		en - 1: enable xip page mode; 0: disable xip page mode.
  * @return 		none
  */
-_attribute_ram_code_sec_ static inline void mspi_set_xip_timeout_mode(unsigned char en)
+_attribute_ram_code_com_sec_ static inline void mspi_set_xip_timeout_mode(unsigned char en)
 {
 	reg_mspi_ctrl4 |= ((en << 1) & FLD_MSPI_XIP_TIMEOUT_MODE_EN);
 }
@@ -417,7 +422,7 @@ _attribute_ram_code_sec_ static inline void mspi_set_xip_timeout_mode(unsigned c
  * para[in]		size - the xip page size.
  * @return 		none
  */
-_attribute_ram_code_sec_ static inline void mspi_set_xip_page_size(unsigned char size)
+_attribute_ram_code_com_sec_ static inline void mspi_set_xip_page_size(unsigned char size)
 {
 	reg_mspi_page_size = size;
 }
@@ -427,7 +432,7 @@ _attribute_ram_code_sec_ static inline void mspi_set_xip_page_size(unsigned char
  * para[in]		cnt - xip timeout cnt.
  * @return 		none
  */
-_attribute_ram_code_sec_ static inline void mspi_set_xip_timeout_cnt(unsigned char cnt)
+_attribute_ram_code_com_sec_ static inline void mspi_set_xip_timeout_cnt(unsigned char cnt)
 {
 	reg_mspi_xip_timeout_cnt = cnt;
 }
@@ -437,7 +442,7 @@ _attribute_ram_code_sec_ static inline void mspi_set_xip_timeout_cnt(unsigned ch
  * para[in]		cnt - xip write transfer mode.
  * @return 		none
  */
-_attribute_ram_code_sec_ static inline void mspi_set_xip_write_transmode(mspi_wr_tans_mode_e mode)
+_attribute_ram_code_com_sec_ static inline void mspi_set_xip_write_transmode(mspi_wr_tans_mode_e mode)
 {
 	reg_mspi_xip_trans_mod = (mode & FLD_MSPI_XIP_WR_TRANS_MODE);
 }
@@ -447,7 +452,7 @@ _attribute_ram_code_sec_ static inline void mspi_set_xip_write_transmode(mspi_wr
  * para[in]		cnt - xip write transfer mode.
  * @return 		none
  */
-_attribute_ram_code_sec_ static inline void mspi_set_xip_read_transmode(mspi_rd_tans_mode_e mode)
+_attribute_ram_code_com_sec_ static inline void mspi_set_xip_read_transmode(mspi_rd_tans_mode_e mode)
 {
 	reg_mspi_xip_trans_mod = ((mode << 4) & FLD_MSPI_XIP_RD_TRANS_MODE);
 }
@@ -457,7 +462,7 @@ _attribute_ram_code_sec_ static inline void mspi_set_xip_read_transmode(mspi_rd_
  * para[in]		offset - xip addr offset, address offset = xip_addr_offset << 24
  * @return 		none
  */
-_attribute_ram_code_sec_ static inline void mspi_set_xip_addr_offset(unsigned char offset)
+_attribute_ram_code_com_sec_ static inline void mspi_set_xip_addr_offset(unsigned char offset)
 {
 	reg_mspi_xip_addr_offset = offset;
 }
@@ -467,7 +472,7 @@ _attribute_ram_code_sec_ static inline void mspi_set_xip_addr_offset(unsigned ch
  * @param[in] 	none.
  * @return 		txfifo entries.
  */
-_attribute_ram_code_sec_ static inline unsigned char mspi_get_txfifo_entries(void)
+_attribute_ram_code_com_sec_ static inline unsigned char mspi_get_txfifo_entries(void)
 {
 	return (reg_mspi_txfifo_status & FLD_MSPI_TXFIFO_ENTRIES);
 }
@@ -477,7 +482,7 @@ _attribute_ram_code_sec_ static inline unsigned char mspi_get_txfifo_entries(voi
  * @param[in] 	none.
  * @return 		1: txfifo is full.
  */
-_attribute_ram_code_sec_ static inline unsigned char mspi_txfifo_is_full(void)
+_attribute_ram_code_com_sec_ static inline unsigned char mspi_txfifo_is_full(void)
 {
 	return (reg_mspi_txfifo_status & FLD_MSPI_TXFIFO_FULL);
 }
@@ -487,7 +492,7 @@ _attribute_ram_code_sec_ static inline unsigned char mspi_txfifo_is_full(void)
  * @param[in] 	none.
  * @return 		txfifo entries.
  */
-_attribute_ram_code_sec_ static inline unsigned char mspi_get_rxfifo_entries(void)
+_attribute_ram_code_com_sec_ static inline unsigned char mspi_get_rxfifo_entries(void)
 {
 	return (reg_mspi_rxfifo_status & FLD_MSPI_RXFIFO_ENTRIES);
 }
@@ -497,7 +502,7 @@ _attribute_ram_code_sec_ static inline unsigned char mspi_get_rxfifo_entries(voi
  * @param[in] 	none.
  * @return 		1: txfifo is full.
  */
-_attribute_ram_code_sec_ static inline unsigned char mspi_txfifo_is_empty(void)
+_attribute_ram_code_com_sec_ static inline unsigned char mspi_txfifo_is_empty(void)
 {
 	return (reg_mspi_rxfifo_status & FLD_MSPI_RXFIFO_EMPTY);
 }
@@ -507,7 +512,7 @@ _attribute_ram_code_sec_ static inline unsigned char mspi_txfifo_is_empty(void)
  * @param[in] 	none.
  * @return   none
  */
-_attribute_ram_code_sec_ static inline void mspi_soft_reset(void)
+_attribute_ram_code_com_sec_ static inline void mspi_soft_reset(void)
 {
 	reg_mspi_status = FLD_MSPI_SOFT_RESET;
 	while(FLD_MSPI_SOFT_RESET == (reg_mspi_status & FLD_MSPI_SOFT_RESET) );
@@ -519,7 +524,7 @@ _attribute_ram_code_sec_ static inline void mspi_soft_reset(void)
  * @param[in] 	none.
  * @return 		none
  */
-_attribute_ram_code_sec_ static inline void mspi_tx_fifo_clr()
+_attribute_ram_code_com_sec_ static inline void mspi_tx_fifo_clr(void)
 {
 	BM_SET(reg_mspi_status, FLD_MSPI_TXFIFO_CLR_LEVEL);
 	while(FLD_MSPI_TXFIFO_CLR_LEVEL == (reg_mspi_status & FLD_MSPI_TXFIFO_CLR_LEVEL));
@@ -530,7 +535,7 @@ _attribute_ram_code_sec_ static inline void mspi_tx_fifo_clr()
  * @param[in]	none.
  * @return 		none
  */
-_attribute_ram_code_sec_ static inline void mspi_rx_fifo_clr()
+_attribute_ram_code_com_sec_ static inline void mspi_rx_fifo_clr(void)
 {
 	BM_SET(reg_mspi_status, FLD_MSPI_RXFIFO_CLR_LEVEL);
 	while(FLD_MSPI_RXFIFO_CLR_LEVEL == (reg_mspi_status & FLD_MSPI_RXFIFO_CLR_LEVEL));
@@ -542,7 +547,7 @@ _attribute_ram_code_sec_ static inline void mspi_rx_fifo_clr()
  * @param[in] 	dummy_cnt 	- the cnt of dummy clock.
  * @return  	none
  */
-_attribute_ram_code_sec_ static inline void mspi_set_dummy_cnt(unsigned char dummy_cnt)
+_attribute_ram_code_com_sec_ static inline void mspi_set_dummy_cnt(unsigned char dummy_cnt)
 {
 	reg_mspi_ctrl2 = (reg_mspi_ctrl2 & (~FLD_MSPI_DUMMY)) | ((dummy_cnt - 1) & FLD_MSPI_DUMMY);
 }
@@ -553,7 +558,7 @@ _attribute_ram_code_sec_ static inline void mspi_set_dummy_cnt(unsigned char dum
  * @param[in] 	mode 	- transfer mode.
  * @return  	none
  */
-_attribute_ram_code_sec_ static inline void mspi_set_transmode(mspi_tans_mode_e mode)
+_attribute_ram_code_com_sec_ static _always_inline void mspi_set_transmode(mspi_tans_mode_e mode)
 {
 	reg_mspi_ctrl2 = (reg_mspi_ctrl2 & (~FLD_MSPI_TRANSMODE)) | ((mode & 0x0f) << 4);
 }
@@ -568,7 +573,7 @@ _attribute_ram_code_sec_ static inline void mspi_set_transmode(mspi_tans_mode_e 
  *           	MODE3:  CPHA = 1, CPOL = 1;
  * @return  	none
  */
-_attribute_ram_code_sec_ static inline void mspi_set_work_mode(mspi_mode_type_e mode)
+_attribute_ram_code_com_sec_ static inline void mspi_set_work_mode(mspi_mode_type_e mode)
 {
 	reg_mspi_ctrl3 = (reg_mspi_ctrl3 & (~FLD_MSPI_WORK_MODE)) | ((mode << 2) & FLD_MSPI_WORK_MODE);	// select MSPI mode, support four modes
 }
@@ -578,7 +583,7 @@ _attribute_ram_code_sec_ static inline void mspi_set_work_mode(mspi_mode_type_e 
  * @param[in] 	none.
  * @return  	none.
  */
-_attribute_ram_code_sec_ static inline void mspi_set_normal_mode()
+_attribute_ram_code_com_sec_ static inline void mspi_set_normal_mode(void)
 {
 	mspi_dual_mode_dis();
 	mspi_3line_mode_dis();
@@ -590,7 +595,7 @@ _attribute_ram_code_sec_ static inline void mspi_set_normal_mode()
  * @param[in] 	none.
  * @return  	none
  */
-_attribute_ram_code_sec_ static inline void mspi_set_dual_mode()
+_attribute_ram_code_com_sec_ static inline void mspi_set_dual_mode(void)
 {
 	mspi_dual_mode_en();//quad  precede over dual
 	mspi_3line_mode_dis();
@@ -602,7 +607,7 @@ _attribute_ram_code_sec_ static inline void mspi_set_dual_mode()
  * @param[in] 	none.
  * @return	none
  */
-_attribute_ram_code_sec_ static inline void mspi_set_quad_mode()
+_attribute_ram_code_com_sec_ static inline void mspi_set_quad_mode(void)
 {
 	mspi_quad_mode_en();
 	mspi_dual_mode_dis();
@@ -614,7 +619,7 @@ _attribute_ram_code_sec_ static inline void mspi_set_quad_mode()
  * @param[in] 	none.
  * @return  	none
  */
-_attribute_ram_code_sec_ static inline void mspi_set_3line_mode()
+_attribute_ram_code_com_sec_ static inline void mspi_set_3line_mode(void)
 {
 	/*must disable dual and quad*/
 	mspi_3line_mode_en();
@@ -628,7 +633,7 @@ _attribute_ram_code_sec_ static inline void mspi_set_3line_mode()
  * @param[in]	mode 	- single/dual/quad /3line.
  * @return  	none
   */
-_attribute_ram_code_sec_ static inline void mspi_set_io_mode(mspi_io_mode_e mode)
+_attribute_ram_code_com_sec_ static inline void mspi_set_io_mode(mspi_io_mode_e mode)
 {
 	switch (mode)
 	{
@@ -653,7 +658,7 @@ _attribute_ram_code_sec_ static inline void mspi_set_io_mode(mspi_io_mode_e mode
  * @param[in] 	len 	- write length.
  * @return    	none
  */
-_attribute_ram_code_sec_noinline_  void mspi_write(unsigned char *data, unsigned int len);
+_attribute_ram_code_com_sec_noinline_  void mspi_write(unsigned char *data, unsigned int len);
 
 /**
  * @brief     	This function servers to read mspi fifo.
@@ -661,7 +666,7 @@ _attribute_ram_code_sec_noinline_  void mspi_write(unsigned char *data, unsigned
  * @param[in] 	len 	- write length.
  * @return    	none
  */
-_attribute_ram_code_sec_noinline_  void mspi_read(unsigned char *data, unsigned int len);
+_attribute_ram_code_com_sec_noinline_  void mspi_read(unsigned char *data, unsigned int len);
 
 
 

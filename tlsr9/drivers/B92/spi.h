@@ -1,27 +1,24 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
-
 /********************************************************************************************************
- * @file	spi.h
+ * @file    spi.h
  *
- * @brief	This is the header file for B92
+ * @brief   This is the header file for B92
  *
- * @author	Driver Group
+ * @author  Driver Group
+ * @date    2020
+ *
+ * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *
  *******************************************************************************************************/
 #ifndef SPI_H
@@ -42,6 +39,18 @@
  *	Header File: spi.h
  */
 
+/**note:
+ * SPI_END_INT_EN Recommended usage:
+ * 1: spi_master_write_dma_plus()/spi_master_write_dma(): Check whether sending is complete.
+ * If interrupt is enabled, spi_set_irq_mask() :SPI_END_INT_EN;
+ * If interrupt is not enabled, the spi_is_busy() interface is queried.
+ * 2: spi_master_read_dma_plus()/spi_master_write_read_dma()/spi_master_write_read_dma_plus(): Determine whether it is complete:If interrupt is enabled, dma_set_irq_mask() : TC_MASK;
+ * If interrupt is not enabled, the interface dma_get_tc_irq_status() is polled.
+ * Special note:
+ * When spi_master_read_dma_plus()/spi_master_write_read_dma()/spi_master_write_read_dma_plus() is used, TC_MASK is used, because SPI_END_EN can only represent the completion of spi receiving,
+ * and can not represent whether the dma has completed the work, to prevent abnormal situations.
+ * If spi_set_irq_mask() :SPI_END_INT_EN is enabled when master read is used, disable it before read. Enable the read function after it is complete. 
+  */
 typedef enum{
 	SPI_RXFIFO_OR_INT_EN        =BIT(0),
 	SPI_TXFIFO_UR_INT_EN        =BIT(1),
@@ -167,13 +176,13 @@ typedef enum{
  * @brief  Define the SPI write read configuration struct.
  */
 typedef struct{
-	spi_io_mode_e  spi_io_mode;//set spi io mode
 	unsigned char spi_dummy_cnt;//set dummy cnt if tans_mode have dummy .
 	unsigned char spi_cmd_en;//enable cmd phase
 	unsigned char spi_addr_en;//enable address phase
 	unsigned char spi_addr_len;//enable address phase
 	unsigned char spi_cmd_fmt_en;//if cmd_en enable cmd fmt will follow the interface (dual/quad)
 	unsigned char spi_addr_fmt_en;//if addr_en enable addr fmt will follow the interface (dual/quad)
+	spi_io_mode_e  spi_io_mode;//set spi io mode
 }spi_wr_rd_config_t;
 
 typedef enum{
@@ -772,10 +781,11 @@ static inline void spi_tx_irq_trig_cnt(spi_sel_e spi_sel, unsigned char cnt)
 }
 
 /**
- * @brief 		This function servers to get irq status.
- * @param[in] 	spi_sel - the spi module.
- * @param[in] 	status 	- the irq status.
- * @return    - the value of status is be set.
+ * @brief       This function servers to get irq status.
+ * @param[in]   spi_sel   - the spi module.
+ * @param[in]   status    - the irq status.
+ * @retval      non-zero      - the interrupt occurred.
+ * @retval      zero  - the interrupt did not occur.
  */
 static inline unsigned char spi_get_irq_status(spi_sel_e spi_sel,spi_irq_status_e status)
 {
@@ -898,8 +908,9 @@ static inline unsigned char lspi_lcd_get_irq_mask(lspi_lcd_irq_mask lcd_irq_mask
 }
 
 /**
- * @brief 		This function servers to get lspi lcd interrupt status.
- * @return  	none.
+ * @brief      This function servers to get lspi lcd interrupt status.
+ * @retval     non-zero      -  the interrupt occurred.
+ * @retval     zero  -  the interrupt did not occur.
  */
 static inline unsigned char lspi_lcd_get_irq_status(lspi_lcd_irq_status_e status)
 {
@@ -1189,13 +1200,6 @@ void spi_slave_init(spi_sel_e spi_sel, spi_mode_type_e mode);
 void spi_set_dummy_cnt(spi_sel_e spi_sel, unsigned char dummy_cnt);
 
 /**
- * @brief     	This function servers to set slave address.
- * @param[in] 	addr 	- address of slave.
- * @return  	none
- */
-void spi_set_address(spi_sel_e spi_sel,unsigned int addr);
-
-/**
  * @brief     	This function servers to set spi transfer mode.
  * @param[in] 	spi_sel - the spi module.
  * @param[in] 	mode 	- transfer mode.
@@ -1412,7 +1416,7 @@ void spi_set_slave_rx_dma_config(spi_sel_e spi_sel,dma_chn_e chn);
  * @param[in]  	len 		- Amount of data to be sent in bytes, range from 1 to 0xFFFFFC
  * @return		none
  * */
-_attribute_ram_code_sec_ void spi_set_tx_dma(spi_sel_e spi_sel, unsigned char* src_addr,unsigned int len);
+_attribute_ram_code_com_sec_ void spi_set_tx_dma(spi_sel_e spi_sel, unsigned char* src_addr,unsigned int len);
 
 /**
  * @brief      Receive an amount of data in DMA mode
@@ -1426,7 +1430,7 @@ _attribute_ram_code_sec_ void spi_set_tx_dma(spi_sel_e spi_sel, unsigned char* s
  *			   4bytes (length information) + 5bytes (data) + 3bytes (the number of additional bytes to prevent out-of-bounds)
  * @return     none.
  */
-_attribute_ram_code_sec_ void spi_set_rx_dma(spi_sel_e spi_sel, unsigned char* dst_addr);
+_attribute_ram_code_com_sec_ void spi_set_rx_dma(spi_sel_e spi_sel, unsigned char* dst_addr);
 
 /**
  * @brief     	This function serves to normal write data by dma.

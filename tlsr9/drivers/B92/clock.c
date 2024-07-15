@@ -1,30 +1,27 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
-
 /********************************************************************************************************
- * @file	clock.c
+ * @file    clock.c
  *
- * @brief	This is the source file for B92
+ * @brief   This is the source file for B92
  *
- * @author	Driver Group
+ * @author  Driver Group
+ * @date    2020
+ *
+ * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *
  *******************************************************************************************************/
-#include "sys.h"
+#include "lib/include/sys.h"
 #include "clock.h"
 #include "mspi.h"
 #include "stimer.h"
@@ -165,7 +162,15 @@ void clock_cal_24m_rc(void)
 
 	analog_write_reg8(0xc7, 0x0e);
 	analog_write_reg8(0xc7, 0x0f);
-    while((analog_read_reg8(0xcf) & 0x80) == 0);
+	unsigned long long start = rdmcycle();
+    while((analog_read_reg8(0xcf) & 0x80) == 0)
+    {
+		if(rdmcycle() - start > TIMEOUT_US * sys_clk.cclk)
+		{
+			timeout_handler(ERROR_TIMEOUT_RC_24M_CAL);
+			return;
+		}
+    }
     unsigned char cap = analog_read_reg8(0xcb);
     analog_write_reg8(0x52, cap);		//write 24m cap into manual register
 
@@ -184,14 +189,21 @@ void clock_cal_32k_rc(void)
 	analog_write_reg8(0x4f, ((analog_read_reg8(0x4f) & 0x3f) | 0x40));
 	analog_write_reg8(0xc6, 0xf6);
 	analog_write_reg8(0xc6, 0xf7);
-    while(0 == (analog_read_reg8(0xcf) & BIT(6))){};
+	unsigned long long start = rdmcycle();
+    while(0 == (analog_read_reg8(0xcf) & BIT(6)))
+    {
+		if(rdmcycle() - start > TIMEOUT_US * sys_clk.cclk)
+		{
+			timeout_handler(ERROR_TIMEOUT_RC_32K_CAL);
+			return;
+		}
+    }
 	unsigned char res1 = analog_read_reg8(0xc9);	//read 32k res[13:6]
 	analog_write_reg8(0x51, res1);		//write 32k res[13:6] into manual register
 	unsigned char res2 = analog_read_reg8(0xca);	//read 32k res[5:0]
 	analog_write_reg8(0x4f, (res2 | (analog_read_reg8(0x4f) & 0xc0)));		//write 32k res[5:0] into manual register
 	analog_write_reg8(0xc6, 0xf6);
 	analog_write_reg8(0x4f, ((analog_read_reg8(0x4f) & 0x3f) | 0x00));//manual on
-
 	rc_24m_power = analog_read_reg8(0x05) & 0x04;
 	bbpll_power  = analog_read_reg8(0x06) & 0x01;
 }
@@ -201,18 +213,20 @@ void clock_cal_32k_rc(void)
  * @param  tick - the value of to be set to 32k.
  * @return none.
  */
-void clock_set_32k_tick(unsigned int tick)
+_attribute_ram_code_sec_optimize_o2_ void clock_set_32k_tick(unsigned int tick)
 {
 	reg_system_ctrl |= FLD_SYSTEM_32K_WR_EN;	//r_32k_wr = 1;
 	while(reg_system_st & FLD_SYSTEM_RD_BUSY);
 	reg_system_timer_set_32k = tick;
 
 	reg_system_st = FLD_SYSTEM_CMD_SYNC;	//cmd_sync = 1,trig write
-	//delay 10us
-	__asm__("nop");__asm__("nop");__asm__("nop");__asm__("nop");
-	__asm__("nop");__asm__("nop");__asm__("nop");__asm__("nop");
-	__asm__("nop");__asm__("nop");__asm__("nop");__asm__("nop");
-	__asm__("nop");__asm__("nop");__asm__("nop");__asm__("nop");
+	/**
+	 * This delay time is about 1.38us under the calibrated 24M RC clock.
+	 * The minimum waiting time here is 3*pclk cycles+3*24M xtal cycles, a total of 0.25us,
+	 * wait 0.25us before you can use wr_busy signal for judgment, jianzhi suggested that this time to 1us is enough.
+	 * add by bingyu.li, confirmed by jianzhi.chen 20231115
+	 */
+	CLOCK_NOP_DLY_1US;
 	while(reg_system_st & FLD_SYSTEM_CMD_SYNC);	//wait wr_busy = 0
 
 }
@@ -239,7 +253,7 @@ unsigned int clock_get_32k_tick(void)
 	return timer_32k_tick;
 }
 #else
-unsigned int clock_get_32k_tick(void)
+_attribute_ram_code_sec_optimize_o2_ unsigned int clock_get_32k_tick(void)
 {
     unsigned int t0 = 0;
     unsigned int t1 = 0;
@@ -270,7 +284,7 @@ unsigned int clock_get_32k_tick(void)
  * @param[in]	src - cclk source.
  * @param[in]	cclk_div - the cclk divide from pll.it is useless if src is not PAD_PLL_DIV. cclk max is 96M
  * @param[in]	hclk_div - the hclk divide from cclk.hclk max is 48M.
- * @param[in]	pclk_div - the pclk divide from hclk.pclk max is 24M.if hclk = 1/2 * cclk, the pclk can not be 1/4 of hclk.
+ * @param[in]	pclk_div - the pclk divide from hclk.pclk max is 48M.if hclk = 1/2 * cclk, the pclk can not be 1/4 of hclk.
  * @param[in]	mspi_clk_div - mspi_clk has two source - pll div and 24M rc. If it is built-in flash, the maximum speed of mspi is 64M.
 							   If it is an external flash, the maximum speed of mspi needs to be based on the board test.
 							   Because the maximum speed is related to the wiring of the board, and is also affected by temperature and GPIO voltage,
@@ -281,7 +295,7 @@ unsigned int clock_get_32k_tick(void)
  * 			    because during the clock switching process, the system clock will be
  * 			    suspended for a period of time, which may cause data loss
  */
-_attribute_ram_code_sec_noinline_
+_attribute_ram_code_com_sec_noinline_
 void clock_init_ram(sys_pll_clk_e pll,
 					sys_clock_src_e src,
 					sys_pll_div_to_cclk_e cclk_div,
@@ -289,6 +303,13 @@ void clock_init_ram(sys_pll_clk_e pll,
 					sys_hclk_div_to_pclk_e pclk_div,
 					sys_pll_div_to_mspi_clk_e mspi_clk_div)
 {
+	//ensure mspi is not in busy status before change mspi clock
+	mspi_stop_xip();
+
+	//first cclk/mspi_clk switch to 24rc to avoid the risk of hclk/pclk/mspi_clk exceeding its maximum configurable frequency for a short period of time
+	//when switching different clock frequencies using this interface.
+	write_reg8(0x1401e8, read_reg8(0x1401e8) & 0x8f);				//cclk to 24M rc clock
+	write_reg8(0x1401c0, read_reg8(0x1401c0) &(~BIT(6)));           //mspi_clk to 24M rc clock
 
 	//pll clk
 	analog_write_reg8(0x80, (analog_read_reg8(0x80) & 0xe0) | ((pll >> 2) & 0x1f));
@@ -302,9 +323,6 @@ void clock_init_ram(sys_pll_clk_e pll,
 	analog_write_reg8(0x81, (analog_read_reg8(0x81) | BIT(6)));
 	while(BIT(5) != (analog_read_reg8(0x88) & BIT(5)));
 	analog_write_reg8(0x81, (analog_read_reg8(0x81) & ~BIT(6)));
-
-	//ensure mspi is not in busy status before change mspi clock
-	mspi_stop_xip();
 
 	//change mspi clock should be ram code.
 	if(RC_24M_TO_MSPI_CLK == mspi_clk_div)
@@ -370,9 +388,9 @@ void clock_init(sys_pll_clk_e pll,
 				sys_hclk_div_to_pclk_e pclk_div,
 				sys_pll_div_to_mspi_clk_e mspi_clk_div)
 {
-	__asm__("csrci 	0x7D0,8");	//disable BTB
+	__asm__("csrci 	0x7d0,8");	//disable BTB
 	clock_init_ram(pll, src, cclk_div, hclk_div, pclk_div, mspi_clk_div);
-	__asm__("csrsi 	0x7D0,8");	//enable BTB
+	__asm__("csrsi 	0x7d0,8");	//enable BTB
 }
 
 /**
@@ -387,7 +405,17 @@ void cclk_hclk_pclk_config(pll_div_cclk_hclk_pclk_e div)
 	unsigned char hclk_div = (div&0x00f0)>>4;
 	unsigned char pclk_div = div&0x000f;
 
-	//HCLK and PCLK should be set ahead of CCLK, ensure the HCLK and PCLK not exceed the max CCLK(CCLK max 96M, HCLK max 48M, PCLK max 48M)
+	//CCLK max 96M, HCLK max 48M, PCLK max 48M, because the status of cclk is unknown when the interface is invoked,
+	//the configuration sequence is as follows: hclk(div2)/pclk(div1) -> Configure cclk -> Configure hclk/pclk.
+
+	//hclk(div2)/pclk(div1)
+	write_reg8(0x1401d8, read_reg8(0x1401d8) | BIT(2));
+	write_reg8(0x1401d8, read_reg8(0x1401d8) & 0xfc);
+
+	//Configure the CCLK clock frequency.
+	write_reg8(0x1401e8, (read_reg8(0x1401e8) & 0xf0) | cclk_div);
+
+    //Configure hclk/pclk
 	if(CCLK_DIV1_TO_HCLK == hclk_div)
 	{
 		write_reg8(0x1401d8, read_reg8(0x1401d8) & ~BIT(2));
@@ -407,13 +435,41 @@ void cclk_hclk_pclk_config(pll_div_cclk_hclk_pclk_e div)
 		write_reg8(0x1401d8, (read_reg8(0x1401d8) & 0xfc) | (pclk_div/2));
 	}
 
-	//Configure the CCLK clock frequency.
-	write_reg8(0x1401e8, (read_reg8(0x1401e8) & 0xf0) | cclk_div);
-
 	sys_clk.cclk = sys_clk.pll_clk / cclk_div;
 	sys_clk.hclk = sys_clk.cclk / hclk_div;
 	sys_clk.pclk = sys_clk.hclk / pclk_div;
 }
+
+#if RC_4M_FUNCTION
+/**
+ * @brief   	This function performs to select 4M or 24M as the system clock .
+ * @param[in]	sys_clock_src_sel	-sel 4MHz/24MHz RC mode.
+ * @return  	none
+ */
+void sys_clock_src_sel(sys_clock_src_sel_e sys_clock_src_sel)
+{
+	if(RC_4M == sys_clock_src_sel)
+	{
+		analog_write_reg8(0x07, analog_read_reg8(0x07) & (~BIT(1)));
+								//<1>:pm_pd_4M_rcosc_1p0v,		default:1,->0: Power up 4MHz RC oscillator.
+		analog_write_reg8(0x22, analog_read_reg8(0x22) & (~BIT(4)));
+								//<4>:pm_rc_24M_4M_1p0v,		default:1,->0: 4M mux.
+		analog_write_reg8(0x05, analog_read_reg8(0x05) | (BIT(2)));
+								//<2>:24M_rc_pd,		default:0,->1: Power down 24MHz RC oscillator.
+		//analog_write_reg8(0x1f	, (analog_read_reg8(0x1f)	&	0x0f )	|	0x00 << 4); //trim cap of 4M rc, default : 1000
+			//afe1v_aon_reg31<7:4>=0xff:4MRC output 1.9M   afe1v_aon_reg31<7:4>=0x00:4MRC output 4M
+	}
+	else
+	{
+		analog_write_reg8(0x07, analog_read_reg8(0x07) | (BIT(1)));
+								//<1>:pm_pd_4M_rcosc_1p0v,		default:1,->1: Power down 4MHz RC oscillator.
+		analog_write_reg8(0x22, analog_read_reg8(0x22) | (BIT(4)));
+								//<4>:pm_rc_24M_4M_1p0v,		default:1,->1: 24M mux.
+		analog_write_reg8(0x05, analog_read_reg8(0x05) & (~BIT(2)));
+								//<2>:24M_rc_pd,		default:0,->0: Power up 24MHz RC oscillator.
+	}
+}
+#endif
 
 /**********************************************************************************************************************
  *                    						local function implementation                                             *

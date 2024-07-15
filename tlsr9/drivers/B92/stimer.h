@@ -1,27 +1,24 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
-
 /********************************************************************************************************
- * @file	stimer.h
+ * @file    stimer.h
  *
- * @brief	This is the header file for B92
+ * @brief   This is the header file for B92
  *
- * @author	Driver Group
+ * @author  Driver Group
+ * @date    2020
+ *
+ * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *
  *******************************************************************************************************/
 /**	@page STIMER
@@ -49,7 +46,7 @@
  *                                           global macro                                                             *
  *********************************************************************************************************************/
 #ifndef SYS_TIMER_AUTO_MODE
-#define SYS_TIMER_AUTO_MODE     			0
+#define SYS_TIMER_AUTO_MODE     			1 // can only be auto mode ,or it'll compile error
 #endif
 /**********************************************************************************************************************
  *                                         global data type                                                           *
@@ -105,9 +102,10 @@ static inline void stimer_clr_irq_status(stimer_irq_e status)
 }
 
 /**
- * @brief This function servers to get stimer irq status.
- * @param[in] 	status - the irq status.
- * @return      none.
+ * @brief       This function servers to get stimer irq status.
+ * @param[in]   status    - the irq status.
+ * @retval      non-zero      - the interrupt occurred.
+ * @retval      zero  - the interrupt did not occur.
  */
 static inline unsigned char stimer_get_irq_status(stimer_irq_e status)
 {
@@ -165,7 +163,7 @@ static inline void stimer_disable(void)
  * @brief     This function performs to get system timer tick.
  * @return    system timer tick value.
 **/
-static inline unsigned int stimer_get_tick(void)
+static _always_inline unsigned int stimer_get_tick(void)
 {
 
 	return reg_system_tick;
@@ -177,7 +175,7 @@ static inline unsigned int stimer_get_tick(void)
  * @param[in] us   - count by us.
  * @return    true - timeout, false - not timeout
  */
-static inline _Bool clock_time_exceed(unsigned int ref, unsigned int us)
+static _always_inline _Bool clock_time_exceed(unsigned int ref, unsigned int us)
 {
 	return ((unsigned int)(stimer_get_tick() - ref) > us * SYSTEM_TIMER_TICK_1US);
 }
@@ -186,7 +184,7 @@ static inline _Bool clock_time_exceed(unsigned int ref, unsigned int us)
  * @param[in] microsec - need to delay.
  * @return    none
  */
-_attribute_ram_code_sec_noinline_   void delay_us(unsigned int microsec);
+_attribute_ram_code_com_sec_noinline_   void delay_us(unsigned int microsec);
 
 
 /**
@@ -194,7 +192,7 @@ _attribute_ram_code_sec_noinline_   void delay_us(unsigned int microsec);
  * @param[in] millisec - need to delay.
  * @return    none
  */
-_attribute_ram_code_sec_noinline_  void  delay_ms(unsigned int millisec);
+_attribute_ram_code_com_sec_noinline_  void  delay_ms(unsigned int millisec);
 
 
 #endif /* STIMER_H_ */

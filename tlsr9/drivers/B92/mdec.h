@@ -1,27 +1,24 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
-
 /********************************************************************************************************
- * @file	mdec.h
+ * @file    mdec.h
  *
- * @brief	This is the header file for B92
+ * @brief   This is the header file for B92
  *
- * @author	Driver Group
+ * @author  Driver Group
+ * @date    2020
+ *
+ * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *
  *******************************************************************************************************/
 #pragma once
@@ -41,9 +38,10 @@ static inline void mdec_reset(void)
 }
 
 /**
- * @brief		After all packet data are received, it can check whether packet transmission is finished.
- * @param[in]	status	- the interrupt status to be obtained.
- * @return		irq status.
+ * @brief       After all packet data are received, it can check whether packet transmission is finished.
+ * @param[in]   status	  - the interrupt status to be obtained.
+ * @retval      non-zero      - the interrupt occurred.
+ * @retval      zero  - the interrupt did not occur.
  */
 static inline unsigned char mdec_get_irq_status(wakeup_status_e status)
 {
@@ -59,7 +57,7 @@ static inline unsigned char mdec_get_irq_status(wakeup_status_e status)
  */
 static inline void mdec_clr_irq_status(wakeup_status_e status)
 {
-	analog_write_reg8(reg_wakeup_status, (analog_read_reg8(reg_wakeup_status) | status));
+	analog_write_reg8(reg_wakeup_status,status);/*added by wei.wu, confirmed by jianzhi 20231016*/
 }
 
 /**
@@ -76,3 +74,6 @@ void mdec_init(mdec_pin_e pin);
  * @return		1 decode success,  0 decode failure.
  */
 unsigned char mdec_read_dat(unsigned char *dat);
+
+
+

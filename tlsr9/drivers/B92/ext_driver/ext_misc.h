@@ -1,21 +1,26 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
+/********************************************************************************************************
+ * @file    ext_misc.h
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * @brief   This is the header file for BLE SDK
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * @author  BLE GROUP
+ * @date    06,2022
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @par     Copyright (c) 2022, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *****************************************************************************/
-
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
+ *
+ *******************************************************************************************************/
 #ifndef DRIVERS_B92_EXT_MISC_H_
 #define DRIVERS_B92_EXT_MISC_H_
 
@@ -27,14 +32,29 @@
 #include "../adc.h"
 #include "../gpio.h"
 #include "../stimer.h"
-#include "../pm.h"
-#include "../rf.h"
-#include "../trng.h"
+#include "../lib/include/pm.h"
+#include "../lib/include/rf.h"
+#include "../lib/include/trng.h"
 #include "stdbool.h"
 
-/*
- * addr - only 0x00012 ~ 0x00021 can be used !!! */
-#define write_log32(err_code)   		write_sram32(0x00014, err_code)
+
+
+/******************************* dbgErrorCode start ******************************************************************/
+/* SRAM 0x00014 ~ 0x0001F can be used to write some debug information */
+
+#define	DBG_SRAM_ADDR					0x00014
+
+#define write_log32(err_code)   		write_sram32(DBG_SRAM_ADDR, err_code)
+
+/*addr - only 0x00014/0x00018/0x0001C can be used !!! */
+#define write_dbg32(addr, value)   		write_sram32(addr, value)
+/******************************* dbgErrorCode end ********************************************************************/
+
+
+/******************************* pke_start ******************************************************************/
+#define ismemzero4(a, len)				uint32_BigNum_Check_Zero(a, len)	//For compatible with B91
+/******************************* pke_end ********************************************************************/
+
 
 /******************************* analog_start ******************************************************************/
 #define analog_write				analog_write_reg8
@@ -51,6 +71,12 @@
 /******************************* core_end ********************************************************************/
 
 
+/******************************* mtime register start*********************************************************/
+#define ext_reg_mtime_low              0xe6000000
+#define ext_reg_mtime_high             0xe6000004
+
+#define ext_reg_mtimecmp               0xe6000008
+/******************************* mtime register end************************************************************/
 
 
 /******************************* efuse start *****************************************************************/
@@ -169,7 +195,7 @@ void generateRandomNum(int len, unsigned char *data);
 
 /******************************* dma_start ***************************************************************/
 
-//4(DMA_len) + 2(BLE header) + ISORxOct + 4(MIC) + 3(CRC) + 8(ExtraInfor)
+//4(DMA_len) + 2(BLE header) + ISORxOct + 4(MIC) + 3(CRC) + 8(ExtraInfo)
 #define		TLK_RF_RX_EXT_LEN		(21)
 
 //10 = 4(DMA_len) + 2(BLE header) + 4(MIC)
@@ -177,7 +203,7 @@ void generateRandomNum(int len, unsigned char *data);
 
 /**
  * @brief	RX Data buffer length = n + 21, then 16 Byte align
- *			n + 21 = 4(DMA_len) + 2(BLE header) + n + 4(MIC) + 3(CRC) + 8(ExtraInfor)
+ *			n + 21 = 4(DMA_len) + 2(BLE header) + n + 4(MIC) + 3(CRC) + 8(ExtraInfo)
 			RX buffer size must be be 16*n, due to MCU design
  */
 #define 	CAL_LL_COMMON_RX_FIFO_SIZE(n)		(((n + TLK_RF_RX_EXT_LEN) + 15) / 16 *16)
@@ -201,7 +227,7 @@ void generateRandomNum(int len, unsigned char *data);
 
 /*
  * @brief	ISO RX Data buffer length = ISORxOct + 21, then 16 Byte align
- *			ISORxOct + 21 = 4(DMA_len) + 2(BLE header) + ISORxOct + 4(MIC) + 3(CRC) + 8(ExtraInfor)
+ *			ISORxOct + 21 = 4(DMA_len) + 2(BLE header) + ISORxOct + 4(MIC) + 3(CRC) + 8(ExtraInfo)
  *			RX buffer size must be be 16*n, due to MCU design
  */
 #define		CAL_LL_ISO_RX_FIFO_SIZE(n)			(((n + TLK_RF_RX_EXT_LEN) + 15) / 16 * 16)

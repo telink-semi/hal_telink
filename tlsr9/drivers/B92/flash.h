@@ -1,27 +1,24 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
-
 /********************************************************************************************************
- * @file	flash.h
+ * @file    flash.h
  *
- * @brief	This is the header file for B92
+ * @brief   This is the header file for B92
  *
- * @author	Driver Group
+ * @author  Driver Group
+ * @date    2020
+ *
+ * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *
  *******************************************************************************************************/
 /**	@page FLASH
@@ -58,29 +55,25 @@
  */
 typedef enum{
 	//The command called by the flash_mspi_read_ram() function.
-	FLASH_READ_CMD								    = 0x0320a8,
-	FLASH_DREAD_CMD								    = 0x3b97a9,
-	FLASH_X4READ_CMD								= 0xeb95ba,
-	FLASH_READ_SECURITY_REGISTERS_CMD               = 0x4897a8,
-	FLASH_READ_UID_CMD_GD_PUYA_ZB_TH			    = 0x4b97a8,
-	FLASH_GET_JEDEC_ID							    = 0x9f2080,
-	FLASH_READ_STATUS_CMD_LOWBYTE					= 0x052080,
-	FLASH_READ_STATUS_CMD_HIGHBYTE					= 0x352080,
-	FLASH_READ_CONFIGURE_CMD                        = 0x152080,
+	FLASH_READ_CMD								    = 0x030020a8,
+	FLASH_DREAD_CMD								    = 0x3b0097a9,
+	FLASH_X4READ_CMD								= 0xeb0095ba,
+	FLASH_READ_SECURITY_REGISTERS_CMD               = 0x480097a8,
+	FLASH_READ_UID_CMD_GD_PUYA_ZB_TH			    = 0x4b0097a8,
+	FLASH_GET_JEDEC_ID							    = 0x9f002080,
+	FLASH_READ_STATUS_CMD_LOWBYTE					= 0x05002080,
+	FLASH_READ_STATUS_CMD_HIGHBYTE					= 0x35002080,
+	FLASH_READ_CONFIGURE_CMD                        = 0x15002080,
 	//The command called by the flash_mspi_write_ram() function.
-	FLASH_WRITE_CMD						            = 0x0210a8,
-	FLASH_QUAD_PAGE_PROGRAM_CMD					    = 0x3210aa,
-	FLASH_PAGE_ERASE_CMD							= 0x8170a8,    // Caution: only P25Q40L support this function
-	FLASH_SECT_ERASE_CMD						    = 0x2070a8,    // Sector size = 4KBytes
-	FLASH_32KBLK_ERASE_CMD							= 0x5270a8,
-	FLASH_64KBLK_ERASE_CMD							= 0xD870a8,
-	FLASH_CHIP_ERASE_CMD							= 0x6070a8,    // Or 0xc770a8
-	FLASH_WRITE_SECURITY_REGISTERS_CMD              = 0x4210a8,
-	FLASH_ERASE_SECURITY_REGISTERS_CMD              = 0x4470a8,
-	FLASH_WRITE_STATUS_CMD_LOWBYTE					= 0x011080,
-	FLASH_WRITE_STATUS_CMD_HIGHBYTE	                = 0x311080,    // Flash Type = P25Q16SU/P25Q32SU for write status register-1;
-	FLASH_WRITE_CONFIGURE_CMD_1                     = 0x311080,    // Flash Type = P25Q80U  for write configure register;
-	FLASH_WRITE_CONFIGURE_CMD_2                     = 0x111080,    // Flash Type = P25Q16SU/P25Q32SU  for write configure register;
+	FLASH_WRITE_CMD						            = 0x020010a8,
+	FLASH_QUAD_PAGE_PROGRAM_CMD					    = 0x320010aa,
+	FLASH_SECT_ERASE_CMD						    = 0x200070a8,
+	FLASH_WRITE_SECURITY_REGISTERS_CMD              = 0x420010a8,
+	FLASH_ERASE_SECURITY_REGISTERS_CMD              = 0x440070a8,
+	FLASH_WRITE_STATUS_CMD_LOWBYTE					= 0x01001080,
+	FLASH_WRITE_STATUS_CMD_HIGHBYTE	                = 0x31001080,    // Flash Type = P25Q16SU/P25Q32SU for write status register-1;
+	FLASH_WRITE_CONFIGURE_CMD_1                     = 0x31001080,    // Flash Type = P25Q80U  for write configure register;
+	FLASH_WRITE_CONFIGURE_CMD_2                     = 0x11001080,    // Flash Type = P25Q16SU/P25Q32SU  for write configure register;
 	// other command called by flash_send_cmd() function,no need to configure:transfer mode/dummy/format.
 	FLASH_WRITE_DISABLE_CMD 			        = 	0x04,
 	FLASH_WRITE_ENABLE_CMD 			         	= 	0x06,
@@ -134,6 +127,7 @@ typedef enum{
 	MID156085   =   0x156085,//P25Q16SU
 	MID1560c8   =   0x1560c8,//GD25LQ16E
 	MID166085   =   0x166085,//P25Q32SU
+	MID1660C8	=	0x1660c8,//GD25LQ32E/GD25LE32E
 	MID186085   =   0x186085,//P25Q128L
 }flash_mid_e;
 
@@ -179,28 +173,10 @@ static inline void flash_change_rw_func(flash_handler_t read, flash_handler_t wr
 	flash_write_page = write;
 }
 
-/**
- * @brief 		This function serves to erase a page.
- * @param[in]   addr	- the start address of the page needs to erase.
- * @return 		none.
- * @note        Attention: The block erase takes a long time, please pay attention to feeding the dog in advance.
- * 				The maximum block erase time is listed at the beginning of this document and is available for viewing.
- *
- * 				Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
- *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.
- *              Taking into account the factors such as power supply fluctuations, the safe voltage value needs to be greater
- *              than the minimum chip operating voltage. For the specific value, please make a reasonable setting according
- *              to the specific application and hardware circuit.
- *
- *              Risk description: When the chip power supply voltage is relatively low, due to the unstable power supply,
- *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
- *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
- */
-_attribute_text_sec_ void flash_erase_page(unsigned long addr);
 
 /**
  * @brief 		This function serves to erase a sector.
- * @param[in]   addr	- the start address of the sector needs to erase.
+ * @param[in]   addr	- must be 0 or a multiple of 0x1000.
  * @return 		none.
  * @note        Attention: The block erase takes a long time, please pay attention to feeding the dog in advance.
  * 				The maximum block erase time is listed at the beginning of this document and is available for viewing.
@@ -217,67 +193,11 @@ _attribute_text_sec_ void flash_erase_page(unsigned long addr);
  */
 _attribute_text_sec_ void flash_erase_sector(unsigned long addr);
 
-/**
- * @brief 		This function serves to erase a block(32k).
- * @param[in]   addr	- the start address of the block needs to erase.
- * @return 		none.
- * @note        Attention: The block erase takes a long time, please pay attention to feeding the dog in advance.
- * 				The maximum block erase time is listed at the beginning of this document and is available for viewing.
- *
- * 				Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
- *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.
- *              Taking into account the factors such as power supply fluctuations, the safe voltage value needs to be greater
- *              than the minimum chip operating voltage. For the specific value, please make a reasonable setting according
- *              to the specific application and hardware circuit.
- *
- *              Risk description: When the chip power supply voltage is relatively low, due to the unstable power supply,
- *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
- *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
- */
-_attribute_text_sec_ void flash_erase_32kblock(unsigned long addr);
-
-/**
- * @brief 		This function serves to erase a block(64k).
- * @param[in]   addr	- the start address of the block needs to erase.
- * @return 		none.
- * @note        Attention: The block erase takes a long time, please pay attention to feeding the dog in advance.
- * 				The maximum block erase time is listed at the beginning of this document and is available for viewing.
- *
- * 				Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
- *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.
- *              Taking into account the factors such as power supply fluctuations, the safe voltage value needs to be greater
- *              than the minimum chip operating voltage. For the specific value, please make a reasonable setting according
- *              to the specific application and hardware circuit.
- *
- *              Risk description: When the chip power supply voltage is relatively low, due to the unstable power supply,
- *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
- *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
- */
-_attribute_text_sec_ void flash_erase_64kblock(unsigned long addr);
-
-/**
- * @brief 		This function serves to erase a chip.
- * @param[in]   addr	- the start address of the chip needs to erase.
- * @return 		none.
- * @note        Attention: The block erase takes a long time, please pay attention to feeding the dog in advance.
- * 				The maximum block erase time is listed at the beginning of this document and is available for viewing.
- *
- * 				Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
- *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.
- *              Taking into account the factors such as power supply fluctuations, the safe voltage value needs to be greater
- *              than the minimum chip operating voltage. For the specific value, please make a reasonable setting according
- *              to the specific application and hardware circuit.
- *
- *              Risk description: When the chip power supply voltage is relatively low, due to the unstable power supply,
- *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
- *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
- */
-_attribute_text_sec_ void flash_erase_chip(void);
 
 /**
  * @brief 		This function reads the content from a page to the buf with single mode.
  * @param[in]   addr	- the start address of the page.
- * @param[in]   len		- the length(in byte) of content needs to read out from the page.
+ * @param[in]   len		- the length(in byte, must be above 0) of content needs to read out from the page.
  * @param[out]  buf		- the start address of the buffer(ram address).
  * @return 		none.
  * @note        cmd:1x, addr:1x, data:1x, dummy:0
@@ -296,7 +216,7 @@ _attribute_text_sec_ void flash_read_data(unsigned long addr, unsigned long len,
 /**
  * @brief 		This function reads the content from a page to the buf with dual read mode.
  * @param[in]   addr	- the start address of the page.
- * @param[in]   len		- the length(in byte) of content needs to read out from the page.
+ * @param[in]   len		- the length(in byte, must be above 0) of content needs to read out from the page.
  * @param[out]  buf		- the start address of the buffer(ram address).
  * @return 		none.
  * @note        cmd:1x, addr:1x, data:2x, dummy:8
@@ -315,7 +235,7 @@ _attribute_text_sec_ void flash_dread(unsigned long addr, unsigned long len, uns
 /**
  * @brief 		This function reads the content from a page to the buf with 4*IO read mode.
  * @param[in]   addr	- the start address of the page.
- * @param[in]   len		- the length(in byte) of content needs to read out from the page.
+ * @param[in]   len		- the length(in byte, must be above 0) of content needs to read out from the page.
  * @param[out]  buf		- the start address of the buffer(ram address).
  * @return 		none.
  * @note        cmd:1x, addr:4x, data:4x, dummy:6
@@ -334,7 +254,7 @@ _attribute_text_sec_ void flash_4read(unsigned long addr, unsigned long len, uns
 /**
  * @brief 		This function serves to decrypt the read data from the flash at the specified address and compare it with the plain text in single mode.
  * @param[in]   addr	        - the start address of the page.
- * @param[in]   plain_len		- the length(in byte) of content needs to read out from the page.
+ * @param[in]   plain_len		- the length(in byte, must be above 0) of content needs to read out from the page.
  * @param[out]  plain_buf		- the start address of the plain buffer(ram address).
  * @return 		0: check pass; 1: check fail.
  * @note        cmd:1x, addr:1x, data:1x, dummy:0
@@ -352,7 +272,7 @@ _attribute_text_sec_ unsigned char  flash_read_data_decrypt_check(unsigned long 
 /**
  * @brief 		This function serves to decrypt the read data from the flash at the specified address and compare it with the plain text in dual read mode.
  * @param[in]   addr	        - the start address of the page.
- * @param[in]   plain_len		- the length(in byte) of content needs to read out from the page.
+ * @param[in]   plain_len		- the length(in byte, must be above 0) of content needs to read out from the page.
  * @param[out]  plain_buf		- the start address of the plain buffer(ram address).
  * @return 		0: check pass; 1: check fail.
  * @note        cmd:1x, addr:1x, data:2x, dummy:8
@@ -370,7 +290,7 @@ _attribute_text_sec_ unsigned char flash_dread_decrypt_check(unsigned long addr,
 /**
  * @brief 		This function serves to decrypt the read data from the flash at the specified address and compare it with the plain text in 4*IO read mode.
  * @param[in]   addr	        - the start address of the page.
- * @param[in]   plain_len		- the length(in byte) of content needs to read out from the page.
+ * @param[in]   plain_len		- the length(in byte, must be above 0) of content needs to read out from the page.
  * @param[out]  plain_buf		- the start address of the plain buffer(ram address).
  * @return 		0: check pass; 1: check fail.
  * @note        cmd:1x, addr:4x, data:4x, dummy:6
@@ -392,7 +312,7 @@ _attribute_text_sec_ unsigned char flash_4read_decrypt_check(unsigned long addr,
  * 				and the data will become the wrong value. Note that when erasing, the minimum is erased by sector (4k bytes).
  * 				Do not erase the useful information in other locations of the sector during erasing.
  * @param[in]   addr	- the start address of the area.
- * @param[in]   len		- the length(in byte) of content needs to write into the flash.
+ * @param[in]   len		- the length(in byte, must be above 0) of content needs to write into the flash.
  * @param[in]   buf		- the start address of the content needs to write into(ram address).
  * @return 		none.
  * @note        cmd:1x, addr:1x, data:1x
@@ -416,7 +336,7 @@ _attribute_text_sec_ void flash_page_program(unsigned long addr, unsigned long l
  * 				and the data will become the wrong value. Note that when erasing, the minimum is erased by sector (4k bytes).
  * 				Do not erase the useful information in other locations of the sector during erasing.
  * @param[in]   addr	- the start address of the area.
- * @param[in]   len		- the length(in byte) of content needs to write into the flash.
+ * @param[in]   len		- the length(in byte, must be above 0) of content needs to write into the flash.
  * @param[in]   buf		- the start address of the content needs to write into(ram address).
  * @return 		none.
  * @note        cmd:1x, addr:1x, data:4x
@@ -441,7 +361,7 @@ _attribute_text_sec_ void flash_quad_page_program(unsigned long addr, unsigned l
  * 				and the data will become the wrong value. Note that when erasing, the minimum is erased by sector (4k bytes).
  * 				Do not erase the useful information in other locations of the sector during erasing.
  * @param[in]   addr	- the start address of the area.
- * @param[in]   len		- the length(in byte) of content needs to write into the flash.
+ * @param[in]   len		- the length(in byte, must be above 0) of content needs to write into the flash.
  * @param[in]   buf		- the start address of the content needs to write into(ram address).
  * @return 		none.
  * @note        cmd:1x, addr:1x, data:1x
@@ -465,7 +385,7 @@ _attribute_text_sec_ void flash_page_program_encrypt(unsigned long addr, unsigne
  * 				and the data will become the wrong value. Note that when erasing, the minimum is erased by sector (4k bytes).
  * 				Do not erase the useful information in other locations of the sector during erasing.
  * @param[in]   addr	- the start address of the area.
- * @param[in]   len		- the length(in byte) of content needs to write into the flash.
+ * @param[in]   len		- the length(in byte, must be above 0) of content needs to write into the flash.
  * @param[in]   buf		- the start address of the content needs to write into(ram address).
  * @return 		none.
  * @note        cmd:1x, addr:1x, data:4x
@@ -520,15 +440,15 @@ _attribute_text_sec_ void flash_read_uid(unsigned char idcmd, unsigned char *buf
 
 
 /**
- * @brief 		This function serves to set priority threshold. when the interrupt priority > Threshold flash process will disturb by interrupt.
+ * @brief 		This function serves to set priority threshold. When the interrupt priority is greater than the maximum of the current interrupt threshold and the given interrupt threshold, flash process will disturb by interrupt.
  * @param[in]   preempt_en	- 1 can disturb by interrupt, 0 can disturb by interrupt.
  * @param[in]	threshold	- priority Threshold, .
  * @return    	none.
  * @note
  *              -# The correlation between flash_plic_preempt_config() and the flash functions that call sub-functions (all declared in flash_base.h) is as follows:
  *                  - When preempt_en = 1 and interrupt nesting is enabled (plic_preempt_feature_en):
- *                      - The initialized interrupt threshold can only be 0, because the PLIC threshold will be set to 0 when the flash functions returns.
- *                      - During the flash functions execution, it can be interrupted by external interrupts with priority greater than given threshold
+ *                      - During the flash functions execution, the threshold of the PLIC is set to the maximum of the threshold before calling the interface and the given threshold value. \n
+ *                        This means that when the external interrupt priority is greater than this maximum value, the execution of the flash function is disturbed by this interrupt.
  *                      - machine timer and software interrupt will definitely interrupt the flash functions execution, they are not controlled by the plic interrupt threshold
  *                  - In other cases(preempt_en = 0 or plic_preempt_feature_en = 0), global interrupts (including machine timer and software interrupt) will be turned off during the execution of the flash functions and will be restored when the flash functions exits.
  *              -# If the flash operation may be interrupted by an interrupt, it is necessary to ensure that the interrupt handling function and the function it calls must be in the RAM code. 
@@ -538,10 +458,10 @@ _attribute_text_sec_ void flash_plic_preempt_config(unsigned char preempt_en, un
  * @brief 		This function is used to update the configuration parameters of xip(eXecute In Place),
  * 				this configuration will affect the speed of MCU fetching,
  * 				this parameter needs to be consistent with the corresponding parameters in the flash datasheet.
- * @param[in]	config	- xip configuration,reference structure flash_xip_config_t
+ * @param[in]	config	- xip configuration,reference structure flash_command_e
  * @return none
  */
-_attribute_text_sec_ void flash_set_xip_config(flash_xip_config_t config);
+_attribute_text_sec_ void flash_set_xip_config(flash_command_e config);
 
 
 
@@ -575,11 +495,10 @@ unsigned int flash_get_vendor(unsigned int flash_mid);
 
 
 
+/*******************************************************************************************************************
+ *									This function serves to all area flash protection
+ ******************************************************************************************************************/
+void flash_protection_lock_operation(void);
 
-
-
-
-
-
-
+void flash_protection_unlock_operation(void);
 
