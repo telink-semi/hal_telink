@@ -1,27 +1,24 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
-
 /********************************************************************************************************
- * @file	sys.h
+ * @file    sys.h
  *
- * @brief	This is the header file for B92
+ * @brief   This is the header file for B92
  *
- * @author	Driver Group
+ * @author  Driver Group
+ * @date    2020
+ *
+ * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *
  *******************************************************************************************************/
 /**	@page SYS
@@ -51,7 +48,7 @@
  * @brief instruction delay
  */
 
-#define	_ASM_NOP_					__asm__("nop")
+#define	_ASM_NOP_					 __asm__ __volatile__("nop")
 
 #define	CLOCK_DLY_1_CYC				_ASM_NOP_
 #define	CLOCK_DLY_2_CYC				_ASM_NOP_;_ASM_NOP_
@@ -63,7 +60,22 @@
 #define	CLOCK_DLY_8_CYC				_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_
 #define	CLOCK_DLY_9_CYC				_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_
 #define	CLOCK_DLY_10_CYC			_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_
+#define	CLOCK_DLY_64_CYC			CLOCK_DLY_10_CYC;CLOCK_DLY_10_CYC;CLOCK_DLY_10_CYC;CLOCK_DLY_10_CYC;CLOCK_DLY_10_CYC;CLOCK_DLY_10_CYC;CLOCK_DLY_4_CYC
 
+#define CLOCK_NOP_DLY_1US			CLOCK_DLY_6_CYC;CLOCK_DLY_6_CYC;CLOCK_DLY_6_CYC;CLOCK_DLY_6_CYC
+#define CLOCK_NOP_DLY_2US			CLOCK_NOP_DLY_1US;CLOCK_NOP_DLY_1US
+#define CLOCK_NOP_DLY_3US			CLOCK_NOP_DLY_1US;CLOCK_NOP_DLY_1US;CLOCK_NOP_DLY_1US
+#define CLOCK_NOP_DLY_4US			CLOCK_NOP_DLY_2US;CLOCK_NOP_DLY_2US
+#define CLOCK_NOP_DLY_5US			CLOCK_NOP_DLY_2US;CLOCK_NOP_DLY_2US;CLOCK_NOP_DLY_1US
+#define CLOCK_NOP_DLY_10US			CLOCK_NOP_DLY_5US;CLOCK_NOP_DLY_5US
+#define CLOCK_NOP_DLY_20US			CLOCK_NOP_DLY_10US;CLOCK_NOP_DLY_10US
+#define CLOCK_NOP_DLY_40US			CLOCK_NOP_DLY_20US;CLOCK_NOP_DLY_20US
+#define CLOCK_NOP_DLY_100US			CLOCK_NOP_DLY_40US;CLOCK_NOP_DLY_40US;CLOCK_NOP_DLY_20US
+#define CLOCK_NOP_DLY_500US			CLOCK_NOP_DLY_100US;CLOCK_NOP_DLY_100US;CLOCK_NOP_DLY_100US;CLOCK_NOP_DLY_100US;CLOCK_NOP_DLY_100US
+#define CLOCK_NOP_DLY_1MS			CLOCK_NOP_DLY_500US;CLOCK_NOP_DLY_500US
+#define CLOCK_NOP_DLY_4MS			CLOCK_NOP_DLY_1MS;CLOCK_NOP_DLY_1MS;CLOCK_NOP_DLY_1MS;CLOCK_NOP_DLY_1MS
+#define CLOCK_NOP_DLY_10MS			CLOCK_NOP_DLY_4MS;CLOCK_NOP_DLY_4MS;CLOCK_NOP_DLY_1MS;CLOCK_NOP_DLY_1MS
+#define CLOCK_NOP_DLY_70MS			CLOCK_NOP_DLY_10MS;CLOCK_NOP_DLY_10MS;CLOCK_NOP_DLY_10MS;CLOCK_NOP_DLY_10MS;CLOCK_NOP_DLY_10MS;CLOCK_NOP_DLY_10MS;CLOCK_NOP_DLY_10MS
 
 /**********************************************************************************************************************
  *                                         global data type                                                           *
@@ -135,7 +147,7 @@ extern unsigned int g_chip_version;
  * @brief      This function reboot mcu.
  * @return     none
  */
-_attribute_text_sec_ void sys_reboot(void);
+_attribute_text_sec_ void sys_reboot_lib(void);
 
 /**
  * @brief   	This function serves to initialize system.
@@ -167,4 +179,12 @@ int write_reg_table(const tbl_cmd_set_t * pt, int size);
  * @return 	   1 - the calibration value update, 0 - the calibration value is not update.
  */
 unsigned char efuse_calib_adc_vref(gpio_voltage_e gpio_type);
+
+/**
+* @brief      This function servers to get chip id from EFUSE.
+* @param[in]  chip_id_buff - store chip id. Chip ID is 16 bytes.
+* @return     1 - operation completed,  0 - operation failed.
+* @note       Only A3 and later are written as chip id values.
+*/
+unsigned char efuse_get_chip_id(unsigned char *chip_id_buff);
 #endif

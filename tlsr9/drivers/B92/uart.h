@@ -1,31 +1,37 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
-
 /********************************************************************************************************
- * @file	uart.h
+ * @file    uart.h
  *
- * @brief	This is the header file for B92
+ * @brief   This is the header file for B92
  *
- * @author	Driver Group
+ * @author  Driver Group
+ * @date    2020
+ *
+ * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *
  *******************************************************************************************************/
 /**	@page UART
  *
+ *	Introduction
+ *	===============
+ *	supports two uart: uart0~ uart1.
+ * 	-# support nodma/dma
+ *	-# support cts/rts
+ *	-# support s7816
+ *
+ *	API Reference
+ *	===============
  *	Header File: uart.h
  *
  *	How to use this driver
@@ -46,7 +52,7 @@
                 - manual: uart_rts_config() / uart_set_rts_level() API;
                 - auto: uart_rts_config() / uart_rts_trig_level_auto_mode() / uart_rxdone_rts_en() / uart_rts_stop_rxtimeout_en() API;
   -# UART Interrupts Configuration and Response
-     -# UART interupts initial configuration:
+     -# UART interrupts initial configuration:
         - nodma_tx
            - polling send, it does not need to configure interrupt;
         - nodma_rx
@@ -64,21 +70,53 @@
         - uart_clr_irq_status() API;
         - nodma_rx
             - UART_RX_ERR/UART_RXBUF_IRQ_STATUS/UART_RXDONE_IRQ_STATUS ;
+               - If err occurs during the receiving process, perform the following operations:
+                  -# uart_clr_irq_status(): UART_RXBUF_IRQ_STATUS;
+                  -# clear the data received in ram buff;
         - dma_tx
             - UART_TXDONE_IRQ_STATUS ;
         - dma_rx
            - when the received length configured for rx_dma is less than 0xfffffc :
-               - UART_RXDONE_IRQ_STATUS/UART_RX_ERR;
+               - When the length of the send is not known, the recommended interrupts are :UART_RXDONE_IRQ_STATUS/UART_RX_ERR;
+                  - After rxdone is generated and before configuring the next dma, the rxfifo hardware pointer must be set to 0 (uart_clr_irq_status(): UART_RXBUF_IRQ_STATUS/UART_RXDONE_IRQ_STATUS)
+                    in order to prevent the next dma from working properly due to the rxfifo pointer not being in the default state(When the sending length is greater than the receiving length)
+                  - When the send length is less than the receive length, although the rxdone interrupt is generated, the dma has not reached the configured length, and the dma is still working.
+                    When configuring the next dma, dma_chn_dis needs to be configured before the next dma(this action has been processed in uart_receive_dma).
+               - If the transmission length is fixed, use the following interrupt:See the TC_MASK note for details/UART_RX_ERR:
+                   - A dma interrupt can only occur if the receive length is equal to the length configured by the dma.
+                   - If the dma stops working and reconfigures it, perform the following operations:
+                      -# uart_receive_dma();(dma_chn_dis-> uart_clr_irq_status(): UART_RXBUF_IRQ_STATUS has been implemented in uart_receive_dma())
            - when the received length configured for rx_dma is 0xfffffc:
-               - See the TC_MASK note for details;
+               - See the TC_MASK note for details/UART_RX_ERR;
+           - If err is displayed during dma receiving, the recommended action is as follows:
+               -# uart_receive_dma();(dma_chn_dis-> uart_clr_irq_status(): UART_RXBUF_IRQ_STATUS has been implemented in uart_receive_dma())
         - dma_llp
               - UART_RXDONE_IRQ_STATUS ;
-           
+  -# UART enter suspend sleep before and after handling
+      - nodma_tx
+          - before nodma tx goes to suspend sleep, it is necessary to judge the uart busy bit to ensure the completion of UART data transmission.
+          - after suspend sleep wake up, perform the following operations: 
+            -# uart_clr_tx_index();
+            -# clear the send data in ram buff;
+      - nodma_rx
+          - If go to suspend sleep during nodma rx, the recommended action when waking up is as follows: 
+            -# uart_clr_rx_index();
+            -# clear the data received in ram buff;
+      - dma_tx
+          - If go to suspend sleep during dma sending, the recommended action when waking up is as follows:
+            -# uart_send_dma();(dma_chn_dis has been implemented in uart_send_dma())
+      - dma_rx
+          - If go to suspend sleep during dma receiving, the recommended action when waking up is as follows:
+            -# uart_receive_dma();(dma_chn_dis has been implemented in uart_receive_dma())
   -# UART TX and RX
      -# nodma_tx
         - It can be sent in byte/half word/word polling, use uart_send_byte() / uart_send_hword() / uart_send_word() API;
      -# nodma_rx
         - The data is received via UART_RX_IRQ_MASK and UART_RXDONE_MASK interrupt,the data is read in the interrupt by uart_read_byte() API;
+        - the points to note when receiving nodma:
+           - rx_irq interrupt processing: Use uart_get_rxfifo_num() to determine the number of FIFOs and use uart_read_byte() to read all data in fifo;
+           - The depth size of the uart fifo is 8. If the time before and after entering the rx_irq interrupt exceeds the time of receiving 8 bytes, the fifo pointer may be disturbed, resulting in abnormal received data.
+             You can determine whether uart_get_rxfifo_num() is greater than 8 as an exception,If this exception occurs, it is recommended to use dma mode to receive.
      -# dma_tx
         - send data by uart_send_dma() API;
      -# dma_rx
@@ -88,17 +126,19 @@
              - the received length hardware automatically writes back to the first four bytes of rxbuf;
              - Good real-time,there is no need to manually calculate the length in the interrupt for saving time;
            - If the maximum received length cannot be estimated or if there is insufficient ram space set to maximum length, 
+             if use the scheme that configures dma to 0xfffffc, there is a buff crossover problem,
              it is recommended to configure rx_dma to a fixed length (less than 0xffffc), but this method has the following limitations:
              - Need to manually calculate the received length;
              - If the uart interrupt is interrupted by other interrupts, you need to set the uart interrupt to the highest priority,
                otherwise, data loss and miscalculation of the received length will occur;
-             - The interval between two packets cannot be less than rxtimeout+ interrupt response time, 
+             - The interval between two packets cannot be less than rxtimeout + interrupt response time, 
                otherwise, data loss and receiving length calculation errors may occur;
      -# dma_llp
        - Receive data by uart_set_dma_chain_llp() / uart_rx_dma_add_list_element() API;
        - Differences between dma_llp and dma_rx:
          - dma_rx: After receiving data, uart_receive_dma() needs to be reconfigured before receiving the next data;
          - dma_llp:After the current packet is received, uart_receive_dma() does not need to be reconfigured,the hardware will automatically jump to the next chain node.
+       - Rx linked list mode can only be used if write_num_en is enabled and DMA length is configured as 0xffffc. Only rx timeout will jump to the next linked list.
        - Use restriction:
          - it is needed to know the maximum received length,avoid buff overreach issues;
        
@@ -287,6 +327,8 @@ static inline unsigned char uart_get_txfifo_num(uart_num_e uart_num)
  * @brief     Resets UART module,before using UART, it is needed to call uart_reset() to avoid affecting the use of UART.
  * @param[in] uart_num - UART0 or UART1.
  * @return    none
+ * @note
+ *            this function will clear rx and tx status and fifo.
  */
 static inline void uart_reset(uart_num_e uart_num)
 {
@@ -407,10 +449,11 @@ static inline void uart_clr_tx_index(uart_num_e uart_num)
 }
 
 /**
- * @brief     Get the irq status of UART.
- * @param[in] uart_num - UART0 or UART1.
- * @param[in] status   - enum uart irq status.
- * @return    irq status
+ * @brief      Get the irq status of UART.
+ * @param[in]  uart_num  - UART0 or UART1.
+ * @param[in]  status    - enum uart irq status.
+ * @retval     non-zero      - the interrupt occurred.
+ * @retval     zero  - the interrupt did not occur.
  */
 static inline unsigned int  uart_get_irq_status(uart_num_e uart_num,uart_irq_status_e status)
 {
@@ -609,25 +652,31 @@ static inline void uart_rxdone_rts_dis(uart_num_e uart_num){
     -# uart_init() set the baud rate by the div and bwpc of the uart_cal_div_and_bwpc, some applications have higher timing requirements,
        you can first calculate the div and bwpc, and then call uart_init.
  */
-extern void uart_init(uart_num_e uart_num,unsigned short div, unsigned char bwpc, uart_parity_e parity, uart_stop_bit_e stop_bit);
+void uart_init(uart_num_e uart_num,unsigned short div, unsigned char bwpc, uart_parity_e parity, uart_stop_bit_e stop_bit);
 
 /**
- * @brief  		Calculate the best bwpc(bit width),bwpc range from 3 to 15,loop and get the minimum one decimal point(BaudRate*(div+1)*(bwpc+1) = pclk).
- * @param[in]	baudrate - baud rate of UART.
- * @param[in]	pclk   -   pclk.
- * @param[out]	div      - UART clock divider.
- * @param[out]	bwpc     - bitwidth, should be set to larger than 2,range[3-15].
- * @return 		none
+ * @brief      Calculate the best bwpc(bit width),bwpc range from 3 to 15,loop and get the minimum one decimal point(BaudRate*(div+1)*(bwpc+1) = pclk).
+ * @param[in]  baudrate - baud rate of UART.
+ * @param[in]  pclk     - pclk.
+ * @param[out] div      - UART clock divider.
+ * @param[out] bwpc     - bitwidth, should be set to larger than 2,range[3-15].
+ * @return     none
  * @note
-   @verbatim
-	   The maximum baud rate depends on the hardware environment (such as cable length, etc.) and pclk/cclk/hclk:
-	   -# pclk is the main factor affecting the upper baud rate of UART
-	   -# cclk and pclk affect interrupt processing times
-	   Using the B92 development board,the test results:
-	   -# CCLK_16M_HCLK_16M_PCLK_16M:in nodma,the maximum speed is 750 kHz; in dma,the maximum speed is 2 MHz;
-	   -# CCLK_24M_HCLK_24M_PCLK_24M:in nodma,the maximum speed is 2 MHz(this is not a garbled code, interrupt processing can not come over);
-                                     in dma,3 MHz can be met, the maximum limit of non-garbled codes has not been confirmed;
-   @endverbatim
+    -# The maximum baud rate depends on the hardware environment (such as cable length, etc.) and pclk/cclk/hclk:
+         - pclk is the main factor affecting the upper baud rate of UART
+         - cclk and pclk affect interrupt processing times(increase the frequency of cclk will increase the maximum baud rate of NDMA, but it has no obvious effect on the maximum baud rate of DMA)
+    -# The maximum baud rate must meet two testing conditions: 
+         - proper parsing by the logic analyzer
+         - successful communication on the development board
+    -# Note on the actual use of the maximum baud rate:
+         - if only communication on the development board is considered, the baud rate can be set higher 
+         - setting a significantly higher baud rate may result in a deviation between the set and actual baud rates, leading to incorrect parsing by the logic analyzer and possible communication failures with other devices
+    -# Using the B92 development board,the test results:
+         - CCLK_16M_HCLK_16M_PCLK_16M: in nodma,the maximum speed is 2 MHz; in dma,the maximum speed is 2 MHz;
+         - CCLK_24M_HCLK_24M_PCLK_24M: in nodma,the maximum speed is 3 MHz; in dma,the maximum speed is 3 MHz;
+         - CCLK_32M_HCLK_32M_PCLK_16M: in nodma,the maximum speed is 2 MHz; in dma,the maximum speed is 2 MHz;
+         - CCLK_48M_HCLK_48M_PCLK_24M: in nodma,the maximum speed is 3 MHz; in dma,the maximum speed is 3 MHz;
+         - CCLK_96M_HCLK_48M_PCLK_24M: in nodma,the maximum speed is 3 MHz; in dma,the maximum speed is 3 MHz;
  */
 void uart_cal_div_and_bwpc(unsigned int baudrate, unsigned int pclk, unsigned short* div, unsigned char *bwpc);
 
@@ -635,8 +684,8 @@ void uart_cal_div_and_bwpc(unsigned int baudrate, unsigned int pclk, unsigned sh
  * @brief  	 Set rx_timeout.
    @verbatim
        The effect:
-         -# When no data is received within the rx_timeout period, that is rx timeout, the UART_RXDONE_IRQ_STATUS interrupt is generated.
-         -# The UART_RXDONE_IRQ_STATUS interrupt is required to process the remaining data below the threshold(the DMA Operation threshold is fixed at 4,
+         - When no data is received within the rx_timeout period, that is rx timeout, the UART_RXDONE_IRQ_STATUS interrupt is generated.
+         - The UART_RXDONE_IRQ_STATUS interrupt is required to process the remaining data below the threshold(the DMA Operation threshold is fixed at 4,
             the NDMA threshold can be configured through uart_rx_irq_trig_level)
        How to set:
          rx_timeout = ((bwpc+1) * bit_cnt)* mul ((bwpc+1) * bit_cnt:the maximum can be set to 0xff).

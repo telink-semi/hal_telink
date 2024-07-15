@@ -1,27 +1,24 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
-
 /********************************************************************************************************
- * @file	dma_reg.h
+ * @file    dma_reg.h
  *
- * @brief	This is the header file for B92
+ * @brief   This is the header file for B92
  *
- * @author	Driver Group
+ * @author  Driver Group
+ * @date    2020
+ *
+ * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *
  *******************************************************************************************************/
 #ifndef DMA_REG_H
@@ -125,23 +122,35 @@ enum{
 
 #define reg_dma_llp_int_mode(i)	REG_ADDR8(REG_DMA_BASE+0x113+(((i)>3) ? 1 : 0))
 
-#if 1	//BLE SDK use: for B91/B92 compatible, may modify next driver release
-//#define reg_dma_rx_wptr			REG_ADDR8(0x801004f4)
-#define reg_dma_tx_wptr			REG_ADDR8(0x80100500)		//rf_get_tx_wptr(0)
-
-enum{
-	FLD_DMA_WPTR_MASK =			BIT_RNG(0,4),
-};
 
 
-#define reg_dma_rx_rptr			REG_ADDR8(0x801004f5)
-#define reg_dma_tx_rptr			REG_ADDR8(0x80100501)
-enum{
-	FLD_DMA_RPTR_MASK =			BIT_RNG(0,4),
-	FLD_DMA_RPTR_SET =			BIT(5),
-	FLD_DMA_RPTR_NEXT =			BIT(6),
-	FLD_DMA_RPTR_CLR =			BIT(7),
-};
-#endif
+/**
+ * The following registers are related to rf, refer to the definition in rf_reg.h
+ * #define    CHNADDR         0x100400
+ * #define reg_rf_bb_auto_ctrl				REG_ADDR8(0x10050c)
+ * enum{
+ *	FLD_RF_TX_MULTI_EN					=	BIT(0),
+ *	FLD_RF_RX_MULTI_EN					=	BIT(1),
+ *	FLD_RF_CH_0_RNUM_EN_BK				=	BIT(2),
+ *  FLD_RF_CH_1_RNUM_EN_BK				=	BIT(3),
+ *	FLD_RF_CH1_RX_ERR_EN				=	BIT(4),
+ *	FLD_RF_DMA_REQ_D1_EN				=	BIT(5),
+ * };
+ * #define reg_rf_bb_tx_chn_dep				REG_ADDR8(0x1004f3)
+ * #define reg_rf_bb_tx_size					REG_ADDR8(0x1004f0)
+ * #define reg_rf_bb_tx_size_h					REG_ADDR8(0x1004f1)
+ *
+ * #define reg_rf_dma_rx_wptr				REG_ADDR8(0x001004f4)
+ * #define reg_rf_dma_rx_rptr				REG_ADDR8(0x001004f5)
+ *
+ * #define reg_rf_dma_tx_rptr(i)			REG_ADDR8(0x00100501 + (i << 1))
+ * #define reg_rf_dma_tx_wptr(i)			REG_ADDR8(0x00100500 + (i << 1))
+ *
+ * #define reg_rf_bb_rx_size					REG_ADDR8(CHNADDR+0xf6)
+ * #define reg_rf_bb_rx_size_h					REG_ADDR8(CHNADDR+0xf7)
+ *
+ * #define reg_rf_rx_wptr_mask					REG_ADDR8(CHNADDR+0x10d)
+ *
+ */
 
 #endif

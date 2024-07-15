@@ -1,27 +1,24 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
-
 /********************************************************************************************************
- * @file	pwm.h
+ * @file    pwm.h
  *
- * @brief	This is the header file for B92
+ * @brief   This is the header file for B92
  *
- * @author	Driver Group
+ * @author  Driver Group
+ * @date    2020
+ *
+ * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *
  *******************************************************************************************************/
 #ifndef PWM_H_
@@ -132,30 +129,25 @@ static inline void pwm_set_tmax(pwm_id_e id, unsigned short tmax){
 
 /**
  * @brief     This function servers to start the pwm,can have more than one PWM open at the same time.
- * @param[in] id - variable of enum to select the pwm number.
+ * @param[in] en - variable of enum to select the pwm.
  * @return	  none.
  */
-static inline void pwm_start(pwm_id_e id){
-	if(PWM0_ID == id){
-		BM_SET(reg_pwm0_enable, BIT(PWM0_ID));
-	}
-	else{
-		BM_SET(reg_pwm_enable, BIT(id));
-	}
+static inline void pwm_start(pwm_en_e en){
+
+		reg_pwm_enable|=en;
 }
+
+
 
 /**
  * @brief     This function servers to stop the pwm,can have more than one PWM stop at the same time.
- * @param[in] id - variable of enum to select the pwm number.
+ * @param[in] en - variable of enum to select the pwm.
  * @return	  none.
  */
-static inline void pwm_stop(pwm_id_e id){
-	if(PWM0_ID == id){
-		BM_CLR(reg_pwm0_enable, BIT(PWM0_ID));
-	}
-	else{
-		BM_CLR(reg_pwm_enable, BIT(id));
-	}
+static inline void pwm_stop(pwm_en_e en){
+
+		reg_pwm_enable&=~en;
+
 }
 
 
@@ -245,12 +237,13 @@ static inline void pwm_clr_irq_mask(pwm_irq_e mask){
 
 /**
  * @brief     This function servers to get the pwm interrupt status.
- * @param[in] status - variable of enum to select the pwm interrupt source.
- * @return	  none.
+ * @param[in] status   - variable of enum to select the pwm interrupt source.
+ * @retval    non-zero     - the interrupt occurred.
+ * @retval    zero  - the interrupt did not occur.
  */
-static inline unsigned char pwm_get_irq_status(pwm_irq_e status){
+static inline unsigned short pwm_get_irq_status(pwm_irq_e status){
 
-	return reg_pwm_irq_sta |=status;
+	return (reg_pwm_irq_sta & status);
 
 }
 
@@ -483,3 +476,8 @@ static inline void pwm_32k_chn_dis(pwm_clk_32k_en_chn_e pwm_32K_en_chn)
     BM_CLR(reg_pwm_mode32k, pwm_32K_en_chn);
 }
 #endif
+
+
+
+
+

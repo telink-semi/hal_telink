@@ -28,6 +28,12 @@ zephyr_include_directories(drivers/${SOC}/lib/include/pke)
 zephyr_include_directories(drivers/${SOC}/lib/include/trng)
 zephyr_include_directories(drivers/${SOC})
 
+# add for B92 headers
+zephyr_include_directories(drivers/${SOC}/ext_driver)
+zephyr_include_directories(drivers/${SOC}/ext_driver/driver_lib)
+zephyr_include_directories(drivers/${SOC}/ext_peripherals/codec_0581)
+zephyr_include_directories(drivers/${SOC}/flash)
+
 # soc.c reference sources
 zephyr_library_sources(drivers/${SOC}/clock.c)
 zephyr_library_sources(drivers/${SOC}/analog.c)

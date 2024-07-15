@@ -1,27 +1,24 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
-
 /********************************************************************************************************
- * @file	pwm_reg.h
+ * @file    pwm_reg.h
  *
- * @brief	This is the header file for B92
+ * @brief   This is the header file for B92
  *
- * @author	Driver Group
+ * @author  Driver Group
+ * @date    2020
+ *
+ * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *
  *******************************************************************************************************/
 #ifndef PWM_REG_H
@@ -42,24 +39,17 @@
 
 
 /**
- * This register is used to enable PWM1~PWM5.
+ * This register is used to enable PWM0~PWM5.
  */
-#define reg_pwm_enable			REG_ADDR8(REG_PWM_BASE)
-enum{
+#define reg_pwm_enable			REG_ADDR16(REG_PWM_BASE)
+typedef enum{
 	FLD_PWM1_EN = BIT(1),
 	FLD_PWM2_EN = BIT(2),
 	FLD_PWM3_EN = BIT(3),
 	FLD_PWM4_EN = BIT(4),
 	FLD_PWM5_EN = BIT(5),
-};
-
-/**
- * This register is used to enable PWM0.
- */
-#define reg_pwm0_enable			REG_ADDR8(REG_PWM_BASE+0x01)
-enum{
-	FLD_PWM0_EN = BIT(0),
-};
+	FLD_PWM0_EN = BIT(8),
+}pwm_en_e;
 
 
 /**

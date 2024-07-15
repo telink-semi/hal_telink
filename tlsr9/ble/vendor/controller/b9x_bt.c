@@ -186,7 +186,7 @@ static void b9x_bt_irq_init()
 	flash_plic_preempt_config(0,1);
 #endif
 
-#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92
+#if CONFIG_SOC_RISCV_TELINK_B91
 #define IRQ_SYSTIMER IRQ1_SYSTIMER
 #define IRQ_ZB_RT IRQ15_ZB_RT
 #endif
@@ -240,8 +240,8 @@ int b9x_bt_controller_init()
 #elif CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B95
 	blc_ll_registerGiveSemCb(os_give_sem_cb, os_give_sem_cb);
 	blc_setOsSupEnable(true);
+	blc_ll_enOsPowerManagement_module();
 #endif
-
 	/* init semaphore */
 	k_sem_reset(&controller_sem);
 	k_sem_give(&controller_sem);

@@ -1,27 +1,24 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
-
 /********************************************************************************************************
- * @file	pke.h
+ * @file    pke.h
  *
- * @brief	This is the header file for B92
+ * @brief   This is the header file for B92
  *
- * @author	Driver Group
+ * @author  Driver Group
+ * @date    2020
+ *
+ * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *
  *******************************************************************************************************/
 /********* pke version:1.1 *********/
@@ -34,7 +31,7 @@ extern "C" {
 
 
 #include "reg_include/pke_reg.h"
-#include "trng.h"
+#include "lib/include/trng.h"
 #include "eccp_curve.h"
 #include "pke_utility.h"
 
@@ -150,14 +147,6 @@ typedef void *(*KDF_FUNC)(const void *input, unsigned int byteLen, unsigned char
 //APIs
 
 /**
- * @brief		This function is used to determine whether the array is all 0s.
- * @param[in]	data	- the buffer data.
- * @param[in]	len		- the length of data.
- * @return		1: all 0, 0: not all 0.
- */
-int ismemzero4(unsigned int a[], unsigned int wordLen);
-
-/**
  * @brief       get random data.
  * @param[in]   rand_pke  - random data array.
  * @param[in]   bytes     - length of the random data.
@@ -175,7 +164,7 @@ unsigned char rand_get(unsigned char *rand, unsigned int byteLen);
  * @return   	PKE_SUCCESS(success), other(inverse not exists or error).
  * @caution     please make sure aWordLen <= modWordLen <= OPERAND_MAX_WORD_LEN and a < modulus.
  */
-unsigned int pke_modinv(const unsigned int *modulus, const unsigned int *a, unsigned int *ainv, unsigned int modWordLen,
+unsigned int pke_modinv(const unsigned int *modulus, volatile const unsigned int *a, unsigned int *ainv, unsigned int modWordLen,
 		unsigned int aWordLen);
 
 /**
@@ -189,7 +178,7 @@ unsigned int pke_modinv(const unsigned int *modulus, const unsigned int *a, unsi
  * @caution     1. a,b must be less than modulus.
  *              2. wordLen must not be bigger than OPERAND_MAX_WORD_LEN.
  */
-unsigned int pke_modadd(const unsigned int *modulus, const unsigned int *a, const unsigned int *b,
+unsigned int pke_modadd(const unsigned int *modulus, volatile const unsigned int *a, volatile const unsigned int *b,
 		unsigned int *out, unsigned int wordLen);
 
 /**
@@ -216,7 +205,7 @@ unsigned int pke_modsub(const unsigned int *modulus, const unsigned int *a, cons
  * @caution     1. a+b may overflow.
  *              2. wordLen must not be bigger than OPERAND_MAX_WORD_LEN.
  */
-unsigned int pke_add(const unsigned int *a, const unsigned int *b, unsigned int *out, unsigned int wordLen);
+unsigned int pke_add(volatile const unsigned int *a, volatile const unsigned int *b, unsigned int *out, unsigned int wordLen);
 
 /**
  * @brief       out = a-b.
@@ -228,7 +217,7 @@ unsigned int pke_add(const unsigned int *a, const unsigned int *b, unsigned int 
  * @caution     1. please make sure a > b.
  *              2. wordLen must not be bigger than OPERAND_MAX_WORD_LEN.
  */
-unsigned int pke_sub(const unsigned int *a, const unsigned int *b, unsigned int *out, unsigned int wordLen);
+unsigned int pke_sub(volatile const unsigned int *a, const unsigned int *b, volatile unsigned int *out, unsigned int wordLen);
 
 /**
  * @brief       out = a*b.
@@ -240,7 +229,7 @@ unsigned int pke_sub(const unsigned int *a, const unsigned int *b, unsigned int 
  * @caution     1. please make sure out buffer word length is bigger than (2*max_bit_len(a,b)+0x1F)>>5.
  *              2. please make sure ab_wordLen is not bigger than OPERAND_MAX_WORD_LEN/2.
  */
-unsigned int pke_mul(const unsigned int *a, const unsigned int *b, unsigned int *out, unsigned int ab_wordLen);
+unsigned int pke_mul(const unsigned int *a, const unsigned int *b, volatile unsigned int *out, unsigned int ab_wordLen);
 
 /**
  * @brief       load the pre-calculated mont parameters H(R^2 mod modulus).
@@ -251,7 +240,7 @@ unsigned int pke_mul(const unsigned int *a, const unsigned int *b, unsigned int 
  * @caution     1. please make sure the 2 input parameters are both valid.
  *              2. wordLen must not be bigger than OPERAND_MAX_WORD_LEN.
  */
-void pke_load_pre_calc_mont(unsigned int *H, unsigned int *n1, unsigned int wordLen);
+void pke_load_pre_calc_mont(volatile const unsigned int *H, volatile const unsigned int *n1, unsigned int wordLen);
 
 /**
  * @brief       out = a*b mod modulus.
@@ -266,7 +255,7 @@ void pke_load_pre_calc_mont(unsigned int *H, unsigned int *n1, unsigned int word
  *              3. wordLen must not be bigger than OPERAND_MAX_WORD_LEN.
  *              4. before calling this function, please make sure the pre-calculated mont arguments of modulus are located in the right address.
  */
-unsigned int pke_modmul_internal(const unsigned int *modulus, const unsigned int *a, const unsigned int *b, unsigned int *out,
+unsigned int pke_modmul_internal(volatile const unsigned int *modulus, volatile const unsigned int *a, volatile const unsigned int *b, volatile unsigned int *out,
 		unsigned int wordLen);
 
 /**
@@ -297,8 +286,8 @@ unsigned int pke_modmul(const unsigned int *modulus, const unsigned int *a, cons
  *              2. modulus must be odd.
  *              3. please make sure exp_wordLen <= mod_wordLen <= OPERAND_MAX_WORD_LEN.
  */
-unsigned int pke_modexp(const unsigned int *modulus, const unsigned int *exponent, const unsigned int *base,
-		unsigned int *out, unsigned int mod_wordLen, unsigned int exp_wordLen);
+unsigned int pke_modexp(volatile const unsigned int *modulus, volatile const unsigned int *exponent, volatile const unsigned int *base,
+		volatile unsigned int *out, unsigned int mod_wordLen, unsigned int exp_wordLen);
 
 /**
  * @brief       c = a mod b.
@@ -314,7 +303,7 @@ unsigned int pke_modexp(const unsigned int *modulus, const unsigned int *exponen
  *              2. please make sure aWordLen <= 2*OPERAND_MAX_WORD_LEN, bWordLen <= OPERAND_MAX_WORD_LEN.
  *              3. real bit length of a can not be bigger than 2*(real bit length of b).
  */
-unsigned int pke_mod(unsigned int *a, unsigned int aWordLen, unsigned int *b, unsigned int *b_h, unsigned int *b_n1, unsigned int bWordLen,
+unsigned int pke_mod(unsigned int *a, unsigned int aWordLen, const unsigned int *b, volatile const unsigned int *b_h, volatile const unsigned int *b_n1, unsigned int bWordLen,
 		unsigned int *c);
 
 /**
@@ -330,8 +319,8 @@ unsigned int pke_mod(unsigned int *a, unsigned int aWordLen, unsigned int *b, un
  *              2. please make sure input point P is on the curve.
  *              3. please make sure bit length of the curve is not bigger than ECCP_MAX_BIT_LEN.
  */
-unsigned int eccp_pointMul(eccp_curve_t *curve, unsigned int *k, unsigned int *Px, unsigned int *Py,
-					  unsigned int *Qx, unsigned int *Qy);
+unsigned int eccp_pointMul(eccp_curve_t *curve, unsigned int *k, const unsigned int *Px, const unsigned int *Py,
+					  volatile unsigned int *Qx, volatile unsigned int *Qy);
 
 /**
  * @brief       ECCP curve point add, Q=P1+P2.
@@ -409,7 +398,7 @@ unsigned int eccp_getkey(eccp_curve_t *curve, unsigned char *priKey, unsigned ch
  *     			2. even if the input point P is valid, the output may be infinite point, in this case return error.
  *     			3. please make sure the curve is c25519.
  */
-unsigned int x25519_pointMul(mont_curve_t *curve, unsigned int *k, unsigned int *Pu, unsigned int *Qu);
+unsigned int x25519_pointMul(mont_curve_t *curve, unsigned int *k, const unsigned int *Pu, unsigned int *Qu);
 
 /**
  * @brief       edwards25519 curve point mul(random point), Q=[k]P.

@@ -1,27 +1,24 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
-
 /********************************************************************************************************
- * @file	pm.h
+ * @file    pm.h
  *
- * @brief	This is the header file for B92
+ * @brief   This is the header file for B92
  *
- * @author	Driver Group
+ * @author  Driver Group
+ * @date    2020
+ *
+ * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *
  *******************************************************************************************************/
 #pragma once
@@ -211,6 +208,7 @@ typedef struct{
 extern _attribute_aligned_(4) pm_status_info_s g_pm_status_info;
 extern _attribute_data_retention_sec_ unsigned char g_pm_vbat_v;
 
+// <remove when release sdk>
 /**
  * @brief		This function servers to set the match value for MDEC wakeup.
  * @param[in]	value - the MDEC match value for wakeup.
@@ -220,6 +218,7 @@ static inline void pm_set_mdec_value_wakeup(unsigned char value)
 {
 	analog_write_reg8(mdec_ctrl,((analog_read_reg8(mdec_ctrl) & (~0x0f)) | value));
 }
+// </remove when release sdk>
 
 /**
  * @brief		This function serves to get deep retention flag.
@@ -281,14 +280,14 @@ void pm_set_xtal_stable_timer_param(unsigned int delay_us, unsigned int loopnum,
  * @brief		this function servers to wait bbpll clock lock.
  * @return		none.
  */
-_attribute_ram_code_sec_noinline_ void pm_wait_bbpll_done(void);
+_attribute_ram_code_com_sec_noinline_ void pm_wait_bbpll_done(void);
 
 /**
  * @brief		This function serves to recover system timer.
  * 				The code is placed in the ram code section, in order to shorten the time.
  * @return		none.
  */
-_attribute_ram_code_sec_noinline_ void pm_stimer_recover(void);
+_attribute_ram_code_com_sec_noinline_ void pm_stimer_recover(void);
 
 /**
  * @brief		This function serves to set the working mode of MCU based on 32k crystal,e.g. suspend mode, deep sleep mode, deep sleep with SRAM retention mode and shutdown mode.
@@ -363,4 +362,4 @@ static inline void pm_set_zb_voltage(pm_zb_voltage_e zb_voltage)
  * 				If it is not reached for a long time, the system will reboot.
  * @return  	none.
  */
-_attribute_ram_code_sec_noinline_ void pm_wait_xtal_ready(void);
+_attribute_ram_code_com_sec_noinline_ void pm_wait_xtal_ready(void);

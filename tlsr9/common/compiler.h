@@ -46,4 +46,9 @@
 
 #define _always_inline                          inline __attribute__((always_inline))
 
+#define _attribute_ram_code_com_sec_      		__attribute__((section(".ram_code")))
+#define _attribute_ram_code_com_sec_noinline_   __attribute__((section(".ram_code"))) __attribute__((noinline))
+
+#define _attribute_ram_code_com_  __attribute__((section(".ram_code"))) __attribute__((noinline))
+
 #endif

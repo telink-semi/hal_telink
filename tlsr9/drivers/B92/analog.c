@@ -1,30 +1,27 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
-
 /********************************************************************************************************
- * @file	analog.c
+ * @file    analog.c
  *
- * @brief	This is the source file for B92
+ * @brief   This is the source file for B92
  *
- * @author	Driver Group
+ * @author  Driver Group
+ * @date    2020
+ *
+ * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
  *
  *******************************************************************************************************/
-#include "plic.h"
+#include "lib/include/plic.h"
 #include "analog.h"
 #include "compiler.h"
 #include "stimer.h"
@@ -91,7 +88,7 @@ dma_config_t analog_rx_dma_config={
  * @brief      This function serves to judge whether analog write/read is busy .
  * @return     none.
  */
-static inline void analog_wait();
+_attribute_ram_code_sec_optimize_o2_ static void analog_wait(void);
 /**********************************************************************************************************************
  *                                         global function implementation                                             *
  *********************************************************************************************************************/
@@ -105,7 +102,7 @@ static inline void analog_wait();
  * @param[in]  addr - address need to be read.
  * @return     the result of read.
  */
-unsigned char analog_read_reg8(unsigned char addr){
+_attribute_ram_code_sec_optimize_o2_ unsigned char analog_read_reg8(unsigned char addr){
 	unsigned int r=core_interrupt_disable();
 	reg_ana_addr = addr;
 	reg_ana_len=0x1;
@@ -123,7 +120,7 @@ unsigned char analog_read_reg8(unsigned char addr){
  * @param[in]  data - the value need to be write.
  * @return     none.
  */
-void analog_write_reg8(unsigned char addr, unsigned char data){
+_attribute_ram_code_sec_optimize_o2_ void analog_write_reg8(unsigned char addr, unsigned char data){
 	unsigned int r=core_interrupt_disable();
 	reg_ana_len = 1;
 	reg_ana_addr = addr;
@@ -140,7 +137,7 @@ void analog_write_reg8(unsigned char addr, unsigned char data){
  * @param[in]  data - the value need to be write.
  * @return     none.
  */
-void analog_write_reg16(unsigned char addr, unsigned short data)
+_attribute_ram_code_sec_optimize_o2_ void analog_write_reg16(unsigned char addr, unsigned short data)
 {
 	unsigned int r=core_interrupt_disable();
 	reg_ana_len=2;
@@ -156,7 +153,7 @@ void analog_write_reg16(unsigned char addr, unsigned short data)
  * @param[in]  addr - address need to be read.
  * @return     the result of read.
  */
-unsigned short analog_read_reg16(unsigned char addr)
+_attribute_ram_code_com_sec_noinline_ unsigned short analog_read_reg16(unsigned char addr)
 {
 	unsigned int r=core_interrupt_disable();
 	reg_ana_len=2;
@@ -175,7 +172,7 @@ unsigned short analog_read_reg16(unsigned char addr)
  * @param[in]  addr - address need to be read.
  * @return     the result of read.
  */
-unsigned int analog_read_reg32(unsigned char addr)
+_attribute_ram_code_sec_optimize_o2_ unsigned int analog_read_reg32(unsigned char addr)
 {
 	unsigned int r=core_interrupt_disable();
 	reg_ana_len = 4;
@@ -194,7 +191,7 @@ unsigned int analog_read_reg32(unsigned char addr)
  * @param[in]  data - the value need to be write.
  * @return     none.
  */
-void analog_write_reg32(unsigned char addr, unsigned int data)
+_attribute_ram_code_sec_optimize_o2_ void analog_write_reg32(unsigned char addr, unsigned int data)
 {
 	unsigned int r=core_interrupt_disable();
 	reg_ana_len = 4;
@@ -262,7 +259,7 @@ void analog_write_reg32_dma(dma_chn_e chn, unsigned char addr, void *pdat)
  * @param[in]  len - the length of buffer.
  * @return     none.
  */
-_attribute_ram_code_sec_noinline_ void analog_write_buff(unsigned char addr, unsigned char *buff, int len)
+_attribute_ram_code_com_sec_noinline_ void analog_write_buff(unsigned char addr, unsigned char *buff, int len)
 {
 	unsigned char wr_idx = 0;
 	unsigned char len_t = len;
@@ -306,7 +303,7 @@ _attribute_ram_code_sec_noinline_ void analog_write_buff(unsigned char addr, uns
  * @param[in]  len - the length of read data.
  * @return     none.
  */
-_attribute_ram_code_sec_noinline_ void analog_read_buff(unsigned char addr, unsigned char *buff, int len)
+_attribute_ram_code_com_sec_noinline_ void analog_read_buff(unsigned char addr, unsigned char *buff, int len)
 {
 	unsigned int r=core_interrupt_disable();
 	unsigned char rd_idx = 0;
@@ -434,8 +431,17 @@ void analog_write_addr_data_dma(dma_chn_e chn, void *pdat, int len)
  * @brief      This function serves to judge whether analog write/read is busy .
  * @return     none.
  */
-static inline void analog_wait(){
-	while(reg_ana_ctrl & FLD_ANA_BUSY){}
+_attribute_ram_code_sec_optimize_o2_ static void analog_wait(void)
+{
+	unsigned long long start = rdmcycle();
+	while(reg_ana_ctrl & FLD_ANA_BUSY)
+	{
+		if(rdmcycle() - start > TIMEOUT_US * sys_clk.cclk)
+		{
+			timeout_handler(ERROR_TIMEOUT_ANALOG_WAIT);
+			return;
+		}
+	}
 }
 
 

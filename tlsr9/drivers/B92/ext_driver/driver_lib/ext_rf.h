@@ -1,389 +1,67 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
+/********************************************************************************************************
+ * @file	ext_rf.h
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * @brief	This is the header file for BLE SDK
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * @author	BLE GROUP
+ * @date	06,2022
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @par		Copyright (c) 2022, Telink Semiconductor (Shanghai) Co., Ltd.
+ *			All rights reserved.
  *
- *****************************************************************************/
-
-
-#ifndef DRIVERS_B92_EXT_DRIVER_EXT_LIB_H_
-#define DRIVERS_B92_EXT_DRIVER_EXT_LIB_H_
-
-
-#include "types.h"
-#include "../uart.h"
-#include "../pm.h"
-#include "../rf.h"
-#include <stdbool.h>
-#include "ext_pm.h"
-
-
-
-
-/******************************* debug_start ******************************************************************/
-void sub_wr_ana(unsigned int addr, unsigned char value, unsigned char e, unsigned char s);
-void sub_wr(unsigned int addr, unsigned char value, unsigned char e, unsigned char s);
-/******************************* debug_end ********************************************************************/
-
-
-/******************************* dbgport start ******************************************************************/
-#define reg_bb_dbg_sel      REG_ADDR16(0x140378)
-#define reg_bb_dbg_sel_l    REG_ADDR8(0x140378)
-#define reg_bb_dbg_sel_h    REG_ADDR8(0x140379)
-#define	bt_dbg_set_pin		dbg_bb_set_pin
-
-void ble_dbg_port_init(int deg_sel0);
-
-void dbg_bb_set_pin(gpio_pin_e pin);
-
-void rf_enable_bb_debug(void);
-/******************************* dbgport end ********************************************************************/
-
-
-/******************************* dbgErrorCode start ******************************************************************/
-/* for debug (write ram)*/
-#define	DBG_SRAM_ADDR					0x00014
-
-#define PKE_OPERAND_MAX_WORD_LEN      (0x08)
-#define PKE_OPERAND_MAX_BIT_LEN       (0x100)
-#define ECC_MAX_WORD_LEN              PKE_OPERAND_MAX_WORD_LEN
-/*
- * addr - only 0x00012 ~ 0x00021 can be used !!! */
-#define write_dbg32(addr, value)   		write_sram32(addr, value)
-
-#define write_log32(err_code)   		write_sram32(0x00014, err_code)
-/******************************* dbgErrorCode end ********************************************************************/
-
-
-/******************************* ext_aes start ******************************************************************/
-#define HW_AES_CCM_ALG_EN										0  //TODO
-
-extern unsigned int aes_data_buff[8];
-
-
-#define	CV_LLBT_BASE				(0x160000)
-
-#define reg_rwbtcntl				REG_ADDR32(CV_LLBT_BASE)
-
-enum{
-
-	FLD_NWINSIZE					= BIT_RNG(0,5),
-	FLD_RWBT_RSVD6_7				= BIT_RNG(6,7),
-
-	FLD_RWBTEN              =   BIT(8),
-	FLD_CX_DNABORT      	=   BIT(9),
-	FLD_CX_RXBSYENA     	=   BIT(10),
-	FLD_CX_TXBSYENA			=   BIT(11),
-	FLD_SEQNDSB				=   BIT(12),
-	FLD_ARQNDSB     		=   BIT(13),
-	FLD_FLOWDSB				=   BIT(14),
-	FLD_HOPDSB				=   BIT(15),
-
-	FLD_WHITDSB             =   BIT(16),
-	FLD_CRCDSB      		=   BIT(17),
-	FLD_CRYPTDSB     		=   BIT(18),
-	FLD_LMPFLOWDSB			=   BIT(19),
-	FLD_SNIFF_ABORT			=   BIT(20),
-	FLD_PAGEINQ_ABORT    	=   BIT(21),
-	FLD_RFTEST_ABORT		=   BIT(22),
-	FLD_SCAN_ABORT			=   BIT(23),
-
-
-	FLD_RWBT_RSVD24_25			=   BIT_RNG(24,25),
-	FLD_CRYPT_SOFT_RST			=	BIT(26),   /**HW AES_CMM module reset*/
-	FLD_SWINT_REQ               =   BIT(27),
-	FLD_RADIOCNTL_SOFT_RST      =   BIT(28),
-	FLD_REG_SOFT_RST     		=   BIT(29),
-	FLD_MASTER_TGSOFT_RST		=   BIT(30),
-	FLD_MASTER_SOFT_RST			=   BIT(31),
-
-};
-
-
-void aes_encryption_le(u8* key, u8* plaintext, u8 *encrypted_data);
-void aes_encryption_be(u8* key, u8* plaintext, u8 *encrypted_data);
-
-bool aes_resolve_irk_rpa(u8 *key, u8 *addr);
-
-void blt_ll_setAesCcmPara(u8 role, u8 *sk, u8 *iv, u8 aad, u64 enc_pno, u64 dec_pno, u8 lastTxLenFlag);
-
-/******************************* ext_aes end ********************************************************************/
-
-
-
-/******************************* ext_aoa start ******************************************************************/
-
-/******************************* ext_aoa end ********************************************************************/
-
-
-
-/******************************* ext_audio start ******************************************************************/
-
-/******************************* ext_audio end ********************************************************************/
-
-
-
-
-/******************************* ext_codec start ******************************************************************/
-
-/******************************* ext_codec end ********************************************************************/
-
-
-
-/******************************* ext_flash start ******************************************************************/
-
-/******************************* ext_flash end ********************************************************************/
-
-
-
-
-/******************************* ext_gpio start ******************************************************************/
-
-/******************************* ext_gpio end ********************************************************************/
-
-
-
-
-/******************************* ext_hci_uart start ******************************************************************/
-
-/******************************* ext_hci_uart end ********************************************************************/
-
-
-
-
-
-/******************************* ext_stimer start ******************************************************************/
-#define	SYSTICK_NUM_PER_US				24
-
-#define	SSLOT_TICK_NUM					1875/4    //attention: not use "()" for purpose !!!    625uS*24/32=625*3/4=1875/4=468.75
-#define	SSLOT_TICK_REVERSE				4/1875	  //attention: not use "()" for purpose !!!
-
-
-typedef enum {
-	STIMER_IRQ_MASK     		=   BIT(0),
-	STIMER_32K_CAL_IRQ_MASK     =   BIT(1),
-}stimer_irq_mask_e;
-
-typedef enum {
-	FLD_IRQ_SYSTEM_TIMER     		=   BIT(0),
-}system_timer_irq_mask_e;
-
-
-typedef enum {
-	STIMER_IRQ_CLR	     		=   BIT(0),
-	STIMER_32K_CAL_IRQ_CLR     	=   BIT(1),
-}stimer_irq_clr_e;
-
-/**
- * @brief define system clock tick per us/ms/s.
- */
-enum{
-	SYSTEM_TIMER_TICK_125US 	= 2000,   //125*16
-};
-
-/**
- * @brief    This function serves to enable system timer interrupt.
- * @return  none
- */
-static inline void systimer_irq_enable(void)
-{
-	reg_irq_src0 |= BIT(IRQ1_SYSTIMER);
-	//plic_interrupt_enable(IRQ1_SYSTIMER);
-}
-
-/**
- * @brief    This function serves to disable system timer interrupt.
- * @return  none
- */
-static inline void systimer_irq_disable(void)
-{
-	reg_irq_src0 &= ~BIT(IRQ1_SYSTIMER);
-	//plic_interrupt_disable(IRQ1_SYSTIMER);
-}
-
-static inline void systimer_set_irq_mask(void)
-{
-	reg_system_irq_mask |= STIMER_IRQ_MASK;
-}
-
-static inline void systimer_clr_irq_mask(void)
-{
-	reg_system_irq_mask &= (~STIMER_IRQ_MASK);
-}
-
-static inline unsigned char systimer_get_irq_status(void)
-{
-	return reg_system_cal_irq & FLD_IRQ_SYSTEM_TIMER;
-}
-
-static inline void systimer_clr_irq_status(void)
-{
-	reg_system_cal_irq = STIMER_IRQ_CLR;
-}
-
-static inline void systimer_set_irq_capture(unsigned int tick)
-{
-	reg_system_irq_level = tick;
-}
-
-static inline unsigned int systimer_get_irq_capture(void)
-{
-	return reg_system_irq_level;
-}
-
-static inline int tick1_exceed_tick2(u32 tick1, u32 tick2)
-{
-	return (u32)(tick1 - tick2) < BIT(30);
-}
-
-
-static inline int tick1_closed_to_tick2(unsigned int tick1, unsigned int tick2, unsigned int tick_distance)
-{
-	return (unsigned int)(tick1 + tick_distance - tick2) < (tick_distance<<1);
-}
-
-static inline int tick1_out_range_of_tick2(unsigned int tick1, unsigned int tick2, unsigned int tick_distance)
-{
-	return (unsigned int)(tick1 + tick_distance - tick2) > (tick_distance<<1);
-}
-
-/******************************* ext_stimer end ********************************************************************/
-
-
-
-/******************************* ext_pm start ******************************************************************/
-#ifndef	PM_32k_RC_CALIBRATION_ALGORITHM_EN
-#define PM_32k_RC_CALIBRATION_ALGORITHM_EN				1
-#endif
-
-#define SYS_NEED_REINIT_EXT32K			    BIT(1)
-#define WAKEUP_STATUS_TIMER_CORE     	    ( WAKEUP_STATUS_TIMER | WAKEUP_STATUS_CORE)
-#define WAKEUP_STATUS_TIMER_PAD		        ( WAKEUP_STATUS_TIMER | WAKEUP_STATUS_PAD)
-
-/**
- * @brief analog register below can store infomation when MCU in deepsleep mode
- * 	      store your information in these ana_regs before deepsleep by calling analog_write function
- * 	      when MCU wakeup from deepsleep, read the information by by calling analog_read function
- * 	      Reset these analog registers only by power cycle
- */
-#define DEEP_ANA_REG0                       PM_ANA_REG_POWER_ON_CLR_BUF0 //initial value =0x00	[Bit0][Bit1] is already occupied. The customer cannot change!
-#define DEEP_ANA_REG1                       PM_ANA_REG_POWER_ON_CLR_BUF1 //initial value =0x00
-#define DEEP_ANA_REG2                       PM_ANA_REG_POWER_ON_CLR_BUF2 //initial value =0x00
-#define DEEP_ANA_REG3                      	PM_ANA_REG_POWER_ON_CLR_BUF3 //initial value =0x00
-#define DEEP_ANA_REG4                       PM_ANA_REG_POWER_ON_CLR_BUF4 //initial value =0x00
-#define DEEP_ANA_REG5                       PM_ANA_REG_POWER_ON_CLR_BUF5 //initial value =0x00
-#define DEEP_ANA_REG6                       PM_ANA_REG_POWER_ON_CLR_BUF6 //initial value =0x0f
-
-/**
- * @brief these analog register can store data in deepsleep mode or deepsleep with SRAM retention mode.
- * 	      Reset these analog registers by watchdog, chip reset, RESET Pin, power cycle
- */
-
-#define DEEP_ANA_REG7                       PM_ANA_REG_WD_CLR_BUF0 //initial value =0xff	[Bit0] is already occupied. The customer cannot change!
-
-//ana39 system used, user can not use
-#define SYS_DEEP_ANA_REG 					PM_ANA_REG_POWER_ON_CLR_BUF0
-
-
-
-
-
-extern  unsigned char 		    tl_24mrc_cal;
-extern 	unsigned int 			g_pm_tick_32k_calib;
-extern  unsigned int 			g_pm_tick_cur;
-extern  unsigned int 			g_pm_tick_32k_cur;
-extern  unsigned char       	g_pm_long_suspend;
-extern  unsigned int 			g_pm_mspi_cfg;
-
-extern	unsigned int 			g_sleep_32k_rc_cnt;
-extern	unsigned int 			g_sleep_stimer_tick;
-
-extern unsigned int	ota_program_bootAddr;
-extern unsigned int	ota_firmware_max_size;
-extern unsigned int	ota_program_offset;
-
-/**
- * @brief   pm 32k rc calibration algorithm.
- */
-typedef struct  pm_clock_drift
-{
-	unsigned int	ref_tick;
-	unsigned int	ref_tick_32k;
-	int				offset;
-	int				offset_dc;
-//	int				offset_cur;
-	unsigned int	offset_cal_tick;
-	int				tc;
-	int				rc32;
-	int				rc32_wakeup;
-	int				rc32_rt;
-	int				s0;
-	unsigned char	calib;
-	unsigned char	ref_no;
-} pm_clock_drift_t;
-
-
-extern pm_clock_drift_t	pmbcd;
-
-static inline unsigned int pm_ble_get_latest_offset_cal_time(void)
-{
-	return pmbcd.offset_cal_tick;
-}
-/**
- * @brief		Calculate the offset value based on the difference of 16M tick.
- * @param[in]	offset_tick	- the 16M tick difference between the standard clock and the expected clock.
- * @param[in]	rc32_cnt	- 32k count
- * @return		none.
- */
-_attribute_ram_code_sec_noinline_ void pm_ble_cal_32k_rc_offset (int offset_tick, int rc32_cnt);
-
-/**
- * @brief		This function reset calibrates the value
- * @param[in]	none
- * @return		none.
- */
-void pm_ble_32k_rc_cal_reset(void);
-#define PM_MIN_SLEEP_US			1500  //B92 todo
-
-/**
- * @brief   internal oscillator or crystal calibration for environment change such as voltage, temperature
- * 			to keep some critical PM or RF performance stable
- * 			attention: this is a stack API, user can not call it
- * @param	none
- * @return	none
- */
-void mcu_oscillator_crystal_calibration(void);
-
-typedef int (*suspend_handler_t)(void);
-typedef void (*check_32k_clk_handler_t)(void);
-typedef unsigned int (*pm_get_32k_clk_handler_t)(void);
-typedef unsigned int (*pm_tim_recover_handler_t)(unsigned int);
-
-extern  suspend_handler_t 		 	func_before_suspend;
-extern  check_32k_clk_handler_t  	pm_check_32k_clk_stable;
-extern  pm_get_32k_clk_handler_t 	pm_get_32k_tick;
-extern  pm_tim_recover_handler_t 	pm_tim_recover;
-
-
-/******************************* ext_pm end ********************************************************************/
-
+ *          The information contained herein is confidential property of Telink
+ *          Semiconductor (Shanghai) Co., Ltd. and is available under the terms
+ *          of Commercial License Agreement between Telink Semiconductor (Shanghai)
+ *          Co., Ltd. and the licensee or the terms described here-in. This heading
+ *          MUST NOT be removed from this file.
+ *
+ *          Licensee shall not delete, modify or alter (or permit any third party to delete, modify, or
+ *          alter) any information contained herein in whole or in part except as expressly authorized
+ *          by Telink semiconductor (shanghai) Co., Ltd. Otherwise, licensee shall be solely responsible
+ *          for any claim to the extent arising out of or relating to such deletion(s), modification(s)
+ *          or alteration(s).
+ *
+ *          Licensees are granted free, non-transferable use of the information in this
+ *          file under Mutual Non-Disclosure Agreement. NO WARRANTY of ANY KIND is provided.
+ *
+ *******************************************************************************************************/
+#ifndef DRIVERS_B92_EXT_DRIVER_DRIVER_LIB_EXT_RF_H_
+#define DRIVERS_B92_EXT_DRIVER_DRIVER_LIB_EXT_RF_H_
+
+#include "../../lib/include/rf.h"
 
 
 /******************************* ext_rf start ******************************************************************/
 
 #ifndef FAST_SETTLE
 #define FAST_SETTLE			1
+#endif
+
+#if SW_DCOC_EN
+extern unsigned char  s_dcoc_software_cal_en;
+extern unsigned short g_rf_dcoc_iq_code;
+extern void rf_rx_dcoc_cali_by_sw(void);					//use extern to avoid modifying Driver rf.h
+extern void rf_set_dcoc_iq_code(unsigned short iq_code);	//use extern to avoid modifying Driver rf.h
+extern void rf_set_dcoc_iq_offset(signed short iq_offset);	//use extern to avoid modifying Driver rf.h
+#endif
+
+#if 1	//Remain this till B91 driver update.
+//#define reg_dma_rx_wptr			REG_ADDR8(0x801004f4)
+#define reg_dma_tx_wptr			REG_ADDR8(0x80100500)		//rf_get_tx_wptr(0)
+
+enum{
+	FLD_DMA_WPTR_MASK =			BIT_RNG(0,4),
+};
+
+
+#define reg_dma_rx_rptr			REG_ADDR8(0x801004f5)
+#define reg_dma_tx_rptr			REG_ADDR8(0x80100501)
+enum{
+	FLD_DMA_RPTR_MASK =			BIT_RNG(0,4),
+	FLD_DMA_RPTR_SET =			BIT(5),
+	FLD_DMA_RPTR_NEXT =			BIT(6),
+	FLD_DMA_RPTR_CLR =			BIT(7),
+};
 #endif
 
 enum{
@@ -466,20 +144,28 @@ enum
 #define DMA_RFRX_OFFSET_RFLEN				5   // 826x: 13
 #define DMA_RFRX_OFFSET_DATA				6	// 826x: 14
 
-#define RF_TX_PAKET_DMA_LEN(rf_data_len)		(((rf_data_len)+3)/4)|(((rf_data_len) % 4)<<22)
+#define RF_TX_PACKET_DMA_LEN(rf_data_len)		(((rf_data_len)+3)/4)|(((rf_data_len) % 4)<<22)
 #define DMA_RFRX_OFFSET_CRC24(p)			(p[DMA_RFRX_OFFSET_RFLEN]+6)  //data len:3
 #define DMA_RFRX_OFFSET_TIME_STAMP(p)		(p[DMA_RFRX_OFFSET_RFLEN]+9)  //data len:4
 #define DMA_RFRX_OFFSET_FREQ_OFFSET(p)		(p[DMA_RFRX_OFFSET_RFLEN]+13) //data len:2
 #define DMA_RFRX_OFFSET_RSSI(p)				(p[DMA_RFRX_OFFSET_RFLEN]+15) //data len:1, signed
 #define DMA_RFRX_OFFSET_STATUS(p)			(p[DMA_RFRX_OFFSET_RFLEN]+16)
 
-#define	RF_BLE_RF_PAYLOAD_LENGTH_OK(p)					( *((unsigned int*)p) == p[5]+13)    			//dma_len must 4 byte aligned
+#define	RF_BLE_RF_PAYLOAD_LENGTH_OK(p)					( *((unsigned int*)p) == (unsigned int)(p[5]+13))    			//dma_len must 4 byte aligned
 #define	RF_BLE_RF_PACKET_CRC_OK(p)						((p[(p[5]+5 + 11)] & 0x01) == 0x0)
 #define	RF_BLE_PACKET_VALIDITY_CHECK(p)					(RF_BLE_RF_PAYLOAD_LENGTH_OK(p) && RF_BLE_RF_PACKET_CRC_OK(p))
 
 #define	RF_BLE_RF_PACKET_CRC_OK_HW_ECC(p)						((p[p[5]+5+11-4] & 0x01) == 0x0)
 
 #define rf_set_tx_packet_address(addr)		(dma_set_src_address(DMA0, convert_ram_addr_cpu2bus(addr)))
+
+#define RF_RX_WAIT_DEFAULT_VALUE			(0)
+#define RF_TX_WAIT_DEFAULT_VALUE			(0)
+
+
+#ifndef RF_ACCESS_CODE_DEFAULT_THRESHOLD
+#define RF_ACCESS_CODE_DEFAULT_THRESHOLD	(31)	//0x1e	. BQB may use 32. Coded PHY may use 0xF0
+#endif
 
 
 //RF BLE Minimum TX Power LVL (unit: 1dBm)
@@ -504,13 +190,13 @@ typedef enum {
 
 extern signed char ble_txPowerLevel;
 
-_attribute_ram_code_ void ble_rf_set_rx_dma(unsigned char *buff, unsigned char size_div_16);
+extern unsigned char rf_fsm_tx_trigger_flag;
 
-_attribute_ram_code_ void ble_rf_set_tx_dma(unsigned char fifo_dep, unsigned char size_div_16);
+_attribute_ram_code_com_ void ble_rf_set_rx_dma(unsigned char *buff, unsigned char size_div_16);
 
-_attribute_ram_code_ void ble_tx_dma_config(void);
+_attribute_ram_code_com_ void ble_rf_set_tx_dma(unsigned char fifo_dep, unsigned char size_div_16);
 
-_attribute_ram_code_ void ble_rx_dma_config(void);
+_attribute_ram_code_com_ void ble_rx_dma_config(void);
 
 
 
@@ -530,13 +216,21 @@ static inline unsigned short rf_read_tx_settle(void)
 	return REG_ADDR16(0x80170204);
 }
 
-
 /* attention that not bigger than 4095 */
 static inline void rf_ble_set_rx_settle( unsigned short rx_stl_us )
 {
 	 write_reg16(0x17020c, rx_stl_us);
 }
 
+static inline void 	rf_ble_set_rx_wait(unsigned short rx_wait_us)
+{
+	write_reg16(0x170206, rx_wait_us);
+}
+
+static inline void 	rf_ble_set_tx_wait(unsigned short tx_wait_us)
+{
+	write_reg16(0x17020e, tx_wait_us);
+}
 
 /**
  * @brief	  	This function serves to update the value of internal cap.
@@ -557,6 +251,13 @@ static inline void 	rf_update_internal_capacitance(unsigned char value)
 
 
 
+
+static inline void rf_ble_set_access_code_threshold(u8 threshold)
+{
+	write_reg8(0x17044e, threshold);
+}
+
+
 /**
  * @brief   This function serves to set RF access code value.
  * @param[in]   ac - the address value.
@@ -564,7 +265,7 @@ static inline void 	rf_update_internal_capacitance(unsigned char value)
  */
 static inline void rf_set_ble_access_code_value (unsigned int ac)
 {
-	write_reg32 (0x80170008, ac);
+	write_reg32(0x80170008, ac);
 }
 
 /**
@@ -574,8 +275,20 @@ static inline void rf_set_ble_access_code_value (unsigned int ac)
  */
 static inline void rf_set_ble_access_code (unsigned char *p)
 {
-	write_reg32 (0x80170008, p[3] | (p[2]<<8) | (p[1]<<16) | (p[0]<<24));
+	write_reg32(0x80170008, p[3] | (p[2]<<8) | (p[1]<<16) | (p[0]<<24));
 }
+
+/**
+ * @brief   This function serves to set RF access code advantage.
+ * @param   none.
+ * @return  none.
+ */
+static inline void rf_set_ble_access_code_adv (void)
+{
+	write_reg32(0x80170008, 0xd6be898e);
+}
+
+
 
 /**
  * @brief   This function serves to reset function for RF.
@@ -588,19 +301,10 @@ static inline void reset_sn_nesn(void)
 	REG_ADDR8(0x80170201) =  0x01;
 }
 
-/**
- * @brief   This function serves to set RF access code advantage.
- * @param   none.
- * @return  none.
- */
-static inline void rf_set_ble_access_code_adv (void)
-{
-	write_reg32 (0x170008, 0xd6be898e);
-}
 
 
 /**
- * @brief   This function serves to triggle accesscode in coded Phy mode.
+ * @brief   This function serves to trigger accesscode in coded Phy mode.
  * @param   none.
  * @return  none.
  */
@@ -614,7 +318,7 @@ static inline void rf_trigger_codedPhy_accesscode(void)
  * @param[in] none.
  * @return    none.
  */
-static inline void rf_ble_tx_on ()
+static inline void rf_ble_tx_on (void)
 {
 	write_reg8  (0x80170202, 0x45 | BIT(4));	// TX enable
 }
@@ -624,7 +328,7 @@ static inline void rf_ble_tx_on ()
  * @param[in] none.
  * @return    none.
  */
-static inline void rf_ble_tx_done ()
+static inline void rf_ble_tx_done (void)
 {
 	write_reg8  (0x80170202, 0x45);
 }
@@ -673,8 +377,8 @@ static inline void rf_set_dma_tx_addr(unsigned int src_addr)//Todo:need check by
 typedef enum{
 	FSM_BTX 	= 0x81,
 	FSM_BRX 	= 0x82,
-	FSM_PTX	= 0x83,
-	FSM_PRX    = 0x84,
+	FSM_PTX 	= 0x83,
+	FSM_PRX 	= 0x84,
 	FSM_STX 	= 0x85,
 	FSM_SRX 	= 0x86,
 	FSM_TX2RX	= 0x87,
@@ -692,6 +396,12 @@ typedef enum{
 void rf_start_fsm(fsm_mode_e mode, void* tx_addr, unsigned int tick);
 
 /**
+ * @brief      This function serves to reset baseband for BLE SDK
+ * @return     none
+ */
+void ble_rf_emi_reset_baseband(void);
+
+/**
  * @brief   	This function serves to set RF baseband channel.This function is suitable for ble open PN mode.
  * @param[in]   chn_num  - Bluetooth channel set according to Bluetooth protocol standard.
  * @return  	none.
@@ -706,12 +416,6 @@ void rf_set_ble_channel (signed char chn_num);
 void rf_switchPhyTestMode(rf_mode_e mode);
 
 
-/**
- * @brief     This function performs to set RF Access Code Threshold.// use for BQB
- * @param[in] threshold   cans be 0-32bits
- * @return    none.
- */
-void rf_set_accessCodeThreshold(u8 threshold);
 
 /*
  * brief:If already know the DMA length value,this API can calculate the real RF length value that is easier for humans to understand.
@@ -735,7 +439,7 @@ enum{
  */
 static inline void zb_rt_irq_enable(void)
 {
-	plic_interrupt_enable(IRQ15_ZB_RT);
+	plic_interrupt_enable(IRQ_ZB_RT);
 }
 
 
@@ -753,6 +457,8 @@ static inline void zb_rt_irq_enable(void)
 #else
 	#define RX_SETTLE_US					85
 #endif
+
+#define RXSET_OPTM_ANTI_INTRF               100  //RX settle value for optimize anti-interference
 
 
 #define PRMBL_LENGTH_1M						2	//preamble length for 1M PHY
@@ -805,10 +511,21 @@ static inline void zb_rt_irq_enable(void)
 	#define			TX_STL_ADV_REAL_CODED							TX_STL_ADV_REAL_COMMON
 	#define 		TX_STL_ADV_SET_CODED							TX_STL_ADV_REAL_CODED  //can not change !!!
 
+#if SW_DCOC_EN
+
+//after enable DCOC, ACL T_IFS is about 152.5us, minus 2 us settle time by lihaojie at 2024-05-07
+	#define 		TX_STL_AUTO_MODE_1M								(125 - PRMBL_EXTRA_1M * 8)
+	#define			TX_STL_AUTO_MODE_2M								(133 - PRMBL_EXTRA_2M * 4)
+//after enable DCOC, ACL T_IFS is about 151.5us, minus 1 us settle time by lihaojie at 2024-05-07
+	#define			TX_STL_AUTO_MODE_CODED							124
+
+#else
 
 	#define 		TX_STL_AUTO_MODE_1M								(127 - PRMBL_EXTRA_1M * 8)
 	#define			TX_STL_AUTO_MODE_2M								(133 - PRMBL_EXTRA_2M * 4)
 	#define			TX_STL_AUTO_MODE_CODED							125
+
+#endif
 
 
 	#if (FAST_SETTLE)
@@ -833,46 +550,139 @@ static inline void zb_rt_irq_enable(void)
  *					Jaguar	1M: 20uS	   2M: 10uS;      500K(S2): 14uS    125K(S8):  14uS
  */
 #define AD_CONVERT_DLY_1M											19	//before:20. Jaguar T_IFS need 32M + AD_Convert=19, tested by kai.jia at 2022-11-17
-#define AD_CONVERT_DLY_2M											10
+#define AD_CONVERT_DLY_2M											13
 #define AD_CONVERT_DLY_CODED										14
+
+#if SW_DCOC_EN
+#define OTHER_SWITCH_DELAY_1M										2  //after enable DCOC, ADV T_IFS is about 152.5us, add 2 us delay by lihaojie at 2024-05-07
+#define OTHER_SWITCH_DELAY_2M										0
+#define OTHER_SWITCH_DELAY_CODED									4  //after enable DCOC, ADV T_IFS is about 154.5us, add 4 us delay by lihaojie at 2024-05-07
+
+#else
 
 #define OTHER_SWITCH_DELAY_1M										0
 #define OTHER_SWITCH_DELAY_2M										0
 #define OTHER_SWITCH_DELAY_CODED									0
 
+#endif
 
 #define HW_DELAY_1M													(AD_CONVERT_DLY_1M + OTHER_SWITCH_DELAY_1M)
 #define HW_DELAY_2M													(AD_CONVERT_DLY_2M + OTHER_SWITCH_DELAY_2M)
 #define HW_DELAY_CODED												(AD_CONVERT_DLY_CODED + OTHER_SWITCH_DELAY_CODED)
 
-static inline void rf_ble_set_1m_phy(void)
+/* Based on Driver API "rf_mode_init":
+ * 1. Move to ram_code. static inline function called in ram_code funtion.
+ * 2. Combine write_reg8 to write_reg16/32 to save instructions.
+ * 3. Add Preamble length judgement. */
+static inline void rf_mode_optimize_init(void)
 {
-	write_reg8(0x17063d,0x61);
-	write_reg32(0x170620,0x23200a16);
-	write_reg8(0x170420,0x8c);// script cc.BIT[3]continue mode.After syncing to the preamble, it will immediately enter
-							  //the sync state again, reducing the probability of mis-syncing.modified by zhiwei,confirmed
-							  //by qiangkai and xuqiang.20221205
-	write_reg8(0x170422,0x00);
-	write_reg8(0x17044d,0x01);
-	write_reg8(0x17044e,0x1e);
-	write_reg16(0x170436,0x0eb7);
-	write_reg16(0x170438,0x71c4);
-	write_reg8(0x170473,0x01);
+#if (PRMBL_LENGTH_1M < 1 || PRMBL_LENGTH_1M > 15)
+	#error "1M PHY pream_ble error!!!"
+#endif
+#if (PRMBL_LENGTH_2M < 2 || PRMBL_LENGTH_2M > 15)
+	#error "2M PHY pream_ble error!!!"
+#endif
+	//To modify DCOC parameters
+#if SW_DCOC_EN	//todo: It is not good to put the whole block here in a staic inline funtion. But we put here currently. -- kai.jia 20240507
+	if(s_dcoc_software_cal_en == 1)
+	{
+		//Solve the problem of unstable rx sensitivity test of some chips by software dcoc calibration scheme. If the calibration value is
+		//not lost after a calibration is completed, it can be used directly without recalibration. Since the _attribute_data_retention_sec_ type
+		//variable is not lost in suspend and deep retention modes, it can be used to record the calibration value to avoid having to perform
+		//software calibration again after returning from suspend and deep retention modes.(Modified by zhiwei,confirmed by xuqiang and yuya at 20230921.)
+		if(g_rf_dcoc_iq_code == 0)	//The value of s_rf_dcoc_iq_code is unlikely to be 0 after calibration is complete.
+		{
+			rf_rx_dcoc_cali_by_sw();
+		}
+		else
+		{
+			rf_set_dcoc_iq_code(g_rf_dcoc_iq_code);	//set bypass value
+			rf_set_dcoc_iq_offset(0x0001);			//set bypass enable, then set offset as 0.
+		}
 
-	write_reg8(0x17049a,0x00);//tx_tp_align.
-	write_reg16(0x1704c2,0x4b3a);
-	write_reg32(0x1704c4,0x7a6e6356);
-	write_reg8(0x1704c8,0x39);//bit[0:5]grx_fix
-#if 1
-	write_reg32(0x170000,0x4440081f | PRMBL_LENGTH_1M<<16);
+	}
+#endif
+	write_reg16(0x1706d2,0x199b);		//default:0x15bb;DCOC_SFIIP DCOC_SFQQP ,DCOC_SFQQ
+
+	//Setting for blanking
+#if RF_RX_SHORT_MODE_EN
+	write_reg8(0x17047b,0x0e);			//default :0xf6;BLANK_WINDOW
+	write_reg8(0x170479,0x38);			//BIT[3] RX_DIS_PDET_BLANK.BIT_RNG[4,5]SHORT MODE all mode open pdet blank to fix
+										//per floor issue.modified by zhiwei,confirmed by qiangkai and xuqiang.20221205
 #else
-	write_reg32(0x170000,0x4446081f);
+	write_reg8(0x17047b,0xfe);
+	write_reg8(0x170479,0x08);			//RX_DIS_PDET_BLANK.BIT_RNG[4,5]SHORT MODE all mode open pdet blank to fix per floor
+										//issue.modified by zhiwei,confirmed by qiangkai and xuqiang.20221205
 #endif
 
-	write_reg16(0x170004,0x04f5);
+	//To set AGC thresholds
+	write_reg16(0x17064a,0x090e);		//default:0x0689;POW_000_001,POW_001_010_H
+//	write_reg16(0x17064e,0x0f09);		//default:0x0f09;POW_100_101 ,POW_101_100_L,POW_101_100_H;
+	write_reg32(0x170654,0x080c090e);	//default:0x078c0689,POW_001_010_L,POW_001_010_H,POW_011_100_L,POW_011_100_H
+//	write_reg16(0x170658,0x0f09);		//default: 0x0f09;POW_101_100_L,POW_101_100_H
+	//For optimum preamble detection
+	write_reg16(0x170476,0x7350);		//default:0x7357;FREQ_CORR_CFG2_0,FREQ_CORR_CFG2_1
+#if RF_RX_SHORT_MODE_EN
+	write_reg16(0x17003a,0x6586);		//default:0x2d4e;rx_ant_offset  rx_dly(0x17047b,0x170479,0x17003a,0x17003b),samp_offset
+#endif
+	analog_write_reg8(0x8b,0x04);		//default:0x06;FREQ_CORR_CFG2_1
 
-	write_reg8(0x1704bb,0x50);//BIT[5]:rxc_chf_sel_ble;1M:0(default) 2M:1 open two stage filter to improve
-							  //the sensitivity.modified by zhiwei,confirmed by wenfeng and xuqiang,20230106.
+	//Note:Delete the modification here for 0x17074e, 0x17074c, 0x1706e4, 0x1706e5, and refer to the 8278
+	//processing method for the 24M sensitivity problem.modified by zhiwei,confirmed by zhiwei.20230106
+
+	write_reg8(0x170774,0x97);//Change this setting from 0x96 to 0x97 to improve the tx power about 1dbm(A1,A2);
+							  //modified by zhiwei,confirmed by wenfeng,20230106
+
+}
+
+/* Based on Driver API "rf_set_ble_1M_mode":
+ * 1. Move to ram_code. static inline function called in ram_code funtion.
+ * 2. Combine write_reg8 to write_reg16/32 to save instructions.
+ * 3. Delete repeated settings from rf_drv_ble_init. */
+static inline void rf_ble_set_1m_phy(void)
+{
+	write_reg8(0x17063d,0x61);			//default:0x61;ble:bw_code
+	write_reg32(0x170620,0x23200a16);	//default:0x23200a16;sc_code,if_freq,IF = 1Mhz,BW = 1Mhz,HPMC_EXP_DIFF_COUNT_L,HPMC_EXP_DIFF_COUNT_H
+//	write_reg8(0x17063f,0x00);			//default:0x00;250k modulation index:telink add rx for 250k/500k
+//	write_reg8(0x17043f,0x00);			//default:0x00;LOW_RATE_EN bit<1>:1 enable bit<2>:0 250k
+	write_reg8(0x170420,0x8c);			// script cc.BIT[3]continue mode.After syncing to the preamble, it will immediately enter
+							  			//the sync state again, reducing the probability of mis-syncing.modified by zhiwei,confirmed
+							 		 	//by qiangkai and xuqiang.20221205
+	write_reg8(0x170422,0x00);			//default:0x00;modem:BLE_MODE_TX,2MBPS
+	write_reg8(0x17044d,0x01);			//default:0x01;r_rxchn_en_i:To modem
+	write_reg8(0x17044e,RF_ACCESS_CODE_DEFAULT_THRESHOLD);			//default:0x1e;ble sync threshold:To modem
+//	write_reg8(0x170421,0x00);			//default:0x00;modem:ZIGBEE_MODE:01
+//	write_reg8(0x170423,0x00);			//default:0x00;modem:ZIGBEE_MODE_TX
+//	write_reg8(0x170426,0x00);			//default:0x00;modem:sync rst sel,for zigbee access code sync.
+//	write_reg8(0x17042a,0x10);			//default:0x10;modem:disable MSK
+//	write_reg8(0x17043d,0x00);			//default:0x00;modem:zb_sfd_frm_ll
+//	write_reg8(0x17042c,0x38);			//default:0x38;modem:zb_dis_rst_pdet_isfd
+	write_reg16(0x170436,0x0eb7);		//default:0x0eb7;LR_NUM_GEAR_L,LR_NUM_GEAR_H,
+	write_reg16(0x170438,0x71c4);		//default:0x71c4;LR_TIM_EDGE_DEV,LR_TIM_REC_CFG_1
+	write_reg8(0x170473,0x01);			//default:0x01;TOT_DEV_RST
+
+	write_reg8(0x17049a,0x00);			//default:0x08;tx_tp_align
+	write_reg16(0x1704c2,0x4b3a);		//default:0x4836;grx_0,grx_1
+	write_reg32(0x1704c4,0x7a6e6356);	//default:0x796e6254;grx_2,grx_3,grx_4,grx_5
+	write_reg8(0x1704c8,0x39);			//default:0x00;bit[0:5]grx_fix
+
+	write_reg32(0x170000,0x4440081f | PRMBL_LENGTH_1M<<16);	//default:0x4442001f;tx_mode,zb_pn_en,preamble set 2 for BLE,bit<0:1>private mode control. bit<2:3> tx mode
+
+	write_reg16(0x170004,0x04f5);		//default:0x04f5; bit<4>mode:1->1m;bit<0:3>:ble head.ble whiting;lr mode bit<4:5> 0:off,3:125k,2:500k
+
+//	write_reg8(0x170021,0xa1);			//default:0xa1;rx packet len 0 enable
+//	write_reg8(0x170022,0x00);			//default:0x00;rxchn_man_en
+//	write_reg8(0x17044c,0x4c);			//default:0x4c;RX:acc_len modem
+
+	#if SW_DCOC_EN
+		//All modes turn on the secondary filter to improve sensitivity performance.
+		//But this will lead to a narrowing of the RX packet receiving bandwidth and a decrease in frequency offset performance.(Modified by chenxi,confirmed by xuqiang and yuya at 20231128)
+		write_reg8(0x1704bb,0x70);		//rx ctrl1  0x50->0x70
+										//<5>:rxc_chf_sel_ble	default 0,->1 Turn on the secondary filter
+	#else
+		write_reg8(0x1704bb,0x50);			//BIT[5]:rxc_chf_sel_ble;1M:0(default) 2M:1 open two stage filter to improve
+									  	  	//the sensitivity.modified by zhiwei,confirmed by wenfeng and xuqiang,20230106.
+	#endif
 }
 
 
@@ -884,17 +694,24 @@ static inline void rf_ble_set_2m_phy(void)
 							  //the sync state again, reducing the probability of mis-syncing.modified by zhiwei,confirmed
 							  //by qiangkai and xuqiang.20221205
 	write_reg8(0x170422,0x01);
-	write_reg8(0x17044d,0x01);
-	write_reg8(0x17044e,0x1e);
+
+	//The initialization is already set, so it will not be set here. (Multi-mode todo)
+	//ronglu.20230905
+	//write_reg8(0x17044d,0x01);
+	write_reg8(0x17044e,RF_ACCESS_CODE_DEFAULT_THRESHOLD);
 	write_reg16(0x170436,0x0eb7);
 	write_reg16(0x170438,0x71c4);
 	write_reg8(0x170473,0x01);
 
-	write_reg8(0x17049a,0x00);//tx_tp_align.
+	//The initialization is already set, so it will not be set here. (Multi-mode todo)
+	//ronglu.20230905
+	//write_reg8(0x17049a,0x00);//tx_tp_align.
 
 	write_reg16(0x1704c2,0x4c3b);
 	write_reg32(0x1704c4,0x7b726359);
-	write_reg8(0x1704c8,0x39);//bit[0:5]grx_fix
+	//The initialization is already set, so it will not be set here. (Multi-mode todo)
+	//ronglu.20230905
+	//write_reg8(0x1704c8,0x39);//bit[0:5]grx_fix
 	#if 1
 		write_reg32(0x170000,0x4440081f | PRMBL_LENGTH_2M<<16);
 	#else
@@ -903,8 +720,14 @@ static inline void rf_ble_set_2m_phy(void)
 
 	write_reg16(0x170004,0x04e5);
 
-	write_reg8(0x1704bb,0x70);//BIT[5]:rxc_chf_sel_ble;1M:0(default) 2M:1 open two stage filter to improve
-								  //the sensitivity.modified by zhiwei,confirmed by wenfeng and xuqiang,20230106.
+	#if SW_DCOC_EN
+		//All modes turn on the secondary filter to improve sensitivity performance.
+		//But this will lead to a narrowing of the RX packet receiving bandwidth and a decrease in frequency offset performance.(Modified by chenxi,confirmed by xuqiang and yuya at 20231128)
+		write_reg8(0x1704bb,0x70);//BIT[5]:rxc_chf_sel_ble;1M:0(default) 2M:1 open two stage filter to improve
+	#else
+		write_reg8(0x1704bb,0x70);//BIT[5]:rxc_chf_sel_ble;1M:0(default) 2M:1 open two stage filter to improve
+									  //the sensitivity.modified by zhiwei,confirmed by wenfeng and xuqiang,20230106.
+	#endif
 }
 
 
@@ -917,25 +740,39 @@ static inline void rf_ble_set_coded_phy_common(void)
 	write_reg8(0x170420,0xcd);// script cc.BIT[3]continue mode.After syncing to the preamble, it will immediately enter
 							  //the sync state again, reducing the probability of mis-syncing.modified by zhiwei,confirmed
 							  //by qiangkai and xuqiang.20221205
+
 	write_reg8(0x170422,0x00);
-	write_reg8(0x17044d,0x01);
+	//The initialization is already set, so it will not be set here. (Multi-mode todo)
+	//ronglu.20230905
+	//write_reg8(0x17044d,0x01);
 	write_reg8(0x17044e,0xf0);
 	write_reg16(0x170438,0x7dc8);
 	write_reg8(0x170473,0xa1);
 
-	write_reg8(0x17049a,0x00);//tx_tp_align.
+	//The initialization is already set, so it will not be set here. (Multi-mode todo)
+	//ronglu.20230905
+	//write_reg8(0x17049a,0x00);//tx_tp_align.
 
 	write_reg16(0x1704c2,0x4b3a);
 	write_reg32(0x1704c4,0x7a6e6356);
-	write_reg8(0x1704c8,0x39);//bit[0:5]grx_fix
+	//The initialization is already set, so it will not be set here. (Multi-mode todo)
+	//ronglu.20230905
+	//write_reg8(0x1704c8,0x39);//bit[0:5]grx_fix
 	#if 1
 		write_reg32(0x170000,0x4440081f | PRMBL_LENGTH_Coded<<16);
 	#else
 		write_reg32(0x170000,0x444a081f);
 	#endif
 
-	write_reg8(0x1704bb,0x50);//BIT[5]:rxc_chf_sel_ble;1M:0(default) 2M:1 open two stage filter to improve
-							  //the sensitivity.modified by zhiwei,confirmed by wenfeng and xuqiang,20230106.
+	#if SW_DCOC_EN
+		//All modes turn on the secondary filter to improve sensitivity performance.
+		//But this will lead to a narrowing of the RX packet receiving bandwidth and a decrease in frequency offset performance.(Modified by chenxi,confirmed by xuqiang and yuya at 20231128)
+		write_reg8(0x1704bb,0x70);		//rx ctrl1  0x50->0x70
+										//<5>:rxc_chf_sel_ble	default 0,->1 Turn on the secondary filter
+	#else
+		write_reg8(0x1704bb,0x50);//BIT[5]:rxc_chf_sel_ble;1M:0(default) 2M:1 open two stage filter to improve
+									  //the sensitivity.modified by zhiwei,confirmed by wenfeng and xuqiang,20230106.
+	#endif
 }
 
 
@@ -958,7 +795,7 @@ static inline void rf_ble_set_coded_phy_s8(void)
 
 
 #if FAST_SETTLE
-	typedef struct
+	typedef struct __attribute__((packed))
 	{
 		u8 LDO_CAL_TRIM;	//0xea[5:0]
 		u8 LDO_RXTXHF_TRIM;	//0xee[5:0]
@@ -968,13 +805,15 @@ static inline void rf_ble_set_coded_phy_s8(void)
 		u8 rsvd;
 	}Ldo_Trim;
 
-	typedef struct
+	typedef struct __attribute__((packed))
 	{
 		unsigned char tx_fast_en;
 		unsigned char rx_fast_en;
 		unsigned short cal_tbl[40];
 		rf_ldo_trim_t	ldo_trim;
+#if (!SW_DCOC_EN)
 		rf_dcoc_cal_t   dcoc_cal;
+#endif
 	}Fast_Settle;
 	extern Fast_Settle fast_settle;
 
@@ -1020,6 +859,130 @@ static inline void rf_ble_set_coded_phy_s8(void)
 
 
 
+#endif
+
+#define		reg_rf_ll_irq_list_h		REG_ADDR8(REG_BB_LL_BASE_ADDR+0x4d)
+
+#ifndef HADM_PHASE_CONTINUITY
+	#define HADM_PHASE_CONTINUITY			1
+#endif
+/**
+ * @brief	Enumerated variables for HADM's settle sequence mode on or off.
+ */
+typedef enum
+{
+	RF_HADM_SETTLE_SEQ_OFF,//Turns off the settle timing in HADM mode and reverts to the normal settle sequence.
+	RF_HADM_SETTLE_SEQ_ON  //Enable settle sequence for use in HADM mode.
+}rf_hadm_settle_seq_mode_e;
+
+/**
+ * @brief	Select how you want to start IQ sampling.
+ */
+typedef enum
+{
+	RF_HADM_IQ_SAMPLE_SYNC_MODE,
+	RF_HADM_IQ_SAMPLE_RXEN_MODE
+}rf_hadm_iq_sample_mode_e;
+
+/**
+ * @brief	Select whether the antenna clock is normally open or turned on when the antenna is switched.
+ */
+typedef enum
+{
+	RF_HADM_ANT_CLK_ALWAYS_ON_MODE,
+	RF_HADM_ANT_CLK_SWITCH_ON_MODE
+}rf_hadm_ant_clk_mode_e;
+/**
+ * @brief		This function is used to get the value of the agc gain latch.
+ * @return		Returns the value of gain latch.
+ */
+static inline unsigned char rf_get_gain_lat_value(void)
+{
+	return ((reg_rf_max_match1>>4)&0x07);
+}
+
+/**
+ *  @brief  tx related calibration value in hadm function.
+ */
+typedef struct __attribute__((packed))  {
+	unsigned short	  tx_hpmc;
+	rf_ldo_trim_t ldo_trim;
+}rf_cs_tx_cali_t;
+
+/**
+ *  @brief  rx related calibration value in hadm function.
+ */
+typedef struct __attribute__((packed)) {
+	rf_ldo_trim_t	ldo_trim;
+#if (!SW_DCOC_EN)
+	rf_dcoc_cal_t   dcoc_cal;
+#endif
+	rf_rccal_cal_t  rccal_cal;
+}rf_cs_rx_cali_t;
+
+/**
+ * @brief	Define function to set tx channel or rx channel.
+ */
+typedef enum
+{
+	TX_CHANNEL		= 0,
+	RX_CHANNEL		= 1,
+}rf_trx_chn_e;
+
+
+/**
+ * @brief		This function is mainly used to get the timestamp information in the process of sending
+ * 				and receiving packets; in the packet receiving stage, this register stores the sync moment
+ * 				timestamp, and this information remains unchanged until the next sending and receiving packets.
+ * 				In the send packet stage, the register stores the timestamp value of the tx_on moment, which
+ * 				remains unchanged until the next send/receive packet.
+ * @return		TX:timestamp value of the tx_on moment.
+ * 				RX:timestamp value of the sync moment.
+ */
+static inline unsigned int rf_hadm_get_timestamp(void)
+{
+	return reg_rf_timestamp;
+}
+
+/**
+ * @brief		This function is mainly used to get the timestamp of the moment when tx_en is pulled up from the registers.
+ * @return		The timestamp of the moment when tx_en is pulled up.
+ */
+static inline unsigned int rf_hadm_get_tx_pos_timestamp(void)
+{
+	return reg_rf_tr_turnaround_pos_time;
+}
+
+#if (HADM_PHASE_CONTINUITY)
+	extern _attribute_data_retention_ rf_cs_tx_cali_t tx_cs_cali;
+	extern _attribute_data_retention_ rf_cs_rx_cali_t rx_cs_cali;
+	extern _attribute_data_retention_ unsigned char cs_phase_continuity_flag;
+
+	void ble_rf_cs_phase_continuity_en(void);
+	void ble_rf_cs_phase_continuity_dis(unsigned char phase_en);
+	//void ble_rf_cs_restore_cali_auto_run(void);
+	void ble_rf_cs_restore_cali_auto_run(unsigned char phase_en);
+	void ble_rf_manual_fcal_start(void);
+	void ble_rf_manual_fcal_done(void);
+	void ble_rf_cs_get_rx_cali_value(rf_cs_rx_cali_t *rx_cali);
+	void ble_rf_cs_get_tx_cali_value(rf_cs_tx_cali_t *tx_cali);
+	void ble_rf_get_ldo_trim_val(rf_ldo_trim_t *ldo_trim);
+#if (!SW_DCOC_EN)
+	void ble_rf_get_dcoc_cal_val(rf_dcoc_cal_t *dcoc_cal);
+	void ble_rf_set_dcoc_cal_val(rf_dcoc_cal_t dcoc_cal);
+	void ble_rf_dis_dcoc_trim(void);
+#endif
+	void ble_rf_get_rccal_cal_val(rf_rccal_cal_t *rccal_cal);
+	void ble_rf_lna_pup(void);
+	void ble_rf_cs_set_rx_cali_value(rf_cs_rx_cali_t *rx_cali);
+	void ble_rf_cs_set_tx_cali_value(rf_cs_tx_cali_t *tx_cali);
+	void ble_rf_dis_fcal_trim(void);
+	void ble_rf_set_ldo_trim_val(rf_ldo_trim_t ldo_trim);
+	void ble_rf_dis_ldo_trim(void);
+	void ble_rf_dis_rccal_trim(void);
+	void ble_rf_set_rccal_cal_val(rf_rccal_cal_t rccal_cal);
+	void ble_rf_dis_hpmc_trim(void);
+	void ble_rf_cs_settle_sequence_mode(rf_hadm_settle_seq_mode_e on_off);
 #endif
 
 static inline u8 rf_ble_get_tx_pwr_idx(s8 rfTxPower)
@@ -1072,6 +1035,10 @@ static inline s8 rf_ble_get_tx_pwr_level(rf_power_level_index_e rfPwrLvlIdx)
     return rfTxPower;
 }
 
+void ble_rf_channel_sounding_init(void);
+
+void ble_rf_channel_sounding_deinit(void);
+
 void ble_rf_tx_channel_sounding_mode_en(void);
 
 void ble_rf_tx_channel_sounding_mode_dis(void);
@@ -1082,53 +1049,23 @@ void ble_rf_rx_channel_sounding_mode_dis(void);
 
 void ble_rf_channel_sounding_iq_sample_config(unsigned short sample_num, unsigned char start_point, rf_hadm_iq_sample_mode_e sample_mode);
 
+void ble_rf_set_manual_tx_mode(void);
+
+void ble_rf_set_tx_modulation_index(rf_mi_value_e mi_value);
+
+void ble_rf_set_power_level_singletone(rf_power_level_e level);
+
+void ble_rf_set_power_off_singletone(void);
+
+void ble_rf_set_cs_channel(signed char chn);
+
+void ble_rf_agc_disable(void);
+
+void ble_rf_agc_enable(void);
+
 /******************************* ext_rf end ********************************************************************/
 
 
 
 
-/******************************* ext_uart start ******************************************************************/
-
-/******************************* ext_uart end ********************************************************************/
-
-
-/******************************* mcu_security start ******************************************************************/
-#define SECBOOT_DESC_SECTOR_NUM		2
-#define SECBOOT_DESC_SIZE			0x2000  //8K for secure boot descriptor size
-
-#define DESCRIPTOR_PUBKEY_OFFSET	0x1002
-
-#define DESCRIPTOR_WATCHDOG_OFFSET	0x108A
-
-typedef struct {
-	unsigned char vendor_mark[4];
-} sb_desc_1st_sector_t;
-
-#define DESC_1ST_SECTOR_DATA_LEN      4
-#define DESC_2ND_SECTOR_DATA_LEN	146  //16*9 + 2 = 144 + 2
-
-
-typedef struct {
-	unsigned short	multi_boot;
-	unsigned char	public_key[64];
-	unsigned char	signature[64];
-	unsigned int	run_code_adr;   //4 byte
-	unsigned int	run_code_size;
-	unsigned char	watdog_v[4];
-	unsigned char	smpi_lane[4];
-} sb_desc_2nd_sector_t;
-
-
-typedef struct {
-	unsigned char	fw_enc_en;
-	unsigned char	secboot_en;
-	unsigned short  sb_desc_adr_k; //unit: 4KB
-} mcu_secure_t;
-extern mcu_secure_t  mcuSecur;
-
-bool mcu_securuty_read_efuse(void);
-bool mcu_securuty_read_idcode(void);
-bool efuse_get_pubkey_hash(u8* pHash);
-/******************************* mcu_security end ********************************************************************/
-
-#endif /* DRIVERS_B92_EXT_DRIVER_EXT_LIB_H_ */
+#endif /* DRIVERS_B92_EXT_DRIVER_DRIVER_LIB_EXT_RF_H_ */
