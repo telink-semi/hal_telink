@@ -498,7 +498,9 @@ unsigned int flash_get_vendor(unsigned int flash_mid);
 /*******************************************************************************************************************
  *									This function serves to all area flash protection
  ******************************************************************************************************************/
-void flash_protection_lock_operation(void);
+void flash_protection_lock_init(void);
 
-void flash_protection_unlock_operation(void);
+void flash_protection_lock_operation(unsigned int offset);
+
+void flash_protection_unlock_operation(unsigned int offset);
 
