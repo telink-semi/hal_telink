@@ -13,13 +13,13 @@ blobs:
     doc-url: https://github.com/telink-semi/zephyr_hal_telink_b91_ble_lib/blob/49bcada9aae1eaae83aee4aa437244403aaf2162/README.md
 
   - path: liblt_9528_zephyr.a
-    sha256: b740727189e22bed5abf9a06c68d713757287aa8850964836003617ebb8533fe
+    sha256: 422a3772161358399c553ad9b1104dd880cf52b60e4023cb356fada4ea1d3ff2
     type: lib
     version: 'V4.0.3.0'
     license-path: tlsr9/ble/license.txt
-    url: https://github.com/telink-semi/zephyr_hal_telink_b91_ble_lib/raw/794ab4bd0e388d885f18afeeb6695c86f35ea7ca/liblt_9528_zephyr.a
+    url: https://github.com/telink-semi/zephyr_hal_telink_b91_ble_lib/raw/fc489d7106aa3ff748c47af255abf5f9aed88908/liblt_9528_zephyr.a
     description: "Binary libraries supporting Telink B92 series BLE subsystems"
-    doc-url: https://github.com/telink-semi/zephyr_hal_telink_b91_ble_lib/blob/794ab4bd0e388d885f18afeeb6695c86f35ea7ca/README.md
+    doc-url: https://github.com/telink-semi/zephyr_hal_telink_b91_ble_lib/blob/fc489d7106aa3ff748c47af255abf5f9aed88908/README.md
 
   - path: liblt_9258_zephyr.a
     sha256: 98d96f166db37d1bb6818677cf841765da898c5871ff096f3c6667b54c6c6820
