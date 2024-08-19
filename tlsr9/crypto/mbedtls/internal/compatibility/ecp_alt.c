@@ -89,6 +89,8 @@
 #include <ext_driver/driver_lib/ext_lib.h>
 #elif CONFIG_SOC_RISCV_TELINK_B95
 #include <ext_driver/driver_lib/ext_lib.h>
+#elif CONFIG_SOC_RISCV_TELINK_TL321X
+#include <ext_driver/driver_lib/ext_lib.h>
 #endif
 #include <ext_driver/ext_misc.h>
 

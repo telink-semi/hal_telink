@@ -18,17 +18,19 @@
 #include "b9x_sleep.h"
 #include <ext_driver/ext_pm.h>
 
-#if CONFIG_BT_B9X
+#if (CONFIG_BT_B9X || CONFIG_BT_TLX)
 #if CONFIG_SOC_RISCV_TELINK_B91
 #include <stack/ble/B91/controller/os_sup.h>
 #elif CONFIG_SOC_RISCV_TELINK_B92
 #include <stack/ble/B92/controller/os_sup.h>
 #elif CONFIG_SOC_RISCV_TELINK_B95
 #include <stack/ble/B95/controller/os_sup.h>
+#elif CONFIG_SOC_RISCV_TELINK_TL321X
+#include <stack/ble/TL321X/controller/os_sup.h>
 #endif
 #include <b9x_bt.h>
 #include <b9x_rf_power.h>
-#endif /* CONFIG_BT_B9X */
+#endif /* (CONFIG_BT_B9X || CONFIG_BT_TLX) */
 
 /**
  * @brief     This function sets B9X MCU to suspend mode
@@ -39,7 +41,7 @@ bool b9x_suspend(uint32_t wake_stimer_tick)
 {
 	bool result = false;
 
-#if CONFIG_BT_B9X
+#if (CONFIG_BT_B9X || CONFIG_BT_TLX)
 	enum b9x_bt_controller_state state = b9x_bt_controller_state();
 
 	if (state == B9X_BT_CONTROLLER_STATE_ACTIVE ||
@@ -62,18 +64,21 @@ bool b9x_suspend(uint32_t wake_stimer_tick)
 		wake_stimer_tick) != STATUS_GPIO_ERR_NO_ENTER_PM) {
 		result = true;
 	}
-#endif /* CONFIG_BT_B9X */
+#endif /* (CONFIG_BT_B9X || CONFIG_BT_TLX) */
 
 	return result;
 }
 
-#if CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION
+#if (CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION || \
+CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION)
 
 #if CONFIG_SOC_RISCV_TELINK_B91
 #define DEEPSLEEP_MODE_RET_SRAM DEEPSLEEP_MODE_RET_SRAM_LOW64K
 #elif CONFIG_SOC_RISCV_TELINK_B92
 #define DEEPSLEEP_MODE_RET_SRAM DEEPSLEEP_MODE_RET_SRAM_LOW96K
 #elif CONFIG_SOC_RISCV_TELINK_B95
+#define DEEPSLEEP_MODE_RET_SRAM DEEPSLEEP_MODE_RET_SRAM_LOW96K
+#elif CONFIG_SOC_RISCV_TELINK_TL321X
 #define DEEPSLEEP_MODE_RET_SRAM DEEPSLEEP_MODE_RET_SRAM_LOW96K
 #endif
 
@@ -86,7 +91,7 @@ bool b9x_deep_sleep(uint32_t wake_stimer_tick)
 	extern void tl_context_save(void);
 	extern void soc_b9x_restore(void);
 
-#if CONFIG_BT_B9X
+#if (CONFIG_BT_B9X || CONFIG_BT_TLX)
 	enum b9x_bt_controller_state state = b9x_bt_controller_state();
 
 	if (state == B9X_BT_CONTROLLER_STATE_ACTIVE ||
@@ -125,9 +130,10 @@ bool b9x_deep_sleep(uint32_t wake_stimer_tick)
 		tl_sleep_retention = false;
 		result = true;
 	}
-#endif /* CONFIG_BT_B9X */
+#endif /* (CONFIG_BT_B9X || CONFIG_BT_TLX) */
 
 	return result;
 }
 
-#endif /* CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION */
+#endif /* (CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION || \ */
+/* CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION) */

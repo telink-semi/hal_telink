@@ -1,7 +1,7 @@
 # Copyright (c) 2022 Telink Semiconductor
 # SPDX-License-Identifier: Apache-2.0
 
-if BT_B9X
+if (BT_B9X || BT_TLX)
 
 menu "B9X BLE Controller"
 
@@ -144,4 +144,4 @@ config B9X_BLE_CTRL_THREAD_PERIOD_MS
 
 endmenu
 
-endif # BT_B9X
+endif # (BT_B9X || BT_TLX)
