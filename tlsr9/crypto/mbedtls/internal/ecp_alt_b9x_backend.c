@@ -51,6 +51,8 @@
 #include <ext_driver/driver_lib/ext_lib.h>
 #elif CONFIG_SOC_RISCV_TELINK_B95
 #include <ext_driver/driver_lib/ext_lib.h>
+#elif CONFIG_SOC_RISCV_TELINK_TL321X
+#include <ext_driver/driver_lib/ext_lib.h>
 #endif
 #include <ext_driver/ext_misc.h>
 
@@ -249,7 +251,7 @@ static mont_curve_t x25519 = {
 		0x00000000, 0x00000000, 0x00000000, 0x00000000
 	}
 };
-#elif CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B95
+#elif CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B95 || CONFIG_SOC_RISCV_TELINK_TL321X
 static mont_curve_t x25519 = {
 	.p_bitLen = 255,
 	.p = (unsigned int[]){
@@ -462,7 +464,7 @@ int ecp_alt_b9x_backend_mul(
 			if (mbedtls_ecp_get_type(grp) ==
 				MBEDTLS_ECP_TYPE_MONTGOMERY) {
 
-#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92
+#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_TL321X
 				mont_curve_t *mont_curve = mont_curve_get(grp);
 
 				if (mont_curve != NULL) {

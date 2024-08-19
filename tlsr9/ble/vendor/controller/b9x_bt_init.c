@@ -27,6 +27,9 @@
 #elif CONFIG_SOC_RISCV_TELINK_B95
 #include "stack/ble/B95/ble.h"
 #include "stack/ble/B95/ble_format.h"
+#elif CONFIG_SOC_RISCV_TELINK_TL321X
+#include "stack/ble/TL321X/ble.h"
+#include "stack/ble/TL321X/ble_format.h"
 #endif
 #include "b9x_bt_buffer.h"
 #include "b9x_bt_init.h"
@@ -154,7 +157,7 @@ int b9x_bt_blc_init(void *prx, void *ptx)
 	}
 #endif /* CONFIG_BT_PERIPHERAL */
 
-#if CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B95
+#if CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B95 || CONFIG_SOC_RISCV_TELINK_TL321X
 	blc_ll_configLegacyAdvEnableStrategy(LEG_ADV_EN_STRATEGY_3);
 	blc_ll_configScanEnableStrategy(SCAN_STRATEGY_1);
 #endif

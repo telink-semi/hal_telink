@@ -865,7 +865,7 @@ int mbedtls_internal_aes_encrypt( mbedtls_aes_context *ctx,
 {
     if ( ctx->nr == 10 ) {
         mbedtls_aes_lock();
-#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92
+#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_TL321X
         ( void ) aes_encrypt( ( unsigned char * )ctx->buf, ( unsigned char * )input, output );
 #elif CONFIG_SOC_RISCV_TELINK_B95
         unsigned int r = core_interrupt_disable();
@@ -944,7 +944,7 @@ int mbedtls_internal_aes_decrypt( mbedtls_aes_context *ctx,
 {
     if ( ctx->nr == 10 ) {
         mbedtls_aes_lock();
-#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92
+#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_TL321X
         ( void ) aes_decrypt( ( unsigned char * )ctx->buf, ( unsigned char * )input, output );
 #elif CONFIG_SOC_RISCV_TELINK_B95
         unsigned int r = core_interrupt_disable();
