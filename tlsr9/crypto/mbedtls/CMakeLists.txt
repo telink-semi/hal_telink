@@ -12,7 +12,7 @@ zephyr_include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-if(CONFIG_TELINK_B9X_MBEDTLS_HW_ACCELERATION)
+if(CONFIG_TELINK_B9X_MBEDTLS_HW_ACCELERATION OR CONFIG_TELINK_TLX_MBEDTLS_HW_ACCELERATION)
 
 zephyr_library()
 
@@ -23,9 +23,15 @@ zephyr_include_directories(
 
 zephyr_library_sources(
 	mbedtls_wrapper.c
-	ecp_backend.c
 	ecp_backend_test.c
 	multithread.c
+)
+
+zephyr_library_sources_ifdef(CONFIG_TELINK_B9X_MBEDTLS_HW_ACCELERATION 
+	./ecp_b9x_backend.c
+)
+zephyr_library_sources_ifdef(CONFIG_TELINK_TLX_MBEDTLS_HW_ACCELERATION 
+	./ecp_tlx_backend.c
 )
 
 zephyr_link_libraries(

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2022 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,5 +26,8 @@
 #elif CONFIG_SOC_RISCV_TELINK_B95
 #include "../drivers/B95/driver_b95.h"
 #include "../drivers/B95/ext_driver/driver_ext.h"
+#elif CONFIG_SOC_RISCV_TELINK_TL321X
+#include "../drivers/TL321X/driver_tl321x.h"
+#include "../drivers/TL321X/ext_driver/driver_ext.h"
 #endif
 #include "../common/types.h"

@@ -505,7 +505,7 @@ static const struct {
 #endif /* MBEDTLS_ECP_DP_CURVE448_ENABLED */
 };
 
-int telink_b9x_ecp_self_test(int verbose)
+int telink_soc_ecp_self_test(int verbose)
 {
 	int ret = 0;
 
@@ -624,4 +624,3 @@ cleanup:
 }
 
 #endif /* MBEDTLS_SELF_TEST */
-
