@@ -1,12 +1,12 @@
 /********************************************************************************************************
  * @file    plmt_reg.h
  *
- * @brief   This is the header file for B92
+ * @brief   This is the header file for TL321X
  *
  * @author  Driver Group
- * @date    2023
+ * @date    2024
  *
- * @par     Copyright (c) 2019, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -31,12 +31,12 @@
  * @brief The compiler supports the long long (64bit) type, but since the CPU is 32bit, it is operated separately in assembly, so need to pay attention to synchronization when reading this register
  * 
  */
-#define reg_mtime                  (*(volatile unsigned long long*)(0xe6000000))
-#define reg_mtime_low              (*(volatile unsigned long*)(0xe6000000))
-#define reg_mtime_high             (*(volatile unsigned long*)(0xe6000004))
+#define reg_mtime                  (*(volatile unsigned long long*)(0xc6000000))
+#define reg_mtime_low              (*(volatile unsigned long*)(0xc6000000))
+#define reg_mtime_high             (*(volatile unsigned long*)(0xc6000004))
 
-#define reg_mtimecmp               (*(volatile unsigned long long*)(0xe6000008))
-#define reg_mtimecmp_low           (*(volatile unsigned long*)(0xe6000008))
-#define reg_mtimecmp_high          (*(volatile unsigned long*)(0xe600000c))
+#define reg_mtimecmp               (*(volatile unsigned long long*)(0xc6000008))
+#define reg_mtimecmp_low           (*(volatile unsigned long*)(0xc6000008))
+#define reg_mtimecmp_high          (*(volatile unsigned long*)(0xc600000c))
 
 #endif /* end of __PLMT_REG_H_ */

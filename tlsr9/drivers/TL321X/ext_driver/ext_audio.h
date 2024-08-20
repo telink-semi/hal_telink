@@ -29,21 +29,22 @@
 #include <string.h>
 
 typedef struct{
-	u8 dft_cap;
-	u8 cap0;
-	u8 rscv1;
+    u8 dft_cap;
+    u8 audio_reset_flag;
+    u8 cap0;
+    u8 rscv1;
 
-	u8  calib_reset_cnt;
-	u8	rscv2;
-	u16 calib_last_pdu_num;
+    u8  calib_reset_cnt;
+    u8  rscv2;
+    u16 calib_last_pdu_num;
 
-	u32 calib_last_timestamp;
-	int calib_diff_t;
-	u32 interval;
+    u32 calib_last_timestamp;
+    int calib_diff_t;
+    u32 interval;
 
 
 }blc_audio_ctr_t;
-extern blc_audio_ctr_t 	audio_ctr;
+extern blc_audio_ctr_t  audio_ctr;
 
 /**
  * @brief     This function serves to init the usb module.

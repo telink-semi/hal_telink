@@ -27,27 +27,27 @@
 #include "../lib/include/pm.h"
 #include "types.h"
 
-#include <zephyr/kernel.h>
-#undef irq_enable
-#undef irq_disable
-#undef ARRAY_SIZE
+
 
 #define DEEPSLEEP_RAM_SIZE_TO_MODE(ram_size)  ram_size==0x8000? DEEPSLEEP_MODE_RET_SRAM_LOW32K: (ram_size==0x10000)? DEEPSLEEP_MODE_RET_SRAM_LOW64K:DEEPSLEEP_MODE_RET_SRAM_LOW96K
 
 typedef int (*cpu_pm_handler_t)(pm_sleep_mode_e sleep_mode,  pm_sleep_wakeup_src_e wakeup_src, unsigned int  wakeup_tick);
-extern 	cpu_pm_handler_t  		 	cpu_sleep_wakeup;
+extern  cpu_pm_handler_t            cpu_sleep_wakeup;
+
+
+#define DEFAULT_DEEPSLEEP_MODE_RET_SRAM_SIZE  DEEPSLEEP_MODE_RET_SRAM_LOW64K
 
 /**
  * @brief   deepsleep wakeup by external xtal
  */
-typedef struct{
-	unsigned char ext_cap_en;    //24xtal  cap
-	unsigned char pad32k_en;
-	unsigned char pm_enter_en;
-	unsigned char adc_efuse_calib_flag;
+typedef struct __attribute__((packed)) {
+    unsigned char ext_cap_en;    //24xtal  cap
+    unsigned char pad32k_en;
+    unsigned char pm_enter_en;
+    unsigned char adc_efuse_calib_flag;
 }misc_para_t;
 
-extern  _attribute_aligned_(4) misc_para_t 				blt_miscParam;
+extern  _attribute_aligned_(4) misc_para_t              blt_miscParam;
 
 /**
  * @brief      This function registers a callback function to be executed before suspend.
@@ -105,7 +105,7 @@ unsigned int clock_get_digital_32k_tick(void);
 
 /**
  * @brief      This function serves to determine whether wake up source is internal 32k RC.
- * 			   attention: this function must called before "sys_init()" if using 32K RC for power management
+ *             attention: this function must called before "sys_init()" if using 32K RC for power management
  * @param[in]  none.
  * @return     none.
  */
@@ -134,7 +134,7 @@ int cpu_long_sleep_wakeup_32k_rc(pm_sleep_mode_e sleep_mode,  pm_sleep_wakeup_sr
  */
 static inline int pm_is_MCU_deepRetentionWakeup(void)
 {
-	return (g_pm_status_info.mcu_status & MCU_STATUS_DEEPRET_BACK);
+    return (g_pm_status_info.mcu_status & MCU_STATUS_DEEPRET_BACK);
 }
 
 /**
@@ -144,7 +144,7 @@ static inline int pm_is_MCU_deepRetentionWakeup(void)
  */
 static inline int pm_is_deepPadWakeup(void)
 {
-	return g_pm_status_info.is_pad_wakeup;
+    return g_pm_status_info.is_pad_wakeup;
 }
 
 /**
@@ -154,9 +154,9 @@ static inline int pm_is_deepPadWakeup(void)
  */
 static inline int pm_get_mcu_status(void)
 {
-	return g_pm_status_info.mcu_status;
+    return g_pm_status_info.mcu_status;
 }
 
-#define cpu_set_gpio_wakeup				pm_set_gpio_wakeup
+#define cpu_set_gpio_wakeup             pm_set_gpio_wakeup
 
 #endif /* DRIVERS_TL321X_DRIVER_EXT_EXT_PM_H_ */

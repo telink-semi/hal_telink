@@ -4,9 +4,9 @@
  * @brief   This is the header file for TL321X
  *
  * @author  Driver Group
- * @date    2020
+ * @date    2024
  *
- * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-/********* pke version:1.1 *********/
 #ifndef ECDSA_H
 #define ECDSA_H
 
@@ -31,47 +30,47 @@ extern "C" {
 
 
 
-#include "pke.h"
+#include "lib/include/pke/pke.h"
 
 
 
 //ECDSA return code
-enum ECDSA_RET_CODE
-{
-	ECDSA_SUCCESS = PKE_SUCCESS,
-	ECDSA_POINTOR_NULL = PKE_SUCCESS+0x50,
-	ECDSA_INVALID_INPUT,
-	ECDSA_ZERO_ALL,
-	ECDSA_INTEGER_TOO_BIG,
-	ECDSA_VERIFY_FAILED,
-};
+#define ECDSA_SUCCESS                         PKE_SUCCESS
+#define ECDSA_POINTOR_NULL                    (PKE_SUCCESS+0x50U)
+#define ECDSA_INVALID_INPUT                   (PKE_SUCCESS+0x51U)
+#define ECDSA_ZERO_ALL                        (PKE_SUCCESS+0x52U)
+#define ECDSA_INTEGER_TOO_BIG                 (PKE_SUCCESS+0x53U)
+#define ECDSA_VERIFY_FAILED                   (PKE_SUCCESS+0x54U)
+
+
 
 
 //APIs
 
-/**
- * @brief		Generate ECDSA Signature in octet string style.
- * @param[in]	curve		- eccp curve struct pointer, please make sure it is valid.
- * @param[in]	E			- hash value, big-endian.
- * @param[in]	EByteLen	- byte length of E.
- * @param[in]	rand_k		- random number k.
- * @param[in]	priKey		- private key, big-endian.
- * @param[out]	signature	- signature r and s, big-endian.
- * @return		ECDSA_SUCCESS(success), other(error).
- */
-unsigned int ecdsa_sign(eccp_curve_t *curve, unsigned char *E, unsigned int EByteLen, unsigned char *rand_k, unsigned char *priKey,
-		unsigned char *signature);
+unsigned int ecdsa_sign( eccp_curve_t *curve, unsigned char *E, unsigned int EByteLen, unsigned char *rand_k, unsigned char *priKey,
+        unsigned char *signature);
 
-/**
- * @brief		Verify ECDSA Signature in octet string style.
- * @param[in]	curve		- eccp curve struct pointer, please make sure it is valid.
- * @param[in]	E			- hash value, big-endian.
- * @param[in]	EByteLen	- byte length of E.
- * @param[in]	pubKey		- public key, big-endian.
- * @param[in]	signature	- signature r and s, big-endian.
- * @return		ECDSA_SUCCESS(success), other(error).
- */
-unsigned int ecdsa_verify(eccp_curve_t *curve, unsigned char *E, unsigned int EByteLen, unsigned char *pubKey, unsigned char *signature);
+unsigned int ecdsa_verify( eccp_curve_t *curve, unsigned char *E, unsigned int EByteLen, unsigned char *pubKey, unsigned char *signature);
+
+
+
+
+
+#ifdef ECDSA_SEC
+
+//ECDSA return code(secure version)
+#define ECDSA_SUCCESS_S                       (0x7D5FEB14U)
+#define ECDSA_ERROR_S                         (0xB4C0BC5AU)
+
+
+unsigned int ecdsa_sign_s(eccp_curve_t *curve, unsigned char *E, unsigned int EByteLen, unsigned char *rand_k, unsigned char *priKey,
+        unsigned char *signature);
+    
+unsigned int ecdsa_verify_s(eccp_curve_t *curve, unsigned char *E, unsigned int EByteLen, unsigned char *pubKey, unsigned char *signature);
+
+#endif
+
+
 
 
 #ifdef __cplusplus

@@ -25,7 +25,7 @@
 #define DRIVERS_TL321X_EXT_DRIVER_EXT_HCI_UART_H_
 
 
-//#include "common/types.h"
+#include "common/types.h"
 #include "uart.h"
 
 
@@ -69,8 +69,8 @@ typedef enum
 
 /**
  * @brief   hci uart initialization
- * @param	none
- * @return	none
+ * @param   none
+ * @return  none
  */
 ext_hci_StatusTypeDef_e ext_hci_uartInit(ext_hci_InitTypeDef * uart);
 
@@ -99,6 +99,11 @@ unsigned char ext_hci_uartSendData(unsigned char *addr, unsigned int len);
  * @param[in]   rev_size - the receive length of DMA,The maximum transmission length of DMA is 0xFFFFFC bytes, so dont'n over this length.
  * @return      none
  * @note
+ *              - addr must be aligned by word (4 bytes), otherwise the program will enter an exception.
+ *              - A length greater than XX_len itself and a multiple of 4 is denoted as CEILING(XX_len,4). For example: XX_len=3 ,CEILING(XX_len,4)=4; XX_len=21 ,CEILING(Tx_length, 4)=24. \n
+ *                The actual length sent by master  is denoted as Tx_len, The length (param[in]-rev_size) of the interface configuration is denoted as Rx_len. \n
+ *                when CEILING(Tx_len,4) > CEILING(Rx_len,4), When the length of the DMA carry reaches Rx_len, the DMA will not stop working and the excess data will not be carried into the buff. \n
+ *                For example:Tx_len=21,Rx_len=20,When the DMA stops working the buff is written with a length of 21 and only 20 bytes of data are stored.It is recommended to configure the appropriate Rx_len to avoid this situation.
  */
 void ext_hci_uartReceData(unsigned char *addr, unsigned int len);
 

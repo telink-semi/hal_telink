@@ -28,44 +28,39 @@
 #include"types.h"
 #include "../driver.h"
 #include "compiler.h"
-#include"ext_peripherals/codec_0581/codec_0581.h"
-
-#ifndef EXT_CODEC_0581
-#define EXT_CODEC_0581 0
-#endif
 
 
 //codec class
 typedef enum{
-	TLK_CODEC_INPUT                    = 1,
-	TLK_CODEC_OUTPUT                   = 2,
+    TLK_CODEC_INPUT                    = 1,
+    TLK_CODEC_OUTPUT                   = 2,
 }tlk_codec_e;
 
 //codec frequency,support 16k,24k,32k,48k
 typedef enum{
-	TLK_CODEC_FREQ_8000                = 1,
-	TLK_CODEC_FREQ_11025               = 2,
-	TLK_CODEC_FREQ_16000               = 3,
-	TLK_CODEC_FREQ_22050               = 4,
-	TLK_CODEC_FREQ_24000               = 5,
-	TLK_CODEC_FREQ_32000               = 6,
-	TLK_CODEC_FREQ_44100               = 7,
-	TLK_CODEC_FREQ_48000               = 8,
-	TLK_CODEC_FREQ_MAX                 = 9,
+    TLK_CODEC_FREQ_8000                = 1,
+    TLK_CODEC_FREQ_11025               = 2,
+    TLK_CODEC_FREQ_16000               = 3,
+    TLK_CODEC_FREQ_22050               = 4,
+    TLK_CODEC_FREQ_24000               = 5,
+    TLK_CODEC_FREQ_32000               = 6,
+    TLK_CODEC_FREQ_44100               = 7,
+    TLK_CODEC_FREQ_48000               = 8,
+    TLK_CODEC_FREQ_MAX                 = 9,
 }tlk_codec_frequency_e;
 
 //codec channel,max 2 channel
 typedef enum{
-	TLK_CODEC_1_CHANNEL                = 1,
-	TLK_CODEC_2_CHANNEL                = 2,
-	TLK_CODEC_CHANNEL_MAX              = 3,
+    TLK_CODEC_1_CHANNEL                = 1,
+    TLK_CODEC_2_CHANNEL                = 2,
+    TLK_CODEC_CHANNEL_MAX              = 3,
 }tlk_codec_channel_e;
 
 //codec mode,Mic only support input,I2S and Line support input and output
 typedef enum{
-	TLK_CODEC_MIC,
-	TLK_CODEC_LINE,
-	TLK_CODEC_I2S,
+    TLK_CODEC_MIC,
+    TLK_CODEC_LINE,
+    TLK_CODEC_I2S,
 }tlk_codec_mode_e;
 
 

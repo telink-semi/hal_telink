@@ -39,6 +39,7 @@ zephyr_include_directories(drivers/${SOC}/flash)
 # soc.c reference sources
 zephyr_library_sources(drivers/${SOC}/clock.c)
 zephyr_library_sources(drivers/${SOC}/analog.c)
+zephyr_library_sources(drivers/${SOC}/stimer.c)
 
 # MbedTLS HW acceleration
 if(CONFIG_MBEDTLS AND CONFIG_TELINK_B9X_MBEDTLS_HW_ACCELERATION)

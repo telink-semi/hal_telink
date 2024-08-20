@@ -4,9 +4,9 @@
  * @brief   This is the header file for TL321X
  *
  * @author  Driver Group
- * @date    2020
+ * @date    2024
  *
- * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -21,12 +21,17 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-#include "pke_utility.h"
-#include "eccp_curve.h"
+#ifndef PKE_ALGORITHM_H
+#define PKE_ALGORITHM_H
+
+#include "lib/include/crypto_common/utility.h"
+#include "lib/include/crypto_common/eccp_curve.h"
+#include "lib/include/pke/pke_portable.h"
 #include "ecdh.h"
 #include "ecdsa.h"
+#include "pke.h"
 #include "pke_prime.h"
 #include "rsa.h"
-#include "x25519.h"
 
 
+#endif

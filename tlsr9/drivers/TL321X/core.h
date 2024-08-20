@@ -1,12 +1,12 @@
 /********************************************************************************************************
  * @file    core.h
  *
- * @brief   This is the header file for B92
+ * @brief   This is the header file for TL321X
  *
  * @author  Driver Group
- * @date    2020
+ * @date    2024
  *
- * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -24,7 +24,14 @@
 #ifndef CORE_H
 #define CORE_H
 #include "lib/include/sys.h"
-//#include "nds_intrinsic.h"
+#include "reg_include/core_reg.h"
+#include <stdbool.h>
+
+
+#define DISABLE_BTB __asm__("csrci 0x7d0, 8")
+//#define DISABLE_BTB __asm__("csrci mmisc_ctl,8")
+#define ENABLE_BTB  __asm__("csrsi 0x7d0, 8")
+//#define ENABLE_BTB  __asm__("csrsi mmisc_ctl,8")
 
 /**
  * @brief Machine mode MHSP_CTL
@@ -40,13 +47,13 @@ typedef enum {
 
 typedef enum
 {
-	FLD_MSTATUS_MIE = BIT(3),//M-mode interrupt enable bit
+    FLD_MSTATUS_MIE = BIT(3),//M-mode interrupt enable bit
 }mstatus_e;
 typedef enum
 {
-	FLD_MIE_MSIE     = BIT(3),//M-mode software interrupt enable bit.
-	FLD_MIE_MTIE     = BIT(7),//M-mode timer interrupt enable bit
-	FLD_MIE_MEIE     = BIT(11),//M-mode external interrupt enable bit
+    FLD_MIE_MSIE     = BIT(3),//M-mode software interrupt enable bit.
+    FLD_MIE_MTIE     = BIT(7),//M-mode timer interrupt enable bit
+    FLD_MIE_MEIE     = BIT(11),//M-mode external interrupt enable bit
 }mie_e;
 
 /**
@@ -59,80 +66,65 @@ typedef enum
  */
 typedef enum {
     CORE_PREEMPT_PRI_MODE0 = FLD_MIE_MSIE | FLD_MIE_MTIE, /**< MTI and MSI cannot interrupt MEI, MSI and MTI can be nested within each other. */
-    CORE_PREEMPT_PRI_MODE1 = FLD_MIE_MTIE,                /**< MTI cannot interrupt MEI, MSI and MTI can be nested within each other. */
-    CORE_PREEMPT_PRI_MODE2 = FLD_MIE_MSIE,                /**< MSI cannot interrupt MEI, MSI and MTI can be nested within each other. */
+    CORE_PREEMPT_PRI_MODE1 = FLD_MIE_MTIE,                /**< MTI cannot interrupt MEI, MSI and MTI can be nested within each other, MSI and MEI can be nested within each other. */
+    CORE_PREEMPT_PRI_MODE2 = FLD_MIE_MSIE,                /**< MSI cannot interrupt MEI, MSI and MTI can be nested within each other, MTI and MEI can be nested within each other. */
     CORE_PREEMPT_PRI_MODE3 = BIT(1),                      /**< MEI, MSI and MTI can be nested within each other(MIE register bit1 is an invalid bit). */
 }core_preempt_pri_e;
 
-#define NDS_MXSTATUS            0x7C4
-#define NDS_MSTATUS             0x300
-#define NDS_MIE                 0x304
-#define NDS_MEPC                0x341
-#define NDS_MCAUSE              0x342
-#define NDS_MILMB               0x7C0
-#define NDS_MDLMB               0x7C1
-#define NDS_MHSP_CTL            0x7C6
-#define NDS_MSP_BOUND           0x7C7
-#define NDS_MSP_BASE            0x7C8
-#define NDS_MCYCLE              0xB00
-#define NDS_MCYCLEH             0xB80
+#define read_csr(reg) ({ unsigned long __tmp; \
+  __asm__ volatile ("csrr %0, %1" : "=r"(__tmp) : "i" (reg)); \
+  __tmp; })
 
+#define write_csr(reg, val) ({ \
+  __asm__ volatile ("csrw %0, %1" :: "i" (reg), "rK"(val)); })
 
-#define read_csr(var, csr)      __asm__ volatile ("csrr %0, %1" : "=r" (var) : "i" (csr))
-#define write_csr(csr, val)     __asm__ volatile ("csrw %0, %1" :: "i" (csr), "r" (val))
+#define swap_csr(reg, val) ({ unsigned long __tmp; \
+  __asm__ volatile ("csrrw %0, %1, %2" : "=r"(__tmp) : "i" (reg), "rK"(val)); \
+  __tmp; })
 
-#define  swap_csr(reg, val)	    
-#define set_csr(csr, bit)       __asm__ volatile ("csrs %0, %1" :: "i" (csr), "r" (bit))
-#define clear_csr(csr, bit)     __asm__ volatile ("csrc %0, %1" :: "i" (csr), "r" (bit))
+#define set_csr(reg, bit) ({ unsigned long __tmp; \
+  __asm__ volatile ("csrrs %0, %1, %2" : "=r"(__tmp) : "i" (reg), "rK"(bit)); \
+  __tmp; })
 
+#define clear_csr(reg, bit) ({ unsigned long __tmp; \
+  __asm__ volatile ("csrrc %0, %1, %2" : "=r"(__tmp) : "i" (reg), "rK"(bit)); \
+  __tmp; })
+
+#define fence_iorw               __asm__ volatile ("fence" : : : "memory")
+
+#define core_get_current_sp() ({ unsigned long __tmp; \
+  __asm__ volatile ("mv %0, sp" : "=r"(__tmp)); \
+  __tmp; })
 
 /*
  * Inline nested interrupt entry/exit macros
  */
 /* Save/Restore macro */
-#define save_csr(r)             long __##r;          \
-                                read_csr(__##r,r);
-#define restore_csr(r)          write_csr(r, __##r);
+#define save_csr(r)             long __##r = read_csr(r);
+#define restore_csr(r)           write_csr(r, __##r);
 /* Support PowerBrake (Performance Throttling) feature */
 
 
 #define save_mxstatus()         save_csr(NDS_MXSTATUS)
 #define restore_mxstatus()      restore_csr(NDS_MXSTATUS)
 
-/* Nested external IRQ entry macro : Save CSRs and enable global interrupt.
- * - If mei does not want to be interrupted by msi and mti, can do the following
- *     save_csr(NDS_MIE)                                 \
- *     save_csr(NDS_MEPC)                                \
- *     save_csr(NDS_MSTATUS)                             \
- *     save_mxstatus()                                   \
- *     clear_csr(NDS_MIE, FLD_MIE_MTIE | FLD_MIE_MSIE);  \
- *     set_csr(NDS_MSTATUS, FLD_MSTATUS_MIE);
- */
+ /* Nested IRQ entry macro : Save CSRs and enable global interrupt. */
 #define core_save_nested_context()                              \
-	 save_csr(NDS_MEPC)                              \
-	 save_csr(NDS_MSTATUS)                           \
-	 save_mxstatus()                                 \
-	 set_csr(NDS_MSTATUS, FLD_MSTATUS_MIE);
+     save_csr(NDS_MEPC)                              \
+     save_csr(NDS_MSTATUS)                           \
+     save_mxstatus()                                 \
+     set_csr(NDS_MSTATUS, FLD_MSTATUS_MIE);
 
-/* Nested external IRQ exit macro : Restore CSRs
- * - If closed mti and msi in mei, can restore with the following
- *     clear_csr(NDS_MSTATUS, FLD_MSTATUS_MIE);        \
- *     restore_csr(NDS_MSTATUS)                        \
- *     restore_csr(NDS_MEPC)                           \
- *     restore_mxstatus()                              \
- *     restore_csr(NDS_MIE);
- */
+/* Nested IRQ exit macro : Restore CSRs */
 #define core_restore_nested_context()                               \
-	 clear_csr(NDS_MSTATUS, FLD_MSTATUS_MIE);            \
-	 restore_csr(NDS_MSTATUS)                        \
-	 restore_csr(NDS_MEPC)                           \
-	 restore_mxstatus()
-
-#define fence_iorw	      	//__nds__fence(FENCE_IORW,FENCE_IORW)
+     clear_csr(NDS_MSTATUS, FLD_MSTATUS_MIE);            \
+     restore_csr(NDS_MSTATUS)                        \
+     restore_csr(NDS_MEPC)                           \
+     restore_mxstatus()
 
 typedef enum{
-	FLD_FEATURE_PREEMPT_PRIORITY_INT_EN = BIT(0),
-	FLD_FEATURE_VECTOR_MODE_EN 			= BIT(1),
+    FLD_FEATURE_PREEMPT_PRIORITY_INT_EN = BIT(0),
+    FLD_FEATURE_VECTOR_MODE_EN          = BIT(1),
 }
 feature_e;
 
@@ -143,14 +135,14 @@ feature_e;
  * @note  this function must be used when the system wants to disable all the interrupt.
  * @return     none
  */
-_attribute_ram_code_sec_optimize_o2_ static inline unsigned int core_interrupt_disable(void){
-
-	unsigned int r;
-	read_csr (r, NDS_MIE);
-  
-	clear_csr(NDS_MIE, BIT(3)| BIT(7)| BIT(11));
-  
-	return r;
+static inline unsigned int core_interrupt_disable(void){
+    unsigned int r = read_csr (NDS_MSTATUS)&FLD_MSTATUS_MIE;
+    if(r)
+    {
+        clear_csr(NDS_MSTATUS,FLD_MSTATUS_MIE);//global interrupts disable
+        fence_iorw; /* Hardware may change this value, fence IO ensures that software changes are valid. */
+    }
+    return r;
 }
 
 /**
@@ -160,10 +152,13 @@ _attribute_ram_code_sec_optimize_o2_ static inline unsigned int core_interrupt_d
  * @return     0
  * @note this function must be used when the system wants to restore all the interrupt.
  */
-_attribute_ram_code_sec_optimize_o2_ static inline unsigned int core_restore_interrupt(unsigned int en){
-
-	set_csr(NDS_MIE, en);
-	return 0;
+static inline unsigned int core_restore_interrupt(unsigned int en){
+    if(en)
+    {
+        set_csr(NDS_MSTATUS,en);//global interrupts enable
+        fence_iorw; /* Hardware may change this value, fence IO ensures that software changes are valid. */
+    }
+    return 0;
 }
 
 /**
@@ -171,19 +166,33 @@ _attribute_ram_code_sec_optimize_o2_ static inline unsigned int core_restore_int
  * @param[in] mie_mask - MIE(Machine Interrupt Enable) register mask.
  * @return  none
  */
-static _always_inline void core_mie_enable(mie_e mie_mask)
+static inline void core_mie_enable(mie_e mie_mask)
 {
     set_csr(NDS_MIE, mie_mask);
 }
 
 /**
- * @brief This function serves to disable MEI(Machine External Interrupt),MTI(Machine timer Interrupt),or MSI(Machine Software Interrupt).
- * @param[in] mie_mask - MIE(Machine Interrupt Enable) register mask.
- * @return  none
+ * @brief      This function serves to disable MEI(Machine External Interrupt),MTI(Machine timer Interrupt),or MSI(Machine Software Interrupt).
+ * @param[in]  mie_mask - MIE(Machine Interrupt Enable) register mask.
+ * @return     mie register value before disable.
+ * @note       core_mie_disable and core_mie_restore must be used in pairs.
  */
-static _always_inline void core_mie_disable(mie_e mie_mask)
+static inline unsigned int core_mie_disable(mie_e mie_mask)
 {
+    unsigned int r = read_csr(NDS_MIE);
     clear_csr(NDS_MIE, mie_mask);
+    return r;
+}
+
+/**
+ * @brief      This function serves to restore MIE register value.
+ * @param[in]  mie_value - mie register value returned by core_mie_disable().
+ * @return     none.
+ * @note       core_mie_disable and core_mie_restore must be used in pairs.
+ */
+static inline void core_mie_restore(unsigned int mie_value)
+{
+    write_csr(NDS_MIE, mie_value);
 }
 
 /**
@@ -251,9 +260,7 @@ static inline void core_set_msp_base(unsigned int base)
  */
 static inline unsigned int core_get_msp_bound(void)
 {
-	unsigned int i=0;
-    read_csr(i ,NDS_MSP_BOUND);
-	return i;
+    return read_csr(NDS_MSP_BOUND);
 }
 
 /**
@@ -262,22 +269,8 @@ static inline unsigned int core_get_msp_bound(void)
  */
 static inline unsigned int core_get_msp_base(void)
 {
-	unsigned int i=0;
-    read_csr(i,NDS_MSP_BASE);
-	return i;
+    return read_csr(NDS_MSP_BASE);
 }
-
-#if 0
-/**
- * @brief This function serves to get current sp(Stack pointer).
- * @return     none
- */
-static inline unsigned int core_get_current_sp(void)
-{
-    return __nds__get_current_sp();
-}
-#endif
-
 
 /**
  * @brief This function serves to get mcause(Machine Cause) value.
@@ -287,9 +280,7 @@ static inline unsigned int core_get_current_sp(void)
  */
 static inline unsigned int core_get_mcause(void)
 {
-	unsigned int r;
-	read_csr (r, NDS_MCAUSE);
-	return r;
+    return read_csr(NDS_MCAUSE);
 }
 
 /**
@@ -300,9 +291,7 @@ static inline unsigned int core_get_mcause(void)
  */
 static inline unsigned int core_get_mepc(void)
 {
-	unsigned int r;
-	read_csr (r, NDS_MEPC);
-	return r;
+    return read_csr(NDS_MEPC);
 }
 
 /**
@@ -353,21 +342,28 @@ static inline unsigned int core_get_current_pc(void)
  */
 __attribute__((always_inline)) static inline unsigned long long rdmcycle(void)
 {
-	int r=0;
 #if __riscv_xlen == 32
-	do {
-		unsigned long hi ;
-		unsigned long lo ;
-		read_csr(hi,NDS_MCYCLEH);
-		read_csr(lo,NDS_MCYCLE);
-		read_csr(r,NDS_MCYCLEH);
-		if (hi == r)
-			return ((unsigned long long)hi << 32) | lo;
-	} while(1);
+    do {
+        unsigned long hi = read_csr(NDS_MCYCLEH);
+        unsigned long lo = read_csr(NDS_MCYCLE);
+
+        if (hi == read_csr(NDS_MCYCLEH))
+            return ((unsigned long long)hi << 32) | lo;
+    } while(1);
 #else
-	read_csr(r,NDS_MCYCLE);
-	return r;
+    return read_csr(NDS_MCYCLE);
 #endif
+}
+
+/**
+ * @brief     This function serves to set timeout by us.
+ * @param[in] ref  - reference tick of cclk .
+ * @param[in] us   - count by us.
+ * @return    true - timeout, false - not timeout
+ */
+static _always_inline bool core_cclk_time_exceed(unsigned long long ref, unsigned int us)
+{
+    return ((unsigned long long)(rdmcycle() - ref) > us *  sys_clk.cclk);
 }
 
 /**
@@ -375,6 +371,124 @@ __attribute__((always_inline)) static inline unsigned long long rdmcycle(void)
  * @param[in]   core_cclk_tick - Number of ticks in cclk
  * @return      none
  */
-_attribute_ram_code_sec_optimize_o2_noinline_ void core_cclk_delay_tick(unsigned long long core_cclk_tick);
+_attribute_ram_code_sec_noinline_ void core_cclk_delay_tick(unsigned long long core_cclk_tick);
 
+typedef bool (*condition_fp)(void);
+typedef bool (*condition_fp_with_param)(unsigned int);
+typedef void (*timeout_handler_fp)(unsigned int err_code);
+
+/**
+ * @brief       provides a unified timeout interface(for internal calls only).
+ * @param[in]   condition - function pointer, timeout judgment condition, must be bool xxx(void).
+ * @param[in]   timeout_us - timeout(us).
+ * @param[in]   func -  function pointer, timeout exit handle,must be void xxx(unsigned int).
+ * @param[in]   err_code - xxx_api_error_code_e/drv_api_error_code_e.
+ * @return      1: timeout(the upper layer interface uses drv_api_status_e(DRV_API_TIMEOUT)) 0: pass
+ * @note        the rules for parameter are as follows (for internal purposes only):
+ *              wait_condition_fails_or_timeout_with_param:
+ *              1.If the peripheral module has only one timeout judgment, can call this interface directly;
+ *              2.If the peripheral module has multiple calls, for the code simplicity, can be redefined by macros (refer to I2C_WAIT);
+ *              3.If the function is called by another .c file or by itself .h,
+ *                define it in the.h file and state that it is for internal use (refer to analog.h),otherwise put it in.c;
+ *              condition:
+ *              1.What is the type of the function according to the type of the upper layer interface;
+ *              2.For the new conditional interface,if the function is called by another .c file or by itself .h,
+ *                define it in the.c file,declare in.h and state that it is for internal use (refer to analog.h),otherwise put it in.c;
+ *              3.For the original interface in.h,if the application is likely to call, determine whether to add timeout precautions;
+ *              timeout_us:
+ *              1.If determine that the timeout is caused by own interface(1.must reboot 2.reset is solved,
+ *                but it is called in many places, and function calls are too nested, and most functions have no return type),
+ *                use g_drv_api_error_timeout_us,and the corresponding set interface drv_set_error_timeout;
+ *              2.If the timeout may be caused by an external source or own unexpected exceptions need to be reset,
+ *                define the timeout global variable in the corresponding module(g_xxx_error_timeout_us),
+ *                and the corresponding interface xxx_set_error_timeout:
+ *                - If timeout may be related to the other side of the communication,
+ *                  add comment minimum time limit and solution(refer to i2c);
+ *                - If the timeout may be caused own unexpected exceptions need to be reset,
+ *                  the timeout solution has been added to the parameter func,just note the minimum time limit(refer to aes);
+ *              func:
+ *              1.If determine that the timeout is caused by own interface(1.must reboot 2.reset is solved, but it is called
+ *                in many places, and function calls are too nested, and most functions have no return type), use timeout_handler;
+ *              2.If the timeout may be caused by an external source or own unexpected exceptions need to be reset,
+ *                define the timeout_handler interface in the corresponding module (xxx_timeout_handler):
+ *                - If timeout may be related to the other side of the communication,
+ *                  the driver only needs to record err_code using global variable g_xxx_error_timeout_code(refer to i2c);
+ *                - If the timeout may be caused own unexpected exceptions need to be reset(one wrong reasons),
+ *                  add the timeout solution to the interface,and (void)err_code(refer to trng);
+ *                - If the timeout may be caused own unexpected exceptions need to be reset(many wrong reasons),
+ *                  add the timeout solution to the interface,and (void)err_code(refer to aes);
+ *              err_code:
+ *              1.If determine that the timeout is caused by own interface(1.must reboot 2.reset is solved,
+ *                but it is called in many places, and function calls are too nested, and most functions have no return type),
+ *                use drv_api_error_code_e(self-add);
+ *              2.If the timeout may be caused by an external source or own unexpected exceptions need to be reset:
+ *                 - If timeout may be related to the other side of the communication,
+ *                   define the enumeration xxx_api_error_timeout_code_e, the global variable g_xxx_error_timeout_code,
+ *                   and the interface xxx_get_error_timeout_code(refer to i2c);
+ *                 - If the timeout may be caused own unexpected exceptions need to be reset(one wrong reasons),
+ *                   err_code parameter transfer is 0,no need to define the enumeration xxx_api_error_timeout_code_e,
+ *                   the global variable g_xxx_error_timeout_code, and the interface xxx_get_error_timeout_code(refer to trng);
+ *                 - If the timeout may be caused own unexpected exceptions need to be reset(many wrong reasons),
+ *                   only define the enumeration xxx_api_error_timeout_code_e, no need to define the global variable
+ *                   g_xxx_error_timeout_code, and the interface xxx_get_error_timeout_code(refer to aes);
+ */
+unsigned int wait_condition_fails_or_timeout(condition_fp condition,unsigned int timeout_us,timeout_handler_fp func,unsigned int  err_code);
+
+/**
+ * @brief       provides a unified timeout interface(condition with parameter)(for internal calls only).
+ * @param[in]   condition - function pointer, timeout judgment condition, must be bool xxx(unsigned int).
+ * @param[in]   cdt_param  - condition parameter.
+ * @param[in]   timeout_us - timeout(us).
+ * @param[in]   func -  function pointer, timeout exit handle,must be void xxx(unsigned int).
+ * @param[in]   err_code - xxx_api_error_code_e/drv_api_error_code_e.
+ * @return      1: timeout(the upper layer interface uses drv_api_status_e(DRV_API_TIMEOUT)) 0: pass
+ * @note        the rules for parameter are as follows (for internal purposes only):
+ *              wait_condition_fails_or_timeout_with_param:
+ *              1.If the peripheral module has only one timeout judgment, can call this interface directly;
+ *              2.If the peripheral module has multiple calls, for the code simplicity, can be redefined by macros (refer to I2C_WAIT);
+ *              3.If the function is called by another .c file or by itself .h,
+ *                define it in the.h file and state that it is for internal use (refer to analog.h),otherwise put it in.c;
+ *              condition:
+ *              1.What is the type of the function according to the type of the upper layer interface;
+ *              2.For the new conditional interface,if the function is called by another .c file or by itself .h,
+ *                define it in the.c file,declare in.h and state that it is for internal use (refer to analog.h),otherwise put it in.c;
+ *              3.For the original interface in.h,if the application is likely to call, determine whether to add timeout precautions;
+ *              timeout_us:
+ *              1.If determine that the timeout is caused by own interface(1.must reboot 2.reset is solved,
+ *                but it is called in many places, and function calls are too nested, and most functions have no return type),
+ *                use g_drv_api_error_timeout_us,and the corresponding set interface drv_set_error_timeout;
+ *              2.If the timeout may be caused by an external source or own unexpected exceptions need to be reset,
+ *                define the timeout global variable in the corresponding module(g_xxx_error_timeout_us),
+ *                and the corresponding interface xxx_set_error_timeout:
+ *                - If timeout may be related to the other side of the communication,
+ *                  add comment minimum time limit and solution(refer to i2c);
+ *                - If the timeout may be caused own unexpected exceptions need to be reset,
+ *                  the timeout solution has been added to the parameter func,just note the minimum time limit(refer to aes);
+ *              func:
+ *              1.If determine that the timeout is caused by own interface(1.must reboot 2.reset is solved, but it is called
+ *                in many places, and function calls are too nested, and most functions have no return type), use timeout_handler;
+ *              2.If the timeout may be caused by an external source or own unexpected exceptions need to be reset,
+ *                define the timeout_handler interface in the corresponding module (xxx_timeout_handler):
+ *                - If timeout may be related to the other side of the communication,
+ *                  the driver only needs to record err_code using global variable g_xxx_error_timeout_code(refer to i2c);
+ *                - If the timeout may be caused own unexpected exceptions need to be reset(one wrong reasons),
+ *                  add the timeout solution to the interface,and (void)err_code(refer to trng);
+ *                - If the timeout may be caused own unexpected exceptions need to be reset(many wrong reasons),
+ *                  add the timeout solution to the interface,and (void)err_code(refer to aes);
+ *              err_code:
+ *              1.If determine that the timeout is caused by own interface(1.must reboot 2.reset is solved,
+ *                but it is called in many places, and function calls are too nested, and most functions have no return type),
+ *                use drv_api_error_code_e(self-add);
+ *              2.If the timeout may be caused by an external source or own unexpected exceptions need to be reset:
+ *                 - If timeout may be related to the other side of the communication,
+ *                   define the enumeration xxx_api_error_timeout_code_e, the global variable g_xxx_error_timeout_code,
+ *                   and the interface xxx_get_error_timeout_code(refer to i2c);
+ *                 - If the timeout may be caused own unexpected exceptions need to be reset(one wrong reasons),
+ *                   err_code parameter transfer is 0,no need to define the enumeration xxx_api_error_timeout_code_e,
+ *                   the global variable g_xxx_error_timeout_code, and the interface xxx_get_error_timeout_code(refer to trng);
+ *                 - If the timeout may be caused own unexpected exceptions need to be reset(many wrong reasons),
+ *                   only define the enumeration xxx_api_error_timeout_code_e, no need to define the global variable
+ *                   g_xxx_error_timeout_code, and the interface xxx_get_error_timeout_code(refer to aes);
+ */
+unsigned int wait_condition_fails_or_timeout_with_param(condition_fp_with_param condition,unsigned int cdt_param,unsigned int timeout_us,timeout_handler_fp func,unsigned int  err_code);
 #endif

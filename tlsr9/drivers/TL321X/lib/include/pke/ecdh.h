@@ -4,9 +4,9 @@
  * @brief   This is the header file for TL321X
  *
  * @author  Driver Group
- * @date    2020
+ * @date    2024
  *
- * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-/********* pke version:1.1 *********/
 #ifndef ECDH_H
 #define ECDH_H
 
@@ -31,32 +30,39 @@ extern "C" {
 
 
 
-#include "pke.h"
+#include "lib/include/pke/pke.h"
 
 
 //ECDH return code
-enum ECDH_RET_CODE
-{
-	ECDH_SUCCESS = PKE_SUCCESS,
-	ECDH_POINTOR_NULL = PKE_SUCCESS+0x60,
-	ECDH_INVALID_INPUT,
-};
+#define ECDH_SUCCESS                          PKE_SUCCESS
+#define ECDH_POINTOR_NULL                     (PKE_SUCCESS+0x60U)
+#define ECDH_INVALID_INPUT                    (PKE_SUCCESS+0x61U)
+#define ECDH_ZERO_ALL                         (PKE_SUCCESS+0x62U)
+#define ECDH_INTEGER_TOO_BIG                  (PKE_SUCCESS+0x63U)
+
 
 
 //APIs
 
-/**
- * @brief		ECDH compute key.
- * @param[in]   curve			- eccp curve struct pointer.
- * @param[in]	local_prikey	- local private key, big-endian.
- * @param[in]	peer_pubkey		- peer public key, big-endian.
- * @param[out]	key				- output key.
- * @param[in]	keyByteLen		- byte length of output key.
- * @param[in]	KDF				- KDF function to get key.
- * @Return		0(success), other(error).
- */
-unsigned int ecdh_compute_key(eccp_curve_t *curve, unsigned char *local_prikey, unsigned char *peer_pubkey, unsigned char *key,
-		unsigned int keyByteLen, KDF_FUNC kdf);
+unsigned int ecdh_compute_key( eccp_curve_t *curve, unsigned char *local_prikey, unsigned char *peer_pubkey, unsigned char *key,
+        unsigned int keyByteLen, KDF_FUNC kdf);
+
+
+
+
+#ifdef ECDH_SEC
+
+//ECDH return code(secure version)
+#define ECDH_SUCCESS_S                        (0x8B9BC1E1U)
+#define ECDH_ERROR_S                          (0xCBC192A3U)
+
+
+unsigned int ecdh_compute_key_s(eccp_curve_t *curve, unsigned char *local_prikey, unsigned char *peer_pubkey, unsigned char *key,
+        unsigned int keyByteLen, KDF_FUNC kdf);
+
+#endif
+
+
 
 
 #ifdef __cplusplus

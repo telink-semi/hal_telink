@@ -1,12 +1,12 @@
 /********************************************************************************************************
  * @file    pwm.c
  *
- * @brief   This is the source file for B92
+ * @brief   This is the source file for TL321X
  *
  * @author  Driver Group
- * @date    2020
+ * @date    2024
  *
- * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -25,19 +25,19 @@
 
 
 dma_config_t pwm_tx_dma_config={
-	.dst_req_sel= DMA_REQ_PWM_TX,//tx req
-	.src_req_sel=0,
-	.dst_addr_ctrl=DMA_ADDR_FIX,
-	.src_addr_ctrl=DMA_ADDR_INCREMENT,//increment
-	.dstmode=DMA_HANDSHAKE_MODE,//handshake
-	.srcmode=DMA_NORMAL_MODE,
-	.dstwidth=DMA_CTR_WORD_WIDTH,//must word
-	.srcwidth=DMA_CTR_WORD_WIDTH,//must word
-	.src_burst_size=0,//must 0
-	.read_num_en=0,
-	.priority=0,
-	.write_num_en=0,
-	.auto_en=0,
+    .dst_req_sel= DMA_REQ_PWM_TX,//tx req
+    .src_req_sel=0,
+    .dst_addr_ctrl=DMA_ADDR_FIX,
+    .src_addr_ctrl=DMA_ADDR_INCREMENT,//increment
+    .dstmode=DMA_HANDSHAKE_MODE,//handshake
+    .srcmode=DMA_NORMAL_MODE,
+    .dstwidth=DMA_CTR_WORD_WIDTH,//must word
+    .srcwidth=DMA_CTR_WORD_WIDTH,//must word
+    .src_burst_size=0,//must 0
+    .read_num_en=0,
+    .priority=0,
+    .write_num_en=0,
+    .auto_en=0,
 };
 
 
@@ -60,7 +60,7 @@ void pwm_set_pin(gpio_func_pin_e pin,gpio_func_e func){
  */
 void pwm_set_dma_config(dma_chn_e chn)
 {
-	dma_config(chn,&pwm_tx_dma_config);
+    dma_config(chn,&pwm_tx_dma_config);
 }
 
 
@@ -74,8 +74,8 @@ void pwm_set_dma_config(dma_chn_e chn)
  */
 void pwm_set_dma_buf(dma_chn_e chn,unsigned int buf_addr,unsigned int len)
 {
-	dma_set_address( chn,(unsigned int)(buf_addr),reg_pwm_data_buf_adr);
-	dma_set_size(chn,len,DMA_WORD_WIDTH);
+    dma_set_address( chn,(unsigned int)(buf_addr),reg_pwm_data_buf_adr);
+    dma_set_size(chn,len,DMA_WORD_WIDTH);
 }
 
 
@@ -86,7 +86,7 @@ void pwm_set_dma_buf(dma_chn_e chn,unsigned int buf_addr,unsigned int len)
  */
 void pwm_ir_dma_mode_start(dma_chn_e chn)
 {
-	dma_chn_en(chn);
+    dma_chn_en(chn);
 }
 
 
@@ -102,10 +102,10 @@ void pwm_ir_dma_mode_start(dma_chn_e chn)
  */
 void pwm_set_dma_chain_llp(dma_chn_e chn,unsigned short * src_addr, unsigned int data_len,dma_chain_config_t * head_of_list)
 {
-	 dma_config(chn,&pwm_tx_dma_config);
-	 dma_set_address( chn,(unsigned int)(src_addr),reg_pwm_data_buf_adr);
-	 dma_set_size(chn,data_len,DMA_WORD_WIDTH);
-	 reg_dma_llp(chn)=(unsigned int)convert_ram_addr_cpu2bus(head_of_list);
+     dma_config(chn,&pwm_tx_dma_config);
+     dma_set_address( chn,(unsigned int)(src_addr),reg_pwm_data_buf_adr);
+     dma_set_size(chn,data_len,DMA_WORD_WIDTH);
+     reg_dma_llp(chn)=(unsigned int)(head_of_list);
 }
 
 
@@ -121,10 +121,10 @@ void pwm_set_dma_chain_llp(dma_chn_e chn,unsigned short * src_addr, unsigned int
  */
 void pwm_set_tx_dma_add_list_element(dma_chn_e chn,dma_chain_config_t *config_addr,dma_chain_config_t *llpoint ,unsigned short * src_addr,unsigned int data_len)
 {
-	config_addr->dma_chain_ctl= reg_dma_ctrl(chn)|BIT(0);
-	config_addr->dma_chain_src_addr=(unsigned int)convert_ram_addr_cpu2bus(src_addr);
-	config_addr->dma_chain_dst_addr=reg_pwm_data_buf_adr;
+    config_addr->dma_chain_ctl= reg_dma_ctrl(chn)|BIT(0);
+    config_addr->dma_chain_src_addr=(unsigned int)(src_addr);
+    config_addr->dma_chain_dst_addr=reg_pwm_data_buf_adr;
     config_addr->dma_chain_data_len=dma_cal_size(data_len,DMA_WORD_WIDTH);
-	config_addr->dma_chain_llp_ptr=(unsigned int)convert_ram_addr_cpu2bus(llpoint);
+    config_addr->dma_chain_llp_ptr=(unsigned int)(llpoint);
 }
 
