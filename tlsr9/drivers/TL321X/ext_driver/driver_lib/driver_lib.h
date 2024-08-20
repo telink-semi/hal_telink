@@ -1,13 +1,13 @@
 /********************************************************************************************************
- * @file	driver_lib.h
+ * @file    driver_lib.h
  *
- * @brief	This is the header file for BLE SDK
+ * @brief   This is the header file for BLE SDK
  *
- * @author	BLE GROUP
- * @date	06,2022
+ * @author  BLE GROUP
+ * @date    06,2022
  *
- * @par		Copyright (c) 2022, Telink Semiconductor (Shanghai) Co., Ltd.
- *			All rights reserved.
+ * @par     Copyright (c) 2022, Telink Semiconductor (Shanghai) Co., Ltd.
+ *          All rights reserved.
  *
  *          The information contained herein is confidential property of Telink
  *          Semiconductor (Shanghai) Co., Ltd. and is available under the terms
@@ -29,9 +29,9 @@
 #define DRIVERS_TL321X_EXT_DRIVER_DRIVER_LIB_DRIVER_LIB_H_
 
 
-#include "ext_rf.h"
-#include "ext_aes.h"
+//#include "ext_rf.h"
+//#include "ext_aes.h"
 #include "ext_lib.h"
-
+#include "mcu_cfg_internal.h"
 
 #endif /* DRIVERS_TL321X_EXT_DRIVER_DRIVER_LIB_DRIVER_LIB_H_ */

@@ -1,12 +1,12 @@
 /********************************************************************************************************
  * @file    watchdog.h
  *
- * @brief   This is the header file for B92
+ * @brief   This is the header file for TL321X
  *
  * @author  Driver Group
- * @date    2020
+ * @date    2024
  *
- * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -21,12 +21,12 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-/**	@page WATCHDOG
+/** @page WATCHDOG
  *
- *	Introduction
- *	===============
- *	 -----------------------------------------------------------------------------------------------------------------------------------------------
- *	|  watchdog mode | timer source |            Usage scenarios                         |                          note                            |
+ *  Introduction
+ *  ===============
+ *   -----------------------------------------------------------------------------------------------------------------------------------------------
+ *  |  watchdog mode | timer source |            Usage scenarios                         |                          note                            |
  *  |-----------------------------------------------------------------------------------------------------------------------------------------------
  *  |                |              |                                                    |the timer watchdog does not work while sleep              |
  *  | timer watchdog | system clock | only reset exceptions that occur during active     |(because its clock source is no longer available)         |
@@ -45,9 +45,9 @@
  *  |                |              |                                                    |(If set the capture value without stopping,there will be  |
  *  |                |              |                                                    |some intermediate values that can cause an abnormal reset)|
  *   ------------------------------------------------------------------------------------------------------------------------------------------------
- *	API Reference
- *	===============
- *	Header File: watchdog.h
+ *  API Reference
+ *  ===============
+ *  Header File: watchdog.h
  */
 #ifndef WATCHDOG_H_
 #define WATCHDOG_H_
@@ -55,7 +55,7 @@
 #include "clock.h"
 #include "compiler.h"
 
-#define wd_clear_cnt		wd_clear
+#define wd_clear_cnt        wd_clear
 
 /**
  * @brief     start watchdog.
@@ -63,7 +63,7 @@
  */
 static inline void wd_start(void){
 
-	BM_SET(reg_tmr_ctrl2, FLD_TMR_WD_EN);
+    BM_SET(reg_tmr_wd_en, FLD_TMR_WD_EN);
 }
 
 
@@ -72,7 +72,7 @@ static inline void wd_start(void){
  * @return    none
  */
 static inline void wd_stop(void){
-	BM_CLR(reg_tmr_ctrl2, FLD_TMR_WD_EN);
+    BM_CLR(reg_tmr_wd_en, FLD_TMR_WD_EN);
 }
 
 /**
@@ -86,7 +86,7 @@ static inline void wd_stop(void){
  */
 static inline unsigned char wd_get_status(void)
 {
-	return (reg_tmr_sta & FLD_TMR_STA_WD);
+    return (reg_tmr_sta0 & FLD_TMR_STA_WD);
 }
 
 /**
@@ -96,7 +96,7 @@ static inline unsigned char wd_get_status(void)
  */
 static inline void wd_clear_status(void)
 {
-	reg_tmr_sta = FLD_TMR_STA_WD;
+    reg_tmr_sta0 = FLD_TMR_STA_WD;
 }
 
 /**
@@ -105,29 +105,29 @@ static inline void wd_clear_status(void)
  */
 static inline void wd_clear(void)
 {
-	reg_tmr_sta = FLD_TMR_WD_CNT_CLR;
+    reg_tmr_sta0 = FLD_TMR_WD_CNT_CLR;
 }
 
 /**
  * @brief     This function set the watchdog trigger time.
- * 			  Because the lower 8bit of the wd timer register will always be 0, there will be an error ,
-			  The time error = (0x00~0xff)/(APB clock frequency)
+ *            Because the lower 8bit of the wd timer register will always be 0, there will be an error ,
+              The time error = (0x00~0xff)/(APB clock frequency)
  * @param[in] period_ms - The watchdog trigger time. Unit is  millisecond
  * @return    none
  * @attention The clock source of watchdog comes from pclk, when pclk changes it needs to be reconfigured.
  */
 static inline void wd_set_interval_ms(unsigned int period_ms)
 {
-	static unsigned int tmp_period_ms = 0;
-	tmp_period_ms=period_ms*sys_clk.pclk*1000;
-	reg_wt_target=tmp_period_ms;
+    static unsigned int tmp_period_ms = 0;
+    tmp_period_ms=period_ms*sys_clk.pclk*1000;
+    reg_wt_target=tmp_period_ms;
 }
 
 /**
  * @brief     start 32k watchdog.
  * @return    none.
  */
-_attribute_ram_code_com_sec_noinline_ void wd_32k_start(void);
+_attribute_ram_code_sec_noinline_ void wd_32k_start(void);
 
 /**
  * @brief     stop 32k watchdog.
@@ -135,7 +135,7 @@ _attribute_ram_code_com_sec_noinline_ void wd_32k_start(void);
  * @note      -# the interface sys_init() must be called before this interface can be invoked.
  *            -# after calling this interface, wd_32k_get_status() will be cleared.
  */
-_attribute_ram_code_com_sec_noinline_ void wd_32k_stop(void);
+_attribute_ram_code_sec_noinline_ void wd_32k_stop(void);
 
 /**
  * @brief     get 32k watchdog overflow status.
@@ -146,31 +146,20 @@ _attribute_ram_code_com_sec_noinline_ void wd_32k_stop(void);
  *                - software reboot(sys_reboot())/deep/deepretation/32k watchdog come back,the interface status remains;
  *                - power cyele/reset pin/vbus detect come back, the status of the interface is lost;
  */
-_attribute_ram_code_com_sec_noinline_ unsigned char wd_32k_get_status(void);
+_attribute_ram_code_sec_noinline_ unsigned char wd_32k_get_status(void);
 
 /**
  * @brief     Clear the reset state caused by the 32k watchdog overflow.
  * @return    none.
  * @note      -# the interface sys_init() must be called before this interface can be invoked.
  */
-_attribute_ram_code_com_sec_noinline_ void wd_32k_clear_status(void);
+_attribute_ram_code_sec_noinline_ void wd_32k_clear_status(void);
 
 /**
  * @brief     This function set the watchdog trigger time.
  * @param[in] period_ms - The watchdog trigger time. Unit is  millisecond,the lower 8bit of the wd timer register is invalid,so ranges from 8~134,217,720ms.
  * @return    none
  */
-_attribute_ram_code_com_sec_noinline_ void wd_32k_set_interval_ms(unsigned int period_ms);
+_attribute_ram_code_sec_noinline_ void wd_32k_set_interval_ms(unsigned int period_ms);
 
-
-/**
- * @brief      This function is used to turn off the 8s vbus timer.
- * @attention  When using the vbus (not vbat) power supply, you must turn off the vbus timer,
- *             otherwise the MCU will be reset after 8s.
- * @return     none.
- */
-static inline void wd_turn_off_vbus_timer(void)
-{
-	analog_write_reg8(0x69, 0x40);
-}
 #endif

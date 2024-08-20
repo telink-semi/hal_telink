@@ -1,12 +1,12 @@
 /********************************************************************************************************
  * @file    plic_reg.h
  *
- * @brief   This is the header file for B92
+ * @brief   This is the header file for TL321X
  *
  * @author  Driver Group
- * @date    2020
+ * @date    2024
  *
- * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -26,19 +26,19 @@
 #include "soc.h"
 
 
-/*******************************     interrupt registers:     ******************************/
-#define reg_irq_feature		         (*(volatile unsigned long*)(0 + (0xe4000000)))
+/*******************************     interrupt registers:  plic base 0xc4000000   ******************************/
+#define reg_irq_feature              (*(volatile unsigned long*)(0 + (0xc4000000)))
 
-#define reg_irq_pending(i)           (*(volatile unsigned long*)(0 + (0xe4001000+((i>31) ? 4 : 0))))
+#define reg_irq_pending(i)           (*(volatile unsigned long*)(0 + (0xc4001000+((i>31) ? 4 : 0))))
 
-#define reg_irq_src0             	 (*(volatile unsigned long*)(0 + (0xe4002000)))
-#define reg_irq_src1             	 (*(volatile unsigned long*)(0 + (0xe4002004)))
+#define reg_irq_src0                 (*(volatile unsigned long*)(0 + (0xc4002000)))
+#define reg_irq_src1                 (*(volatile unsigned long*)(0 + (0xc4002004)))
 
-#define reg_irq_src(i)             	 (*(volatile unsigned long*)(0 + (0xe4002000+((i>31) ? 4 : 0) )))
+#define reg_irq_src(i)               (*(volatile unsigned long*)(0 + (0xc4002000+((i>31) ? 4 : 0) )))
 
-#define reg_irq_threshold            (*(volatile unsigned long*)(0 + (0xe4200000)))
-#define reg_irq_done          	  	 (*(volatile unsigned long*)(0 + (0xe4200004)))
+#define reg_irq_threshold            (*(volatile unsigned long*)(0 + (0xc4200000)))
+#define reg_irq_done                 (*(volatile unsigned long*)(0 + (0xc4200004)))
 
-#define reg_irq_src_priority(i)      (*(volatile unsigned long*)(0 + 0xe4000000+((i)<<2)))
+#define reg_irq_src_priority(i)      (*(volatile unsigned long*)(0 + 0xc4000000+((i)<<2)))
 
 #endif

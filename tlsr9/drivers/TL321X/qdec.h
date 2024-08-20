@@ -1,12 +1,12 @@
 /********************************************************************************************************
  * @file    qdec.h
  *
- * @brief   This is the header file for B92
+ * @brief   This is the header file for TL321X
  *
  * @author  Driver Group
- * @date    2020
+ * @date    2024
  *
- * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -33,14 +33,14 @@
  */
 typedef enum
 {
-	QDEC_CHN_PA2,
-	QDEC_CHN_PA3,
-	QDEC_CHN_PB6,
-	QDEC_CHN_PB7,
-	QDEC_CHN_PC2,
-	QDEC_CHN_PC3,
-	QDEC_CHN_PD6,
-	QDEC_CHN_PD7,
+    QDEC_CHN_PA2,
+    QDEC_CHN_PA3,
+    QDEC_CHN_PB6,
+    QDEC_CHN_PB7,
+    QDEC_CHN_PC2,
+    QDEC_CHN_PC3,
+    QDEC_CHN_PD6,
+    QDEC_CHN_PD7,
 }qdec_chn_e;
 
 
@@ -50,22 +50,22 @@ typedef enum
  */
 typedef enum
 {
-	COMMON_MODE,
-	DOUBLE_ACCURACY_MODE,
+    COMMON_MODE,
+    DOUBLE_ACCURACY_MODE,
 }qdec_mode_e;
 
 /**
  *the hardware debouncing threshold
  */
 typedef enum{
-	QDEC_THRSH_P187p5us =0,
-	QDEC_THRSH_P375p0us,
+    QDEC_THRSH_P187p5us =0,
+    QDEC_THRSH_P375p0us,
     QDEC_THRSH_P750p0us,
-	QDEC_THRSH_P1500p0us,
-	QDEC_THRSH_P3000p0us,
-	QDEC_THRSH_P6000p0us,
-	QDEC_THRSH_P12000p0us,
-	QDEC_THRSH_P24000p0us,
+    QDEC_THRSH_P1500p0us,
+    QDEC_THRSH_P3000p0us,
+    QDEC_THRSH_P6000p0us,
+    QDEC_THRSH_P12000p0us,
+    QDEC_THRSH_P24000p0us,
 }qdec_thrsh_e;
 
 
