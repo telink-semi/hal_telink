@@ -15,7 +15,7 @@ zephyr_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/zephyr/blobs/liblt_9528_zephyr
 elseif (CONFIG_SOC_RISCV_TELINK_B95)
 zephyr_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/zephyr/blobs/liblt_9258_zephyr.a)
 elseif (CONFIG_SOC_RISCV_TELINK_TL321X)
-zephyr_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/zephyr/blobs/liblt_3218_zephyr.a)
+zephyr_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/zephyr/blobs/liblt_321x_zephyr.a)
 else()
 	message( FATAL_ERROR "Not supported SOC" )
 endif()
