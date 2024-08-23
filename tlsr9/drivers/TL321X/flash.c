@@ -23,6 +23,7 @@
  *******************************************************************************************************/
 #include "lib/include/sys.h"
 #include "lib/include/flash_base.h"
+#include "lib/include/flash_prot.h"
 #include "flash.h"
 
 #include "mspi.h"
@@ -653,4 +654,43 @@ unsigned int flash_get_vendor(unsigned int flash_mid)
 flash_capacity_e  flash_get_capacity(unsigned int flash_mid)
 {
     return (flash_mid&0x00ff0000)>>16;
+}
+
+/*******************************************************************************************************************
+ *									This function serves to 1m area flash protection
+ ******************************************************************************************************************/
+#define FLASH_1M_ADR_OFFSET 		0x100000
+#define FLASH_2M_ADR_OFFSET 		0x200000
+#define FLASH_3M_ADR_OFFSET 		0x300000
+#define FLASH_3M5_ADR_OFFSET 		0x380000
+
+#define FLASH_ADR_OFFSET_SELECT		FLASH_1M_ADR_OFFSET
+
+#define FLASH_PROTECT_BLOCK_SIZE	FLASH_LOCK_FW_LOW_1M
+
+void flash_protection_lock_init(void)
+{
+    flash_protection_init();
+
+    unsigned int app_lockBlock = FLASH_PROTECT_BLOCK_SIZE; // init is 1M, in the ble lib, actual area will be less than 1m, so we protect 1m.
+
+    unsigned int flash_lockBlock_cmd = flash_change_app_lock_block_to_flash_lock_block(app_lockBlock);
+
+    flash_lock(flash_lockBlock_cmd);
+}
+
+void flash_protection_lock_operation(unsigned int offset)
+{
+	/* no need to lock again, detect fw addr will unlock flash. */
+	if(offset < FLASH_ADR_OFFSET_SELECT){
+		flash_unlock();
+	}
+}
+
+void flash_protection_unlock_operation(unsigned int offset)
+{
+	/* suppose we will operate lock area, it will do ota, will unlock first and not lock again until it will reboot. */
+	if(offset < FLASH_ADR_OFFSET_SELECT){
+		flash_unlock();
+	}
 }
