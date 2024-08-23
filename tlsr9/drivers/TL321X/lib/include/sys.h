@@ -129,7 +129,7 @@ extern unsigned int g_chip_version;
  * @brief      This function reboot mcu.
  * @return     none
  */
-_attribute_text_sec_ void sys_reboot(void);
+_attribute_text_sec_ void protected_sys_reboot(void);
 
 /**
  * @brief       This function serves to initialize system.
