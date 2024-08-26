@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * Copyright (c) 2023-2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,9 +17,9 @@
  *****************************************************************************/
 
 #include "b9x_rf_power.h"
-#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_TL321X
+#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92
  #include <rf.h>
-#elif CONFIG_SOC_RISCV_TELINK_B95
+#elif CONFIG_SOC_RISCV_TELINK_B95 || CONFIG_SOC_RISCV_TELINK_TL321X
 #include <rf_common.h>
 #endif
 
@@ -68,7 +68,7 @@ const uint8_t b9x_tx_pwr_lt[] = {
 	RF_POWER_P9p11dBm,      /*   9.1 dBm:   9 */
 };
 
-#elif CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B95 || CONFIG_SOC_RISCV_TELINK_TL321X
+#elif CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B95
 /* TX power B92 lookup table */
 const uint8_t b9x_tx_pwr_lt[] = {
 	RF_POWER_N30dBm,        /* -30.0 dBm: -30 */
@@ -111,6 +111,51 @@ const uint8_t b9x_tx_pwr_lt[] = {
 	RF_POWER_P7p00dBm,      /*   7.0 dBm:   7 */
 	RF_POWER_P8p25dBm,      /*   8.2 dBm:   8 */
 	RF_POWER_P9p90dBm,      /*   9.9 dBm:   9 */
+};
+
+#elif CONFIG_SOC_RISCV_TELINK_TL321X
+/* TX power TL321X lookup table */
+const uint8_t tlx_tx_pwr_lt[] = {
+	RF_POWER_N31p73dBm,        /* -31.7 dBm: -30 */
+	RF_POWER_N26p20dBm,        /* -31.7 dBm: -29 */
+	RF_POWER_N20p25dBm,        /* -31.7 dBm: -28 */
+	RF_POWER_N16p82dBm,        /* -31.7 dBm: -27 */
+	RF_POWER_N14p37dBm,        /* -31.7 dBm: -26 */
+	RF_POWER_N11p67dBm,     /* -22.5 dBm: -25 */
+	RF_POWER_N10p28dBm,     /* -22.5 dBm: -24 */
+	RF_POWER_N8p52dBm,     /* -22.5 dBm: -23 */
+	RF_POWER_N7p57dBm,     /* -22.5 dBm: -22 */
+	RF_POWER_N6p72dBm,     /* -22.5 dBm: -21 */
+	RF_POWER_N5p59dBm,     /* -13.5 dBm: -20 */
+	RF_POWER_N4p64dBm,     /* -13.5 dBm: -19 */
+	RF_POWER_N3p52dBm,     /* -13.5 dBm: -18 */
+	RF_POWER_N2p55dBm,     /* -13.5 dBm: -17 */
+	RF_POWER_N1p50dBm,     /* -13.5 dBm: -16 */
+	RF_POWER_N0p44dBm,      /* -9.0 dBm: -15 */
+	RF_POWER_N0p13dBm,      /* -9.0 dBm: -14 */
+	RF_POWER_P0p03dBm,      /* -9.0 dBm: -13 */
+	RF_POWER_P0p47dBm,      /* -9.0 dBm: -12 */
+	RF_POWER_P1p00dBm,      /* -9.0 dBm: -11 */
+	RF_POWER_P1p90dBm,      /*  -5.9 dBm: -10 */
+	RF_POWER_P2p47dBm,      /*  -5.9 dBm:  -9 */
+	RF_POWER_P2p85dBm,      /*  -5.9 dBm:  -8 */
+	RF_POWER_P3p21dBm,      /*  -5.9 dBm:  -7 */
+	RF_POWER_P3p86dBm,      /*  -5.9 dBm:  -6 */
+	RF_POWER_P4p47dBm,      /*  -4.0 dBm:  -5 */
+	RF_POWER_P5p02dBm,      /*  -4.0 dBm:  -4 */
+	RF_POWER_P5p54dBm,      /*  -2.5 dBm:  -3 */
+	RF_POWER_P6p03dBm,      /*  -1.5 dBm:  -2 */
+	RF_POWER_P6p49dBm,      /*  -0.5 dBm:  -1 */
+	RF_POWER_P6p91dBm,      /*   0.0 dBm:   0 */
+	RF_POWER_P7p11dBm,      /*   1.0 dBm:   1 */
+	RF_POWER_P7p31dBm,      /*   1.6 dBm:   2 */
+	RF_POWER_P7p49dBm,      /*   2.5 dBm:   3 */
+	RF_POWER_P8p03dBm,      /*   3.5 dBm:   4 */
+	RF_POWER_P8p52dBm,      /*   4.6 dBm:   5 */
+	RF_POWER_P8p99dBm,      /*   5.2 dBm:   6 */
+	RF_POWER_P9p54dBm,      /*   7.0 dBm:   7 */
+	RF_POWER_P10p04dBm,      /*   8.2 dBm:   8 */
+	RF_POWER_P10p73dBm,      /*   9.9 dBm:   9 */
 };
 
 #endif

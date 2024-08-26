@@ -53,7 +53,7 @@
 
 #include "../multithread.h"
 #include "aes.h"
-#if CONFIG_SOC_RISCV_TELINK_B95
+#if CONFIG_SOC_RISCV_TELINK_B95 || CONFIG_SOC_RISCV_TELINK_TL321X
 #include "ske.h"
 #include "ske_portable.h"
 #endif
@@ -865,9 +865,9 @@ int mbedtls_internal_aes_encrypt( mbedtls_aes_context *ctx,
 {
     if ( ctx->nr == 10 ) {
         mbedtls_aes_lock();
-#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_TL321X
+#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92
         ( void ) aes_encrypt( ( unsigned char * )ctx->buf, ( unsigned char * )input, output );
-#elif CONFIG_SOC_RISCV_TELINK_B95
+#elif CONFIG_SOC_RISCV_TELINK_B95 || CONFIG_SOC_RISCV_TELINK_TL321X
         unsigned int r = core_interrupt_disable();
         ( void ) ske_lp_crypto(SKE_ALG_AES_128, SKE_MODE_ECB,
 	    SKE_CRYPTO_ENCRYPT, ( unsigned char * )ctx->buf, 0,
@@ -944,9 +944,9 @@ int mbedtls_internal_aes_decrypt( mbedtls_aes_context *ctx,
 {
     if ( ctx->nr == 10 ) {
         mbedtls_aes_lock();
-#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_TL321X
+#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92
         ( void ) aes_decrypt( ( unsigned char * )ctx->buf, ( unsigned char * )input, output );
-#elif CONFIG_SOC_RISCV_TELINK_B95
+#elif CONFIG_SOC_RISCV_TELINK_B95 || CONFIG_SOC_RISCV_TELINK_TL321X
         unsigned int r = core_interrupt_disable();
         ( void ) ske_lp_crypto(SKE_ALG_AES_128, SKE_MODE_ECB,
 	    SKE_CRYPTO_DECRYPT, ( unsigned char * )ctx->buf, 0,
@@ -1043,7 +1043,7 @@ int mbedtls_aes_crypt_ecb( mbedtls_aes_context *ctx,
         //
     }
 #endif
-#ifdef CONFIG_SOC_RISCV_TELINK_B95
+#if CONFIG_SOC_RISCV_TELINK_B95 || CONFIG_SOC_RISCV_TELINK_TL321X
     ske_dig_en();
 #endif
 
