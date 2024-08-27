@@ -12,7 +12,7 @@ blobs:
     description: "Binary libraries supporting Telink B91 series BLE subsystems"
 
   - path: lib_zephyr_b92.a
-    sha256: d705c83c66c883b8aeaaf3d7faf77bf9419270d4f638b5e538ad36ae997c4944
+    sha256: 82820c6252935dd128379604e99c3e2b8aa3c31021cf74698e2363131babcee4
     type: lib
     version: 'tl-wiki-0001'
     license-path: tlsr9/ble/license.txt
