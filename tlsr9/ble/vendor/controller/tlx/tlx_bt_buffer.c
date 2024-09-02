@@ -16,7 +16,7 @@
  *
  *****************************************************************************/
 
-#include "b9x_bt_buffer.h"
+#include "tlx_bt_buffer.h"
 
 /******* ACL connection LinkLayer TX & RX data FIFO allocation, Begin ********/
 _attribute_data_ u8 app_acl_rxfifo[ACL_RX_FIFO_SIZE * ACL_RX_FIFO_NUM] = {0};

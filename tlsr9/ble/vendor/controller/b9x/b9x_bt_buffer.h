@@ -26,8 +26,6 @@
 #include "stack/ble/B92/ble.h"
 #elif CONFIG_SOC_RISCV_TELINK_B95
 #include "stack/ble/B95/ble.h"
-#elif CONFIG_SOC_RISCV_TELINK_TL321X
-#include "stack/ble/TL321X/ble.h"
 #endif
 
 #define BT_BUF_HCI_RX_SIZE                                                                             \
