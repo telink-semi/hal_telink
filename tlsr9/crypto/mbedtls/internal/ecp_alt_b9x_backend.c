@@ -72,6 +72,8 @@ extern int ecp_mul_mxz( mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
  ****************************************************************/
 
 #if defined(MBEDTLS_ECP_DP_SECP256R1_ENABLED)
+
+#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B95
 static eccp_curve_t secp256r1_curve_dat = {
 	.eccp_p_bitLen = 256,
 	.eccp_p = (unsigned int[]){
@@ -92,9 +94,35 @@ static eccp_curve_t secp256r1_curve_dat = {
 		0x769886bc, 0xb3ebbd55, 0xaa3a93e7, 0x5ac635d8
 	}
 };
+#elif CONFIG_SOC_RISCV_TELINK_TL321X
+static eccp_curve_t secp256r1_curve_dat = {
+	.eccp_p_bitLen = 256,
+	.eccp_n_bitLen = 256,
+	.eccp_p = (unsigned int[]){
+		0xffffffff, 0xffffffff, 0xffffffff, 0x00000000,
+		0x00000000, 0x00000000, 0x00000001, 0xffffffff
+	},
+	.eccp_p_h = (unsigned int[]){
+		0x00000003, 0x00000000, 0xffffffff, 0xfffffffb,
+		0xfffffffe, 0xffffffff, 0xfffffffd, 0x00000004
+	},
+	.eccp_p_n0 = (unsigned int[]){0x00000001},
+	.eccp_a = (unsigned int[]){
+		0xfffffffc, 0xffffffff, 0xffffffff, 0x00000000,
+		0x00000000, 0x00000000, 0x00000001, 0xffffffff
+	},
+	.eccp_b = (unsigned int[]){
+		0x27d2604b, 0x3bce3c3e, 0xcc53b0f6, 0x651d06b0,
+		0x769886bc, 0xb3ebbd55, 0xaa3a93e7, 0x5ac635d8
+	}
+};
+#endif
+
 #endif /* MBEDTLS_ECP_DP_SECP256R1_ENABLED */
 
 #if defined(MBEDTLS_ECP_DP_SECP256K1_ENABLED)
+
+#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B95
 static eccp_curve_t secp256k1_curve_dat = {
 	.eccp_p_bitLen = 256,
 	.eccp_p = (unsigned int[]){
@@ -115,9 +143,35 @@ static eccp_curve_t secp256k1_curve_dat = {
 		0x00000000, 0x00000000, 0x00000000, 0x00000000
 	}
 };
+#elif CONFIG_SOC_RISCV_TELINK_TL321X
+static eccp_curve_t secp256k1_curve_dat = {
+	.eccp_p_bitLen = 256,
+	.eccp_n_bitLen = 256,
+	.eccp_p = (unsigned int[]){
+		0xfffffc2f, 0xfffffffe, 0xffffffff, 0xffffffff,
+		0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff
+	},
+	.eccp_p_h = (unsigned int[]){
+		0x000e90a1, 0x000007a2, 0x00000001, 0x00000000,
+		0x00000000, 0x00000000, 0x00000000, 0x00000000
+	},
+	.eccp_p_n0 = (unsigned int[]){0xd2253531},
+	.eccp_a = (unsigned int[]){
+		0x00000000, 0x00000000, 0x00000000, 0x00000000,
+		0x00000000, 0x00000000, 0x00000000, 0x00000000
+	},
+	.eccp_b = (unsigned int[]){
+		0x00000007, 0x00000000, 0x00000000, 0x00000000,
+		0x00000000, 0x00000000, 0x00000000, 0x00000000
+	}
+};
+#endif
+
 #endif /* MBEDTLS_ECP_DP_SECP256K1_ENABLED */
 
 #if defined(MBEDTLS_ECP_DP_BP256R1_ENABLED)
+
+#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B95
 static eccp_curve_t BP256r1_curve_dat = {
 	.eccp_p_bitLen = 256,
 	.eccp_p = (unsigned int[]){
@@ -138,9 +192,35 @@ static eccp_curve_t BP256r1_curve_dat = {
 		0xbbd77cbf, 0xf330b5d9, 0xe94a4b44, 0x26dc5c6c
 	}
 };
+#elif CONFIG_SOC_RISCV_TELINK_TL321X
+static eccp_curve_t BP256r1_curve_dat = {
+	.eccp_p_bitLen = 256,
+	.eccp_n_bitLen = 256,
+	.eccp_p = (unsigned int[]){
+		0x1f6e5377, 0x2013481d, 0xd5262028, 0x6e3bf623,
+		0x9d838d72, 0x3e660a90, 0xa1eea9bc, 0xa9fb57db
+	},
+	.eccp_p_h = (unsigned int[]){
+		0xa6465b6c, 0x8cfedf7b, 0x614d4f4d, 0x5cce4c26,
+		0x6b1ac807, 0xa1ecdacd, 0xe5957fa8, 0x4717aa21
+	},
+	.eccp_p_n0 = (unsigned int[]){0xcefd89b9},
+	.eccp_a = (unsigned int[]){
+		0xf330b5d9, 0xe94a4b44, 0x26dc5c6c, 0xfb8055c1,
+		0x417affe7, 0xeef67530, 0xfc2c3057, 0x7d5a0975
+	},
+	.eccp_b = (unsigned int[]){
+		0xff8c07b6, 0x6bccdc18, 0x5cf7e1ce, 0x95841629,
+		0xbbd77cbf, 0xf330b5d9, 0xe94a4b44, 0x26dc5c6c
+	}
+};
+#endif
+
 #endif /* MBEDTLS_ECP_DP_BP256R1_ENABLED */
 
 #if defined(MBEDTLS_ECP_DP_SECP224R1_ENABLED)
+
+#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B95
 static eccp_curve_t secp224r1_curve_dat = {
 	.eccp_p_bitLen = 224,
 	.eccp_p = (unsigned int[]){
@@ -161,9 +241,35 @@ static eccp_curve_t secp224r1_curve_dat = {
 		0xf5413256, 0x0c04b3ab, 0xb4050a85
 	}
 };
+#elif CONFIG_SOC_RISCV_TELINK_TL321X
+static eccp_curve_t secp224r1_curve_dat = {
+	.eccp_p_bitLen = 224,
+	.eccp_n_bitLen = 224,
+	.eccp_p = (unsigned int[]){
+		0x00000001, 0x00000000, 0x00000000, 0xffffffff,
+		0xffffffff, 0xffffffff, 0xffffffff
+	},
+	.eccp_p_h = (unsigned int[]){
+		0x00000001, 0x00000000, 0x00000000, 0xfffffffe,
+		0xffffffff, 0xffffffff, 0x00000000
+	},
+	.eccp_p_n0 = (unsigned int[]){0xffffffff},
+	.eccp_a = (unsigned int[]){
+		0xfffffffe, 0xffffffff, 0xffffffff, 0xfffffffe,
+		0xffffffff, 0xffffffff, 0xffffffff
+	},
+	.eccp_b = (unsigned int[]){
+		0x2355ffb4, 0x270b3943, 0xd7bfd8ba, 0x5044b0b7,
+		0xf5413256, 0x0c04b3ab, 0xb4050a85
+	}
+};
+#endif
+
 #endif /* MBEDTLS_ECP_DP_SECP224R1_ENABLED */
 
 #if defined(MBEDTLS_ECP_DP_SECP224K1_ENABLED)
+
+#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B95
 static eccp_curve_t secp224k1_curve_dat = {
 	.eccp_p_bitLen = 224,
 	.eccp_p = (unsigned int[]){
@@ -184,9 +290,35 @@ static eccp_curve_t secp224k1_curve_dat = {
 		0x00000000, 0x00000000, 0x00000000
 	}
 };
+#elif CONFIG_SOC_RISCV_TELINK_TL321X
+static eccp_curve_t secp224k1_curve_dat = {
+	.eccp_p_bitLen = 224,
+	.eccp_n_bitLen = 224,
+	.eccp_p = (unsigned int[]){
+		0xffffe56d, 0xfffffffe, 0xffffffff, 0xffffffff,
+		0xffffffff, 0xffffffff, 0xffffffff
+	},
+	.eccp_p_h = (unsigned int[]){
+		0x02c23069, 0x00003526, 0x00000001, 0x00000000,
+		0x00000000, 0x00000000, 0x00000000
+	},
+	.eccp_p_n0 = (unsigned int[]){0x198d139b},
+	.eccp_a = (unsigned int[]){
+		0x00000000, 0x00000000, 0x00000000, 0x00000000,
+		0x00000000, 0x00000000, 0x00000000
+	},
+	.eccp_b = (unsigned int[]){
+		0x00000005, 0x00000000, 0x00000000, 0x00000000,
+		0x00000000, 0x00000000, 0x00000000
+	}
+};
+#endif
+
 #endif /* MBEDTLS_ECP_DP_SECP224K1_ENABLED */
 
 #if defined(MBEDTLS_ECP_DP_SECP192R1_ENABLED)
+
+#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B95
 static eccp_curve_t secp192r1_curve_dat = {
 	.eccp_p_bitLen = 192,
 	.eccp_p = (unsigned int[]){
@@ -207,9 +339,35 @@ static eccp_curve_t secp192r1_curve_dat = {
 		0xe59c80e7, 0x64210519
 	}
 };
+#elif CONFIG_SOC_RISCV_TELINK_TL321X
+static eccp_curve_t secp192r1_curve_dat = {
+	.eccp_p_bitLen = 192,
+	.eccp_n_bitLen = 192,
+	.eccp_p = (unsigned int[]){
+		0xffffffff, 0xffffffff, 0xfffffffe, 0xffffffff,
+		0xffffffff, 0xffffffff
+	},
+	.eccp_p_h = (unsigned int[]){
+		0x00000001, 0x00000000, 0x00000002, 0x00000000,
+		0x00000001, 0x00000000
+	},
+	.eccp_p_n0 = (unsigned int[]){0x00000001},
+	.eccp_a = (unsigned int[]){
+		0xfffffffc, 0xffffffff, 0xfffffffe, 0xffffffff,
+		0xffffffff, 0xffffffff
+	},
+	.eccp_b = (unsigned int[]){
+		0xc146b9b1, 0xfeb8deec, 0x72243049, 0x0fa7e9ab,
+		0xe59c80e7, 0x64210519
+	}
+};
+#endif
+
 #endif /* MBEDTLS_ECP_DP_SECP192R1_ENABLED */
 
 #if defined(MBEDTLS_ECP_DP_SECP192K1_ENABLED)
+
+#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B95
 static eccp_curve_t secp192k1_curve_dat = {
 	.eccp_p_bitLen = 192,
 	.eccp_p = (unsigned int[]){
@@ -230,6 +388,30 @@ static eccp_curve_t secp192k1_curve_dat = {
 		0x00000000, 0x00000000
 	}
 };
+#elif CONFIG_SOC_RISCV_TELINK_TL321X
+static eccp_curve_t secp192k1_curve_dat = {
+	.eccp_p_bitLen = 192,
+	.eccp_n_bitLen = 192,
+	.eccp_p = (unsigned int[]){
+		0xffffee37, 0xfffffffe, 0xffffffff, 0xffffffff,
+		0xffffffff, 0xffffffff
+	},
+	.eccp_p_h = (unsigned int[]){
+		0x013c4fd1, 0x00002392, 0x00000001, 0x00000000,
+		0x00000000, 0x00000000
+	},
+	.eccp_p_n0 = (unsigned int[]){0x7446d879},
+	.eccp_a = (unsigned int[]){
+		0x00000000, 0x00000000, 0x00000000, 0x00000000,
+		0x00000000, 0x00000000
+	},
+	.eccp_b = (unsigned int[]){
+		0x00000003, 0x00000000, 0x00000000, 0x00000000,
+		0x00000000, 0x00000000
+	}
+};
+#endif
+
 #endif /* MBEDTLS_ECP_DP_SECP192K1_ENABLED */
 
 #if defined(MBEDTLS_ECP_DP_CURVE25519_ENABLED)
@@ -251,7 +433,7 @@ static mont_curve_t x25519 = {
 		0x00000000, 0x00000000, 0x00000000, 0x00000000
 	}
 };
-#elif CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B95 || CONFIG_SOC_RISCV_TELINK_TL321X
+#elif CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B95
 static mont_curve_t x25519 = {
 	.p_bitLen = 255,
 	.p = (unsigned int[]){
@@ -263,6 +445,24 @@ static mont_curve_t x25519 = {
 		0x00000000, 0x00000000, 0x00000000, 0x00000000
 	},
 	.p_n1 = (unsigned int[]){0x286bca1b},
+	.a24 = (unsigned int[]){
+		0x0001db41, 0x00000000, 0x00000000, 0x00000000,
+		0x00000000, 0x00000000, 0x00000000, 0x00000000
+	}
+};
+#elif CONFIG_SOC_RISCV_TELINK_TL321X
+static mont_curve_t x25519 = {
+	.p_bitLen = 255,
+	.n_bitLen = 253,
+	.p = (unsigned int[]){
+		0xffffffed, 0xffffffff, 0xffffffff, 0xffffffff,
+		0xffffffff, 0xffffffff, 0xffffffff, 0x7fffffff
+	},
+	.p_h = (unsigned int[]){
+		0x000005a4, 0x00000000, 0x00000000, 0x00000000,
+		0x00000000, 0x00000000, 0x00000000, 0x00000000
+	},
+	.p_n0 = (unsigned int[]){0x286bca1b},
 	.a24 = (unsigned int[]){
 		0x0001db41, 0x00000000, 0x00000000, 0x00000000,
 		0x00000000, 0x00000000, 0x00000000, 0x00000000
