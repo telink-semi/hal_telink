@@ -134,10 +134,10 @@ zephyr_library_sources(
 	drivers/${SOC}/flash.c
 	drivers/${SOC}/stimer.c
 	ble/common/utility.c
-	ble/vendor/controller/b9x_bt.c
-	ble/vendor/controller/b9x_bt_init.c
-	ble/vendor/controller/b9x_bt_buffer.c
-	ble/vendor/controller/b9x_bt_flash.c
+	ble/vendor/controller/b9x/b9x_bt.c
+	ble/vendor/controller/b9x/b9x_bt_init.c
+	ble/vendor/controller/b9x/b9x_bt_buffer.c
+	ble/vendor/controller/b9x/b9x_bt_flash.c
 )
 
 endif() # (CONFIG_BT_B9X OR CONFIG_BT_TLX)
