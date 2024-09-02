@@ -20,13 +20,7 @@
 #define TLX_BT_BUFFER_H_
 
 #include "zephyr/bluetooth/buf.h"
-#if CONFIG_SOC_RISCV_TELINK_B91
-#include "stack/ble/B91/ble.h"
-#elif CONFIG_SOC_RISCV_TELINK_B92
-#include "stack/ble/B92/ble.h"
-#elif CONFIG_SOC_RISCV_TELINK_B95
-#include "stack/ble/B95/ble.h"
-#elif CONFIG_SOC_RISCV_TELINK_TL321X
+#if CONFIG_SOC_RISCV_TELINK_TL321X
 #include "stack/ble/TL321X/ble.h"
 #endif
 

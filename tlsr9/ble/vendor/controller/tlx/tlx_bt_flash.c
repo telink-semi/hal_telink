@@ -16,15 +16,9 @@
  *
  *****************************************************************************/
 
-#include "b9x_bt_flash.h"
+#include "tlx_bt_flash.h"
 
-#if CONFIG_SOC_RISCV_TELINK_B91
-#include "stack/ble/B91/ble_common.h"
-#elif CONFIG_SOC_RISCV_TELINK_B92
-#include "stack/ble/B92/ble_common.h"
-#elif CONFIG_SOC_RISCV_TELINK_B95
-#include "stack/ble/B95/ble_common.h"
-#elif CONFIG_SOC_RISCV_TELINK_TL321X
+#if CONFIG_SOC_RISCV_TELINK_TL321X
 #include "stack/ble/TL321X/ble_common.h"
 #endif
 

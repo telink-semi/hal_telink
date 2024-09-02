@@ -30,16 +30,7 @@
 #include "compiler.h"
 #include "plic.h"
 
-#if CONFIG_SOC_RISCV_TELINK_B91
-#include "stack/ble/B91/controller/ble_controller.h"
-#include "stack/ble/B91/controller/os_sup.h"
-#elif CONFIG_SOC_RISCV_TELINK_B92
-#include "stack/ble/B92/controller/ble_controller.h"
-#include "stack/ble/B92/controller/os_sup.h"
-#elif CONFIG_SOC_RISCV_TELINK_B95
-#include "stack/ble/B95/controller/ble_controller.h"
-#include "stack/ble/B95/controller/os_sup.h"
-#elif CONFIG_SOC_RISCV_TELINK_TL321X
+#if CONFIG_SOC_RISCV_TELINK_TL321X
 #include "stack/ble/TL321X/controller/ble_controller.h"
 #include "stack/ble/TL321X/controller/os_sup.h"
 #endif
@@ -156,7 +147,7 @@ static int b9x_bt_hci_rx_handler(void)
 	if (p) {
 		/* Send data to the controller */
 		blc_hci_handler(&p[0], 0);
-#if CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B95 || CONFIG_SOC_RISCV_TELINK_TL321X
+#if CONFIG_SOC_RISCV_TELINK_TL321X
 		if (p[0] == HCI_TYPE_ACL_DATA) {
 			k_sem_give(&controller_sem);
 		}
@@ -184,14 +175,9 @@ static void b9x_bt_controller_thread()
  */
 static void b9x_bt_irq_init()
 {
-#if CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B95 || CONFIG_SOC_RISCV_TELINK_TL321X
+#if CONFIG_SOC_RISCV_TELINK_TL321X
 	plic_preempt_feature_dis();
 	flash_plic_preempt_config(0,1);
-#endif
-
-#if CONFIG_SOC_RISCV_TELINK_B91
-#define IRQ_SYSTIMER IRQ1_SYSTIMER
-#define IRQ_ZB_RT IRQ15_ZB_RT
 #endif
 
 	/* Init STimer IRQ */
@@ -222,7 +208,7 @@ CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION)
 
 	/* Reset Radio */
 	rf_radio_reset();
-#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_TL321X
+#if CONFIG_SOC_RISCV_TELINK_TL321X
 	rf_reset_dma();
 	rf_baseband_reset();
 #endif
@@ -240,9 +226,7 @@ CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION)
 	b9x_bt_irq_init();
 
 	/* Register callback to controller. */
-#if CONFIG_SOC_RISCV_TELINK_B91
-	blc_ll_registerGiveSemCb(os_give_sem_cb);
-#elif CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B95 || CONFIG_SOC_RISCV_TELINK_TL321X
+#if CONFIG_SOC_RISCV_TELINK_TL321X
 	blc_ll_registerGiveSemCb(os_give_sem_cb, os_give_sem_cb);
 	blc_setOsSupEnable(true);
 	blc_ll_enOsPowerManagement_module();
@@ -255,13 +239,7 @@ CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION)
 	(void)k_thread_create(&b9x_bt_controller_thread_data,
 		b9x_bt_controller_thread_stack, K_THREAD_STACK_SIZEOF(b9x_bt_controller_thread_stack),
 		b9x_bt_controller_thread, NULL, NULL, NULL, BLE_THREAD_PRIORITY, 0, K_NO_WAIT);
-#if CONFIG_SOC_RISCV_TELINK_B91
-		(void)k_thread_name_set(&b9x_bt_controller_thread_data, "B91_BT");
-#elif CONFIG_SOC_RISCV_TELINK_B92
-		(void)k_thread_name_set(&b9x_bt_controller_thread_data, "B92_BT");
-#elif CONFIG_SOC_RISCV_TELINK_B95
-		(void)k_thread_name_set(&b9x_bt_controller_thread_data, "B95_BT");
-#elif CONFIG_SOC_RISCV_TELINK_TL321X
+#if CONFIG_SOC_RISCV_TELINK_TL321X
 		(void)k_thread_name_set(&b9x_bt_controller_thread_data, "TL321X_BT");
 #endif
 
@@ -293,7 +271,7 @@ void b9x_bt_controller_deinit()
 
 	/* Reset Radio */
 	rf_radio_reset();
-#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_TL321X
+#if CONFIG_SOC_RISCV_TELINK_TL321X
 	rf_reset_dma();
 	rf_baseband_reset();
 #endif
