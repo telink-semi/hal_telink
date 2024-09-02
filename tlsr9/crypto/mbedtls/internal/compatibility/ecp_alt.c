@@ -2548,6 +2548,10 @@ int mbedtls_ecp_mul_restartable( mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
     ECP_VALIDATE_RET( m   != NULL );
     ECP_VALIDATE_RET( P   != NULL );
 
+#if CONFIG_SOC_RISCV_TELINK_TL321X
+    pke_dig_en();
+#endif
+
     if( f_rng == NULL )
         return( MBEDTLS_ERR_ECP_BAD_INPUT_DATA );
 
@@ -2681,6 +2685,10 @@ int mbedtls_ecp_muladd_restartable(
     ECP_VALIDATE_RET( P   != NULL );
     ECP_VALIDATE_RET( n   != NULL );
     ECP_VALIDATE_RET( Q   != NULL );
+
+#if CONFIG_SOC_RISCV_TELINK_TL321X
+    pke_dig_en();
+#endif
 
     if( mbedtls_ecp_get_type( grp ) != MBEDTLS_ECP_TYPE_SHORT_WEIERSTRASS )
         return( MBEDTLS_ERR_ECP_FEATURE_UNAVAILABLE );
@@ -2897,6 +2905,10 @@ int mbedtls_ecp_check_pubkey( const mbedtls_ecp_group *grp,
 {
     ECP_VALIDATE_RET( grp != NULL );
     ECP_VALIDATE_RET( pt  != NULL );
+
+#if CONFIG_SOC_RISCV_TELINK_TL321X
+    pke_dig_en();
+#endif
 
     /* Must use affine coordinates */
     if( mbedtls_mpi_cmp_int( &pt->Z, 1 ) != 0 )

@@ -32,7 +32,10 @@ extern "C" {
 
 #include "pke_common.h"
 #include "lib/include/crypto_common/eccp_curve.h"
+#include "lib/include/crypto_common/utility.h"
+#include "pke_portable.h"
 
+#define SUPPORT_C25519
 
 #ifdef SUPPORT_SM2
 extern eccp_curve_t sm2_curve[1];
@@ -46,6 +49,23 @@ extern eccp_curve_t sm9_curve[1];
 extern edward_curve_t ed25519[1];
 #endif
 
+#define big_integer_compare			uint32_BigNumCmp
+
+#define pke_clr_irq_status			pke_clear_interrupt
+#define pke_get_irq_status			pke_wait_till_done
+#define pke_opr_start				pke_start
+#define pke_mod_add					pke_modadd
+#define pke_mod_sub					pke_modsub
+#define pke_mod_mul					pke_modmul
+#define pke_mod_inv					pke_modinv
+#define div2n_u32					Big_Div2n
+#define sub_u32						pke_sub
+#define pke_eccp_point_mul			eccp_pointMul
+#define pke_eccp_point_add			eccp_pointAdd
+#define pke_eccp_point_verify		eccp_pointVerify
+#define pke_x25519_point_mul		x25519_pointMul
+#define pke_ed25519_point_mul		ed25519_pointMul
+#define pke_ed25519_point_add		ed25519_pointAdd
 
 /***************** PKE register *******************/
 #define rPKE_CTRL           (*((volatile unsigned int *)(PKE_BASE_ADDR)))
