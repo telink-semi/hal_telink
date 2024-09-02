@@ -124,12 +124,17 @@ endif()
 # BLE stack reference sources
 if (CONFIG_BT_B9X OR CONFIG_BT_TLX)
 
-zephyr_include_directories(
+zephyr_include_directories_ifdef(CONFIG_BT_B9X
 	ble
-	ble/vendor/controller
+	ble/vendor/controller/b9x
 )
 
-zephyr_library_sources(
+zephyr_include_directories_ifdef(CONFIG_BT_TLX
+	ble
+	ble/vendor/controller/tlx
+)
+
+zephyr_library_sources(CONFIG_BT_B9X
 	drivers/${SOC}/aes.c
 	drivers/${SOC}/flash.c
 	drivers/${SOC}/stimer.c
@@ -138,6 +143,17 @@ zephyr_library_sources(
 	ble/vendor/controller/b9x/b9x_bt_init.c
 	ble/vendor/controller/b9x/b9x_bt_buffer.c
 	ble/vendor/controller/b9x/b9x_bt_flash.c
+)
+
+zephyr_library_sources(CONFIG_BT_TLX
+	drivers/${SOC}/aes.c
+	drivers/${SOC}/flash.c
+	drivers/${SOC}/stimer.c
+	ble/common/utility.c
+	ble/vendor/controller/tlx/tlx_bt.c
+	ble/vendor/controller/tlx/tlx_bt_init.c
+	ble/vendor/controller/tlx/tlx_bt_buffer.c
+	ble/vendor/controller/tlx/tlx_bt_flash.c
 )
 
 endif() # (CONFIG_BT_B9X OR CONFIG_BT_TLX)
