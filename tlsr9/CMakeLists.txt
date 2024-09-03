@@ -114,19 +114,28 @@ zephyr_library_sources_ifdef(CONFIG_PM common/sleep.c)
 #BLE flash reference sources
 if (CONFIG_IEEE802154_TELINK_B9X OR CONFIG_IEEE802154_TELINK_TLX)
 
-zephyr_include_directories(
+zephyr_include_directories_ifdef(CONFIG_IEEE802154_TELINK_B9X
 	ble
-	ble/vendor/controller
+	ble/vendor/controller/b9x
+)
+
+zephyr_include_directories_ifdef(CONFIG_IEEE802154_TELINK_TLX
+	ble
+	ble/vendor/controller/tlx
 )
 
 endif()
 
 # BLE stack reference sources
-if (CONFIG_BT_B9X OR CONFIG_BT_TLX OR CONFIG_IEEE802154)
+if (CONFIG_BT_B9X OR CONFIG_BT_TLX)
 
-zephyr_include_directories(
+zephyr_include_directories_ifdef(CONFIG_BT_B9X
 	ble
 	ble/vendor/controller/b9x
+)
+
+zephyr_include_directories_ifdef(CONFIG_BT_TLX
+	ble
 	ble/vendor/controller/tlx
 )
 
