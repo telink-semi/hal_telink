@@ -88,8 +88,6 @@ int b9x_bt_blc_init(void *prx, void *ptx)
 
 	blc_ll_initLegacyAdvertising_module(); // adv module: 		 mandatory for BLE slave,
 
-	blc_ll_initLegacyScanning_module(); // scan module: 		 mandatory for BLE master
-
 	blc_ll_initInitiating_module(); // initiate module: 	 mandatory for BLE master
 
 	blc_ll_initAclConnection_module();
@@ -150,7 +148,6 @@ int b9x_bt_blc_init(void *prx, void *ptx)
 
 #if CONFIG_SOC_RISCV_TELINK_TL321X
 	blc_ll_configLegacyAdvEnableStrategy(LEG_ADV_EN_STRATEGY_3);
-	blc_ll_configScanEnableStrategy(SCAN_STRATEGY_1);
 #endif
 
 	blc_ll_setMaxConnectionNumber(CONFIG_B9X_BLE_CTRL_MASTER_MAX_NUM,

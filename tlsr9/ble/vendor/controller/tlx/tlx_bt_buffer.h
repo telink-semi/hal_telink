@@ -120,12 +120,11 @@
 */
 #define ACL_MASTER_TX_FIFO_NUM CAL_LL_ACL_BUF_NUM(CONFIG_BT_BUF_ACL_TX_COUNT)
 
-extern u8 app_acl_rxfifo[];
-extern u8 app_acl_mstTxfifo[];
-extern u8 app_acl_slvTxfifo[];
-
-extern u8 app_hci_rxfifo[];
-extern u8 app_hci_txfifo[];
-extern u8 app_hci_rxAclfifo[];
+extern _attribute_data_ u8* app_acl_rxfifo;
+extern _attribute_data_ u8* app_acl_mstTxfifo;
+extern _attribute_data_ u8* app_acl_slvTxfifo;
+extern _attribute_data_ u8* app_hci_rxfifo;
+extern _attribute_data_ u8* app_hci_txfifo;
+extern _attribute_data_ u8* app_hci_rxAclfifo;
 
 #endif /* TLX_BT_BUFFER_H_ */

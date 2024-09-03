@@ -29,7 +29,8 @@
 #include "tlx_bt_init.h"
 #include "compiler.h"
 #include "plic.h"
-
+#include <stdlib.h>
+#include "tlx_bt_buffer.h"
 #if CONFIG_SOC_RISCV_TELINK_TL321X
 #include "stack/ble/TL321X/controller/ble_controller.h"
 #include "stack/ble/TL321X/controller/os_sup.h"
@@ -216,6 +217,19 @@ CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION)
 	/* Init RF driver */
 	rf_drv_ble_init();
 
+#ifdef CONFIG_BT_CENTRAL
+	app_acl_mstTxfifo = (u8 *)calloc(ACL_MASTER_TX_FIFO_SIZE * ACL_MASTER_TX_FIFO_NUM * CONFIG_B9X_BLE_CTRL_MASTER_MAX_NUM,1);
+#endif /* CONFIG_BT_CENTRAL */
+
+#ifdef CONFIG_BT_PERIPHERAL
+	app_acl_slvTxfifo = (u8 *)calloc(ACL_SLAVE_TX_FIFO_SIZE * ACL_SLAVE_TX_FIFO_NUM * CONFIG_B9X_BLE_CTRL_SLAVE_MAX_NUM,1);
+#endif /* CONFIG_BT_PERIPHERAL */
+	
+	app_acl_rxfifo = (u8 *)calloc(ACL_RX_FIFO_SIZE * ACL_RX_FIFO_NUM,1);
+	app_hci_rxfifo = (u8 *)calloc(HCI_RX_FIFO_SIZE * HCI_RX_FIFO_NUM,1);
+	app_hci_txfifo = (u8 *)calloc(HCI_TX_FIFO_SIZE * HCI_TX_FIFO_NUM,1);
+	app_hci_rxAclfifo = (u8 *)calloc(HCI_RX_ACL_FIFO_SIZE * HCI_RX_ACL_FIFO_NUM,1);
+
 	/* Init BLE Controller stack */
 	status = b9x_bt_blc_init(b9x_bt_hci_rx_handler, b9x_bt_hci_tx_handler);
 	if (status != INIT_OK) {
@@ -275,6 +289,18 @@ void b9x_bt_controller_deinit()
 	rf_reset_dma();
 	rf_baseband_reset();
 #endif
+
+#ifdef CONFIG_BT_CENTRAL
+	free(app_acl_mstTxfifo);
+#endif /* CONFIG_BT_CENTRAL */
+#ifdef CONFIG_BT_PERIPHERAL
+	free(app_acl_slvTxfifo);
+#endif /* CONFIG_BT_PERIPHERAL */
+	free(app_acl_rxfifo);
+	free(app_hci_rxfifo);
+	free(app_hci_txfifo);
+	free(app_hci_rxAclfifo);
+
 
 #if CONFIG_PM && (CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION || \
 CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION)
