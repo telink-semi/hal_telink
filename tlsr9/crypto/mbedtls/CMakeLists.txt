@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2022-2023, Telink
+# Copyright (c) 2022-2024, Telink
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -32,5 +32,7 @@ zephyr_library_sources(
 	./internal/compatibility/ecp_alt.c
 	./internal/compatibility/ecp_curves_alt.c
 	./internal/ecp_alt_b9x_backend_test.c
-	./internal/ecp_alt_b9x_backend.c
 	)
+
+zephyr_library_sources_ifdef(CONFIG_TELINK_B9X_MBEDTLS_HW_ACCELERATION ./internal/ecp_alt_b9x_backend.c)
+zephyr_library_sources_ifdef(CONFIG_TELINK_TLX_MBEDTLS_HW_ACCELERATION ./internal/ecp_alt_tlx_backend.c)

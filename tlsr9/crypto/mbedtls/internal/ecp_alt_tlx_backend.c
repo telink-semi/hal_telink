@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2022-2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -47,11 +47,9 @@
 #include <multithread.h>
 #include <pke.h>
 
-#if CONFIG_SOC_RISCV_TELINK_B92
+
 #include <ext_driver/driver_lib/ext_lib.h>
-#elif CONFIG_SOC_RISCV_TELINK_B95
-#include <ext_driver/driver_lib/ext_lib.h>
-#endif
+
 #include <ext_driver/ext_misc.h>
 
 #include <string.h>
@@ -59,11 +57,6 @@
 #if defined(MBEDTLS_ECP_ALT)
 
 #define ARRAY_SIZE(array)	(sizeof(array) / sizeof(array)[0])
-
-extern int ecp_mul_mxz( mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
-                        const mbedtls_mpi *m, const mbedtls_ecp_point *P,
-                        int (*f_rng)(void *, unsigned char *, size_t),
-                        void *p_rng );
 
 /****************************************************************
  * HW unit curve data constants definition
@@ -81,7 +74,7 @@ static eccp_curve_t secp256r1_curve_dat = {
 		0x00000003, 0x00000000, 0xffffffff, 0xfffffffb,
 		0xfffffffe, 0xffffffff, 0xfffffffd, 0x00000004
 	},
-	.eccp_p_n1 = (unsigned int[]){0x00000001},
+	.eccp_p_n0 = (unsigned int[]){0x00000001},
 	.eccp_a = (unsigned int[]){
 		0xfffffffc, 0xffffffff, 0xffffffff, 0x00000000,
 		0x00000000, 0x00000000, 0x00000001, 0xffffffff
@@ -105,7 +98,7 @@ static eccp_curve_t secp256k1_curve_dat = {
 		0x000e90a1, 0x000007a2, 0x00000001, 0x00000000,
 		0x00000000, 0x00000000, 0x00000000, 0x00000000
 	},
-	.eccp_p_n1 = (unsigned int[]){0xd2253531},
+	.eccp_p_n0 = (unsigned int[]){0xd2253531},
 	.eccp_a = (unsigned int[]){
 		0x00000000, 0x00000000, 0x00000000, 0x00000000,
 		0x00000000, 0x00000000, 0x00000000, 0x00000000
@@ -129,7 +122,7 @@ static eccp_curve_t BP256r1_curve_dat = {
 		0xa6465b6c, 0x8cfedf7b, 0x614d4f4d, 0x5cce4c26,
 		0x6b1ac807, 0xa1ecdacd, 0xe5957fa8, 0x4717aa21
 	},
-	.eccp_p_n1 = (unsigned int[]){0xcefd89b9},
+	.eccp_p_n0 = (unsigned int[]){0xcefd89b9},
 	.eccp_a = (unsigned int[]){
 		0xf330b5d9, 0xe94a4b44, 0x26dc5c6c, 0xfb8055c1,
 		0x417affe7, 0xeef67530, 0xfc2c3057, 0x7d5a0975
@@ -153,7 +146,7 @@ static eccp_curve_t secp224r1_curve_dat = {
 		0x00000001, 0x00000000, 0x00000000, 0xfffffffe,
 		0xffffffff, 0xffffffff, 0x00000000
 	},
-	.eccp_p_n1 = (unsigned int[]){0xffffffff},
+	.eccp_p_n0 = (unsigned int[]){0xffffffff},
 	.eccp_a = (unsigned int[]){
 		0xfffffffe, 0xffffffff, 0xffffffff, 0xfffffffe,
 		0xffffffff, 0xffffffff, 0xffffffff
@@ -177,7 +170,7 @@ static eccp_curve_t secp224k1_curve_dat = {
 		0x02c23069, 0x00003526, 0x00000001, 0x00000000,
 		0x00000000, 0x00000000, 0x00000000
 	},
-	.eccp_p_n1 = (unsigned int[]){0x198d139b},
+	.eccp_p_n0 = (unsigned int[]){0x198d139b},
 	.eccp_a = (unsigned int[]){
 		0x00000000, 0x00000000, 0x00000000, 0x00000000,
 		0x00000000, 0x00000000, 0x00000000
@@ -201,7 +194,7 @@ static eccp_curve_t secp192r1_curve_dat = {
 		0x00000001, 0x00000000, 0x00000002, 0x00000000,
 		0x00000001, 0x00000000
 	},
-	.eccp_p_n1 = (unsigned int[]){0x00000001},
+	.eccp_p_n0 = (unsigned int[]){0x00000001},
 	.eccp_a = (unsigned int[]){
 		0xfffffffc, 0xffffffff, 0xfffffffe, 0xffffffff,
 		0xffffffff, 0xffffffff
@@ -225,7 +218,7 @@ static eccp_curve_t secp192k1_curve_dat = {
 		0x013c4fd1, 0x00002392, 0x00000001, 0x00000000,
 		0x00000000, 0x00000000
 	},
-	.eccp_p_n1 = (unsigned int[]){0x7446d879},
+	.eccp_p_n0 = (unsigned int[]){0x7446d879},
 	.eccp_a = (unsigned int[]){
 		0x00000000, 0x00000000, 0x00000000, 0x00000000,
 		0x00000000, 0x00000000
@@ -238,27 +231,9 @@ static eccp_curve_t secp192k1_curve_dat = {
 #endif /* MBEDTLS_ECP_DP_SECP192K1_ENABLED */
 
 #if defined(MBEDTLS_ECP_DP_CURVE25519_ENABLED)
-
-#if CONFIG_SOC_RISCV_TELINK_B91
-static mont_curve_t x25519 = {
-	.mont_p_bitLen = 255,
-	.mont_p = (unsigned int[]){
-		0xffffffed, 0xffffffff, 0xffffffff, 0xffffffff,
-		0xffffffff, 0xffffffff, 0xffffffff, 0x7fffffff
-	},
-	.mont_p_h = (unsigned int[]){
-		0x000005a4, 0x00000000, 0x00000000, 0x00000000,
-		0x00000000, 0x00000000, 0x00000000, 0x00000000
-	},
-	.mont_p_n1 = (unsigned int[]){0x286bca1b},
-	.mont_a24 = (unsigned int[]){
-		0x0001db41, 0x00000000, 0x00000000, 0x00000000,
-		0x00000000, 0x00000000, 0x00000000, 0x00000000
-	}
-};
-#elif CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B95
 static mont_curve_t x25519 = {
 	.p_bitLen = 255,
+	.n_bitLen = 253,
 	.p = (unsigned int[]){
 		0xffffffed, 0xffffffff, 0xffffffff, 0xffffffff,
 		0xffffffff, 0xffffffff, 0xffffffff, 0x7fffffff
@@ -267,14 +242,12 @@ static mont_curve_t x25519 = {
 		0x000005a4, 0x00000000, 0x00000000, 0x00000000,
 		0x00000000, 0x00000000, 0x00000000, 0x00000000
 	},
-	.p_n1 = (unsigned int[]){0x286bca1b},
+	.p_n0 = (unsigned int[]){0x286bca1b},
 	.a24 = (unsigned int[]){
 		0x0001db41, 0x00000000, 0x00000000, 0x00000000,
 		0x00000000, 0x00000000, 0x00000000, 0x00000000
 	}
 };
-#endif
-
 #endif /* MBEDTLS_ECP_DP_CURVE25519_ENABLED */
 
 /****************************************************************
@@ -361,7 +334,7 @@ static mont_curve_t *mont_curve_get(const mbedtls_ecp_group *grp)
  * Public functions declaration
  ****************************************************************/
 
-int ecp_alt_b9x_backend_check_pubkey(
+int ecp_alt_tlx_backend_check_pubkey(
 	const mbedtls_ecp_group *grp, const mbedtls_ecp_point *pt)
 {
 	int result = MBEDTLS_ERR_ECP_BAD_INPUT_DATA;
@@ -405,11 +378,9 @@ int ecp_alt_b9x_backend_check_pubkey(
 	return result;
 }
 
-int ecp_alt_b9x_backend_mul(
+int ecp_alt_tlx_backend_mul(
 	mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
-	const mbedtls_mpi *m, const mbedtls_ecp_point *P,
-	int (*f_rng)(void *, unsigned char *, size_t), void *p_rng,
-    mbedtls_ecp_restart_ctx *rs_ctx)
+	const mbedtls_mpi *m, const mbedtls_ecp_point *P)
 {
 	int result = MBEDTLS_ERR_ECP_BAD_INPUT_DATA;
 
@@ -468,8 +439,6 @@ int ecp_alt_b9x_backend_mul(
 #if defined(MBEDTLS_ECP_MONTGOMERY_ENABLED)
 			if (mbedtls_ecp_get_type(grp) ==
 				MBEDTLS_ECP_TYPE_MONTGOMERY) {
-
-#if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92
 				mont_curve_t *mont_curve = mont_curve_get(grp);
 
 				if (mont_curve != NULL) {
@@ -501,9 +470,6 @@ int ecp_alt_b9x_backend_mul(
 					}
 					mbedtls_ecp_unlock();
 				}
-#elif CONFIG_SOC_RISCV_TELINK_B95
-				result = ecp_mul_mxz( grp, R, m, P, f_rng, p_rng );
-#endif
 			}
 #endif /* MBEDTLS_ECP_MONTGOMERY_ENABLED */
 
@@ -515,7 +481,7 @@ int ecp_alt_b9x_backend_mul(
 	return result;
 }
 
-int ecp_alt_b9x_backend_muladd(
+int ecp_alt_tlx_backend_muladd(
 	mbedtls_ecp_group *grp,
 	mbedtls_ecp_point *R, const mbedtls_mpi *m,
 	const mbedtls_ecp_point *P, const mbedtls_mpi *n,
