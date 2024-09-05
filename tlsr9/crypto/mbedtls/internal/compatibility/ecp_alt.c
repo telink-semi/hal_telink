@@ -95,6 +95,14 @@
 #include <ext_driver/ext_misc.h>
 
 /* HW accelerator functionality */
+#if CONFIG_SOC_RISCV_TELINK_TL321X
+extern int ecp_alt_tlx_backend_check_pubkey( const mbedtls_ecp_group *grp, const mbedtls_ecp_point *pt );
+extern int ecp_alt_tlx_backend_mul( mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
+                                    const mbedtls_mpi *m, const mbedtls_ecp_point *P );
+extern int ecp_alt_tlx_backend_muladd( mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
+                                       const mbedtls_mpi *m, const mbedtls_ecp_point *P,
+                                       const mbedtls_mpi *n, const mbedtls_ecp_point *Q );
+#elif CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B95
 extern int ecp_alt_b9x_backend_check_pubkey( const mbedtls_ecp_group *grp, const mbedtls_ecp_point *pt );
 extern int ecp_alt_b9x_backend_mul( mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
                                     const mbedtls_mpi *m, const mbedtls_ecp_point *P,
@@ -103,6 +111,7 @@ extern int ecp_alt_b9x_backend_mul( mbedtls_ecp_group *grp, mbedtls_ecp_point *R
 extern int ecp_alt_b9x_backend_muladd( mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
                                        const mbedtls_mpi *m, const mbedtls_ecp_point *P,
                                        const mbedtls_mpi *n, const mbedtls_ecp_point *Q );
+#endif
 /* self test functionality */
 #if defined(MBEDTLS_SELF_TEST)
 extern const int __ecp_alt_b9x_skip_internal_self_tests;
@@ -2556,8 +2565,11 @@ int mbedtls_ecp_mul_restartable( mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
         return( MBEDTLS_ERR_ECP_BAD_INPUT_DATA );
 
     if( GET_WORD_LEN( grp->pbits ) <= PKE_OPERAND_MAX_WORD_LEN )
+#if CONFIG_SOC_RISCV_TELINK_TL321X
+        return( ecp_alt_tlx_backend_mul( grp, R, m, P ) );
+#elif CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B95
         return( ecp_alt_b9x_backend_mul( grp, R, m, P, f_rng, p_rng, rs_ctx ) );
-
+#endif
     return( ecp_mul_restartable_internal( grp, R, m, P, f_rng, p_rng, rs_ctx ) );
 }
 
@@ -2694,7 +2706,11 @@ int mbedtls_ecp_muladd_restartable(
         return( MBEDTLS_ERR_ECP_FEATURE_UNAVAILABLE );
 
     if( GET_WORD_LEN( grp->pbits ) <= PKE_OPERAND_MAX_WORD_LEN )
+#if CONFIG_SOC_RISCV_TELINK_TL321X
+        return( ecp_alt_tlx_backend_muladd( grp, R, m, P, n, Q ) );
+#elif CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B95
         return( ecp_alt_b9x_backend_muladd( grp, R, m, P, n, Q ) );
+#endif
 
     mbedtls_ecp_point_init( &mP );
 
@@ -2924,7 +2940,11 @@ int mbedtls_ecp_check_pubkey( const mbedtls_ecp_group *grp,
     }
     if( mbedtls_ecp_get_type( grp ) == MBEDTLS_ECP_TYPE_SHORT_WEIERSTRASS ) {
         if( GET_WORD_LEN( grp->pbits ) <= PKE_OPERAND_MAX_WORD_LEN )
+#if CONFIG_SOC_RISCV_TELINK_TL321X
+            return( ecp_alt_tlx_backend_check_pubkey( grp, pt ) );
+#elif CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B95
             return( ecp_alt_b9x_backend_check_pubkey( grp, pt ) );
+#endif
         else
             return( ecp_check_pubkey_sw( grp, pt ) );
     }
