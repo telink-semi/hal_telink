@@ -25,9 +25,6 @@
 #define DRIVERS_TL321X_EXT_DRIVER_EXT_UART_H_
 
 
-#include "common/config/user_config.h"
-
-
 /**
  * @brief   debug UART port definition, don not change this
  */

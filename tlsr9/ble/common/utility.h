@@ -101,6 +101,7 @@
 #define foreach_range(i, s, e) 	for(int i = (s); i < (e); ++i)
 #define foreach_arr(i, arr) 	for(int i = 0; i < ARRAY_SIZE(arr); ++i)
 
+#undef  ARRAY_SIZE
 #define ARRAY_SIZE(a) 			(sizeof(a) / sizeof(*a))
 
 #define everyN(i, n) 			++(i); (i)=((i) < N ? (i) : 0); if(0 == (i))

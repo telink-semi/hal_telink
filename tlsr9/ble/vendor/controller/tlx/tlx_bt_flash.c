@@ -22,6 +22,9 @@
 #include "stack/ble/TL321X/ble_common.h"
 #endif
 
+/* remove ARRAY_SIZE redefine issue */
+#undef  ARRAY_SIZE
+
 #include "flash.h"
 #include "string.h"
 #include <zephyr/storage/flash_map.h>

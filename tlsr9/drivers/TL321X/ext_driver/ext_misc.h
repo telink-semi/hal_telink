@@ -54,6 +54,10 @@
 
 
 /******************************* core_start ******************************************************************/
+#undef  irq_disable
+#undef  irq_enable
+#undef  irq_restore
+
 #define irq_disable                 core_interrupt_disable
 #define irq_enable                  core_interrupt_enable
 #define irq_restore(en)             core_restore_interrupt(en)

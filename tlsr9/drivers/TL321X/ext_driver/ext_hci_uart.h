@@ -25,7 +25,7 @@
 #define DRIVERS_TL321X_EXT_DRIVER_EXT_HCI_UART_H_
 
 
-#include "common/types.h"
+#include "types.h"
 #include "uart.h"
 
 
