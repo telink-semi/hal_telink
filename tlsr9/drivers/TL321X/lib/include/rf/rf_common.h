@@ -1162,4 +1162,11 @@ void rf_tx_fast_settle_update_cal_val(rf_tx_fast_settle_time_e tx_settle_time,un
 */
 void rf_rx_fast_settle_update_cal_val(rf_rx_fast_settle_time_e rx_settle_time,unsigned char chn);
 
+/* Compatibility macros */
+#define rf_baseband_reset			rf_clr_dig_logic_state
+
+#define rf_radio_reset				rf_reset_register_value
+
+#define rf_reset_dma				rf_dma_reset
+
 #endif

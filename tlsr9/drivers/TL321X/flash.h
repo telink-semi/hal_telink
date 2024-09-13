@@ -494,3 +494,9 @@ void flash_protection_lock_init(void);
 void flash_protection_lock_operation(unsigned int offset);
 
 void flash_protection_unlock_operation(unsigned int offset);
+
+/*******************************************************************************************************************
+ *		Should include these header file here , flash_read_mid_uid_with_check moved to flash_common.h
+ ******************************************************************************************************************/
+
+#include "flash/flash_common.h"

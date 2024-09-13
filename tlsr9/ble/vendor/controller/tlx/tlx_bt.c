@@ -28,7 +28,7 @@
 #include "tlx_bt.h"
 #include "tlx_bt_init.h"
 #include "compiler.h"
-#include "plic.h"
+#include "drivers.h"
 #include <stdlib.h>
 #include "tlx_bt_buffer.h"
 #if CONFIG_SOC_RISCV_TELINK_TL321X
@@ -209,10 +209,6 @@ CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION)
 
 	/* Reset Radio */
 	rf_radio_reset();
-#if CONFIG_SOC_RISCV_TELINK_TL321X
-	rf_reset_dma();
-	rf_baseband_reset();
-#endif
 
 	/* Init RF driver */
 	rf_drv_ble_init();
@@ -243,7 +239,6 @@ CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION)
 #if CONFIG_SOC_RISCV_TELINK_TL321X
 	blc_ll_registerGiveSemCb(os_give_sem_cb, os_give_sem_cb);
 	blc_setOsSupEnable(true);
-	blc_ll_enOsPowerManagement_module();
 #endif
 	/* init semaphore */
 	k_sem_reset(&controller_sem);
@@ -285,10 +280,6 @@ void b9x_bt_controller_deinit()
 
 	/* Reset Radio */
 	rf_radio_reset();
-#if CONFIG_SOC_RISCV_TELINK_TL321X
-	rf_reset_dma();
-	rf_baseband_reset();
-#endif
 
 #ifdef CONFIG_BT_CENTRAL
 	free(app_acl_mstTxfifo);
