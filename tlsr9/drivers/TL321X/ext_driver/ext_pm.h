@@ -24,10 +24,15 @@
 #ifndef DRIVERS_TL321X_DRIVER_EXT_EXT_PM_H_
 #define DRIVERS_TL321X_DRIVER_EXT_EXT_PM_H_
 
+#include <zephyr/kernel.h>
+#undef irq_enable
+#undef irq_disable
+#undef ARRAY_SIZE
+#undef rand
+
 #include "../lib/include/pm.h"
 #include "types.h"
-
-
+#include "ext_misc.h"
 
 #define DEEPSLEEP_RAM_SIZE_TO_MODE(ram_size)  ram_size==0x8000? DEEPSLEEP_MODE_RET_SRAM_LOW32K: (ram_size==0x10000)? DEEPSLEEP_MODE_RET_SRAM_LOW64K:DEEPSLEEP_MODE_RET_SRAM_LOW96K
 
