@@ -68,6 +68,7 @@ zephyr_library_sources_ifdef(CONFIG_I2C_TELINK_B9X drivers/${SOC}/i2c.c)
 # RF driver reference sources
 if(CONFIG_BT_B9X OR CONFIG_IEEE802154_TELINK_B9X)
 	zephyr_library_sources(
+		drivers/${SOC}/aes.c
 		drivers/${SOC}/stimer.c
 		common/b9x_rf_power.c
 	)
@@ -104,9 +105,6 @@ zephyr_include_directories(
 )
 
 zephyr_library_sources(
-	drivers/${SOC}/aes.c
-	drivers/${SOC}/flash.c
-	drivers/${SOC}/stimer.c
 	ble/common/utility.c
 	ble/vendor/controller/b9x_bt.c
 	ble/vendor/controller/b9x_bt_init.c
