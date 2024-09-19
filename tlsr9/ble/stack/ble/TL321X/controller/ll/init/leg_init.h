@@ -1,20 +1,26 @@
-/******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
+/********************************************************************************************************
+ * @file    leg_init.h
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * @brief   This is the header file for BLE SDK
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * @author  BLE GROUP
+ * @date    06,2022
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @par     Copyright (c) 2022, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *****************************************************************************/
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
+ *
+ *******************************************************************************************************/
 #ifndef LLMS_INIT_H_
 #define LLMS_INIT_H_
 
@@ -24,11 +30,11 @@
 
 /**
  * @brief      for user to initialize legacy initiating module
- * 			   notice that only one module can be selected between legacy initiating module and extended initiating module
- * @param	   none
+ *             notice that only one module can be selected between legacy initiating module and extended initiating module
+ * @param      none
  * @return     none
  */
-void 		blc_ll_initLegacyInitiating_module(void);
+void        blc_ll_initLegacyInitiating_module(void);
 
 
 
@@ -48,8 +54,8 @@ void 		blc_ll_initLegacyInitiating_module(void);
  * @param[in]  ce_max - informative parameters providing the Controller with the expected maximum length of the connection events.
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t 	blc_ll_createConnection( scan_inter_t scanInter, scan_wind_t scanWindow, init_fp_t fp, u8 peerAdrType, u8 *peerAddr, own_addr_type_t ownAdrType,
-									 conn_inter_t conn_min,  conn_inter_t conn_max, u16 conn_latency, conn_tm_t timeout, u16 ce_min,   u16 ce_max );
+ble_sts_t   blc_ll_createConnection( scan_inter_t scanInter, scan_wind_t scanWindow, init_fp_t fp, u8 peerAdrType, u8 *peerAddr, own_addr_type_t ownAdrType,
+                                     conn_inter_t conn_min,  conn_inter_t conn_max, u16 conn_latency, conn_tm_t timeout, u16 ce_min,   u16 ce_max );
 
 
 

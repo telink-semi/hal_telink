@@ -36,8 +36,8 @@
 
 /*********************************************************/
 //Remove when file merge to SDK //
-#include "driver_lib/ext_lib.h"
-#include "driver_lib/driver_lib.h"
+#include "driver_internal/ext_lib.h"
+#include "driver_internal/driver_internal.h"
 
 /*********************************************************/
 

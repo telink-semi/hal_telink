@@ -434,6 +434,8 @@ static inline void audio_set_i2s_src_clk_dis(audio_i2s_select_e i2s_select)
  */
 static inline void audio_set_codec_clk(unsigned short div_numerator,unsigned short  div_denominator)
 {
+    clock_bbpll_config(PLL_CLK);
+
     reg_dmic_step = (div_numerator&FLD_DMIC_STEP)|FLD_DMIC_SEL;
     reg_dmic_mod = div_denominator;
 }

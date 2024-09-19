@@ -130,7 +130,7 @@ drv_api_status_e trng_init(void);
  * @brief     This function performs to get one random number.
  * @return    the value of one random number.
  */
-int trng_rand(void);
+unsigned int trng_rand(void);
 
 #ifdef __cplusplus
 }

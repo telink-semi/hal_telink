@@ -26,9 +26,9 @@
 #include "lib/include/flash_prot.h"
 #include "flash.h"
 
-#include "mspi.h"
+#include "lib/include/mspi.h"
 #include "timer.h"
-#include "core.h"
+#include "lib/include/core.h"
 #include "stimer.h"
 #include "types.h"
 
