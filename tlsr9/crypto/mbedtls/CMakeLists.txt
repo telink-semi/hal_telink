@@ -1,36 +1,40 @@
 #
-# Copyright (c) 2022-2023, Telink
+# Copyright (c) 2022-2024, Telink
 #
 # SPDX-License-Identifier: Apache-2.0
 #
 
-zephyr_library()
-
-# MbedTLS HW accelerated alternative
-
-zephyr_library_compile_definitions( MBEDTLS_CONFIG_FILE="${CONFIG_MBEDTLS_CFG_FILE}")
+zephyr_compile_definitions(
+	MBEDTLS_CONFIG_FILE="${CONFIG_MBEDTLS_CFG_FILE}"
+)
 
 zephyr_include_directories(
-	./
-	./internal/
-	${ZEPHYR_MBEDTLS_MODULE_DIR}/include/
-	${ZEPHYR_BASE}/modules/mbedtls/configs/
-	)
+	${CMAKE_CURRENT_SOURCE_DIR}
+)
 
-# Common
-zephyr_library_sources(
-	./internal/multithread.c
-	)
+if(CONFIG_TELINK_B9X_MBEDTLS_HW_ACCELERATION)
 
-# AES accelerator
-zephyr_library_sources(
-	./internal/compatibility/aes_alt.c
-	)
+zephyr_library()
 
-# EC accelerator
+zephyr_include_directories(
+	${ZEPHYR_MBEDTLS_MODULE_DIR}/include
+	${ZEPHYR_BASE}/modules/mbedtls/configs
+)
+
 zephyr_library_sources(
-	./internal/compatibility/ecp_alt.c
-	./internal/compatibility/ecp_curves_alt.c
-	./internal/ecp_alt_b9x_backend_test.c
-	./internal/ecp_alt_b9x_backend.c
-	)
+	mbedtls_wrapper.c
+	ecp_backend.c
+	ecp_backend_test.c
+	multithread.c
+)
+
+zephyr_link_libraries(
+	-Wl,--wrap,mbedtls_ecp_check_pubkey
+	-Wl,--wrap,mbedtls_ecp_mul
+	-Wl,--wrap,mbedtls_ecp_mul_restartable
+	-Wl,--wrap,mbedtls_ecp_muladd
+	-Wl,--wrap,mbedtls_ecp_muladd_restartable
+	-Wl,--wrap,mbedtls_ecp_self_test
+)
+
+endif()
