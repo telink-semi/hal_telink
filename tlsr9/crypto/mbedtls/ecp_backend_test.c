@@ -1,62 +1,34 @@
-/******************************************************************************
- * Copyright (c) 2022-2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
+/*
+ * Copyright (c) 2024 Telink Semiconductor
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- *****************************************************************************/
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
-#include "common.h"
+#include <mbedtls/build_info.h>
 
-#if defined(MBEDTLS_ECP_C)
+#ifdef MBEDTLS_SELF_TEST
 
-#include <mbedtls/ctr_drbg.h>
-#include <mbedtls/ecp.h>
-#include <mbedtls/entropy.h>
 #include <mbedtls/error.h>
 #include <mbedtls/platform.h>
+#include <mbedtls/ctr_drbg.h>
+#include <mbedtls/entropy.h>
+#include <mbedtls/ecp.h>
 
-#if defined(MBEDTLS_ECP_ALT)
+#include <zephyr/sys/util.h>
 
-#if defined(MBEDTLS_SELF_TEST)
-
-#define ARRAY_SIZE(array)	(sizeof(array) / sizeof(array)[0])
-
-static void ecp_alt_b9x_backend_printbuf(const char *comment,
-	const void *buf, size_t len)
-{
-	mbedtls_printf("%s [%u]:", comment, (unsigned int)len);
-	for (size_t i = 0; i < len; i++)
-		mbedtls_printf(" %02x", ((unsigned char *)buf)[i]);
-	mbedtls_printf("\n");
-}
-
-/****************************************************************
- * Test vectors
- ****************************************************************/
-
+/* Test vector */
 static const struct {
 	mbedtls_ecp_group_id ecp_group_id;
-	const unsigned char *sk;
-	const size_t sk_len;
-	const unsigned char *pk;
-	const size_t pk_len;
-	const unsigned char *sum;
+	const uint8_t *sk;
+	size_t sk_len;
+	const uint8_t *pk;
+	size_t pk_len;
+	const uint8_t *sum;
 } ecp_tc[] = {
 #if defined(MBEDTLS_ECP_DP_SECP521R1_ENABLED)
 	{
 		.ecp_group_id = MBEDTLS_ECP_DP_SECP521R1,
-		.sk = (const unsigned char[]){
+		.sk = (const uint8_t[]){
 			0x01, 0xeb, 0x60, 0x88, 0x03, 0x15, 0x7b, 0x13,
 			0xb1, 0xc3, 0x5b, 0xa8, 0x7b, 0x09, 0xa4, 0x2e,
 			0xa6, 0x0f, 0xc7, 0x06, 0x66, 0x55, 0x22, 0x57,
@@ -68,7 +40,7 @@ static const struct {
 			0x5d, 0x8d
 		},
 		.sk_len = 66,
-		.pk = (const unsigned char[]){
+		.pk = (const uint8_t[]){
 			0x04, 0x00, 0xef, 0xa5, 0x11, 0x33, 0x8b, 0x71,
 			0xba, 0x23, 0x9a, 0x37, 0xed, 0xad, 0xfa, 0xf6,
 			0x94, 0x3f, 0xac, 0x7e, 0x23, 0x63, 0x4f, 0xcd,
@@ -88,7 +60,7 @@ static const struct {
 			0x9a, 0xed, 0xad, 0x1b, 0x71
 		},
 		.pk_len = 133,
-		.sum = (const unsigned char[]){
+		.sum = (const uint8_t[]){
 			0x04, 0x01, 0x68, 0x45, 0x34, 0x25, 0x5b, 0xad,
 			0x67, 0x54, 0x6b, 0x7c, 0x45, 0xe7, 0x60, 0x7b,
 			0xe7, 0x2f, 0xe4, 0x94, 0xf6, 0x28, 0x06, 0x74,
@@ -112,7 +84,7 @@ static const struct {
 #if defined(MBEDTLS_ECP_DP_BP512R1_ENABLED)
 	{
 		.ecp_group_id = MBEDTLS_ECP_DP_BP512R1,
-		.sk = (const unsigned char[]){
+		.sk = (const uint8_t[]){
 			0x64, 0x35, 0x05, 0x6c, 0x1d, 0x98, 0xc8, 0xe1,
 			0x30, 0x5e, 0xf4, 0x11, 0x2c, 0x05, 0x68, 0x98,
 			0x31, 0xf4, 0xba, 0x16, 0xf4, 0x67, 0x9a, 0x78,
@@ -123,7 +95,7 @@ static const struct {
 			0x1e, 0xf2, 0xfa, 0x03, 0x35, 0xd1, 0xad, 0x92
 		},
 		.sk_len = 64,
-		.pk = (const unsigned char[]){
+		.pk = (const uint8_t[]){
 			0x04, 0x47, 0x6a, 0x9d, 0x4e, 0xb4, 0xb9, 0x1c,
 			0x82, 0x11, 0xa4, 0xff, 0x40, 0x60, 0xf1, 0x34,
 			0xd8, 0x29, 0x26, 0xa8, 0xd8, 0xcc, 0x08, 0x38,
@@ -143,7 +115,7 @@ static const struct {
 			0x36
 		},
 		.pk_len = 129,
-		.sum = (const unsigned char[]){
+		.sum = (const uint8_t[]){
 			0x04, 0x1d, 0x10, 0xaa, 0xb7, 0x2b, 0x6b, 0x1c,
 			0x8e, 0xde, 0x85, 0x9b, 0xf3, 0x8c, 0xaf, 0xbb,
 			0x86, 0xdd, 0xc9, 0x0b, 0xc0, 0xdc, 0x28, 0x1c,
@@ -167,7 +139,7 @@ static const struct {
 #if defined(MBEDTLS_ECP_DP_SECP384R1_ENABLED)
 	{
 		.ecp_group_id = MBEDTLS_ECP_DP_SECP384R1,
-		.sk = (const unsigned char[]){
+		.sk = (const uint8_t[]){
 			0x35, 0x05, 0x64, 0x07, 0xb0, 0xfd, 0x3e, 0x09,
 			0xe3, 0x07, 0x41, 0xdc, 0x8a, 0xd3, 0xef, 0xc7,
 			0xad, 0x29, 0xc5, 0x97, 0x8a, 0xbb, 0x15, 0x10,
@@ -176,7 +148,7 @@ static const struct {
 			0x17, 0xc2, 0x22, 0x6a, 0x99, 0xf1, 0x8b, 0xc0
 		},
 		.sk_len = 48,
-		.pk = (const unsigned char[]){
+		.pk = (const uint8_t[]){
 			0x04, 0xc8, 0x2d, 0xaa, 0x27, 0xd0, 0x91, 0x1f,
 			0x3d, 0x41, 0xf5, 0xe7, 0xa6, 0x46, 0xae, 0xf8,
 			0xca, 0x74, 0x31, 0x63, 0xe2, 0x1f, 0x38, 0x25,
@@ -192,7 +164,7 @@ static const struct {
 			0xfc
 		},
 		.pk_len = 97,
-		.sum = (const unsigned char[]){
+		.sum = (const uint8_t[]){
 			0x04, 0xf5, 0xf1, 0x09, 0xb7, 0x3d, 0x7e, 0x05,
 			0x13, 0xc7, 0x6a, 0x99, 0x17, 0xcf, 0x3b, 0x5a,
 			0x5a, 0x04, 0x1a, 0x6e, 0xa4, 0x23, 0x9d, 0x47,
@@ -212,7 +184,7 @@ static const struct {
 #if defined(MBEDTLS_ECP_DP_BP384R1_ENABLED)
 	{
 		.ecp_group_id = MBEDTLS_ECP_DP_BP384R1,
-		.sk = (const unsigned char[]){
+		.sk = (const uint8_t[]){
 			0x50, 0xff, 0xbb, 0xab, 0x9c, 0x62, 0x8c, 0x3e,
 			0xc4, 0x1d, 0xb9, 0x00, 0x5e, 0x1a, 0xf0, 0x8d,
 			0x64, 0x58, 0x44, 0x97, 0x2c, 0xf5, 0x2f, 0xcf,
@@ -221,7 +193,7 @@ static const struct {
 			0xc5, 0x12, 0x8a, 0x59, 0xcb, 0xff, 0x91, 0xc7
 		},
 		.sk_len = 48,
-		.pk = (const unsigned char[]){
+		.pk = (const uint8_t[]){
 			0x04, 0x3a, 0xef, 0x56, 0x8a, 0x8b, 0x51, 0x2b,
 			0xb7, 0x49, 0x3c, 0x92, 0xc4, 0x6a, 0x12, 0xd5,
 			0x84, 0x2f, 0x53, 0x89, 0x8c, 0x38, 0x29, 0x3f,
@@ -237,7 +209,7 @@ static const struct {
 			0x03
 		},
 		.pk_len = 97,
-		.sum = (const unsigned char[]){
+		.sum = (const uint8_t[]){
 			0x04, 0x7c, 0x9b, 0xab, 0x7c, 0x51, 0xc0, 0x36,
 			0x5c, 0xdd, 0x22, 0xf7, 0x10, 0xb7, 0x39, 0x14,
 			0x50, 0xf9, 0xe1, 0x05, 0x09, 0x74, 0x5b, 0x1a,
@@ -257,14 +229,14 @@ static const struct {
 #if defined(MBEDTLS_ECP_DP_SECP256R1_ENABLED)
 	{
 		.ecp_group_id = MBEDTLS_ECP_DP_SECP256R1,
-		.sk = (const unsigned char[]){
+		.sk = (const uint8_t[]){
 			0x3d, 0x1d, 0x83, 0xfa, 0xf6, 0xbb, 0x86, 0xe9,
 			0xf8, 0x9e, 0x45, 0x6a, 0xa8, 0x29, 0x6f, 0x52,
 			0x04, 0x79, 0xff, 0xc4, 0x94, 0xd8, 0xe0, 0xe7,
 			0xcd, 0xe8, 0xe0, 0x83, 0xab, 0xcf, 0x63, 0x0b
 		},
 		.sk_len = 32,
-		.pk = (const unsigned char[]){
+		.pk = (const uint8_t[]){
 			0x04, 0xd3, 0x48, 0xb6, 0x80, 0x35, 0x49, 0x67,
 			0x97, 0xc9, 0x28, 0xc4, 0xfe, 0xa6, 0x13, 0xe1,
 			0xb3, 0xee, 0x51, 0x95, 0xfd, 0x20, 0x7f, 0xe7,
@@ -276,7 +248,7 @@ static const struct {
 			0x08
 		},
 		.pk_len = 65,
-		.sum = (const unsigned char[]){
+		.sum = (const uint8_t[]){
 			0x04, 0xd4, 0x87, 0x27, 0x27, 0xbf, 0xaf, 0x6a,
 			0xea, 0xb7, 0x84, 0xa8, 0x1a, 0xd8, 0x29, 0x9e,
 			0x2b, 0xa7, 0x87, 0x4f, 0xa9, 0xb5, 0x7a, 0x66,
@@ -292,14 +264,14 @@ static const struct {
 #if defined(MBEDTLS_ECP_DP_SECP256K1_ENABLED)
 	{
 		.ecp_group_id = MBEDTLS_ECP_DP_SECP256K1,
-		.sk = (const unsigned char[]){
+		.sk = (const uint8_t[]){
 			0x38, 0x4c, 0x12, 0x83, 0xf8, 0x4d, 0xba, 0x47,
 			0xcf, 0x6b, 0x71, 0xff, 0xc3, 0x7c, 0x8d, 0x08,
 			0x65, 0xee, 0xed, 0x5b, 0x2b, 0x48, 0xf3, 0x79,
 			0xdf, 0x52, 0x53, 0xff, 0x10, 0xf9, 0x22, 0x7c
 		},
 		.sk_len = 32,
-		.pk = (const unsigned char[]){
+		.pk = (const uint8_t[]){
 			0x04, 0x73, 0x06, 0x4b, 0x4b, 0x3e, 0x38, 0x2f,
 			0xa0, 0x89, 0x1f, 0x61, 0xfc, 0x85, 0xf9, 0x51,
 			0xbe, 0xe4, 0x3d, 0x2c, 0xe9, 0x3e, 0xb0, 0x79,
@@ -311,7 +283,7 @@ static const struct {
 			0x7a
 		},
 		.pk_len = 65,
-		.sum = (const unsigned char[]){
+		.sum = (const uint8_t[]){
 			0x04, 0x50, 0x81, 0x70, 0xde, 0x4b, 0x36, 0x41,
 			0xe8, 0x1a, 0x41, 0xf0, 0x5b, 0x88, 0x1e, 0x4e,
 			0xed, 0xed, 0x46, 0x0c, 0xf3, 0xd5, 0xfb, 0xe6,
@@ -327,14 +299,14 @@ static const struct {
 #if defined(MBEDTLS_ECP_DP_BP256R1_ENABLED)
 	{
 		.ecp_group_id = MBEDTLS_ECP_DP_BP256R1,
-		.sk = (const unsigned char[]){
+		.sk = (const uint8_t[]){
 			0xa6, 0xb5, 0x48, 0x3f, 0x74, 0xd9, 0x94, 0x9f,
 			0x09, 0xcd, 0x56, 0x29, 0x19, 0xde, 0xfc, 0x41,
 			0x3a, 0x83, 0xf1, 0x2a, 0xda, 0x4f, 0x5f, 0xf4,
 			0x8e, 0xb5, 0x20, 0x59, 0x11, 0x8e, 0xe6, 0x03
 		},
 		.sk_len = 32,
-		.pk = (const unsigned char[]){
+		.pk = (const uint8_t[]){
 			0x04, 0x95, 0x44, 0xdb, 0xb4, 0xdc, 0x6f, 0x39,
 			0x23, 0xb1, 0x3b, 0x13, 0xb6, 0xcc, 0xcc, 0xde,
 			0xfb, 0xc0, 0x10, 0xfa, 0x8a, 0x06, 0x30, 0xb9,
@@ -346,7 +318,7 @@ static const struct {
 			0xcc
 		},
 		.pk_len = 65,
-		.sum = (const unsigned char[]){
+		.sum = (const uint8_t[]){
 			0x04, 0x7d, 0x88, 0xb4, 0x73, 0xa0, 0x7d, 0x66,
 			0x5c, 0xc2, 0x9b, 0x7a, 0xbc, 0x0c, 0xab, 0x04,
 			0xc9, 0x79, 0x3e, 0x9a, 0x4e, 0xd3, 0x27, 0x75,
@@ -362,14 +334,14 @@ static const struct {
 #if defined(MBEDTLS_ECP_DP_SECP224R1_ENABLED)
 	{
 		.ecp_group_id = MBEDTLS_ECP_DP_SECP224R1,
-		.sk = (const unsigned char[]){
+		.sk = (const uint8_t[]){
 			0x34, 0xac, 0xe1, 0x1f, 0xfa, 0x5e, 0x25, 0xac,
 			0xee, 0x68, 0xa8, 0xc1, 0x47, 0x64, 0xa2, 0xa4,
 			0x69, 0xd5, 0x2c, 0x99, 0x3c, 0x77, 0xf9, 0xc2,
 			0x38, 0x42, 0x79, 0x93
 		},
 		.sk_len = 28,
-		.pk = (const unsigned char[]){
+		.pk = (const uint8_t[]){
 			0x04, 0x37, 0x84, 0x05, 0x01, 0xf4, 0x98, 0x12,
 			0x37, 0x5e, 0xf7, 0x13, 0xcb, 0x29, 0x6a, 0x43,
 			0xf4, 0x47, 0xd2, 0xe4, 0x14, 0x3c, 0x10, 0xef,
@@ -380,7 +352,7 @@ static const struct {
 			0xa3
 		},
 		.pk_len = 57,
-		.sum = (const unsigned char[]){
+		.sum = (const uint8_t[]){
 			0x04, 0x7d, 0x26, 0x1b, 0xf6, 0xb4, 0xa9, 0x45,
 			0xf8, 0x0f, 0x93, 0xef, 0x05, 0x43, 0x98, 0x1b,
 			0x48, 0xf5, 0xea, 0x5c, 0x07, 0x7d, 0xe9, 0x42,
@@ -395,14 +367,14 @@ static const struct {
 #if defined(MBEDTLS_ECP_DP_SECP224K1_ENABLED)
 	{
 		.ecp_group_id = MBEDTLS_ECP_DP_SECP224K1,
-		.sk = (const unsigned char[]){
+		.sk = (const uint8_t[]){
 			0xba, 0xc8, 0xa0, 0x42, 0xe1, 0x0c, 0xa2, 0xf3,
 			0xf0, 0x76, 0x04, 0x74, 0xb7, 0x1a, 0x8f, 0x42,
 			0xc3, 0x25, 0xeb, 0x57, 0xcd, 0x8d, 0xb0, 0xf9,
 			0x73, 0x1a, 0x18, 0x26
 		},
 		.sk_len = 28,
-		.pk = (const unsigned char[]){
+		.pk = (const uint8_t[]){
 			0x04, 0x7f, 0x07, 0xbe, 0xb0, 0x26, 0xd8, 0x6c,
 			0xe4, 0x09, 0xe8, 0xa6, 0x21, 0x70, 0x37, 0x52,
 			0xd6, 0x14, 0x58, 0x4c, 0x99, 0xc8, 0x62, 0x28,
@@ -413,7 +385,7 @@ static const struct {
 			0x0f
 		},
 		.pk_len = 57,
-		.sum = (const unsigned char[]){
+		.sum = (const uint8_t[]){
 			0x04, 0xb2, 0xbe, 0x4b, 0xc0, 0x62, 0xf2, 0xf6,
 			0x0e, 0x7f, 0x48, 0x25, 0x50, 0x81, 0xed, 0xac,
 			0x14, 0xaa, 0x42, 0x5f, 0x0d, 0x12, 0x52, 0x6d,
@@ -428,13 +400,13 @@ static const struct {
 #if defined(MBEDTLS_ECP_DP_SECP192R1_ENABLED)
 	{
 		.ecp_group_id = MBEDTLS_ECP_DP_SECP192R1,
-		.sk = (const unsigned char[]){
+		.sk = (const uint8_t[]){
 			0x52, 0x9f, 0x95, 0xf5, 0x4e, 0x73, 0xb6, 0x75,
 			0x14, 0xcc, 0x92, 0x0c, 0xcc, 0x07, 0x84, 0x06,
 			0x01, 0xf3, 0xde, 0x42, 0xad, 0x79, 0x6c, 0x82
 		},
 		.sk_len = 24,
-		.pk = (const unsigned char[]){
+		.pk = (const uint8_t[]){
 			0x04, 0x61, 0xe9, 0x8d, 0x7e, 0x8e, 0x40, 0x31,
 			0x20, 0x27, 0xfb, 0x3f, 0x45, 0x4b, 0x65, 0x0e,
 			0xfc, 0x41, 0x56, 0x49, 0x20, 0xe6, 0x5c, 0xd4,
@@ -444,7 +416,7 @@ static const struct {
 			0x28
 		},
 		.pk_len = 49,
-		.sum = (const unsigned char[]){
+		.sum = (const uint8_t[]){
 			0x04, 0x0a, 0xe7, 0xc5, 0x9e, 0x3b, 0x36, 0xb9,
 			0x38, 0xdd, 0x75, 0x41, 0x7c, 0x2d, 0x90, 0xaf,
 			0x2d, 0x62, 0xf5, 0x5a, 0x86, 0xfe, 0xa0, 0x5f,
@@ -458,13 +430,13 @@ static const struct {
 #if defined(MBEDTLS_ECP_DP_SECP192K1_ENABLED)
 	{
 		.ecp_group_id = MBEDTLS_ECP_DP_SECP192K1,
-		.sk = (const unsigned char[]){
+		.sk = (const uint8_t[]){
 			0xf2, 0x58, 0xcf, 0xba, 0xb6, 0xb0, 0xb4, 0x03,
 			0x9e, 0xb2, 0x74, 0xfc, 0x70, 0xfc, 0x99, 0x0c,
 			0xcc, 0xed, 0xf4, 0x5f, 0x32, 0x72, 0x22, 0x94
 		},
 		.sk_len = 24,
-		.pk = (const unsigned char[]){
+		.pk = (const uint8_t[]){
 			0x04, 0xac, 0xe4, 0x74, 0xd8, 0x67, 0x26, 0x60,
 			0xff, 0x35, 0x10, 0x74, 0xa1, 0x4e, 0x46, 0xed,
 			0x2b, 0x94, 0x10, 0x13, 0x01, 0x51, 0x8f, 0xe7,
@@ -474,7 +446,7 @@ static const struct {
 			0x70
 		},
 		.pk_len = 49,
-		.sum = (const unsigned char[]){
+		.sum = (const uint8_t[]){
 			0x04, 0x7c, 0xe5, 0xe9, 0x57, 0x0c, 0x36, 0x88,
 			0x8f, 0xaf, 0xe5, 0x4a, 0xac, 0xf2, 0x2d, 0xf9,
 			0xba, 0xf9, 0xb5, 0xa2, 0x64, 0xa2, 0x0b, 0x9f,
@@ -488,14 +460,14 @@ static const struct {
 #ifdef MBEDTLS_ECP_DP_CURVE25519_ENABLED
 	{
 		.ecp_group_id = MBEDTLS_ECP_DP_CURVE25519,
-		.sk = (const unsigned char[]){
+		.sk = (const uint8_t[]){
 			0x60, 0xc6, 0x2b, 0x85, 0x21, 0x87, 0xf7, 0xd5,
 			0xdb, 0x8a, 0xa0, 0x3c, 0xe1, 0x73, 0x66, 0xe6,
 			0xcf, 0x57, 0xcd, 0xa2, 0x5a, 0xd0, 0xb1, 0xb8,
 			0xdd, 0xf1, 0x2f, 0x6e, 0x5f, 0xcd, 0x50, 0x30
 		},
 		.sk_len = 32,
-		.pk = (const unsigned char[]){
+		.pk = (const uint8_t[]){
 			0x36, 0xce, 0xe3, 0x98, 0x09, 0xe1, 0x72, 0xca,
 			0xcd, 0x26, 0x79, 0xa9, 0xbf, 0xc4, 0xda, 0xd9,
 			0x65, 0x4a, 0x53, 0x23, 0xf4, 0x02, 0x75, 0x7c,
@@ -508,7 +480,7 @@ static const struct {
 #if defined(MBEDTLS_ECP_DP_CURVE448_ENABLED)
 	{
 		.ecp_group_id = MBEDTLS_ECP_DP_CURVE448,
-		.sk = (const unsigned char[]){
+		.sk = (const uint8_t[]){
 			0xf5, 0x73, 0x0e, 0x50, 0xb2, 0xd3, 0x3b, 0x01,
 			0x28, 0x29, 0xa0, 0xa1, 0x43, 0x92, 0x2f, 0x05,
 			0x40, 0xc3, 0x5f, 0xcf, 0xc1, 0x53, 0x49, 0xc2,
@@ -518,7 +490,7 @@ static const struct {
 			0x16, 0x6c, 0x7b, 0xdd, 0x7c, 0x55, 0x5f, 0xf0
 		},
 		.sk_len = 56,
-		.pk = (const unsigned char[]){
+		.pk = (const uint8_t[]){
 			0x4f, 0xf4, 0xd0, 0x42, 0x1a, 0xa6, 0xfc, 0x2d,
 			0xba, 0x7b, 0x45, 0x9e, 0xed, 0xd0, 0xf1, 0x8c,
 			0xec, 0xeb, 0xae, 0x29, 0x27, 0x9f, 0xc7, 0xe8,
@@ -533,230 +505,123 @@ static const struct {
 #endif /* MBEDTLS_ECP_DP_CURVE448_ENABLED */
 };
 
-/****************************************************************
- * Dummy variable to skip mbedtls_ecp_self_test sw functionality
- ****************************************************************/
-const int __ecp_alt_b9x_skip_internal_self_tests = 1;
-
-
-/****************************************************************
- * Public functions declaration
- ****************************************************************/
-
-int ecp_alt_b9x_backend_test(int verbose)
+int telink_b9x_ecp_self_test(int verbose)
 {
-	int result = 0;
+	int ret = 0;
 
-	if (verbose)
+	if (verbose) {
 		mbedtls_printf("test started\n");
+	}
 
 	mbedtls_ctr_drbg_context ctr_drbg;
 	mbedtls_entropy_context entropy;
 
+	mbedtls_ecp_group ecp_group;
+	mbedtls_mpi sk;
+	mbedtls_ecp_point pk;
+	mbedtls_ecp_point pk_ref;
+	mbedtls_ecp_point sum;
+	mbedtls_ecp_point sum_ref;
+	bool item_allocated = false;
+
 	mbedtls_ctr_drbg_init(&ctr_drbg);
 	mbedtls_entropy_init(&entropy);
 
-	result = mbedtls_ctr_drbg_seed(&ctr_drbg,
-		mbedtls_entropy_func, &entropy, NULL, 0);
-	if (result == 0) {
-		for (size_t i = 0;
-			result == 0 && i < ARRAY_SIZE(ecp_tc); i++) {
+	mbedtls_printf("stage 0\n");
+	MBEDTLS_MPI_CHK(mbedtls_ctr_drbg_seed(&ctr_drbg, mbedtls_entropy_func, &entropy, NULL, 0));
 
-			const mbedtls_ecp_curve_info *ecp_curve_info =
-				mbedtls_ecp_curve_info_from_grp_id(
-					ecp_tc[i].ecp_group_id);
+	for (size_t i = 0; i < ARRAY_SIZE(ecp_tc); i++) {
 
-			if (verbose)
-				mbedtls_printf("\tcurve: %s\n",
-					ecp_curve_info->name);
+		const mbedtls_ecp_curve_info *ecp_curve_info =
+			mbedtls_ecp_curve_info_from_grp_id(ecp_tc[i].ecp_group_id);
 
-			mbedtls_ecp_group ecp_group;
-			mbedtls_mpi sk;
-			mbedtls_ecp_point pk;
-			mbedtls_ecp_point pk_ref;
-			mbedtls_ecp_point sum;
-			mbedtls_ecp_point sum_ref;
+		if (verbose) {
+			mbedtls_printf("\tcurve: %s\n", ecp_curve_info->name);
+		}
 
-			mbedtls_ecp_group_init(&ecp_group);
-			mbedtls_mpi_init(&sk);
-			mbedtls_ecp_point_init(&pk);
-			mbedtls_ecp_point_init(&pk_ref);
-			mbedtls_ecp_point_init(&sum);
-			mbedtls_ecp_point_init(&sum_ref);
+		mbedtls_ecp_group_init(&ecp_group);
+		mbedtls_mpi_init(&sk);
+		mbedtls_ecp_point_init(&pk);
+		mbedtls_ecp_point_init(&pk_ref);
+		mbedtls_ecp_point_init(&sum);
+		mbedtls_ecp_point_init(&sum_ref);
+		item_allocated = true;
 
-			do {
-				result = mbedtls_ecp_group_load(
-					&ecp_group,
-					ecp_tc[i].ecp_group_id);
-				if (result != 0) {
-					if (verbose)
-						mbedtls_printf(
-							"mbedtls_ecp_group_load failed\n");
-					break;
-				}
-				result = mbedtls_mpi_read_binary(
-					&sk, ecp_tc[i].sk,
-					ecp_tc[i].sk_len);
-				if (result != 0) {
-					if (verbose)
-						mbedtls_printf(
-							"mbedtls_mpi_read_binary (SK) failed\n");
-					break;
-				}
+		mbedtls_printf("\tstage 1\n");
+		MBEDTLS_MPI_CHK(mbedtls_ecp_group_load(&ecp_group, ecp_tc[i].ecp_group_id));
+		mbedtls_printf("\tstage 2\n");
+		MBEDTLS_MPI_CHK(mbedtls_mpi_read_binary(&sk, ecp_tc[i].sk, ecp_tc[i].sk_len));
+		mbedtls_printf("\tstage 3\n");
+		MBEDTLS_MPI_CHK(mbedtls_ecp_check_privkey(&ecp_group, &sk));
+		mbedtls_printf("\tstage 4\n");
+		MBEDTLS_MPI_CHK(mbedtls_ecp_mul(&ecp_group, &pk, &sk, &ecp_group.G,
+			mbedtls_ctr_drbg_random, &ctr_drbg));
+		mbedtls_printf("\tstage 5\n");
+		MBEDTLS_MPI_CHK(mbedtls_ecp_point_read_binary(&ecp_group,
+			&pk_ref, ecp_tc[i].pk, ecp_tc[i].pk_len));
+		mbedtls_printf("\tstage 6\n");
+		MBEDTLS_MPI_CHK(mbedtls_ecp_point_cmp(&pk, &pk_ref));
+		mbedtls_printf("\tstage 7\n");
+		MBEDTLS_MPI_CHK(mbedtls_ecp_check_pubkey(&ecp_group, &pk));
 
-				result = mbedtls_ecp_check_privkey(
-					&ecp_group, &sk);
-				if (result != 0) {
-					if (verbose)
-						mbedtls_printf(
-							"mbedtls_ecp_check_privkey failed\n");
-					break;
-				}
-
-				result = mbedtls_ecp_mul(&ecp_group, &pk, &sk,
-					&ecp_group.G,
-					mbedtls_ctr_drbg_random, &ctr_drbg);
-				if (result != 0) {
-					if (verbose)
-						mbedtls_printf(
-							"mbedtls_ecp_mul failed\n");
-					break;
-				}
-
-				result = mbedtls_ecp_point_read_binary(
-					&ecp_group, &pk_ref,
-					ecp_tc[i].pk,
-					ecp_tc[i].pk_len);
-				if (result != 0) {
-					if (verbose)
-						mbedtls_printf(
-							"mbedtls_ecp_point_read_binary (RK) failed\n");
-					break;
-				}
-
-				result = mbedtls_ecp_point_cmp(&pk, &pk_ref);
-				if (result != 0 && verbose) {
-					mbedtls_printf(
-						"mbedtls_ecp_point_cmp (PK) failed\n");
-					ecp_alt_b9x_backend_printbuf(
-						"sk    :",
-						ecp_tc[i].sk,
-						ecp_tc[i].sk_len);
-					ecp_alt_b9x_backend_printbuf(
-						"pk ref:",
-						ecp_tc[i].pk,
-						ecp_tc[i].pk_len);
-
-					unsigned char buf[ecp_tc[i].pk_len];
-					size_t buf_len;
-
-					if (mbedtls_ecp_point_write_binary(
-						&ecp_group, &pk,
-						MBEDTLS_ECP_PF_UNCOMPRESSED,
-						&buf_len, buf,
-						sizeof(buf)) == 0)
-						ecp_alt_b9x_backend_printbuf(
-							"pk    :",
-							buf, buf_len);
-				}
-				if (result != 0)
-					break;
-
-				result = mbedtls_ecp_check_pubkey(
-					&ecp_group, &pk);
-				if (result != 0) {
-					if (verbose)
-						mbedtls_printf(
-							"mbedtls_ecp_check_pubkey failed\n");
-					break;
-				}
-
-				if (mbedtls_ecp_get_type(&ecp_group) !=
-				    MBEDTLS_ECP_TYPE_SHORT_WEIERSTRASS)
-					continue;
-
-				result = mbedtls_ecp_muladd(
-					&ecp_group, &sum, &sk, &ecp_group.G,
-					&sk, &pk);
-				if (result != 0) {
-					if (verbose)
-						mbedtls_printf(
-							"mbedtls_ecp_muladd failed\n");
-					break;
-				}
-
-				result = mbedtls_ecp_point_read_binary(
-					&ecp_group, &sum_ref,
-					ecp_tc[i].sum,
-					ecp_tc[i].pk_len);
-				if (result != 0) {
-					if (verbose)
-						mbedtls_printf(
-							"mbedtls_ecp_point_read_binary (RS) failed\n");
-					break;
-				}
-
-				result = mbedtls_ecp_point_cmp(&sum, &sum_ref);
-				if (result != 0 && verbose) {
-					mbedtls_printf(
-						"mbedtls_ecp_point_cmp (sum) failed\n");
-					ecp_alt_b9x_backend_printbuf(
-						"sk     :", ecp_tc[i].sk,
-						ecp_tc[i].sk_len);
-					ecp_alt_b9x_backend_printbuf(
-						"pk ref :", ecp_tc[i].pk,
-						ecp_tc[i].pk_len);
-					ecp_alt_b9x_backend_printbuf(
-						"sum ref:", ecp_tc[i].pk,
-						ecp_tc[i].pk_len);
-
-					unsigned char buf[ecp_tc[i].pk_len];
-					size_t buf_len;
-
-					if (mbedtls_ecp_point_write_binary(
-						&ecp_group, &sum,
-						MBEDTLS_ECP_PF_UNCOMPRESSED,
-						&buf_len, buf,
-						sizeof(buf)) == 0)
-						ecp_alt_b9x_backend_printbuf(
-							"sum    :",
-							buf, buf_len);
-				}
-				if (result != 0)
-					break;
-
-			} while (0);
-
+		if (mbedtls_ecp_get_type(&ecp_group) != MBEDTLS_ECP_TYPE_SHORT_WEIERSTRASS) {
 			mbedtls_ecp_point_free(&sum_ref);
 			mbedtls_ecp_point_free(&sum);
 			mbedtls_ecp_point_free(&pk_ref);
 			mbedtls_ecp_point_free(&pk);
 			mbedtls_mpi_free(&sk);
 			mbedtls_ecp_group_free(&ecp_group);
+			item_allocated = false;
+			continue;
 		}
-	} else /* mbedtls_ctr_drbg_seed failed */ {
-		if (verbose)
-			mbedtls_printf("random failed\n");
+
+		mbedtls_printf("\tstage 8\n");
+		MBEDTLS_MPI_CHK(mbedtls_ecp_muladd(&ecp_group, &sum, &sk, &ecp_group.G, &sk, &pk));
+		mbedtls_printf("\tstage 9\n");
+		MBEDTLS_MPI_CHK(mbedtls_ecp_point_read_binary(&ecp_group,
+			&sum_ref, ecp_tc[i].sum, ecp_tc[i].pk_len));
+		mbedtls_printf("\tstage 10\n");
+		MBEDTLS_MPI_CHK(mbedtls_ecp_point_cmp(&sum, &sum_ref));
+
+		mbedtls_ecp_point_free(&sum_ref);
+		mbedtls_ecp_point_free(&sum);
+		mbedtls_ecp_point_free(&pk_ref);
+		mbedtls_ecp_point_free(&pk);
+		mbedtls_mpi_free(&sk);
+		mbedtls_ecp_group_free(&ecp_group);
+		item_allocated = false;
+	}
+
+	mbedtls_ctr_drbg_free(&ctr_drbg);
+	mbedtls_entropy_free(&entropy);
+
+cleanup:
+	if (item_allocated) {
+		mbedtls_ecp_point_free(&sum_ref);
+		mbedtls_ecp_point_free(&sum);
+		mbedtls_ecp_point_free(&pk_ref);
+		mbedtls_ecp_point_free(&pk);
+		mbedtls_mpi_free(&sk);
+		mbedtls_ecp_group_free(&ecp_group);
 	}
 
 	mbedtls_ctr_drbg_free(&ctr_drbg);
 	mbedtls_entropy_free(&entropy);
 
 	if (verbose) {
-		if (result == 0)
+		if (!ret) {
 			mbedtls_printf("test successfully finished\n");
-		else {
-			char buf[512];
-
-			mbedtls_strerror(result, buf, sizeof(buf));
-			mbedtls_printf("test failed: %s\n", buf);
+		} else {
+			char buf[256] = "n/a";
+#if defined(MBEDTLS_ERROR_C) || defined(MBEDTLS_ERROR_STRERROR_DUMMY)
+			mbedtls_strerror(ret, buf, sizeof(buf));
+#endif /* MBEDTLS_ERROR_C || MBEDTLS_ERROR_STRERROR_DUMMY */
+			mbedtls_printf("test failed: (%d) %s\n", ret, buf);
 		}
 	}
-	return result;
+
+	return ret;
 }
 
 #endif /* MBEDTLS_SELF_TEST */
 
-#endif /* MBEDTLS_ECP_ALT */
-
-#endif /* MBEDTLS_ECP_C */
