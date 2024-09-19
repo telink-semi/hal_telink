@@ -1,26 +1,20 @@
-/********************************************************************************************************
- * @file    dma.h
+/******************************************************************************
+ * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * All rights reserved.
  *
- * @brief   This is the header file for TL321X
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * @author  Driver Group
- * @date    2024
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
- *          Licensed under the Apache License, Version 2.0 (the "License");
- *          you may not use this file except in compliance with the License.
- *          You may obtain a copy of the License at
- *
- *              http://www.apache.org/licenses/LICENSE-2.0
- *
- *          Unless required by applicable law or agreed to in writing, software
- *          distributed under the License is distributed on an "AS IS" BASIS,
- *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *          See the License for the specific language governing permissions and
- *          limitations under the License.
- *
- *******************************************************************************************************/
+ *****************************************************************************/
 /** @page DMA
  *
  *  Introduction
@@ -64,10 +58,11 @@ typedef enum{
  * @brief  Define DMA chain interrupt mode.
  */
 typedef enum{
-    DMA_CONTINUE_MODE=0, /**< The chain transfers are constant, interrupts are only generated when the last chain is completed.*/
-    DMA_INTERRUPT_MODE,  /**< The chain transfers are constant,interrupts are generated at the completion of each chain.*/
-    DMA_TERMINAL_MODE,   /**< The chain transfers are automatically stopped at the completion of each chain, and interrupts are generated at the completion of each chain.*/
-}dma_llp_int_mode;
+    DMA_CONTINUE_MODE=0, /**< The transmission of DMA chain is continuous, interrupts are only generated when the last chain transmission is completed.*/
+    DMA_INTERRUPT_MODE,  /**< The transmission of DMA chain is continuous, interrupts are generated at the completion of each chain transmission.*/
+    DMA_TERMINAL_MODE,   /**< The transmission of DMA chain is automatically stopped at the completion of each chain transmission,
+                            DMA should be triggered again for the next chain transfer and interrupts are generated at the completion of each chain transmission.*/
+}dma_llp_irq_mode_e;
 
 /**
  * @brief Define DMA Interrupt Request enumeration.
@@ -254,7 +249,7 @@ typedef struct {
  * @param[in]  llp_mode - DMA chain interrupt mode
  * @return     none
  */
-static inline void dma_set_llp_int_mode(dma_chn_e chn, dma_llp_int_mode llp_mode)
+static inline void dma_set_llp_irq_mode(dma_chn_e chn, dma_llp_irq_mode_e llp_mode)
 {
     reg_dma_llp_int_mode(chn) = (reg_dma_llp_int_mode(chn) & (~BIT_RNG((chn % 4) << 1, ((chn % 4) << 1) + 1))) | (llp_mode << ((chn % 4) << 1));
 }
@@ -515,7 +510,7 @@ static inline void dma_set_wnum_dis(dma_chn_e chn)
  * @param[in] burst_mode - dma burst mode
  * @return    none
  */
-static inline void dma_set_spi_burst_size(dma_chn_e chn ,dma_burst_size_e burst_size)
+static inline void dma_set_burst_size(dma_chn_e chn ,dma_burst_size_e burst_size)
 {
     reg_dma_ctr3(chn) = (reg_dma_ctr3(chn)&(~FLD_DMA_SRC_BURST_SIZE))|burst_size;
 }

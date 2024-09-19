@@ -1,26 +1,20 @@
-/********************************************************************************************************
- * @file    rf_reg.h
+/******************************************************************************
+ * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * All rights reserved.
  *
- * @brief   This is the header file for TL321X
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * @author  Driver Group
- * @date    2024
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
- *          Licensed under the Apache License, Version 2.0 (the "License");
- *          you may not use this file except in compliance with the License.
- *          You may obtain a copy of the License at
- *
- *              http://www.apache.org/licenses/LICENSE-2.0
- *
- *          Unless required by applicable law or agreed to in writing, software
- *          distributed under the License is distributed on an "AS IS" BASIS,
- *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *          See the License for the specific language governing permissions and
- *          limitations under the License.
- *
- *******************************************************************************************************/
+ *****************************************************************************/
 #ifndef  RF_REG_H
 #define  RF_REG_H
 #include "soc.h"
@@ -146,26 +140,6 @@ enum{
     FLD_BB_DMA_TX_SIZE_IDX      =   BIT_RNG(22,23),
 };
 
-
-#define reg_bb_dma_rx_wptr              REG_ADDR8(BB_DMA_BASE_ADDR+0xf4)
-#define reg_bb_dma_tx_wptr              REG_ADDR8(BB_DMA_BASE_ADDR+0x100)
-
-enum{
-    FLD_BB_DMA_WPTR_MASK =          BIT_RNG(0,4),
-};
-
-
-#define reg_bb_dma_rx_rptr              REG_ADDR8(BB_DMA_BASE_ADDR+0xf5)
-#define reg_bb_dma_tx_rptr              REG_ADDR8(BB_DMA_BASE_ADDR+0x101)
-enum{
-    FLD_BB_DMA_RPTR_MASK =          BIT_RNG(0,4),
-    FLD_BB_DMA_RPTR_SET =           BIT(5),
-    FLD_BB_DMA_RPTR_NEXT =          BIT(6),
-    FLD_BB_DMA_RPTR_CLR =           BIT(7),
-};
-
-
-
 #define reg_rf_bb_auto_ctrl             REG_ADDR8(0x17090c)
 enum{
     FLD_RF_TX_MULTI_EN                  =   BIT(0),
@@ -184,7 +158,17 @@ enum{
 #define reg_rf_dma_rx_rptr              REG_ADDR8(0x1708f5)
 
 #define reg_rf_dma_tx_rptr(i)           REG_ADDR8(0x170901 + (i << 1))
+enum{
+    FLD_BB_DMA_RPTR_MASK =          BIT_RNG(0,4),
+    FLD_BB_DMA_RPTR_SET =           BIT(5),
+    FLD_BB_DMA_RPTR_NEXT =          BIT(6),
+    FLD_BB_DMA_RPTR_CLR =           BIT(7),
+};
+
 #define reg_rf_dma_tx_wptr(i)           REG_ADDR8(0x170900 + (i << 1))
+enum{
+    FLD_BB_DMA_WPTR_MASK =          BIT_RNG(0,4),
+};
 
 #define reg_rf_dma_tx_rptr1(i)          REG_ADDR8(0x170919 + (i << 1))
 #define reg_rf_dma_tx_wptr1(i)          REG_ADDR8(0x170918 + (i << 1))

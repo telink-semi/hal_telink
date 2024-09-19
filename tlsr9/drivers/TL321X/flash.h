@@ -1,26 +1,20 @@
-/********************************************************************************************************
- * @file    flash.h
+/******************************************************************************
+ * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * All rights reserved.
  *
- * @brief   This is the header file for TL321X
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * @author  Driver Group
- * @date    2024
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
- *          Licensed under the Apache License, Version 2.0 (the "License");
- *          you may not use this file except in compliance with the License.
- *          You may obtain a copy of the License at
- *
- *              http://www.apache.org/licenses/LICENSE-2.0
- *
- *          Unless required by applicable law or agreed to in writing, software
- *          distributed under the License is distributed on an "AS IS" BASIS,
- *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *          See the License for the specific language governing permissions and
- *          limitations under the License.
- *
- *******************************************************************************************************/
+ *****************************************************************************/
 /** @page FLASH
  *
  *  Introduction
@@ -41,7 +35,7 @@
  */
 #pragma once
 
-#include "mspi.h"
+#include "lib/include/mspi.h"
 #include "compiler.h"
 
 #define PAGE_SIZE       256
@@ -201,7 +195,7 @@ extern _attribute_data_retention_sec_ flash_read_check_handler_t flash_read_page
  * @param[in]   write   - the write function.
  * @none
  */
-static inline void flash_change_rw_func(flash_handler_t read, flash_handler_t write)
+static _always_inline void flash_change_rw_func(flash_handler_t read, flash_handler_t write)
 {
     flash_read_page = read;
     flash_write_page = write;

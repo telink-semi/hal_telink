@@ -1,26 +1,20 @@
-/********************************************************************************************************
- * @file    pwm.h
+/******************************************************************************
+ * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * All rights reserved.
  *
- * @brief   This is the header file for TL321X
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * @author  Driver Group
- * @date    2024
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
- *          Licensed under the Apache License, Version 2.0 (the "License");
- *          you may not use this file except in compliance with the License.
- *          You may obtain a copy of the License at
- *
- *              http://www.apache.org/licenses/LICENSE-2.0
- *
- *          Unless required by applicable law or agreed to in writing, software
- *          distributed under the License is distributed on an "AS IS" BASIS,
- *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *          See the License for the specific language governing permissions and
- *          limitations under the License.
- *
- *******************************************************************************************************/
+ *****************************************************************************/
 #ifndef PWM_H_
 #define PWM_H_
 #include "dma.h"
@@ -272,6 +266,23 @@ static inline void pwm_set_pwm0_mode(pwm_mode_e  mode){
         reg_pwm0_mode = mode;  //only PWM0 has count/IR/fifo IR mode
 }
 
+/**
+ * @brief     This function servers to set pwm0 output to analog.
+ * @return    none.
+ */
+static inline void pwm_set_pwm0_output_to_ana_ir_en(void)
+{
+    BM_SET(reg_pwm0_mode, BIT(4));
+}
+
+/**
+ * @brief     This function servers to disable pwm0 output to analog.
+ * @return    none.
+ */
+static inline void pwm_set_pwm0_output_to_ana_ir_dis(void)
+{
+    BM_CLR(reg_pwm0_mode, BIT(4));
+}
 
 /**
  * @brief     This function servers to set pwm cycle time & count status.

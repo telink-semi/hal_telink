@@ -1,26 +1,20 @@
-/********************************************************************************************************
- * @file    audio.h
+/******************************************************************************
+ * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * All rights reserved.
  *
- * @brief   This is the header file for TL321X
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * @author  Driver Group
- * @date    2024
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
- *          Licensed under the Apache License, Version 2.0 (the "License");
- *          you may not use this file except in compliance with the License.
- *          You may obtain a copy of the License at
- *
- *              http://www.apache.org/licenses/LICENSE-2.0
- *
- *          Unless required by applicable law or agreed to in writing, software
- *          distributed under the License is distributed on an "AS IS" BASIS,
- *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *          See the License for the specific language governing permissions and
- *          limitations under the License.
- *
- *******************************************************************************************************/
+ *****************************************************************************/
 /** @page AUDIO
  *
  *  Introduction
@@ -434,6 +428,8 @@ static inline void audio_set_i2s_src_clk_dis(audio_i2s_select_e i2s_select)
  */
 static inline void audio_set_codec_clk(unsigned short div_numerator,unsigned short  div_denominator)
 {
+    clock_bbpll_config(PLL_CLK);
+
     reg_dmic_step = (div_numerator&FLD_DMIC_STEP)|FLD_DMIC_SEL;
     reg_dmic_mod = div_denominator;
 }

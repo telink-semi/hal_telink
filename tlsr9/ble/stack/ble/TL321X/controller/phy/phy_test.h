@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,15 +20,15 @@
 
 #include "tl_common.h"
 
-#define 		BLC_PHYTEST_DISABLE						0
-#define 		BLC_PHYTEST_ENABLE						1
+#define         BLC_PHYTEST_DISABLE                     0
+#define         BLC_PHYTEST_ENABLE                      1
 
 /**
  * @brief      for user to initialize PHY test module
  * @param      none
  * @return     none
  */
-void 	  blc_phy_initPhyTest_module(void);
+void      blc_phy_initPhyTest_module(void);
 
 
 /**
@@ -44,7 +44,7 @@ ble_sts_t blc_phy_setPhyTestEnable (u8 en);
  * @param      none
  * @return     1: PHY test is enable; 0: PHY test is disable
  */
-bool 	  blc_phy_isPhyTestEnable(void);
+bool      blc_phy_isPhyTestEnable(void);
 
 /**
  * @brief      This function is used to manipulate "phytest"

@@ -47,8 +47,11 @@
 #include <multithread.h>
 #include <pke.h>
 
-
+#if CONFIG_SOC_RISCV_TELINK_TL321X
+#include <ext_driver/driver_internal/ext_lib.h>
+#else
 #include <ext_driver/driver_lib/ext_lib.h>
+#endif
 
 #include <ext_driver/ext_misc.h>
 

@@ -1,26 +1,20 @@
-/********************************************************************************************************
- * @file    dma_reg.h
+/******************************************************************************
+ * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * All rights reserved.
  *
- * @brief   This is the header file for TL321X
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * @author  Driver Group
- * @date    2024
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
- *          Licensed under the Apache License, Version 2.0 (the "License");
- *          you may not use this file except in compliance with the License.
- *          You may obtain a copy of the License at
- *
- *              http://www.apache.org/licenses/LICENSE-2.0
- *
- *          Unless required by applicable law or agreed to in writing, software
- *          distributed under the License is distributed on an "AS IS" BASIS,
- *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *          See the License for the specific language governing permissions and
- *          limitations under the License.
- *
- *******************************************************************************************************/
+ *****************************************************************************/
 #ifndef DMA_REG_H
 #define DMA_REG_H
 #include "soc.h"
@@ -127,23 +121,6 @@ enum{
 #define reg_dma_llp(i)              REG_ADDR32 (DMA_BASE_ADDR+0x54+(i)*0x14)
 
 #define reg_dma_llp_int_mode(i) REG_ADDR8(DMA_BASE_ADDR+0x113+(((i)>3) ? 1 : 0))
-
-#define reg_dma_rx_wptr             REG_ADDR8(DMA_BASE_ADDR+0xf4)
-#define reg_dma_tx_wptr             REG_ADDR8(DMA_BASE_ADDR+0x100)
-
-enum{
-    FLD_DMA_WPTR_MASK =         BIT_RNG(0,4),
-};
-
-
-#define reg_dma_rx_rptr             REG_ADDR8(DMA_BASE_ADDR+0xf5)
-#define reg_dma_tx_rptr             REG_ADDR8(DMA_BASE_ADDR+0x101)
-enum{
-    FLD_DMA_RPTR_MASK =         BIT_RNG(0,4),
-    FLD_DMA_RPTR_SET =          BIT(5),
-    FLD_DMA_RPTR_NEXT =         BIT(6),
-    FLD_DMA_RPTR_CLR =          BIT(7),
-};
 
 #define reg_dma_int_wbufov_mask(i)      REG_ADDR8(DMA_BASE_ADDR + 0x28 + (((i) > 0x80) ? 1 : 0) * 0x1000)
 #define reg_dmac_wbufov_isr(i)          REG_ADDR8(DMA_BASE_ADDR + 0x2c + (((i) > 0x80) ? 1 : 0) * 0x1000)

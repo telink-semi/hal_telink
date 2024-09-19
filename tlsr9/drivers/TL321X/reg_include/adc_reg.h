@@ -1,26 +1,20 @@
-/********************************************************************************************************
- * @file    adc_reg.h
+/******************************************************************************
+ * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * All rights reserved.
  *
- * @brief   This is the header file for TL321X
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * @author  Driver Group
- * @date    2024
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
- *          Licensed under the Apache License, Version 2.0 (the "License");
- *          you may not use this file except in compliance with the License.
- *          You may obtain a copy of the License at
- *
- *              http://www.apache.org/licenses/LICENSE-2.0
- *
- *          Unless required by applicable law or agreed to in writing, software
- *          distributed under the License is distributed on an "AS IS" BASIS,
- *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *          See the License for the specific language governing permissions and
- *          limitations under the License.
- *
- *******************************************************************************************************/
+ *****************************************************************************/
 #ifndef ADC_REG_H
 #define ADC_REG_H
 #include "soc.h"
@@ -123,11 +117,15 @@ enum{
     FLD_SEL_VREF = BIT_RNG(6,7),
 };
 
+#define reg_adc_rng_set_state        REG_ADDR8(ADC_BASE_ADDR + 0x09)
+
 #define reg_adc_capture_state(i)    REG_ADDR16(ADC_BASE_ADDR + 0x0a + (i)*0x02)
 enum{
     FLD_R_MAX_C_L = BIT_RNG(0,7),
     FLD_R_MAX_C_H = BIT_RNG(8,9),
 };
+
+#define reg_adc_rng_capture_state   REG_ADDR16(ADC_BASE_ADDR + 0x10)
 
 #define reg_adc_config0     REG_ADDR8(ADC_BASE_ADDR + 0x28)
 enum{
@@ -157,7 +155,7 @@ enum{
     FLD_BUF_CNT = BIT_RNG(4,7),
 };
 
-#define reg_adc_rxfifo_dat      REG_ADDR32(ADC_BASE_ADDR + 0x2c)
+#define reg_adc_rxfifo_dat(i)      REG_ADDR16(ADC_BASE_ADDR + 0x2c + 2*(i))
 #define SAR_ADC_FIFO            (ADC_BASE_ADDR+0x2c)
 
 #define reg_soft_control        REG_ADDR8(ADC_BASE_ADDR + 0x30)

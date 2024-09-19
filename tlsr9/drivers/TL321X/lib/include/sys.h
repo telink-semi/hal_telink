@@ -1,26 +1,20 @@
-/********************************************************************************************************
- * @file    sys.h
+/******************************************************************************
+ * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * All rights reserved.
  *
- * @brief   This is the header file for TL321X
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * @author  Driver Group
- * @date    2024
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
- *          Licensed under the Apache License, Version 2.0 (the "License");
- *          you may not use this file except in compliance with the License.
- *          You may obtain a copy of the License at
- *
- *              http://www.apache.org/licenses/LICENSE-2.0
- *
- *          Unless required by applicable law or agreed to in writing, software
- *          distributed under the License is distributed on an "AS IS" BASIS,
- *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *          See the License for the specific language governing permissions and
- *          limitations under the License.
- *
- *******************************************************************************************************/
+ *****************************************************************************/
 /** @page SYS
  *
  *  Introduction
@@ -34,7 +28,7 @@
 
 #ifndef SYS_H_
 #define SYS_H_
-#include "reg_include/stimer_reg.h"
+#include "reg_include/register.h"
 #include "compiler.h"
 
 /**********************************************************************************************************************
@@ -44,11 +38,11 @@
 /**********************************************************************************************************************
  *                                           global macro                                                             *
  *********************************************************************************************************************/
-/*
- * brief instruction delay
+/**
+ * @brief instruction delay
  */
 
-#define _ASM_NOP_                   __asm__("nop")
+#define _ASM_NOP_                   __asm__ __volatile__("nop")
 
 #define CLOCK_DLY_1_CYC             _ASM_NOP_
 #define CLOCK_DLY_2_CYC             _ASM_NOP_;_ASM_NOP_
@@ -61,7 +55,6 @@
 #define CLOCK_DLY_9_CYC             _ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_
 #define CLOCK_DLY_10_CYC            _ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_
 #define CLOCK_DLY_64_CYC            CLOCK_DLY_10_CYC;CLOCK_DLY_10_CYC;CLOCK_DLY_10_CYC;CLOCK_DLY_10_CYC;CLOCK_DLY_10_CYC;CLOCK_DLY_10_CYC;CLOCK_DLY_4_CYC
-
 
 /**********************************************************************************************************************
  *                                         global data type                                                           *
@@ -83,10 +76,11 @@ typedef enum{
 
 /**
  * @brief   Power type for different application
+ * @note    Chip version A0 don't support DCDC_1P25_LDO_1P8 mode, only A1 can use.
  */
 typedef enum{
     LDO_1P25_LDO_1P8    = 0x00, /**< 1.25V-LDO & 1.8V-LDO mode */
-    // DCDC_1P25_LDO_1P8    = 0x01, /**< 1.25V-DCDC & 1.8V-LDO mode */
+    DCDC_1P25_LDO_1P8    = 0x01, /**< 1.25V-DCDC & 1.8V-LDO mode */
     // DCDC_1P25_DCDC_1P8   = 0x03, /**< 1.25V-DCDC & 1.8V-DCDC mode */
 }power_mode_e;
 
@@ -115,6 +109,14 @@ typedef struct tbl_cmd_set_t {
     unsigned char   cmd;
 } tbl_cmd_set_t;
 
+/**
+ * @brief   chip version.
+ * @note    this value should confirm when chip reversion.
+ */
+typedef enum{
+    CHIP_VERSION_A0 = 0x00,
+    CHIP_VERSION_A1 = 0x01,
+}sys_chip_version_e;
 
 /**********************************************************************************************************************
  *                                     global variable declaration                                                    *
@@ -133,43 +135,23 @@ _attribute_text_sec_ void protected_sys_reboot(void);
 
 /**
  * @brief       This function serves to initialize system.
+ * @param[in]   power_mode  - power mode(LDO/DCDC_LDO)
  * @param[in]   vbat_v      - This parameter is used to determine whether the VBAT voltage can be greater than 3.6V.
  * @attention   If vbat_v is set to VBAT_MAX_VALUE_LESS_THAN_3V6, then gpio_v can only be set to GPIO_VOLTAGE_3V3.
  * @return      none
  * @note        For crystal oscillator with slow start-up or poor quality, after calling this function, 
- *              a reboot will be triggered(whether a reboot has occurred can be judged by using PM_ANA_REG_POWER_ON_CLR_BUF0[bit1]).
+ *              a reboot will be triggered(whether a reboot has occurred can be judged by using pm_update_status_info() and pm_get_sw_reboot_event()).
  *              For the case where the crystal oscillator used is very slow to start-up, you can call the pm_set_xtal_stable_timer_param interface 
  *              to adjust the waiting time for the crystal oscillator to start before calling the sys_init interface.
  *              When this time is adjusted to meet the crystal oscillator requirements, it will not reboot.
  */
-void sys_init(vbat_type_e vbat_v, cap_typedef_e cap);
-
-/**
- * @brief       This function serves to set system power mode.
- * @param[in]   power_mode  - power mode(LDO/DCDC/LDO_DCDC).
- * @return      none.
- * @note        pd_dcdc_ldo_sw<1:0>, dcdc & bypass ldo status bits:
-                    dcdc_1p25   dcdc_1p8     ldo_1p25    ldo_1p8
-                00:     N           N           Y           Y
-                01:     Y           N           N           Y
-                10:     Y           N           N           N
-                11:     Y           Y           N           N
- */
-void sys_set_power_mode(power_mode_e power_mode);
-
-/**
- * @brief       This function serves to set vbat type. 
- * @param[in]   vbat_v  - This parameter is used to determine whether the VBAT voltage can be greater than 3.6V.
- *                      - Please refer to vbat_type_e for specific usage precautions.
- * @return      none
- */
-void sys_set_vbat_type(vbat_type_e vbat_v);
+_attribute_ram_code_sec_noinline_ void sys_init(power_mode_e power_mode, vbat_type_e vbat_v, cap_typedef_e cap);
 
 /**
  * @brief     this function servers to manual set crystal.
  * @return    none.
  * @note      This function can only used when cclk is 24M RC cause the function execution process will power down the 24M crystal.
  */
-_attribute_ram_code_sec_ void crystal_manual_settle(void);
+_attribute_ram_code_sec_noinline_ void crystal_manual_settle(void);
 
 #endif

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,7 +24,7 @@
 
 /**
  * @brief      this function is used to initialize channel selection algorithm #2 feature
- * @param	   none
+ * @param      none
  * @return     none
  */
 void blc_ll_initChannelSelectionAlgorithm_2_feature(void);

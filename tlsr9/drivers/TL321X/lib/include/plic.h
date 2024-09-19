@@ -1,26 +1,20 @@
-/********************************************************************************************************
- * @file    plic.h
+/******************************************************************************
+ * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * All rights reserved.
  *
- * @brief   This is the header file for TL321X
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * @author  Driver Group
- * @date    2024
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
- *          Licensed under the Apache License, Version 2.0 (the "License");
- *          you may not use this file except in compliance with the License.
- *          You may obtain a copy of the License at
- *
- *              http://www.apache.org/licenses/LICENSE-2.0
- *
- *          Unless required by applicable law or agreed to in writing, software
- *          distributed under the License is distributed on an "AS IS" BASIS,
- *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *          See the License for the specific language governing permissions and
- *          limitations under the License.
- *
- *******************************************************************************************************/
+ *****************************************************************************/
 /** @page PLIC
  *
  *  Introduction
@@ -92,10 +86,23 @@
  *                core_restore_interrupt(g_mstatus_value);
  *            }
  *            @endcode
+ *    - WFI Example.
+ *      # Before entering WFI, set the wakeup source and turn off unneeded interrupts:
+ *          @code
+ *          plic_irqs_preprocess_for_wfi(1, FLD_MIE_MEIE); // disable all interrupts except MEIE.
+ *          plic_interrupt_enable(IRQ_SYSTIMER); // stimer wakeup.
+ *          core_entry_wfi_mode(); // enter wfi.
+ *          @endcode
+ *      # After WFI wakeup, clear the corresponding interrupt flag bit and restore other interrupts:
+ *          @code
+ *          core_entry_wfi_mode();
+ *          stimer_clr_irq_status(FLD_SYSTEM_IRQ); // clear stimer irq status.
+ *          plic_irqs_postprocess_for_wfi(); // restore interrupts.
+ *          @endcode
  */
 #ifndef INTERRUPT_H
 #define INTERRUPT_H
-#include "core.h"
+#include "lib/include/core.h"
 #include "compiler.h"
 #include "reg_include/register.h"
 
@@ -231,7 +238,7 @@ typedef enum
  * @param[in]   feature - Preemptive priority interrupt feature and the vector mode.
  * @return  none
  */
-static inline void plic_set_feature(feature_e feature)
+static _always_inline void plic_set_feature(feature_e feature)
 {
     reg_irq_feature = feature; /* set preempt and vector mode */
 }
@@ -244,7 +251,7 @@ static inline void plic_set_feature(feature_e feature)
  * @param[in]   preempt_pri - MEI, MSI, and MTI interrupt priorities that do not occur simultaneously, configure the interrupt nesting priority at which MEI can be interrupted by MSI and MTI.
  * @return   none
  */
-static inline void plic_preempt_feature_en(core_preempt_pri_e preempt_pri)
+static _always_inline void plic_preempt_feature_en(core_preempt_pri_e preempt_pri)
 {
     reg_irq_feature |= FLD_FEATURE_PREEMPT_PRIORITY_INT_EN;
     g_plic_preempt_en = preempt_pri;
@@ -254,7 +261,7 @@ static inline void plic_preempt_feature_en(core_preempt_pri_e preempt_pri)
  * @brief    This function serves to disable preemptive priority interrupt feature.
  * @return  none
  */
-static inline void plic_preempt_feature_dis(void)
+static _always_inline void plic_preempt_feature_dis(void)
 {
     reg_irq_feature &= (~FLD_FEATURE_PREEMPT_PRIORITY_INT_EN);
     g_plic_preempt_en = 0;
@@ -265,7 +272,7 @@ static inline void plic_preempt_feature_dis(void)
  * @param[in]  src - Interrupt source see @ref irq_source_index.
  * @return  none
  */
-static inline void plic_set_pending(unsigned int src)
+static _always_inline void plic_set_pending(unsigned int src)
 {
     reg_irq_pending(src) = BIT(src % 32);
 }
@@ -278,7 +285,7 @@ static inline void plic_set_pending(unsigned int src)
  *          If this interface is called in an interrupt service routine, the hardware has threshold in-stack and out-stack behaviors, \n
  *          the out-stack overwrites the set threshold value.
  */
-static inline void plic_set_threshold(irq_threshold_e threshold)
+static _always_inline void plic_set_threshold(irq_threshold_e threshold)
 {
     /*The priority number in the threshold register will be saved to a preempted priority stack and the new priority number of the claimed interrupt will be written to the threshold register.
     when the mcu sends an interrupt completion message to the PLIC (plic_interrupt_complete()), the PLIC will restore(Hardware automatic operation) the highest priority number in the preempted priority stack back to the priority threshold register.
@@ -299,7 +306,7 @@ static inline void plic_set_threshold(irq_threshold_e threshold)
  *          If this interface is called in an interrupt service routine, the priority = 0 is changed at this point, and if it is done before the claim, \n
  *          claim accesses the PLIC and gets no value and the interrupt is considered not to have occurred.
  */
-static inline void plic_set_priority(unsigned int src, irq_priority_e priority)
+static _always_inline void plic_set_priority(unsigned int src, irq_priority_e priority)
 {
     reg_irq_src_priority(src) = priority;
 }
@@ -310,7 +317,7 @@ static inline void plic_set_priority(unsigned int src, irq_priority_e priority)
  * @return  none
  * @note    This interface cannot be called from the interrupt service routine.
  */
-static inline void plic_interrupt_enable(unsigned int src)
+static _always_inline void plic_interrupt_enable(unsigned int src)
 {
     reg_irq_src(src) |= BIT(src % 32);
 }
@@ -323,7 +330,7 @@ static inline void plic_interrupt_enable(unsigned int src)
  *          If this interface is called in an interrupt service routine, the CPU claims the ID and then closes the interrupt, complete will not be completed and the threshold value will not be updated, \n
  *          all subsequent interrupts of the same priority to be stuck.
  */
-static inline void plic_interrupt_disable(unsigned int src)
+static _always_inline void plic_interrupt_disable(unsigned int src)
 {
     reg_irq_src(src) &= (~BIT(src % 32));
 }
@@ -335,7 +342,7 @@ static inline void plic_interrupt_disable(unsigned int src)
  * @note
  *          - plic_interrupt_claim() and plic_interrupt_complete() must be used in pairs.
  */
-static inline void plic_interrupt_complete(unsigned int src)
+static _always_inline void plic_interrupt_complete(unsigned int src)
 {
     reg_irq_done = src;
 }
@@ -346,8 +353,9 @@ static inline void plic_interrupt_complete(unsigned int src)
  * @note
  *          - For vector interrupt, the hardware will automatically claim an interrupt, in general, the software does not need to claim.
  *          - plic_interrupt_claim() and plic_interrupt_complete() must be used in pairs.
+ *          - If the corresponding interrupt has never been enabled, claim does not get the corresponding interrupt ID, and the interface returns 0.
  */
-static inline unsigned int plic_interrupt_claim(void)
+static _always_inline unsigned int plic_interrupt_claim(void)
 {
     /**
      *   - Each claim can only claim one IP corresponding to the ID, more than one IP, need to claim multiple times.
@@ -400,7 +408,7 @@ _attribute_ram_code_sec_ void plic_isr(func_isr_t func, unsigned int src);
  *          - When global interrupt is disabled, the application needs to call this interface to ensure that all PLIC interrupt requests have been processed.
  *          - When global interrupt is enabled, the application does not need to call this interface, the hardware and interrupt service routine handle interrupt requests.
  */
-_attribute_ram_code_sec_ int plic_clr_all_request(void);
+_attribute_ram_code_sec_noinline_ int plic_clr_all_request(void);
 
 /**
  * @brief      This function serves to save and disable all PLIC interrupt sources.
@@ -415,5 +423,28 @@ void plic_all_interrupt_save_and_disable(void);
  * @note       plic_all_interrupt_save_and_disable and plic_all_interrupt_restore must be used in pairs.
  */
 void plic_all_interrupt_restore(void);
+
+/**
+ * @brief      This function serves to save and disable interrupts, including the MIE bit of the MSTATUS register(depends on the first parameter,regardless of whether the global interrupt is enabled or not.), \n
+ *             MSIE, MTIE, and MEIE bits of the MIE register, and all PLIC interrupt sources.
+ * @param[in]  flag - Global interrupt disable flag, 1: disable, 0: not disable.
+ * @param[in]  mie - MSIE, MTIE, and MEIE Which one wakes up WFI.
+ * @note
+ *  - When the core is awoken by the taken interrupt and global interrupts enable, it will resume and start to execute from the corresponding interrupt service routine.
+ *  - When the core is awoken by the pending interrupt and global interrupts disable, it will resume and start to execute from the instruction after the WFI instruction.
+ *  - plic_irqs_preprocess_for_wfi and plic_irqs_postprocess_for_wfi must be used in pairs.
+ */
+void plic_irqs_preprocess_for_wfi(unsigned char flag, mie_e mie);
+
+/**
+ * @brief      This function serves to restore interrupts, including the MIE bit of the MSTATUS register, \n
+ *             MSIE, MTIE, and MEIE bits of the MIE register, and all PLIC interrupt sources.
+ * @return     none
+ * @note
+ *  - Make sure that the status flag of the corresponding interrupt is cleared before calling this interface.
+ *  - This function will enable PLIC interrupt so this interface cannot be called from the interrupt service routine.
+ *  - plic_irqs_preprocess_for_wfi and plic_irqs_postprocess_for_wfi must be used in pairs.
+ */
+void plic_irqs_postprocess_for_wfi(void);
 
 #endif

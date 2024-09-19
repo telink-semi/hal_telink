@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2022 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +15,6 @@
  * limitations under the License.
  *
  *****************************************************************************/
-
 #include "zephyr/bluetooth/buf.h"
 #include <zephyr/storage/flash_map.h>
 #if CONFIG_SOC_RISCV_TELINK_TL321X

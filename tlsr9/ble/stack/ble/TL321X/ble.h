@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,7 @@
 #define BLE_H_
 
 
-#include "ble_config.h"
+
 #include "ble_common.h"
 #include "ble_format.h"
 
@@ -29,5 +29,7 @@
 #include "hci/hci_const.h"
 #include "hci/hci_cmd.h"
 #include "hci/hci_event.h"
+
+#include "ble_config.h"
 
 #endif /* BLE_H_ */

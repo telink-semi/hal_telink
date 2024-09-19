@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2023 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,34 +23,32 @@
 /**
  * @brief      This function is used to clear WhiteList
  * @param[in]  none
- * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
+ * @return     Status - 0x00: command succeeded;
+ *  *                   Others: command failed, refer to definition of "ble_sts_t" to know the reason
  */
-ble_sts_t		blc_ll_clearWhiteList(void);
+ble_sts_t       blc_ll_clearWhiteList(void);
 
 
 /**
- * @brief      This function is used to add a device form WhiteList
+ * @brief      This function is used to add a device to WhiteList
+ *             attention: maximum device number in Whitelist list is 4 by default. Please contact Telink if this number can not meet your requirement.
  * @param[in]  adr_type - device address type
  * @param[in]  addr - device address
- * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
+ * @return     Status - 0x00: command succeeded;
+ *                      Others: command failed, refer to definition of "ble_sts_t" to know the reason
  */
-ble_sts_t		blc_ll_addDeviceToWhiteList(u8 adr_type, u8 *addr);
+ble_sts_t       blc_ll_addDeviceToWhiteList(u8 adr_type, u8 *addr);
 
 
 /**
  * @brief      This function is used to delete a device from WhiteList
  * @param[in]  adr_type - device address type
  * @param[in]  addr - device address
- * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
+ * @return     Status - 0x00: command succeeded;
+ *                      Others: command failed, refer to definition of "ble_sts_t" to know the reason
  */
-ble_sts_t		blc_ll_removeDeviceFromWhiteList(u8 adr_type, u8 *addr);
+ble_sts_t       blc_ll_removeDeviceFromWhiteList(u8 adr_type, u8 *addr);
 
-
-
-
-#define	ll_whiteList_reset		blc_ll_clearWhiteList
-#define	ll_whiteList_add		blc_ll_addDeviceToWhiteList
-#define	ll_whiteList_delete		blc_ll_removeDeviceFromWhiteList
 
 
 #endif /* LL_WHITELIST_H_ */

@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2022 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +15,6 @@
  * limitations under the License.
  *
  *****************************************************************************/
-
 #include "tlx_bt_buffer.h"
 
 /******* ACL connection LinkLayer TX & RX data FIFO allocation, Begin ********/

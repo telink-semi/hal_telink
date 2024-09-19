@@ -23,8 +23,8 @@
 
 #define B9X_TX_POWER_MIN                    (-30)
 #define B9X_TX_POWER_MAX                    (9)
-#define TLX_TX_POWER_MIN                    (-30)
-#define TLX_TX_POWER_MAX                    (9)
+#define TLX_TX_POWER_MIN                    (-19)
+#define TLX_TX_POWER_MAX                    (31)
 
 extern const uint8_t b9x_tx_pwr_lt[];
 extern const uint8_t tlx_tx_pwr_lt[];  
