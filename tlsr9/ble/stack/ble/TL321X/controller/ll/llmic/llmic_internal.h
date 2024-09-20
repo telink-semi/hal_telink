@@ -32,25 +32,18 @@
 #define ADVINTVL_RANDOM_MAX_5MS         8   //5mS
 #define ADVINTVL_RANDOM_MAX_10MS        16  //10mS
 
-#define SSLOT_NUM_5MS                   256  //LLMIC requirement
-#define SSLOT_NUM_6MS                   308  //DAJIang requirement
-
-#define LL_MIC_TASK_MINI_GAP_SSLOT_NUM   SSLOT_NUM_6MS  //A minimum interval value between tasks is required
+#define SSLOT_NUM_5MS                   256
 
 extern blc_ll_llmic_callback_t bltLlmic_taskFiash_cb;
 
-
-
 _attribute_aligned_(4)
 typedef struct {
-    u8     llmic_task_en:1; //0 or 1
-    u8     change_sch:1;//0 or 1
-    u8     acl_per_sync:1;//0 or 1
-    u8     occupy_cur_task:1;//0 or 1
-    u8     mode:2;//0 LLMIC_MANUAL or 1 LLMIC_ATUO
-    u16    u8_rsvd:10;
-    u16    taskMiniGapSslotNum; //  Task minimum interval setting value
+    u8     llmic_task_en;
+    u8     change_sch;
+    u8     acl_per_sync;
+    u8     occupy_cur_task;
 
+    //u8     u8_rsvd[1];
 
     s32    sSlot_ble_mark;
 
@@ -68,5 +61,5 @@ int blt_llmic_build_acl_slave_schedule(void);
 
 int blt_llmic_quick_brx (int conn_idx);
 
-int blt_llmic_getSslotGapValue(void);
+
 #endif /* STACK_BLE_CONTROLLER_LL_LLMIC_LLMIC_INTERNAL_H_ */

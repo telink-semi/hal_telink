@@ -22,7 +22,7 @@
  *
  *******************************************************************************************************/
 #include "spi.h"
-#include "clock.h"
+#include "lib/include/clock.h"
 
 static unsigned char s_gspi_tx_dma_chn;
 static unsigned char s_gspi_master_rx_dma_chn;

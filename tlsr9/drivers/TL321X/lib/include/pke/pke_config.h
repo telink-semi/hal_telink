@@ -84,7 +84,7 @@ extern "C" {
 //#define SUPPORT_ECIES
 //#define SUPPORT_SM2
 //#define SUPPORT_SM9
-//#define SUPPORT_C25519
+#define SUPPORT_C25519
 
 
 #ifdef SUPPORT_RSA

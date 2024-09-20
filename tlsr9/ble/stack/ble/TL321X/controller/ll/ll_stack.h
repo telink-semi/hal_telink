@@ -136,22 +136,22 @@
     #define         LL_MAX_ACL_CEN_NUM                              0
     #define         LL_MAX_ACL_PER_NUM                              1
 
-    #define         LL_ACL_CEN_EN                               0
+    #define         LL_ACL_CEN_EN                                   0
 #elif (CONN_MAX_NUM_CONFIG == CONN_MAX_NUM_C0_P2)
     #define         LL_MAX_ACL_CEN_NUM                              0
     #define         LL_MAX_ACL_PER_NUM                              2
 
-    #define         LL_ACL_CEN_EN                               0
+    #define         LL_ACL_CEN_EN                                   0
 #elif (CONN_MAX_NUM_CONFIG == CONN_MAX_NUM_C0_P4)
     #define         LL_MAX_ACL_CEN_NUM                              0
     #define         LL_MAX_ACL_PER_NUM                              4
 
-    #define         LL_ACL_CEN_EN                               0
+    #define         LL_ACL_CEN_EN                                   0
 #elif (CONN_MAX_NUM_CONFIG == CONN_MAX_NUM_C1_P0)
     #define         LL_MAX_ACL_CEN_NUM                              1
     #define         LL_MAX_ACL_PER_NUM                              0
 
-    #define         LL_ACL_PER_EN                               0
+    #define         LL_ACL_PER_EN                                   0
 #elif (CONN_MAX_NUM_CONFIG == CONN_MAX_NUM_C1_P1)
     #define         LL_MAX_ACL_CEN_NUM                              1
     #define         LL_MAX_ACL_PER_NUM                              1
@@ -165,7 +165,7 @@
     #define         LL_MAX_ACL_CEN_NUM                              2
     #define         LL_MAX_ACL_PER_NUM                              0
 
-    #define         LL_ACL_PER_EN                               0
+    #define         LL_ACL_PER_EN                                   0
 #elif (CONN_MAX_NUM_CONFIG == CONN_MAX_NUM_C2_P2)
     #define         LL_MAX_ACL_CEN_NUM                              2
     #define         LL_MAX_ACL_PER_NUM                              2
@@ -176,7 +176,7 @@
     #define         LL_MAX_ACL_CEN_NUM                              4
     #define         LL_MAX_ACL_PER_NUM                              0
 
-    #define         LL_ACL_PER_EN                               0
+    #define         LL_ACL_PER_EN                                   0
 #elif (CONN_MAX_NUM_CONFIG == CONN_MAX_NUM_C4_P2)
     #define         LL_MAX_ACL_CEN_NUM                              2
     #define         LL_MAX_ACL_PER_NUM                              4
@@ -359,7 +359,7 @@ typedef struct {
 } st_llm_hostChnClassUpt_t;
 
 extern  _attribute_aligned_(4)  st_llm_hostChnClassUpt_t    blmhostChnClassUpt;
-extern  const u16 scaPpmTbl[8];
+extern const u16 scaPpmTbl[8];
 
 #if (CONTROLLER_GEN_P256KEY_ENABLE)
 extern _attribute_aligned_(4) smp_sc_key_t  smp_sc_key;
@@ -999,8 +999,9 @@ typedef struct {
     u8      extScanModule_en: 1;
     u8      extInitModule_en: 1;
     u8      standard_hci_en : 1;
-	u8		phy_test_en 	: 1;
-    u8      reserved            : 3;
+    u8      phy_test_en     : 1;
+    u8      reserved        : 2;
+
     
     u8      phy_2mCoded_en  : 1;
     u8      acl_master_en   : 1;
@@ -1100,7 +1101,7 @@ extern _attribute_aligned_(4)   st_ll_temp_para_t  bltempParam;
 
 extern  volatile    u64 blms_state;
 extern  volatile    int blm_btxbrx_state;
-extern  const u8  blms_tx_empty_packet[];
+extern const u8  blms_tx_empty_packet[];
 extern  volatile    u64 systick_irq_trigger;
 
 extern  volatile u8     blc_adv_chn_ext_sel;

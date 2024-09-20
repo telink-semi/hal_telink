@@ -25,7 +25,7 @@
 #define CORE_H
 #include "reg_include/core_reg.h"
 #include <stdbool.h>
-#include "clock.h"
+#include "lib/include/clock.h"
 #include "lib/include/sys.h"
 
 #ifdef STD_GCC

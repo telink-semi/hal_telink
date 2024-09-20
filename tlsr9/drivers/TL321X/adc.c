@@ -24,7 +24,7 @@
 #include "adc.h"
 #include "audio.h"
 #include "compiler.h"
-#include "stimer.h"
+#include "lib/include/stimer.h"
 #define  ADC_CHN_CNT          3
 /**
  * Note: When the reference voltage is configured to 1.2V, the calculated ADC voltage value is closest to the actual voltage value using 1175 as the coefficient default.

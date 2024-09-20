@@ -26,18 +26,6 @@
 #define STACK_BLE_CONTROLLER_LL_LLMIC_LLMIC_H_
 
 
-typedef enum {
-    LLMIC_SUCCESS = 0,
-    LLMIC_ERR_LIMIT_EXCEEDED ,
-}llmic_sts_e;
-
-
-typedef enum{
-  LLMIC_MANUAL = 0X00,
-  LLMIC_ATUO   = 0X01,
-}llmic_controller_mode_e;
-
-
 /*
  * brief:The current task priority level of the BLE module
  * */
@@ -45,6 +33,7 @@ typedef enum{
     BLE_SIGL_IDLE                 =0 ,//BLE task,
     BLE_SIGL_NORMAL                  ,
     BLE_SIGL_TSYNC                   ,//ACL Peripheral connect or update, need highest priority
+
 }llmic_ble_sigl_e;
 
 
@@ -105,19 +94,5 @@ signal_fifo_t * blc_ll_get_llmic_param(void);
 void blc_ll_registerTelinkControllerFinishCallback ( blc_ll_llmic_callback_t  p);
 
 
-/**
- * @brief      Set parameters for the Link Layer and LLMIC (Link Layer Management Interface Controller)
- * @param[in]  minTaskIntervalMs Minimum interval for Link Layer tasks, in milliseconds.(max: 11 Ms)
- * @param[in]  workType Operational mode for the LLMIC. Defined by the `llmic_controller_mode_e` enum.
- * @return     llmic_sts_e :  Status - 0x00: command succeeded; 0x01-0xFF: command failed
- */
-llmic_sts_e blc_ll_set_llmic_Parameters(u16 minTaskIntervalMs,llmic_controller_mode_e workType);
-
-
-/**
- * @brief     Switch the BLE Link Layer to 2 Mbps PHY mode
- * @param[in]  none
- * @return     none
- */
 void blc_llmic_switch_2M(void);
 #endif /* STACK_BLE_CONTROLLER_LL_LLMIC_LLMIC_H_ */

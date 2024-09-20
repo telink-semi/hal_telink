@@ -98,11 +98,11 @@
 
 //Link layer feature enable flag default setting
 #ifndef LL_FEATURE_SUPPORT_LE_ENCRYPTION
-#define LL_FEATURE_SUPPORT_LE_ENCRYPTION							1   
+#define LL_FEATURE_SUPPORT_LE_ENCRYPTION                            1
 #endif
 
 #ifndef LL_FEATURE_SUPPORT_LE_PING
-#define LL_FEATURE_SUPPORT_LE_PING									1   
+#define LL_FEATURE_SUPPORT_LE_PING                                  1
 #endif
 
 #ifndef LL_FEATURE_SUPPORT_LE_DATA_LENGTH_EXTENSION
@@ -170,7 +170,7 @@
 #endif
 
 #ifndef LL_FEATURE_SUPPORT_PHY_TEST_MODE
-#define LL_FEATURE_SUPPORT_PHY_TEST_MODE							1
+#define LL_FEATURE_SUPPORT_PHY_TEST_MODE                            1
 #endif
 
 //core_5.1 feature begin
@@ -354,11 +354,6 @@
 #ifndef  LE_AUTHENTICATED_PAYLOAD_TIMEOUT_SUPPORT_EN
 #define  LE_AUTHENTICATED_PAYLOAD_TIMEOUT_SUPPORT_EN                0
 #endif
-
-
-
-
-
 
 
  /* privacy relative */
