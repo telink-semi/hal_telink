@@ -112,7 +112,9 @@ zephyr_library_sources_ifdef(CONFIG_USB_TELINK_TLX drivers/${SOC}/gpio.c)
 zephyr_library_sources_ifdef(CONFIG_USB_TELINK_TLX drivers/${SOC}/usbhw.c)
 
 #PM driver dependency
-zephyr_library_sources_ifdef(CONFIG_PM AND NOT CONFIG_SOC_RISCV_TELINK_TL321X drivers/${SOC}/stimer.c)
+if (NOT CONFIG_SOC_RISCV_TELINK_TL321X)
+zephyr_library_sources_ifdef(CONFIG_PM drivers/${SOC}/stimer.c)
+endif()
 zephyr_library_sources_ifdef(CONFIG_PM common/sleep.c)
 
 #BLE flash reference sources
