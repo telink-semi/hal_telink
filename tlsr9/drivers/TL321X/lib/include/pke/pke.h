@@ -50,7 +50,6 @@ extern edward_curve_t ed25519[1];
 #endif
 
 #define big_integer_compare			uint32_BigNumCmp
-
 #define pke_clr_irq_status			pke_clear_interrupt
 #define pke_get_irq_status			pke_wait_till_done
 #define pke_opr_start				pke_start
@@ -66,6 +65,7 @@ extern edward_curve_t ed25519[1];
 #define pke_x25519_point_mul		x25519_pointMul
 #define pke_ed25519_point_mul		ed25519_pointMul
 #define pke_ed25519_point_add		ed25519_pointAdd
+
 
 /***************** PKE register *******************/
 #define rPKE_CTRL           (*((volatile unsigned int *)(PKE_BASE_ADDR)))

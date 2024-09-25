@@ -32,14 +32,20 @@ zephyr_include_directories(drivers/${SOC})
 
 # add for B92 headers
 zephyr_include_directories(drivers/${SOC}/ext_driver)
+if (NOT CONFIG_SOC_RISCV_TELINK_TL321X)
 zephyr_include_directories(drivers/${SOC}/ext_driver/driver_lib)
+else()
+zephyr_include_directories(drivers/${SOC}/ext_driver/driver_internal)
+endif()
 zephyr_include_directories(drivers/${SOC}/ext_peripherals/codec_0581)
 zephyr_include_directories(drivers/${SOC}/flash)
 
 # soc.c reference sources
+if (NOT CONFIG_SOC_RISCV_TELINK_TL321X)
 zephyr_library_sources(drivers/${SOC}/clock.c)
 zephyr_library_sources(drivers/${SOC}/analog.c)
 zephyr_library_sources(drivers/${SOC}/stimer.c)
+endif()
 
 # MbedTLS HW acceleration
 if(CONFIG_MBEDTLS AND CONFIG_TELINK_B9X_MBEDTLS_HW_ACCELERATION)
@@ -65,7 +71,6 @@ endif()
 if(CONFIG_SOC_FLASH_TELINK_TLX OR CONFIG_USB_TELINK_TLX)
 	zephyr_library_sources(
 		drivers/${SOC}/flash.c
-		drivers/${SOC}/stimer.c
 	)
 endif()
 
@@ -90,7 +95,6 @@ if(CONFIG_BT_B9X OR CONFIG_IEEE802154_TELINK_B9X)
 endif()
 if(CONFIG_BT_TLX OR CONFIG_IEEE802154_TELINK_TLX)
 	zephyr_library_sources(
-		drivers/${SOC}/stimer.c
 		common/b9x_rf_power.c
 	)
 endif()
@@ -108,7 +112,9 @@ zephyr_library_sources_ifdef(CONFIG_USB_TELINK_TLX drivers/${SOC}/gpio.c)
 zephyr_library_sources_ifdef(CONFIG_USB_TELINK_TLX drivers/${SOC}/usbhw.c)
 
 #PM driver dependency
+if (NOT CONFIG_SOC_RISCV_TELINK_TL321X)
 zephyr_library_sources_ifdef(CONFIG_PM drivers/${SOC}/stimer.c)
+endif()
 zephyr_library_sources_ifdef(CONFIG_PM common/sleep.c)
 
 #BLE flash reference sources
@@ -153,7 +159,6 @@ zephyr_library_sources_ifdef(CONFIG_BT_B9X
 zephyr_library_sources_ifdef(CONFIG_BT_TLX
 	drivers/${SOC}/aes.c
 	drivers/${SOC}/flash.c
-	drivers/${SOC}/stimer.c
 	ble/common/utility.c
 	ble/vendor/controller/tlx/tlx_bt.c
 	ble/vendor/controller/tlx/tlx_bt_init.c
@@ -162,6 +167,8 @@ zephyr_library_sources_ifdef(CONFIG_BT_TLX
 )
 
 endif() # (CONFIG_BT_B9X OR CONFIG_BT_TLX)
+
+add_definitions(-DSTD_GCC)
 
 # Retention feature
 if (CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION OR CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION)

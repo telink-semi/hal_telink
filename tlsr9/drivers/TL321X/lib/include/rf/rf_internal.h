@@ -28,7 +28,7 @@
 #include "lib/include/rf/rf_dma.h"
 #include "lib/include/rf/rf_common.h"
 #include "gpio.h"
-#include "stimer.h"
+#include "lib/include/stimer.h"
 
 #if(0)
 /******************************************************FOR HADM************************************************************/
@@ -1485,9 +1485,4 @@ static inline unsigned int rf_bb_timer_get_tick(void)
 
 #endif
 #endif
-/**
- * @brief       This function serves to close internal cap;
- * @return      none.
- */
-void rf_turn_off_internal_cap(void);
 #endif

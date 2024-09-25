@@ -31,6 +31,7 @@
  *********************************************************************************************************************/
 #define EMI_ACCESS_ADDR                      0x140808
 #define EMI_ACCESS_CODE                      0x29417671
+#define EMI_TX_PKT_PAYLOAD                   37
 
 /**********************************************************************************************************************
  *                                         function declaration                                                    *
@@ -89,9 +90,13 @@ void rf_emi_tx_continue_setup(void);
  * @param[in]  power_level - power level of RF.
  * @param[in]  rf_chn      - channel of RF.
  * @param[in]  pkt_type    - The type of data sent.
- * -#0:random
- * -#1:0xf0
- * -#2:0x55
+ *    -#0:random
+ *    -#1:0x0f
+ *    -#2:0x55
+ *    -#3:0xaa
+ *    -#4:0xf0
+ *    -#5:0x00
+ *    -#6:0xff
  * @return     none
  */
 void rf_emi_tx_continue_update_data(rf_mode_e rf_mode,rf_power_level_e power_level,signed char rf_chn,unsigned char pkt_type);
@@ -106,9 +111,13 @@ void rf_continue_mode_run(void);
  * @brief      This function serves to send packets in the burst mode
  * @param[in]  rf_mode  - mode of RF.
  * @param[in]  pkt_type - The type of data sent.
- * -#0:random
- * -#1:0xf0
- * -#2:0x55
+ *  * -#0:prbs9(random)
+ *    -#1:0x0f
+ *    -#2:0x55
+ *    -#3:0xaa
+ *    -#4:0xf0
+ *    -#5:0x00
+ *    -#6:0xff
  * @return     none
  */
 void rf_emi_tx_burst_loop(rf_mode_e rf_mode,unsigned char pkt_type);
@@ -119,9 +128,13 @@ void rf_emi_tx_burst_loop(rf_mode_e rf_mode,unsigned char pkt_type);
  * @param[in]  power_level - power level of RF.
  * @param[in]  rf_chn      - channel of RF.
  * @param[in]  pkt_type    - The type of data sent.
- * -#0:random
- * -#1:0xf0
- * -#2:0x55
+ *  * -#0:prbs9(random)
+ *    -#1:0x0f
+ *    -#2:0x55
+ *    -#3:0xaa
+ *    -#4:0xf0
+ *    -#5:0x00
+ *    -#6:0xff
  * @return     none
  */
 void rf_emi_tx_burst_setup(rf_mode_e rf_mode,rf_power_level_e power_level,signed char rf_chn,unsigned char pkt_type);
@@ -135,10 +148,19 @@ void rf_emi_tx_burst_setup(rf_mode_e rf_mode,rf_power_level_e power_level,signed
 void rf_phy_test_prbs9 (unsigned char *p, int n);
 
 /**
+ * @brief      This function serves to generate random packets that need to be sent in burst mode
+ * @param[in] *p - the address of random packets.
+ * @param[in]  n - the number of random packets.
+ * @return     none
+ */
+void rf_phy_test_prbs15 (unsigned char *p, int n);
+
+/**
  * @brief      This function serves to generate random number.
  * @param[in]  state - the old random number.
  * @return     the new random number
  */
 unsigned int emi_pn_gen(unsigned int state);
+
 
 #endif
