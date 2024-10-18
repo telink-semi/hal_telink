@@ -4,11 +4,11 @@ build:
   kconfig: Kconfig
 blobs:
   - path: lib_zephyr_b91.a
-    sha256: 22fddd786949b1e4aa4c5b2a70342d703aedc7e24c6d10d19cf939445b7f3082
+    sha256: e362416fdbed427de687ba763730851371853787f55790720ed85f485ecc9d16
     type: lib
-    version: 'tl-wiki-0001'
+    version: 'tl-wiki-0002'
     license-path: tlsr9/ble/license.txt
-    url: http://wiki.telink-semi.cn/wiki/protocols/Zephyr/binaries/public/b91_lib/lib_zephyr_b91_82dec720797fd5e2220950e8661b53d00803101d.a
+    url: http://wiki.telink-semi.cn/wiki/protocols/Zephyr/binaries/public/b91_lib/lib_zephyr_b91_13ca3999c731bbd5bab0ea73ccb24e9d0a80a2d2.a
     description: "Binary libraries supporting Telink B91 series BLE subsystems"
 
   - path: lib_zephyr_b92.a
@@ -20,9 +20,9 @@ blobs:
     description: "Binary libraries supporting Telink B92 series BLE subsystems"
 
   - path: lib_zephyr_b95.a
-    sha256: 91d8d32d220dad1149ad41398065cb1763ad3d62d5ac6a65e54e63ca8be43274
+    sha256: 7176ec335fd448c07b00305ff00e785d95ec90d947464c1ffd007c89d8584b82
     type: lib
-    version: 'tl-wiki-0001'
+    version: 'tl-wiki-0002'
     license-path: tlsr9/ble/license.txt
-    url: http://wiki.telink-semi.cn/wiki/protocols/Zephyr/binaries/public/b95_lib/lib_zephyr_b95_fbae231a0169356ec3c68c2dd67d63f2faa6aacc.a
+    url: http://wiki.telink-semi.cn/wiki/protocols/Zephyr/binaries/public/b95_lib/lib_zephyr_b95_86c3c6d3643c86f08baad23db72074eaf9597b4e.a
     description: "Binary libraries supporting Telink B95 series BLE subsystems"

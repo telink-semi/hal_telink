@@ -199,8 +199,8 @@ static void b9x_bt_irq_init()
 #else
 	IRQ_CONNECT(IRQ_ZB_RT + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 2, rf_irq_handler, 0, 0);
 #endif
-	riscv_plic_set_priority(IRQ_SYSTIMER, 2);
-	riscv_plic_set_priority(IRQ_ZB_RT, 2);
+	plic_set_priority(IRQ_SYSTIMER, 2);
+	plic_set_priority(IRQ_ZB_RT, 2);
 }
 
 /**
