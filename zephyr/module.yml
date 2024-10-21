@@ -20,9 +20,9 @@ blobs:
     description: "Binary libraries supporting Telink B92 series BLE subsystems"
 
   - path: lib_zephyr_b95.a
-    sha256: 7176ec335fd448c07b00305ff00e785d95ec90d947464c1ffd007c89d8584b82
+    sha256: f6ecb0c28689cfc71f60f306b1d5d8820a17dc4131ff2e66b6dac64036e6bd83
     type: lib
-    version: 'tl-wiki-0002'
+    version: 'tl-wiki-0003'
     license-path: tlsr9/ble/license.txt
-    url: http://wiki.telink-semi.cn/wiki/protocols/Zephyr/binaries/public/b95_lib/lib_zephyr_b95_86c3c6d3643c86f08baad23db72074eaf9597b4e.a
+    url: http://wiki.telink-semi.cn/wiki/protocols/Zephyr/binaries/public/b95_lib/lib_zephyr_b95_0c00877b859bafb9b878094b5a0a264c7abcc061.a
     description: "Binary libraries supporting Telink B95 series BLE subsystems"
