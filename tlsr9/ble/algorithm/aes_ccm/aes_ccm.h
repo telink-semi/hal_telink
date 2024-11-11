@@ -25,6 +25,8 @@
 #include "stack/ble/B95/ble_format.h"
 #elif CONFIG_SOC_RISCV_TELINK_TL321X
 #include "stack/ble/TL321X/ble_format.h"
+#elif CONFIG_SOC_RISCV_TELINK_TL721X
+#include "stack/ble/TL721X/ble_format.h"
 #endif
 
 #define AES_BLOCK_SIZE     16

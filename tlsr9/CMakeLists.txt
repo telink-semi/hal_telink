@@ -14,37 +14,59 @@ elseif (CONFIG_SOC_RISCV_TELINK_B95)
 	set(SOC "B95")
 elseif (CONFIG_SOC_RISCV_TELINK_TL321X)
 	set(SOC "TL321X")
+elseif (CONFIG_SOC_RISCV_TELINK_TL721X)
+	set(SOC "TL721X")
 else()
 	message( FATAL_ERROR "Not supported SOC" )
 endif()
 
 zephyr_library()
 
-# common headers
-zephyr_include_directories(common)
-zephyr_include_directories(drivers/${SOC}/compatibility_pack)
-zephyr_include_directories(drivers/${SOC}/reg_include)
+# common headers for all 
+zephyr_include_directories(
+	common
+	drivers/${SOC}
+	drivers/${SOC}/compatibility_pack
+	drivers/${SOC}/reg_include
+	drivers/${SOC}/ext_driver
+)
 
-# add for B95 headers
-zephyr_include_directories(drivers/${SOC}/lib/include)
-zephyr_include_directories(drivers/${SOC}/lib/include/rf)
-zephyr_include_directories(drivers/${SOC}/lib/include/ske)
-zephyr_include_directories(drivers/${SOC}/lib/include/pke)
-zephyr_include_directories(drivers/${SOC}/lib/include/trng)
-zephyr_include_directories(drivers/${SOC})
+if (NOT CONFIG_SOC_RISCV_TELINK_B91)
 
-# add for TL321X or B92 headers
-zephyr_include_directories(drivers/${SOC}/ext_driver)
-if (CONFIG_SOC_RISCV_TELINK_TL321X)
+# common headers excluse B91
+zephyr_include_directories(
+	drivers/${SOC}/flash
+	drivers/${SOC}/lib/include
+	drivers/${SOC}/lib/include/pke
+	)
+
+# B92 headers
+if (CONFIG_SOC_RISCV_TELINK_B92)
+	zephyr_include_directories(
+		drivers/${SOC}/ext_peripherals/codec_0581
+		)
+endif()
+
+# add for B95/TLX headers
+if (CONFIG_SOC_RISCV_TELINK_B95 OR CONFIG_SOC_SERIES_RISCV_TELINK_TLX OR CONFIG_SOC_RISCV_TELINK_TLX)
+	zephyr_include_directories(
+		drivers/${SOC}/lib/include/rf
+		drivers/${SOC}/lib/include/ske
+		drivers/${SOC}/lib/include/trng
+	)
+endif()
+
+# add for TLX or B9X headers
+if (CONFIG_SOC_SERIES_RISCV_TELINK_TLX OR CONFIG_SOC_RISCV_TELINK_TLX)
 	zephyr_include_directories(drivers/${SOC}/ext_driver/driver_internal)
-else()
+elseif(CONFIG_SOC_SERIES_RISCV_TELINK_B9X)
 	zephyr_include_directories(drivers/${SOC}/ext_driver/driver_lib)
 endif()
-zephyr_include_directories(drivers/${SOC}/ext_peripherals/codec_0581)
-zephyr_include_directories(drivers/${SOC}/flash)
+
+endif() # NOT CONFIG_SOC_RISCV_TELINK_B91
 
 # soc.c reference sources for B9X
-if (NOT CONFIG_SOC_RISCV_TELINK_TL321X)
+if (NOT (CONFIG_SOC_SERIES_RISCV_TELINK_TLX OR CONFIG_SOC_RISCV_TELINK_TLX))
 	zephyr_library_sources(drivers/${SOC}/clock.c)
 	zephyr_library_sources(drivers/${SOC}/analog.c)
 endif()
@@ -111,7 +133,7 @@ endif()
 #PM driver dependency
 if(CONFIG_PM)
 	zephyr_library_sources(common/tl_sleep.c)
-	zephyr_library_sources_ifdef(NOT CONFIG_SOC_RISCV_TELINK_TL321X
+	zephyr_library_sources_ifdef(NOT (CONFIG_SOC_SERIES_RISCV_TELINK_TLX OR CONFIG_SOC_RISCV_TELINK_TLX)
 		drivers/${SOC}/stimer.c
 	)
 endif()
@@ -139,15 +161,15 @@ if (CONFIG_BT_B9X OR CONFIG_BT_TLX)
 	)
 endif() # CONFIG_BT_B9X OR CONFIG_BT_TLX
 
-if (CONFIG_SOC_RISCV_TELINK_TL321X)
+if (CONFIG_SOC_SERIES_RISCV_TELINK_TLX OR CONFIG_SOC_RISCV_TELINK_TLX)
 	add_definitions(-DSTD_GCC)
 endif()
 
 # Retention feature
 if (CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION OR CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION)
 	zephyr_library_sources(common/tl_context.S)
-endif() # CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION OR CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION
+endif()
 
-if (CONFIG_SOC_RISCV_TELINK_TL321X)
+if (CONFIG_SOC_SERIES_RISCV_TELINK_TLX OR CONFIG_SOC_RISCV_TELINK_TLX)
 	target_compile_options(${ZEPHYR_CURRENT_LIBRARY} PRIVATE -flto=auto)
 endif()

@@ -33,6 +33,9 @@
 #if CONFIG_SOC_RISCV_TELINK_TL321X
 #include "stack/ble/TL321X/controller/ble_controller.h"
 #include "stack/ble/TL321X/controller/os_sup.h"
+#elif CONFIG_SOC_RISCV_TELINK_TL721X
+#include "stack/ble/TL721X/controller/ble_controller.h"
+#include "stack/ble/TL721X/os_sup.h"
 #endif
 
 /* Module defines */
@@ -147,7 +150,7 @@ static int tlx_bt_hci_rx_handler(void)
 	if (p) {
 		/* Send data to the controller */
 		blc_hci_handler(&p[0], 0);
-#if CONFIG_SOC_RISCV_TELINK_TL321X
+#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X
 		if (p[0] == HCI_TYPE_ACL_DATA) {
 			k_sem_give(&controller_sem);
 		}
@@ -175,7 +178,7 @@ static void tlx_bt_controller_thread()
  */
 static void tlx_bt_irq_init()
 {
-#if CONFIG_SOC_RISCV_TELINK_TL321X
+#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X
 	plic_preempt_feature_dis();
 	flash_plic_preempt_config(0,1);
 #endif
@@ -233,7 +236,7 @@ int tlx_bt_controller_init()
 	tlx_bt_irq_init();
 
 	/* Register callback to controller. */
-#if CONFIG_SOC_RISCV_TELINK_TL321X
+#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X
 	blc_ll_registerGiveSemCb(os_give_sem_cb, os_give_sem_cb);
 	blc_setOsSupEnable(true);
 #endif
@@ -247,6 +250,8 @@ int tlx_bt_controller_init()
 		tlx_bt_controller_thread, NULL, NULL, NULL, BLE_THREAD_PRIORITY, 0, K_NO_WAIT);
 #if CONFIG_SOC_RISCV_TELINK_TL321X
 		(void)k_thread_name_set(&tlx_bt_controller_thread_data, "TL321X_BT");
+#elif CONFIG_SOC_RISCV_TELINK_TL721X
+		(void)k_thread_name_set(&tlx_bt_controller_thread_data, "TL721X_BT");
 #endif
 
 	/* Start thread */

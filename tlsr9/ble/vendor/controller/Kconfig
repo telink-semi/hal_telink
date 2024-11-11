@@ -40,7 +40,7 @@ config TL_BLE_CTRL_CONNECTION_TIMEOUT_MS
 	help
 	  ACL connection timeout, ms.
 
-if BT_TLX
+if BT_B9X
 config TL_BLE_CTRL_RF_POWER
 	int "Tx power, dbm"
 	default 8
@@ -49,11 +49,20 @@ config TL_BLE_CTRL_RF_POWER
 	  Telink TLX BLE TX power
 endif
 
-if BT_B9X
+if SOC_RISCV_TELINK_TL321X
 config TL_BLE_CTRL_RF_POWER
 	int "Tx power, dbm"
-	default 3
+	default 8
 	range -30 9
+	help
+	  Telink B9X BLE TX power
+endif
+
+if SOC_RISCV_TELINK_TL721X
+config TL_BLE_CTRL_RF_POWER
+	int "Tx power, dbm"
+	default 11
+	range -23 26
 	help
 	  Telink B9X BLE TX power
 endif

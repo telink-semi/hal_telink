@@ -20,6 +20,9 @@
 #if CONFIG_SOC_RISCV_TELINK_TL321X
 #include "stack/ble/TL321X/ble.h"
 #include "stack/ble/TL321X/ble_format.h"
+#elif CONFIG_SOC_RISCV_TELINK_TL721X
+#include "stack/ble/TL721X/ble.h"
+#include "stack/ble/TL721X/ble_format.h"
 #endif
 #include "tlx_bt_buffer.h"
 #include "tlx_bt_init.h"
@@ -145,7 +148,7 @@ int tlx_bt_blc_init(void *prx, void *ptx)
 	}
 #endif /* CONFIG_BT_PERIPHERAL */
 
-#if CONFIG_SOC_RISCV_TELINK_TL321X
+#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X
 	blc_ll_configLegacyAdvEnableStrategy(LEG_ADV_EN_STRATEGY_3);
 #endif
 

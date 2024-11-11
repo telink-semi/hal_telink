@@ -21,6 +21,8 @@
 #include "zephyr/bluetooth/buf.h"
 #if CONFIG_SOC_RISCV_TELINK_TL321X
 #include "stack/ble/TL321X/ble.h"
+#elif CONFIG_SOC_RISCV_TELINK_TL721X
+#include "stack/ble/TL721X/ble.h"
 #endif
 
 #define BT_BUF_HCI_RX_SIZE                                                                             \
