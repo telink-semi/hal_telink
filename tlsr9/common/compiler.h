@@ -51,4 +51,8 @@
 
 #define _attribute_ram_code_com_  __attribute__((section(".ram_code"))) __attribute__((noinline))
 
+
+#define _attribute_flash_code_sec_noinline_     __attribute__((section(".flash_code"))) __attribute__((noinline))
+
+
 #endif
