@@ -28,9 +28,9 @@ blobs:
     description: "Binary libraries supporting Telink B95 series BLE subsystems"
 
   - path: lib_zephyr_tl321x.a
-    sha256: 2a894857207ef1ea933c3b2f4d9d15e4d885b0c5c9158c3b283a752c1467b5a1
+    sha256: 413adb403ef81679498668e805aea21943ae982ffe6e1dd123789137c72d1201
     type: lib
     version: 'V4.0.4.2'
     license-path: tlsr9/ble/license.txt
-    url: http://wiki.telink-semi.cn/wiki/protocols/Zephyr/binaries/public/tl321x_lib/lib_zephyr_tl321x_d28fa8eb56710d4ca70163cef0032a88b57385af.a
+    url: http://wiki.telink-semi.cn/wiki/protocols/Zephyr/binaries/public/tl321x_lib/lib_zephyr_tl321x_37251a7ca8f8488443f70dc6a09de19b604894a4.a
     description: "Binary libraries supporting Telink TL321X series BLE subsystems"
