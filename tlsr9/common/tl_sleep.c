@@ -50,7 +50,7 @@ bool tl_suspend(uint32_t wake_stimer_tick)
 	enum tl_bt_controller_state state = tl_bt_controller_state();
 
 	if (state == TL_BT_CONTROLLER_STATE_ACTIVE ||
-		state == TL_BT_CONTROLLER_STATE_STOPPED) {
+		state == TL_BT_CONTROLLER_STATE_STOPPING) {
 		blc_pm_setAppWakeupLowPower(wake_stimer_tick, 1);
 		if (!blc_pm_handler()) {
 			rf_set_power_level(tl_tx_pwr_lt[CONFIG_TL_BLE_CTRL_RF_POWER
@@ -104,7 +104,7 @@ bool tl_deep_sleep(uint32_t wake_stimer_tick)
 	enum tl_bt_controller_state state = tl_bt_controller_state();
 
 	if (state == TL_BT_CONTROLLER_STATE_ACTIVE ||
-		state == TL_BT_CONTROLLER_STATE_STOPPED) {
+		state == TL_BT_CONTROLLER_STATE_STOPPING) {
 		blc_pm_setAppWakeupLowPower(wake_stimer_tick, 1);
 		if (!blc_pm_handler()) {
 			rf_set_power_level(tl_tx_pwr_lt[CONFIG_TL_BLE_CTRL_RF_POWER
