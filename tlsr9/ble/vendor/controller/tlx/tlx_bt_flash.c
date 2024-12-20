@@ -28,6 +28,12 @@
 #include <zephyr/storage/flash_map.h>
 #include <zephyr/drivers/flash.h>
 
+#define USER_PARA_MAC_OFFSET            (0x100)
+#define USER_PARTITION user_para_partition
+#define USER_PARTITION_DEVICE FIXED_PARTITION_DEVICE(USER_PARTITION)
+#define USER_PARTITION_OFFSET FIXED_PARTITION_OFFSET(USER_PARTITION)
+#define USER_PARTITION_SIZE FIXED_PARTITION_SIZE(USER_PARTITION)
+
 #if CONFIG_TL_BLE_CTRL_MAC_TYPE_PUBLIC || CONFIG_TL_BLE_CTRL_MAC_FLASH
 static const struct device *flash_device =
 	DEVICE_DT_GET(DT_CHOSEN(zephyr_flash_controller));
@@ -110,9 +116,22 @@ _attribute_no_inline_ int tlx_bt_blc_mac_init(uint8_t *bt_mac)
 	err = flash_write(flash_device, FIXED_PARTITION_OFFSET(vendor_partition)
 			+ TLX_BT_MAC_ADDR_OFFSET, temp_mac, BLE_ADDR_LEN + 3);
 #else
+	#if CONFIG_SOC_RISCV_TELINK_TL321X
+	uint8_t dummy_mac[BLE_ADDR_LEN] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+
+	/*Get the ramdom mac address from zb which will passed in the user-para sector */
+	err = flash_read(USER_PARTITION_DEVICE, USER_PARTITION_OFFSET
+			+ USER_PARA_MAC_OFFSET, bt_mac, BLE_ADDR_LEN );
+	if(memcmp(bt_mac, dummy_mac, sizeof(dummy_mac)) == 0){
+		// if mac address is empty, use random instead .
+		generateRandomNum(BLE_ADDR_LEN, bt_mac);
+	}
+	bt_mac[5] |= 0xC0; /* random static by default */
+	#else
 	generateRandomNum(BLE_ADDR_LEN, bt_mac);
 	/* The random static address will be generated on every reboot */
 	bt_mac[5] |= 0xC0; /* random static by default */
+	#endif
 #endif
 #else
 #error "Other address types are not supported or need to be set via HCI"
