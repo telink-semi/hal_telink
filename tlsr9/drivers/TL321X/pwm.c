@@ -122,3 +122,26 @@ void pwm_set_tx_dma_add_list_element(dma_chn_e chn,dma_chain_config_t *config_ad
     config_addr->dma_chain_llp_ptr=(unsigned int)(llpoint);
 }
 
+/**
+ * @brief     This function servers to start the pwm,can have more than one PWM open at the same time.
+ * @param[in] en - variable of enum to select the pwm.
+ * @return	  none.
+ */
+void pwm_start_t(pwm_en_e en)
+{
+	pwm_start(en);
+}
+
+/**
+* @brief     This function servers to stop the pwm,can have more than one PWM stop at the same time.
+ * @param[in] en - variable of enum to select the pwm.
+ * @return	  none.
+ */
+void pwm_stop_t(pwm_en_e en)
+{
+	pwm_stop(en);
+}
+
+pwm_set_pin_t   pwm_set_pinctrl = pwm_set_pin;
+pwm_set_start_t pwm_set_start   = pwm_start_t;
+pwm_set_stop_t  pwm_set_stop    = pwm_stop_t;

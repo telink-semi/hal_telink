@@ -269,7 +269,11 @@ static unsigned char i2c_master_data_nack_detect(void)
 unsigned char i2c_master_write(unsigned char id, unsigned char *data, unsigned int len)
 {
     i2c_clr_irq_status(I2C_TX_BUF_STATUS);
+#if CONFIG_I2C_LED
+    reg_i2c_id = id; //BIT(0):R:High  W:Low
+#else
     reg_i2c_id = id & (~FLD_I2C_WRITE_READ_BIT); //BIT(0):R:High  W:Low
+#endif
     reg_i2c_sct1 = (FLD_I2C_LS_ID| FLD_I2C_LS_START);
     if (I2C_WAIT(I2C_API_ERROR_TIMEOUT_ID)){
         return DRV_API_TIMEOUT;
