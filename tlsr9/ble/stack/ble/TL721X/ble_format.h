@@ -29,7 +29,7 @@
 
 //data type definitions and formats, used Advertising Data(AD), Scan Response(SRD), Additional Controller Advertising Data(ACAD).
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     unsigned char length;
     unsigned char type;
     unsigned char value[0];
@@ -41,7 +41,7 @@ typedef struct{
 #define FLAGS_BR_EDR_NOT_SUPPORTED                  BIT(2)
 #define FLAGS_CONTROLLER_SUPPORTED_LE_AND_BR_EDR    BIT(3)
 #define FLAGS_PREVIOUSLY_USED                       BIT(4)
-typedef struct{
+typedef struct __attribute__((packed)) {
     advData_ltv_t header;       //refer to DT_FLAGS
     unsigned char flags;
 }advData_flags_t;
@@ -50,13 +50,13 @@ typedef struct{
 
 //Shortened Local Name: utf8s
 //For example, if the device name is 'BT_Device_Name' then the shortened name could be 'BT_Device' or 'BT_Dev'.
-typedef struct{
+typedef struct __attribute__((packed)) {
     advData_ltv_t header;       //refer to DT_SHORTENED_LOCAL_NAME
     unsigned char shortenedLocalName[0];
 }advData_shortenedLocalName_t;
 
 //Complete Local Name: utf8s
-typedef struct{
+typedef struct __attribute__((packed)) {
     advData_ltv_t header;       //refer to DT_COMPLETE_LOCAL_NAME
     unsigned char completeLocalName[0];
 }advData_completeLocalName_t;
@@ -83,16 +83,16 @@ typedef struct __attribute__((packed)) {
     unsigned int uuid[0];       //Complete list of 32-bit Service UUIDs.
 }advData_complete32BitServiceUuid_t;
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     unsigned char uuid[16];
 }bit128UUID_t;
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     advData_ltv_t header;       //refer to DT_INCOMPLETE_LIST_128BIT_SERVICE_UUID
     bit128UUID_t uuid[0];       //More 128-bit Service UUIDs available.
 }advData_incomplete128BitServiceUuid_t;
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     advData_ltv_t header;       //refer to DT_COMPLETE_LIST_128BIT_SERVICE_UUID
     bit128UUID_t uuid[0];       //Complete list of 128-bit Service UUIDs.
 }advData_complete128BitServiceUuid_t;
@@ -105,7 +105,7 @@ typedef struct __attribute__((packed)) {
 }advData_manufacturerSpecificData_t;
 
 //TX Power Level: ACAD not used. Optional in this context (may appear more than once in a block).
-typedef struct{
+typedef struct __attribute__((packed)) {
     advData_ltv_t header;       //refer to DT_TX_POWER_LEVEL
     char txPowerLevel;          //0xXX:-127 to +127 dBm.
 }advData_txPowerLevel_t;
@@ -129,7 +129,7 @@ typedef struct __attribute__((packed)) {
     unsigned int solicitationUuid[0];   //List of 32 bit Service Solicitation UUIDs
 }advData_32bitsolicitationUuid_t;
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     advData_ltv_t header;       //refer to DT_LIST_128BIT_SERVICE_SOLICITATION_UUID
     bit128UUID_t solicitationUuid[0];   //List of 128 bit Service Solicitation UUIDs
 }advData_128bitsolicitationUuid_t;
@@ -161,20 +161,20 @@ typedef struct __attribute__((packed)) {
 }advData_appearance_t;
 
 //target address
-typedef struct{
+typedef struct __attribute__((packed)) {
     unsigned char addr[6];
 }targetAddress_t;
 
 //Public Target Address: Optional in this context;  shall not appear more than once in a block and
 //              shall not appear in both the AD and SRD of the same extended advertising interval.
-typedef struct{
+typedef struct __attribute__((packed)) {
     advData_ltv_t header;       //refer to DT_PUBLIC_TARGET_ADDRESS
     targetAddress_t public;     //The format of each address is the same as the Public Device Address defined in [Vol 6] Part B, Section 1.3.
 }advData_publicTargetAddress_t;
 
 //Random Target Address: Optional in this context;  shall not appear more than once in a block and
 //              shall not appear in both the AD and SRD of the same extended advertising interval.
-typedef struct{
+typedef struct __attribute__((packed)) {
     advData_ltv_t header;       //refer to DT_RANDOM_TARGET_ADDRESS
     targetAddress_t random;     //The format of each address is the same as the Random Device Address defined in [Vol 6] Part B, Section 1.3.
 }advData_randomTargetAddress_t;

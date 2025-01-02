@@ -100,7 +100,7 @@ enum{
     NOT_SYNC_ALL_PDA            = BITS4(0, 1, 2, 4),
 };
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     //transmit and receive setting
     u8 cte_switch_pattern_len;
     u8 cte_swtich_pattern[SWITCH_PATTERN_MAX_LEN];

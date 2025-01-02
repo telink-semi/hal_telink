@@ -25,7 +25,7 @@
 #define DRIVERS_TL721X_EXT_DRIVER_EXT_HCI_UART_H_
 
 
-#include "types.h"
+#include "common/types.h"
 #include "uart.h"
 
 

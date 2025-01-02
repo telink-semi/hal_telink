@@ -442,7 +442,15 @@ static inline void zb_rt_irq_enable(void)
 
 
 #define PRMBL_LENGTH_1M                     3   //preamble length for 1M PHY
-#define PRMBL_LENGTH_2M                     4   //preamble length for 2M PHY
+#if(MCU_CORE_TYPE == MCU_CORE_TL721X)
+    /*preamble length  4byte->7byte
+    * Add 3Byte preamble length to fix Freq Drift Rate marginal fail for A2 chip in TX power above 10dBm.
+    * modified by chenxi.wang,confirmed by wenfeng.lou 20241205.
+    */
+    #define PRMBL_LENGTH_2M                 7   //preamble length for 2M PHY
+#else
+    #define PRMBL_LENGTH_2M                 4   //preamble length for 2M PHY
+#endif
 #define PRMBL_LENGTH_Coded                  11  //preamble length for Coded PHY, never change this value !!!
 
 #define PRMBL_EXTRA_1M                      (PRMBL_LENGTH_1M - 1)   // 1 byte for 1M PHY

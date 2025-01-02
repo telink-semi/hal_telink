@@ -25,6 +25,9 @@
 #define DRIVERS_TL721X_EXT_DRIVER_EXT_UART_H_
 
 
+#include "common/config/user_config.h"
+
+
 /**
  * @brief   debug UART port definition, don not change this
  */

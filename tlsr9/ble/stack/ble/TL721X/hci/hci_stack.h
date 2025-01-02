@@ -31,7 +31,7 @@
 #include "hci.h"
 
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u16  connHandle      :12;
     u16  PB_Flag         :2;
     u16  BC_Flag         :2;
@@ -42,7 +42,7 @@ typedef struct{
 
 
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  hciCmplEvtEn;     /* Reply with HCI Command Complete Event for unsupported HCI CMD */
 
     /* Host to Controller flow control */

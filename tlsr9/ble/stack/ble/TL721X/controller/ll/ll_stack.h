@@ -298,7 +298,7 @@
 
 
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u32 dma_len;
 
     u8  type   :4;
@@ -359,7 +359,11 @@ typedef struct {
 } st_llm_hostChnClassUpt_t;
 
 extern  _attribute_aligned_(4)  st_llm_hostChnClassUpt_t    blmhostChnClassUpt;
+#if STACK_IRQ_CODE_IN_SRAM_DUE_TO_FLASH_OPERATION_V2
+extern u16 scaPpmTbl[8];
+#else
 extern const u16 scaPpmTbl[8];
+#endif
 
 #if (CONTROLLER_GEN_P256KEY_ENABLE)
 extern _attribute_aligned_(4) smp_sc_key_t  smp_sc_key;
@@ -911,6 +915,7 @@ typedef struct {
        attention that same potential risk as "conn_req_info": two connections very close, first connection callback event blocked by mainloop */
     u8      idenAdr_cur_addr[6];
     u8      idenAdr_cur_type;
+    u8      rsvd;
 }ll_mac_t;
 extern _attribute_aligned_(4)  ll_mac_t  bltMac;
 
@@ -1101,7 +1106,11 @@ extern _attribute_aligned_(4)   st_ll_temp_para_t  bltempParam;
 
 extern  volatile    u64 blms_state;
 extern  volatile    int blm_btxbrx_state;
-extern const u8  blms_tx_empty_packet[];
+#if STACK_IRQ_CODE_IN_SRAM_DUE_TO_FLASH_OPERATION_V2
+extern u8 blms_tx_empty_packet[];
+#else
+extern const u8 blms_tx_empty_packet[];
+#endif
 extern  volatile    u64 systick_irq_trigger;
 
 extern  volatile u8     blc_adv_chn_ext_sel;
@@ -1407,8 +1416,13 @@ void        blt_extAdv_terminateEvt(u8 connHandle, u8 advHandle, u8 terminateEvt
 #define         PAYLOAD_27B_TIFS_EMPTY_ENCRT_CODED_S8_US            5558   // (2704 + 150 + 720) = 3514
 
 
+#if STACK_IRQ_CODE_IN_SRAM_DUE_TO_FLASH_OPERATION_V2
+extern u16 pdu_27b_tifs_27b_us[3][2];
+extern u16 pdu_27b_tifs_27b_sslot[3][2];
+#else
 extern const u16 pdu_27b_tifs_27b_us[3][2];
 extern const u16 pdu_27b_tifs_27b_sslot[3][2];
+#endif
 
 /******************************* llms_slot end ********************************************************************/
 
@@ -2233,14 +2247,14 @@ enum {
 };
 
 
-typedef struct {
+typedef struct __attribute__((packed)){
     u32     pkt;
     u8      dir;
     u8      iv[8];
 } ble_crypt_nonce_t;
 
 
-typedef struct {
+typedef struct __attribute__((packed)){
     u64                 enc_pno;
     u64                 dec_pno;
     u8                  ltk[16];

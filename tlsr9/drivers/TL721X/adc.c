@@ -26,12 +26,22 @@
 #include "compiler.h"
 #include "lib/include/stimer.h"
 #define  ADC_CHN_CNT          3
+
+#define  ADC_GPIO_VREF_DEFAULT_VALUE              1220
+#define  ADC_GPIO_VREF_OFFSET_DEFAULT_VALUE       8
+
+#define  ADC_VBAT_VREF_DEFAULT_VALUE              1220
+#define  ADC_VBAT_VREF_OFFSET_DEFAULT_VALUE       15
 /**
- * Note: When the reference voltage is configured to 1.2V, the calculated ADC voltage value is closest to the actual voltage value using 1175 as the coefficient default.
- * 1175 is the value obtained by ATE through big data statistics, which is more in line with most chips than 1200.
+ * Note: When the reference voltage is configured to 1.2V, the calculated ADC voltage value is closest to the actual voltage value using ADC_GPIO_VREF_DEFAULT_VALUE/ADC_VBAT_VREF_DEFAULT_VALUE as the coefficient default.
+ * ADC_GPIO_VREF_DEFAULT_VALUE/ADC_VBAT_VREF_DEFAULT_VALUE is the value obtained by ATE through big data statistics, which is more in line with most chips than 1200.
  */
-_attribute_data_retention_sec_ unsigned short g_adc_vref[ADC_CHN_CNT] = {1175,1175,1175}; //default ADC ref voltage (unit:mV)
+_attribute_data_retention_sec_ unsigned short g_adc_vref[ADC_CHN_CNT] = {ADC_GPIO_VREF_DEFAULT_VALUE,ADC_VBAT_VREF_DEFAULT_VALUE,ADC_GPIO_VREF_DEFAULT_VALUE}; //default ADC ref voltage (unit:mV)
 _attribute_data_retention_sec_ signed char g_adc_vref_offset[ADC_CHN_CNT];//ADC calibration value voltage offset (unit:mV).
+_attribute_data_retention_sec_ unsigned short g_adc_gpio_calib_vref = ADC_GPIO_VREF_DEFAULT_VALUE;//ADC gpio calibration value voltage (unit:mV)(used for gpio voltage sample).
+_attribute_data_retention_sec_ signed char g_adc_gpio_calib_vref_offset = ADC_GPIO_VREF_OFFSET_DEFAULT_VALUE;//ADC gpio calibration value voltage offset (unit:mV)(used for gpio voltage sample).
+_attribute_data_retention_sec_ unsigned short g_adc_vbat_calib_vref = ADC_VBAT_VREF_DEFAULT_VALUE;//ADC vbat calibration value voltage (unit:mV)(used for vbat voltage sample).
+_attribute_data_retention_sec_ signed char g_adc_vbat_calib_vref_offset = ADC_VBAT_VREF_OFFSET_DEFAULT_VALUE;//ADC vbat calibration value voltage offset (unit:mV)(used for vbat voltage sample).
 
 volatile unsigned char g_adc_pre_scale[ADC_CHN_CNT];
 volatile unsigned char g_adc_vbat_divider[ADC_CHN_CNT];
@@ -182,11 +192,13 @@ static inline void adc_set_scan_chn_cnt(unsigned char chn_cnt)
 /**
  * @brief       This function is used to enable the data weighted average algorithm function to improve ADC performance.
  * @return      none
+ * @note        tercel A2  Enabling dwa for tercel a2 affects adc performance. 
+ *              Haitao does not recommend using this feature.
  */
-static inline void adc_data_weighted_average_en(void)
-{
-    analog_write_reg8(areg_adc_data_sample_control, (analog_read_reg8(areg_adc_data_sample_control) | FLD_DWA_EN_O));
-}
+// static inline void adc_data_weighted_average_en(void)
+// {
+//     analog_write_reg8(areg_adc_data_sample_control, (analog_read_reg8(areg_adc_data_sample_control) | FLD_DWA_EN_O));
+// }
 /**
  * @brief      This function disable adc digital clock.
  * @return     none
@@ -220,6 +232,8 @@ static inline void adc_set_scan_chn_dis(void)
  * @brief    This function is used to power on sar_adc.
  * @return   none.
  * @note     -# User need to wait >30us after adc_power_on() for ADC to be stable.
+ *           -# If you calling adc_power_off(), because all analog circuits of ADC are turned off after adc_power_off(),
+ *            it is necessary to wait >100us after re-adc_power_on() for ADC to be stable.
  */
 void adc_power_on(void)
 {
@@ -241,10 +255,10 @@ void adc_power_off(void)
 /**
  * @brief This function is used to set IO port for ADC supply or ADC IO port voltage sampling.
  * @param[in]  mode - ADC gpio pin sample mode
- * @param[in]  pin - adc_input_pin_e ADC input gpio pin
+ * @param[in]  pin - adc_input_pin_def_e ADC input gpio pin
  * @return none
  */
-void adc_pin_config(adc_input_pin_mode_e mode ,adc_input_pin_e pin)
+void adc_pin_config(adc_input_pin_mode_e mode ,adc_input_pin_def_e pin)
 {
     unsigned short adc_input_pin = pin & 0xfff;
     switch(mode)
@@ -270,7 +284,7 @@ void adc_pin_config(adc_input_pin_mode_e mode ,adc_input_pin_e pin)
  * @param[in]  n_pin - enum variable of ADC analog negative input IO.
  * @return none
  */
-void adc_set_diff_pin(adc_sample_chn_e chn,adc_input_pin_e p_pin, adc_input_pin_e n_pin)
+void adc_set_diff_pin(adc_sample_chn_e chn,adc_input_pin_def_e p_pin, adc_input_pin_def_e n_pin)
 {
     adc_pin_config(ADC_GPIO_MODE, p_pin);
     adc_pin_config(ADC_GPIO_MODE, n_pin);
@@ -282,25 +296,25 @@ void adc_set_diff_pin(adc_sample_chn_e chn,adc_input_pin_e p_pin, adc_input_pin_
  * @param[in]  chn - enum variable of ADC sample channel.
  * @param[in]  v_ref - enum variable of ADC reference voltage.
  * @return none
- * @note       adc_set_ref_voltage does not take effect immediately after configuration, it needs to be delayed 30us after calling adc_dig_clk_en().
+ * @note       1. adc_set_ref_voltage does not take effect immediately after configuration, it needs to be delayed 100us after calling adc_dig_clk_en().
+ *             2. If you call adc_set_ref_voltage() alone, please change the value of g_adc_vref of the corresponding channel, otherwise the voltage conversion will be wrong.
  */
 static void adc_set_ref_voltage(adc_sample_chn_e chn,adc_ref_vol_e v_ref)
 {
     reg_adc_channel_set_state(chn) = (reg_adc_channel_set_state(chn)&(~FLD_SEL_VREF)) | (v_ref<<6);
-    if(v_ref == ADC_VREF_1P2V)
+    if(v_ref == ADC_VREF_GPIO_1P2V || v_ref == ADC_VREF_VBAT_1P2V)
     {
         //Vref buffer bias current trimming:        150%
         //Comparator preamp bias current trimming:  100%
         analog_write_reg8(areg_ain_scale  , (analog_read_reg8( areg_ain_scale  )&(0xC0)) | 0x3d );
-        g_adc_vref[chn] = 1175;// v_ref = ADC_VREF_0P9V,
     }
-    else if(v_ref == ADC_VREF_0P9V)
-    {
-        //Vref buffer bias current trimming:        100%
-        //Comparator preamp bias current trimming:  100%
-        analog_write_reg8(areg_ain_scale  , (analog_read_reg8( areg_ain_scale  )&(0xC0)) | 0x15 );
-        g_adc_vref[chn] = 900;// v_ref = ADC_VREF_0P9V,
-    }
+    //Only for internal testing,not recommended.
+//    else if(v_ref == ADC_VREF_0P9V)      //
+//    {
+//        //Vref buffer bias current trimming:        100%
+//        //Comparator preamp bias current trimming:  100%
+//        analog_write_reg8(areg_ain_scale  , (analog_read_reg8( areg_ain_scale  )&(0xC0)) | 0x15 );
+//    }
 }
 /**
  * @brief This function serves to set the sample frequency.
@@ -333,7 +347,7 @@ static inline void adc_set_scale_factor(adc_sample_chn_e chn,adc_pre_scale_e pre
  * @param[in]  chn - enum variable of ADC sample channel
  * @param[in]  vbat_div - enum variable of Vbat division factor.
  * @return     none
- * @note       adc_set_vbat_divider() does not take effect immediately after configuration, it needs to be delayed 30us after calling adc_dig_clk_en().
+ * @note       adc_set_vbat_divider() does not take effect immediately after configuration, it needs to be delayed 100us after calling adc_dig_clk_en().
  */
 void adc_set_vbat_divider(adc_sample_chn_e chn,adc_vbat_div_e vbat_div)
 {
@@ -367,7 +381,11 @@ void adc_init(adc_chn_cnt_e channel_cnt)
     adc_clk_en();//enable signal of 24M clock to sar adc
     adc_set_clk();//set adc digital clk to 24MHz and adc analog clk to 4MHz
     adc_set_resolution(ADC_RES12);//default adc_resolution set as 12bit ,BIT(11) is sign bit
-    adc_data_weighted_average_en();//enabled by default to improve ADC performance.
+    
+    // tercel A2  Enabling dwa for tercel a2 affects adc performance. 
+    // Haitao suggested turning it off.
+    // adc_data_weighted_average_en();//enabled by default to improve ADC performance.
+    
     if(NDMA_M_CHN == channel_cnt)
     {
         adc_all_chn_data_to_fifo_dis();
@@ -418,6 +436,13 @@ void adc_gpio_sample_init(adc_sample_chn_e chn , adc_gpio_cfg_t cfg)
         .input_n = GND,
     };
     adc_chn_config(chn, chn_cfg);
+    /**
+     * At present, the reference voltage is 1.2V by default, and the calibration is also based on 1.2V. If other chips have different gears in the future,
+     * it is necessary to add a judgment here: only when the corresponding gears of the corresponding calibration conditions are selected,
+     * the following calibration code can be invoked
+     */
+    g_adc_vref[chn] = g_adc_gpio_calib_vref;//set gpio sample calib vref
+    g_adc_vref_offset[chn] = g_adc_gpio_calib_vref_offset;//set adc_vref_offset as adc_gpio_calib_vref_offset
 }
 
 /**
@@ -430,7 +455,7 @@ void adc_vbat_sample_init(adc_sample_chn_e chn)
     adc_chn_cfg_t chn_cfg =
     {
         .divider = ADC_VBAT_DIV_1F4,
-        .v_ref = ADC_VREF_1P2V,
+        .v_ref = ADC_VREF_VBAT_1P2V,
         .pre_scale = ADC_PRESCALE_1,
         .sample_freq = ADC_SAMPLE_FREQ_96K,
         .input_p = ADC_VBAT,
@@ -438,8 +463,44 @@ void adc_vbat_sample_init(adc_sample_chn_e chn)
 
     };
     adc_chn_config(chn, chn_cfg);
-
+    /**
+     * At present, the reference voltage is 1.2V by default, and the calibration is also based on 1.2V. If other chips have different gears in the future,
+     * it is necessary to add a judgment here: only when the corresponding gears of the corresponding calibration conditions are selected,
+     * the following calibration code can be invoked
+     */
+    g_adc_vref[chn] = g_adc_vbat_calib_vref;//set vbat sample calib vref
+    g_adc_vref_offset[chn] = g_adc_vbat_calib_vref_offset;//set g_adc_vref_offset as g_adc_vbat_calib_vref_offset
 }
+
+/**
+ * @brief  This function is used to initialize the ADC for gpio sampling to indirectly sample the vbat voltage.
+ * @param[in]  chn -the channel to be configured.
+ * @param[in]  cfg -structure for configuring ADC channel.
+ * @return none
+ * @attention Only for 1.9V ~ 3.6V vbat power supply, if the vbat power supply > 3.6V, ADC_VBAT_SAMPLE must be selected.
+ */
+void adc_gpio_sample_vbat_init(adc_sample_chn_e chn , adc_gpio_cfg_t cfg)
+{
+    adc_pin_config(ADC_VBAT_MODE, cfg.pin);
+    adc_chn_cfg_t chn_cfg =
+    {
+        .divider = ADC_VBAT_DIV_OFF,
+        .v_ref = cfg.v_ref,
+        .pre_scale = cfg.pre_scale,
+        .sample_freq = cfg.sample_freq,
+        .input_p = cfg.pin >> 12,
+        .input_n = GND,
+    };
+    adc_chn_config(chn, chn_cfg);
+    /**
+     * At present, the reference voltage is 1.2V by default, and the calibration is also based on 1.2V. If other chips have different gears in the future,
+     * it is necessary to add a judgment here: only when the corresponding gears of the corresponding calibration conditions are selected,
+     * the following calibration code can be invoked
+     */
+    g_adc_vref[chn] = g_adc_gpio_calib_vref;//set gpio sample calib vref
+    g_adc_vref_offset[chn] = g_adc_gpio_calib_vref_offset;//set adc_vref_offset as adc_gpio_calib_vref_offset
+}
+
 #if INTERNAL_TEST_FUNC_EN
 /**
  * @brief      This function open temperature sensor power.
@@ -467,8 +528,8 @@ void adc_temp_init(adc_sample_chn_e chn)
     adc_chn_cfg_t chn_cfg =
     {
         .divider = ADC_VBAT_DIV_OFF,
-        .v_ref = ADC_VREF_1P2V,
-        .pre_scale = ADC_PRESCALE_1,
+        .v_ref = ADC_VREF_VBAT_1P2V,
+        .pre_scale = ADC_PRESCALE_1F4,
         .sample_freq = ADC_SAMPLE_FREQ_96K,
         .input_p = ADC_TEMPSENSORP_EE,
         .input_n = ADC_TEMPSENSORN_EE,
@@ -488,7 +549,7 @@ unsigned short adc_calculate_temperature(unsigned short adc_code)
 {
     //////////////// adc sample data convert to temperature(Celsius) ////////////////
     //adc_temp_value = 564 - ((adc_code * 819)>>11)
-    return 564 - ((adc_code * 819)>>11);
+    return 564 - ((adc_code * 4 * 819)>>11);
 }
 #endif
 /**
@@ -514,7 +575,28 @@ unsigned short adc_calculate_voltage(adc_sample_chn_e chn,unsigned short adc_cod
     }
 }
 
-
+/**
+ * @brief This function is used to calib ADC 1.2V vref for GPIO.
+ * @param[in] vref - GPIO sampling calibration value.
+ * @param[in] offset - GPIO sampling two-point calibration value offset.
+ * @return none
+ */
+void adc_set_gpio_calib_vref(unsigned short vref,signed char offset)
+{
+    g_adc_gpio_calib_vref = vref;
+    g_adc_gpio_calib_vref_offset = offset;
+}
+/**
+ * @brief This function is used to calib ADC 1.2V vref for Vbat.
+ * @param[in] vref - Vbat channel sampling calibration value.
+ * @param[in] offset - Vbat channel sampling two-point calibration value offset.
+ * @return none
+ */
+void adc_set_vbat_calib_vref(unsigned short vref,signed char offset)
+{
+    g_adc_vbat_calib_vref = vref;
+    g_adc_vbat_calib_vref_offset = offset;
+}
 /**********************************************************************************************************************
  *                                                DMA only interface                                                  *
  **********************************************************************************************************************/
@@ -530,11 +612,12 @@ void adc_set_dma_config(dma_chn_e chn)
     dma_config(chn, &adc_rx_dma_config);
     reg_dma_llp(adc_dma_chn) = 0;
     /*
-     * Configuration differs from TL751X for the following reasons:
-     * The TL751X's RX FIFO is stored in WORD units.
+     * Configuration differs from TL7518 for the following reasons:
+     * The TL7518's RX FIFO is stored in WORD units.
      * The TL721X's RX FIFO is stored in HALF WORD units.
      */
     adc_set_rx_fifo_trig_cnt(1);//Default value is 1, users should not change.
+    adc_clr_rx_fifo_cnt(); //If not removed, there may be a risk of residual values in the fifo, affecting sampling.
     adc_all_chn_data_to_fifo_en();
 }
 
@@ -625,6 +708,7 @@ unsigned short adc_get_code(void)
  */
 void adc_start_sample_nodma(void)
 {
+    adc_clr_rx_fifo_cnt(); //If not removed, there may be a risk of residual values in the fifo, affecting sampling.
     adc_all_chn_data_to_fifo_en();
     adc_set_scan_chn_cnt(1);
 }

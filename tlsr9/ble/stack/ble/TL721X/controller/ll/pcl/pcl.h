@@ -115,7 +115,7 @@ enum
 };
 
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  llid;
     u8  rf_len;
     u8  opcode;
@@ -124,7 +124,7 @@ typedef struct{
     s8  txPwr;
 }rf_pkt_ll_pwr_ctrl_req_t;   //LL_POWER_CONTROL_REQ
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  llid;
     u8  rf_len;
     u8  opcode;
@@ -134,7 +134,7 @@ typedef struct{
     u8  APR;
 }rf_pkt_ll_pwr_ctrl_rsp_t;   //LL_POWER_CONTROL_RSP
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  llid;
     u8  rf_len;
     u8  opcode;

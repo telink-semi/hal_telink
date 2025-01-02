@@ -55,10 +55,9 @@
 #define PM_MIN_CODE_DEBUG               0
 #define PM_START_CODE_DEBUG             0
 #define PM_XTAL_READY_DEBUG             0
-
-//TODO:The A2 chip changes the default values of some analog registers to commonly configured values,
-//which saves the time of configuring registers during initialization.
-#define PM_A0_1_ANA_DEFAULT             1
+#define PM_XTAL_ONCE_DEBUG              0
+#define PM_XTAL_READY_TIME              0
+#define PM_MANUAL_SETTLE_DEBUG          0
 
 //system timer clock source is constant 24M, never change
 //NOTICE:We think that the external 32k crystal clk is very accurate, does not need to read through TIMER_32K_LAT_CAL.
@@ -100,46 +99,61 @@ typedef enum {
  * 
  */
 typedef enum{
-    TRIM_1P8V_TO_1P64V = 0,
-    TRIM_1P8V_TO_1P66V,
-    TRIM_1P8V_TO_1P68V,
-    TRIM_1P8V_TO_1P70V,
-    TRIM_1P8V_TO_1P72V,
-    TRIM_1P8V_TO_1P74V,
-    TRIM_1P8V_TO_1P76V,
-    TRIM_1P8V_TO_1P78V,
-    TRIM_1P8V_TO_1P80V, //default
-    TRIM_1P8V_TO_1P83V,
-    TRIM_1P8V_TO_1P86V,
-    TRIM_1P8V_TO_1P89V,
-    TRIM_1P8V_TO_1P92V,
-    TRIM_1P8V_TO_1P95V,
-    TRIM_1P8V_TO_1P98V,
-    TRIM_1P8V_TO_2P01V,
-}pm_trim_1p8v_e;
+    TRIM_VDDF_TO_1P64V = 0,
+    TRIM_VDDF_TO_1P66V,
+    TRIM_VDDF_TO_1P68V,
+    TRIM_VDDF_TO_1P70V,
+    TRIM_VDDF_TO_1P72V,
+    TRIM_VDDF_TO_1P74V,
+    TRIM_VDDF_TO_1P76V,
+    TRIM_VDDF_TO_1P78V,
+    TRIM_VDDF_TO_1P80V,
+    TRIM_VDDF_TO_1P83V,
+    TRIM_VDDF_TO_1P86V,
+    TRIM_VDDF_TO_1P89V,
+    TRIM_VDDF_TO_1P92V,
+    TRIM_VDDF_TO_1P95V,
+    TRIM_VDDF_TO_1P98V,
+    TRIM_VDDF_TO_2P01V,
+}pm_trim_vddf_e;
 
 /**
- * @brief dcdc trim soc out
+ * @brief trim vddo 1p8 out
  * 
  */
 typedef enum{
-    TRIM_0P94V_TO_0P820V = 0,
-    TRIM_0P94V_TO_0P835V,
-    TRIM_0P94V_TO_0P850V,
-    TRIM_0P94V_TO_0P865V,
-    TRIM_0P94V_TO_0P880V,
-    TRIM_0P94V_TO_08950V,
-    TRIM_0P94V_TO_0P910V,
-    TRIM_0P94V_TO_0P925V,
-    TRIM_0P94V_TO_0P940V, //default
-    TRIM_0P94V_TO_0P963V,
-    TRIM_0P94V_TO_0P986V,
-    TRIM_0P94V_TO_1P009V,
-    TRIM_0P94V_TO_1P032V,
-    TRIM_0P94V_TO_1P055V,
-    TRIM_0P94V_TO_1P078V,
-    TRIM_0P94V_TO_1P101V,
-}pm_trim_0p94v_e;
+    TRIM_VDDO1P8_TO_1P664V = 0,
+    TRIM_VDDO1P8_TO_1P703V,
+    TRIM_VDDO1P8_TO_1P744V,
+    TRIM_VDDO1P8_TO_1P787V,
+    TRIM_VDDO1P8_TO_1P832V,
+    TRIM_VDDO1P8_TO_1P879V,
+    TRIM_VDDO1P8_TO_1P929V,
+    TRIM_VDDO1P8_TO_1P981V,
+}pm_trim_vddo1p8_e;
+
+/**
+ * @brief trim vdd 0p94 out
+ * 
+ */
+typedef enum{
+    TRIM_VDD0P94_TO_0P820V = 0,
+    TRIM_VDD0P94_TO_0P835V,
+    TRIM_VDD0P94_TO_0P850V,
+    TRIM_VDD0P94_TO_0P865V,
+    TRIM_VDD0P94_TO_0P880V,
+    TRIM_VDD0P94_TO_08950V,
+    TRIM_VDD0P94_TO_0P910V,
+    TRIM_VDD0P94_TO_0P925V,
+    TRIM_VDD0P94_TO_0P940V,
+    TRIM_VDD0P94_TO_0P963V,
+    TRIM_VDD0P94_TO_0P986V,
+    TRIM_VDD0P94_TO_1P009V,
+    TRIM_VDD0P94_TO_1P032V,
+    TRIM_VDD0P94_TO_1P055V,
+    TRIM_VDD0P94_TO_1P078V,
+    TRIM_VDD0P94_TO_1P101V,
+}pm_trim_vdd0p94_e;
 
 /**
  * @brief trim dig ldo
@@ -243,15 +257,16 @@ typedef enum {
     SRAM_LDO_TRIM_0P95V,
 } pm_sram_ldo_trim_e;
 
-/**
- * @brief power config
- *
- */
-typedef enum{
-    CORE_0P9V_SRAM_0P9V_BB_0P9V = 0x00, /**< dig ldo mode  1.05V-LDO/DCDC 0.9V_CORE 0.9V_SRAM 0.9V BB*/
-    CORE_0P8V_SRAM_0P8V_BB_0P8V = 0x01, /**< dig ldo mode  0.94V-LDO/DCDC 0.8V_CORE 0.8V_SRAM 0.8V BB*/
-    CORE_0P7V_SRAM_0P8V_BB_0P7V = 0x02, /**< multi ldo mode  0.94V-LDO/DCDC 0.7V_CORE 0.8V_SRAM 0.7V BB*/
-}pm_power_cfg_e;
+typedef struct {
+    unsigned char dcdc_0p95v;
+    unsigned char ldo_0p95v;
+    unsigned char dcdc_1p05v;
+    unsigned char ldo_1p05v;
+}pm_cal_vdd0p94_t;
+extern _attribute_data_retention_sec_ pm_cal_vdd0p94_t g_pm_cal_vdd0p94_info;
+
+extern _attribute_data_retention_sec_ unsigned char g_pm_cal_vddo1p8_info;
+extern _attribute_data_retention_sec_ pm_cal_0p94v_e g_pm_vdd0p94_level;
 
 /**
  * @brief       This function serves to reboot system.
@@ -266,33 +281,50 @@ _always_inline void sys_reset_all(void)
 }
 
 /**
- * @brief       This function serves to trim dcdc/ldo out.
- * @param[in]   trim_1p8vldo    - ldo trim 1.8v out
- * @param[in]   trim_0p94vldo   - ldo trim 0.94v out
- * @param[in]   trim_1p8vdcdc   - dcdc trim 1.8v out
- * @param[in]   trim_0p94vdcdc  - dcdc trim 0.94v out
+ * @brief       This function serves to trim vddo1p8 out.
+ * @param[in]   trim_vddo1p8 - vddo 1.8v out
  * @return      none
  * @note        The trim value is the theoretical voltage, and the actual output voltage is subject to testing.
  */
-static _always_inline void pm_set_1p8v_0p94v(pm_trim_1p8v_e trim_1p8vldo, pm_trim_0p94v_e trim_0p94vldo, pm_trim_1p8v_e trim_1p8vdcdc, pm_trim_0p94v_e trim_0p94vdcdc)
+static _always_inline void pm_set_vddo1p8(pm_trim_vddo1p8_e trim_vddo1p8)
+{
+    /*
+    *                       poweron_dft:    0x44
+    *       bit                     note
+    * ---------------------------------------------------------------------------
+    * <2:0>:vbat_ldo1p8_trim_3v,    calibrate LDO_1p8_HP/LDO_1p8_LP LDO output.
+    */
+    analog_write_reg8(areg_aon_0x08, (analog_read_reg8(areg_aon_0x08) & 0xf8) | trim_vddo1p8);
+}
+
+/**
+ * @brief       This function serves to trim dcdc/ldo out.
+ * @param[in]   trim_vddf_ldo     - ldo trim vddf out
+ * @param[in]   trim_vdd0p94_ldo  - ldo trim 0.94v out
+ * @param[in]   trim_vddf_dcdc    - dcdc trim vddf out
+ * @param[in]   trim_vdd0p94_dcdc - dcdc trim 0.94v out
+ * @return      none
+ * @note        The trim value is the theoretical voltage, and the actual output voltage is subject to testing.
+ */
+static _always_inline void pm_set_vddf_vdd0p94(pm_trim_vddf_e trim_vddf_ldo, pm_trim_vdd0p94_e trim_vdd0p94_ldo, pm_trim_vddf_e trim_vddf_dcdc, pm_trim_vdd0p94_e trim_vdd0p94_dcdc)
 {
     /*
     *                       poweron_dft:    0x88
     *       bit                     note
     * ---------------------------------------------------------------------------
-    * <3:0>:tr_dcdc_ldo_1p8,        calibrate 1.8V LDO output.
+    * <3:0>:tr_dcdc_ldo_1p8,        calibrate VDDF 1.8V LDO output.
     * <7:4>:tr_dcdc_ldo_0p94,       calibrate 0.94V LDO output.
     */
-    analog_write_reg8(0x09, (trim_1p8vldo << 4) | trim_0p94vldo);
+    analog_write_reg8(0x09, (trim_vddf_ldo << 4) | trim_vdd0p94_ldo);
 
     /*
     *                       poweron_dft:    0x88
     *       bit                     note
     * ---------------------------------------------------------------------------
-    * <3:0>:dcdc_trim_flash_out,    calibrate 1.8V DCDC output.
+    * <3:0>:dcdc_trim_flash_out,    calibrate VDDF 1.8V DCDC output.
     * <7:4>:dcdc_trim_soc_out,      calibrate 0.94V DCDC output.
     */
-    analog_write_reg8(0x0c, (trim_0p94vdcdc << 4) | trim_1p8vdcdc);
+    analog_write_reg8(0x0c, (trim_vdd0p94_dcdc << 4) | trim_vddf_dcdc);
 }
 
 /**
@@ -517,16 +549,6 @@ _attribute_ram_code_sec_optimize_o2_noinline_ void pm_wait_bbpll_done(void);
  */
 _attribute_ram_code_sec_optimize_o2_noinline_ void pm_wait_xtal_ready(unsigned char all_ramcode_en);
 
-/**
- * @brief       This function serves to configure power supply.
- * @param[in]   power_cfg - power config
- * @return      none
- * @note        There are three modes can be configure, different configurations correspond to different system power supply modes.
- *              The configured power supply modules are CORE voltage, BASEBAND voltage and SRAM voltage. The configuration requirements are:
- *              1. The working voltage of Baseband should be maintained at the same voltage as the CORE
- *              2. The working voltage of SRAM should not be lower than the CORE voltage and not lower than 0.8V
- */
-_attribute_ram_code_sec_optimize_o2_noinline_ void pm_power_supply_config(pm_power_cfg_e power_cfg);
 
 /**
  * @brief       this function serves to clear all irq status.
@@ -540,4 +562,18 @@ _attribute_ram_code_sec_optimize_o2_noinline_ unsigned char pm_clr_all_irq_statu
  * @return      none.
  */
 _attribute_ram_code_sec_optimize_o2_noinline_ void pm_stimer_recover(void);
+
+/**
+ * @brief      This function serves to get vdd0p94 and vddo1p8 current value from analog register.
+ * @return     none.
+ */
+_attribute_ram_code_sec_optimize_o2_noinline_ void pm_update_vdd0p94_level(void);
+
+/**
+ * @brief      This function serves to update vdd0p94 and vddo1p8 calibration value.
+ * @param[in]  vdd0p94_value - calibration value for vdd0p94(calibration value is 4bytes)
+ * @param[in]  vddo1p8_value - calibration value for vddo1p8(calibration value is 1bytes)
+ * @return     none
+ */
+void pm_update_vdd0p94_vddo1p8_cal_value(unsigned char *vdd0p94_value, unsigned char vddo1p8_value);
 

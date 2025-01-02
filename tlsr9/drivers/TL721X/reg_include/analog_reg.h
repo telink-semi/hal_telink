@@ -40,9 +40,11 @@ enum
     FLD_ANA_BUSY          = BIT(7),
 };
 #define reg_ana_len             REG_ADDR8(ALG_BASE_ADDR+0x03)
-#define reg_ana_data(n)         REG_ADDR8(ALG_BASE_ADDR+0x04+(n))
-#define reg_ana_addr_data16     REG_ADDR16(ALG_BASE_ADDR+0x04)
-#define reg_ana_addr_data32     REG_ADDR32(ALG_BASE_ADDR+0x04)
+#define ANALOG_DATA_REG_ADDR    (ALG_BASE_ADDR+0x04)
+#define reg_ana_data(n)         REG_ADDR8(ANALOG_DATA_REG_ADDR+(n))
+#define reg_ana_addr_data16     REG_ADDR16(ANALOG_DATA_REG_ADDR)
+#define reg_ana_addr_data32     REG_ADDR32(ANALOG_DATA_REG_ADDR)
+
 
 #define reg_ana_buf_cnt         REG_ADDR8(ALG_BASE_ADDR+0x08)
 enum{
@@ -60,5 +62,14 @@ enum
 {
     FLD_ANA_TXBUFF_IRQ    = BIT(0),
     FLD_ANA_RXBUFF_IRQ    = BIT(1),
+};
+#define reg_ana_dma_ctl         REG_ADDR8(ALG_BASE_ADDR+0x0b)
+enum
+{
+    FLD_ANA_CYC1           = BIT(0),
+    FLD_ANA_DMA_EN         = BIT(1),
+    FLD_ANA_AUTO_RXCLR_EN  = BIT(2),
+    FLD_ANA_NDMA_RXDONE_EN = BIT(3),
+
 };
 #endif

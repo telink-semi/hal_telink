@@ -1,20 +1,26 @@
-/******************************************************************************
- * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
+/********************************************************************************************************
+ * @file    flash.h
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * @brief   This is the header file for TL721X
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * @author  Driver Group
+ * @date    2024
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *****************************************************************************/
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
+ *
+ *******************************************************************************************************/
 /** @page FLASH
  *
  *  Introduction
@@ -130,7 +136,10 @@ typedef enum {
  * @brief     flash mid definition
  */
 typedef enum{
+    MID146085   =   0x146085,//P25Q80SU
     MID156085   =   0x156085,//P25Q16SU
+    MID1460C8   =   0x1460c8,//GD25LE80E
+    MID1560C8   =   0x1560c8,//GD25LE16E
 }flash_mid_e;
 
 
@@ -492,18 +501,3 @@ unsigned int flash_get_vendor(unsigned int flash_mid);
  * @return      flash capacity.
  */
 flash_capacity_e  flash_get_capacity(unsigned int flash_mid);
-
-/*******************************************************************************************************************
- *									This function serves to all area flash protection
- ******************************************************************************************************************/
-void flash_protection_lock_init(void);
-
-void flash_protection_lock_operation(unsigned int offset);
-
-void flash_protection_unlock_operation(unsigned int offset);
-
-/*******************************************************************************************************************
- *		Should include these header file here , flash_read_mid_uid_with_check moved to flash_common.h
- ******************************************************************************************************************/
-
-#include "flash/flash_common.h"

@@ -54,4 +54,6 @@
 #define ll_whiteList_delete                         blc_ll_removeDeviceFromWhiteList
 
 
+#define blc_ll_isBrxBusy                            blc_ll_isRfBusy  //Compatible single connection
+
 #endif /* STACK_BLE_CONTROLLER_CONTR_API_COMP_H_ */

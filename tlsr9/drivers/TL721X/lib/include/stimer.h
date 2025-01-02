@@ -39,6 +39,7 @@
 #include "reg_include/stimer_reg.h"
 #include "dma.h"
 #include "gpio.h"
+#include "pem.h"
 
 /**********************************************************************************************************************
  *                                           global macro                                                             *
@@ -243,6 +244,26 @@ static _always_inline void stimer_set_input_capt_mode(stimer_capt_mode_e capt_mo
 static _always_inline unsigned int stimer_get_input_capt_value(void)
 {
     return reg_system_timer_capt;
+}
+
+/**
+ * @brief     This function performs to enable systimer pem.
+ * @param[in] stimer_pem_en  - systimer pem mode enable.
+ * @return    none.
+ */
+static inline void stimer_set_pem(stimer_ctrl_e stimer_pem_en)
+{
+    reg_system_timer_ctrl |= stimer_pem_en;
+}
+
+/**
+ * @brief     This function performs to disable systimer pem.
+ * @param[in] stimer_pem_dis  - systimer pem mode disable.
+ * @return    none.
+ */
+static inline void stimer_pem_dis(stimer_ctrl_e stimer_pem_dis)
+{
+    reg_system_timer_ctrl &= (~stimer_pem_dis);
 }
 
 /**

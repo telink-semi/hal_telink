@@ -36,9 +36,9 @@ blobs:
     description: "Binary libraries supporting Telink TL321X series BLE subsystems"
 
   - path: lib_zephyr_tl721x.a
-    sha256: ab0fcb214922e33b4a397748051d9fccae99ce65775ecd13af2b6aec772633c5
+    sha256: 147e952251754dbce94f7d1cb7597e5bd7066274ee80f5edbf594640e3aac5cd
     type: lib
     version: 'V4.0.4.2-WIP'
     license-path: tlsr9/ble/license.txt
-    url: http://wiki.telink-semi.cn/wiki/protocols/Zephyr/binaries/public/tl721x_lib/lib_zephyr_tl721x_cc4a84ab75b5797aee031777329559fca067ff4d.a
+    url: http://wiki.telink-semi.cn/wiki/protocols/Zephyr/binaries/public/tl721x_lib/lib_zephyr_tl721x_1ca099b6ab50fe0e706458f8ab78fcb4227f4244.a
     description: "Binary libraries supporting Telink TL721X series BLE subsystems"

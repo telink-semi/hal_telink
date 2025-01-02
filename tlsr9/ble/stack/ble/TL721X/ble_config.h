@@ -24,6 +24,9 @@
 #include "drivers.h"
 #include "tl_common.h"
 
+#include "stack/ble/controller/ll/ll_bqb_stack.h"
+#include "stack/ble/hal/hal_internal.h"
+
 ///////////////////  Feature ////////////////////////////
 #ifndef     MULTIPLE_LOCAL_DEVICE_ENABLE
 #define     MULTIPLE_LOCAL_DEVICE_ENABLE                            0
@@ -84,7 +87,10 @@
 #endif
 
 
-
+/*< telink feature sets */
+#ifndef LL_FEATURE_SUPPORT_LE_LEGACY_SCANNING
+#define LL_FEATURE_SUPPORT_LE_LEGACY_SCANNING                       1
+#endif
 
 //Link layer feature enable flag default setting
 #ifndef LL_FEATURE_SUPPORT_LE_ENCRYPTION

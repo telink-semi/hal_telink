@@ -41,6 +41,7 @@ typedef enum{
     DMA5,
     DMA6,
     DMA7,
+    DMA_CNT,
 }dma_chn_e;
 
 /**
@@ -248,6 +249,28 @@ typedef struct {
     volatile unsigned int dma_chain_llp_ptr;
 }dma_chain_config_t ;
 
+/*
+ * @note:
+ * 1.the destination and source addresses contain ram, flash, and registers that do not require handshaking with the dma,
+ *   four-byte alignment not required.
+ * 2.the destination address is configured incrementally.
+ * 3.dma size needs to be configured DMA_BYTE_WIDTH,the length of the configuration can be any byte.
+ */
+#define M2M_DMA_CFG   \
+        (0                      << DMA_CHACTRL_DST_REQ_SEL_OFFSET)  | \
+        (0                      << DMA_CHACTRL_SRC_REQ_SEL_OFFSET)  | \
+        (DMA_ADDR_INCREMENT     << DMA_CHACTRL_DST_ADDR_CTRL_OFFSET) | \
+        (DMA_ADDR_INCREMENT     << DMA_CHACTRL_SRC_ADDR_CTRL_OFFST) | \
+        (DMA_NORMAL_MODE        << DMA_CHACTRL_DSTMODE_OFFSET) | \
+        (DMA_NORMAL_MODE        << DMA_CHACTRL_SRCMODE_OFFSET) | \
+        (DMA_CTR_BYTE_WIDTH     << DMA_CHACTRL_DSTWIDTH_SIZE_OFFSET) | \
+        (DMA_CTR_BYTE_WIDTH     << DMA_CHACTRL_SRCWIDTH_SIZE_OFFSET) | \
+        (0                      << DMA_CHACTRL_SRC_BURST_SIZE_OFFSET) | \
+        (0                      << DMA_CHACTRL_READ_NUM_EN_OFFSET) | \
+        (0                      << DMA_CHACTRL_PRIORITY_OFFSET) | \
+        (0                      << DMA_CHACTRL_WRITE_NUM_EN_OFFSET) | \
+        (0                      << DMA_CHACTRL_AUTO_EN_OFFSET)
+
 /**
  * @brief      This function sets DMA chain transfer interrupt mode.
  * @param[in]  chn      - DMA channel
@@ -313,6 +336,32 @@ static inline void dma_set_irq_mask(dma_chn_e chn,dma_irq_mask_e mask)
         default:
             break;
     }
+}
+
+/**
+ * @brief      This function servers to judge whether DMA irq mask is enable.
+ * @param[in] chn  - dma channel.
+ * @param[in] mask - dma irq mask.
+ * @return    1:enable   0:disable
+ */
+static inline _Bool dma_is_irq_mask(dma_chn_e chn,dma_irq_mask_e mask)
+{
+    unsigned char mask_flag=0;
+    switch (mask)
+    {
+        case TC_MASK:
+            mask_flag = reg_dma_ctr0(chn) & FLD_DMA_CHANNEL_TC_MASK;
+             break;
+        case ERR_MASK:
+            mask_flag = reg_dma_err_mask & BIT(chn);
+             break;
+        case ABT_MASK:
+            mask_flag =  reg_dma_abt_mask & BIT(chn);
+             break;
+        default:
+            break;
+    }
+    return mask_flag;
 }
 
 /**
@@ -521,4 +570,40 @@ static inline void dma_set_burst_size(dma_chn_e chn ,dma_burst_size_e burst_size
     reg_dma_ctr3(chn) = (reg_dma_ctr3(chn)&(~FLD_DMA_SRC_BURST_SIZE))|burst_size;
 }
 
+/**
+ * @brief      This function servers to judge if the dma is completed.
+ * @param[in]  chn - dma channel
+ * @return     0: complete   1: not complete
+ */
+static inline unsigned char dma_chn_is_complete(dma_chn_e chn){
+    return reg_dma_ctr0(chn)&FLD_DMA_CHANNEL_ENABLE;
+}
+
+/**
+ * @brief     This interface is used to configure the address contents corresponding to different modules at once through the dma chain table.
+ * @param[in] chn               - dma channel.
+ * @param[in] dma_chain_config  - dma chain node buff pointer.
+ * @param[in] chain_node_cnt    - dma chain node cnt.
+ * @return    none
+ * @note      1.only support moving from flash to other M2M_DMA_CFG(ram, flash, and registers that do not require handshaking with the dma).
+ *            2.If any of them are configured with analog registers, it is required that the first must be an analog register and can send useless data.
+ *            3.If there is a write operation to the analog registers, you need to wait until after the dma interrupt and then call
+ *              the interface dma_write_reg_is_complete() to ensure that the write operation to the analog registers has been completed.
+ */
+void dma_write_reg(dma_chn_e chn,const dma_chain_config_t* chain,unsigned char node_cnt);
+void dma_write_reg_is_complete(void);
+
+/**
+ * @brief       this function serves to clear all dma irq status.
+ * @return      Indicates whether clearing irq status was successful.
+ */
+drv_api_status_e dma_clr_all_irq_status(void);
+
+/**
+ * @brief       this function serves to wait all dma chn complete.
+ * @param       timeout_us - timeout.
+ * @return      DRV_API_TIMEOUT : wait timeout;
+ *              DRV_API_SUCCESS : all dma complete status is successful;
+ */
+drv_api_status_e dma_wait_for_all_chn_to_complete(unsigned int timeout_us);
 #endif

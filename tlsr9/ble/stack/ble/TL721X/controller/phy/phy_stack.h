@@ -41,7 +41,7 @@
 #define         RFLEN_255_CODEDPHY_S8_US                        17040
 
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  llid;
     u8  rf_len;
     u8  opcode;
@@ -49,7 +49,7 @@ typedef struct{
     u8  rx_phys;
 }rf_pkt_ll_phy_req_rsp_t;   //phy_req, phy_rsp
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  llid;
     u8  rf_len;
     u8  opcode;
@@ -178,9 +178,13 @@ extern  llms_conn_phy_update_callback_t llms_conn_phy_update_cb; ///blt_ll_updat
 extern  llms_conn_phy_switch_callback_t llms_conn_phy_switch_cb; ///blt_ll_switchConnPhy
 extern  ll_phy_switch_callback_t        ll_phy_switch_cb;
 
-extern const u8   tx_stl_auto_mode[4];
-extern const u8   tx_stl_btx_1st_pkt[4];
-
+#if STACK_IRQ_CODE_IN_SRAM_DUE_TO_FLASH_OPERATION_V2
+extern u8 tx_stl_auto_mode[4];
+extern u8 tx_stl_btx_1st_pkt[4];
+#else
+extern const u8 tx_stl_auto_mode[4];
+extern const u8 tx_stl_btx_1st_pkt[4];
+#endif
 
 extern _attribute_aligned_(4) ll_phy_t      bltPHYs;
 

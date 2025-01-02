@@ -49,6 +49,7 @@
 #include "plic_sw_reg.h"
 #include "plmt_reg.h"
 #include "otp_reg.h"
+#include "pem_reg.h"
 #include "analog_afe3v_reg.h"
 #include "analog_afe1v_reg.h"
 #include "ir_learn_reg.h"
