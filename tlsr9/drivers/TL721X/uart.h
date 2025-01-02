@@ -757,7 +757,7 @@ void uart_cal_div_and_bwpc(unsigned int baudrate, unsigned int sysclk, unsigned 
  * @param[in]  rxtimeout_exp   - the power exponent of mul.
  * @return     none
  */
-void uart_set_rx_timeout(uart_num_e uart_num, unsigned char bwpc, unsigned char bit_cnt, uart_timeout_mul_e mul, unsigned char rxtimeout_exp);
+void uart_set_rx_timeout_with_exp(uart_num_e uart_num, unsigned char bwpc, unsigned char bit_cnt, uart_timeout_mul_e mul, unsigned char rxtimeout_exp);
 
 /**
  * @brief      Send UART data by byte in no_dma mode.

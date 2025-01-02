@@ -73,7 +73,7 @@ void uint32_set(volatile unsigned int *a, unsigned int value, unsigned int wordL
  * @param[in]   wordLen      - word length of buffer dst or src.
  * @return      none
  */
-void uint32_copy(volatile unsigned int *dst, volatile const unsigned int *src, unsigned int wordLen);
+void uint32_copy(volatile unsigned int *dst, volatile  unsigned int *src, unsigned int wordLen);
 
 /**
  * @brief       copy uint32 buffer.
@@ -103,7 +103,7 @@ void uint32_endian_reverse(unsigned char *in, unsigned char *out, unsigned int w
       -# 1. in and out could point the same buffer.
   @endverbatim
   */
-void reverse_byte_array(volatile const unsigned char *in, unsigned char *out, unsigned int byteLen);
+void reverse_byte_array(volatile const  unsigned char *in, unsigned char *out, unsigned int byteLen);
 #if 0
 void reverse_word(unsigned char *in, unsigned char *out, unsigned int bytelen);
 
@@ -135,7 +135,7 @@ void uint32_XOR(unsigned int *A, unsigned int *B, unsigned int *C, unsigned int 
  * @param[in]   wordLen   - length of the array in words (unsigned integers).
  * @return      the number of valid bits in the array, or 0 if the array is empty or all elements are zero
  */
-unsigned int get_valid_bits(const unsigned int *a, unsigned int wordLen);
+unsigned int get_valid_bits( unsigned int *a, unsigned int wordLen);
 
 /**
  * @brief       get real word length of big number a of max_words words.
@@ -143,7 +143,7 @@ unsigned int get_valid_bits(const unsigned int *a, unsigned int wordLen);
  * @param[in]   max_words   - max word length of a.
  * @return      real word length of big number a
  */
-unsigned int get_valid_words(volatile const unsigned int *a, unsigned int max_words);
+unsigned int get_valid_words(volatile  unsigned int *a, unsigned int max_words);
 
 /**
  * @brief       check whether big number or unsigned char buffer a is all zero or not.
@@ -169,7 +169,7 @@ unsigned int uint32_BigNum_Check_Zero(unsigned int a[], unsigned int aWordLen);
  * @param[in]   bWordLen    - word length of b.
  * @return      0:a=b,   1:a>b,   -1: a<b
  */
-int uint32_BigNumCmp(volatile unsigned int *a, unsigned int aWordLen, volatile const unsigned int *b, unsigned int bWordLen);
+int uint32_BigNumCmp(volatile unsigned int *a, unsigned int aWordLen, volatile  unsigned int *b, unsigned int bWordLen);
 
 /**
  * @brief       for a = b*2^t, b is odd, get t.
@@ -231,7 +231,7 @@ unsigned char Bigint_Check_p_1(unsigned int a[], unsigned int p[], unsigned int 
  * @param[in]   wordLen            - word length of k and n.
  * @return      ret_zero(k is zero)   ret_big(k is greater/bigger than or equal to n)  ret_success(k is in [1, n-1])
  */
-unsigned int uint32_integer_check(unsigned int *k, const unsigned int *n, unsigned int wordLen, unsigned int ret_zero, unsigned int ret_big,
+unsigned int uint32_integer_check(unsigned int *k,  unsigned int *n, unsigned int wordLen, unsigned int ret_zero, unsigned int ret_big,
         unsigned int ret_success);
 
 #ifdef __cplusplus

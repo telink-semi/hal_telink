@@ -46,6 +46,12 @@ enum {
 };
 
 #define areg_0x8b               0x8b
+enum {
+    FLD_XO_DYN_CAP_ANA       =  BIT(1),//Cap control to optimize the startup time.
+
+    FLD_XO_CNT_OFF_ANA       =  BIT(3),//Disable xo counter
+};
+
 #define areg_0x8c               0x8c
 enum{
     FLD_XO_EN_CLK_ANA        =  BIT(1),//xtal_24M clock to analog   0:turn off  1:turn on   default :0
@@ -86,13 +92,11 @@ enum
 };
 
 /**
- * BIT[0] power down PGA bias current initial state..
- * BIT[1] Enable VMID voltage 1:turn off  0:turn on   default :0.
+ * BIT[1] Enable VMID voltage (A0,A1 version 1:turn off  0:turn on default:0;A2 version 0:turn off  1:turn on default:0.)
  */
 #define areg_0x8f               0x8f
 enum{
-    FLD_PGA_BIAS_PD             =  BIT(0),
-    FLD_AUDIO_VMID_EN           =  BIT(1),
+    FLD_AUDIO_VMID_PD              =  BIT(1),
 };
 
 #define areg_0xc6               0xc6

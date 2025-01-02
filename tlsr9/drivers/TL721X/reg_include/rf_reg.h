@@ -970,7 +970,7 @@ enum{
     FLD_RF_R_T_TXSTL_H           =  BIT_RNG(0,3),
 };
 
-
+#define    reg_rf_ll_rxwait         REG_ADDR16(REG_BB_LL_BASE_ADDR+0x06)
 #define    reg_rf_ll_rxwait_l       REG_ADDR8(REG_BB_LL_BASE_ADDR+0x06)
 
 
@@ -998,7 +998,7 @@ enum{
     FLD_RF_R_T_RXSTL_H            = BIT_RNG(0,3),
 };
 
-
+#define    reg_rf_ll_txwait         REG_ADDR16(REG_BB_LL_BASE_ADDR+0x0e)
 #define    reg_rf_ll_txwait_l       REG_ADDR8(REG_BB_LL_BASE_ADDR+0x0e)
 
 
@@ -1333,6 +1333,12 @@ enum
     FLD_RF_RX_TIM_SRQ_SEL_TESQ      = BIT(3),
     FLD_RF_TX_TIM_SRQ_SEL_TESQ      = BIT(4),
     FLD_RF_FE_CTRIM             = BIT_RNG(5,7),
+};
+
+#define     reg_rf_radio_extral_1       REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x39)
+enum
+{
+    FLD_RF_PA_CAS_BIAS_DIG   = BIT_RNG(0,1),
 };
 
 #define     reg_rf_mode_cfg_tx3_0       REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x3c)
@@ -1874,6 +1880,26 @@ enum
 
 
 #define     reg_rf_locd_cfg_0       REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x104)
+
+#define     reg_rf_lnm_pa_0         REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x14c)
+enum
+{
+     FLD_RF_LNA_ITRIM   =  BIT_RNG(0,1),
+     FLD_RF_MIX_VBIAS   =  BIT_RNG(2,3),
+     FLD_RF_PA_VBIAS    =  BIT_RNG(4,5),
+     FLD_RF_RTFE_PTAT_FORCE = BIT(6),
+     FLD_RF_FE_RTRIM_TX_L   = BIT(7),
+};
+
+#define     reg_rf_cbpf_adc_0         REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x14e)
+enum
+{
+     FLD_RF_CBPF_TRIM_I   =  BIT_RNG(0,1),
+     FLD_RF_CBPF_TRIM_Q   =  BIT_RNG(2,3),
+     FLD_RF_CBPF_EN_DIAG_MEAS = BIT(4),
+     FLD_RF_CBPF_TRIM_SHORT_DCBIAS = BIT_RNG(5,6),
+     FLD_RF_CBPF_VCM_TRIM_L   = BIT(7),
+};
 
 #define     reg_rf_lnm_pa_ow_ctrl_val   REG_ADDR8(REG_TL_RADIO_BASE_ADDR+0x178)
 enum

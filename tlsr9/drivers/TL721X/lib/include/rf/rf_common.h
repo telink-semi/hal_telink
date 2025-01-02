@@ -1,20 +1,26 @@
-/******************************************************************************
- * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
+/********************************************************************************************************
+ * @file    rf_common.h
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * @brief   This is the header file for TL721X
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * @author  Driver Group
+ * @date    2024
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *****************************************************************************/
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
+ *
+ *******************************************************************************************************/
 #ifndef     RF_COMMON_H
 #define     RF_COMMON_H
 
@@ -36,6 +42,12 @@
  *              when this function turn on the time of rx_dly will shorten 6.3us,
  */
 #define     RF_RX_SHORT_MODE_EN         1//In order to debug whether the problem is caused by rx_dly.
+
+/**
+ * @brief       This macro is defined to distinguish between A1 and A2 versions of tx power list.
+ */
+#define     RF_TX_POWER_A2              1
+
 /**
  *  @brief This define serve to calculate the DMA length of packet.
  */
@@ -183,6 +195,9 @@ typedef struct
     rf_ldo_trim_t   ldo_trim;
     rf_dcoc_cal_t   dcoc_cal;
     rf_rccal_cal_t  rccal_cal;
+    unsigned char   tx_fcal[8];
+    unsigned char   rx_fcal[8];
+    unsigned char   fcal[8];
 }rf_fast_settle_t;
 
 
@@ -220,9 +235,78 @@ typedef enum {
  *  @note    (1)The energy meter is averaged over 5 chips at room temperature and 3.3V supply voltage.
  *           (2)Transmit energy in VBAT mode decreases as the supply voltage drops.
  *           (3)There will be some differences in the energy values tested between different chips.
- *           (4)At present, power levels above 9dbm cannot be used.There is spectrum leakage when TX sends energy to levels above 9dbm.
+ *           (4)At present, power levels above 9dbm cannot be used.There is spectrum leakage when TX sends energy to levels above 9dbm.(A2 has fixed this issue)
+ *           (5)TX Power levels above 10dbm are internal test versions and are not open to users.
  */
 typedef enum {
+
+#if RF_TX_POWER_A2
+    /*VBAT*/
+#ifdef GREATER_TX_POWER_EN
+    RF_POWER_P12p11dBm  = 63, /**<  12.1 dbm */
+    RF_POWER_P11p86dBm  = 58, /**<  11.8 dbm */
+    RF_POWER_P11p49dBm  = 52, /**<  11.5 dbm */
+    RF_POWER_P11p01dBm  = 46, /**<  11.0 dbm */
+    RF_POWER_P10p50dBm  = 41, /**<  10.5 dbm */
+#endif
+    RF_POWER_P10p00dBm  = 38, /**<  10.0 dbm */
+    RF_POWER_P9p45dBm   = 35, /**<  9.5 dbm */
+    RF_POWER_P9p10dBm  = 33, /**<  9.1 dbm */
+    RF_POWER_P8p55dBm  = 31, /**<  8.4 dbm */
+    RF_POWER_P8p06dBm  = 29, /**<  8.0 dbm */
+    RF_POWER_P7p52dBm  = 27, /**<  7.5 dbm */
+    RF_POWER_P6p71dBm  = 25, /**<  6.7 dbm */
+    RF_POWER_P6p08dBm  = 23, /**<  6.0 dbm */
+    RF_POWER_P5p53dBm  = 21, /**<  5.5 dbm */
+    RF_POWER_P4p79dBm  = 19, /**<  4.8 dbm */
+    RF_POWER_P4p09dBm  = 18, /**<  4.1 dbm */
+
+
+    /*VANT*/
+    RF_POWER_P3p82dBm  = BIT(7) | 63,   /**<   3.8 dbm */
+    RF_POWER_P3p48dBm  = BIT(7) | 57,   /**<   3.5 dbm */
+    RF_POWER_P3p32dBm  = BIT(7) | 55,   /**<   3.3 dbm */
+    RF_POWER_P3p04dBm  = BIT(7) | 52,   /**<   3.0 dbm */
+    RF_POWER_P2p73dBm  = BIT(7) | 48,   /**<   2.7 dbm */
+    RF_POWER_P2p43dBm  = BIT(7) | 45,   /**<   2.4 dbm */
+    RF_POWER_P2p00dBm  = BIT(7) | 41,   /**<   2.0 dbm */
+    RF_POWER_P1p65dBm  = BIT(7) | 38,   /**<   1.6 dbm */
+    RF_POWER_P0p98dBm  = BIT(7) | 34,   /**<   1.0 dbm */
+    RF_POWER_P0p66dBm  = BIT(7) | 32,   /**<   0.7 dbm */
+    RF_POWER_P0p03dBm  = BIT(7) | 29,   /**<   0.0 dbm */
+    RF_POWER_N0p66dBm  = BIT(7) | 26,   /**<   -0.7 dbm */
+    RF_POWER_N1p08dBm  = BIT(7) | 24,   /**<   -1.0 dbm */
+    RF_POWER_N1p67dBm  = BIT(7) | 22,   /**<  -1.7 dbm */
+    RF_POWER_N2p30dBm  = BIT(7) | 20,   /**<  -2.3 dbm */
+    RF_POWER_N3p08dBm  = BIT(7) | 18,   /**<  -3.0 dbm */
+    RF_POWER_N3p89dBm  = BIT(7) | 16,   /**<  -3.9 dbm */
+    RF_POWER_N4p36dBm  = BIT(7) | 15,   /**<  -4.4 dbm */
+    RF_POWER_N4p90dBm  = BIT(7) | 14,   /**<  -5.0 dbm */
+    RF_POWER_N5p38dBm  = BIT(7) | 13,   /**<  -5.4 dbm */
+    RF_POWER_N6p03dBm  = BIT(7) | 12,   /**<  -6.0 dbm */
+    RF_POWER_N6p61dBm  = BIT(7) | 11,   /**<  -6.6 dbm */
+    RF_POWER_N7p39dBm  = BIT(7) | 10,   /**<  -7.4 dbm */
+    RF_POWER_N8p14dBm  = BIT(7) | 9,   /**<  -8.1 dbm */
+    RF_POWER_N9p14dBm  = BIT(7) | 8,   /**<  -9.1 dbm */
+    RF_POWER_N10p09dBm  = BIT(7) | 7,   /**<  -10.1 dbm */
+    RF_POWER_N11p42dBm  = BIT(7) | 6,   /**<  -11.4 dbm */
+    RF_POWER_N12p72dBm  = BIT(7) | 5,   /**<  -12.7 dbm */
+    RF_POWER_N14p64dBm  = BIT(7) | 4,   /**<  -14.6 dbm */
+    RF_POWER_N16p82dBm  = BIT(7) | 3,    /**<  -16.8 dbm */
+    RF_POWER_N20p22dBm =  BIT(7) | 2,    /**<  -20.2 dbm */
+    RF_POWER_N25p19dBm  = BIT(7) | 1,   /**<  -25.2 dbm */
+    RF_POWER_N41p80dBm  = BIT(7) | 0,   /**<  -41.8 dbm */
+//  (1)Normal energy levels(described above) can be used for typical applications.The following energy levels reduce
+//     TX power consumption but require LDO and DCDC voltage to be raised from 0.94V to 1.05V before TX.To offset
+//     increased base power, the voltage should be restored to 0.94V after RX.You can refer to app_ble_mode.c in RF_Demo.
+//    (2)The default power-up configuration is 1.05V gears There is no need to switch back and forth, but note that the
+//       overall tx power and power consumption will increase.
+    RF_1P05_VANT_POWER_P5p11dBm  = BIT(7)| 63,   /**<   5.1 dbm */
+    RF_1P05_VANT_POWER_P5p00dBm  = BIT(7)| 60,   /**<   5.0 dbm */
+    RF_1P05_VANT_POWER_P4p60dBm  = BIT(7)| 53,   /**<   4.6 dbm */
+    RF_1P05_VANT_POWER_P4p00dBm  = BIT(7)| 45,   /**<   4.0 dbm */
+    RF_1P05_VANT_POWER_P3p52dBm  = BIT(7)| 40,   /**<   3.5 dbm */
+#else
      /*VBAT*/
 #ifdef GREATER_TX_POWER_EN
     /**TODO:The A1 version of the chip cannot be used with power levels above 9dbm.
@@ -285,6 +369,8 @@ typedef enum {
      RF_POWER_N24p04dBm  = BIT(7) | 2,   /**<  -24.0 dbm */
      RF_POWER_N28p86dBm  = BIT(7) | 1,   /**<  -28.9 dbm */
      RF_POWER_N44p08dBm  = BIT(7) | 0,   /**<  -44.0 dbm */
+
+#endif
 } rf_power_level_e;
 
 /**
@@ -292,9 +378,78 @@ typedef enum {
  *  @note    (1)The energy meter is averaged over 5 chips at room temperature and 3.3V supply voltage.
  *           (2)Transmit energy in VBAT mode decreases as the supply voltage drops.
  *           (3)There will be some differences in the energy values tested between different chips.
- *           (4)At present, power levels above 9dbm cannot be used.There is spectrum leakage when TX sends energy to levels above 9dbm.
+ *           (4)At present, power levels above 9dbm cannot be used.There is spectrum leakage when TX sends energy to levels above 9dbm.(A2 has fixed this issue)
+ *           (5)TX Power levels above 10dbm are internal test versions and are not open to users.
  */
 typedef enum {
+
+#if RF_TX_POWER_A2
+    /*VBAT*/
+#ifdef GREATER_TX_POWER_EN
+    RF_POWER_INDEX_P12p11dBm, /**<  12.1 dbm */
+    RF_POWER_INDEX_P11p86dBm, /**<  11.8 dbm */
+    RF_POWER_INDEX_P11p49dBm, /**<  11.5 dbm */
+    RF_POWER_INDEX_P11p01dBm, /**<  11.0 dbm */
+    RF_POWER_INDEX_P10p50dBm, /**<  10.5 dbm */
+#endif
+    RF_POWER_INDEX_P10p00dBm, /**<  10.0 dbm */
+    RF_POWER_INDEX_P9p45dBm,  /**<  9.5 dbm */
+    RF_POWER_INDEX_P9p10dBm,  /**<  9.1 dbm */
+    RF_POWER_INDEX_P8p55dBm,  /**<  8.4 dbm */
+    RF_POWER_INDEX_P8p06dBm,  /**<  8.0 dbm */
+    RF_POWER_INDEX_P7p52dBm,  /**<  7.5 dbm */
+    RF_POWER_INDEX_P6p71dBm,  /**<  6.7 dbm */
+    RF_POWER_INDEX_P6p08dBm,  /**<  6.0 dbm */
+    RF_POWER_INDEX_P5p53dBm,  /**<  5.5 dbm */
+    RF_POWER_INDEX_P4p79dBm,  /**<  4.8 dbm */
+    RF_POWER_INDEX_P4p09dBm,  /**<  4.1 dbm */
+
+
+    /*VANT*/
+    RF_POWER_INDEX_P3p82dBm,   /**<   3.8 dbm */
+    RF_POWER_INDEX_P3p48dBm,   /**<   3.5 dbm */
+    RF_POWER_INDEX_P3p32dBm,   /**<   3.3 dbm */
+    RF_POWER_INDEX_P3p04dBm,   /**<   3.0 dbm */
+    RF_POWER_INDEX_P2p73dBm,   /**<   2.7 dbm */
+    RF_POWER_INDEX_P2p43dBm,   /**<   2.4 dbm */
+    RF_POWER_INDEX_P2p00dBm,   /**<   2.0 dbm */
+    RF_POWER_INDEX_P1p65dBm,   /**<   1.6 dbm */
+    RF_POWER_INDEX_P0p98dBm,   /**<   1.0 dbm */
+    RF_POWER_INDEX_P0p66dBm,   /**<   0.7 dbm */
+    RF_POWER_INDEX_P0p03dBm,   /**<   0.0 dbm */
+    RF_POWER_INDEX_N0p66dBm,   /**<   -0.7 dbm */
+    RF_POWER_INDEX_N1p08dBm,   /**<   -1.0 dbm */
+    RF_POWER_INDEX_N1p67dBm,   /**<  -1.7 dbm */
+    RF_POWER_INDEX_N2p30dBm,   /**<  -2.3 dbm */
+    RF_POWER_INDEX_N3p08dBm,   /**<  -3.0 dbm */
+    RF_POWER_INDEX_N3p89dBm,   /**<  -3.9 dbm */
+    RF_POWER_INDEX_N4p36dBm,   /**<  -4.4 dbm */
+    RF_POWER_INDEX_N4p90dBm,   /**<  -5.0 dbm */
+    RF_POWER_INDEX_N5p38dBm,   /**<  -5.4 dbm */
+    RF_POWER_INDEX_N6p03dBm,   /**<  -6.0 dbm */
+    RF_POWER_INDEX_N6p61dBm,   /**<  -6.6 dbm */
+    RF_POWER_INDEX_N7p39dBm,   /**<  -7.4 dbm */
+    RF_POWER_INDEX_N8p14dBm,   /**<  -8.1 dbm */
+    RF_POWER_INDEX_N9p14dBm,   /**<  -9.1 dbm */
+    RF_POWER_INDEX_N10p09dBm,  /**<  -10.1 dbm */
+    RF_POWER_INDEX_N11p42dBm,  /**<  -11.4 dbm */
+    RF_POWER_INDEX_N12p72dBm,  /**<  -12.7 dbm */
+    RF_POWER_INDEX_N14p64dBm,  /**<  -14.6 dbm */
+    RF_POWER_INDEX_N16p82dBm,  /**<  -16.8 dbm */
+    RF_POWER_INDEX_N20p22dBm,  /**<  -20.2 dbm */
+    RF_POWER_INDEX_N25p19dBm,  /**<  -25.2 dbm */
+    RF_POWER_INDEX_N41p80dBm,  /**<  -41.8 dbm */
+//  (1)Normal energy levels(described above) can be used for typical applications.The following energy levels reduce
+//     TX power consumption but require LDO and DCDC voltage to be raised from 0.94V to 1.05V before TX.To offset
+//     increased base power, the voltage should be restored to 0.94V after RX.You can refer to app_ble_mode.c in RF_Demo.
+//    (2)The default power-up configuration is 1.05V gears There is no need to switch back and forth, but note that the
+//       overall tx power and power consumption will increase.
+    RF_1P05_VANT_POWER_INDEX_P5p11dBm,   /**<   5.1 dbm */
+    RF_1P05_VANT_POWER_INDEX_P5p00dBm,   /**<   5.0 dbm */
+    RF_1P05_VANT_POWER_INDEX_P4p60dBm,   /**<   4.6 dbm */
+    RF_1P05_VANT_POWER_INDEX_P4p00dBm,   /**<   4.0 dbm */
+    RF_1P05_VANT_POWER_INDEX_P3p52dBm,   /**<   3.5 dbm */
+#else
      /*VBAT*/
 #ifdef GREATER_TX_POWER_EN
     /**TODO:The A1 version of the chip cannot be used with power levels above 9dbm.
@@ -357,6 +512,7 @@ typedef enum {
      RF_POWER_INDEX_N24p04dBm,   /**<  -24.0 dbm */
      RF_POWER_INDEX_N28p86dBm,   /**<  -28.9 dbm */
      RF_POWER_INDEX_N44p08dBm,   /**<  -44.0 dbm */
+#endif
 } rf_power_level_index_e;
 
 
@@ -431,10 +587,21 @@ enum{
     BB_TIMER_TICK_1S        = 8000000,
 };
 
+/**
+ * @brief Define RX performance modes, RF_RX_NORMAL_PERFORMANCE and RF_RX_HIGH_PERFORMANCE
+ * @note  Defaults to RF_RX_NORMAL_PERFORMANCE for A2.
+ *        RF_RX_HIGH_PERFORMANCE mode can improve performance, but the rx power consumption will increase
+ */
+typedef enum{
+    RF_RX_NORMAL_PERFORMANCE  = 0,
+    RF_RX_HIGH_PERFORMANCE    = 1,
+}rf_rx_performance_e;
+
 /**********************************************************************************************************************
  *                                         RF global constants                                                        *
  *********************************************************************************************************************/
-extern _attribute_data_retention_ volatile rf_power_level_e rf_power_Level_list[60]; //BLE SDK use: volatile to put into RAM
+
+extern _attribute_data_retention_ volatile rf_power_level_e rf_power_Level_list[70]; //BLE SDK use
 extern rf_mode_e   g_rfmode;
 extern rf_crc_config_t rf_crc_config[3];
 
@@ -830,6 +997,16 @@ static inline unsigned char rf_get_rx_wptr(void)
 }
 
 /**
+ * @brief     This function is used to select the A2 version rx performance mode.
+ * @param[in] rx_performance - rx performance mode.
+ * @return    none.
+ * @note      There are two types of RX performance modes, RF_RX_NORMAL_PERFORMANCE and RX_HIGH_PERFORMANCE
+ *            The default is RF_RX_NORMAL_PERFORMANCE, This mode is the default performance configuration.
+ *            RX_HIGH_PERFORMANCE mode can improve performance, but the rx power consumption will increase
+ */
+void rf_rx_performance_mode(rf_rx_performance_e rx_performance);
+
+/**
  * @brief      This function serves to initiate information of RF.
  * @return     none.
  */
@@ -1124,7 +1301,7 @@ void rf_rx_fast_settle_dis(void);
  *  @brief      This function is mainly used to get rccal Calibration-related values.
  *  @param[in]  rccal_cal  - rccal calibration value address pointer
  *  @return     none
- */
+*/
 void rf_get_rccal_cal_val(rf_rccal_cal_t *rccal_cal);
 
 /**
@@ -1135,29 +1312,33 @@ void rf_get_rccal_cal_val(rf_rccal_cal_t *rccal_cal);
 void rf_set_rccal_cal_val(rf_rccal_cal_t rccal_cal);
 
 /**
- * @brief      This function serves to set RF tx settle time.
- * @param[in]  tx_wait_us  tx settle time,the unit is us.The max value of this param is 0xfff; The default settling time value is 150us.
- *             The typical value is 113us (tx_settle time should not be less than this value).
+ * @brief      This function serves to set the tx wait time during the rx2tx process
+ * @param[in]  tx_wait_us  tx wait time,the unit is us.The max value of this param is 0xfff; The default wait time value is 10us.
  * @return     none.
- * @note       Attention:It is not necessary to call this function to adjust the settling time in the normal sending state.
+ * @note       Attention:It is not necessary to call this function to adjust the wait time in the rx2tx process.
  */
 static inline void rf_set_tx_wait_time(unsigned short tx_wait_us )
 {
-    tx_wait_us &= 0x0fff;
-    write_reg16(0x17020e, (read_reg16(0x17020e)& 0xf000) |(tx_wait_us - 1));
+    if(tx_wait_us>0x0fff)
+    {
+        tx_wait_us = 0x0fff;
+    }
+    reg_rf_ll_txwait = (reg_rf_ll_txwait & 0xf000)|(tx_wait_us-1);
 }
 
 /**
- * @brief      This function serves to set RF tx settle time and rx settle time.
- * @param[in]  rx_stl_us  rx settle time,the unit is us.The max value of this param is 0xfff;The default settling time value is 150us.
- *             The typical value is 85us (rx_settle time should not be less than this value).
+ * @brief      This function serves to set the rx wait time during the tx2rx process
+ * @param[in]  rx_wait_us  rx wait time,the unit is us.The max value of this param is 0xfff; The default wait time value is 10us.
  * @return     none.
- * @note       Attention:It is not necessary to call this function to adjust the settling time in the normal packet receiving state.
+ * @note       Attention:It is not necessary to call this function to adjust the wait time in the tx2rx process.
  */
 static inline void rf_set_rx_wait_time( unsigned short rx_wait_us )
 {
-    rx_wait_us &= 0x0fff;
-     write_reg16(0x170206, (read_reg16(0x170206)& 0xf000) |(rx_wait_us - 1));
+    if(rx_wait_us>0x0fff)
+    {
+        rx_wait_us = 0x0fff;
+    }
+    reg_rf_ll_rxwait = (reg_rf_ll_rxwait & 0xf000)|(rx_wait_us-1);
 }
 
 /**
@@ -1209,11 +1390,51 @@ void rf_rx_fast_settle_update_cal_val(rf_rx_fast_settle_time_e rx_settle_time,un
  */
 void rf_set_power_level_singletone(rf_power_level_e level);
 
+/**
+ *  @brief      This function is used to get the tx fast_settle calibration value.
+ *  @param[in]  tx_settle_us    After adjusting the timing sequence, the time required for tx to settle.
+ *  @param[in]  chn             Calibrates the frequency (2400 + chn). Range: 0 to 80. Applies to TX_SETTLE_TIME_15US and TX_SETTLE_TIME_51US, other parameters are invalid.
+ *                              (When tx_settle_us is 15us or 51us, the modules to be calibrated are frequency-dependent, so all used frequency points need to be calibrated.)
+ *  @param[in]  fs_cv           Fast settle calibration value address pointer.
+ *  @return     none
+*/
+void rf_tx_fast_settle_get_cal_val(rf_tx_fast_settle_time_e tx_settle_time,unsigned char chn, rf_fast_settle_t* fs_cv);
+
+/**
+ *  @brief      This function is used to set the tx fast_settle calibration value.
+ *  @param[in]  tx_settle_us    After adjusting the timing sequence, the time required for tx to settle.
+ *  @param[in]  chn             Calibrates the frequency (2400 + chn). Range: 0 to 80. Applies to TX_SETTLE_TIME_15US and TX_SETTLE_TIME_51US, other parameters are invalid.
+ *                              (When tx_settle_us is 15us or 51us, the modules to be calibrated are frequency-dependent, so all used frequency points need to be calibrated.)
+ *  @param[in]  fs_cv           Fast settle calibration value address pointer.
+ *  @return     none
+*/
+void rf_tx_fast_settle_set_cal_val(rf_tx_fast_settle_time_e tx_settle_time,unsigned char chn,rf_fast_settle_t* fs_cv);
+
+/**
+ *  @brief      This function is used to get the rx fast_settle calibration value.
+ *  @param[in]  rx_settle_us    After adjusting the timing sequence, the time required for rx to settle.
+ *  @param[in]  chn             Calibrates the frequency (2400 + chn). Range: 0 to 80. Applies to RX_SETTLE_TIME_15US, other parameters are invalid.
+ *                              (When rx_settle_us is 15us, the modules to be calibrated are frequency-dependent, so all used frequency points need to be calibrated.)
+ *  @param[in]  fs_cv           Fast settle calibration value address pointer.
+ *  @return     none
+*/
+void rf_rx_fast_settle_get_cal_val(rf_rx_fast_settle_time_e rx_settle_time,unsigned char chn, rf_fast_settle_t* fs_cv);
+
+/**
+ *  @brief      This function is used to set the rx fast_settle calibration value.
+ *  @param[in]  rx_settle_us    After adjusting the timing sequence, the time required for rx to settle.
+ *  @param[in]  chn             Calibrates the frequency (2400 + chn). Range: 0 to 80. Applies to RX_SETTLE_TIME_15US, other parameters are invalid.
+ *                              (When rx_settle_us is 15us, the modules to be calibrated are frequency-dependent, so all used frequency points need to be calibrated.)
+ *  @param[in]  fs_cv           Fast settle calibration value address pointer.
+ *  @return     none
+*/
+void rf_rx_fast_settle_set_cal_val(rf_rx_fast_settle_time_e rx_settle_time,unsigned char chn,rf_fast_settle_t* fs_cv);
+
 /* Compatible macros */
-#define rf_baseband_reset           rf_clr_dig_logic_state
+#define rf_baseband_reset			rf_clr_dig_logic_state
 
-#define rf_radio_reset              rf_reset_register_value
+#define rf_radio_reset				rf_reset_register_value
 
-#define rf_reset_dma                rf_dma_reset
+#define rf_reset_dma				rf_dma_reset
 
 #endif

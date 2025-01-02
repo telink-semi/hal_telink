@@ -47,8 +47,8 @@ typedef enum {
     CHN_STATUS_INVALID  = 0xFF,
 }chn_status_t;
 
-
-typedef struct{
+/* refer to BLE SPEC: Vol 6, Part B, 2.4.2.38 "LL_CHANNEL_REPORTING_IND" for more information. */
+typedef struct __attribute__((packed)) {
     u8  llid;
     u8  rf_len;
     u8  opcode;
@@ -57,7 +57,8 @@ typedef struct{
     u8  maxDelay;
 }rf_pkt_ll_chn_rpt_ind_t;   //LL_CHANNEL_REPORTING_IND
 
-typedef struct{
+/* refer to BLE SPEC: Vol 6, Part B, 2.4.2.39 "LL_CHANNEL_STATUS_IND" for more information. */
+typedef struct __attribute__((packed)) {
     u8  llid;
     u8  rf_len;
     u8  opcode;

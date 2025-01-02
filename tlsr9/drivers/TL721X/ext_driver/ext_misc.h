@@ -129,9 +129,10 @@ void gpio_setup_up_down_resistor(gpio_pin_e gpio, gpio_pull_type up_down);
  */
 void rf_drv_ble_init(void);
 
-#define RF_POWER_P3dBm   RF_POWER_INDEX_P2p98dBm
-#define RF_POWER_P0dBm   RF_POWER_INDEX_P0p05dBm
-#define RF_POWER_P9dBm   RF_POWER_INDEX_P9p06dBm
+#define RF_POWER_P3dBm   RF_POWER_INDEX_P3p04dBm
+#define RF_POWER_P0dBm   RF_POWER_INDEX_P0p03dBm
+#define RF_POWER_P4dbm   RF_POWER_INDEX_P4p09dBm
+#define RF_POWER_P9dBm   RF_POWER_INDEX_P9p10dBm
 
 #if RF_THREE_CHANNEL_CALIBRATION
 

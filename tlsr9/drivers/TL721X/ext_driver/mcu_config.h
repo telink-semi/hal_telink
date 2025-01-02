@@ -35,7 +35,7 @@
 /**
  * @brief   Public Device Address Company ID for this chip
  */
-#define PDA_COMPANY_ID                                          0x3CCFB4    //todo
+#define PDA_COMPANY_ID                                          0x382228    //todo
 
 
 
@@ -46,12 +46,19 @@
     P25Q32SU    0x4b        0x166085    PUYA
     P25Q128L    0x4b        0x186085    PUYA
     GD25LQ16E   0x4b        0x1560c8    GD
+    P25Q80SU    0x4b        0x146085    PUYA
+    GD25LE80E   0x4b        0x1460c8    GD
+    GD25LE16E   0x4b        0x1560c8    GD
  */
 #define FLASH_P25Q80U_SUPPORT_EN                                0
+#define FLASH_P25Q80SU_SUPPORT_EN                               1
 #define FLASH_P25Q16SU_SUPPORT_EN                               1
 #define FLASH_P25Q32SU_SUPPORT_EN                               0
 #define FLASH_P25Q128L_SUPPORT_EN                               0
 #define FLASH_P25Q128H_SUPPORT_EN                               0
+
+#define FLASH_GD25LE80E_SUPPORT_EN                              1
+#define FLASH_GD25LE16E_SUPPORT_EN                              1
 #define FLASH_GD25LQ16E_SUPPORT_EN                              0
 
 

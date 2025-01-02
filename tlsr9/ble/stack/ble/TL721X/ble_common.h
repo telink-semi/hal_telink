@@ -245,6 +245,7 @@ typedef enum {
     HCI_ACL_DATA_BUF_PARAM_INVALID,
     HCI_ACL_DATA_BUF_SIZE_NOT_MEET_MAX_TX_OCT,
 
+    LL_ACL_CONN_NUM_NOT_SUPPORTED,
 
 
     LL_ACL_TX_BUF_SIZE_MUL_NUM_EXCEED_4K                           = 0x1071,        /* special, B91 only */
@@ -294,7 +295,8 @@ typedef enum {
     INIT_ERR_SMP_PARAM_INVALID                                     = 0x2401,
     INIT_ERR_SMP_BONDING_MAX_NUMBER_EXCEED,
 
-
+    ////////////////// system /////////////////////
+    SYS_CLK_ERR_NOT_SUPPORTED                                      = 0x3001, //System clock is too slow: Triggered when the system clock frequency is below the minimum required threshold
 } init_err_t;
 
 
@@ -507,12 +509,12 @@ HCI TX fifo include ACL data report, HCI Event report (controller to host)
 
 
 /**
- * @brief      ota crc16_lib related function.
+ * @brief      ota crc16 related function.
  * @param[in]  pD: input data.
  * @param[in]  len: data length.
  * @return     crc result.
  */
-unsigned short crc16_lib (unsigned char *pD, int len);
+unsigned short blt_Crc16ComputeInternal (unsigned char *pD, int len);
 
 
 /**

@@ -43,19 +43,25 @@
 * @brief This function serves to set the protection area of the flash./
 */
 unsigned char flash_lock_mid156085(mid156085_lock_block_e data);
-
+unsigned char flash_lock_mid146085(mid146085_lock_block_e data);
+unsigned char flash_lock_mid1460c8(mid1460c8_lock_block_e data);
+unsigned char flash_lock_mid1560c8(mid1560c8_lock_block_e data);
 
 /**
 * @brief This function serves to flash release protection.
 */
 unsigned char flash_unlock_mid156085(void);
-
+unsigned char flash_unlock_mid146085(void);
+unsigned char flash_unlock_mid1460c8(void);
+unsigned char flash_unlock_mid1560c8(void);
 
 /**
 * @brief This function serves to get the protection area of the flash.
 */
 mid156085_lock_block_e flash_get_lock_block_mid156085(void);
-
+mid146085_lock_block_e flash_get_lock_block_mid146085(void);
+mid1460c8_lock_block_e flash_get_lock_block_mid1460c8(void);
+mid1560c8_lock_block_e flash_get_lock_block_mid1560c8(void);
 
 /**
  * @brief       This function serves to read MID of flash(MAC id).

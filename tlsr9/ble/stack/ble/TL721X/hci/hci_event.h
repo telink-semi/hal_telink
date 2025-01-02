@@ -31,7 +31,7 @@
 /**
  *  @brief  Definition for general HCI event packet
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8         type;
     u8         eventCode;
     u8         paraLen;
@@ -39,7 +39,7 @@ typedef struct {
 } hci_event_t;
 
 
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8         numHciCmds;
     u8         opCode_OCF;
     u8         opCode_OGF;
@@ -47,14 +47,14 @@ typedef struct {
 } hci_cmdCompleteEvt_evtParam_t;
 
 
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8         status;
     u8         numHciCmds;
     u8         opCode_OCF;
     u8         opCode_OGF;
 } hci_cmdStatusEvt_evtParam_t;
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u16         connHandle;
     u16         numOfCmpPkts;
 }numCmpPktParamRet_t;
@@ -72,7 +72,7 @@ typedef struct __attribute__((packed)) {
     u16 subVerNr;
 }hci_readRemVerInfoCmplEvt_t;
 
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8         type;
     u8         eventCode;
     u8         paraLen;
@@ -127,7 +127,7 @@ typedef struct __attribute__((packed)) {
 /**
  *  @brief  Event Parameters for "7.7.65.1 LE Connection Complete event"
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8         subEventCode;
     u8         status;
     u16        connHandle;
@@ -155,7 +155,7 @@ typedef enum {
 /**
  *  @brief  Event Parameters for "7.7.65.2 LE Advertising Report event"
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8  subcode;
     u8  nreport;
     u8  event_type;
@@ -179,7 +179,7 @@ typedef enum {
 /**
  *  @brief  Event Parameters for "7.7.65.3 LE Connection Update Complete event"
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8         subEventCode;
     u8         status;
     u16        connHandle;
@@ -194,7 +194,7 @@ typedef struct {
  *  @brief  Event Parameters for "7.7.65.4 LE Read Remote Features Complete event"
  */
 #define LL_FEATURE_SIZE                                                 8
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8         subEventCode;
     u8         status;
     u16        connHandle;
@@ -246,7 +246,7 @@ typedef struct __attribute__((packed)) {
 /**
  *  @brief  Event Parameters for "7.7.65.8 LE Read Local P-256 Public Key Complete event"
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8         subEventCode;
     u8         status;
     u8         localP256Key[64];
@@ -257,7 +257,7 @@ typedef struct {
 /**
  *  @brief  Event Parameters for "7.7.65.9 LE Generate DHKey Complete event"
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8         subEventCode;
     u8         status;
     u8         DHKey[32];
@@ -268,7 +268,7 @@ typedef struct {
 /**
  *  @brief  Event Parameters for "7.7.65.10 LE Enhanced Connection Complete event"
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8         subEventCode;
     u8         status;
     u16        connHandle;
@@ -286,7 +286,7 @@ typedef struct {
 /**
  *  @brief  Event Parameters for "7.7.65.10 LE Enhanced Connection Complete event V2"
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8         subEventCode;
     u8         status;
     u16        connHandle;
@@ -306,7 +306,7 @@ typedef struct {
 /**
  *  @brief  Event Parameters for "7.7.65.11 LE Directed Advertising Report event"
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8         subEventCode;
     u8         num_reports;
     u8         event_type;
@@ -321,7 +321,7 @@ typedef struct {
 /**
  *  @brief  Event Parameters for "7.7.65.12 LE PHY Update Complete event"
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8         subEventCode;
     u8         status;
     u16        connHandle;
@@ -350,7 +350,7 @@ typedef struct __attribute__((packed)) {
     u8      data[1];
 } extAdvEvt_info_t;
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8      subEventCode;
     u8      num_reports;
     u16     event_type;         // 2
@@ -417,7 +417,7 @@ typedef struct __attribute__((packed)) {
 }le_periodAdvReportEvt_t_v2;
 
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8      I_sample;
     u8      Q_sample;
 }IQ_sample_t;
@@ -471,7 +471,7 @@ typedef struct __attribute__((packed)) {
 #define EXTADV_INFO_LENGTH              24   //byte number from "event_type" to "data_length"
 #define EXTADV_RPT_DATA_LEN_MAX         229  //253 - 24 = 229
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8      subEventCode;
     u8      num_reports;
     u8      advEvtInfo[1];
@@ -617,7 +617,7 @@ typedef struct __attribute__((packed)) {
 
 
 
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8         subEventCode;
 } hci_le_scanTimeoutEvt_t;
 
@@ -639,7 +639,7 @@ typedef struct __attribute__((packed)) {
 /**
  *  @brief  Event Parameters for "7.7.65.19 LE Scan Request Received event"
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8         subEventCode;
     u8         advHandle;
     u8         scannerAddrType;
@@ -756,7 +756,7 @@ typedef struct __attribute__((packed)) {
 /**
  *  @brief  Event Parameters for "7.7.65.28 LE Terminate BIG Complete event"
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8          subEventCode;
     u8          bigHandle;
     u8          reason;
@@ -785,7 +785,7 @@ typedef struct __attribute__((packed)) {
 /**
  *  @brief  Event Parameters for "7.7.65.29 LE BIG Sync Established event"
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8          subEventCode;
     u8          bigHandle;
     u8          reason;
@@ -833,7 +833,7 @@ typedef struct __attribute__((packed)) {
 /**
  *  @brief  Event Parameters for "7.7.65.33 LE Transmit Power Reporting event"
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8      subEventCode;
     u8      status;
     u16     connHandle;
@@ -849,7 +849,7 @@ typedef struct {
 /**
  * @brief  Event Parameters for "7.7.65.35 LE Subrate Change event"
  */
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8      subEventCode;
     u8      status;
     u16     connHandle;
@@ -864,7 +864,7 @@ typedef struct{
 /**
  * @brief  Event Parameters for "7.7.65.36 LE Periodic Advertising Subevent Data Request event"
  */
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8      subEventCode;
     u8      advHandle;
     u8      subevtStart;
@@ -875,7 +875,7 @@ typedef struct{
 /**
  * @brief  Event Parameters for "77.7.65.37 LE Periodic Advertising Response Report event"
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     s8      txPower;
     s8      RSSI;
     u8      cteType;
@@ -884,7 +884,8 @@ typedef struct {
     u8      dataLength;  // 0 to 247 Length of the Data field
     u8      data[0];
 } pawrRspReportDat_t;
-typedef struct{
+
+typedef struct __attribute__((packed)) {
     u8      subEventCode;
     u8      advHandle;
     u8      Subevent;
@@ -917,22 +918,23 @@ typedef struct __attribute__((packed)) {
     u16 Optional_T_FCS_Times_Supported;
     u16 Optional_T_PM_Times_Supported;
     u8 T_SW_Time_Supported;
+    u8 Optional_TX_SNR_Capability;
 } hci_le_readRemoteSupCapCompleteEvt_t;
 
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8 Subevent_Code;
     u8 Status;
     u16 Connection_Handle;
     u8 Remote_FAE_Table[72];
 } hci_le_readRemoteFAETableCompleteEvt_t;
 
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8 Subevent_Code;
     u8 Status;
     u16 Connection_Handle;
 } hci_le_csSecurityEnableCompleteEvt_t;
 
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8 Subevent_Code;
     u8 Status;
     u16 Connection_Handle;
@@ -959,8 +961,7 @@ typedef struct {
     u8 T_PM_Time;
 } hci_le_csConfigCompleteEvt_t;
 
-
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8 Subevent_Code;
     u8 Status;
     u16 Connection_Handle;
@@ -976,7 +977,7 @@ typedef struct {
     u16 Procedure_Count;
 } hci_le_csProcedureEnableCompleteEvt_t;
 
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8 mode;
     u8 channel;
     u8 len;
@@ -990,7 +991,7 @@ typedef struct __attribute__((packed)) {
     s16 Measured_Freq_Offset;
 } cs_step_mode0_t;
 
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8 Packet_Quality;
     u8 Packet_NADM;
     u8 Packet_RSSI;
@@ -1000,7 +1001,7 @@ typedef struct {
     u8 Packet_PCT2[3];
 } cs_step_mode1_t;
 
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8 Tone_PCT[3];
     u8 Tone_Quality_Indicator;
 } cs_step_tone_t;
@@ -1060,7 +1061,7 @@ typedef struct __attribute__((packed)) {
 
 } hci_le_csSubeventResultContinueEvt_t;
 
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8 Subevent_Code;
     u8 Status;
 } hci_le_csTestEndCompleteEvt_t;
@@ -1068,7 +1069,7 @@ typedef struct {
 /**
  *  @brief  Event Parameters for Telink Private "LE Connection Establish event"
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8         subEventCode;
     u8         status;
     u16        connHandle;
@@ -1085,7 +1086,7 @@ typedef struct {
 /**
  *  @brief  Event Parameters for Telink Private "LE Create Connection Fail event"
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8         subEventCode;
     u8         fail_reason;
     u8         create_conn_cnt;

@@ -55,6 +55,48 @@
  *********************************************************************************************************************/
 #define ANALOG_TIMEOUT                0
 
+/*
+ * @note:
+ * 1.the destination and source addresses, four-byte alignment.
+ * 2.the destination address is configured fixed.
+ * 3.dma size needs to be configured DMA_CTR_WORD_WIDTH,the length needs to be configured as a multiple of four.
+ */
+#define ANALOG_FIXED_ADDR_TX_DMA_CFG   \
+        (DMA_REQ_ALGM_TX        << DMA_CHACTRL_DST_REQ_SEL_OFFSET)  | \
+        (0                      << DMA_CHACTRL_SRC_REQ_SEL_OFFSET)  | \
+        (DMA_ADDR_FIX           << DMA_CHACTRL_DST_ADDR_CTRL_OFFSET) | \
+        (DMA_ADDR_FIX           << DMA_CHACTRL_SRC_ADDR_CTRL_OFFST) | \
+        (DMA_HANDSHAKE_MODE     << DMA_CHACTRL_DSTMODE_OFFSET) | \
+        (DMA_NORMAL_MODE        << DMA_CHACTRL_SRCMODE_OFFSET) | \
+        (DMA_CTR_WORD_WIDTH     << DMA_CHACTRL_DSTWIDTH_SIZE_OFFSET) | \
+        (DMA_CTR_WORD_WIDTH     << DMA_CHACTRL_SRCWIDTH_SIZE_OFFSET) | \
+        (0                      << DMA_CHACTRL_SRC_BURST_SIZE_OFFSET) | \
+        (0                      << DMA_CHACTRL_READ_NUM_EN_OFFSET) | \
+        (0                      << DMA_CHACTRL_PRIORITY_OFFSET) | \
+        (0                      << DMA_CHACTRL_WRITE_NUM_EN_OFFSET) | \
+        (0                      << DMA_CHACTRL_AUTO_EN_OFFSET)
+
+/*
+ * @note:
+ * 1.the destination and source addresses, four-byte alignment.
+ * 2.the destination address is configured incrementally.
+ * 3.dma size needs to be configured DMA_CTR_WORD_WIDTH,the length needs to be configured as a multiple of four.
+ */
+#define ANALOG_INC_ADDR_TX_DMA_CFG   \
+        (DMA_REQ_ALGM_TX        << DMA_CHACTRL_DST_REQ_SEL_OFFSET)  | \
+        (0                      << DMA_CHACTRL_SRC_REQ_SEL_OFFSET)  | \
+        (DMA_ADDR_FIX           << DMA_CHACTRL_DST_ADDR_CTRL_OFFSET) | \
+        (DMA_ADDR_INCREMENT     << DMA_CHACTRL_SRC_ADDR_CTRL_OFFST) | \
+        (DMA_HANDSHAKE_MODE     << DMA_CHACTRL_DSTMODE_OFFSET) | \
+        (DMA_NORMAL_MODE        << DMA_CHACTRL_SRCMODE_OFFSET) | \
+        (DMA_CTR_WORD_WIDTH     << DMA_CHACTRL_DSTWIDTH_SIZE_OFFSET) | \
+        (DMA_CTR_WORD_WIDTH     << DMA_CHACTRL_SRCWIDTH_SIZE_OFFSET) | \
+        (0                      << DMA_CHACTRL_SRC_BURST_SIZE_OFFSET) | \
+        (0                      << DMA_CHACTRL_READ_NUM_EN_OFFSET) | \
+        (0                      << DMA_CHACTRL_PRIORITY_OFFSET) | \
+        (0                      << DMA_CHACTRL_WRITE_NUM_EN_OFFSET) | \
+        (0                      << DMA_CHACTRL_AUTO_EN_OFFSET)
+
 /**********************************************************************************************************************
  *                                         global data type                                                           *
  *********************************************************************************************************************/

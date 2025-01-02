@@ -100,6 +100,30 @@ static inline void swire_fifo_mode_en(void)
 }
 
 /**
+ * @brief     This function is to judge whether the swire slave is on.
+ * @return    none
+ */
+static inline unsigned char swire_slave_is_init(void){
+    return ((reg_rst0&FLD_RST0_SWIRE) &&(reg_clk_en0 & FLD_CLK0_SWIRE_EN)&&(!(reg_gpio_func(GPIO_SWS)&(GPIO_PA7&0xff))));
+}
+
+/**
+ * @brief     This function is to dis swire by reset.
+ * @return    none
+ */
+static inline void swire_slave_dis(void){
+     reg_rst0 &= (~FLD_RST0_SWIRE);
+}
+
+/**
+ * @brief     This function is to enable swire by reset.
+ * @return    none
+ */
+static inline void swire_slave_en(void){
+    reg_rst0 |= (FLD_RST0_SWIRE);
+}
+
+/**
  * @brief     This function is to send a specific timing to reset the status of the slave device.
  *            When the master device connects the DP pin of the slave device, this function must be called first,
  *            because the DP pin of the slave device is USB function by default. Only after calling this function to send a specific timing,

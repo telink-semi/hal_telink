@@ -31,7 +31,8 @@
 
 #include "stack/ble/ble_stack.h"
 
-typedef struct{
+/* refer to BLE SPEC: Vol 6, Part B, 2.4.2.27 "LL_PERIODIC_SYNC_IND" for more information. */
+typedef struct __attribute__((packed)) {
     u8          llid;
     u8          rf_len;
     u8          opcode;
@@ -49,7 +50,8 @@ typedef struct{
 
 
 /////////////////// PAwR ///////////////////////
-typedef struct{
+/* refer to BLE SPEC: Vol 6, Part B, 2.4.2.40 "LL_PERIODIC_SYNC_WR_IND" for more information. */
+typedef struct __attribute__((packed)) {
     rf_pkt_ll_periodic_sync_ind_t pastInd;
     pawr_acad_t pawrTimingInfo;
 }rf_pkt_ll_periodic_sync_wr_ind_t; //LL_PERIODIC_SYNC_WR_IND

@@ -500,6 +500,16 @@ static inline void pwm_32k_chn_dis(pwm_clk_32k_en_chn_e pwm_32K_en_chn)
 {
     BM_CLR(reg_pwm_mode32k, pwm_32K_en_chn);
 }
+
+/**
+ * @brief     This function performs to ctrl pwm pem.
+ * @param[in] pem_ctrl  - pem mode.
+ * @return    none.
+ */
+static inline void pwm_set_pem(pwm_pem_ctrl_e pem_ctrl)
+{
+    reg_pwm_pem_ctrl |= pem_ctrl;
+}
 #endif
 
 

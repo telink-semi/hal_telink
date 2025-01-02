@@ -42,7 +42,7 @@ enum{
 /**
  * @brief   acl slave compatible mode parameter, 24Bytes
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8      slave_index;        //0~3
     u8      slave_status;
     u8      slave_accessAddress[4]; //Little-Endian
@@ -60,7 +60,7 @@ typedef struct {
 /**
  * @brief   acl slave interoperable mode parameter, 28Bytes
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8      slave_index;        //0~3
     u32     slave_connExpectTime;
     u16     slave_connEventCounter;

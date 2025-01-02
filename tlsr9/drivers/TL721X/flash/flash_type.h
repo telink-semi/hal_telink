@@ -25,7 +25,10 @@
 #define __FLASH_TYPE_H__
 
 #include "flash.h"
+#include "flash_mid146085.h"    // P25Q80SU (untest)
 #include "flash_mid156085.h"    // P25Q16SU
+#include "flash_mid1460c8.h"    // GD25LE80E(untest)
+#include "flash_mid1560c8.h"    // GD25LE16E(untest)
 
 
 /**

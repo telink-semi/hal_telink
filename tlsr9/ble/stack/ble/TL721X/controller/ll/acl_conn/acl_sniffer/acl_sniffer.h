@@ -98,7 +98,7 @@ typedef enum {
 /**
  *  @brief  Event Parameters for "BLT_EV_FLAG_SNIFFER_RSSI_REPORT"
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8  snifChannel :6;
     u8  type        :2;     //peer device RSSI mark, 2:master RSSI, 1:slave RSSI, 0:invalid RSSI
     u8  snifHandle;
@@ -109,7 +109,7 @@ typedef struct {
 /**
  *  @brief  Event Parameters for "BLT_EV_FLAG_SNIFFER_SYNC_STATUS"
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8  snifHandle;
     u8  status;
 }acl_sniffer_sync_statusEvt_t;
@@ -118,7 +118,7 @@ typedef struct {
 /**
  *  @brief  Event Parameters for "BLT_EV_FLAG_CHANNEL_MAP_UPDATE"
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     u16 connHandle;
 }acl_channel_map_updateEvt_t;
 
@@ -126,7 +126,7 @@ typedef struct {
 /**
  *  @brief  Event Parameters for "BLT_EV_FLAG_ACL_EVERY_CONN_EVENT"
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     u16 connHandle;
     u16 connEventCounter;
     u32 connExpectTime;

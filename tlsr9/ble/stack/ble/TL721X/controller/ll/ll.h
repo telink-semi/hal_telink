@@ -47,6 +47,15 @@ typedef enum{
 }blt_ev_flag_t;
 
 
+typedef enum {
+    BLE_STATUS_IDLE              = 0x0000, // Idle state
+    BLE_STATUS_ADVERTISING       = 0x0001, // Scanning state
+    BLE_STATUS_SCANNING          = 0x0002, // Advertising state (non-extended)
+    BLE_STATUS_INITIATING        = 0x0004, // initiating state
+    BLE_STATUS_CONNECTED         = 0x0008, // Connected state
+    BLE_STATUS_EXT_ADVERTISING   = 0x0010, // Extended Advertising state
+    BLE_STATUS_UNKNOWN           = 0x8000, // Unknown state (to indicate undefined)
+} ble_status_t;
 
 
 
@@ -169,6 +178,21 @@ bool        blc_ll_isBleTaskIdle(void);
  * @return     none
  */
 void        blc_ll_setCustomizedAdvertisingScanningChannel (u8 chn0, u8 chn1, u8 chn2);
+
+
+/**
+ * @brief   Retrieves the current active states of the BLE stack, similar to `blc_ll_getCurrentState`.
+ * @param   none
+ * @return  A bitmask representing the active BLE states.
+ */
+ble_status_t blc_ll_getBleCurrentState(void);
+
+
+/* @brief   Check if the RF is currently busy.
+ * This function checks if the RF module is currently in a busy state.
+ * @return  true if the RF is busy, false otherwise.
+ */
+bool blc_ll_isRfBusy(void);
 
 
 #endif /* LL_H_ */

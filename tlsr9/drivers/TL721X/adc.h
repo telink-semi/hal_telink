@@ -46,8 +46,8 @@
 extern unsigned char g_adc_rx_fifo_index;
 
 typedef enum{
-    ADC_VREF_0P9V = 0x01,//Only for internal testing,not recommended.
-    ADC_VREF_1P2V = 0x02,
+    ADC_VREF_GPIO_1P2V = 0x01,
+    ADC_VREF_VBAT_1P2V = 0x02,
 }adc_ref_vol_e;
 
 typedef enum{
@@ -57,7 +57,6 @@ typedef enum{
 
 typedef enum {
     NOINPUTN = 0,
-    ADC_GPIO_PB0N = 0x01,
     ADC_GPIO_PB1N = 0x02,
     ADC_GPIO_PB2N = 0x03,
     ADC_GPIO_PB3N = 0x04,
@@ -65,15 +64,12 @@ typedef enum {
     ADC_GPIO_PB5N = 0x06,
     ADC_GPIO_PB6N = 0x07,
     ADC_GPIO_PB7N = 0x08,
-    ADC_GPIO_PD0N = 0x09,
-    ADC_GPIO_PD1N = 0x0a,
     ADC_TEMPSENSORN_EE = 0x0e,
     GND = 0x0f,
 }adc_input_nch_e;
 
 typedef enum {
     NOINPUTP = 0,
-    ADC_GPIO_PB0P = 0x01,
     ADC_GPIO_PB1P = 0x02,
     ADC_GPIO_PB2P = 0x03,
     ADC_GPIO_PB3P = 0x04,
@@ -81,8 +77,6 @@ typedef enum {
     ADC_GPIO_PB5P = 0x06,
     ADC_GPIO_PB6P = 0x07,
     ADC_GPIO_PB7P = 0x08,
-    ADC_GPIO_PD0P = 0x09,
-    ADC_GPIO_PD1P = 0x0a,
     ADC_TEMPSENSORP_EE = 0x0e,
     ADC_VBAT = 0x0f,
 }adc_input_pch_e;
@@ -95,7 +89,6 @@ typedef enum {
  * |adc channel|    gpio pin  |
  */
 typedef enum{
-    ADC_GPIO_PB0 = GPIO_PB0 | (0x1<<12),
     ADC_GPIO_PB1 = GPIO_PB1 | (0x2<<12),
     ADC_GPIO_PB2 = GPIO_PB2 | (0x3<<12),
     ADC_GPIO_PB3 = GPIO_PB3 | (0x4<<12),
@@ -103,9 +96,7 @@ typedef enum{
     ADC_GPIO_PB5 = GPIO_PB5 | (0x6<<12),
     ADC_GPIO_PB6 = GPIO_PB6 | (0x7<<12),
     ADC_GPIO_PB7 = GPIO_PB7 | (0x8<<12),
-    ADC_GPIO_PD0 = GPIO_PD0 | (0x9<<12),
-    ADC_GPIO_PD1 = GPIO_PD1 | (0xa<<12),
-}adc_input_pin_e;
+}adc_input_pin_def_e;
 
 typedef enum{
     ADC_GPIO_MODE,
@@ -192,10 +183,10 @@ typedef enum{
 }adc_sample_freq_e;
 
 typedef enum{
-    ADC_PRESCALE_1   = 0x00,
+    ADC_PRESCALE_1   = 0x00,//Only used for vbat sampling
 //  ADC_PRESCALE_1F2 = 0x01,//Only for internal testing
-//  ADC_PRESCALE_1F4 = 0x02,//Only for internal testing
-    ADC_PRESCALE_1F8 = 0x03,
+    ADC_PRESCALE_1F4 = 0x02,
+//  ADC_PRESCALE_1F8 = 0x03,//Only for internal testing
 }adc_pre_scale_e;
 
 typedef struct{
@@ -211,7 +202,7 @@ typedef struct{
     adc_ref_vol_e v_ref;
     adc_pre_scale_e pre_scale;
     adc_sample_freq_e sample_freq;
-    adc_input_pin_e pin;
+    adc_input_pin_def_e pin;
 }adc_gpio_cfg_t;
 
 typedef enum{
@@ -227,6 +218,8 @@ typedef enum{
  * @brief    This function is used to power on sar_adc.
  * @return   none.
  * @note     -# User need to wait >30us after adc_power_on() for ADC to be stable.
+ *           -# If you calling adc_power_off(), because all analog circuits of ADC are turned off after adc_power_off(),
+ *            it is necessary to wait >30us after re-adc_power_on() for ADC to be stable.
  */
 void adc_power_on(void);
 /**
@@ -249,10 +242,10 @@ static inline void adc_set_diff_input(adc_sample_chn_e chn,adc_input_pch_e p_ain
 /**
  * @brief This function is used to set IO port for ADC supply or ADC IO port voltage sampling.
  * @param[in]  mode - ADC gpio pin sample mode
- * @param[in]  pin - adc_input_pin_e ADC input gpio pin
+ * @param[in]  pin - adc_input_pin_def_e ADC input gpio pin
  * @return none
  */
-void adc_pin_config(adc_input_pin_mode_e mode ,adc_input_pin_e pin);
+void adc_pin_config(adc_input_pin_mode_e mode ,adc_input_pin_def_e pin);
 /**
  * @brief This function is used to set two IO port configuration and set it as input channel of ADC difference IO port voltage sampling.
  * @param[in]  chn - enum variable of ADC sample channel.
@@ -260,7 +253,7 @@ void adc_pin_config(adc_input_pin_mode_e mode ,adc_input_pin_e pin);
  * @param[in]  n_pin - enum variable of ADC analog negative input IO.
  * @return none
  */
-void adc_set_diff_pin(adc_sample_chn_e chn,adc_input_pin_e p_pin, adc_input_pin_e n_pin);
+void adc_set_diff_pin(adc_sample_chn_e chn,adc_input_pin_def_e p_pin, adc_input_pin_def_e n_pin);
 
 /**
  * @brief      This function serves to select Vbat voltage division factor.
@@ -293,6 +286,15 @@ void adc_gpio_sample_init(adc_sample_chn_e chn , adc_gpio_cfg_t cfg);
  * @return none
  */
 void adc_vbat_sample_init(adc_sample_chn_e chn);
+
+/**
+ * @brief  This function is used to initialize the ADC for gpio sampling to indirectly sample the vbat voltage.
+ * @param[in]  chn -the channel to be configured.
+ * @param[in]  cfg -structure for configuring ADC channel.
+ * @return none
+ * @attention Only for 1.9V ~ 3.6V vbat power supply, if the vbat power supply > 3.6V, ADC_VBAT_SAMPLE must be selected.
+ */
+void adc_gpio_sample_vbat_init(adc_sample_chn_e chn , adc_gpio_cfg_t cfg);
 #if INTERNAL_TEST_FUNC_EN
 /**
  * @brief This function is used to initialize the ADC for Temperature Sensor sampling.
@@ -333,6 +335,22 @@ static inline void adc_set_rx_fifo_trig_cnt(unsigned char trig_num)
 {
     reg_adc_rxfifo_trig_num = ((reg_adc_rxfifo_trig_num & (~FLD_RXFIFO_TRIG_NUM)) | trig_num);
 }
+
+/**
+ * @brief This function is used to calib ADC 1.2V vref for GPIO.
+ * @param[in] vref - GPIO sampling calibration value.
+ * @param[in] offset - GPIO sampling two-point calibration value offset.
+ * @return none
+ */
+void adc_set_gpio_calib_vref(unsigned short vref,signed char offset);
+
+/**
+ * @brief This function is used to calib ADC 1.2V vref for Vbat.
+ * @param[in] vref - Vbat channel sampling calibration value.
+ * @param[in] offset - Vbat channel sampling two-point calibration value offset.
+ * @return none
+ */
+void adc_set_vbat_calib_vref(unsigned short vref,signed char offset);
 /**********************************************************************************************************************
  *                                                DMA only interface                                                  *
  **********************************************************************************************************************/

@@ -1,20 +1,26 @@
-/******************************************************************************
- * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
+/********************************************************************************************************
+ * @file    flash.c
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * @brief   This is the source file for TL721X
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * @author  Driver Group
+ * @date    2024
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *****************************************************************************/
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
+ *
+ *******************************************************************************************************/
 #include "lib/include/sys.h"
 #include "lib/include/flash_base.h"
 #include "lib/include/flash_prot.h"
@@ -86,7 +92,7 @@ void flash_plic_preempt_config(unsigned char preempt_en,unsigned char threshold)
  */
 _attribute_text_sec_ void flash_erase_sector(unsigned long addr)
 {
-    wd_clear();
+    wd_clear(); //BLE SDK use
     DISABLE_BTB;
     flash_mspi_write_ram(FLASH_SECT_ERASE_CMD, addr, 0, 0, FLASH_WRITE_ENABLE_CMD, FLASH_READ_STATUS_CMD_LOWBYTE);
     ENABLE_BTB;
@@ -544,7 +550,7 @@ _attribute_text_sec_ unsigned int flash_read_mid_with_device_num(mspi_slave_devi
 _attribute_text_sec_ void flash_read_uid_with_device_num(mspi_slave_device_num_e device_num, unsigned char idcmd, unsigned char *buf)
 {
     DISABLE_BTB;
-    if(idcmd==((FLASH_READ_UID_CMD_GD_PUYA_ZB_TH>>16)&0xff))
+    if(idcmd==((FLASH_READ_UID_CMD_GD_PUYA_ZB_TH>>24)&0xff))
     {
         flash_mspi_read_ram(FLASH_READ_UID_CMD_GD_PUYA_ZB_TH, g_slave_base_addr[device_num], buf, 16);
     }

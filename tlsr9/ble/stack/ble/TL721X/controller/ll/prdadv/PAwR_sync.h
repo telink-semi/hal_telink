@@ -55,7 +55,7 @@ enum{
 /**
  *  @brief  Command Parameters for "7.8.126 LE Set Periodic Advertising Response Data command"
  */
-typedef struct {
+typedef struct __attribute__((packed)) {
     u16     sync_handle;
     u16     req_event_count; // indicate PAwR event count. i.e. receive packet in the PAwR event count. ---paEventCounter
 
@@ -77,7 +77,7 @@ typedef struct {
 } setPDARspData_cmdParam_t;
 
 
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8      sync_subevt_num;
     u8      sync_subevt_prop;
     u8      set_syncSubevt_flag;
@@ -86,8 +86,8 @@ typedef struct {
     u8      sync_subevt[128]; //max subevent number is 128
 } setPDASyncSubevt_cmdParam_t;
 
-
-typedef struct{
+/* refer to BLE SPEC: Vol 6, Part B, 2.3.1.10 "AUX_SYNC_SUBEVENT_RSP" for more information. */
+typedef struct __attribute__((packed)) {
     u32 dma_len;
 
     u8  type        :4;
