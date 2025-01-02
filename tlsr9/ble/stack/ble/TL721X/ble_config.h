@@ -24,8 +24,8 @@
 #include "drivers.h"
 #include "tl_common.h"
 
-#include "stack/ble/controller/ll/ll_bqb_stack.h"
-#include "stack/ble/hal/hal_internal.h"
+// #include "stack/ble/controller/ll/ll_bqb_stack.h"
+// #include "stack/ble/hal/hal_internal.h"
 
 ///////////////////  Feature ////////////////////////////
 #ifndef     MULTIPLE_LOCAL_DEVICE_ENABLE
