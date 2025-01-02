@@ -501,3 +501,18 @@ unsigned int flash_get_vendor(unsigned int flash_mid);
  * @return      flash capacity.
  */
 flash_capacity_e  flash_get_capacity(unsigned int flash_mid);
+
+/*******************************************************************************************************************
+ *									This function serves to all area flash protection
+ ******************************************************************************************************************/
+void flash_protection_lock_init(void);
+
+void flash_protection_lock_operation(unsigned int offset);
+
+void flash_protection_unlock_operation(unsigned int offset);
+
+/*******************************************************************************************************************
+ *		Should include these header file here , flash_read_mid_uid_with_check moved to flash_common.h
+ ******************************************************************************************************************/
+
+#include "flash/flash_common.h"
