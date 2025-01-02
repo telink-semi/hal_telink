@@ -97,8 +97,6 @@ if(CONFIG_PWM_TELINK_B9X OR CONFIG_PWM_TELINK_TLX)
 	zephyr_library_sources(drivers/${SOC}/pwm.c)
 endif()
 
-zephyr_library_sources_ifdef(CONFIG_SOC_RISCV_TELINK_TL721X drivers/${SOC}/pwm.c)
-
 # SPI driver reference sources
 if(CONFIG_SPI_TELINK_B9X OR CONFIG_SPI_TELINK_TLX)
 	zephyr_library_sources(drivers/${SOC}/gpio.c)
