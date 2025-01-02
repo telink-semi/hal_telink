@@ -291,7 +291,7 @@ enum{
 
 #define reg_i2s2_mod                REG_ADDR16(SC_BASE_ADDR+0x0a)
 
-#define reg_dmic_mod                REG_ADDR8(SC_BASE_ADDR+0x36)
+#define reg_dmic_mod                REG_ADDR16(SC_BASE_ADDR+0x36)
 
 #define reg_dmic_step               REG_ADDR16(SC_BASE_ADDR+0x2c)
 enum{
@@ -299,8 +299,69 @@ enum{
     FLD_DMIC_SEL            =   BIT(15),
 };
 
+#define AUDIO_SRAM_EMA_ADDR          (SC_BASE_ADDR + 0x68)
+#define AUDIO_SRAM_EMA_DATA_LEN      2
+#define reg_audio_reg_cfg0        REG_ADDR8(SC_BASE_ADDR + 0x68)
+enum{
+    FLD_AUDIO_REG_EMA              = BIT_RNG(0,2),
+    FLD_AUDIO_REG_EMAW             = BIT_RNG(3,4),
+    FLD_AUDIO_REG_EMAS             = BIT(5),
+};
+#define reg_audio_reg_cfg1        REG_ADDR8(SC_BASE_ADDR + 0x69)
+enum{
+    FLD_AUDIO_REG_RAWL             = BIT(0),
+    FLD_AUDIO_REG_RAWLM            = BIT_RNG(1,2),
+    FLD_AUDIO_REG_WABL             = BIT(3),
+    FLD_AUDIO_REG_WABLM            = BIT_RNG(4,5),
+};
 
-#define reg_dma_set                REG_ADDR32(SC_BASE_ADDR+0x78)
+#define USB_SRAM_EMA_ADDR          (SC_BASE_ADDR + 0x6c)
+#define USB_SRAM_EMA_DATA_LEN      2
+#define reg_usb_reg_cfg0        REG_ADDR8(SC_BASE_ADDR + 0x6c)
+enum{
+    FLD_USB_REG_EMA              = BIT_RNG(0,2),
+    FLD_USB_REG_EMAW             = BIT_RNG(3,4),
+    FLD_USB_REG_EMAS             = BIT(5),
+};
+#define reg_usb_reg_cfg1        REG_ADDR8(SC_BASE_ADDR + 0x6d)
+enum{
+    FLD_USB_REG_RAWL             = BIT(0),
+    FLD_USB_REG_RAWLM            = BIT_RNG(1,2),
+    FLD_USB_REG_WABL             = BIT(3),
+    FLD_USB_REG_WABLM            = BIT_RNG(4,5),
+};
+
+#define D25F_SRAM_EMA_ADDR          (SC_BASE_ADDR + 0x70)
+#define D25F_SRAM_EMA_DATA_LEN      4
+#define reg_soc_sram_cfg0       REG_ADDR8(SC_BASE_ADDR + 0x70)
+enum{
+    FLD_SRAM_EMA              = BIT_RNG(0,2),
+    FLD_SRAM_EMAW             = BIT_RNG(3,4),
+    FLD_SRAM_EMAS             = BIT(5),
+};
+
+#define reg_soc_sram_cfg1       REG_ADDR8(SC_BASE_ADDR + 0x71)
+enum{
+    FLD_SRAM_RAML             = BIT(0),
+    FLD_SRAM_RAWLM            = BIT_RNG(1,2),
+    FLD_SRAM_WABL             = BIT(3),
+    FLD_SRAM_WABLM            = BIT_RNG(4,6),
+    FLD_SRAM_STOV             = BIT(7),
+};
+
+#define reg_soc_reg_cfg0        REG_ADDR8(SC_BASE_ADDR + 0x72)
+enum{
+    FLD_REG_EMA              = BIT_RNG(0,2),
+    FLD_REG_EMAW             = BIT_RNG(3,4),
+    FLD_REG_EMAS             = BIT(5),
+};
+#define reg_soc_reg_cfg1        REG_ADDR8(SC_BASE_ADDR + 0x73)
+enum{
+    FLD_REG_RAWL             = BIT(0),
+    FLD_REG_RAWLM            = BIT_RNG(1,2),
+    FLD_REG_WABL             = BIT(3),
+    FLD_REG_WABLM            = BIT_RNG(4,5),
+};
 
 #define reg_wakeup_en               REG_ADDR8(SC_BASE_ADDR+0x2e)
 enum{

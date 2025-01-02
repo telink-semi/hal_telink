@@ -1,10 +1,10 @@
 /********************************************************************************************************
- * @file    ble.h
+ * @file    os_sup_stack.h
  *
- * @brief   This is the header file for BLE SDK
+ * @brief   This is the source file for BLE SDK
  *
  * @author  BLE GROUP
- * @date    06,2022
+ * @date    2022
  *
  * @par     Copyright (c) 2022, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
@@ -21,21 +21,21 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-#ifndef BLE_H_
-#define BLE_H_
+#ifndef OS_SUP_STACK_H_
+#define OS_SUP_STACK_H_
 
 
+extern os_give_sem_t blt_os_giveSem_cb;
+extern os_give_sem_t blt_os_giveSemFromIrq_cb;
 
-#include "ble_common.h"
-#include "ble_format.h"
+extern os_give_sem_t blt_os_semCountIncrement_cb;
+extern os_give_sem_t blt_os_semCountIncrementIrq_cb;
 
-#include "controller/ble_controller.h"
 
-#include "hci/hci.h"
-#include "hci/hci_const.h"
-#include "hci/hci_cmd.h"
-#include "hci/hci_event.h"
+/**
+ * @brief srack use
+ */
+extern bool is_os_sup_en;
+#define blt_isOsSupEnable()                                     (is_os_sup_en)
 
-#include "ble_config.h"
-
-#endif /* BLE_H_ */
+#endif /* OS_SUP_STACK_H_ */

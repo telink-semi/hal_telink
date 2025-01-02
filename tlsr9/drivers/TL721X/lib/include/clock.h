@@ -68,6 +68,9 @@ typedef enum{
  *          and the high and low temperature long-term stability test speed is no problem.
  */
 //clock_bbpll_config(PLL_CLK_240M);
+//core 0.9V
+#define PLL_240M_CCLK_240M_HCLK_120M_PCLK_120M_MSPI_48M         clock_init(BASEBAND_PLL, CLK_DIV1, CCLK_DIV2_TO_HCLK_DIV2_TO_PCLK, CLK_DIV5)
+//core 0.8V
 #define PLL_240M_CCLK_120M_HCLK_60M_PCLK_60M_MSPI_48M           clock_init(BASEBAND_PLL, CLK_DIV2, CCLK_DIV2_TO_HCLK_DIV2_TO_PCLK, CLK_DIV5)
 #define PLL_240M_CCLK_120M_HCLK_60M_PCLK_30M_MSPI_48M           clock_init(BASEBAND_PLL, CLK_DIV2, CCLK_DIV2_TO_HCLK_DIV4_TO_PCLK, CLK_DIV5)
 

@@ -89,6 +89,20 @@ enum{
     FLD_DMA_CHANNEL_SRC_WIDTH       = BIT_RNG(22,23),
 };
 
+#define  DMA_CHACTRL_DST_REQ_SEL_OFFSET             (2)
+#define  DMA_CHACTRL_SRC_REQ_SEL_OFFSET             (8)
+#define  DMA_CHACTRL_DST_ADDR_CTRL_OFFSET           (14)
+#define  DMA_CHACTRL_SRC_ADDR_CTRL_OFFST            (16)
+#define  DMA_CHACTRL_DSTMODE_OFFSET                 (18)
+#define  DMA_CHACTRL_SRCMODE_OFFSET                 (19)
+#define  DMA_CHACTRL_DSTWIDTH_SIZE_OFFSET           (20)
+#define  DMA_CHACTRL_SRCWIDTH_SIZE_OFFSET           (22)
+#define  DMA_CHACTRL_SRC_BURST_SIZE_OFFSET          (24)
+#define  DMA_CHACTRL_READ_NUM_EN_OFFSET             (28)
+#define  DMA_CHACTRL_PRIORITY_OFFSET                (29)
+#define  DMA_CHACTRL_WRITE_NUM_EN_OFFSET            (30)
+#define  DMA_CHACTRL_AUTO_EN_OFFSET                 (31)
+
 #define reg_dma_ctr3(i)             REG_ADDR8(DMA_BASE_ADDR+0x47+(i)*0x14)
 enum{
     FLD_DMA_SRC_BURST_SIZE          =   BIT_RNG(0,2),

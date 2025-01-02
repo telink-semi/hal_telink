@@ -1332,7 +1332,7 @@ ble_sts_t blt_ll_exchangeDataLength (u16 connHandle, u8 opcode, u16 maxTxOct);
 st_llm_conn_t* blt_ll_isValidAclCentralHandle(u16 connHandle);
 
 
-u8 blt_ll_getMaxAalCentralNumber(void);
+u8 blt_ll_getMaxAclCentralNumber(void);
 
 #define         INVALID_ACL_IDX                                 0xFF
 

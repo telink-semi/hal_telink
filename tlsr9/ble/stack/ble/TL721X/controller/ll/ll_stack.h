@@ -298,7 +298,7 @@
 
 
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u32 dma_len;
 
     u8  type   :4;
@@ -911,6 +911,7 @@ typedef struct {
        attention that same potential risk as "conn_req_info": two connections very close, first connection callback event blocked by mainloop */
     u8      idenAdr_cur_addr[6];
     u8      idenAdr_cur_type;
+    u8      rsvd;
 }ll_mac_t;
 extern _attribute_aligned_(4)  ll_mac_t  bltMac;
 
@@ -1101,7 +1102,7 @@ extern _attribute_aligned_(4)   st_ll_temp_para_t  bltempParam;
 
 extern  volatile    u64 blms_state;
 extern  volatile    int blm_btxbrx_state;
-extern const u8  blms_tx_empty_packet[];
+extern const u8 blms_tx_empty_packet[];
 extern  volatile    u64 systick_irq_trigger;
 
 extern  volatile u8     blc_adv_chn_ext_sel;
@@ -2233,14 +2234,14 @@ enum {
 };
 
 
-typedef struct {
+typedef struct __attribute__((packed)){
     u32     pkt;
     u8      dir;
     u8      iv[8];
 } ble_crypt_nonce_t;
 
 
-typedef struct {
+typedef struct __attribute__((packed)){
     u64                 enc_pno;
     u64                 dec_pno;
     u8                  ltk[16];

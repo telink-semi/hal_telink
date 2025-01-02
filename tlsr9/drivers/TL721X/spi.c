@@ -1291,11 +1291,12 @@ void spi_master_write_read_full_duplex(spi_sel_e spi_sel,unsigned char *write_da
     spi_tx_dma_dis(spi_sel);
     spi_rx_dma_dis(spi_sel);
     spi_set_transmode(spi_sel, SPI_MODE_WRITE_AND_READ);
-    spi_set_cmd(spi_sel, 0);
     spi_tx_fifo_clr(spi_sel);
     spi_rx_fifo_clr(spi_sel);
     spi_tx_cnt(spi_sel, len);
     spi_rx_cnt(spi_sel, len);
+    spi_set_cmd(spi_sel, 0x00);//when  cmd  disable that  will not sent cmd,just trigger spi send .
+
 
     for(unsigned int i = 0; i<len; i = i +chunk_size){
         if(chunk_size > (len - i)){

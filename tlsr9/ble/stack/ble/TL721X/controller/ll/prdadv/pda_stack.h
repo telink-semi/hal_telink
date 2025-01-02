@@ -71,7 +71,7 @@ typedef struct {
 }st_pda_t;
 extern st_pda_t *blt_pPda;
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  len;
     u8  type;
     u8  chm[5];
@@ -94,7 +94,7 @@ int blt_ll_pdaSync_pawrSync_info_process(sync_info_t *pSyncInf, u8* pPAwR_syncTi
 /******************************* prd_adv start *******************************************************************/
 
 
-typedef struct
+typedef struct __attribute__((packed))
 {
     u8      maxNum_perdAdv;
     u8      prd_adv_sel;
@@ -128,12 +128,12 @@ extern ll_prdadv_mng_t      bltPrdA;
 
 
 #if(LL_FEATURE_ENABLE_PERIODIC_ADVERTISING_WITH_RESPONSES_ADVERTISER)
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8 subevtStart;
     u8 subevtCount;
 }subDataReq_subInfo_t;
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8      subevent_idx;
     u8      rsp_slot_start;
     u8      rsp_slot_count;
@@ -370,14 +370,14 @@ extern ll_prdadv_sync_t     bltPdaSync;
 
 #if (PDA_SYNC_TIMING_ADJUST_EN)
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u32 rx_1st_tick;
 
     s16 sSlot_offset;
     u16 timing_update;
 }pda_syncTiming_t;
 
-typedef struct
+typedef struct __attribute__((packed))
 {
     u8  maxNum_pawrSync;
     u8  pawrSync_sel;

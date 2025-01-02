@@ -24,10 +24,20 @@
 #ifndef ANALOG_AFE3V_REG_H
 #define ANALOG_AFE3V_REG_H
 #include "soc.h"
+#define areg_aon_0x00           0x00
+enum{
+    FLD_FC_BG_HV                = BIT(0),//Force start for bandgap
+    FLD_BG_TRIM_3V              = BIT_RNG(1,3),//Bandgap voltage trimming
+    FLD_BUF                     = BIT(4),
+    FLD_DCDC_BPO                = BIT_RNG(5,7),//change the on time of PMOS switch, and it will be prolonged as the value of control bit increases
+};
+
+#define areg_aon_0x01           0x01
 
 #define areg_aon_0x02           0x02
 enum{
     FLD_DCDC_CAL_TWOHIGH_EN     = BIT(0),//Calibrate the logic bug when two EA output is high
+    FLD_DCDC_VCOMP_VOS_PN       = BIT(2),
 };
 
 #define areg_aon_0x05           0x05

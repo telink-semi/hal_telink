@@ -163,8 +163,8 @@ extern ll_adv_t bltAdv;
 
 
 
-
-typedef struct{
+/* refer to BLE SPEC: Vol 6, Part B, 2.3 "Advertising physical channel PDU" for more information. */
+typedef struct __attribute__((packed)) {
     u32 dma_len;
 
     u8 type   :4;
@@ -181,7 +181,7 @@ typedef struct{
 extern rf_packet_adv_t  pkt_Adv;
 
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u32 dma_len;
 
     u8 type   :4;
@@ -198,7 +198,7 @@ typedef struct{
 
 
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u32 dma_len;
 
     u8  type   :4;
@@ -215,7 +215,7 @@ typedef struct{
 
 
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u32 dma_len;
 
     u8  type   :4;
@@ -433,8 +433,8 @@ ble_sts_t       blc_hci_le_setAdvEnable(adv_en_t adv_enable);
 
 
 
-
-typedef struct{
+/* refer to BLE SPEC: Vol 6, Part B, 2.3.4 "Common Extended Advertising Payload Format" for more information. */
+typedef struct __attribute__((packed)) {
     u32 dma_len;
 
     u8 type   :4;
@@ -454,7 +454,7 @@ typedef struct{
 
 
 //#define MAX_VALID_LEN_ADV_EXT_IND     26
-typedef struct{
+typedef struct __attribute__((packed)) {
     u32 dma_len;
 
     u8 type   :4;
@@ -479,7 +479,7 @@ typedef struct{
 
 
 #define AUX_ADV_FORMAT_LEN      8
-typedef struct{
+typedef struct __attribute__((packed)) {
     u32 dma_len;
 
     u8 type   :4;
@@ -506,7 +506,7 @@ typedef struct{
 }ll_aux_adv_ind_header_t;  //must 4B aligned, now 48B
 
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u32 dma_len;
 
     u8 type   :4;
@@ -530,7 +530,7 @@ typedef struct{
 
 
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u32 dma_len;
 
     u8 type   :4;
@@ -546,7 +546,7 @@ typedef struct{
 }rf_pkt_pri_scanrsp_t;
 
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u32 dma_len;
 
     u8 type   :4;
@@ -881,7 +881,7 @@ ble_sts_t   blc_ll_setAuxAdvChnIdxByCustomers(u8 aux_chn);
 
 
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u32 dma_len;
 
     u8 type   :4;
@@ -906,7 +906,7 @@ extern rf_pkt_aux_conn_rsp_t    pkt_aux_conn_rsp;
 /****************************************************  SCAN_REQ / AUX_SCAN_REQ **************************************************
 
 *********************************************************************************************************************************/
-typedef struct{
+typedef struct __attribute__((packed)) {
     u32 dma_len;
 
     u8 type   :4;

@@ -1000,6 +1000,26 @@ static inline void spi_xip_stop(spi_sel_e spi_sel)
 }
 
 /**
+ * @brief   This function servers to enable txdma request after cmd.
+ * @param[in]   spi_sel     - the spi module.
+ * @return  none.
+ */
+static inline void spi_txdma_req_after_cmd_en(spi_sel_e spi_sel)
+{
+    BM_SET(reg_spi_ctrl4(spi_sel), FLD_TXDMA_REQ_AF_CMD);
+}
+
+/**
+ * @brief   This function servers to disable txdma request after cmd.
+ * @param[in]   spi_sel     - the spi module.
+ * @return  none.
+ */
+static inline void spi_txdma_req_after_cmd_dis(spi_sel_e spi_sel)
+{
+    BM_CLR(reg_spi_ctrl4(spi_sel), FLD_TXDMA_REQ_AF_CMD);
+}
+
+/**
  * @brief       This function servers to set xip timeout cnt,when two data frame intervals exceed hclk_period*timeout_cnt,csn will set high level.
  * @param[in]   spi_sel     - the spi module.
  * @param[in]   cnt         - xip timeout cnt.

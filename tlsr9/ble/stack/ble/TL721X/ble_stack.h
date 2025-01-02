@@ -992,7 +992,7 @@ typedef struct __attribute__((packed)) {
     u16 evtCounter;
 } sync_info_t;
 
-typedef struct {
+typedef struct __attribute__((packed)) {
     u32 rsp_AA;
 
     u8  num_subevent;   //also be used to judge whether is PAwR sync. 0 indicate periodic advertising without response. not zero indicate PAwR
@@ -1004,7 +1004,7 @@ typedef struct {
 
 
 
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8  type;
     u8  rf_len;
     u8  opcode;
@@ -1016,7 +1016,7 @@ typedef struct {
     u16 instant;
 } rf_packet_connect_upd_req_t;
 
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8  type;
     u8  rf_len;
     u8  opcode;
@@ -1034,7 +1034,7 @@ typedef struct __attribute__((packed)) {
     u8  ivm[4];
 } rf_packet_ll_enc_req_t;
 
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8  type;
     u8  rf_len;
     u8  opcode;
@@ -1042,21 +1042,21 @@ typedef struct {
     u8  ivs[4];
 } rf_packet_ll_enc_rsp_t;
 
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8  type;
     u8  rf_len;
     u8  opcode;
     u8  unknownType;
 } rf_packet_ll_unknown_rsp_t;
 
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8  type;
     u8  rf_len;
     u8  opcode;
     u8  featureSet[8];
 } rf_packet_ll_feature_exg_t;
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  type;
     u8  rf_len;
     u8  opcode;
@@ -1065,14 +1065,14 @@ typedef struct{
     u16 subVersNr;
 }rf_packet_version_ind_t;
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  type;
     u8  rf_len;
     u8  opcode;
     u8  errCode;
 }rf_packet_ll_reject_ind_t;
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  type;
     u8  rf_len;
     u8  opcode;
@@ -1080,7 +1080,7 @@ typedef struct{
     u8  errCode;
 }rf_packet_ll_reject_ext_ind_t;
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  type;
     u8  rf_len;
     u8  opcode;
@@ -1089,7 +1089,7 @@ typedef struct{
 
 
 
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8  type;
     u8  rf_len;
 
@@ -1104,7 +1104,7 @@ typedef struct {
 
 
 
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8 llid   :2;
     u8 nesn   :1;
     u8 sn     :1;
@@ -1118,7 +1118,7 @@ typedef struct {
 
 
 
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8 llid   :2;
     u8 nesn   :1;
     u8 sn     :1;
@@ -1129,7 +1129,7 @@ typedef struct {
 
 
 
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8 llid   :2;
     u8 nesn   :1;
     u8 sn     :1;
@@ -1142,7 +1142,7 @@ typedef struct {
 
 
 
-typedef struct {
+typedef struct __attribute__((packed)) {
     u8 llid   :2;
     u8 cssn   :3;
     u8 cstf   :1;
@@ -1207,7 +1207,7 @@ typedef struct __attribute__((packed)) {
     u16 connEventCnt;
 }rf_packet_ll_cis_ind_t;
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  type;
     u8  rf_len;
     u8  opcode;
@@ -1239,7 +1239,7 @@ typedef struct __attribute__((packed)) {
 
 
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  type;
     u8  rf_len;
     u8  opcode;
@@ -1285,7 +1285,7 @@ typedef struct __attribute__((packed)) {
 
 }rf_packet_ll_cs_cap_req_t;
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  type;
     u8  rf_len;
     u8  opcode;
@@ -1295,7 +1295,7 @@ typedef struct{
     u8 CS_PV_C[8];
 }rf_pkt_ll_cs_sec_req_t;
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  type;
     u8  rf_len;
     u8  opcode;
@@ -1306,13 +1306,13 @@ typedef struct{
 }rf_pkt_ll_cs_sec_rsp_t;
 
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  type;
     u8  rf_len;
     u8  opcode;
 }rf_pkt_ll_cs_fae_req_t;
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  type;
     u8  rf_len;
     u8  opcode;
@@ -1327,7 +1327,7 @@ typedef struct __attribute__((packed)) {
     u16 instant;
 }rf_pkt_ll_cs_chn_map_ind_t;
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  type;
     u8  rf_len;
     u8  opcode;
@@ -1380,7 +1380,7 @@ typedef struct __attribute__((packed)) {
 }rf_packet_ll_cs_config_req_t;
 
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  type;
     u8  rf_len;
     u8  opcode;
@@ -1511,7 +1511,7 @@ typedef struct __attribute__((packed)) {
 
 
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  type;
     u8  rf_len;
     u16 l2capLen;
@@ -1523,7 +1523,7 @@ typedef struct{
 
 
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  llid;
     u8  rf_len;
     u16 l2capLen;
@@ -1539,7 +1539,7 @@ typedef struct{
 
 
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  llid;
     u8  rf_len;
     u16 l2capLen;
@@ -1554,7 +1554,7 @@ typedef struct{
 
 
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  type;
     u8  rf_len;
     u16 l2capLen;
@@ -1565,7 +1565,7 @@ typedef struct{
     u16  result;
 }rf_pkt_l2cap_sig_connParaUpRsp_t;
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  type;
     u8  rf_len;
     u16 l2capLen;
@@ -1580,7 +1580,7 @@ typedef struct{
     u16 scid[5];
 }rf_pkt_l2cap_credit_based_connection_req_t;
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  type;
     u8  rf_len;
     u16 l2capLen;
@@ -1596,7 +1596,7 @@ typedef struct{
 }rf_pkt_l2cap_credit_based_connection_rsp_t;
 
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  llid;
     u8  rf_len;
     u16 l2capLen;
@@ -1611,7 +1611,7 @@ typedef struct{
     u16 scid[5];
 }rf_packet_l2cap_credit_based_connection_req_t;
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  type;
     u8  rf_len;
     u16 l2capLen;
@@ -1624,7 +1624,7 @@ typedef struct{
     u16 dcid[5];
 }rf_pkt_l2cap_credit_based_reconfigure_req_t;
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  type;
     u8  rf_len;
     u16 l2capLen;
@@ -1712,7 +1712,7 @@ typedef struct __attribute__((packed)) {
     u8  attGroupType[2];                //
 }rf_packet_att_readByGroupType_t;
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  type;
     u8  rf_len;
     u16 l2capLen;
@@ -1721,7 +1721,7 @@ typedef struct{
     u8  value[22];
 }rf_packet_att_readRsp_t;
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  type;
     u8  rf_len;
     u16 l2capLen;
@@ -1731,7 +1731,7 @@ typedef struct{
     u8  data[3];
 }rf_packet_att_readByGroupTypeRsp_t;
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  type;
     u8  rf_len;
     u16 l2capLen;
@@ -1741,7 +1741,7 @@ typedef struct{
     u8  data[1];            // character_handle / property / value_handle / value
 }rf_packet_att_findInfoRsp_t;
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  type;
     u8  rf_len;
     u16 l2capLen;
@@ -1760,7 +1760,7 @@ typedef struct __attribute__((packed)) {
     u8 value;
 }rf_packet_att_write_t;
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  type;
     u8  rf_len;
     u16 l2capLen;
@@ -1769,7 +1769,7 @@ typedef struct{
     u8 mtu[2];
 }rf_packet_att_mtu_t;
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  type;
     u8  rf_len;
     u16 l2capLen;
@@ -1778,7 +1778,7 @@ typedef struct{
     u8 mtu[2];
 }rf_packet_att_mtu_exchange_t;
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  type;
     u8  rf_len;
     u16 l2capLen;
@@ -1786,7 +1786,7 @@ typedef struct{
     u8  opcode;
 }rf_packet_att_writeRsp_t;
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  type;
     u8  rf_len;
     u16 l2capLen;
@@ -1797,7 +1797,7 @@ typedef struct{
 }att_readByTypeRsp_t;
 
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u8  type;
     u8  rf_len;
     u16 l2capLen;

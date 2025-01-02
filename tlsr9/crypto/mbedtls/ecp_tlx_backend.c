@@ -222,39 +222,42 @@ static eccp_curve_t secp192k1_curve_dat = {
 
 #if defined(MBEDTLS_ECP_DP_CURVE25519_ENABLED)
 
-#if CONFIG_SOC_RISCV_TELINK_TL721X
-/* dummy function to compile */
-inline static uint8_t pke_x25519_point_mul(mont_curve_t *curve,
-	uint32_t *k, uint32_t *Pu, uint32_t *Qu)
-{
-	(void) curve;
-	(void) k;
-	(void) Pu;
-	(void) Qu;
-
-	return PKE_INVALID_INPUT;
-}
+#if CONFIG_SOC_RISCV_TELINK_TL321X
+#define MONT_P_BITLEN       p_bitLen
+#define MONT_N_BITLEN       n_bitLen
+#define MONT_P              p
+#define MONT_P_H            p_h
+#define MONT_P_N0           p_n0
+#define MONT_A24            a24
+#elif CONFIG_SOC_RISCV_TELINK_TL721X
+#define MONT_P_BITLEN       p_bitLen
+#define MONT_P              p
+#define MONT_P_H            p_h
+#define MONT_P_N0           p_n0
+#define MONT_A24            a24
 #endif
 
-#if CONFIG_SOC_RISCV_TELINK_TL321X
+#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X
 static mont_curve_t x25519 = {
-	.p_bitLen = 255,
-	.n_bitLen = 253,
-	.p = (unsigned int[]){
+	.MONT_P_BITLEN = 255,
+#if CONFIG_SOC_RISCV_TELINK_TL321X
+	.MONT_N_BITLEN = 253,
+#endif
+	.MONT_P = (unsigned int[]){
 		0xffffffed, 0xffffffff, 0xffffffff, 0xffffffff,
 		0xffffffff, 0xffffffff, 0xffffffff, 0x7fffffff
 	},
-	.p_h = (unsigned int[]){
+	.MONT_P_H = (unsigned int[]){
 		0x000005a4, 0x00000000, 0x00000000, 0x00000000,
 		0x00000000, 0x00000000, 0x00000000, 0x00000000
 	},
-	.p_n0 = (unsigned int[]){0x286bca1b},
-	.a24 = (unsigned int[]){
+	.MONT_P_N0 = (unsigned int[]){0x286bca1b},
+	.MONT_A24 = (unsigned int[]){
 		0x0001db41, 0x00000000, 0x00000000, 0x00000000,
 		0x00000000, 0x00000000, 0x00000000, 0x00000000
 	}
 };
-#endif	/*CONFIG_SOC_RISCV_TELINK_TL321X*/
+#endif /*CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X*/
 
 #endif /* MBEDTLS_ECP_DP_CURVE25519_ENABLED */
 
@@ -297,9 +300,9 @@ static const struct {
 	mont_curve_t *curve_dat;
 } mont_curve_linking[] = {
 #if defined(MBEDTLS_ECP_DP_CURVE25519_ENABLED)
-#if CONFIG_SOC_RISCV_TELINK_TL321X
+#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X
 	{.group = MBEDTLS_ECP_DP_CURVE25519, .curve_dat = &x25519}
-#endif /*CONFIG_SOC_RISCV_TELINK_TL321X*/
+#endif /*CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X*/
 #endif /* MBEDTLS_ECP_DP_CURVE25519_ENABLED */
 };
 #endif /* MBEDTLS_ECP_MONTGOMERY_ENABLED */

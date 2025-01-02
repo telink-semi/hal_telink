@@ -121,6 +121,7 @@ typedef struct tbl_cmd_set_t {
 typedef enum{
     CHIP_VERSION_A0 = 0x00,
     CHIP_VERSION_A1 = 0x80,
+    CHIP_VERSION_A2 = 0xc0,
 }sys_chip_version_e;
 
 /**********************************************************************************************************************
@@ -137,6 +138,12 @@ extern unsigned int g_chip_version;
  * @return     none
  */
 _attribute_text_sec_ void protected_sys_reboot(void);
+
+/**
+ * @brief      This function reboot mcu.
+ * @return     none
+ */
+_attribute_ram_code_sec_noinline_ void sys_reboot_ram(void);
 
 /**
  * @brief       This function serves to initialize system.

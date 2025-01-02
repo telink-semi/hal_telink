@@ -231,8 +231,8 @@ extern  _attribute_aligned_(4) ll_scn_align_t  bltAlignScn;
 
 
 
-
-typedef struct{
+/* refer to BLE SPEC: Vol 6, Part B, 2.3.2 "Scanning PDUs" for more information. */
+typedef struct __attribute__((packed)) {
     u32 dma_len;
 
     u8  type   :4;

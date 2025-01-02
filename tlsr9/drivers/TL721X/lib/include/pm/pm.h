@@ -27,6 +27,7 @@
 #include "compiler.h"
 #include "gpio.h"
 #include "lib/include/clock.h"
+#include "dma.h"
 
 
 /**
@@ -164,6 +165,26 @@ typedef enum{
     PM_OPTIMIZE_O2      = 0,
     PM_OPTIMIZE_OS      = 1,
 }pm_optimize_sel_e;
+
+typedef enum {
+    CAL_0P94V_TO_0P95V, 
+    CAL_0P94V_TO_1P05V, 
+}pm_cal_0p94v_e;
+
+/**
+ * @brief   active mode CORE/SRAM output trim definition
+ * @note    The voltage values of the following gears are all theoretical values, and there may be deviations between the actual and theoretical values.
+ *          The CORE_0P7V_SRAM_0P8V_BB_0P7V is not opened to user after evaluate. 
+ *          As we know, reducing voltage can reduce power consumption in some extent, but for this gear, the benefits may not be significant. 
+ *          At this gear, it will takes nearly 150us more time to enter sleep mode, which is unacceptable in most scenarios.
+ */
+typedef enum{
+    // CORE_0P7V_SRAM_0P8V_BB_0P7V = 0,/**< multi ldo mode  0.94V-LDO/DCDC 0.7V_CORE 0.8V_SRAM 0.7V BB*/
+    CORE_0P8V_SRAM_0P8V_BB_0P8V = 0,/**< dig ldo mode  0.94V-LDO/DCDC 0.8V_CORE 0.8V_SRAM 0.8V BB (default value)*/
+    CORE_0P9V_SRAM_0P9V_BB_0P9V,/**< dig ldo mode  1.05V-LDO/DCDC 0.9V_CORE 0.9V_SRAM 0.9V BB*/
+}pm_power_cfg_e;
+
+extern unsigned int g_dvdd_vol;
 
 /**
  * @brief   early wakeup time
@@ -344,6 +365,28 @@ pm_sw_reboot_reason_e pm_get_sw_reboot_event(void);
 _attribute_ram_code_sec_optimize_o2_noinline_ void pm_set_dig_module_power_switch(pm_pd_module_e module, pm_power_sel_e power_sel);
 
 /**
+ * @brief       This function serves to set dvdd
+ * @param[in]   vol      - CORE_0P8V_SRAM_0P8V_BB_0P8V /CORE_0P9V_SRAM_0P9V_BB_0P9V.
+ *                       - the 0.8v/0.9v confirms which of the pm_core_sram_bb_voltage_e enumeration is configured, and then assigns the value to the macro CORE_0P8V_SRAM_0P8V_BB_0P8V_CONFG/CORE_0P9V_SRAM_0P9V_BB_0P9V_CONFG.
+ * @param[in]   chn      - dma channel.
+ * @param[in]   dma_timeout_us - wait dma all chn complete timeout.
+ * @return      DRV_API_SUCCESS - successful;
+ *              DRV_API_INVALID_PARAM - equal to the current voltage configuration or dvdd1_dvdd2_vol error;
+ *              DRV_API_FAILURE - core error(need contains all the cores used);
+ *              DRV_API_TIMEOUT - wait for dma all chn idle timeout to exit;
+ *              DRV_API_OTHER_ERROR - clear all interrupt requests failed;
+ * @note        1.If the voltage goes up, after calling the interface first, then adjust the frequency;
+ *                If the voltage goes down, adjust the frequency first, then call the interface;
+ *              2.When adjusting this voltage, no access ram operation is allowed, so it will wait for dma idle in this interface,
+ *                modifying dma_timeout_us won't work if there are dma chains working all the time, and needs to be turned off by the upper layers themselves depending on the situation.
+ *              3.When adjusting this voltage, the mcu will be stalled because the ram cannot be operated, use the dma method to modify the dvdd configuration and wake up the d25f with this dma interrupt,
+ *                so will turns off the general interrupt and clears all interrupt requests.
+ *              4.When adjusting this voltage, no access ram operation is allowed, disable swire.
+ *              5.If the check configuration fails, reboot.
+ */
+drv_api_status_e pm_set_dvdd(pm_power_cfg_e vol, dma_chn_e chn, unsigned int dma_timeout_us);
+
+/**
  * @brief       This function serves to test different voltages from pd3.
  * @param[in]   mux_sel - select different voltages from pd3.
  * @return      none.
@@ -376,6 +419,20 @@ _attribute_ram_code_sec_noinline_ void pm_update_status_info(unsigned char clr_e
                 11:     Y           Y           N           N
  */
 _attribute_ram_code_sec_noinline_ void pm_set_power_mode(power_mode_e power_mode);
+
+/**
+ * @brief      This function serves to update vdd0p94 and vddo1p8 current value current from global variable.
+ * @return     pm_cal_0p94v_e - the vdd 0.94 current voltage level.
+ * @note       This function must call after sys_init, otherwise the return value may be incorrect.
+ */
+_attribute_ram_code_sec_noinline_ pm_cal_0p94v_e pm_get_vdd0p94_level(void); //BLE SDK use
+
+/**
+ * @brief       This function serves to trim dcdc/ldo 0.94v.
+ * @param[in]   value - the voltage to be set.
+ * @return      none
+ */
+_attribute_ram_code_sec_noinline_ void pm_set_vdd0p94(pm_cal_0p94v_e value);
 
 /********************************************************************************************************
  *                                          internal

@@ -63,7 +63,7 @@ extern  blc_hci_tx_handler_t    blc_hci_tx_handler;
 
 extern  my_fifo_t   hci_tx_iso_fifo;
 
-typedef struct {
+typedef struct __attribute__((packed)) {
     u32     size;
     u8      num;
     u8      mask;
@@ -119,7 +119,7 @@ typedef enum{
 } iso_ps_flag_t;
 
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u16  connHandle      :12;
     u16  pb              :2;
     u16  ts              :1;
@@ -133,7 +133,7 @@ typedef struct{
 
 
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u32  timestamp;
     u16  pkt_seq;
     u16  iso_sdu_len     :12;
@@ -143,7 +143,7 @@ typedef struct{
     u8   iso_sdu[1];
 }iso_data_load_1_t;
 
-typedef struct{
+typedef struct __attribute__((packed)) {
     u16  pkt_seq;
     u16  iso_sdu_len     :12;
     u16  rfu             :2;
