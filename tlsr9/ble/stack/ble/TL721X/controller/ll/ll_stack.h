@@ -359,11 +359,7 @@ typedef struct {
 } st_llm_hostChnClassUpt_t;
 
 extern  _attribute_aligned_(4)  st_llm_hostChnClassUpt_t    blmhostChnClassUpt;
-#if STACK_IRQ_CODE_IN_SRAM_DUE_TO_FLASH_OPERATION_V2
-extern u16 scaPpmTbl[8];
-#else
 extern const u16 scaPpmTbl[8];
-#endif
 
 #if (CONTROLLER_GEN_P256KEY_ENABLE)
 extern _attribute_aligned_(4) smp_sc_key_t  smp_sc_key;
@@ -1106,11 +1102,7 @@ extern _attribute_aligned_(4)   st_ll_temp_para_t  bltempParam;
 
 extern  volatile    u64 blms_state;
 extern  volatile    int blm_btxbrx_state;
-#if STACK_IRQ_CODE_IN_SRAM_DUE_TO_FLASH_OPERATION_V2
-extern u8 blms_tx_empty_packet[];
-#else
 extern const u8 blms_tx_empty_packet[];
-#endif
 extern  volatile    u64 systick_irq_trigger;
 
 extern  volatile u8     blc_adv_chn_ext_sel;
@@ -1416,13 +1408,8 @@ void        blt_extAdv_terminateEvt(u8 connHandle, u8 advHandle, u8 terminateEvt
 #define         PAYLOAD_27B_TIFS_EMPTY_ENCRT_CODED_S8_US            5558   // (2704 + 150 + 720) = 3514
 
 
-#if STACK_IRQ_CODE_IN_SRAM_DUE_TO_FLASH_OPERATION_V2
-extern u16 pdu_27b_tifs_27b_us[3][2];
-extern u16 pdu_27b_tifs_27b_sslot[3][2];
-#else
 extern const u16 pdu_27b_tifs_27b_us[3][2];
 extern const u16 pdu_27b_tifs_27b_sslot[3][2];
-#endif
 
 /******************************* llms_slot end ********************************************************************/
 

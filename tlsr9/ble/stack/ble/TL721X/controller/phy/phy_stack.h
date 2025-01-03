@@ -178,13 +178,8 @@ extern  llms_conn_phy_update_callback_t llms_conn_phy_update_cb; ///blt_ll_updat
 extern  llms_conn_phy_switch_callback_t llms_conn_phy_switch_cb; ///blt_ll_switchConnPhy
 extern  ll_phy_switch_callback_t        ll_phy_switch_cb;
 
-#if STACK_IRQ_CODE_IN_SRAM_DUE_TO_FLASH_OPERATION_V2
-extern u8 tx_stl_auto_mode[4];
-extern u8 tx_stl_btx_1st_pkt[4];
-#else
 extern const u8 tx_stl_auto_mode[4];
 extern const u8 tx_stl_btx_1st_pkt[4];
-#endif
 
 extern _attribute_aligned_(4) ll_phy_t      bltPHYs;
 
