@@ -30,35 +30,12 @@
 #include "ble_format.h"
 
 #include "controller/ble_controller.h"
-#include "host/ble_host.h"
-#include "profile/ble_profile.h"
 
 #include "hci/hci.h"
 #include "hci/hci_const.h"
 #include "hci/hci_cmd.h"
 #include "hci/hci_event.h"
 
-#include "service/ota/ota.h"
-#include "service/ota/ota_server.h"
-#include "service/device_information.h"
-#include "service/hids.h"
-#include "service/uuid.h"
-
-#include "device/multi_device.h"
-
-#include "stack/ble/debug/debug.h"
-
-
-/*********************************************************/
-//Remove when file merge to SDK //
-#include "service/ota/ota_stack.h"
-#include "device/device_stack.h"
-#include "darwin/darwin_stack.h"
 #include "ble_config.h"
-
-/*********************************************************/
-
-
-
 
 #endif /* BLE_H_ */

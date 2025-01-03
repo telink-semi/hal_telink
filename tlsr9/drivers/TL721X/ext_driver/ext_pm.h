@@ -24,9 +24,15 @@
 #ifndef DRIVERS_TL721X_DRIVER_EXT_EXT_PM_H_
 #define DRIVERS_TL721X_DRIVER_EXT_EXT_PM_H_
 
+#include <zephyr/kernel.h>
+#undef irq_enable
+#undef irq_disable
+#undef ARRAY_SIZE
+#undef rand
+
 #include "../lib/include/pm/pm.h"
 #include "types.h"
-
+#include "ext_misc.h"
 
 /**
  * @brief       This function serves to set the working mode of MCU based on 32k crystal,e.g. suspend mode, deep sleep mode, deep sleep with SRAM retention mode and shutdown mode.
