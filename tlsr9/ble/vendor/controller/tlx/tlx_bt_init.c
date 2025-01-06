@@ -28,6 +28,10 @@
 
 #ifdef CONFIG_PM
 #include "ext_driver/ext_pm.h"
+
+/** a temporary method to set exit latency which can be set in header files */
+#define SUSPEND_EXIT_LATENCY_US		(200U)
+#define DEEPRETN_EXIT_LATENCY_US	(1000U)
 #endif /* CONFIG_PM */
 
 #if CONFIG_TL_BLE_CTRL_EXT_ADV
@@ -203,6 +207,11 @@ int tlx_bt_blc_init(void *prx, void *ptx)
 	/* Enable the sleep masks for BLE stack thread */
 	blc_pm_setSleepMask(PM_SLEEP_LEG_ADV | PM_SLEEP_LEG_SCAN | PM_SLEEP_ACL_SLAVE |
 			    PM_SLEEP_ACL_MASTER);
+
+	#if CONFIG_SOC_RISCV_TELINK_TL321X
+		extern void blc_ll_setOsLowPowerExitLatencyUs(uint32_t suspendUs, uint32_t deepretUs);
+		blc_ll_setOsLowPowerExitLatencyUs(SUSPEND_EXIT_LATENCY_US, DEEPRETN_EXIT_LATENCY_US);
+	#endif
 #endif /* CONFIG_PM */
 
 	return INIT_OK;
