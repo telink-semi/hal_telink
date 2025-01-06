@@ -2146,8 +2146,8 @@ typedef struct {
 
     u32     appWakeup_tick;
 
-
-
+    u32     suspend_exitLatencyTick;
+    u32     deepret_exitLatencyTick;
 
     sch_task_t  *pTask_wakeup;
 
