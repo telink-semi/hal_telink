@@ -51,6 +51,9 @@ extern "C" {
 #define pke_eccp_point_mul			eccp_pointMul
 #define pke_eccp_point_add			eccp_pointAdd
 #define pke_eccp_point_verify		eccp_pointVerify
+#define pke_x25519_point_mul		x25519_pointMul
+#define pke_ed25519_point_mul		ed25519_pointMul
+#define pke_ed25519_point_add		ed25519_pointAdd
 
 /***************** PKE register *******************/
 #define PKE_CTRL           (*((volatile unsigned int *)(PKE_BASE_ADDR)))
