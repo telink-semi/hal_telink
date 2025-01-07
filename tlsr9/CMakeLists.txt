@@ -46,6 +46,12 @@ zephyr_include_directories(drivers/${SOC}/flash)
 # soc.c reference sources for B9X
 if (NOT CONFIG_SOC_RISCV_TELINK_TL321X)
 	zephyr_library_sources(drivers/${SOC}/clock.c)
+endif()
+
+# analog reference sources for B9X and TL321X
+if (CONFIG_SOC_RISCV_TELINK_TL321X)
+	zephyr_library_sources(drivers/${SOC}/analog_user.c)
+else()
 	zephyr_library_sources(drivers/${SOC}/analog.c)
 endif()
 

@@ -32,5 +32,5 @@ blobs:
     type: lib
     version: 'V4.0.4.2'
     license-path: tlsr9/ble/license.txt
-    url: http://wiki.telink-semi.cn/wiki/protocols/Zephyr/binaries/public/tl321x_lib/lib_zephyr_tl321x_37251a7ca8f8488443f70dc6a09de19b604894a4.a
+    url: http://wiki.telink-semi.cn/wiki/protocols/Zephyr/binaries/public/tl321x_lib/lib_zephyr_tl321x_e21ff4c6b90ca0e5bc3f9a0c8abe9239679a8f1c.a
     description: "Binary libraries supporting Telink TL321X series BLE subsystems"
