@@ -52,7 +52,7 @@
  */
 typedef int (*cpu_pm_handler_t)(pm_sleep_mode_e sleep_mode,  pm_sleep_wakeup_src_e wakeup_src, unsigned int  wakeup_tick);
 extern  cpu_pm_handler_t            cpu_sleep_wakeup;
-
+#define cpu_sleep_wakeup_32k_rc cpu_sleep_wakeup
 
 /**
  * @brief   deepsleep wakeup by external xtal

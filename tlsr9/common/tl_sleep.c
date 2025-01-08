@@ -28,7 +28,7 @@
 #elif CONFIG_SOC_RISCV_TELINK_TL321X
 #include <stack/ble/TL321X/controller/os_sup.h>
 #elif CONFIG_SOC_RISCV_TELINK_TL721X
-#include <stack/ble/TL721X/controller/os_sup/os_sup.h>
+#include <stack/ble/TL721X/os_sup/os_sup.h>
 #endif
 #include <tl_rf_power.h>
 #endif /* CONFIG_BT_B9X || CONFIG_BT_TLX */

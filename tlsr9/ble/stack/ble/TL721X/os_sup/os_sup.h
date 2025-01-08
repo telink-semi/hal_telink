@@ -74,4 +74,7 @@ void blc_ll_registerGiveSemCb(os_give_sem_t give_sem_from_isr, os_give_sem_t giv
  */
 void blc_ll_registerMutexSemCb(os_mutex_sem_t take_mutex_sem, os_mutex_sem_t give_mutex_sem);
 
+extern int blc_pm_handler(void);
+extern void blc_pm_setAppWakeupLowPower(u32 wakeup_tick, u8 enable);
+
 #endif /* OS_SUP_H_ */
