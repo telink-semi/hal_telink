@@ -36,9 +36,17 @@ blobs:
     description: "Binary libraries supporting Telink TL321X series BLE subsystems"
 
   - path: lib_zephyr_tl721x.a
-    sha256: aee582ee7517bf7062ead3294af077902699f0f2ae74eacf9f7ae06efdea0edc
+    sha256: a6a2e54fa93b5bf6808e3b79b05229d7a16e11e703cbd151fe6f85b74aa03b06
     type: lib
     version: 'V4.0.4.2-c8c196e0'
     license-path: tlsr9/ble/license.txt
-    url: http://wiki.telink-semi.cn/wiki/protocols/Zephyr/binaries/public/tl721x_lib/lib_zephyr_tl721x_f259473c711cf772110c32474484f44164cfebd5_pm.a
+    url: http://wiki.telink-semi.cn/wiki/protocols/Zephyr/binaries/public/tl721x_lib/lib_zephyr_tl721x_694382dbee377cc85ad0edef52d7538debd0e595.a
     description: "Binary libraries supporting Telink TL721X series BLE subsystems"
+
+  - path: lib_zephyr_tl721x_pm.a
+    sha256: 36511a53653e0379c4da1470b616e882bf5c129a0bbcee8496349e7218a65a38
+    type: lib
+    version: 'V4.0.4.2-c8c196e0'
+    license-path: tlsr9/ble/license.txt
+    url: http://wiki.telink-semi.cn/wiki/protocols/Zephyr/binaries/public/tl721x_lib/lib_zephyr_tl721x_694382dbee377cc85ad0edef52d7538debd0e595_pm.a
+    description: "Binary libraries supporting Telink TL721X series BLE subsystems, optimized for low-power mode"
