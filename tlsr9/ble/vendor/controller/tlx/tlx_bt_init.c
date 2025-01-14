@@ -66,6 +66,15 @@ _attribute_ble_data_retention_ u8
 
 #endif /* CONFIG_TL_BLE_CTRL_PER_ADV */
 
+/** a temporary method to set exit latency which can be set in header files */
+#if CONFIG_SOC_RISCV_TELINK_TL321X
+	#define SUSPEND_EXIT_LATENCY_US		(200U)
+	#define DEEPRETN_EXIT_LATENCY_US	(1000U)		/*!< Not used for now */
+#elif CONFIG_SOC_RISCV_TELINK_TL721X
+	#define SUSPEND_EXIT_LATENCY_US		(250U)
+	#define DEEPRETN_EXIT_LATENCY_US	(0U)		/*!< Not used for now */
+#endif
+
 /**
  * @brief       Telink TLX BLE Controller initialization
  * @param[in]   prx - HCI RX callback
@@ -202,11 +211,17 @@ int tlx_bt_blc_init(void *prx, void *ptx)
 #ifdef CONFIG_PM
 	/* Enable PM for BLE stack */
 	blc_ll_enOsPowerManagement_module();
-
+	blc_ll_initPowerManagement_module();
 	/* Enable the sleep masks for BLE stack thread */
 	blc_pm_setSleepMask(PM_SLEEP_LEG_ADV | PM_SLEEP_LEG_SCAN | PM_SLEEP_ACL_SLAVE |
 			    PM_SLEEP_ACL_MASTER);
+	#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X
+	extern void blc_ll_setOsLowPowerExitLatencyUs(uint32_t suspendUs, uint32_t deepretUs);
+	blc_ll_setOsLowPowerExitLatencyUs(SUSPEND_EXIT_LATENCY_US, DEEPRETN_EXIT_LATENCY_US);
+	#endif
 #endif /* CONFIG_PM */
+
+
 
 	return INIT_OK;
 }

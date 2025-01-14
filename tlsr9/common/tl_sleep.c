@@ -28,7 +28,7 @@
 #elif CONFIG_SOC_RISCV_TELINK_TL321X
 #include <stack/ble/TL321X/controller/os_sup.h>
 #elif CONFIG_SOC_RISCV_TELINK_TL721X
-#include <stack/ble/TL721X/controller/os_sup/os_sup.h>
+#include <stack/ble/TL721X/os_sup/os_sup.h>
 #endif
 #include <tl_rf_power.h>
 #endif /* CONFIG_BT_B9X || CONFIG_BT_TLX */
@@ -88,7 +88,7 @@ CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION)
 #elif CONFIG_SOC_RISCV_TELINK_TL321X
 #define DEEPSLEEP_MODE_RET_SRAM DEEPSLEEP_MODE_RET_SRAM_LOW96K
 #elif CONFIG_SOC_RISCV_TELINK_TL721X
-#define DEEPSLEEP_MODE_RET_SRAM DEEPSLEEP_MODE_RET_SRAM_LOW96K
+#define DEEPSLEEP_MODE_RET_SRAM DEEPSLEEP_MODE_RET_SRAM_LOW128K
 #endif
 
 bool tl_deep_sleep(uint32_t wake_stimer_tick)
