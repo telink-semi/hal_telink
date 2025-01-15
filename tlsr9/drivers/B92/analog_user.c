@@ -1,7 +1,7 @@
 /********************************************************************************************************
- * @file    analog_user.h
+ * @file    analog_user.c
  *
- * @brief   This is the header file for TL321X
+ * @brief   This is the source file for TLSR9528
  *
  * @author  Driver Group
  * @date    2024
@@ -22,20 +22,18 @@
  *
  *******************************************************************************************************/
 
-#pragma once
-
-#include "compiler.h"
-
-#define analog_reg_59   (0x3b)
-#define analog_reg_60   (0x3c)
+#include "analog_user.h"
+#include "analog.h"
 
 /**
  * @brief      This function serves to analog register read by byte.
  * @param[in]  addr - address need to be read.
  * @return     the result of read.
  */
-_attribute_ram_code_com_sec_noinline_ unsigned char user_analog_read_reg8(unsigned char addr);
-
+_attribute_ram_code_sec_optimize_o2_ unsigned char user_analog_read_reg8(unsigned char addr)
+{
+    return analog_read_reg8(addr);
+}
 
 /**
  * @brief      This function serves to analog register write by byte.
@@ -43,11 +41,16 @@ _attribute_ram_code_com_sec_noinline_ unsigned char user_analog_read_reg8(unsign
  * @param[in]  data - the value need to be write.
  * @return     none.
  */
-_attribute_ram_code_com_sec_noinline_ int user_analog_write_reg8(unsigned char addr, unsigned char data);
+_attribute_ram_code_sec_optimize_o2_ int user_analog_write_reg8(unsigned char addr, unsigned char data)
+{
+    if (addr == analog_reg_59 || addr == analog_reg_60)
+    {
+        analog_write_reg8(addr, data);
+        return 0;
+    }
+    return -1;
+}
 
 
-typedef unsigned char (*analog_read_f)(unsigned char addr);
-typedef int (*analog_write_f)(unsigned char addr, unsigned char data);
-
-extern _attribute_data_retention_sec_ analog_read_f analog_read;
-extern _attribute_data_retention_sec_ analog_write_f analog_write;
+_attribute_data_retention_sec_ analog_read_f analog_read = user_analog_read_reg8;
+_attribute_data_retention_sec_ analog_write_f analog_write = user_analog_write_reg8;
