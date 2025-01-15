@@ -1,7 +1,7 @@
 /********************************************************************************************************
  * @file    analog_user.h
  *
- * @brief   This is the header file for TL321X
+ * @brief   This is the header file for TLSR9528
  *
  * @author  Driver Group
  * @date    2024
@@ -34,7 +34,7 @@
  * @param[in]  addr - address need to be read.
  * @return     the result of read.
  */
-_attribute_ram_code_com_sec_noinline_ unsigned char user_analog_read_reg8(unsigned char addr);
+_attribute_ram_code_sec_optimize_o2_ unsigned char user_analog_read_reg8(unsigned char addr);
 
 
 /**
@@ -43,7 +43,7 @@ _attribute_ram_code_com_sec_noinline_ unsigned char user_analog_read_reg8(unsign
  * @param[in]  data - the value need to be write.
  * @return     none.
  */
-_attribute_ram_code_com_sec_noinline_ int user_analog_write_reg8(unsigned char addr, unsigned char data);
+_attribute_ram_code_sec_optimize_o2_ int user_analog_write_reg8(unsigned char addr, unsigned char data);
 
 
 typedef unsigned char (*analog_read_f)(unsigned char addr);
