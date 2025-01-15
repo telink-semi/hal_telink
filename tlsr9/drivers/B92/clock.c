@@ -399,7 +399,7 @@ void clock_init(sys_pll_clk_e pll,
  * @param[in]   cclk_hclk_pclk - frequency of CCLK/HCLK/PCLK.
  * @return      none
  */
-void cclk_hclk_pclk_config(pll_div_cclk_hclk_pclk_e div)
+_attribute_ram_code_com_sec_noinline_ void cclk_hclk_pclk_config(pll_div_cclk_hclk_pclk_e div)
 {
 	unsigned char cclk_div = div>>8;
 	unsigned char hclk_div = (div&0x00f0)>>4;
