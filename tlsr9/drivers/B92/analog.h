@@ -59,10 +59,6 @@
  *                                      global function prototype                                                     *
  *********************************************************************************************************************/
 
-typedef void (*analog_write_f)(unsigned char, unsigned char);
-extern _attribute_data_retention_sec_ analog_write_f analog_write;
-typedef unsigned char (*analog_read_f)(unsigned char addr);
-extern _attribute_data_retention_sec_ analog_read_f analog_read;
 
 /**
  * @brief      This function serves to analog register read by byte.

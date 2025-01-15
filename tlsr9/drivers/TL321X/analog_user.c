@@ -41,10 +41,16 @@ _attribute_ram_code_com_sec_noinline_ unsigned char user_analog_read_reg8(unsign
  * @param[in]  data - the value need to be write.
  * @return     none.
  */
-_attribute_ram_code_com_sec_noinline_ void user_analog_write_reg8(unsigned char addr, unsigned char data)
+_attribute_ram_code_com_sec_noinline_ int user_analog_write_reg8(unsigned char addr, unsigned char data)
 {
-    return analog_write_reg8(addr, data);
+    if (addr == analog_reg_59 || addr == analog_reg_60)
+    {
+        analog_write_reg8(addr, data);
+        return 0;
+    }
+    return -1;
 }
 
-_attribute_data_retention_sec_ analog_write_f analog_write = user_analog_write_reg8;
+
 _attribute_data_retention_sec_ analog_read_f analog_read = user_analog_read_reg8;
+_attribute_data_retention_sec_ analog_write_f analog_write = user_analog_write_reg8;
