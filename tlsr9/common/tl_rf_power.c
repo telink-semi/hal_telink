@@ -19,7 +19,7 @@
 #include "tl_rf_power.h"
 #if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92
  #include <rf.h>
-#elif CONFIG_SOC_RISCV_TELINK_B95 || CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X
+#elif CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X
 #include <rf_common.h>
 #endif
 
@@ -68,8 +68,8 @@ const uint8_t tl_tx_pwr_lt[] = {
 	RF_POWER_P9p11dBm,      /*   9.1 dBm:   9 */
 };
 
-#elif CONFIG_SOC_RISCV_TELINK_B92 || CONFIG_SOC_RISCV_TELINK_B95
-/* TX power B92 and B95 lookup table */
+#elif CONFIG_SOC_RISCV_TELINK_B92
+/* TX power B92 lookup table */
 const uint8_t tl_tx_pwr_lt[] = {
 	RF_POWER_N30dBm,        /* -30.0 dBm: -30 */
 	RF_POWER_N30dBm,        /* -30.0 dBm: -29 */

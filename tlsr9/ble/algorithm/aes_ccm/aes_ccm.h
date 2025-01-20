@@ -21,8 +21,6 @@
 #include "stack/ble/B91/ble_format.h"
 #elif CONFIG_SOC_RISCV_TELINK_B92
 #include "stack/ble/B92/ble_format.h"
-#elif CONFIG_SOC_RISCV_TELINK_B95
-#include "stack/ble/B95/ble_format.h"
 #elif CONFIG_SOC_RISCV_TELINK_TL321X
 #include "stack/ble/TL321X/ble_format.h"
 #elif CONFIG_SOC_RISCV_TELINK_TL721X
