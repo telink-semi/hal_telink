@@ -10,8 +10,6 @@ if (CONFIG_SOC_RISCV_TELINK_B91)
 	set(SOC "B91")
 elseif (CONFIG_SOC_RISCV_TELINK_B92)
 	set(SOC "B92")
-elseif (CONFIG_SOC_RISCV_TELINK_B95)
-	set(SOC "B95")
 elseif (CONFIG_SOC_RISCV_TELINK_TL321X)
 	set(SOC "TL321X")
 elseif (CONFIG_SOC_RISCV_TELINK_TL721X)
@@ -47,8 +45,8 @@ if (CONFIG_SOC_RISCV_TELINK_B92)
 		)
 endif()
 
-# add for B95/TLX headers
-if (CONFIG_SOC_RISCV_TELINK_B95 OR CONFIG_SOC_SERIES_RISCV_TELINK_TLX OR CONFIG_SOC_RISCV_TELINK_TLX)
+# add for TLX headers
+if (CONFIG_SOC_SERIES_RISCV_TELINK_TLX OR CONFIG_SOC_RISCV_TELINK_TLX)
 	zephyr_include_directories(
 		drivers/${SOC}/lib/include/rf
 		drivers/${SOC}/lib/include/ske

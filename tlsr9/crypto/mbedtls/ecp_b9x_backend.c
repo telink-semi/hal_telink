@@ -216,18 +216,6 @@ static eccp_curve_t secp192k1_curve_dat = {
 #define MONT_P_H            p_h
 #define MONT_P_N1           p_n1
 #define MONT_A24            a24
-#elif CONFIG_SOC_RISCV_TELINK_B95
-/* dummy function to compile */
-inline static uint8_t pke_x25519_point_mul(mont_curve_t *curve,
-	uint32_t *k, uint32_t *Pu, uint32_t *Qu)
-{
-	(void) curve;
-	(void) k;
-	(void) Pu;
-	(void) Qu;
-
-	return PKE_INVALID_INPUT;
-}
 #endif
 
 #if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92
