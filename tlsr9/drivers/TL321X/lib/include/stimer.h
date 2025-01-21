@@ -1,20 +1,26 @@
-/******************************************************************************
- * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
+/********************************************************************************************************
+ * @file    stimer.h
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * @brief   This is the header file for TL321X
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * @author  Driver Group
+ * @date    2024
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *****************************************************************************/
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
+ *
+ *******************************************************************************************************/
 /** @page STIMER
  *
  *  Introduction
@@ -38,7 +44,7 @@
  *                                           global macro                                                             *
  *********************************************************************************************************************/
 #ifndef SYS_TIMER_AUTO_MODE
-#define SYS_TIMER_AUTO_MODE                 1
+    #define SYS_TIMER_AUTO_MODE 1
 #endif
 
 /**********************************************************************************************************************
@@ -47,56 +53,60 @@
 /**
  * @brief define system clock tick per us/ms/s.
  */
-enum{
-    SYSTEM_TIMER_TICK_1US       = 24,
-    SYSTEM_TIMER_TICK_1MS       = 24000,
-    SYSTEM_TIMER_TICK_1S        = 24000000,
+enum
+{
+    SYSTEM_TIMER_TICK_1US = 24,
+    SYSTEM_TIMER_TICK_1MS = 24000,
+    SYSTEM_TIMER_TICK_1S  = 24000000,
 
-    SYSTEM_TIMER_TICK_625US     = 15000,  //625*24
-    SYSTEM_TIMER_TICK_1250US    = 30000,  //1250*24
+    SYSTEM_TIMER_TICK_625US  = 15000, //625*24
+    SYSTEM_TIMER_TICK_1250US = 30000, //1250*24
 };
 
 /**
  * @brief define stimer capture mode.
  */
-typedef enum{
-    CAPT_RISING_EDGE            = 0,
-    CAPT_FALLING_EDGE           = 1,
-    CAPT_RISING_FALLING_EDGE    = 2,
-}stimer_capt_mode_e;
+typedef enum
+{
+    CAPT_RISING_EDGE         = 0,
+    CAPT_FALLING_EDGE        = 1,
+    CAPT_RISING_FALLING_EDGE = 2,
+} stimer_capt_mode_e;
 
 /**
  * @brief   This enumeration defines how many 32k ticks are reached, update the tick value of the increased system timer into the register.
  *          //32k_cnt = 2^(16-(cal_32k_mode>>4)), system_timer_cnt = 750*32k_cnt.(system timer is 24M).
  */
-typedef enum{
-    STIMER_TRACK_32KCNT_2       = 0xf0, /* 2 32k ticks, corresponds 0x5dc system timer ticks. */
-    STIMER_TRACK_32KCNT_4       = 0xe0, /* 4 32k ticks, corresponds 0xbb8 system timer ticks. */
-    STIMER_TRACK_32KCNT_8       = 0xd0, /* 8 32k ticks, corresponds 0x1770 system timer ticks. */
-    STIMER_TRACK_32KCNT_16      = 0xc0, /* 16 32k ticks, corresponds 0x2ee0 system timer ticks. */
-    STIMER_TRACK_32KCNT_32      = 0xb0, /* 32 32k ticks, corresponds 0x5dc0 system timer ticks. */
-    STIMER_TRACK_32KCNT_64      = 0xa0, /* 64 32k ticks, corresponds 0xbb80 system timer ticks. */
-    STIMER_TRACK_32KCNT_128     = 0x90, /* 128 32k ticks, corresponds 0x17700 system timer ticks. */
-    STIMER_TRACK_32KCNT_256     = 0x80, /* 256 32k ticks, corresponds 0x2ee00 system timer ticks. */
-    STIMER_TRACK_32KCNT_512     = 0x70, /* 512 32k ticks, corresponds 0x5dc00 system timer ticks. */
-    STIMER_TRACK_32KCNT_1024    = 0x60, /* 1024 32k ticks, corresponds 0xbb800 system timer ticks. */
-    STIMER_TRACK_32KCNT_2048    = 0x50, /* 2048 32k ticks, corresponds 0x177000 system timer ticks. */
-    STIMER_TRACK_32KCNT_4096    = 0x40, /* 4096 32k ticks, corresponds 0x2ee000 system timer ticks. */
-    STIMER_TRACK_32KCNT_8192    = 0x30, /* 8192 32k ticks, corresponds 0x5dc000 system timer ticks. */
-    STIMER_TRACK_32KCNT_16384   = 0x20, /* 16384 32k ticks, corresponds 0xbb8000 system timer ticks. */
-    STIMER_TRACK_32KCNT_32768   = 0x10, /* 32768 32k ticks, corresponds 0x1770000 system timer ticks. */
-    STIMER_TRACK_32KCNT_65536   = 0x00, /* 65536 32k ticks, corresponds 0x2ee0000 system timer ticks. */
-}stimer_track_cnt_e;
+typedef enum
+{
+    STIMER_TRACK_32KCNT_2     = 0xf0, /* 2 32k ticks, corresponds 0x5dc system timer ticks. */
+    STIMER_TRACK_32KCNT_4     = 0xe0, /* 4 32k ticks, corresponds 0xbb8 system timer ticks. */
+    STIMER_TRACK_32KCNT_8     = 0xd0, /* 8 32k ticks, corresponds 0x1770 system timer ticks. */
+    STIMER_TRACK_32KCNT_16    = 0xc0, /* 16 32k ticks, corresponds 0x2ee0 system timer ticks. */
+    STIMER_TRACK_32KCNT_32    = 0xb0, /* 32 32k ticks, corresponds 0x5dc0 system timer ticks. */
+    STIMER_TRACK_32KCNT_64    = 0xa0, /* 64 32k ticks, corresponds 0xbb80 system timer ticks. */
+    STIMER_TRACK_32KCNT_128   = 0x90, /* 128 32k ticks, corresponds 0x17700 system timer ticks. */
+    STIMER_TRACK_32KCNT_256   = 0x80, /* 256 32k ticks, corresponds 0x2ee00 system timer ticks. */
+    STIMER_TRACK_32KCNT_512   = 0x70, /* 512 32k ticks, corresponds 0x5dc00 system timer ticks. */
+    STIMER_TRACK_32KCNT_1024  = 0x60, /* 1024 32k ticks, corresponds 0xbb800 system timer ticks. */
+    STIMER_TRACK_32KCNT_2048  = 0x50, /* 2048 32k ticks, corresponds 0x177000 system timer ticks. */
+    STIMER_TRACK_32KCNT_4096  = 0x40, /* 4096 32k ticks, corresponds 0x2ee000 system timer ticks. */
+    STIMER_TRACK_32KCNT_8192  = 0x30, /* 8192 32k ticks, corresponds 0x5dc000 system timer ticks. */
+    STIMER_TRACK_32KCNT_16384 = 0x20, /* 16384 32k ticks, corresponds 0xbb8000 system timer ticks. */
+    STIMER_TRACK_32KCNT_32768 = 0x10, /* 32768 32k ticks, corresponds 0x1770000 system timer ticks. */
+    STIMER_TRACK_32KCNT_65536 = 0x00, /* 65536 32k ticks, corresponds 0x2ee0000 system timer ticks. */
+} stimer_track_cnt_e;
 
-typedef enum{
-    STIMER_MANUAL_MODE                  = 0x00, /**< Write a register to start the system timer. */
-    STIMER_AUTO_MODE_W_TRIG             = 0x01, /**< When you write the tick value of the system timer,
+typedef enum
+{
+    STIMER_MANUAL_MODE                   = 0x00, /**< Write a register to start the system timer. */
+    STIMER_AUTO_MODE_W_TRIG              = 0x01, /**< When you write the tick value of the system timer,
                                                 the system timer starts automatically. */
-    STIMER_AUTO_MODE_W_AND_NXT_32K_START= 0x02, /**< Configure this mode:
+    STIMER_AUTO_MODE_W_AND_NXT_32K_START = 0x02, /**< Configure this mode:
                                                 When the first 32k scale rises, the system timer starts automatically.*/
-    STIMER_AUTO_MODE_W_AND_NXT_32K_DONE = 0x03, /**< After the tick value is written to the system timer,
+    STIMER_AUTO_MODE_W_AND_NXT_32K_DONE  = 0x03, /**< After the tick value is written to the system timer,
                                                 the system timer automatically starts when the first 32k tick rises. */
-}stimer_enable_mode_e;
+} stimer_enable_mode_e;
 
 /**********************************************************************************************************************
  *                                     global variable declaration                                                    *
@@ -193,14 +203,14 @@ static _always_inline _Bool clock_time_exceed(unsigned int ref, unsigned int us)
  * @param[in] microsec - need to delay.
  * @return    none
  */
-_attribute_ram_code_sec_noinline_ void delay_us(unsigned int microsec);
+_attribute_ram_code_com_sec_noinline_ void delay_us(unsigned int microsec);
 
 /**
  * @brief     This function performs to set delay time by ms.
  * @param[in] millisec - need to delay.
  * @return    none
  */
-_attribute_ram_code_sec_noinline_ void delay_ms(unsigned int millisec);
+_attribute_ram_code_com_sec_noinline_ void delay_ms(unsigned int millisec);
 
 /**
  * @brief     This function servers to enable system timer input capture mode.
@@ -208,7 +218,7 @@ _attribute_ram_code_sec_noinline_ void delay_ms(unsigned int millisec);
  */
 static _always_inline void stimer_set_input_capt_enable(void)
 {
-    reg_system_timer_ctrl |=  FLD_SYSTEM_CAPT_EN ;
+    reg_system_timer_ctrl |= FLD_SYSTEM_CAPT_EN;
 }
 
 /**
@@ -217,7 +227,7 @@ static _always_inline void stimer_set_input_capt_enable(void)
  */
 static _always_inline void stimer_set_input_capt_disable(void)
 {
-     reg_system_timer_ctrl &= ~(FLD_SYSTEM_CAPT_EN) ;
+    reg_system_timer_ctrl &= ~(FLD_SYSTEM_CAPT_EN);
 }
 
 /**
@@ -227,7 +237,7 @@ static _always_inline void stimer_set_input_capt_disable(void)
  */
 static _always_inline void stimer_set_input_capt_mode(stimer_capt_mode_e capt_mode)
 {
-    reg_system_timer_ctrl = (reg_system_timer_ctrl & (~FLD_SYSTEM_CAPT_MODE))| capt_mode;
+    reg_system_timer_ctrl = (reg_system_timer_ctrl & (~FLD_SYSTEM_CAPT_MODE)) | capt_mode;
 }
 
 /**
@@ -272,7 +282,7 @@ void stimer_set_input_capt_value_dma(dma_chn_e chn, unsigned int *dst_addr, unsi
  * @param[in] head_of_list - the head address of dma llp.
  * @return    none
  */
-void stimer_set_input_capt_dma_chain_llp(dma_chn_e dma_chn,unsigned int* dst_addr,unsigned int data_len,dma_chain_config_t *head_of_list);
+void stimer_set_input_capt_dma_chain_llp(dma_chn_e dma_chn, unsigned int *dst_addr, unsigned int data_len, dma_chain_config_t *head_of_list);
 
 /**
  * @brief     This function servers to configure DMA cycle chain node.
@@ -283,7 +293,7 @@ void stimer_set_input_capt_dma_chain_llp(dma_chn_e dma_chn,unsigned int* dst_add
  * @param[in] data_len    - to configure DMA length.
  * @return    none
  */
-void stimer_input_capt_dma_add_list_element(dma_chn_e dma_chn,unsigned int* dst_addr,unsigned int data_len,dma_chain_config_t *config_addr,dma_chain_config_t *llpointer);
+void stimer_input_capt_dma_add_list_element(dma_chn_e dma_chn, unsigned int *dst_addr, unsigned int data_len, dma_chain_config_t *config_addr, dma_chain_config_t *llpointer);
 
 /**********************************************************************************************************************
  *                          Internal interface, provided only for driver use.                                         *
@@ -367,7 +377,7 @@ static _always_inline void stimer_set_update_upon_nxt_32k_disable(void)
  */
 static _always_inline void stimer_wait_write_done(void)
 {
-    while((reg_system_st & FLD_SYSTEM_CMD_SET_DLY_DONE) == 0);
+    while ((reg_system_st & FLD_SYSTEM_CMD_SET_DLY_DONE) == 0);
 }
 
 /**
@@ -396,7 +406,7 @@ static _always_inline void stimer_32k_tracking_disable(void)
 static _always_inline void stimer_set_32k_track_cnt(stimer_track_cnt_e cnt)
 {
     reg_system_ctrl = (reg_system_ctrl & 0x0f) | cnt;
-    g_track_32kcnt = (1 << (16 - (cnt >> 4)));
+    g_track_32kcnt  = (1 << (16 - (cnt >> 4)));
 }
 
 /**
@@ -441,7 +451,7 @@ static _always_inline void stimer_set_32k_read_mode(void)
  */
 static _always_inline void stimer_wait_read_32k_done(void)
 {
-    while(reg_system_st & FLD_SYSTEM_RD_BUSY);
+    while (reg_system_st & FLD_SYSTEM_RD_BUSY);
 }
 
 /**
@@ -466,9 +476,9 @@ static _always_inline void stimer_set_32k_tick_write_trig(void)
  * @brief     This interface is used to wait for the completion of writing 32k timers using system timers.
  * @return    none.
  */
-static _always_inline void stimer_wait_write_32k_done (void)
+static _always_inline void stimer_wait_write_32k_done(void)
 {
-    while(reg_system_st & FLD_SYSTEM_CMD_SYNC);
+    while (reg_system_st & FLD_SYSTEM_CMD_SYNC);
 }
 
 /**
@@ -477,12 +487,12 @@ static _always_inline void stimer_wait_write_32k_done (void)
  * @param[in]   tick    - The initial value of the tick at startup.
  * @return      none.
  */
-_attribute_ram_code_sec_noinline_ void stimer_enable(stimer_enable_mode_e mode, unsigned int tick);
+_attribute_ram_code_com_sec_noinline_ void stimer_enable(stimer_enable_mode_e mode, unsigned int tick);
 
 /**
  * @brief       This function is used to stop the system timer.
  * @return      none.
  */
-_attribute_ram_code_sec_noinline_ void stimer_disable(void);
+_attribute_ram_code_com_sec_noinline_ void stimer_disable(void);
 
 #endif /* STIMER_H_ */

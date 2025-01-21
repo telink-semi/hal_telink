@@ -1,26 +1,28 @@
-/******************************************************************************
- * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
+/********************************************************************************************************
+ * @file    resolvelist.h
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * @brief   This is the header file for BLE SDK
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * @author  BLE GROUP
+ * @date    06,2022
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @par     Copyright (c) 2022, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *****************************************************************************/
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
+ *
+ *******************************************************************************************************/
 #ifndef LL_RESOLVELIST_H_
 #define LL_RESOLVELIST_H_
-
-
-
-
 
 
 /**
@@ -33,7 +35,7 @@
  * @return     Status - 0x00: command succeeded;
  *                      Others: command failed, refer to definition of "ble_sts_t" to know the reason
  */
-ble_sts_t   blc_ll_addDeviceToResolvingList(ida_type_t peerIdAddrType, u8 *peerIdAddr, u8 *peer_irk, u8 *local_irk);
+ble_sts_t blc_ll_addDeviceToResolvingList(ida_type_t peerIdAddrType, u8 *peerIdAddr, u8 *peer_irk, u8 *local_irk);
 
 
 /**
@@ -45,7 +47,7 @@ ble_sts_t   blc_ll_addDeviceToResolvingList(ida_type_t peerIdAddrType, u8 *peerI
  * @return     Status - 0x00: command succeeded;
  *                      Others: command failed, refer to definition of "ble_sts_t" to know the reason
  */
-ble_sts_t   blc_ll_removeDeviceFromResolvingList(ida_type_t peerIdAddrType, u8 *peerIdAddr);
+ble_sts_t blc_ll_removeDeviceFromResolvingList(ida_type_t peerIdAddrType, u8 *peerIdAddr);
 
 
 /**
@@ -54,7 +56,7 @@ ble_sts_t   blc_ll_removeDeviceFromResolvingList(ida_type_t peerIdAddrType, u8 *
  * @return     Status - 0x00: command succeeded;
  *                      Others: command failed, refer to definition of "ble_sts_t" to know the reason
  */
-ble_sts_t   blc_ll_clearResolvingList(void);
+ble_sts_t blc_ll_clearResolvingList(void);
 
 
 /**
@@ -62,7 +64,7 @@ ble_sts_t   blc_ll_clearResolvingList(void);
  * @param[in]  none
  * @return     resolving list size
  */
-int         blc_ll_readResolvingListSize(void);
+int blc_ll_readResolvingListSize(void);
 
 
 /**
@@ -70,7 +72,7 @@ int         blc_ll_readResolvingListSize(void);
  * @param[in]  resolution_en - Address Resolution Enable/Disable
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t   blc_ll_setAddressResolutionEnable (addr_res_en_t resolution_en);
+ble_sts_t blc_ll_setAddressResolutionEnable(addr_res_en_t resolution_en);
 
 
 /*
@@ -84,7 +86,7 @@ ble_sts_t   blc_ll_setAddressResolutionEnable (addr_res_en_t resolution_en);
  * @return     Status - 0x00: command succeeded;
  *                      Others: command failed, refer to definition of "ble_sts_t" to know the reason
  */
-ble_sts_t       blc_ll_setResolvablePrivateAddressTimeout (u16 rpa_timeout_s);
+ble_sts_t blc_ll_setResolvablePrivateAddressTimeout(u16 rpa_timeout_s);
 
 
 /*
@@ -95,8 +97,7 @@ ble_sts_t       blc_ll_setResolvablePrivateAddressTimeout (u16 rpa_timeout_s);
  * @return     Status - 0x00: command succeeded;
  *                      Others: command failed, refer to definition of "ble_sts_t" to know the reason
  */
-ble_sts_t       blc_ll_setPrivacyMode(ida_type_t peerIdAddrType, u8* peerIdAddr, privacy_mode_t privMode);
-
+ble_sts_t blc_ll_setPrivacyMode(ida_type_t peerIdAddrType, u8 *peerIdAddr, privacy_mode_t privMode);
 
 
 #endif /* LL_RESOLVELIST_H_ */

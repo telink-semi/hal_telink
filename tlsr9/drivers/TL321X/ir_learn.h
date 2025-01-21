@@ -1,20 +1,27 @@
-/******************************************************************************
- * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
+/********************************************************************************************************
+ * @file    ir_learn.h
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * @brief   This is the source file for TL321X
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * @author  Driver Group
+ * @date    2024
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *          All rights reserved.
  *
- *****************************************************************************/
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
+ *
+ *******************************************************************************************************/
 /** @page IR_LEARN
  *
  *  Introduction
@@ -36,6 +43,7 @@
 #include "reg_include/register.h"
 #include "dma.h"
 #include "pwm.h"
+#include "lib/include/stimer.h"
 
 /**
  * @brief ir_learn capture mode
@@ -78,13 +86,13 @@ typedef enum
  */
 typedef struct
 {
-    bool high_data_en;                  /**< 1: high write enable, 0: high write disable. */
-    bool cycle_data_en;                 /**< 1: cycle write enable, 0: cycle write disable.*/
-    bool timeout_en;                    /**< 1: timeout enable, 0: timeout disable. */
-    bool rx_invert_en;                  /**< 1: rx invert enable, 0: rx invert disable, analog rx mode need enable. */
-    ir_learn_start_cnt_mode_e cnt_mode; /**< start count mode select. */
-    ir_learn_data_format_e data_format; /**< data format select. */
-    ir_learn_rx_e rx_mode;              /**< ir_learn rx signal select. */
+    bool                      high_data_en;  /**< 1: high write enable, 0: high write disable. */
+    bool                      cycle_data_en; /**< 1: cycle write enable, 0: cycle write disable.*/
+    bool                      timeout_en;    /**< 1: timeout enable, 0: timeout disable. */
+    bool                      rx_invert_en;  /**< 1: rx invert enable, 0: rx invert disable, analog rx mode need enable. */
+    ir_learn_start_cnt_mode_e cnt_mode;      /**< start count mode select. */
+    ir_learn_data_format_e    data_format;   /**< data format select. */
+    ir_learn_rx_e             rx_mode;       /**< ir_learn rx signal select. */
 } ir_learn_rx_t;
 
 /**
@@ -159,6 +167,11 @@ static inline void ir_learn_dis(void)
 static inline void ir_learn_ana_rx_en(void)
 {
     analog_write_reg8(0x0f, (analog_read_reg8(0x0f) | 0x08));
+    if (g_chip_version == 0x81) {
+        analog_write_reg8(0x14, (analog_read_reg8(0x14) | 0x08));
+        delay_us(1);
+        analog_write_reg8(0x14, (analog_read_reg8(0x14) & 0xf7));
+    }
 }
 
 /**
@@ -380,8 +393,7 @@ static inline unsigned char ir_learn_get_irq_status(ir_learn_irq_e status)
  */
 static inline void ir_learn_clr_irq_status(ir_learn_irq_e status)
 {
-    if (status & FLD_IR_LEARN_TIMEOUT_IRQ)
-    {
+    if (status & FLD_IR_LEARN_TIMEOUT_IRQ) {
         ir_learn_clr_rx_fifo_cnt();
     }
     reg_ir_learn_irq_status = status;
@@ -470,8 +482,7 @@ void ir_learn_receive_dma(dma_chn_e chn, unsigned int *dst_addr, unsigned int le
  * @param[in]  data_len    - length of DMA in byte.
  * @return     none
  */
-void ir_learn_rx_dma_add_list_element(dma_chn_e chn, dma_chain_config_t *config_addr, dma_chain_config_t *llpointer, unsigned char *dst_addr,
-                                      unsigned int data_len);
+void ir_learn_rx_dma_add_list_element(dma_chn_e chn, dma_chain_config_t *config_addr, dma_chain_config_t *llpointer, unsigned char *dst_addr, unsigned int data_len);
 
 /**
  * @brief      This function serves to set ir_learn receive dma chain.

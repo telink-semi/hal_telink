@@ -1,31 +1,39 @@
-/******************************************************************************
- * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
+/********************************************************************************************************
+ * @file    ir_learn_reg.h
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * @brief   This is the header file for TL321X
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * @author  Driver Group
+ * @date    2024
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *          All rights reserved.
  *
- *****************************************************************************/
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
+ *
+ *******************************************************************************************************/
 #ifndef IR_LEARN_REG_H
 #define IR_LEARN_REG_H
 #include "soc.h"
 /*******************************      ir-learn registers: 0x1404C0      ******************************/
-#define IR_LEARN_BASE_ADDR (0x1404C0)
+#define IR_LEARN_BASE_ADDR              (0x1404C0)
 
 #define reg_ir_learn_fifo_addr          (IR_LEARN_BASE_ADDR + 0x0c)
 #define reg_ir_learn_data_hword_buff(i) REG_ADDR16(IR_LEARN_BASE_ADDR + 0x0c + i * 2)
 #define reg_ir_learn_data_word_buff     REG_ADDR32(IR_LEARN_BASE_ADDR + 0x0c)
 
-#define reg_ir_learn_ctrl0 REG_ADDR8(IR_LEARN_BASE_ADDR)
+#define reg_ir_learn_ctrl0              REG_ADDR8(IR_LEARN_BASE_ADDR)
+
 enum
 {
     FLD_IR_LEARN_EN         = BIT(0), /**< 1: enable, 0: disable. */
@@ -57,6 +65,7 @@ enum
  *  -# 0 select GPIO level as ir-learn input signal
  */
 #define reg_ir_learn_ctrl1 REG_ADDR8(IR_LEARN_BASE_ADDR + 0x01)
+
 enum
 {
     FLD_IR_LEARN_MODE        = BIT(1),
@@ -77,7 +86,7 @@ enum
  * -# BIT[2]: An timeout interrupt is generated when the ir module is at a low level and the count value reaches the preset timeout threshold, storing the count value into the cycle register.
  * -# BIT[3]: An rx_fifo interrupt is generated when the threshold of the set fifo_level is reached.
  */
-#define reg_ir_learn_irq_mask   REG_ADDR8(IR_LEARN_BASE_ADDR + 0x05)
+#define reg_ir_learn_irq_mask REG_ADDR8(IR_LEARN_BASE_ADDR + 0x05)
 
 /**
  * @brief ir_learn irq status.
@@ -87,6 +96,7 @@ enum
  * BIT[3]: If this is set 1 Indicates that a rx buff interrupt has been generated. You can manually write 1 to clear the interrupt flag.
  */
 #define reg_ir_learn_irq_status REG_ADDR8(IR_LEARN_BASE_ADDR + 0x06)
+
 typedef enum
 {
     FLD_IR_LEARN_HIGH_IRQ    = BIT(0), /**< W1C. */
@@ -96,6 +106,7 @@ typedef enum
 } ir_learn_irq_e;
 
 #define reg_ir_learn_fifo_ctrl REG_ADDR8(IR_LEARN_BASE_ADDR + 0x07)
+
 typedef enum
 {
     FLD_IR_LEARN_FIFO_THRES    = BIT_RNG(0, 2), /* unit is bytes */
@@ -106,6 +117,7 @@ typedef enum
 } ir_learn_fifo_ctrl_e;
 
 #define reg_ir_learn_fifo_state REG_ADDR8(IR_LEARN_BASE_ADDR + 0x08)
+
 typedef enum
 {
     FLD_IR_LEARN_FIFO_RX_CNT   = BIT_RNG(0, 3), /* unit is bytes */

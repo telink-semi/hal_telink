@@ -1,26 +1,31 @@
-/******************************************************************************
- * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
+/********************************************************************************************************
+ * @file    bis_sync.h
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * @brief   This is the header file for BLE SDK
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * @author  BLE GROUP
+ * @date    06,2022
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @par     Copyright (c) 2022, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *****************************************************************************/
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
+ *
+ *******************************************************************************************************/
 #ifndef BIS_SYNC_H_
 #define BIS_SYNC_H_
 
 
-#define     BIG_SYNC_PARAM_LENGTH                           928  //user can't modify this value !!!
-
+#define BIG_SYNC_PARAM_LENGTH 816 //user can't modify this value !!!
 
 
 /**
@@ -30,7 +35,7 @@
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_initBigSyncModule_initBigSyncParametersBuffer(u8 *pBigSyncPara, u8 bigSyncNum);
+ble_sts_t blc_ll_initBigSyncModule_initBigSyncParametersBuffer(u8 *pBigSyncPara, u8 bigSyncNum);
 
 
 /*
@@ -64,7 +69,7 @@ ble_sts_t blc_ll_initBisRxFifo(u8 *pRxbuf, int full_size, int fifo_number, u8 bi
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_bigTerminateSync(u8 bigHandle);
+ble_sts_t blc_ll_bigTerminateSync(u8 bigHandle);
 
 
 /**
@@ -72,7 +77,7 @@ ble_sts_t   blc_ll_bigTerminateSync(u8 bigHandle);
  * @param[in]  bis_connHandle - Identifier of the bis handle.
  * @return     sdu_packet_t, PDU packet to SDU data structure
  */
-sdu_packet_t* blc_ll_popBisSyncRxSduData(u16 bis_connHandle);
+sdu_packet_t *blc_ll_popBisSyncRxSduData(u16 bis_connHandle);
 
 
 #endif /* BIS_SYNC_H_ */

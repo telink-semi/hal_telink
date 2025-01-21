@@ -1,20 +1,26 @@
-/******************************************************************************
- * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
+/********************************************************************************************************
+ * @file    ble_controller.h
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * @brief   This is the header file for BLE SDK
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * @author  BLE GROUP
+ * @date    06,2022
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @par     Copyright (c) 2022, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *****************************************************************************/
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
+ *
+ *******************************************************************************************************/
 #ifndef BLE_CONTROLLER_H_
 #define BLE_CONTROLLER_H_
 
@@ -56,10 +62,10 @@
 #include "stack/ble/TL321X/controller/ll/init/ext_init.h"
 
 
-#include "stack/ble/TL321X/controller/ll/prdadv/pda.h"
-#include "stack/ble/TL321X/controller/ll/prdadv/prd_adv.h"
+// #include "stack/ble/TL321X/controller/ll/prdadv/pda.h"
+// #include "stack/ble/TL321X/controller/ll/prdadv/prd_adv.h"
 // #include "stack/ble/controller/ll/prdadv/PAwR_adv.h"
-#include "stack/ble/TL321X/controller/ll/prdadv/pda_sync.h"
+// #include "stack/ble/TL321X/controller/ll/prdadv/pda_sync.h"
 // #include "stack/ble/controller/ll/prdadv/PAwR_sync.h"
 
 // #include "stack/ble/controller/ial/ial.h"
@@ -117,11 +123,11 @@
 // #include "stack/ble/controller/phy/phy_stack.h"
 // #include "stack/ble/hci/hci_stack.h"
 // #include "stack/ble/controller/ll/subrate/subrate_stack.h"
-// #include "stack/ble/controller/ll/chn_sound/chn_sound_stack.h"
+// #include "stack/ble/controller/ll/chn_sound/cs_stack.h"
+// #include "stack/ble/controller/ll/chn_sound/cs_drbg/cs_drbg_stack.h"
+// #include "stack/ble/controller/ll/chn_sound/cs_sniffer/cs_sniffer_stack.h"
 // #include "stack/ble/controller/ll/acl_conn/acl_sniffer/acl_sniffer_stack.h"
 // #include "stack/ble/hal/hal_internal.h"
-
-// #include "stack/ble/controller/cs_drbg/drbg_stack.h"
 
 // #include "stack/ble/device/device_stack.h"
 // #include "stack/ble/darwin/darwin_stack.h"

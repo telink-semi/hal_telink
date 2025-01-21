@@ -1,20 +1,26 @@
-/******************************************************************************
- * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
+/********************************************************************************************************
+ * @file    error_handler.h
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * @brief   This is the header file for TL321X
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * @author  Driver Group
+ * @date    2024
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *****************************************************************************/
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
+ *
+ *******************************************************************************************************/
 #ifndef ERROR_HANDLER_H_
 #define ERROR_HANDLER_H_
 
@@ -38,22 +44,25 @@ extern unsigned int g_drv_api_error_timeout_us;
  */
 typedef enum
 {
-    DRV_API_SUCCESS          = 0x00,
-    DRV_API_FAILURE          = 0x01,
-    DRV_API_TIMEOUT          = 0x02,
-    DRV_API_INVALID_PARAM    = 0x03
+    DRV_API_SUCCESS       = 0x00,
+    DRV_API_FAILURE       = 0x01,
+    DRV_API_TIMEOUT       = 0x02,
+    DRV_API_INVALID_PARAM = 0x03
 } drv_api_status_e;
+
 /**
  *  @brief  Timeout error code,this enumeration is applicable to the module that does reboot handle when the times out.
  */
-typedef enum {
-    DRV_API_ERROR_NONE                      = 0,
-    DRV_API_ERROR_TIMEOUT_RC_24M_CAL        = 0x01,
-    DRV_API_ERROR_TIMEOUT_RC_32K_CAL        = 0x02,
-    DRV_API_ERROR_TIMEOUT_MSPI_WAIT         = 0x03,
-    DRV_API_ERROR_TIMEOUT_ANALOG_WAIT       = 0x04,
-    DRV_API_ERROR_TIMEOUT_ANA_TX_BUFCNT     = 0x05,
-    DRV_API_ERROR_TIMEOUT_EFUSE_WAIT        = 0x06,
+typedef enum
+{
+    DRV_API_ERROR_NONE                  = 0,
+    DRV_API_ERROR_TIMEOUT_RC_24M_CAL    = 0x01,
+    DRV_API_ERROR_TIMEOUT_RC_32K_CAL    = 0x02,
+    DRV_API_ERROR_TIMEOUT_MSPI_WAIT     = 0x03,
+    DRV_API_ERROR_TIMEOUT_ANALOG_WAIT   = 0x04,
+    DRV_API_ERROR_TIMEOUT_ANA_TX_BUFCNT = 0x05,
+    DRV_API_ERROR_TIMEOUT_PLL_DONE      = 0x06,
+    DRV_API_ERROR_TIMEOUT_EFUSE_WAIT    = 0x07,
 } drv_api_error_code_e;
 
 /**********************************************************************************************************************
@@ -77,7 +86,7 @@ drv_api_error_code_e drv_get_error_code(void);
  * @return    none.
  * @note      This function can be rewritten according to the application scenario.
  */
-__attribute__((weak)) void drv_timeout_handler(unsigned int error_code);
+__attribute__((weak)) void _attribute_ram_code_sec_noinline_ drv_timeout_handler(unsigned int error_code);
 
 /**
  * @brief     This function serves to set the error timeout(us).

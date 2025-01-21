@@ -1,20 +1,26 @@
-/******************************************************************************
- * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
+/********************************************************************************************************
+ * @file    timer.h
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * @brief   This is the header file for TL321X
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * @author  Driver Group
+ * @date    2024
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *****************************************************************************/
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
+ *
+ *******************************************************************************************************/
 /** @page TIMER
  *
  *  Introduction
@@ -38,7 +44,6 @@
 #include "gpio.h"
 #include "reg_include/register.h"
 
-
 /**********************************************************************************************************************
  *                                         global constants                                                           *
  *********************************************************************************************************************/
@@ -50,20 +55,22 @@
 /**
  * @brief   Type of Timer
  */
-typedef enum{
-    TIMER0      =0,
-    TIMER1      =1,
-}timer_type_e;
+typedef enum
+{
+    TIMER0 = 0,
+    TIMER1 = 1,
+} timer_type_e;
 
 /**
  * @brief   Mode of Timer
  */
-typedef enum{
-    TIMER_MODE_SYSCLK       =0,
-    TIMER_MODE_GPIO_TRIGGER =1,
-    TIMER_MODE_GPIO_WIDTH   =2,
-    TIMER_MODE_TICK         =3,
-}timer_mode_e;
+typedef enum
+{
+    TIMER_MODE_SYSCLK       = 0,
+    TIMER_MODE_GPIO_TRIGGER = 1,
+    TIMER_MODE_GPIO_WIDTH   = 2,
+    TIMER_MODE_TICK         = 3,
+} timer_mode_e;
 
 /**********************************************************************************************************************
  *                                      global function prototype                                                     *
@@ -77,7 +84,7 @@ typedef enum{
  */
 static inline unsigned char timer_get_irq_status(timer_irq_e status)
 {
-    return  reg_tmr_sta1&status ;
+    return reg_tmr_sta1 & status;
 }
 
 /*
@@ -87,17 +94,16 @@ static inline unsigned char timer_get_irq_status(timer_irq_e status)
  */
 static inline void timer_clr_irq_status(timer_irq_e status)
 {
-         reg_tmr_sta1 = status;
+    reg_tmr_sta1 = status;
 }
 
 /**
  * @brief   This function refer to get timer0 tick.
  * @return  none
  */
-static inline  unsigned int timer0_get_gpio_width(void)
+static inline unsigned int timer0_get_gpio_width(void)
 {
-     return reg_tmr0_tick;
-
+    return reg_tmr0_tick;
 }
 
 /**
@@ -107,7 +113,6 @@ static inline  unsigned int timer0_get_gpio_width(void)
 static inline unsigned int timer1_get_gpio_width(void)
 {
     return reg_tmr1_tick;
-
 }
 
 /**
@@ -126,7 +131,7 @@ static inline void timer0_set_tick(unsigned int tick)
  */
 static inline unsigned int timer0_get_tick(void)
 {
-    return reg_tmr0_tick ;
+    return reg_tmr0_tick;
 }
 
 /**
@@ -169,6 +174,7 @@ static inline void timer_set_cap_tick(timer_type_e type, unsigned int cap_tick)
 {
     reg_tmr_capt(type) = cap_tick;
 }
+
 /**
  * @brief     This function set timer irq mask.
  * @return    none.
@@ -187,7 +193,6 @@ static inline void timer_clr_irq_mask(timer_irq_e mask)
     reg_tmr_ctrl3 &= ~mask;
 }
 
-
 /**
  * @brief     the specified timer start working.
  * @param[in] type - select the timer to start.
@@ -196,7 +201,7 @@ static inline void timer_clr_irq_mask(timer_irq_e mask)
 void timer_start(timer_type_e type);
 
 /**
- * @brief     set mode, initial tick and capture of timer.
+ * @brief     set mode of timer.
  * @param[in] type - select the timer to start.
  * @param[in] mode - select mode for timer.
  * @return    none
@@ -210,7 +215,7 @@ void timer_set_mode(timer_type_e type, timer_mode_e mode);
  * @param[in] pol - select polarity for gpio trigger and gpio width
  * @return    none
  */
-void timer_gpio_init(timer_type_e type, gpio_pin_e pin, gpio_pol_e pol );
+void timer_gpio_init(timer_type_e type, gpio_pin_e pin, gpio_pol_e pol);
 
 /**
  * @brief     the specified timer stop working.
@@ -226,17 +231,16 @@ void timer_stop(timer_type_e type);
  */
 static inline void timer_set_wrap(timer_type_e type)
 {
-    switch(type)
-        {
-            case TIMER0:
-                BM_CLR(reg_tmr_ctrl0, FLD_TMR0_NOWRAP);
-                break;
-            case TIMER1:
-                BM_CLR(reg_tmr_ctrl0, FLD_TMR1_NOWRAP);
-                break;
-            default:
-                break;
-        }
+    switch (type) {
+    case TIMER0:
+        BM_CLR(reg_tmr_ctrl0, FLD_TMR0_NOWRAP);
+        break;
+    case TIMER1:
+        BM_CLR(reg_tmr_ctrl0, FLD_TMR1_NOWRAP);
+        break;
+    default:
+        break;
+    }
 }
 
 

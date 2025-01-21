@@ -1,34 +1,39 @@
-/******************************************************************************
- * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
+/********************************************************************************************************
+ * @file    trng.h
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * @brief   This is the header file for TL321X
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * @author  Driver Group
+ * @date    2024
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *****************************************************************************/
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
+ *
+ *******************************************************************************************************/
 #ifndef TRNG_H
 #define TRNG_H
-
 
 
 #include "lib/include/trng/trng_basic.h"
 
 
-
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-/**
+    /**
  * @brief       get rand(for internal test)
  * @param[in]   rand                byte buffer rand
  * @param[in]   bytes               byte length of rand
@@ -41,21 +46,21 @@ extern "C" {
             if you get the pseudo-random please use get_rand.
   @endverbatim
  */
-unsigned int get_rand_internal(unsigned char *rand, unsigned int bytes);
+    unsigned int get_rand_internal(unsigned char *rand, unsigned int bytes);
 
-/**
+    /**
  * @brief       get rand with fast speed(with entropy reducing, for such as clearing tmp buffer)
  * @param[in]   rand                byte buffer rand
  * @param[in]   bytes               byte length of rand
  * @return      TRNG_SUCCESS(success), other(error)
  */
-unsigned int get_rand_fast(unsigned char *rand, unsigned int bytes);
+    unsigned int get_rand_fast(unsigned char *rand, unsigned int bytes);
 
 #ifndef CONFIG_TRNG_GENERATE_BY_HARDWARE
-unsigned int get_rand_register(void);
+    unsigned int get_rand_register(void);
 #endif
 
-/**
+    /**
  * @brief       get rand(without entropy reducing)
  * @param[in]   rand                byte buffer rand
  * @param[in]   bytes               byte length of rand
@@ -66,7 +71,7 @@ unsigned int get_rand_register(void);
       -# 2. After the call the mode configuration is changed to post-processing mode.
   @endverbatim
  */
-unsigned int get_rand(unsigned char *rand, unsigned int bytes);
+    unsigned int get_rand(unsigned char *rand, unsigned int bytes);
 
 #ifdef __cplusplus
 }

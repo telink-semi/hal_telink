@@ -1,38 +1,46 @@
-/******************************************************************************
- * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
+/********************************************************************************************************
+ * @file    emi_internal.h
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * @brief   This is the header file for TL321X
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * @author  Driver Group
+ * @date    2024
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *****************************************************************************/
-#ifndef  EMI_INTERNAL_H_
-#define  EMI_INTERNAL_H_
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
+ *
+ *******************************************************************************************************/
+#ifndef EMI_INTERNAL_H_
+#define EMI_INTERNAL_H_
 
 #include "lib/include/rf/rf_common.h"
 
-#define EMI_ACCESS_CODE_V1                      0x29417671
+#define EMI_ACCESS_CODE_V1 0x29417671
+
 /**
  *  @brief  Define emi_cfg_param_t struct.
  */
-typedef struct{
-   signed char rf_chn;               /**< RF channel number.Default: 2 (Frequency channel 2402 MHz) */
-   unsigned char pkt_type;           /**< The type of data sent (0:pbrs9  1:0x0f  2:0x55  3:0xaa  4:0xf0  5:0x00  6:0xff)*/
-   unsigned char emi_tx_payload_len; /**< Length of the EMI TX payload;Default: 37 */
-   unsigned char emi_pkt_duty_cycle; /**< Duty cycle of the EMI packet;Default: 50 (50% duty cycle) */
-   unsigned int  emi_access_code;    /**< Access code for EMI transmission Default:0x29417671*/
-   rf_mode_e rf_mode;                /**< RF mode setting. */
-   rf_power_level_e power_level;     /**< RF power level.  */
-}emi_cfg_param_t;
+typedef struct
+{
+    signed char      rf_chn;             /**< RF channel number.Default: 2 (Frequency channel 2402 MHz) */
+    unsigned char    pkt_type;           /**< The type of data sent (0:pbrs9  1:0x0f  2:0x55  3:0xaa  4:0xf0  5:0x00  6:0xff)*/
+    unsigned char    emi_tx_payload_len; /**< Length of the EMI TX payload;Default: 37 */
+    unsigned char    emi_pkt_duty_cycle; /**< Duty cycle of the EMI packet;Default: 50 (50% duty cycle) */
+    unsigned int     emi_access_code;    /**< Access code for EMI transmission Default:0x29417671*/
+    rf_mode_e        rf_mode;            /**< RF mode setting. */
+    rf_power_level_e power_level;        /**< RF power level.  */
+} emi_cfg_param_t;
 
 extern emi_cfg_param_t emi_cfg_param;
 

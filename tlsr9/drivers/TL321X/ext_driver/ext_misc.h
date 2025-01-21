@@ -1,34 +1,32 @@
-/******************************************************************************
- * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
+/********************************************************************************************************
+ * @file    ext_misc.h
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * @brief   This is the header file for BLE SDK
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * @author  BLE GROUP
+ * @date    06,2022
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @par     Copyright (c) 2022, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *****************************************************************************/
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
+ *
+ *******************************************************************************************************/
 #ifndef DRIVERS_TL321X_EXT_MISC_H_
 #define DRIVERS_TL321X_EXT_MISC_H_
 
-//#include "drivers/TL321X/reg_include/core_reg.h" //#include "nds_intrinsic.h"
-
 #include "types.h"
 #include "../compatibility_pack/cmpt.h"
-#include "../lib/include/analog.h"
-#include "../adc.h"
-#include "../gpio.h"
-#include "../lib/include/stimer.h"
-#include "../lib/include/pm/pm.h"
-#include "lib/include/rf/rf_common.h"
-#include "../lib/include/trng/trng.h"
+#include "../driver.h"
 #include <stdbool.h>
 
 /*
@@ -56,11 +54,26 @@
 
 
 
+/******************************* mac start ************************************************************/
+ static inline bool get_device_mac_address(u8* mac_read, int length)
+ {
+    unsigned char mac[8];
+    efuse_get_ieee_addr(mac);
 
-/******************************* efuse start *****************************************************************/
+    u8 zero_8_byte[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    if(memcmp(mac, zero_8_byte, 8)){
+        if(length > 8){
+            length = 8;
+        }
+        memcpy(mac_read, (u8*)mac, 6);
 
-bool efuse_get_mac_address(u8* mac_read, int length);
-/******************************* efuse end *******************************************************************/
+        return TRUE;
+    }
+    else{
+        return FALSE;
+    }
+ }
+/******************************* mac end **************************************************************/
 
 
 
@@ -123,9 +136,9 @@ void gpio_setup_up_down_resistor(gpio_pin_e gpio, gpio_pull_type up_down);
  */
 void rf_drv_ble_init(void);
 
-#define RF_POWER_P3dBm   RF_POWER_INDEX_P2p99dBm
-#define RF_POWER_P0dBm   RF_POWER_INDEX_N0p07dBm
-#define RF_POWER_P9dBm   RF_POWER_INDEX_P8p95dBm
+#define RF_POWER_P3dBm   RF_POWER_INDEX_P3p03dBm
+#define RF_POWER_P0dBm   RF_POWER_INDEX_P0p08dBm
+#define RF_POWER_P9dBm   RF_POWER_INDEX_P9p10dBm
 
 #if RF_THREE_CHANNEL_CALIBRATION
 
@@ -150,7 +163,7 @@ void rf_set_channel_power_enable(unsigned char enable);
 
 
 /******************************* trng_start ******************************************************************/
-#define rand                        trng_rand
+
 #define random_generator_init       trng_init
 
 

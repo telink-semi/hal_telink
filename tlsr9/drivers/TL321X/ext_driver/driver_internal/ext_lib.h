@@ -1,20 +1,30 @@
-/******************************************************************************
- * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
+/********************************************************************************************************
+ * @file    ext_lib.h
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * @brief   This is the header file for BLE SDK
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * @author  BLE GROUP
+ * @date    06,2022
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @par     Copyright (c) 2022, Telink Semiconductor (Shanghai) Co., Ltd.
+ *          All rights reserved.
  *
- *****************************************************************************/
+ *          The information contained herein is confidential property of Telink
+ *          Semiconductor (Shanghai) Co., Ltd. and is available under the terms
+ *          of Commercial License Agreement between Telink Semiconductor (Shanghai)
+ *          Co., Ltd. and the licensee or the terms described here-in. This heading
+ *          MUST NOT be removed from this file.
+ *
+ *          Licensee shall not delete, modify or alter (or permit any third party to delete, modify, or
+ *          alter) any information contained herein in whole or in part except as expressly authorized
+ *          by Telink semiconductor (shanghai) Co., Ltd. Otherwise, licensee shall be solely responsible
+ *          for any claim to the extent arising out of or relating to such deletion(s), modification(s)
+ *          or alteration(s).
+ *
+ *          Licensees are granted free, non-transferable use of the information in this
+ *          file under Mutual Non-Disclosure Agreement. NO WARRANTY of ANY KIND is provided.
+ *
+ *******************************************************************************************************/
 #ifndef DRIVERS_TL321X_EXT_DRIVER_EXT_LIB_H_
 #define DRIVERS_TL321X_EXT_DRIVER_EXT_LIB_H_
 
@@ -36,14 +46,6 @@ void sub_wr(unsigned int addr, unsigned char value, unsigned char e, unsigned ch
 
 
 /******************************* dbgport start ******************************************************************/
-#define reg_bb_dbg_sel      REG_ADDR16(0x140ca0)
-#define reg_bb_dbg_sel_l    REG_ADDR8(0x140ca0)
-#define reg_bb_dbg_sel_h    REG_ADDR8(0x140ca1)
-#define bt_dbg_set_pin      dbg_bb_set_pin
-
-
-void ble_dbg_port_init(int deg_sel0);
-
 void dbg_bb_set_pin(gpio_pin_e pin);
 
 void rf_enable_bb_debug(void);
@@ -289,11 +291,7 @@ static inline int tick1_out_range_of_tick2(unsigned int tick1, unsigned int tick
  */
 #define DEEP_ANA_REG0                       PM_ANA_REG_POWER_ON_CLR_BUF0 //initial value =0x00  [Bit0][Bit1] is already occupied. The customer cannot change!
 #define DEEP_ANA_REG1                       PM_ANA_REG_POWER_ON_CLR_BUF1 //initial value =0x00
-#define DEEP_ANA_REG2                       PM_ANA_REG_POWER_ON_CLR_BUF2 //initial value =0x00
-#define DEEP_ANA_REG3                       PM_ANA_REG_POWER_ON_CLR_BUF3 //initial value =0x00
-#define DEEP_ANA_REG4                       PM_ANA_REG_POWER_ON_CLR_BUF4 //initial value =0x00
-#define DEEP_ANA_REG5                       PM_ANA_REG_POWER_ON_CLR_BUF5 //initial value =0x00
-#define DEEP_ANA_REG6                       PM_ANA_REG_POWER_ON_CLR_BUF6 //initial value =0x0f
+#define DEEP_ANA_REG2                       PM_ANA_REG_POWER_ON_CLR_BUF2 //initial value =0xff
 
 /**
  * @brief these analog register can store data in deepsleep mode or deepsleep with SRAM retention mode.
@@ -352,7 +350,7 @@ static inline unsigned int pm_ble_get_latest_offset_cal_time(void)
  * @param[in]   rc32_cnt    - 32k count
  * @return      none.
  */
-_attribute_ram_code_sec_noinline_ void pm_ble_cal_32k_rc_offset (int offset_tick, int rc32_cnt);
+_attribute_ram_code_com_sec_noinline_ void pm_ble_cal_32k_rc_offset (int offset_tick, int rc32_cnt);
 
 /**
  * @brief       This function reset calibrates the value
@@ -397,10 +395,18 @@ extern  pm_tim_recover_handler_t    pm_tim_recover;
 
 
 #ifndef FAST_SETTLE
-#define FAST_SETTLE         0
+#define FAST_SETTLE         1
 #endif
 
+#define TX_FAST_SETTLE_LEVEL  TX_SETTLE_TIME_59US
+#define RX_FAST_SETTLE_LEVEL  RX_SETTLE_TIME_37US
 
+#define TX_FAST_SETTLE_TIME  59
+#define RX_FAST_SETTLE_TIME  37
+
+#ifndef BLE_S2_S8_NEW_PATH
+#define BLE_S2_S8_NEW_PATH      1
+#endif
 
 enum{
     //BLE mode
@@ -519,11 +525,11 @@ typedef enum {
 
 extern signed char ble_txPowerLevel;
 
-_attribute_ram_code_ void ble_rf_set_rx_dma(unsigned char *buff, unsigned char size_div_16);
+_attribute_ram_code_com_ void ble_rf_set_rx_dma(unsigned char *buff, unsigned char size_div_16);
 
-_attribute_ram_code_ void ble_rf_set_tx_dma(unsigned char fifo_dep, unsigned char size_div_16);
+_attribute_ram_code_com_ void ble_rf_set_tx_dma(unsigned char fifo_dep, unsigned char size_div_16);
 
-_attribute_ram_code_ void ble_rx_dma_config(void);
+_attribute_ram_code_com_ void ble_rx_dma_config(void);
 
 
 
@@ -792,7 +798,7 @@ static inline void zb_rt_irq_enable(void)
  */
 
 #if (FAST_SETTLE)
-    #define RX_SETTLE_US                    45
+    #define RX_SETTLE_US                    RX_FAST_SETTLE_TIME
 #else
     #define RX_SETTLE_US                    85
 #endif
@@ -805,14 +811,14 @@ static inline void zb_rt_irq_enable(void)
 
 #define PRMBL_EXTRA_1M                      (PRMBL_LENGTH_1M - 1)   // 1 byte for 1M PHY
 #define PRMBL_EXTRA_2M                      (PRMBL_LENGTH_2M - 2)   // 2 byte for 2M
-#define PRMBL_EXTRA_Coded                   0                       // 10byte for Coded, 80uS, no extra byte
+#define PRMBL_EXTRA_Coded                   (PRMBL_LENGTH_Coded - 10)                       // 10byte for Coded, 80uS, no extra byte
 
 
 
 #if RF_RX_SHORT_MODE_EN//open rx dly
 
     #if (FAST_SETTLE)
-        #define         TX_STL_LEGADV_SCANRSP_REAL                  53  //can change, consider TX packet quality
+        #define         TX_STL_LEGADV_SCANRSP_REAL                  TX_FAST_SETTLE_TIME  //can change, consider TX packet quality
     #else
         #define         TX_STL_LEGADV_SCANRSP_REAL                  110 //can change, consider TX packet quality
     #endif
@@ -820,7 +826,7 @@ static inline void zb_rt_irq_enable(void)
 
 
     #if (FAST_SETTLE)
-        #define         TX_STL_TIFS_REAL_COMMON                     53  //can change, consider TX packet quality
+        #define         TX_STL_TIFS_REAL_COMMON                     TX_FAST_SETTLE_TIME  //can change, consider TX packet quality
     #else
         #define         TX_STL_TIFS_REAL_COMMON                     113 //can change, consider TX packet quality
     #endif
@@ -836,7 +842,7 @@ static inline void zb_rt_irq_enable(void)
 
 
     #if (FAST_SETTLE)
-        #define         TX_STL_ADV_REAL_COMMON                      53  //can change, consider TX packet quality
+        #define         TX_STL_ADV_REAL_COMMON                      TX_FAST_SETTLE_TIME  //can change, consider TX packet quality
     #else
         #define         TX_STL_ADV_REAL_COMMON                      113 //can change, consider TX packet quality
     #endif
@@ -852,11 +858,16 @@ static inline void zb_rt_irq_enable(void)
 
     #define         TX_STL_AUTO_MODE_1M                             (127 - PRMBL_EXTRA_1M * 8)
     #define         TX_STL_AUTO_MODE_2M                             (133 - PRMBL_EXTRA_2M * 4)
+#if(BLE_S2_S8_NEW_PATH)
+    #define         TX_STL_AUTO_MODE_CODED_S2                       115
+    #define         TX_STL_AUTO_MODE_CODED_S8                       119
+#else
     #define         TX_STL_AUTO_MODE_CODED                          127
+#endif
 
 
     #if (FAST_SETTLE)
-        #define     TX_STL_BTX_1ST_PKT_REAL                         53 //110 - 57 = 53
+        #define     TX_STL_BTX_1ST_PKT_REAL                         TX_FAST_SETTLE_TIME //110 - 57 = 53
     #else
         /* normal mode(no fast settle): for ACL Central, tx settle real 110uS or 107uS or even 105uS, not big difference,
          * but for CIS Central, timing is very urgent considering T_MSS between two sub_event, so SiHui use 107, we keep this set
@@ -882,7 +893,11 @@ static inline void zb_rt_irq_enable(void)
 
 #define OTHER_SWITCH_DELAY_1M                                       0
 #define OTHER_SWITCH_DELAY_2M                                       2
+#if(BLE_S2_S8_NEW_PATH)
+#define OTHER_SWITCH_DELAY_CODED                                    9
+#else
 #define OTHER_SWITCH_DELAY_CODED                                    2
+#endif
 
 
 #define HW_DELAY_1M                                                 (AD_CONVERT_DLY_1M + OTHER_SWITCH_DELAY_1M)
@@ -892,8 +907,8 @@ static inline void zb_rt_irq_enable(void)
 static inline void rf_ble_set_1m_phy(void)
 {
     //aura_1m
-    write_reg8(0x17063d,0x61);//ble:bw_code.
-    write_reg8(0x170620,0x10);//sc_code.
+    write_reg8(0x17063d, 0x61); //ble:bw_code.
+    write_reg8(0x170620, 0x10); //sc_code.
     /*
     *         bit                        default    value                note
     *                                                             note
@@ -903,224 +918,295 @@ static inline void rf_ble_set_1m_phy(void)
     * <6:5>:IF_FREQ              default:0x00(IF:1MHz,BW:1MHz) Intermediate Frequency Selection.
     * This setting is used to set the RF different modes Intermediate Frequency.
     */
-    reg_rf_mode_cfg_rx1_1 = (reg_rf_mode_cfg_rx1_1 &(~FLD_RF_IF_FREQ))|FLD_RF_MODE_VANT_RX;
+    reg_rf_mode_cfg_rx1_1 = (reg_rf_mode_cfg_rx1_1 & (~FLD_RF_IF_FREQ)) | FLD_RF_MODE_VANT_RX;
 
-    write_reg8(0x170622,0x20);//RADIO BLE_MODE_TX,1MBPS:bit<0>;VCO_TRIM_KV:bit<1-3>;HPMC_EXP_DIFF_COUNT_L:bit<4-7>.
-    write_reg8(0x170623,0x23);//HPMC_EXP_DIFF_COUNT_H.
-    write_reg8(0x170422,0x00);//modem:BLE_MODE_TX,1MBPS.
-    write_reg8(0x17044e,0x1e);//ble sync threshold:To modem.
+    write_reg8(0x170622, 0x20); //RADIO BLE_MODE_TX,1MBPS:bit<0>;VCO_TRIM_KV:bit<1-3>;HPMC_EXP_DIFF_COUNT_L:bit<4-7>.
+    write_reg8(0x170623, 0x23); //HPMC_EXP_DIFF_COUNT_H.
+    write_reg8(0x170422, 0x00); //modem:BLE_MODE_TX,1MBPS.
+    write_reg8(0x17044e, 0x1e); //ble sync threshold:To modem.
 
 
-    write_reg8(0x17063f,0x00);//250k modulation index:telink add rx for 250k/500k.
+    write_reg8(0x17063f, 0x00); //250k modulation index:telink add rx for 250k/500k.
 
     //rx_cont_mode
-    write_reg8(0x170420,0xc8);// script cc. rx continue mode on:bit<3>
+    write_reg8(0x170420, 0xc8); // script cc. rx continue mode on:bit<3>
 
 
-    write_reg8(0x17044d,0x01);//r_rxchn_en_i:To modem.
-    write_reg8(0x170421,0x00);//modem:ZIGBEE_MODE:01
-    write_reg8(0x170423,0x00);//modem:ZIGBEE_MODE_TX.
-    write_reg8(0x170426,0x00);//modem:sync rst sel,for zigbee access code sync.
-    write_reg8(0x17042a,0x10);//modem:disable MSK.
-    write_reg8(0x17043d,0x00);//modem:zb_sfd_frm_ll.
-    write_reg8(0x17042c,0x38);//modem:zb_dis_rst_pdet_isfd.
-    write_reg8(0x170436,0xb7);//LR_NUM_GEAR_L.
-    write_reg8(0x170437,0x0e);//LR_NUM_GEAR_H.
-    write_reg8(0x170438,0xb6);//LR_TIM_EDGE_DEV.0xc4->0xb6
-    write_reg8(0x170439,0x71);//LR_TIM_REC_CFG_1.
-    write_reg8(0x170473,0x01);//TOT_DEV_RST.
-    write_reg8(0x17049a,0x00);//tx_tp_align.
+    write_reg8(0x17044d, 0x01); //r_rxchn_en_i:To modem.
+    write_reg8(0x170421, 0x00); //modem:ZIGBEE_MODE:01
+    write_reg8(0x170423, 0x00); //modem:ZIGBEE_MODE_TX.
+    write_reg8(0x170426, 0x00); //modem:sync rst sel,for zigbee access code sync.
+    write_reg8(0x17042a, 0x10); //modem:disable MSK.
+    write_reg8(0x17043d, 0x00); //modem:zb_sfd_frm_ll.
+    write_reg8(0x17042c, 0x38); //modem:zb_dis_rst_pdet_isfd.
+    write_reg8(0x170436, 0xb7); //LR_NUM_GEAR_L.
+    write_reg8(0x170437, 0x0e); //LR_NUM_GEAR_H.
+    write_reg8(0x170438, 0xb6); //LR_TIM_EDGE_DEV.0xc4->0xb6
+    write_reg8(0x170439, 0x71); //LR_TIM_REC_CFG_1.
+    write_reg8(0x170473, 0x01); //TOT_DEV_RST.
+    write_reg8(0x17049a, 0x00); //tx_tp_align.
 
     //agc_table_1m
-    write_reg8(0x1704c2,0x3e);//grx_0.
-    write_reg8(0x1704c3,0x4b);//grx_1.
-    write_reg8(0x1704c4,0x56);//grx_2.
-    write_reg8(0x1704c5,0x63);//grx_3.
-    write_reg8(0x1704c6,0x6e);//grx_4.
-    write_reg8(0x1704c7,0x7a);//grx_5.
-    write_reg8(0x1704c8,0x39);//default:0x00->0x39 Gain offset to compensate system error
-
+    if ((g_chip_version == CHIP_VERSION_A0) || (g_chip_version == CHIP_VERSION_A1))
+    {
+        write_reg8(0x1704c2, 0x3e); //grx_0.
+        write_reg8(0x1704c3, 0x4b); //grx_1.
+        write_reg8(0x1704c4, 0x56); //grx_2.
+        write_reg8(0x1704c5, 0x63); //grx_3.
+        write_reg8(0x1704c6, 0x6e); //grx_4.
+        write_reg8(0x1704c7, 0x7a); //grx_5.
+    }
+    else
+    {
+        write_reg8(0x1704c2, 0x3b); //grx_0.
+        write_reg8(0x1704c3, 0x47); //grx_1.
+        write_reg8(0x1704c4, 0x53); //grx_2.
+        write_reg8(0x1704c5, 0x63); //grx_3.
+        write_reg8(0x1704c6, 0x6e); //grx_4.
+        write_reg8(0x1704c7, 0x76); //grx_5.
+    }
+    write_reg8(0x1704c8, 0x39); //default:0x00->0x39 Gain offset to compensate system error
     //ble1m_setup
     write_reg32(0x170000,0x5440080f|PRMBL_LENGTH_1M<<16);//tx_mode.
-//  write_reg8(0x170001,0x08);//PN.
-//  write_reg8(0x170002,0x40| PRMBL_LENGTH_1M<<16);//preamble length
-//  write_reg8(0x170003,0x54);//bit<0:1>private mode control.
-    write_reg8(0x170004,0xf1);//bit<4>mode:1->1m;bit<0:3>:ble head.
-    write_reg8(0x170005,0x04);//lr mode bit<4:5>
+//  write_reg8(0x170001, 0x08);//PN.
+//  write_reg8(0x170002, 0x40| PRMBL_LENGTH_1M<<16);//preamble length
+//  write_reg8(0x170003, 0x54);//bit<0:1>private mode control.
+    write_reg8(0x170004, 0xf1); //bit<4>mode:1->1m;bit<0:3>:ble head.
+    write_reg8(0x170005, 0x04); //lr mode bit<4:5>
 
-    write_reg8(0x170021,0xa1);//rx packet len 0 enable.
-                              //bit<5>:write packet length filed into sram
+    write_reg8(0x170021, 0xa1); //rx packet len 0 enable.
+                                //bit<5>:write packet length filed into sram
 
-    write_reg8(0x170022,0x00);//rxchn_man_en.
-    write_reg8(0x17044c,0x0c);//RX:acc_len modem.0x4c->0x0c
-    write_reg8(0x1704bb,0x00);//disable 2 stage filter
-    write_reg8(0x17043e,0x81);//BIT<7>:0 new ,1 old  pm2fm suppress more than pi/4
+    write_reg8(0x170022, 0x00); //rxchn_man_en.
+    write_reg8(0x17044c, 0x0c); //RX:acc_len modem.0x4c->0x0c
+    write_reg8(0x1704bb, 0x00); //disable 2 stage filter
+    write_reg8(0x17043e, 0x81); //BIT<7>:0 new ,1 old  pm2fm suppress more than pi/4
 
     //The following register configurations are configured in zigbee/hybee mode, which maintains register defaults
-    write_reg8(0x170014,0x7a);//access code for hybee 500K.
-    write_reg8(0x170015,0x35);//access code for hybee 500K.
-    write_reg8(0x17043b,0x1c);//ZB_NUM_GEAR_H
-    write_reg8(0x170132,0x01);//zigbee PHR field enable 1: phr field length embedded in data stream; 0: phr field length from reg ctrl as like private SB packet
+    write_reg8(0x170014, 0x7a); //access code for hybee 500K.
+    write_reg8(0x170015, 0x35); //access code for hybee 500K.
+    write_reg8(0x17043b, 0x1c); //ZB_NUM_GEAR_H
+    write_reg8(0x170132, 0x01); //zigbee PHR field enable 1: phr field length embedded in data stream; 0: phr field length from reg ctrl as like private SB packet
 
     //The following registers are configured in BLE 125K and BLE 500K mode, which maintains the register defaults
     write_reg8(0x1704f0,RF_ACCESS_CODE_DEFAULT_THRESHOLD);//defaults 31. lr_s8_pdet synv_success threshold 0~32
 }
 
 
- static inline void rf_ble_set_2m_phy(void)
- {
-     //aura_2m
-     write_reg8(0x17063d,0x41);//ble:bw_code.
-     write_reg8(0x170620,0x00);//sc_code.
-     /*
-     *         bit                        default    value                note
-     *                                                             note
-     * ---------------------------------------------------------------------------
-     * <1>:MODE_VANT_RX           default:1           defines if RX is in vbat or vant mode. Default is LDO_ANT mode
-     * <4:2>:FE_RTRIM_RX          default:0x02->0x03  Front end matching resistor adjustment for RX. (Configured by the rf_rx_performance_mode interface)
-     * <6:5>:IF_FREQ              default:0x00->0x01(IF:1MHz->1.5MHz,BW:1MHz->2MHz) Intermediate Frequency Selection.
-     * This setting is used to set the RF different modes Intermediate Frequency.
-     */
-     reg_rf_mode_cfg_rx1_1 = (reg_rf_mode_cfg_rx1_1 &(~FLD_RF_IF_FREQ))|(0x01<<5)|FLD_RF_MODE_VANT_RX;
-     write_reg8(0x170622,0x43);//HPMC_EXP_DIFF_COUNT_L.
-     write_reg8(0x170623,0x26);//HPMC_EXP_DIFF_COUNT_H.
-     write_reg8(0x170422,0x01);//modem:BLE_MODE_TX,2MBPS.
-     write_reg8(0x17044e,0x1e);//ble sync threshold:To modem.0x20->0x1e
+static inline void rf_ble_set_2m_phy(void)
+{
+    //aura_2m
+    write_reg8(0x17063d, 0x41); //ble:bw_code.
+    write_reg8(0x170620, 0x00); //sc_code.
+    /*
+    *         bit                        default    value                note
+    *                                                             note
+    * ---------------------------------------------------------------------------
+    * <1>:MODE_VANT_RX           default:1           defines if RX is in vbat or vant mode. Default is LDO_ANT mode
+    * <4:2>:FE_RTRIM_RX          default:0x02->0x03  Front end matching resistor adjustment for RX. (Configured by the rf_rx_performance_mode interface)
+    * <6:5>:IF_FREQ              default:0x00->0x01(IF:1MHz->1.5MHz,BW:1MHz->2MHz) Intermediate Frequency Selection.
+    * This setting is used to set the RF different modes Intermediate Frequency.
+    */
+    reg_rf_mode_cfg_rx1_1 = (reg_rf_mode_cfg_rx1_1 & (~FLD_RF_IF_FREQ)) | (0x01 << 5) | FLD_RF_MODE_VANT_RX;
+    write_reg8(0x170622, 0x43); //HPMC_EXP_DIFF_COUNT_L.
+    write_reg8(0x170623, 0x26); //HPMC_EXP_DIFF_COUNT_H.
+    write_reg8(0x170422, 0x01); //modem:BLE_MODE_TX,2MBPS.
+    write_reg8(0x17044e, 0x1e); //ble sync threshold:To modem.0x20->0x1e
 
 
-     write_reg8(0x17063f,0x00);//250k modulation index:telink add rx for 250k/500k.
+    write_reg8(0x17063f, 0x00); //250k modulation index:telink add rx for 250k/500k.
 
-     write_reg8(0x1704bb,0x20);//2 stage filter
+    write_reg8(0x1704bb, 0x20); //2 stage filter
 
-     //rx_cont_mode
-     write_reg8(0x170420,0xc8);
+    //rx_cont_mode
+    write_reg8(0x170420, 0xc8);
 
-     write_reg8(0x17044d,0x01);//r_rxchn_en_i:To modem.
-     write_reg8(0x170421,0x00);//modem:ZIGBEE_MODE:01.
-     write_reg8(0x170423,0x00);//modem:ZIGBEE_MODE_TX.
-     write_reg8(0x170426,0x00);//modem:sync rst sel,for zigbee access code sync.
-     write_reg8(0x17042a,0x10);//modem:disable MSK.
-     write_reg8(0x17043d,0x00);//modem:zb_sfd_frm_ll.
-     write_reg8(0x17042c,0x38);//modem:zb_dis_rst_pdet_isfd.
-     write_reg8(0x170436,0xb7);//LR_NUM_GEAR_L.
-     write_reg8(0x170437,0x0e);//LR_NUM_GEAR_H.
-     write_reg8(0x170438,0xb6);//LR_TIM_EDGE_DEV.0xc4->0xb6
-     write_reg8(0x170439,0x71);//LR_TIM_REC_CFG_1.
-     write_reg8(0x170473,0x01);//TOT_DEV_RST.
-     write_reg8(0x17049a,0x00);//tx_tp_align.
+    write_reg8(0x17044d, 0x01); //r_rxchn_en_i:To modem.
+    write_reg8(0x170421, 0x00); //modem:ZIGBEE_MODE:01.
+    write_reg8(0x170423, 0x00); //modem:ZIGBEE_MODE_TX.
+    write_reg8(0x170426, 0x00); //modem:sync rst sel,for zigbee access code sync.
+    write_reg8(0x17042a, 0x10); //modem:disable MSK.
+    write_reg8(0x17043d, 0x00); //modem:zb_sfd_frm_ll.
+    write_reg8(0x17042c, 0x38); //modem:zb_dis_rst_pdet_isfd.
+    write_reg8(0x170436, 0xb7); //LR_NUM_GEAR_L.
+    write_reg8(0x170437, 0x0e); //LR_NUM_GEAR_H.
+    write_reg8(0x170438, 0xb6); //LR_TIM_EDGE_DEV.0xc4->0xb6
+    write_reg8(0x170439, 0x71); //LR_TIM_REC_CFG_1.
+    write_reg8(0x170473, 0x01); //TOT_DEV_RST.
+    write_reg8(0x17049a, 0x00); //tx_tp_align.
 
-     //agc_table
-     write_reg8(0x1704c2,0x40);//grx_0.
-     write_reg8(0x1704c3,0x4b);//grx_1.
-     write_reg8(0x1704c4,0x59);//grx_2.
-     write_reg8(0x1704c5,0x64);//grx_3.
-     write_reg8(0x1704c6,0x70);//grx_4.
-     write_reg8(0x1704c7,0x7b);//grx_5.
-     write_reg8(0x1704c8,0x39);//default:0x00->0x39 Gain offset to compensate system error
+    //agc_table_2m
+    if ((g_chip_version == CHIP_VERSION_A0) || (g_chip_version == CHIP_VERSION_A1))
+    {
+    write_reg8(0x1704c2, 0x40); //grx_0.
+    write_reg8(0x1704c3, 0x4b); //grx_1.
+    write_reg8(0x1704c4, 0x59); //grx_2.
+    write_reg8(0x1704c5, 0x64); //grx_3.
+    write_reg8(0x1704c6, 0x70); //grx_4.
+    write_reg8(0x1704c7, 0x7b); //grx_5.
+    }
+    else
+    {
+    write_reg8(0x1704c2, 0x3e); //grx_0.
+    write_reg8(0x1704c3, 0x49); //grx_1.
+    write_reg8(0x1704c4, 0x56); //grx_2.
+    write_reg8(0x1704c5, 0x63); //grx_3.
+    write_reg8(0x1704c6, 0x6e); //grx_4.
+    write_reg8(0x1704c7, 0x7a); //grx_5.
+    }
+    write_reg8(0x1704c8, 0x39); //default:0x00->0x39 Gain offset to compensate system error
 
-     write_reg32(0x170000,0x5440080f|PRMBL_LENGTH_2M<<16);//tx_mode.
- //  write_reg8(0x170001,0x08);//PN.
- //  write_reg8(0x170002,0x43);//preamble len.
- //  write_reg8(0x170003,0x54);//bit<0:1>private mode control.
-     write_reg8(0x170004,0xe1);//bit<4>mode:1->1m;bit<0:3>:ble head.
-     write_reg8(0x170005,0x04);//lr mode bit<4:5>
+    write_reg32(0x170000,0x5440080f|PRMBL_LENGTH_2M<<16);//tx_mode.
+    //  write_reg8(0x170001, 0x08);//PN.
+    //  write_reg8(0x170002, 0x43);//preamble len.
+    //  write_reg8(0x170003, 0x54);//bit<0:1>private mode control.
+    write_reg8(0x170004, 0xe1); //bit<4>mode:1->1m;bit<0:3>:ble head.
+    write_reg8(0x170005, 0x04); //lr mode bit<4:5>
 
-     write_reg8(0x170021,0xa1);//rx packet len 0 enable.
-
-
-     write_reg8(0x170022,0x00);//rxchn_man_en.
-     write_reg8(0x17044c,0x0c);//RX:acc_len modem.
-     write_reg8(0x17043e,0x81);//BIT<7>:0 new ,1 old  pm2fm suppress more than pi/4
-
-     //The following register configurations are configured in zigbee/hybee mode, which maintains register defaults
-     write_reg8(0x170014,0x7a);//access code for hybee 500K.
-     write_reg8(0x170015,0x35);//access code for hybee 500K.
-     write_reg8(0x17043b,0x1c);//ZB_NUM_GEAR_H
-     write_reg8(0x170132,0x01);//zigbee PHR field enable 1: phr field length embedded in data stream; 0: phr field length from reg ctrl as like private SB packet
-
-     //The following registers are configured in BLE 125K and BLE 500K mode, which maintains the register defaults
-     write_reg8(0x1704f0,RF_ACCESS_CODE_DEFAULT_THRESHOLD);//defaults 31. lr_s8_pdet synv_success threshold 0~32
- }
+    write_reg8(0x170021, 0xa1); //rx packet len 0 enable.
 
 
+    write_reg8(0x170022, 0x00); //rxchn_man_en.
+    write_reg8(0x17044c, 0x0c); //RX:acc_len modem.
+    write_reg8(0x17043e, 0x81); //BIT<7>:0 new ,1 old  pm2fm suppress more than pi/4
+
+    //The following register configurations are configured in zigbee/hybee mode, which maintains register defaults
+    write_reg8(0x170014, 0x7a); //access code for hybee 500K.
+    write_reg8(0x170015, 0x35); //access code for hybee 500K.
+    write_reg8(0x17043b, 0x1c); //ZB_NUM_GEAR_H
+    write_reg8(0x170132, 0x01); //zigbee PHR field enable 1: phr field length embedded in data stream; 0: phr field length from reg ctrl as like private SB packet
+
+    //The following registers are configured in BLE 125K and BLE 500K mode, which maintains the register defaults
+    write_reg8(0x1704f0, RF_ACCESS_CODE_DEFAULT_THRESHOLD);//defaults 31. lr_s8_pdet synv_success threshold 0~32
+}
+
+static inline void rf_ble_set_coded_phy_common(void)
+{
+    write_reg8(0x17063d, 0x61); //ble:bw_code.
+    write_reg8(0x170620, 0x10); //sc_code.
+    /*
+    *         bit                        default    value                note
+    *                                                             note
+    * ---------------------------------------------------------------------------
+    * <1>:MODE_VANT_RX           default:1           defines if RX is in vbat or vant mode. Default is LDO_ANT mode
+    * <4:2>:FE_RTRIM_RX          default:0x02->0x03  Front end matching resistor adjustment for RX. (Configured by the rf_rx_performance_mode interface)
+    * <6:5>:IF_FREQ              default:0x00(IF:1MHz,BW:1MHz) Intermediate Frequency Selection.
+    * This setting is used to set the RF different modes Intermediate Frequency.
+    */
+    reg_rf_mode_cfg_rx1_1 = (reg_rf_mode_cfg_rx1_1 & (~FLD_RF_IF_FREQ)) | FLD_RF_MODE_VANT_RX;
+    write_reg8(0x170622, 0x20); //HPMC_EXP_DIFF_COUNT_L.
+    write_reg8(0x170623, 0x23); //HPMC_EXP_DIFF_COUNT_H.
 
 
- static inline void rf_ble_set_coded_phy_common(void)
- {
-     write_reg8(0x17063d,0x61);//ble:bw_code.
-     write_reg8(0x170620,0x10);//sc_code.
-     write_reg8(0x170621,0x0a);//if_freq,IF = 1Mhz,BW = 1Mhz.
-     write_reg8(0x170622,0x20);//HPMC_EXP_DIFF_COUNT_L.
-     write_reg8(0x170623,0x23);//HPMC_EXP_DIFF_COUNT_H.
-     write_reg8(0x170422,0x00);//modem:BLE_MODE_TX,2MBPS.
-     write_reg8(0x17044e,0xf0);//ble sync threshold:To modem.
+    write_reg8(0x17063f, 0x00); //250k modulation index:telink add rx for 250k/500k.
+
+    write_reg8(0x170422, 0x00); //modem:BLE_MODE_TX,2MBPS.
+    write_reg8(0x170473, 0xa1); //TOT_DEV_RST.
+    write_reg8(0x170437, 0x0c); //LR_NUM_GEAR_H.
+    write_reg8(0x170439, 0x7d); //LR_TIM_REC_CFG_1.
+
+    write_reg8(0x17044d, 0x01); //r_rxchn_en_i:To modem.
+    write_reg8(0x170423, 0x00); //modem:ZIGBEE_MODE_TX.
 
 
-     write_reg8(0x17063f,0x00);//250k modulation index:telink add rx for 250k/500k.
+    write_reg8(0x170426, 0x00); //modem:sync rst sel,for zigbee access code sync.
+    write_reg8(0x17042a, 0x10); //modem:disable MSK.
+    write_reg8(0x17043d, 0x00); //modem:zb_sfd_frm_ll.
+    write_reg8(0x17042c, 0x38); //modem:zb_dis_rst_pdet_isfd.
 
-     write_reg8(0x170473,0xa1);//TOT_DEV_RST.
-     write_reg8(0x170437,0x0c);//LR_NUM_GEAR_H.
-     write_reg8(0x170438,0xb8);//LR_TIM_EDGE_DEV.
-     write_reg8(0x170439,0x7d);//LR_TIM_REC_CFG_1.
+    write_reg8(0x170420, 0xc9); // script cc.
 
-     write_reg8(0x170420,0xc9);// script cc.
+    write_reg8(0x17049a, 0x00); //tx_tp_align.
+    //agc_table_1m
+    if ((g_chip_version == CHIP_VERSION_A0) || (g_chip_version == CHIP_VERSION_A1))
+    {
+     write_reg8(0x1704c2, 0x3e); //grx_0.
+     write_reg8(0x1704c3, 0x4b); //grx_1.
+     write_reg8(0x1704c4, 0x56); //grx_2.
+     write_reg8(0x1704c5, 0x63); //grx_3.
+     write_reg8(0x1704c6, 0x6e); //grx_4.
+     write_reg8(0x1704c7, 0x7a); //grx_5.
+    }
+    else
+    {
+     write_reg8(0x1704c2, 0x3b); //grx_0.
+     write_reg8(0x1704c3, 0x47); //grx_1.
+     write_reg8(0x1704c4, 0x53); //grx_2.
+     write_reg8(0x1704c5, 0x63); //grx_3.
+     write_reg8(0x1704c6, 0x6e); //grx_4.
+     write_reg8(0x1704c7, 0x76); //grx_5.
+    }
+    write_reg8(0x1704c8, 0x39); //default:0x00->0x39 Gain offset to compensate system error
 
-     write_reg8(0x17044d,0x01);//r_rxchn_en_i:To modem.
-     write_reg8(0x170423,0x00);//modem:ZIGBEE_MODE_TX.
-     write_reg8(0x17043e,0x81);//BIT<7>:0 new ,1 old  pm2fm suppress more than pi/4
-     write_reg8(0x170426,0x00);//modem:sync rst sel,for zigbee access code sync.
-     write_reg8(0x17042a,0x10);//modem:disable MSK.
-     write_reg8(0x17043d,0x00);//modem:zb_sfd_frm_ll.
-     write_reg8(0x17042c,0x38);//modem:zb_dis_rst_pdet_isfd.
-     write_reg8(0x17049a,0x00);//tx_tp_align.
+    write_reg8(0x170000, 0x0f); //tx_mode.
+    write_reg8(0x170001, 0x08); //PN.
+    /*
+    *       bit                 default value               note
+    * ---------------------------------------------------------------------------
+    * <4: 0>:preamble length     default:10
+    * At present, TX adopts the method of pa_ramp starting first and preamble sending later, so the preamble adopts this length setting
+    * modified by chenxi.wang,confirmed by wenfeng.lou 20250114.
+    */
+    write_reg8(0x170002, 0x4a); //preamble len.
+    write_reg8(0x170003, 0x54); //bit<0:1>private mode control.
+    write_reg8(0x170004, 0xf1); //bit<4>mode:1->1m;bit<0:3>:ble head.
 
-     write_reg8(0x1704c2,0x3e);//grx_0.
-     write_reg8(0x1704c3,0x4b);//grx_1.
-     write_reg8(0x1704c4,0x56);//grx_2.
-     write_reg8(0x1704c5,0x63);//grx_3.
-     write_reg8(0x1704c6,0x6e);//grx_4.
-     write_reg8(0x1704c7,0x7a);//grx_5.
-     write_reg8(0x1704c8,0x39);//default:0x00->0x39 Gain offset to compensate system error
+    write_reg8(0x170021, 0xa1); //rx packet len 0 enable.
 
-     write_reg32(0x170000,0x5440080f| PRMBL_LENGTH_Coded<<16);
- //  write_reg8(0x170001,0x00);//PN.
- //  write_reg8(0x170002,0x4a);//preamble len.
- //  write_reg8(0x170003,0x54);//bit<0:1>private mode control.
-     write_reg8(0x170004,0xf1);//bit<4>mode:1->1m;bit<0:3>:ble head.
+    write_reg8(0x170022, 0x00); //rxchn_man_en.
+    write_reg8(0x17044c, 0x0c); //RX:acc_len modem.
+    write_reg8(0x1704bb, 0x00); //disable 2 stage filter
 
-     write_reg8(0x170021,0xa1);//rx packet len 0 enable.
-     write_reg8(0x170022,0x00);//rxchn_man_en.
+    #if (!BLE_S2_S8_NEW_PATH)
+    //old path config
+    write_reg8(0x17044e, 0xf0); //ble sync threshold:To modem.
+    write_reg8(0x170436, 0xf6); //LR_NUM_GEAR_L.
+    write_reg8(0x170438, 0xb8); //LR_TIM_EDGE_DEV.
+    write_reg8(0x170421, 0x80); //modem:bit<2> LR_MODEM_SEL,bit<3> LR_VITERBI_SEL
+    write_reg8(0x17043e, 0x81); //BIT<7>:0 new ,1 old  pm2fm suppress more than pi/4
+    #else
+    //new path config
+    write_reg8(0x17044e, 0x3c); //ble sync threshold:To modem.
+    write_reg8(0x170436, 0xf6); //LR_NUM_GEAR_L.
+    write_reg8(0x170438, 0xb6); //LR_TIM_EDGE_DEV.
+    write_reg8(0x170421, 0x8c); //modem:ZIGBEE_MODE:01.
+    write_reg8(0x17043e, 0x01); //BIT<7>:0 new ,1 old;pm2fm suppress more than pi/4
+    #endif
 
-     write_reg8(0x17044c,0x0c);//RX:acc_len modem.
+    //The following configurations fix the BLE 125k and BLE 500k PER floor non-zeroing issue
+    //Modified by chenxi.wang, confirmed by yuya.hao at 20240829.
+    write_reg8(0x1704f0, 0x1e); //defaults 0x1c->0x1e. lr_s8_pdet synv_success threshold 0~32
 
-     write_reg8(0x1704bb,0x00);//disable 2 stage filter
-
-     //The following configurations fix the BLE 125k and BLE 500k PER floor non-zeroing issue.
-     //Modified by chenxi.wang, confirmed by yuya.hao at 20240829.
-     write_reg8(0x1704f0,0x1e);//defaults 0x1c->0x1e. lr_s8_pdet synv_success threshold 0~32
-
-     //The following register configurations are configured in zigbee/hybee mode, which maintains register defaults
-     write_reg8(0x170014,0x7a);//access code for hybee 500K.
-     write_reg8(0x170015,0x35);//access code for hybee 500K.
-     write_reg8(0x17043b,0x1c);//ZB_NUM_GEAR_H
-     write_reg8(0x170132,0x01);//zigbee PHR field enable 1: phr field length embedded in data stream; 0: phr field length from reg ctrl as like private SB packet
- }
-
-
- static inline void rf_ble_set_coded_phy_s2(void)
- {
-     write_reg8(0x170436,0xee);//LR_NUM_GEAR_L.
-     write_reg8(0x170421,0x00);//modem:ZIGBEE_MODE:01.
-     write_reg8(0x170005,0x24);//lr mode bit<4:5>
- }
+    //The following register configurations are configured in zigbee/hybee mode, which maintains register defaults
+    write_reg8(0x170014, 0x7a); //access code for hybee 500K.
+    write_reg8(0x170015, 0x35); //access code for hybee 500K.
+    write_reg8(0x17043b, 0x1c); //ZB_NUM_GEAR_H
+    write_reg8(0x170132, 0x01); //zigbee PHR field enable 1: phr field length embedded in data stream; 0: phr field length from reg ctrl as like private SB packet
+}
 
 
- static inline void rf_ble_set_coded_phy_s8(void)
- {
-     write_reg8(0x170436,0xf6);//LR_NUM_GEAR_L.
-     write_reg8(0x170421,0x80);//modem:bit<2> LR_MODEM_SEL,bit<3> LR_VITERBI_SEL
-     write_reg8(0x170005,0x34);//lr mode bit<4:5>
- }
+
+
+static inline void rf_ble_set_coded_phy_s2(void)
+{
+    write_reg8(0x170005,0x24);//lr mode bit<4:5>
+#if(!BLE_S2_S8_NEW_PATH)
+    //old path config
+    write_reg8(0x170436,0xee);//LR_NUM_GEAR_L.
+    write_reg8(0x170421,0x00);//modem:ZIGBEE_MODE:01.
+#endif
+}
+
+
+static inline void rf_ble_set_coded_phy_s8(void)
+{
+    write_reg8(0x170005,0x34);//lr mode bit<4:5>
+#if(!BLE_S2_S8_NEW_PATH)
+     //old path config
+    write_reg8(0x170436,0xf6);//LR_NUM_GEAR_L.
+    write_reg8(0x170421,0x80);//modem:bit<2> LR_MODEM_SEL,bit<3> LR_VITERBI_SEL
+#endif
+}
 
 //This is to be compatible in older versions. If you don't use them, you can delete them.
 #define rf_trigle_codedPhy_accesscode rf_trigger_codedPhy_accesscode
@@ -1137,55 +1223,23 @@ static inline void rf_ble_set_1m_phy(void)
         u8 rsvd;
     }Ldo_Trim;
 
-    typedef struct __attribute__((packed)) 
+    typedef struct
     {
-        unsigned char tx_fast_en;
-        unsigned char rx_fast_en;
-        unsigned short cal_tbl[40];
+        unsigned short cal_tbl[81];
         rf_ldo_trim_t   ldo_trim;
         rf_dcoc_cal_t   dcoc_cal;
+        rf_rccal_cal_t  rccal_cal;
+        unsigned char   tx_fcal[8];
+        unsigned char   rx_fcal[8];
+        unsigned char   fcal[8];
+        unsigned char   tx_fast_en;
+        unsigned char   rx_fast_en;
     }Fast_Settle;
-    extern Fast_Settle fast_settle;
+    extern Fast_Settle fast_settle_1M;
+    extern Fast_Settle fast_settle_2M;
+    extern Fast_Settle fast_settle_S2;
+    extern Fast_Settle fast_settle_S8;
 
-    void ble_rf_tx_fast_settle(void);
-    void ble_rf_rx_fast_settle(void);
-    unsigned short get_rf_hpmc_cal_val(void);
-    void set_rf_hpmc_cal_val(unsigned short value);
-    unsigned char ble_is_rf_tx_fast_settle_en(void);
-    unsigned char ble_is_rf_rx_fast_settle_en(void);
-    void get_ldo_trim_val(u8* p);
-    void set_ldo_trim_val(u8* p);
-    void set_ldo_trim_on(void);
-
-    /**
-     *  @brief      this function serve to enable the tx timing sequence adjusted.
-     *  @param[in]  none
-     *  @return     none
-    */
-    void ble_rf_tx_fast_settle_en(void);
-
-    /**
-     *  @brief      this function serve to disable the tx timing sequence adjusted.
-     *  @param[in]  none
-     *  @return     none
-    */
-    void ble_rf_tx_fast_settle_dis(void);
-
-
-    /**
-     *  @brief      this function serve to enable the rx timing sequence adjusted.
-     *  @param[in]  none
-     *  @return     none
-    */
-    void ble_rf_rx_fast_settle_en(void);
-
-
-    /**
-     *  @brief      this function serve to disable the rx timing sequence adjusted.
-     *  @param[in]  none
-     *  @return     none
-    */
-    void ble_rf_rx_fast_settle_dis(void);
 
 
 
@@ -1197,14 +1251,14 @@ static inline u8 rf_ble_get_tx_pwr_idx(s8 rfTxPower)
     rf_power_level_index_e rfPwrLvlIdx;
 
     /*VBAT*/
-    if      (rfTxPower >=   9)  {  rfPwrLvlIdx = RF_POWER_INDEX_P8p95dBm;  }
+    if      (rfTxPower >=   9)  {  rfPwrLvlIdx = RF_POWER_INDEX_P9p10dBm;  }
     else if (rfTxPower >=   8)  {  rfPwrLvlIdx = RF_POWER_INDEX_P8p03dBm;  }
     else if (rfTxPower >=   7)  {  rfPwrLvlIdx = RF_POWER_INDEX_P7p19dBm;  }
-    else if (rfTxPower >=   6)  {  rfPwrLvlIdx = RF_POWER_INDEX_P5p97dBm;  }
+    else if (rfTxPower >=   6)  {  rfPwrLvlIdx = RF_POWER_INDEX_P6p05dBm;  }
     /*VANT*/
     else if (rfTxPower >=   5)  {  rfPwrLvlIdx = RF_POWER_INDEX_P5p00dBm;  }
-    else if (rfTxPower >=   4)  {  rfPwrLvlIdx = RF_POWER_INDEX_P4p05dBm;  }
-    else if (rfTxPower >=   3)  {  rfPwrLvlIdx = RF_POWER_INDEX_P2p99dBm;  }
+    else if (rfTxPower >=   4)  {  rfPwrLvlIdx = RF_POWER_INDEX_P4p13dBm;  }
+    else if (rfTxPower >=   3)  {  rfPwrLvlIdx = RF_POWER_INDEX_P3p03dBm;  }
 
     return rfPwrLvlIdx;
 }
@@ -1214,14 +1268,14 @@ static inline s8 rf_ble_get_tx_pwr_level(rf_power_level_index_e rfPwrLvlIdx)
     s8 rfTxPower;
 
     /*VBAT*/
-    if      (rfPwrLvlIdx <= RF_POWER_INDEX_P8p95dBm)  {  rfTxPower =   9;  }
+    if      (rfPwrLvlIdx <= RF_POWER_INDEX_P9p10dBm)  {  rfTxPower =   9;  }
     else if (rfPwrLvlIdx <= RF_POWER_INDEX_P8p03dBm)  {  rfTxPower =   8;  }
     else if (rfPwrLvlIdx <= RF_POWER_INDEX_P7p19dBm)  {  rfTxPower =   7;  }
-    else if (rfPwrLvlIdx <= RF_POWER_INDEX_P5p97dBm)  {  rfTxPower =   6;  }
+    else if (rfPwrLvlIdx <= RF_POWER_INDEX_P6p05dBm)  {  rfTxPower =   6;  }
     /*VANT*/
     else if (rfPwrLvlIdx <= RF_POWER_INDEX_P5p00dBm)  {  rfTxPower =   5;  }
-    else if (rfPwrLvlIdx <= RF_POWER_INDEX_P4p05dBm)  {  rfTxPower =   4;  }
-    else if (rfPwrLvlIdx <= RF_POWER_INDEX_P2p99dBm)  {  rfTxPower =   3;  }
+    else if (rfPwrLvlIdx <= RF_POWER_INDEX_P4p13dBm)  {  rfTxPower =   4;  }
+    else if (rfPwrLvlIdx <= RF_POWER_INDEX_P3p03dBm)  {  rfTxPower =   3;  }
     else                                              {  rfTxPower = -23;  }
 
     return rfTxPower;
@@ -1231,6 +1285,7 @@ static inline s8 rf_ble_get_tx_pwr_level(rf_power_level_index_e rfPwrLvlIdx)
 typedef struct {
     unsigned char  rfMode_init_flag;
     unsigned char  txPower_index;
+    unsigned char  txPower_level;   /*!< added to be compatible with driver api */
 }ext_rf_t;
 
 extern ext_rf_t blt_extRF;

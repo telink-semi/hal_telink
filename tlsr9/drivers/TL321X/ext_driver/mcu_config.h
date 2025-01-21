@@ -1,20 +1,26 @@
-/******************************************************************************
- * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
+/********************************************************************************************************
+ * @file    mcu_config.h
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * @brief   This is the header file for BLE SDK
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * @author  BLE GROUP
+ * @date    06,2022
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @par     Copyright (c) 2022, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *****************************************************************************/
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
+ *
+ *******************************************************************************************************/
 #ifndef DRIVERS_TL321X_EXT_DRIVER_MCU_CONFIG_H_
 #define DRIVERS_TL321X_EXT_DRIVER_MCU_CONFIG_H_
 
@@ -29,7 +35,7 @@
 /**
  * @brief   Public Device Address Company ID for this chip
  */
-#define PDA_COMPANY_ID                                          0x3CCFB4    //B92
+#define PDA_COMPANY_ID                                          0xC0A3C7
 
 
 
@@ -48,7 +54,9 @@
 #define FLASH_P25Q128H_SUPPORT_EN                               0
 #define FLASH_GD25LQ16E_SUPPORT_EN                              0
 
-
+#define FLASH_P25Q80SU_SUPPORT_EN                               0
+#define FLASH_GD25LE80E_SUPPORT_EN                              1
+#define FLASH_GD25LE16E_SUPPORT_EN                              1
 
 
 /**
@@ -59,9 +67,9 @@
 
 
 /**
- * @brief   MAC address burning on EFUSE
+ * @brief   MAC address burning on EFUSE/OTP
  */
-#define BUILT_IN_MAC_ON_EFUSE                                   1
+#define BUILT_IN_MAC_ON_DEVICE                                  1
 
 
 

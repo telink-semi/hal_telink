@@ -1,20 +1,26 @@
-/******************************************************************************
- * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
+/********************************************************************************************************
+ * @file    cmpt.h
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * @brief   This is the header file for TL321X
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * @author  Driver Group
+ * @date    2024
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *****************************************************************************/
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
+ *
+ *******************************************************************************************************/
 #ifndef DRIVERS_CMPT_H_
 #define DRIVERS_CMPT_H_
 #include "../gpio.h"
@@ -53,7 +59,7 @@
  * @author    BLE group .
  * @return    none
  */
-#define gpio_write(pin,value)       gpio_set_level(pin,value)
+#define gpio_write(pin, value) gpio_set_level(pin, value)
 
 
 /**
@@ -62,7 +68,7 @@
  * @author     BLE group .
  * @return     none
  */
-#define gpio_set_output_en(pin,value)  gpio_set_output(pin,value)
+#define gpio_set_output_en(pin, value) gpio_set_output(pin, value)
 
 
 /**
@@ -71,7 +77,7 @@
  * @author    BLE group .
  * @return    the pin's level(1: high 0: low)
  */
-#define  gpio_read(pin)   gpio_get_level(pin)
+#define gpio_read(pin) gpio_get_level(pin)
 
 
 /**
@@ -80,7 +86,7 @@
  * @author     BLE group .
  * @return     none
  */
-#define  gpio_set_gpio_en(pin)   gpio_function_en(pin)
+#define gpio_set_gpio_en(pin) gpio_function_en(pin)
 
 /**
  * @brief      This function set the input function of a pin.
@@ -89,7 +95,7 @@
  * @author     BLE group .
  * @return     none
  */
-#define  gpio_set_input_en(pin,value)  gpio_set_input (pin,value)
+#define gpio_set_input_en(pin, value) gpio_set_input(pin, value)
 
 
 /**********************************************************************************************************************
@@ -101,7 +107,7 @@
  * @return    system timer tick value.
  * @author    BLE group .
  */
-#define  clock_time  stimer_get_tick
+#define clock_time stimer_get_tick
 
 
 #endif

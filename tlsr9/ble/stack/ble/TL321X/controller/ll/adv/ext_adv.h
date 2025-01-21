@@ -1,20 +1,26 @@
-/******************************************************************************
- * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
+/********************************************************************************************************
+ * @file    ext_adv.h
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * @brief   This is the header file for BLE SDK
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * @author  BLE GROUP
+ * @date    06,2022
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @par     Copyright (c) 2022, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *****************************************************************************/
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
+ *
+ *******************************************************************************************************/
 #ifndef LL_EXT_ADV_H_
 #define LL_EXT_ADV_H_
 
@@ -22,15 +28,14 @@
 
 
 /* maximum number of advertising sets this SDK can support, periodic advertising is included. */
-#define         ADV_SETS_NUMBER_MAX                             4 //user can't modify this value !!!
+#define ADV_SETS_NUMBER_MAX 4 //user can't modify this value !!!
 
 
 /* extended ADV parameters buffer length for each ADV set */
-#define         ADV_SET_PARAM_LENGTH                            (536) //user can't modify this value !!!
+#define ADV_SET_PARAM_LENGTH (536) //user can't modify this value !!!
 
 
-
- /**
+/**
   * @brief      for user to initialize extended advertising module and allocate single or multiple advertising sets parameter buffer
   *                notice that: this API must be used before any other extended ADV initialization APIs.
   * @param[in]  pBuff_advSets - global extended ADV parameters buffer allocated by application layer.
@@ -38,7 +43,7 @@
   * @return     Status - 0x00: command succeeded;
   *                      0x12: num_advSets exceed maximum number of supported adv_sets.
   */
- ble_sts_t  blc_ll_initExtendedAdvModule_initExtendedAdvSetParamBuffer(u8 *pBuff_advSets, int num_advSets);
+ble_sts_t blc_ll_initExtendedAdvModule_initExtendedAdvSetParamBuffer(u8 *pBuff_advSets, int num_advSets);
 
 
 /**
@@ -47,7 +52,7 @@
  * @param[in]  max_len_advData - extended ADV data maximum length
  * @return     none
  */
-void        blc_ll_initExtendedAdvDataBuffer(u8 *pExtAdvData, int max_len_advData);
+void blc_ll_initExtendedAdvDataBuffer(u8 *pExtAdvData, int max_len_advData);
 
 
 /**
@@ -56,7 +61,7 @@ void        blc_ll_initExtendedAdvDataBuffer(u8 *pExtAdvData, int max_len_advDat
  * @param[in]  max_len_scanRspData - extended ADV scan response data maximum length
  * @return     none
  */
-void        blc_ll_initExtendedScanRspDataBuffer(u8 *pScanRspData, int max_len_scanRspData);
+void blc_ll_initExtendedScanRspDataBuffer(u8 *pScanRspData, int max_len_scanRspData);
 
 
 /**
@@ -81,11 +86,7 @@ void        blc_ll_initExtendedScanRspDataBuffer(u8 *pScanRspData, int max_len_s
  *                             2. pri_advChnMap out of range
  *                      0x0C:  advertising is enabled for the specified advertising set
  */
-ble_sts_t   blc_ll_setExtAdvParam(  u8 adv_handle,                  advEvtProp_type_t adv_evt_prop, u32 pri_advInter_min,       u32 pri_advInter_max,
-                                    adv_chn_map_t pri_advChnMap,    own_addr_type_t ownAddrType,    u8 peerAddrType,            u8  *peerAddr,
-                                    adv_fp_type_t advFilterPolicy,  tx_power_t adv_tx_pow,          le_phy_type_t pri_adv_phy,  u8 sec_adv_max_skip,
-                                    le_phy_type_t sec_adv_phy,      u8 adv_sid,                     u8 scan_req_notify_en);
-
+ble_sts_t blc_ll_setExtAdvParam(u8 adv_handle, advEvtProp_type_t adv_evt_prop, u32 pri_advInter_min, u32 pri_advInter_max, adv_chn_map_t pri_advChnMap, own_addr_type_t ownAddrType, u8 peerAddrType, u8 *peerAddr, adv_fp_type_t advFilterPolicy, tx_power_t adv_tx_pow, le_phy_type_t pri_adv_phy, u8 sec_adv_max_skip, le_phy_type_t sec_adv_phy, u8 adv_sid, u8 scan_req_notify_en);
 
 
 /**
@@ -96,11 +97,7 @@ ble_sts_t   blc_ll_setExtAdvParam(  u8 adv_handle,                  advEvtProp_t
  * @param[in]  *advData - Advertising data
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t   blc_ll_setExtAdvData (u8 adv_handle, int advData_len, const u8 *advData);
-
-
-
-
+ble_sts_t blc_ll_setExtAdvData(u8 adv_handle, int advData_len, const u8 *advData);
 
 
 /**
@@ -111,10 +108,7 @@ ble_sts_t   blc_ll_setExtAdvData (u8 adv_handle, int advData_len, const u8 *advD
  * @param[in]  *scanRspData - Scan response data
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t   blc_ll_setExtScanRspData(u8 adv_handle, int scanRspData_len, const u8 *scanRspData);
-
-
-
+ble_sts_t blc_ll_setExtScanRspData(u8 adv_handle, int scanRspData_len, const u8 *scanRspData);
 
 
 /**
@@ -128,8 +122,7 @@ ble_sts_t   blc_ll_setExtScanRspData(u8 adv_handle, int scanRspData_len, const u
  *                             attempt to send prior to terminating the extended advertising
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t   blc_ll_setExtAdvEnable(adv_en_t enable, u8 adv_handle, u16 duration, u8 max_extAdvEvt);
-
+ble_sts_t blc_ll_setExtAdvEnable(adv_en_t enable, u8 adv_handle, u16 duration, u8 max_extAdvEvt);
 
 
 /**
@@ -139,8 +132,7 @@ ble_sts_t   blc_ll_setExtAdvEnable(adv_en_t enable, u8 adv_handle, u16 duration,
  * @param[in]  *rand_addr - Random Device Address
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t   blc_ll_setAdvRandomAddr(u8 adv_handle, u8* rand_addr);
-
+ble_sts_t blc_ll_setAdvRandomAddr(u8 adv_handle, u8 *rand_addr);
 
 
 /**
@@ -148,8 +140,7 @@ ble_sts_t   blc_ll_setAdvRandomAddr(u8 adv_handle, u8* rand_addr);
  * @param[in]  adv_handle - Used to identify an advertising set
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t   blc_ll_removeAdvSet(u8 adv_handle);
-
+ble_sts_t blc_ll_removeAdvSet(u8 adv_handle);
 
 
 /**
@@ -157,7 +148,7 @@ ble_sts_t   blc_ll_removeAdvSet(u8 adv_handle);
  * @param[in]  none.
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t   blc_ll_clearAdvSets(void);
+ble_sts_t blc_ll_clearAdvSets(void);
 
 
 /**
@@ -167,7 +158,7 @@ ble_sts_t   blc_ll_clearAdvSets(void);
  *                  0xFF: invalid ADV handle, e.g. connection is not Peripheral role, or Peripheral is established by legacy ADV
  *                  Others: Extended ADV handle
  */
-u8          blc_ll_getExtendedAdvHandleForAclConnection(u16 connHandle);
+u8 blc_ll_getExtendedAdvHandleForAclConnection(u16 connHandle);
 
 
 #endif /* LL_EXT_ADV_H_ */

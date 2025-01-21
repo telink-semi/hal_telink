@@ -1,46 +1,51 @@
-/******************************************************************************
- * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
+/********************************************************************************************************
+ * @file    acl_sniffer_mst.h
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * @brief   This is the header file for BLE SDK
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * @author  BLE GROUP
+ * @date    2020.06
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @par     Copyright (c) 2020, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *****************************************************************************/
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
+ *
+ *******************************************************************************************************/
 #ifndef ACL_SNIFFER_MST_H_
 #define ACL_SNIFFER_MST_H_
 
 
 #include "acl_sniffer.h"
 
-
 /**
  * @brief   acl master status for compatible mode.
  */
-enum{
+enum
+{
     //0x00
-    MASTER_STATUS_STANDBY           = 0,            //
-    MASTER_STATUS_CONNECTION_SETUP,                 //
-    MASTER_STATUS_CONNECTION_GENERAL,               //
-    MASTER_STATUS_CONNECTION_UPDATE,                //
-    MASTER_STATUS_CONNECTION_CHANNEL_MAP,           //
+    MASTER_STATUS_STANDBY = 0,            //
+    MASTER_STATUS_CONNECTION_SETUP,       //
+    MASTER_STATUS_CONNECTION_GENERAL,     //
+    MASTER_STATUS_CONNECTION_UPDATE,      //
+    MASTER_STATUS_CONNECTION_CHANNEL_MAP, //
 };
-
 
 /**
  * @brief      for user to initialize ACL sniffer for monitor peer-slave.
  * @param      none
  * @return     none
  */
-void        blc_ll_initAclSnifferMst_module(void);
+void blc_ll_initAclSnifferMst_module(void);
 
 
 /**
@@ -48,7 +53,7 @@ void        blc_ll_initAclSnifferMst_module(void);
  * @param[in]   earlyTime_us
  * @return      none.
  */
-void        blc_ll_addAclSnifferMstSyncEarlyTime(u32 earlyTime_us);
+void blc_ll_addAclSnifferMstSyncEarlyTime(u32 earlyTime_us);
 
 
 /**
@@ -57,7 +62,7 @@ void        blc_ll_addAclSnifferMstSyncEarlyTime(u32 earlyTime_us);
  * @return      status, 0x00:  succeed
  *                      other: failed
  */
-ble_sts_t   blc_ll_setAclSnifferMstReportRssiType(acl_sniffer_rssi_report_type_t rssi_type);
+ble_sts_t blc_ll_setAclSnifferMstReportRssiType(acl_sniffer_rssi_report_type_t rssi_type);
 
 
 /**
@@ -66,7 +71,7 @@ ble_sts_t   blc_ll_setAclSnifferMstReportRssiType(acl_sniffer_rssi_report_type_t
  *                      0: disable
  * @return     none
  */
-void        blc_ll_setAclSnifferMst1stSyncWinMaxEnable(u8 enable);
+void blc_ll_setAclSnifferMst1stSyncWinMaxEnable(u8 enable);
 
 
 /**
@@ -74,7 +79,7 @@ void        blc_ll_setAclSnifferMst1stSyncWinMaxEnable(u8 enable);
  * @param[in]  none.
  * @return     The number of all ACL sniffer sync.
  */
-int         blc_ll_getAclSnifferMstSyncNumber(void);
+int blc_ll_getAclSnifferMstSyncNumber(void);
 
 
 /**
@@ -82,7 +87,7 @@ int         blc_ll_getAclSnifferMstSyncNumber(void);
  * @param[in]  snifHandle - ACL sniffer handle.
  * @return     The status of currently ACL sniffer sync.
  */
-int         blc_ll_getAclSnifferMstSyncStatus(u16 snifHandle);
+int blc_ll_getAclSnifferMstSyncStatus(u16 snifHandle);
 
 
 /**
@@ -91,7 +96,7 @@ int         blc_ll_getAclSnifferMstSyncStatus(u16 snifHandle);
  * @return     status, 0x00:   succeed
  *                      other: failed
  */
-int         blc_ll_setAclSnifferMstTerminateSync(u16 snifHandle);
+int blc_ll_setAclSnifferMstTerminateSync(u16 snifHandle);
 
 
 /**
@@ -101,7 +106,7 @@ int         blc_ll_setAclSnifferMstTerminateSync(u16 snifHandle);
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_getAclMasterConnectionTimingParameter(u16 connHandle, u8* aclMasterParam);
+ble_sts_t blc_ll_getAclMasterConnectionTimingParameter(u16 connHandle, u8 *aclMasterParam);
 
 
 /**

@@ -1,70 +1,82 @@
-/******************************************************************************
- * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
+/********************************************************************************************************
+ * @file    phy_stack.h
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * @brief   This is the header file for BLE SDK
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * @author  BLE GROUP
+ * @date    06,2022
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @par     Copyright (c) 2022, Telink Semiconductor (Shanghai) Co., Ltd.
+ *          All rights reserved.
  *
- *****************************************************************************/
+ *          The information contained herein is confidential property of Telink
+ *          Semiconductor (Shanghai) Co., Ltd. and is available under the terms
+ *          of Commercial License Agreement between Telink Semiconductor (Shanghai)
+ *          Co., Ltd. and the licensee or the terms described here-in. This heading
+ *          MUST NOT be removed from this file.
+ *
+ *          Licensee shall not delete, modify or alter (or permit any third party to delete, modify, or
+ *          alter) any information contained herein in whole or in part except as expressly authorized
+ *          by Telink semiconductor (shanghai) Co., Ltd. Otherwise, licensee shall be solely responsible
+ *          for any claim to the extent arising out of or relating to such deletion(s), modification(s)
+ *          or alteration(s).
+ *
+ *          Licensees are granted free, non-transferable use of the information in this
+ *          file under Mutual Non-Disclosure Agreement. NO WARRANTY of ANY KIND is provided.
+ *
+ *******************************************************************************************************/
 #ifndef PHY_STACK_H_
 #define PHY_STACK_H_
 
 
 #include "tl_common.h"
-#include "stack/ble/hci/hci_cmd.h"
+#include "stack/ble/TL321X/hci/hci_cmd.h"
 
 
 /******************************* phy start *************************************************************************/
 
-#define         RFLEN_255_1MPHY_US                              2120
-#define         RFLEN_255_2MPHY_US                              1064
-#define         RFLEN_255_CODEDPHY_S2_US                        4542
-#define         RFLEN_255_CODEDPHY_S8_US                        17040
+#define RFLEN_255_1MPHY_US       2120
+#define RFLEN_255_2MPHY_US       1064
+#define RFLEN_255_CODEDPHY_S2_US 4542
+#define RFLEN_255_CODEDPHY_S8_US 17040
 
+typedef struct __attribute__((packed))
+{
+    u8 llid;
+    u8 rf_len;
+    u8 opcode;
+    u8 tx_phys;
+    u8 rx_phys;
+} rf_pkt_ll_phy_req_rsp_t; //phy_req, phy_rsp
 
-typedef struct{
-    u8  llid;
-    u8  rf_len;
-    u8  opcode;
-    u8  tx_phys;
-    u8  rx_phys;
-}rf_pkt_ll_phy_req_rsp_t;   //phy_req, phy_rsp
+typedef struct __attribute__((packed))
+{
+    u8 llid;
+    u8 rf_len;
+    u8 opcode;
+    u8 m_to_s_phy;
+    u8 s_to_m_phy;
+    u8 instant0;
+    u8 instant1;
+} rf_pkt_ll_phy_update_ind_t; //phy_req, phy_rsp
 
-typedef struct{
-    u8  llid;
-    u8  rf_len;
-    u8  opcode;
-    u8  m_to_s_phy;
-    u8  s_to_m_phy;
-    u8  instant0;
-    u8  instant1;
-}rf_pkt_ll_phy_update_ind_t;   //phy_req, phy_rsp
-
-typedef struct {
-    u8  dft_tx_prefer_phys;
-    u8  dft_rx_prefer_phys;
-    u8  dft_prefer_phy;
-    u8  dft_CI;
+typedef struct
+{
+    u8 dft_tx_prefer_phys;
+    u8 dft_rx_prefer_phys;
+    u8 dft_prefer_phy;
+    u8 dft_CI;
 
     //for Extended ADV
-    u8  cur_llPhy;  //"le_phy_type_t"    1:1M    2:2M   3:Coded
-    u8  cur_own_CI;  //TX cur_coding_ind
-    u8  cur_peer_CI; //IRQ variable, current Peer CI
-    u8  tx_stl_adv;
+    u8 cur_llPhy;   //"le_phy_type_t"    1:1M    2:2M   3:Coded
+    u8 cur_own_CI;  //TX cur_coding_ind
+    u8 cur_peer_CI; //IRQ variable, current Peer CI
+    u8 tx_stl_adv;
 
-    u8  tx_stl_tifs;
-    u8  peer_oneByte_us; //1M: 8uS;  2M: 4uS; Coded S2: 16uS; Coded S8: 64uS
-    u8  own_oneByte_us; //1M: 8uS;  2M: 4uS; Coded S2: 16uS; Coded S8: 64uS
-    u8  extra_preamble; //extra preamble numbers
+    u8 tx_stl_tifs;
+    u8 peer_oneByte_us; //1M: 8uS;  2M: 4uS; Coded S2: 16uS; Coded S8: 64uS
+    u8 own_oneByte_us;  //1M: 8uS;  2M: 4uS; Coded S2: 16uS; Coded S8: 64uS
+    u8 extra_preamble;  //extra preamble numbers
     /* T1 definition
      * timing after "access_code" to packet tail
      * 1M:       (rf_len+5)*8          = rf_len*8 + 40          5 = 2(header)+3(CRC)
@@ -115,36 +127,39 @@ typedef struct {
      *        Coded: 336 + 14 = 350 uS
      * */
     u16 prmb_ac_us; //
-}ll_phy_t;
+} ll_phy_t;
 
-typedef enum {
-    BLE_PHY_NONE        = 0x00, //different from BLE_PHY_1M/BLE_PHY_2M/BLE_PHY_CODED
+typedef enum
+{
+    BLE_PHY_NONE = 0x00, //different from BLE_PHY_1M/BLE_PHY_2M/BLE_PHY_CODED
 } le_phy_ext_type_t;
 
-typedef enum{
-    LE_CI_NONE = 0,  //when setting 1M/2M PHY, use this to distinguish, for code readability
+typedef enum
+{
+    LE_CI_NONE  = 0, //when setting 1M/2M PHY, use this to distinguish, for code readability
     LE_CODED_S2 = 2,
     LE_CODED_S8 = 8,
-}le_coding_ind_t;
+} le_coding_ind_t;
 
 //do not support Asymmetric PHYs, conn_phys = tx_phys & rx_phys
-typedef struct {
-    u8  conn_prefer_phys;  // conn_prefer_phys = tx_prefer_phys & rx_prefer_phys
-    u8  conn_cur_phy;      //
-    u8  conn_next_phy;     //
-    u8  conn_cur_CI;       // CI: coding_ind
+typedef struct
+{
+    u8 conn_prefer_phys; // conn_prefer_phys = tx_prefer_phys & rx_prefer_phys
+    u8 conn_cur_phy;     //
+    u8 conn_next_phy;    //
+    u8 conn_cur_CI;      // CI: coding_ind
 
-    u8  conn_next_CI;
-    u8  phy_req_trigger;  // 1: means current device triggers phy_req, due to API "blc_ll_setPhy" called by Host or Application
-    u8  phy_req_pending;
-    u8  phy_update_pending;
+    u8 conn_next_CI;
+    u8 phy_req_trigger;  // 1: means current device triggers phy_req, due to API "blc_ll_setPhy" called by Host or Application
+    u8 phy_req_pending;
+    u8 phy_update_pending;
 
     u32 conn_updatePhy;
 
     u8 conn_last_phy;
     u8 align[3];
 
-    #if 0
+#if 0
         u8  tx_prefer_phys;     //phy set
         u8  rx_prefer_phys;
         u8  tx_next_phys;
@@ -153,9 +168,9 @@ typedef struct {
         u8  cur_tx_phy;     //phy using
         u8  cur_rx_phy;
         u16 rsvd;
-    #endif
+#endif
 
-}ll_conn_phy_t;
+} ll_conn_phy_t;
 
 typedef int (*llms_conn_phy_update_callback_t)(u16 connHandle);
 typedef int (*llms_conn_phy_switch_callback_t)(u16 connHandle);
@@ -164,29 +179,38 @@ typedef void (*ll_phy_switch_callback_t)(le_phy_type_t, le_coding_ind_t);
 typedef void (*ll_coded_phy_ind_detect_callback_t)(u8);
 extern ll_coded_phy_ind_detect_callback_t ll_coded_phy_ind_detect_cb;
 
-extern  llms_conn_phy_update_callback_t llms_conn_phy_update_cb; ///blt_ll_updateConnPhy
-extern  llms_conn_phy_switch_callback_t llms_conn_phy_switch_cb; ///blt_ll_switchConnPhy
-extern  ll_phy_switch_callback_t        ll_phy_switch_cb;
+extern llms_conn_phy_update_callback_t llms_conn_phy_update_cb; ///blt_ll_updateConnPhy
+extern llms_conn_phy_switch_callback_t llms_conn_phy_switch_cb; ///blt_ll_switchConnPhy
+extern ll_phy_switch_callback_t        ll_phy_switch_cb;
 
-extern const u8   tx_stl_auto_mode[4];
-extern const u8   tx_stl_btx_1st_pkt[4];
+#if STACK_IRQ_CODE_IN_SRAM_DUE_TO_FLASH_OPERATION_V2
+    #if (BLE_S2_S8_NEW_PATH)
+    extern u8 tx_stl_auto_mode[5];
+    #else
+    extern u8 tx_stl_auto_mode[4];
+    #endif
+    extern u8 tx_stl_btx_1st_pkt[4];
+#else
+    #if (BLE_S2_S8_NEW_PATH)
+    extern const u8 tx_stl_auto_mode[5];
+    #else
+    extern const u8 tx_stl_auto_mode[4];
+    #endif
+    extern const u8 tx_stl_btx_1st_pkt[4];
+#endif /*!< STACK_IRQ_CODE_IN_SRAM_DUE_TO_FLASH_OPERATION_V2 */
 
-
-extern _attribute_aligned_(4) ll_phy_t      bltPHYs;
+extern _attribute_aligned_(4) ll_phy_t bltPHYs;
 
 int  blt_phy_getRfPacketTime_us(int rf_len, le_phy_type_t phy, le_coding_ind_t ci);
 void rf_ble_switch_phy(le_phy_type_t phy, le_coding_ind_t own_coding_ind);
 void blt_ll_set_peer_codePhy_CI(le_coding_ind_t coding_ind);
-void blt_ll_phy_param_reset(void);;
+void blt_ll_phy_param_reset(void);
+;
 /******************************* phy end ***************************************************************************/
 
 
-
-
-
-
 /******************************* phy_test start *************************************************************************/
-    int       blt_phyTest_main_loop(void);
+int blt_phyTest_main_loop(void);
 
 
 /**
@@ -220,14 +244,11 @@ ble_sts_t blt_phyTest_hci_setReceiverTest_V2(hci_le_receiverTestV2_cmdParam_t *p
 ble_sts_t blt_phyTest_setTestEnd(u8 *pkt_num);
 
 
-    //void blc_phy_preamble_length_set(unsigned char len);
-    void blt_InitPhyTestDriver(rf_mode_e rf_mode);
+//void blc_phy_preamble_length_set(unsigned char len);
+void blt_InitPhyTestDriver(rf_mode_e rf_mode);
 
 
 /******************************* phy_test end ***************************************************************************/
 
 
-
 #endif /* PHY_STACK_H_ */
-
-

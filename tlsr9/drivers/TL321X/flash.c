@@ -1,20 +1,26 @@
-/******************************************************************************
- * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
+/********************************************************************************************************
+ * @file    flash.c
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * @brief   This is the source file for TL321X
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * @author  Driver Group
+ * @date    2024
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *****************************************************************************/
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
+ *
+ *******************************************************************************************************/
 #include "lib/include/sys.h"
 #include "lib/include/flash_base.h"
 #include "lib/include/flash_prot.h"
@@ -27,20 +33,19 @@
 #include "types.h"
 
 
-_attribute_data_retention_sec_ flash_handler_t flash_read_page = flash_dread;
+_attribute_data_retention_sec_ flash_handler_t flash_read_page  = flash_dread;
 _attribute_data_retention_sec_ flash_handler_t flash_write_page = flash_page_program;
 /*
  * note:flash_write_page_encrypt and flash_read_page_decrypt_check should be used in combination,and the check read address is corresponding to the encrypted write.
  */
-_attribute_data_retention_sec_ flash_handler_t flash_write_page_encrypt = flash_page_program_encrypt;
+_attribute_data_retention_sec_ flash_handler_t            flash_write_page_encrypt      = flash_page_program_encrypt;
 _attribute_data_retention_sec_ flash_read_check_handler_t flash_read_page_decrypt_check = flash_dread_decrypt_check;
 
 
-
 _attribute_data_retention_sec_ preempt_config_t s_flash_preempt_config =
-{
-    .preempt_en =0,
-    .threshold  =1,
+    {
+        .preempt_en = 0,
+        .threshold  = 1,
 };
 
 /*******************************************************************************************************************
@@ -60,10 +65,10 @@ _attribute_data_retention_sec_ preempt_config_t s_flash_preempt_config =
  *                  - In other cases(preempt_en = 0 or plic_preempt_feature_en = 0), global interrupts (including machine timer and software interrupt) will be turned off during the execution of the flash functions and will be restored when the flash functions exits.
  *              -# If the flash operation may be interrupted by an interrupt, it is necessary to ensure that the interrupt handling function and the function it calls must be in the RAM code. 
  */
-void flash_plic_preempt_config(unsigned char preempt_en,unsigned char threshold)
+void flash_plic_preempt_config(unsigned char preempt_en, unsigned char threshold)
 {
-    s_flash_preempt_config.preempt_en=preempt_en;
-    s_flash_preempt_config.threshold=threshold;
+    s_flash_preempt_config.preempt_en = preempt_en;
+    s_flash_preempt_config.threshold  = threshold;
 }
 
 /**
@@ -110,7 +115,7 @@ _attribute_text_sec_ void flash_erase_sector(unsigned long addr)
 _attribute_text_sec_ void flash_dread(unsigned long addr, unsigned long len, unsigned char *buf)
 {
     DISABLE_BTB;
-    flash_mspi_read_ram(FLASH_DREAD_CMD,addr, buf,len);
+    flash_mspi_read_ram(FLASH_DREAD_CMD, addr, buf, len);
     ENABLE_BTB;
 }
 
@@ -134,7 +139,7 @@ _attribute_text_sec_ void flash_dread(unsigned long addr, unsigned long len, uns
 _attribute_text_sec_ void flash_4read(unsigned long addr, unsigned long len, unsigned char *buf)
 {
     DISABLE_BTB;
-    flash_mspi_read_ram(FLASH_X4READ_CMD, addr,  buf,len);
+    flash_mspi_read_ram(FLASH_X4READ_CMD, addr, buf, len);
     ENABLE_BTB;
 }
 
@@ -155,11 +160,11 @@ _attribute_text_sec_ void flash_4read(unsigned long addr, unsigned long len, uns
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-_attribute_text_sec_ unsigned char flash_dread_decrypt_check(unsigned long addr,unsigned long plain_len,unsigned char* plain_buf)
+_attribute_text_sec_ unsigned char flash_dread_decrypt_check(unsigned long addr, unsigned long plain_len, unsigned char *plain_buf)
 {
-    unsigned char check_data=0;
+    unsigned char check_data = 0;
     DISABLE_BTB;
-    check_data = flash_mspi_read_decrypt_check_ram(FLASH_DREAD_CMD,addr,plain_buf,plain_len);
+    check_data = flash_mspi_read_decrypt_check_ram(FLASH_DREAD_CMD, addr, plain_buf, plain_len);
     ENABLE_BTB;
     return check_data;
 }
@@ -181,11 +186,11 @@ _attribute_text_sec_ unsigned char flash_dread_decrypt_check(unsigned long addr,
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-_attribute_text_sec_ unsigned char flash_4read_decrypt_check(unsigned long addr,unsigned long plain_len,unsigned char* plain_buf)
+_attribute_text_sec_ unsigned char flash_4read_decrypt_check(unsigned long addr, unsigned long plain_len, unsigned char *plain_buf)
 {
-    unsigned char check_data=0;
+    unsigned char check_data = 0;
     DISABLE_BTB;
-    check_data = flash_mspi_read_decrypt_check_ram(FLASH_X4READ_CMD,addr,plain_buf,plain_len);
+    check_data = flash_mspi_read_decrypt_check_ram(FLASH_X4READ_CMD, addr, plain_buf, plain_len);
     ENABLE_BTB;
     return check_data;
 }
@@ -200,10 +205,10 @@ _attribute_text_sec_ unsigned char flash_4read_decrypt_check(unsigned long addr,
  */
 _attribute_text_sec_ static void flash_write(unsigned long addr, unsigned long len, unsigned char *buf, flash_command_e cmd)
 {
-    unsigned int ns = PAGE_SIZE - (addr & (PAGE_SIZE-1));
-    int nw = 0;
+    unsigned int ns = PAGE_SIZE - (addr & (PAGE_SIZE - 1));
+    int          nw = 0;
 
-    while(len > 0){
+    while (len > 0) {
         nw = len > ns ? ns : len;
         DISABLE_BTB;
         flash_mspi_write_ram(cmd, addr, buf, nw, FLASH_WRITE_ENABLE_CMD, FLASH_READ_STATUS_CMD_LOWBYTE);
@@ -279,10 +284,10 @@ _attribute_text_sec_ void flash_quad_page_program(unsigned long addr, unsigned l
  */
 _attribute_text_sec_ static void flash_write_encrypt(unsigned long addr, unsigned long len, unsigned char *buf, flash_command_e cmd)
 {
-    unsigned int ns = PAGE_SIZE - (addr & (PAGE_SIZE-1));
-    int nw = 0;
+    unsigned int ns = PAGE_SIZE - (addr & (PAGE_SIZE - 1));
+    int          nw = 0;
 
-    while(len > 0){
+    while (len > 0) {
         nw = len > ns ? ns : len;
         DISABLE_BTB;
         flash_mspi_write_encrypt_ram(cmd, addr, buf, nw, FLASH_WRITE_ENABLE_CMD, FLASH_READ_STATUS_CMD_LOWBYTE);
@@ -391,13 +396,13 @@ _attribute_text_sec_ void flash_write_status(flash_status_typedef_e type, unsign
     unsigned char buf[2];
 
     buf[0] = data;
-    buf[1] = data>>8;
+    buf[1] = data >> 8;
     DISABLE_BTB;
-    if(type == FLASH_TYPE_8BIT_STATUS){
+    if (type == FLASH_TYPE_8BIT_STATUS) {
         flash_mspi_write_ram(FLASH_WRITE_STATUS_CMD_LOWBYTE, 0, buf, 1, FLASH_WRITE_ENABLE_CMD, FLASH_READ_STATUS_CMD_LOWBYTE);
-    }else if(type == FLASH_TYPE_16BIT_STATUS_ONE_CMD){
+    } else if (type == FLASH_TYPE_16BIT_STATUS_ONE_CMD) {
         flash_mspi_write_ram(FLASH_WRITE_STATUS_CMD_LOWBYTE, 0, buf, 2, FLASH_WRITE_ENABLE_CMD, FLASH_READ_STATUS_CMD_LOWBYTE);
-    }else if(type == FLASH_TYPE_16BIT_STATUS_TWO_CMD){
+    } else if (type == FLASH_TYPE_16BIT_STATUS_TWO_CMD) {
         flash_mspi_write_ram(FLASH_WRITE_STATUS_CMD_LOWBYTE, 0, (unsigned char *)&buf[0], 1, FLASH_WRITE_ENABLE_CMD, FLASH_READ_STATUS_CMD_LOWBYTE);
         flash_mspi_write_ram(FLASH_WRITE_STATUS_CMD_HIGHBYTE, 0, (unsigned char *)&buf[1], 1, FLASH_WRITE_ENABLE_CMD, FLASH_READ_STATUS_CMD_LOWBYTE);
     }
@@ -420,7 +425,7 @@ _attribute_text_sec_ void flash_write_status(flash_status_typedef_e type, unsign
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-_attribute_text_sec_ void flash_read_otp(unsigned long addr, unsigned long len, unsigned char* buf)
+_attribute_text_sec_ void flash_read_otp(unsigned long addr, unsigned long len, unsigned char *buf)
 {
     DISABLE_BTB;
     flash_mspi_read_ram(FLASH_READ_SECURITY_REGISTERS_CMD, addr, buf, len);
@@ -446,9 +451,9 @@ _attribute_text_sec_ void flash_read_otp(unsigned long addr, unsigned long len, 
 _attribute_text_sec_ void flash_write_otp(unsigned long addr, unsigned long len, unsigned char *buf)
 {
     unsigned int ns = PAGE_SIZE_OTP - (addr & (PAGE_SIZE_OTP - 1));
-    int nw = 0;
+    int          nw = 0;
 
-    while(len > 0){
+    while (len > 0) {
         nw = len > ns ? ns : len;
         DISABLE_BTB;
         flash_mspi_write_ram(FLASH_WRITE_SECURITY_REGISTERS_CMD, addr, buf, nw, FLASH_WRITE_ENABLE_CMD, FLASH_READ_STATUS_CMD_LOWBYTE);
@@ -478,7 +483,7 @@ _attribute_text_sec_ void flash_write_otp(unsigned long addr, unsigned long len,
 _attribute_text_sec_ void flash_erase_otp(unsigned long addr)
 {
     DISABLE_BTB;
-    flash_mspi_write_ram(FLASH_ERASE_SECURITY_REGISTERS_CMD, addr, 0, 0, FLASH_WRITE_ENABLE_CMD, FLASH_READ_STATUS_CMD_LOWBYTE );
+    flash_mspi_write_ram(FLASH_ERASE_SECURITY_REGISTERS_CMD, addr, 0, 0, FLASH_WRITE_ENABLE_CMD, FLASH_READ_STATUS_CMD_LOWBYTE);
     ENABLE_BTB;
 }
 
@@ -525,8 +530,7 @@ _attribute_text_sec_ unsigned int flash_read_mid(void)
 _attribute_text_sec_ void flash_read_uid(unsigned char idcmd, unsigned char *buf)
 {
     DISABLE_BTB;
-    if(idcmd==((FLASH_READ_UID_CMD_GD_PUYA_ZB_TH>>16)&0xff))
-    {
+    if (idcmd == ((FLASH_READ_UID_CMD_GD_PUYA_ZB_TH >> 24) & 0xff)) {
         flash_mspi_read_ram(FLASH_READ_UID_CMD_GD_PUYA_ZB_TH, 0, buf, 16);
     }
     ENABLE_BTB;
@@ -577,7 +581,7 @@ _attribute_text_sec_ void flash_set_wr_xip_config(flash_wr_xip_config_t config)
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-_attribute_text_sec_ void flash_write_config(unsigned long addr,unsigned int cmd, unsigned char data)
+_attribute_text_sec_ void flash_write_config(unsigned long addr, unsigned int cmd, unsigned char data)
 {
     DISABLE_BTB;
     flash_mspi_write_ram(cmd, addr, &data, 1, FLASH_WRITE_ENABLE_CMD, FLASH_READ_STATUS_CMD_LOWBYTE);
@@ -599,9 +603,9 @@ _attribute_text_sec_ void flash_write_config(unsigned long addr,unsigned int cmd
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-_attribute_text_sec_ unsigned char  flash_read_config(unsigned long addr, unsigned int cmd)
+_attribute_text_sec_ unsigned char flash_read_config(unsigned long addr, unsigned int cmd)
 {
-    unsigned char config=0;
+    unsigned char config = 0;
     DISABLE_BTB;
     flash_mspi_read_ram(cmd, addr, &config, 1);
     ENABLE_BTB;
@@ -621,8 +625,7 @@ _attribute_text_sec_ unsigned char  flash_read_config(unsigned long addr, unsign
  */
 unsigned int flash_get_vendor(unsigned int flash_mid)
 {
-    switch(flash_mid&0x0000ffff)
-    {
+    switch (flash_mid & 0x0000ffff) {
     case 0x0000325E:
         return FLASH_ETOX_ZB;
     case 0x000060C8:
@@ -645,9 +648,9 @@ unsigned int flash_get_vendor(unsigned int flash_mid)
  * @param[in]   flash_mid - MID of the flash(4 bytes).
  * @return      flash capacity.
  */
-flash_capacity_e  flash_get_capacity(unsigned int flash_mid)
+flash_capacity_e flash_get_capacity(unsigned int flash_mid)
 {
-    return (flash_mid&0x00ff0000)>>16;
+    return (flash_mid & 0x00ff0000) >> 16;
 }
 
 /*******************************************************************************************************************

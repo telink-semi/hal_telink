@@ -1,20 +1,26 @@
-/******************************************************************************
- * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
+/********************************************************************************************************
+ * @file    qdec.h
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * @brief   This is the header file for TL321X
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * @author  Driver Group
+ * @date    2024
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *****************************************************************************/
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
+ *
+ *******************************************************************************************************/
 #pragma once
 
 #include "gpio.h"
@@ -27,7 +33,12 @@
  */
 typedef enum
 {
-    QDEC_CHN_PA2,
+    /**
+      PA2 is not recommended
+      Because its use is limited, it is necessary to ensure that the PA2 input function is disabled before the sys_init /pm_sleep_wakeup/pm_set_dig_module_power_switch functions,
+      otherwise RF may not work properly.For details, refer to the comments of the functions mentioned above(BUT-53)
+    */
+    QDEC_CHN_PA2,//This pin is not recommended. Because when using PA2, baseband cannot be turned off during suspend sleep.
     QDEC_CHN_PA3,
     QDEC_CHN_PB6,
     QDEC_CHN_PB7,
@@ -35,9 +46,7 @@ typedef enum
     QDEC_CHN_PC3,
     QDEC_CHN_PD6,
     QDEC_CHN_PD7,
-}qdec_chn_e;
-
-
+} qdec_chn_e;
 
 /**
  * qedc mode
@@ -46,13 +55,14 @@ typedef enum
 {
     COMMON_MODE,
     DOUBLE_ACCURACY_MODE,
-}qdec_mode_e;
+} qdec_mode_e;
 
 /**
  *the hardware debouncing threshold
  */
-typedef enum{
-    QDEC_THRSH_P187p5us =0,
+typedef enum
+{
+    QDEC_THRSH_P187p5us = 0,
     QDEC_THRSH_P375p0us,
     QDEC_THRSH_P750p0us,
     QDEC_THRSH_P1500p0us,
@@ -60,8 +70,7 @@ typedef enum{
     QDEC_THRSH_P6000p0us,
     QDEC_THRSH_P12000p0us,
     QDEC_THRSH_P24000p0us,
-}qdec_thrsh_e;
-
+} qdec_thrsh_e;
 
 /**
  * @brief      This function servers to set input port.
@@ -69,7 +78,7 @@ typedef enum{
  * @param[in]  chn_b - input types of b channel.
  * @return     none.
  */
-void qdec_set_pin(qdec_chn_e chn_a,qdec_chn_e chn_b);
+void qdec_set_pin(qdec_chn_e chn_a, qdec_chn_e chn_b);
 
 /**
  * @brief      This function servers to set qdec mode,qdec mode:common mode and double accuracy mode.

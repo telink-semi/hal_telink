@@ -1,20 +1,26 @@
-/******************************************************************************
- * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
+/********************************************************************************************************
+ * @file    swire.h
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * @brief   This is the header file for TL321X
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * @author  Driver Group
+ * @date    2024
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *****************************************************************************/
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
+ *
+ *******************************************************************************************************/
 #ifndef _SWIRE_H_
 #define _SWIRE_H_
 #include "reg_include/register.h"
@@ -27,8 +33,8 @@
  */
 static inline void swire_reset(void)
 {
-     reg_rst0 &= (~FLD_RST0_SWIRE);
-     reg_rst0 |= (FLD_RST0_SWIRE);
+    reg_rst0 &= (~FLD_RST0_SWIRE);
+    reg_rst0 |= (FLD_RST0_SWIRE);
 }
 
 /**
@@ -37,7 +43,7 @@ static inline void swire_reset(void)
  */
 static inline void swire_wait_wr_done(void)
 {
-/*
+    /*
  * FLD_SWIRE_WR clearing mechanism:the write operation is controlled by the clk issued by the master side,when the master finishes writing, FLD_SWIRE_WR will clear 0 and not be affected by the slave.
  */
     while (reg_swire_ctl & FLD_SWIRE_WR);
@@ -51,7 +57,7 @@ static inline void swire_wait_wr_done(void)
 static inline void swire_master_write_cmd(unsigned char cmd)
 {
     reg_swire_data = cmd;
-    reg_swire_ctl = (FLD_SWIRE_CMD | FLD_SWIRE_WR );
+    reg_swire_ctl  = (FLD_SWIRE_CMD | FLD_SWIRE_WR);
     swire_wait_wr_done();
 }
 
@@ -63,7 +69,7 @@ static inline void swire_master_write_cmd(unsigned char cmd)
 static inline void swire_master_write_data(unsigned char data)
 {
     reg_swire_data = data;
-    reg_swire_ctl =  FLD_SWIRE_WR ;
+    reg_swire_ctl  = FLD_SWIRE_WR;
     swire_wait_wr_done();
 }
 
@@ -77,7 +83,6 @@ static inline void swire_master_write_data(unsigned char data)
 static inline void swire_fifo_mode_dis(void)
 {
     BM_CLR(reg_swire_id, FLD_SWIRE_FIFO_MODE);
-
 }
 
 /**
@@ -90,7 +95,6 @@ static inline void swire_fifo_mode_dis(void)
 static inline void swire_fifo_mode_en(void)
 {
     BM_SET(reg_swire_id, FLD_SWIRE_FIFO_MODE);
-
 }
 
 /**
@@ -103,7 +107,7 @@ static inline void swire_fifo_mode_en(void)
  * @param[in] dp_through_swire_en - If the master is connected to the DP pin of the slave device, this parameter needs to be set to 1.
  * @return    none.
  */
-void swire_sync (gpio_func_pin_e gpio_swm,unsigned char dp_through_swire_en);
+void swire_sync(gpio_func_pin_e gpio_swm, unsigned char dp_through_swire_en);
 
 /**
  * @brief     This function is to set GPIO_PC0 as the swm function.
@@ -151,7 +155,7 @@ void swire_set_slave_id(unsigned char id);
  * @param[in] data_len  - data length.
  * @return    none.
  */
-void swire_master_write(unsigned char slave_id,unsigned char *addr, unsigned char addr_len,unsigned char *data,unsigned int data_len);
+void swire_master_write(unsigned char slave_id, unsigned char *addr, unsigned char addr_len, unsigned char *data, unsigned int data_len);
 
 /**
  * @brief      This function is used by the master device to read data to the slave device.
@@ -167,7 +171,7 @@ void swire_master_write(unsigned char slave_id,unsigned char *addr, unsigned cha
  * @param[in]  data_len  - data length.
  * @return     0:read timeout  1:read success.
  */
-unsigned char  swire_master_read (unsigned char slave_id,unsigned char *addr, unsigned char addr_len,unsigned char *data,unsigned int data_len);
+unsigned char swire_master_read(unsigned char slave_id, unsigned char *addr, unsigned char addr_len, unsigned char *data, unsigned int data_len);
 
 /*
  * @brief      This function is used to set swire read timeout tick.
@@ -183,7 +187,7 @@ unsigned char  swire_master_read (unsigned char slave_id,unsigned char *addr, un
  * @param[in]  slave_clk_hz   - swire slave  clock,unit is HZ.
  * @return     none.
  */
-void swire_read_set_timeout_tick(unsigned int master_clk_hz,unsigned int slave_clk_hz);
+void swire_read_set_timeout_tick(unsigned int master_clk_hz, unsigned int slave_clk_hz);
 
 /*
  * @brief      This function is used to set swire read timeout tick.

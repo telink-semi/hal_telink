@@ -1,28 +1,30 @@
-/******************************************************************************
- * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
+/********************************************************************************************************
+ * @file    ext_scan.h
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * @brief   This is the header file for BLE SDK
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * @author  BLE GROUP
+ * @date    06,2022
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @par     Copyright (c) 2022, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *****************************************************************************/
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
+ *
+ *******************************************************************************************************/
 #ifndef LL_SCAN_EXT_H_
 #define LL_SCAN_EXT_H_
 
 #include "stack/ble/TL321X/hci/hci_cmd.h"
-
-
-
-
 
 
 /**
@@ -31,12 +33,7 @@
  * @param      none
  * @return     none
  */
-void        blc_ll_initExtendedScanning_module(void);
-
-
-
-
-
+void blc_ll_initExtendedScanning_module(void);
 
 
 /**
@@ -63,14 +60,7 @@ void        blc_ll_initExtendedScanning_module(void);
  *
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t   blc_ll_setExtScanParam ( own_addr_type_t  ownAddrType,  scan_fp_type_t scan_fp,      scan_phy_t scan_phys,
-                                         scan_type_t   scanType_0,  scan_inter_t   scanInter_0,  scan_wind_t scanWindow_0,
-                                         scan_type_t   scanType_1,  scan_inter_t   scanInter_1,  scan_wind_t scanWindow_1);
-
-
-
-
-
+ble_sts_t blc_ll_setExtScanParam(own_addr_type_t ownAddrType, scan_fp_type_t scan_fp, scan_phy_t scan_phys, scan_type_t scanType_0, scan_inter_t scanInter_0, scan_wind_t scanWindow_0, scan_type_t scanType_1, scan_inter_t scanInter_1, scan_wind_t scanWindow_1);
 
 
 /**
@@ -82,14 +72,11 @@ ble_sts_t   blc_ll_setExtScanParam ( own_addr_type_t  ownAddrType,  scan_fp_type
  *                      subsequent Scan_Duration.
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t   blc_ll_setExtScanEnable (scan_en_t  extScan_en, dupe_fltr_en_t filter_duplicate, scan_durn_t duration,  scan_period_t period);
-
-
-
+ble_sts_t blc_ll_setExtScanEnable(scan_en_t extScan_en, dupe_fltr_en_t filter_duplicate, scan_durn_t duration, scan_period_t period);
 
 
 /* special use API */
-void        blc_ll_setExtendedScanSecondaryChannelRxDataProcessEnable(u8 enable);
+void blc_ll_setExtendedScanSecondaryChannelRxDataProcessEnable(u8 enable);
 
 
 #endif /* LL_SCAN_EXT_H_ */

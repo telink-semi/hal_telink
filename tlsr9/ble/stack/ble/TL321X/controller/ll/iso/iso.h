@@ -1,47 +1,50 @@
-/******************************************************************************
- * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- * All rights reserved.
+/********************************************************************************************************
+ * @file    iso.h
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * @brief   This is the header file for BLE SDK
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ * @author  BLE GROUP
+ * @date    06,2022
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * @par     Copyright (c) 2022, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
- *****************************************************************************/
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
+ *
+ *******************************************************************************************************/
 #ifndef ISO_H_
 #define ISO_H_
 
 #include "stack/ble/hci/hci_cmd.h"
 
+typedef struct
+{
+    u16 pkt_seq_num; /*Packet_Sequence_Number*/
+    u16 iso_sdu_len; /*ISO_SDU_Length*/
 
-
-typedef struct{
-
-    u16 pkt_seq_num;       /*Packet_Sequence_Number*/
-    u16 iso_sdu_len;       /*ISO_SDU_Length*/
-
-    u32 timestamp;         /*Time_Stamp*/
+    u32 timestamp;   /*Time_Stamp*/
     u16 sduOffset;
     u8  numHciPkt;
 
-    u8 pkt_st       :2;   /*Packet_Status_Flag*/
-    u8 pb           :2;   /*PB_FLAG*/
-    u8 ts           :1;   /*TS_Flag*/
-    u8 numOfCmplt_en:1;
-    u8 rsvd         :2;
+    u8 pkt_st        : 2; /*Packet_Status_Flag*/
+    u8 pb            : 2; /*PB_FLAG*/
+    u8 ts            : 1; /*TS_Flag*/
+    u8 numOfCmplt_en : 1;
+    u8 rsvd          : 2;
 
-    u8 isoHandle;        /*connection_handle*/
-    u8 data[1];          /*SDU payload*/
+    u8 isoHandle; /*connection_handle*/
+    u8 data[1];   /*SDU payload*/
 
-}sdu_packet_t;
-
+} sdu_packet_t;
 
 /**
  * @brief  This function is used to enable/disable time stamp in SDU reported from controller
@@ -50,10 +53,6 @@ typedef struct{
  *                        - 0x01:  enable, time stamp is valid in SDU
  */
 void blc_iso_enableSduToHostTimestamp(u8 en);
-
-
-
-
 
 
 /**
@@ -74,9 +73,7 @@ void blc_iso_enableSduToHostTimestamp(u8 en);
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_setupIsoDataPath(u16 conn_handle, dat_path_dir_t dir, dat_path_id_t id, u8 cid_assignNum, u16 cidcompId, u16 cid_vendorDef,
-                                     u32 control_dly, u8 codec_cfg_len,      u8 codec_cfg1,    u8 codec_cfg2,     u8 codec_cfg3, u8 codec_cfg4);
-
+ble_sts_t blc_ll_setupIsoDataPath(u16 conn_handle, dat_path_dir_t dir, dat_path_id_t id, u8 cid_assignNum, u16 cidcompId, u16 cid_vendorDef, u32 control_dly, u8 codec_cfg_len, u8 codec_cfg1, u8 codec_cfg2, u8 codec_cfg3, u8 codec_cfg4);
 
 
 /**
@@ -87,9 +84,7 @@ ble_sts_t   blc_ll_setupIsoDataPath(u16 conn_handle, dat_path_dir_t dir, dat_pat
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_removeIsoDataPath(u16 conn_handle, dp_dir_msk_t dir_mask);
-
-
+ble_sts_t blc_ll_removeIsoDataPath(u16 conn_handle, dp_dir_msk_t dir_mask);
 
 
 /**
@@ -104,5 +99,3 @@ ble_sts_t blc_iso_sendData(u16 handle, u8 *pData, u16 len);
 
 
 #endif
-
-
