@@ -813,6 +813,7 @@ static inline void zb_rt_irq_enable(void)
 #define PRMBL_EXTRA_2M                      (PRMBL_LENGTH_2M - 2)   // 2 byte for 2M
 #define PRMBL_EXTRA_Coded                   (PRMBL_LENGTH_Coded - 10)                       // 10byte for Coded, 80uS, no extra byte
 
+#if !FAST_SETTLE//open rx dly
 
 
 #if RF_RX_SHORT_MODE_EN//open rx dly
@@ -882,6 +883,54 @@ static inline void zb_rt_irq_enable(void)
     #error "add code here, TX settle time"
 #endif
 
+#else  //#if !FAST_SETTLE//open rx dly
+
+    #define         TX_STL_LEGADV_SCANRSP_REAL                      (TX_FAST_SETTLE_TIME + PRMBL_EXTRA_1M * 8)  //can change, consider TX packet quality
+    #define         TX_STL_LEGADV_SCANRSP_SET                        TX_FAST_SETTLE_TIME    //  (TX_STL_LEGADV_SCANRSP_REAL - PRMBL_EXTRA_1M * 8)  //can not change !!!
+
+
+    #define         TX_STL_TIFS_REAL_COMMON                         TX_FAST_SETTLE_TIME  //can change, consider TX packet quality
+
+
+    #define         TX_STL_TIFS_REAL_1M                             (TX_STL_TIFS_REAL_COMMON + PRMBL_EXTRA_1M * 8) //can not change !!!
+    #define         TX_STL_TIFS_SET_1M                              (TX_STL_TIFS_REAL_COMMON)  //can not change !!!
+
+    #define         TX_STL_TIFS_REAL_2M                             (TX_STL_TIFS_REAL_COMMON + PRMBL_EXTRA_2M * 4)  //can not change !!!
+    #define         TX_STL_TIFS_SET_2M                              TX_STL_TIFS_REAL_COMMON  //can not change !!!
+
+    #define         TX_STL_TIFS_REAL_CODED                          TX_STL_TIFS_REAL_COMMON  //can not change !!!
+    #define         TX_STL_TIFS_SET_CODED                           TX_STL_TIFS_REAL_CODED   //can not change !!!
+
+
+
+    #define         TX_STL_ADV_REAL_COMMON                          TX_FAST_SETTLE_TIME  //can change, consider TX packet quality
+
+    #define         TX_STL_ADV_REAL_1M                              (TX_STL_ADV_REAL_COMMON + PRMBL_EXTRA_1M * 8)
+    #define         TX_STL_ADV_SET_1M                               (TX_STL_ADV_REAL_COMMON)  //can not change !!!
+
+    #define         TX_STL_ADV_REAL_2M                              (TX_STL_ADV_REAL_COMMON + PRMBL_EXTRA_2M * 4)
+    #define         TX_STL_ADV_SET_2M                               TX_STL_ADV_REAL_COMMON  //can not change !!!
+
+    #define         TX_STL_ADV_REAL_CODED                           TX_STL_ADV_REAL_COMMON
+    #define         TX_STL_ADV_SET_CODED                            TX_STL_ADV_REAL_CODED  //can not change !!!
+
+
+    #define         TX_STL_AUTO_MODE_1M                             (127 - PRMBL_EXTRA_1M * 8)
+    #define         TX_STL_AUTO_MODE_2M                             (133 - PRMBL_EXTRA_2M * 4)
+    #define         TX_STL_AUTO_MODE_CODED_S2                       (115 - PRMBL_EXTRA_Coded * 8)
+    #define         TX_STL_AUTO_MODE_CODED_S8                       (119 - PRMBL_EXTRA_Coded * 8)
+
+
+    #define         TX_STL_BTX_1ST_PKT_REAL                         (110 - 3) //3 is total switch delay time
+
+
+    #define         TX_STL_BTX_1ST_PKT_SET_1M                       (TX_STL_BTX_1ST_PKT_REAL - PRMBL_EXTRA_1M * 8)
+    #define         TX_STL_BTX_1ST_PKT_SET_2M                       (TX_STL_BTX_1ST_PKT_REAL - PRMBL_EXTRA_2M * 4)
+    #define         TX_STL_BTX_1ST_PKT_SET_CODED                    TX_STL_BTX_1ST_PKT_REAL
+
+
+#endif
+
 
 /* AD convert delay : timing cost on RF analog to digital convert signal process:
  *                  Eagle   1M: 20uS       2M: 10uS;      500K(S2): 14uS    125K(S8):  14uS
@@ -904,7 +953,7 @@ static inline void zb_rt_irq_enable(void)
 #define HW_DELAY_2M                                                 (AD_CONVERT_DLY_2M + OTHER_SWITCH_DELAY_2M)
 #define HW_DELAY_CODED                                              (AD_CONVERT_DLY_CODED + OTHER_SWITCH_DELAY_CODED)
 
-static inline void rf_ble_set_1m_phy(void)
+__INLINE void rf_ble_set_1m_phy(void)
 {
     //aura_1m
     write_reg8(0x17063d, 0x61); //ble:bw_code.
@@ -993,7 +1042,7 @@ static inline void rf_ble_set_1m_phy(void)
 }
 
 
-static inline void rf_ble_set_2m_phy(void)
+__INLINE void rf_ble_set_2m_phy(void)
 {
     //aura_2m
     write_reg8(0x17063d, 0x41); //ble:bw_code.
@@ -1080,7 +1129,7 @@ static inline void rf_ble_set_2m_phy(void)
     write_reg8(0x1704f0, RF_ACCESS_CODE_DEFAULT_THRESHOLD);//defaults 31. lr_s8_pdet synv_success threshold 0~32
 }
 
-static inline void rf_ble_set_coded_phy_common(void)
+__INLINE void rf_ble_set_coded_phy_common(void)
 {
     write_reg8(0x17063d, 0x61); //ble:bw_code.
     write_reg8(0x170620, 0x10); //sc_code.
@@ -1187,7 +1236,7 @@ static inline void rf_ble_set_coded_phy_common(void)
 
 
 
-static inline void rf_ble_set_coded_phy_s2(void)
+__INLINE void rf_ble_set_coded_phy_s2(void)
 {
     write_reg8(0x170005,0x24);//lr mode bit<4:5>
 #if(!BLE_S2_S8_NEW_PATH)
@@ -1198,7 +1247,7 @@ static inline void rf_ble_set_coded_phy_s2(void)
 }
 
 
-static inline void rf_ble_set_coded_phy_s8(void)
+__INLINE void rf_ble_set_coded_phy_s8(void)
 {
     write_reg8(0x170005,0x34);//lr mode bit<4:5>
 #if(!BLE_S2_S8_NEW_PATH)

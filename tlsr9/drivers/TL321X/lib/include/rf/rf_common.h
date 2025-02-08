@@ -42,7 +42,7 @@
  *              when this function turn on the time of rx_dly will shorten 6.3us,
  */
 #define RF_RX_SHORT_MODE_EN         1 //In order to debug whether the problem is caused by rx_dly.
-#define RF_RX_DCOC_SOFTWARE_CAL_EN  1 //BLE move the macro here.
+#define RF_RX_DCOC_SOFTWARE_CAL_EN  0 //BLE move the macro here.
 
 /**
  *  @brief This define serve to calculate the DMA length of packet.
@@ -733,7 +733,6 @@ static inline void rf_set_crc_byte_order(unsigned char order)
  */
 static inline void rf_set_crc_config(const rf_crc_config_t *config)
 {
-
     rf_set_crc_init_value(config->init_value);
     rf_set_crc_poly(config->poly);
     rf_set_crc_xor_out(config->xor_out);
@@ -762,7 +761,6 @@ static inline void rf_set_tx_wptr(unsigned char pipe_id, unsigned char wptr)
 {
     reg_rf_dma_tx_wptr(pipe_id) = wptr;
 }
-
 
 /**
  * @brief   This function serve to clear the writer pointer of tx terminal.
@@ -811,7 +809,6 @@ static inline void rf_clr_rx_rptr(void)
 {
     write_reg8(0x1708f5, 0x80); //clear rptr
 }
-
 
 /**
  * @brief   This function serve to get the pointer of write in rx terminal.

@@ -20,19 +20,11 @@ blobs:
     description: "Binary libraries supporting Telink B92 series BLE subsystems"
 
   - path: lib_zephyr_tl321x.a
-<<<<<<< HEAD
-    sha256: f968ecadbe71aa584c48e85dc3f65a444a91e67c78dbd6890014f20944d46209
-=======
     sha256: 298e6d28f5dc47f8f0e1f57de9feffd486a005779e5ead51ce8616a1997ef7a3
->>>>>>> b5e12fb... hal: telink: tl321x: update for SOC version 2
     type: lib
-    version: 'V4.0.4.3-WIP'
+    version: 'V4.0.4.2'
     license-path: tlsr9/ble/license.txt
-<<<<<<< HEAD
-    url: http://wiki.telink-semi.cn/wiki/protocols/Zephyr/binaries/public/tl321x_lib/lib_zephyr_tl321x_f1f79fc37849c5e6a51758a5c532f1fa45bbb838.a
-=======
     url: http://wiki.telink-semi.cn/wiki/protocols/Zephyr/binaries/public/tl321x_lib/lib_zephyr_tl321x_4074844f886e88be312fdc50fde53a453a94278b.a
->>>>>>> b5e12fb... hal: telink: tl321x: update for SOC version 2
     description: "Binary libraries supporting Telink TL321X series BLE subsystems"
 
   - path: lib_zephyr_tl321x_pm.a

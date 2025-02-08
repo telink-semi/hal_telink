@@ -383,7 +383,7 @@ static _always_inline unsigned int plic_interrupt_claim(void)
  *                - Return the value of the mstatus.MIE bit in other cases.
  * @note    plic_enter_critical_sec and plic_exit_critical_sec must be used in pairs.
  */
-_attribute_ram_code_com_sec_noinline_ unsigned int plic_enter_critical_sec(unsigned char preempt_en, unsigned char threshold);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ unsigned int plic_enter_critical_sec(unsigned char preempt_en, unsigned char threshold);
 
 /**
  * @brief    This function serves to restore interrupt threshold or mstatus.MIE to exit the critical section, such as calling some flash interface to exit some function.
@@ -394,7 +394,7 @@ _attribute_ram_code_com_sec_noinline_ unsigned int plic_enter_critical_sec(unsig
  *                 - The value of mstatus.MIE or threshold to restore when exit critical section, it must be the value returned by the plic_enter_critical_sec function.
  * @return  none
  */
-_attribute_ram_code_com_sec_noinline_ void plic_exit_critical_sec(unsigned char preempt_en, unsigned int r);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ void plic_exit_critical_sec(unsigned char preempt_en, unsigned int r);
 
 /**
  * @brief       This function serves to execute the interrupt service routine. you can call this function when an interrupt occurs.
@@ -415,7 +415,7 @@ _attribute_ram_code_com_sec_ void plic_isr(func_isr_t func, unsigned int src);
  *          - When global interrupt is disabled, the application needs to call this interface to ensure that all PLIC interrupt requests have been processed.
  *          - When global interrupt is enabled, the application does not need to call this interface, the hardware and interrupt service routine handle interrupt requests.
  */
-_attribute_ram_code_com_sec_noinline_ int plic_clr_all_request(void);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ int plic_clr_all_request(void);
 
 /**
  * @brief      This function serves to save and disable all PLIC interrupt sources.
@@ -429,7 +429,7 @@ void plic_all_interrupt_save_and_disable(void);
  * @return     none
  * @note       plic_all_interrupt_save_and_disable and plic_all_interrupt_restore must be used in pairs.
  */
-void plic_all_interrupt_restore(void);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ void plic_all_interrupt_restore(void);
 
 /**
  * @brief      This function serves to save and disable interrupts, including the MIE bit of the MSTATUS register(depends on the first parameter,regardless of whether the global interrupt is enabled or not.), \n
@@ -441,7 +441,7 @@ void plic_all_interrupt_restore(void);
  *  - When the core is awoken by the pending interrupt and global interrupts disable, it will resume and start to execute from the instruction after the WFI instruction.
  *  - plic_irqs_preprocess_for_wfi and plic_irqs_postprocess_for_wfi must be used in pairs.
  */
-void plic_irqs_preprocess_for_wfi(unsigned char flag, mie_e mie);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ void plic_irqs_preprocess_for_wfi(unsigned char flag, mie_e mie);
 
 /**
  * @brief      This function serves to restore interrupts, including the MIE bit of the MSTATUS register, \n
@@ -452,6 +452,6 @@ void plic_irqs_preprocess_for_wfi(unsigned char flag, mie_e mie);
  *  - This function will enable PLIC interrupt so this interface cannot be called from the interrupt service routine.
  *  - plic_irqs_preprocess_for_wfi and plic_irqs_postprocess_for_wfi must be used in pairs.
  */
-void plic_irqs_postprocess_for_wfi(void);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ void plic_irqs_postprocess_for_wfi(void);
 
 #endif

@@ -60,8 +60,9 @@
     unsigned char mac[8];
     efuse_get_ieee_addr(mac);
 
-    u8 zero_8_byte[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-    if(memcmp(mac, zero_8_byte, 8)){
+    u8 empty_8_byte_0[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    u8 empty_8_byte_F[8] = {0XFF, 0XFF, 0XFF, 0XFF, 0XFF, 0XFF, 0XFF, 0XFF};
+    if(memcmp(mac, empty_8_byte_0, 8) && memcmp(mac, empty_8_byte_F, 8)){
         if(length > 8){
             length = 8;
         }
@@ -163,7 +164,7 @@ void rf_set_channel_power_enable(unsigned char enable);
 
 
 /******************************* trng_start ******************************************************************/
-
+#define rand                        trng_rand
 #define random_generator_init       trng_init
 
 

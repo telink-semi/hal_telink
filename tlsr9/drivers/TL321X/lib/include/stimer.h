@@ -493,6 +493,6 @@ _attribute_ram_code_com_sec_noinline_ void stimer_enable(stimer_enable_mode_e mo
  * @brief       This function is used to stop the system timer.
  * @return      none.
  */
-_attribute_ram_code_com_sec_noinline_ void stimer_disable(void);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ void stimer_disable(void);
 
 #endif /* STIMER_H_ */

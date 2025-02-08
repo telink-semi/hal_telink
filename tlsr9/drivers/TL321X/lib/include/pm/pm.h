@@ -380,7 +380,7 @@ _attribute_ram_code_com_sec_noinline_ void pm_set_power_mode(power_mode_e power_
  * @param[in]   all_ramcode_en  - Whether all processing in this function is required to be ram code.
  * @return      none.
  */
-_attribute_ram_code_com_sec_noinline_ void pm_sys_reboot_with_reason(pm_sw_reboot_reason_e reboot_reason, unsigned char all_ramcode_en);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ void pm_sys_reboot_with_reason(pm_sw_reboot_reason_e reboot_reason, unsigned char all_ramcode_en);
 
 /**
  * @brief       This function serves to switch digital module power.
@@ -389,4 +389,4 @@ _attribute_ram_code_com_sec_noinline_ void pm_sys_reboot_with_reason(pm_sw_reboo
  * @return      none.
  * @note        Before calling this interface to open base band, you need to make sure that the input function of PA2 is turned off.(BUT-53)
  */
-_attribute_ram_code_com_sec_noinline_ void pm_set_dig_module_power_switch(pm_pd_module_e module, pm_power_sel_e power_sel);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ void pm_set_dig_module_power_switch(pm_pd_module_e module, pm_power_sel_e power_sel);

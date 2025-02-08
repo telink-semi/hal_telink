@@ -55,7 +55,6 @@ typedef enum
     MSPI_3LINE  = 3,
 } mspi_normal_3line_mode_e;
 
-
 /**
  * @brief  Define the SPI command & translate mode.
  */

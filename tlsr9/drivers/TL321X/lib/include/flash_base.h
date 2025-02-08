@@ -85,7 +85,7 @@ _attribute_ram_code_com_sec_noinline_ unsigned char flash_mspi_read_decrypt_chec
  * @param[in]   busy_cmd- the flash read status cmd.
  * @return      none.
  */
-_attribute_ram_code_com_sec_noinline_ void flash_mspi_write_ram(unsigned int cmd,unsigned long addr, unsigned char *data, unsigned long data_len,unsigned int w_en_cmd,unsigned int busy_cmd);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ void flash_mspi_write_ram(unsigned int cmd,unsigned long addr, unsigned char *data, unsigned long data_len,unsigned int w_en_cmd,unsigned int busy_cmd);
 
 /**
  * @brief       This function serves to write write data to flash(include erase,write status) in encrypt mode.
@@ -106,7 +106,7 @@ _attribute_ram_code_com_sec_noinline_ void flash_mspi_write_encrypt_ram(unsigned
  * @param[in]   cmd - set command.
  * @return      none.
  */
-_attribute_ram_code_com_sec_noinline_ void flash_send_cmd(unsigned int cmd);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ void flash_send_cmd(unsigned int cmd);
 
 /**
  * @brief       This function is used to update the read configuration parameters of xip(eXecute In Place),

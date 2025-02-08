@@ -272,14 +272,14 @@ void clock_cal_32k_rc(void);
  * @brief  This function serves to get the 32k tick.
  * @return none.
  */
-_attribute_ram_code_com_sec_noinline_ unsigned int clock_get_32k_tick (void);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ unsigned int clock_get_32k_tick (void);
 
 /**
  * @brief  This function serves to set the 32k tick.
  * @param  tick - the value of to be set to 32k.
  * @return none.
  */
-_attribute_ram_code_com_sec_noinline_ void clock_set_32k_tick(unsigned int tick);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ void clock_set_32k_tick(unsigned int tick);
 
 /**
  * @brief       This function use to configure the mspi clock source.

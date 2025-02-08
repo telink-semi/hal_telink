@@ -376,7 +376,7 @@ static _always_inline bool core_cclk_time_exceed(unsigned long long ref, unsigne
  * @param[in]   core_cclk_tick - Number of ticks in cclk
  * @return      none
  */
-_attribute_ram_code_com_sec_noinline_ void core_cclk_delay_tick(unsigned long long core_cclk_tick);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ void core_cclk_delay_tick(unsigned long long core_cclk_tick);
 
 typedef bool (*condition_fp)(void);
 typedef bool (*condition_fp_with_param)(unsigned int);
@@ -437,7 +437,7 @@ typedef void (*timeout_handler_fp)(unsigned int err_code);
  *                   only define the enumeration xxx_api_error_timeout_code_e, no need to define the global variable
  *                   g_xxx_error_timeout_code, and the interface xxx_get_error_timeout_code(refer to aes);
  */
-unsigned int wait_condition_fails_or_timeout(condition_fp condition, unsigned int timeout_us, timeout_handler_fp func, unsigned int err_code);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ unsigned int wait_condition_fails_or_timeout(condition_fp condition, unsigned int timeout_us, timeout_handler_fp func, unsigned int err_code);
 
 /**
  * @brief       provides a unified timeout interface(condition with parameter)(for internal calls only).

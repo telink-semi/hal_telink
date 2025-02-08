@@ -28,19 +28,31 @@
 #define COMPILER_H_
 
 #define _attribute_noinline_                    __attribute__((noinline))
+
 #define _attribute_ram_code_sec_                __attribute__((section(".ram_code")))
 #define _attribute_ram_code_sec_noinline_       __attribute__((section(".ram_code"))) __attribute__((noinline))
-#define _attribute_ram_code_sec_optimize_o2_    __attribute__((section(".ram_code"))) __attribute__((optimize("O2"))) 
-#define _attribute_ram_code_sec_optimize_o2_noinline_    __attribute__((noinline)) __attribute__((section(".ram_code"))) __attribute__((optimize("O2"))) 
+
+// STD-RISCV compiler
+#define _attribute_ram_code_sec_optimize_o2_                __attribute__((section(".ram_code_ble"))) __attribute__((optimize("O2")))
+#define _attribute_ram_code_sec_optimize_o2_noinline_       __attribute__((noinline)) __attribute__((section(".ram_code_ble"))) __attribute__((optimize("O2")))
+#define _attribute_ram_code_com_sec_optimize_o2_            __attribute__((section(".ram_code"))) __attribute__((optimize("O2")))
+#define _attribute_ram_code_com_sec_optimize_o2_noinline_   __attribute__((noinline)) __attribute__((section(".ram_code"))) __attribute__((optimize("O2")))
+
 #define _attribute_ram_code_                    _attribute_ram_code_sec_noinline_
+
 #define _attribute_text_sec_                    __attribute__((section(".text")))
 #define _attribute_text_code_                   _attribute_text_sec_
+
 #define _attribute_aes_data_sec_                __attribute__((section(".aes_data")))
+
 #define _attribute_data_retention_sec_          __attribute__((section(".retention_data")))
 #define _attribute_data_retention_              __attribute__((section(".retention_data")))
 #define _attribute_ble_data_retention_          __attribute__((section(".retention_data")))
+
 #define _attribute_aligned_(s)                  __attribute__((aligned(s)))
+
 #define _attribute_no_inline_                   __attribute__((noinline))
+
 #define _attribute_data_                        __attribute__((section(".data")))
 #define _attribute_session_(s)                  __attribute__((section(s)))
 
@@ -52,7 +64,11 @@
 #define _attribute_ram_code_com_  __attribute__((section(".ram_code"))) __attribute__((noinline))
 
 
+
+// STD-RISCV compiler
 #define _attribute_flash_code_sec_noinline_     __attribute__((section(".flash_code"))) __attribute__((noinline))
 
+/// define the force inlining attribute for this compiler
+#define __INLINE static __attribute__((__always_inline__)) inline
 
 #endif

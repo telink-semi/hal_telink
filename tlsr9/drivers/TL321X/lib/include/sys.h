@@ -151,7 +151,7 @@ typedef enum
 {
     LDO_1P25_LDO_1P8  = 0x00, /**< 1.25V-LDO & 1.8V-LDO mode */
     DCDC_1P25_LDO_1P8 = 0x01, /**< 1.25V-DCDC & 1.8V-LDO mode */
-    DCDC_1P25_DCDC_1P8   = 0x03, /**< 1.25V-DCDC & 1.8V-DCDC mode */
+    //DCDC_1P25_DCDC_1P8   = 0x03, /**< 1.25V-DCDC & 1.8V-DCDC mode */
 } power_mode_e;
 
 /**
@@ -211,7 +211,7 @@ _attribute_text_sec_ void protected_sys_reboot(void);
  * @brief      This function reboot mcu.
  * @return     none
  */
-_attribute_ram_code_com_sec_noinline_ void sys_reboot_ram(void);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ void sys_reboot_ram(void);
 
 /**
  * @brief       This function serves to initialize system.
@@ -234,6 +234,6 @@ _attribute_ram_code_com_sec_noinline_ void sys_init(power_mode_e power_mode, vba
  * @return    none.
  * @note      This function can only used when cclk is 24M RC cause the function execution process will power down the 24M crystal.
  */
-_attribute_ram_code_com_sec_noinline_ void crystal_manual_settle(void);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ void crystal_manual_settle(void);
 
 #endif

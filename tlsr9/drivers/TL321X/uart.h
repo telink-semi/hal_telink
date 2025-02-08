@@ -933,7 +933,7 @@ void uart_cts_config(uart_num_e uart_num, gpio_func_pin_e cts_pin, unsigned char
  */
 void uart_rts_config(uart_num_e uart_num, gpio_func_pin_e rts_pin, unsigned char rts_parity, unsigned char auto_mode_en);
 
- /*
+/*
   * @brief      Configure DMA head node.
  * @param[in]  uart_num - UART0/UART1/UART2.
   * @param[in]  chn         - DMA channel.

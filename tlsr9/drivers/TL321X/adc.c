@@ -193,7 +193,7 @@ static inline void adc_set_scan_chn_cnt(unsigned char chn_cnt)
 {
     reg_adc_config0 = ((reg_adc_config0 & (~FLD_SCANT_MAX)) | ((chn_cnt * 2) << 4)); //scan_cnt = chn_cnt*2
 }
-
+#if INTERNAL_TEST_FUNC_EN
 /**
  * @brief       This function is used to enable the data weighted average algorithm function to improve ADC performance.
  * @return      none
@@ -202,7 +202,7 @@ static inline void adc_data_weighted_average_en(void)
 {
     analog_write_reg8(areg_adc_data_sample_control, (analog_read_reg8(areg_adc_data_sample_control) | FLD_DWA_EN_O));
 }
-
+#endif
 /**
  * @brief      This function disable adc digital clock.
  * @return     none
@@ -397,7 +397,8 @@ void adc_init(adc_chn_cnt_e channel_cnt)
     adc_clk_en();                                       //enable signal of 24M clock to sar adc
     adc_set_clk();                                      //set adc digital clk to 24MHz and adc analog clk to 4MHz
     adc_set_resolution(ADC_RES12);                      //default adc_resolution set as 12bit ,BIT(11) is sign bit
-    adc_data_weighted_average_en();                     //enabled by default to improve ADC performance.
+    //Enabling dwa affects adc performance.(confirmed by liupeng)
+    //adc_data_weighted_average_en();
     if (NDMA_M_CHN == channel_cnt) {
         adc_all_chn_data_to_fifo_dis();
         reg_adc_config2 &= ~FLD_RX_DMA_ENABLE;          //In NDMA mode,RX DMA needs to be disabled.
@@ -464,6 +465,8 @@ void adc_gpio_sample_init(adc_sample_chn_e chn, adc_gpio_cfg_t cfg)
  * @brief This function is used to initialize the ADC for vbat sampling.
  * @param[in]  chn -structure for configuring ADC channel.
  * @return none
+ * @note   When you select ADC_SAMPLE_FREQ_192K, the first code of the vbat sample mode is an exception and needs to be discarded.
+ *
  */
 void adc_vbat_sample_init(adc_sample_chn_e chn)
 {
@@ -735,6 +738,7 @@ _attribute_ram_code_com_
 /*!< BLE USED END */
 void adc_start_sample_nodma(void)
 {
+    adc_clr_rx_fifo_cnt(); //If the fifo is not cleared, there may be residual values in the fifo that affect the sampling results.
     adc_all_chn_data_to_fifo_en();
     adc_set_scan_chn_cnt(1);
 }

@@ -326,7 +326,7 @@ _attribute_flash_code_sec_noinline_ void gpio_shutdown_flashcode_for_asm(void)
  * @note       This function called by .S file to shutdown all the GPIO input which can decrease the current early.
  *             If this C function is called in the S file, it needs to be called after setting sp.
  */
-_attribute_ram_code_com_sec_ void gpio_shutdown_ramcode_for_asm(void)
+_attribute_ram_code_com_sec_optimize_o2_noinline_ void gpio_shutdown_ramcode_for_asm(void)
 {
     //disable input
     reg_gpio_pa_ie = 0x80; //SWS

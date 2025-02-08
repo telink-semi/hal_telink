@@ -225,6 +225,7 @@ static inline void usbhw_clr_ctrl_ep_irq(int ep)
 {
     reg_ctrl_ep_irq_sta = ep;
 }
+
 /**
  * @brief     This function servers to get the pointer of data endpoint.
  * @param[in] ep - select the data endpoint.

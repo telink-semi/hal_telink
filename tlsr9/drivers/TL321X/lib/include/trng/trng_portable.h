@@ -132,7 +132,7 @@ extern "C"
  * @brief     This function performs to get one random number.
  * @return    the value of one random number.
  */
-int trng_rand(void);
+    int trng_rand(void);
 
 #ifdef __cplusplus
 }

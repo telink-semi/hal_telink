@@ -333,13 +333,13 @@ static _always_inline void pm_24mrc_power_down_if_unused(void)
  * @brief       this function servers to power up BBPLL
  * @return      none.
  */
-_attribute_ram_code_com_sec_noinline_ void pm_bbpll_power_up(void);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ void pm_bbpll_power_up(void);
 
 /**
  * @brief       this function servers to wait BBPLL clock lock.
  * @return      none.
  */
-_attribute_ram_code_com_sec_noinline_ void pm_wait_bbpll_done(void);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ void pm_wait_bbpll_done(void);
 
 /**
  * @brief       This function is used to determine the stability of the crystal oscillator.
@@ -355,17 +355,17 @@ _attribute_ram_code_com_sec_noinline_ void pm_wait_bbpll_done(void);
  * @attention   This function can only be called with the 24M clock configuration
  * @return      none.
  */
-_attribute_ram_code_com_sec_noinline_ void pm_wait_xtal_ready(unsigned char all_ramcode_en);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ void pm_wait_xtal_ready(unsigned char all_ramcode_en);
 
 /**
  * @brief       this function serves to clear all irq status.
  * @return      Indicates whether clearing irq status was successful.
  */
-_attribute_ram_code_com_sec_noinline_ unsigned char pm_clr_all_irq_status(void);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ unsigned char pm_clr_all_irq_status(void);
 
 /**
  * @brief       This function serves to recover system timer.
  *              The code is placed in the ram code section, in order to shorten the time.
  * @return      none.
  */
-_attribute_ram_code_com_sec_noinline_ void pm_stimer_recover(void);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ void pm_stimer_recover(void);
