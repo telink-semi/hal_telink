@@ -22,11 +22,11 @@
 #include "stdint.h"
 
 #if CONFIG_SOC_RISCV_TELINK_TL321X
-#define TL_TX_POWER_MIN                    (-19)
-#define TL_TX_POWER_MAX                    (31)
+#define TL_TX_POWER_MIN                    (-20)
+#define TL_TX_POWER_MAX                    (11)
 #elif CONFIG_SOC_RISCV_TELINK_TL721X
-#define TL_TX_POWER_MIN                    (-22)
-#define TL_TX_POWER_MAX                    (21)
+#define TL_TX_POWER_MIN                    (-20)
+#define TL_TX_POWER_MAX                    (10)
 #else
 #define TL_TX_POWER_MIN                    (-30)
 #define TL_TX_POWER_MAX                    (9)
