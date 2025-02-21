@@ -116,107 +116,79 @@ const uint8_t tl_tx_pwr_lt[] = {
 #elif CONFIG_SOC_RISCV_TELINK_TL321X
 /* TX power TL321X lookup table */
 const uint8_t tl_tx_pwr_lt[] = {
-	RF_POWER_N48p75dBm,   /**< -48.8 dbm: -19 */
-	RF_POWER_N25p53dBm,   /**< -25.5 dbm: -18 */
+	/*VANT*/
+	RF_POWER_N20p01dBm,   /**< -20.0 dbm: -20 */
+	RF_POWER_N20p01dBm,   /**< -20.0 dbm: -19 */
+	RF_POWER_N20p01dBm,   /**< -20.0 dbm: -18 */
 	RF_POWER_N20p01dBm,   /**< -20.0 dbm: -17 */
 	RF_POWER_N14p13dBm,   /**< -14.1 dbm: -16 */
-	RF_POWER_N10p77dBm,   /**< -10.7 dbm: -15 */
-	RF_POWER_N9p45dBm,    /**<  -9.5 dbm: -14 */
-	RF_POWER_N8p32dBm,    /**<  -8.3 dbm: -13 */
-	RF_POWER_N7p33dBm,    /**<  -7.3 dbm: -12 */
-	RF_POWER_N6p53dBm,    /**<  -6.5 dbm: -11 */
-	RF_POWER_N5p73dBm,    /**<  -5.7 dbm: -10 */
-	RF_POWER_N5p07dBm,    /**<  -5.0 dbm:  -9 */
-	RF_POWER_N4p41dBm,    /**<  -4.4 dbm:  -8 */
-	RF_POWER_N3p21dBm,    /**<  -3.2 dbm:  -7 */
-	RF_POWER_N2p80dBm,    /**<  -2.8 dbm:  -6 */
-	RF_POWER_N2p21dBm,    /**<  -2.1 dbm:  -5 */
-	RF_POWER_N1p49dBm,    /**<  -1.5 dbm:  -4 */
-	RF_POWER_N1p10dBm,    /**<  -1.0 dbm:  -3 */
-	RF_POWER_N0p72dBm,    /**<  -0.7 dbm:  -2 */
-	RF_POWER_N0p41dBm,    /**<  -0.4 dbm:  -1 */
-	RF_POWER_N0p07dBm,    /**<   0.0 dbm:   0 */
-	RF_POWER_P0p25dBm,    /**<   0.2 dbm:   1 */
-	RF_POWER_P0p55dBm,    /**<   0.5 dbm:   2 */
-	RF_POWER_P1p09dBm,    /**<   1.0 dbm:   3 */
-	RF_POWER_P1p33dBm,    /**<   1.3 dbm:   4 */
-	RF_POWER_P1p53dBm,    /**<   1.5 dbm:   5 */
-	RF_POWER_P2p03dBm,    /**<   2.0 dbm:   6 */
-	RF_POWER_P2p45dBm,    /**<   2.5 dbm:   7 */
-	RF_POWER_P2p99dBm,    /**<   3.0 dbm:   8 */
-	RF_POWER_P3p49dBm,    /**<   3.5 dbm:   9 */
-	RF_POWER_P4p05dBm,    /**<   4.0 dbm:  10 */
-	RF_POWER_P4p52dBm,    /**<   4.5 dbm:  11 */
-	RF_POWER_P4p73dBm,    /**<   4.7 dbm:  12 */
-	RF_POWER_P5p00dBm,    /**<   5.0 dbm:  13 */
-	RF_POWER_P5p09dBm,    /**<   5.1 dbm:  14 */
-	RF_POWER_P5p25dBm,    /**<   5.2 dbm:  15 */
-	RF_POWER_P5p54dBm,    /**<   5.5 dbm:  16 */
-	RF_POWER_P5p79dBm,    /**<   5.8 dbm:  17 */
-	RF_POWER_P5p97dBm,    /**<   6.0 dbm:  18 */
-	RF_POWER_P6p48dBm,    /**<   6.5 dbm:  19 */
-	RF_POWER_P6p97dBm,    /**<   7.0 dbm:  20 */
-	RF_POWER_P7p19dBm,    /**<   7.2 dbm:  21 */
-	RF_POWER_P7p61dBm,    /**<   7.6 dbm:  22 */
-	RF_POWER_P8p03dBm,    /**<   8.0 dbm:  23 */
-	RF_POWER_P8p48dBm,    /**<   8.5 dbm:  24 */
-	RF_POWER_P8p95dBm,    /**<   9.0 dbm:  25 */
-	RF_POWER_P9p50dBm,    /**<   9.5 dbm:  26 */
-	RF_POWER_P9p97dBm,    /**<  10.0 dbm:  27 */
-	RF_POWER_P10p56dBm,   /**<  10.5 dbm:  28 */
-	RF_POWER_P10p78dBm,   /**<  10.8 dbm:  29 */
-	RF_POWER_P11p16dBm,   /**<  11.1 dbm:  30 */
-	RF_POWER_P11p33dBm    /**<  11.3 dbm:  31 */
+	RF_POWER_N14p13dBm,   /**< -14.1 dbm: -15 */
+	RF_POWER_N14p13dBm,   /**< -14.1 dbm: -14 */
+	RF_POWER_N14p13dBm,   /**< -14.1 dbm: -13 */
+	RF_POWER_N14p13dBm,   /**< -14.1 dbm: -12 */
+	RF_POWER_N10p77dBm,   /**< -10.7 dbm: -11 */
+	RF_POWER_N10p77dBm,   /**< -10.7 dbm: -10 */
+	RF_POWER_N9p45dBm,    /**<  -9.5 dbm: -9  */
+	RF_POWER_N8p32dBm,    /**<  -8.3 dbm: -8  */
+	RF_POWER_N7p33dBm,    /**<  -7.3 dbm: -7  */
+	RF_POWER_N6p53dBm,    /**<  -6.5 dbm: -6  */
+	RF_POWER_N5p07dBm,    /**<  -5.0 dbm: -5  */
+	RF_POWER_N4p41dBm,    /**<  -4.4 dbm: -4  */
+	RF_POWER_N3p21dBm,    /**<  -3.2 dbm: -3  */
+	RF_POWER_N2p21dBm,    /**<  -2.1 dbm: -2  */
+	RF_POWER_N1p10dBm,    /**<  -1.1 dbm: -1  */
+	RF_POWER_N0p07dBm,    /**<   0.0 dbm:  0  */
+	RF_POWER_P1p09dBm,    /**<   1.0 dbm:  1  */
+	RF_POWER_P2p03dBm,    /**<   2.0 dbm:  2  */
+	RF_POWER_P2p99dBm,    /**<   3.0 dbm:  3  */
+	RF_POWER_P4p05dBm,    /**<   4.0 dbm:  4  */
+	RF_POWER_P5p00dBm,    /**<   5.0 dbm:  5  */
+	/*VBAT*/
+	RF_POWER_P5p97dBm,    /**<   6.0 dbm:  6  */
+	RF_POWER_P6p97dBm,    /**<   7.0 dbm:  7  */
+	RF_POWER_P8p03dBm,    /**<   8.0 dbm:  8  */
+	RF_POWER_P8p95dBm,    /**<   9.0 dbm:  9  */
+	RF_POWER_P9p97dBm,    /**<  10.0 dbm:  10 */
+	RF_POWER_P11p16dBm,   /**<  11.1 dbm:  11 */
 };
 
 
 #elif CONFIG_SOC_RISCV_TELINK_TL721X
 /* TX power TL721X lookup table */
 const uint8_t tl_tx_pwr_lt[] = {
-	RF_POWER_N41p80dBm,   /**< -41.8 dbm: -22 */
-	RF_POWER_N25p19dBm,   /**< -25.2 dbm: -21 */
+	/*VANT*/
 	RF_POWER_N20p22dBm,   /**< -20.2 dbm: -20 */
-	RF_POWER_N16p82dBm,   /**< -16.8 dbm: -19 */
-	RF_POWER_N14p64dBm,   /**< -14.6 dbm: -18 */
-	RF_POWER_N12p72dBm,   /**< -12.7 dbm: -17 */
-	RF_POWER_N11p42dBm,   /**< -11.4 dbm: -16 */
-	RF_POWER_N10p09dBm,   /**< -10.1 dbm: -15 */
-	RF_POWER_N9p14dBm,    /**<  -9.1 dbm: -14 */
-	RF_POWER_N8p14dBm,    /**<  -8.1 dbm: -13 */
-	RF_POWER_N7p39dBm,    /**<  -7.4 dbm: -12 */
-	RF_POWER_N6p61dBm,    /**<  -6.6 dbm: -11 */
-	RF_POWER_N6p03dBm,    /**<  -6.0 dbm: -10 */
-	RF_POWER_N5p38dBm,    /**<  -5.4 dbm:  -9 */
-	RF_POWER_N4p90dBm,    /**<  -5.0 dbm:  -8 */
-	RF_POWER_N4p36dBm,    /**<  -4.4 dbm:  -7 */
-	RF_POWER_N3p89dBm,    /**<  -3.8 dbm:  -6 */
-	RF_POWER_N3p08dBm,    /**<  -3.0 dbm:  -5 */
-	RF_POWER_N2p30dBm,    /**<  -2.3 dbm:  -4 */
-	RF_POWER_N1p67dBm,    /**<  -1.7 dbm:  -3 */
-	RF_POWER_N1p08dBm,    /**<  -1.0 dbm   -2 */
-	RF_POWER_N0p66dBm,    /**<  -0.7 dbm:  -1 */
+	RF_POWER_N20p22dBm,   /**< -20.2 dbm: -19 */
+	RF_POWER_N20p22dBm,   /**< -20.2 dbm: -18 */
+	RF_POWER_N16p82dBm,   /**< -16.8 dbm: -17 */
+	RF_POWER_N16p82dBm,   /**< -16.8 dbm: -16 */
+	RF_POWER_N14p64dBm,   /**< -14.6 dbm: -15 */
+	RF_POWER_N14p64dBm,   /**< -14.6 dbm: -14 */
+	RF_POWER_N12p72dBm,   /**< -12.7 dbm: -13 */
+	RF_POWER_N12p72dBm,   /**< -12.7 dbm: -12 */
+	RF_POWER_N11p42dBm,   /**< -11.4 dbm: -11 */
+	RF_POWER_N10p09dBm,   /**< -10.1 dbm: -10 */
+	RF_POWER_N9p14dBm,    /**<  -9.1 dbm: -9  */
+	RF_POWER_N8p14dBm,    /**<  -8.1 dbm: -8  */
+	RF_POWER_N7p39dBm,    /**<  -7.4 dbm: -7  */
+	RF_POWER_N6p03dBm,    /**<  -6.0 dbm: -6  */
+	RF_POWER_N5p38dBm,    /**<  -5.4 dbm: -5  */
+	RF_POWER_N3p89dBm,    /**<  -3.8 dbm: -4  */
+	RF_POWER_N3p08dBm,    /**<  -3.0 dbm: -3  */
+	RF_POWER_N2p30dBm,    /**<  -2.3 dbm: -2  */
+	RF_POWER_N1p08dBm,    /**<  -1.0 dbm  -1  */
 	RF_POWER_P0p03dBm,    /**<   0.0 dbm:   0 */
-	RF_POWER_P0p66dBm,    /**<   0.7 dbm:   1 */
-	RF_POWER_P0p98dBm,    /**<   1.0 dbm:   2 */
-	RF_POWER_P1p65dBm,    /**<   1.6 dbm:   3 */
-	RF_POWER_P2p00dBm,    /**<   2.0 dbm:   4 */
-	RF_POWER_P2p43dBm,    /**<   2.4 dbm:   5 */
-	RF_POWER_P2p73dBm,    /**<   2.7 dbm:   6 */
-	RF_POWER_P3p04dBm,    /**<   3.0 dbm:   7*/
-	RF_POWER_P3p32dBm,    /**<   3.3 dbm:   8 */
-	RF_POWER_P3p48dBm,    /**<   3.5 dbm:   9 */
-	RF_POWER_P3p82dBm,    /**<   3.8 dbm:  10 */
-	RF_POWER_P4p09dBm,    /**<   4.1 dbm:  11 */
-	RF_POWER_P4p79dBm,    /**<   4.8 dbm:  12 */
-	RF_POWER_P5p53dBm,    /**<   5.5 dbm:  13 */
-	RF_POWER_P6p08dBm,    /**<   6.0 dbm:  14 */
-	RF_POWER_P6p71dBm,    /**<   6.7 dbm:  15 */
-	RF_POWER_P7p52dBm,    /**<   7.5 dbm:  16 */
-	RF_POWER_P8p06dBm,    /**<   8.0 dbm:  17 */
-	RF_POWER_P8p55dBm,    /**<   8.4 dbm:  18 */
-	RF_POWER_P9p10dBm,    /**<   9.1 dbm:  19 */
-	RF_POWER_P9p45dBm,    /**<   9.5 dbm:  20 */
-	RF_POWER_P10p00dBm,   /**<  10.0 dbm:  21 */
+	RF_POWER_P0p98dBm,    /**<   1.0 dbm:   1 */
+	/*VBAT*/
+	RF_POWER_P2p00dBm,    /**<   2.0 dbm:   2 */
+	RF_POWER_P3p04dBm,    /**<   3.0 dbm:   3 */
+	RF_POWER_P4p09dBm,    /**<   4.1 dbm:   4 */
+	RF_POWER_P5p53dBm,    /**<   5.5 dbm:   5 */
+	RF_POWER_P6p08dBm,    /**<   6.0 dbm:   6 */
+	RF_POWER_P6p71dBm,    /**<   6.7 dbm:   7 */
+	RF_POWER_P8p06dBm,    /**<   8.0 dbm:   8 */
+	RF_POWER_P9p10dBm,    /**<   9.1 dbm:   9 */
+	RF_POWER_P10p00dBm,   /**<  10.0 dbm:  10 */
 };
 
 #endif
