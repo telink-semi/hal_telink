@@ -106,6 +106,12 @@ if(CONFIG_I2C_TELINK_B9X OR CONFIG_I2C_TELINK_TLX)
 	zephyr_library_sources(drivers/${SOC}/i2c.c)
 endif()
 
+# Audio & DMA driver reference sources
+if(CONFIG_SOC_RISCV_TELINK_TL721X AND CONFIG_MICRO_SPEECH_EXTRA_DRIVER)
+	zephyr_library_sources(drivers/${SOC}/audio.c)
+	zephyr_library_sources(drivers/${SOC}/dma.c)
+endif()
+
 # RF driver reference sources
 if(CONFIG_BT OR CONFIG_IEEE802154)
 	zephyr_library_sources(
