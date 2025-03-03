@@ -209,7 +209,10 @@ int tlx_bt_controller_init()
 
 	/* Reset Radio */
 	rf_radio_reset();
-
+#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X
+	rf_reset_dma();
+	rf_baseband_reset();
+#endif
 	/* Init RF driver */
 	rf_drv_ble_init();
 
@@ -282,6 +285,10 @@ void tlx_bt_controller_deinit()
 
 	/* Reset Radio */
 	rf_radio_reset();
+#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X
+	rf_reset_dma();
+	rf_baseband_reset();
+#endif
 
 #ifdef CONFIG_BT_CENTRAL
 	free(app_acl_mstTxfifo);
