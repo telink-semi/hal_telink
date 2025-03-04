@@ -19,7 +19,7 @@
 #ifndef OS_SUP_H_
 #define OS_SUP_H_
 
-#include "stack/ble/TL321X/ble_config.h"
+#include "tl_common.h"
 
 /**
  *  @brief  Define the prototypes that the os_give_sem_t must conform to.
@@ -32,21 +32,21 @@ typedef void (*os_give_sem_t)(void);
 typedef void (*os_mutex_sem_t)(void);
 
 /**
- * @brief		This feature is used to enable support for OS mode
+ * @brief       This feature is used to enable support for OS mode
  * @param[in]   true - Enable, false - disable
  * @return      none
  */
 void blc_setOsSupEnable(bool en);
 
 /**
- * @brief		This function is to check if OS is supported
+ * @brief       This function is to check if OS is supported
  * @param[in]   none
  * @return      true - Enable, false - disable
  */
 bool blc_isOsSupEnable(void);
 
 /**
- * @brief		This feature is used to check if the task schedule is busy
+ * @brief       This feature is used to check if the task schedule is busy
  * @param[in]   none
  * @return      true - busy,   false - no busy
  */
@@ -69,7 +69,6 @@ void blc_ll_registerGiveSemCb(os_give_sem_t give_sem_from_isr, os_give_sem_t giv
  */
 void blc_ll_registerMutexSemCb(os_mutex_sem_t take_mutex_sem, os_mutex_sem_t give_mutex_sem);
 
-extern int blc_pm_handler(void);
 extern void blc_pm_setAppWakeupLowPower(u32 wakeup_tick, u8 enable);
-
+extern int blc_pm_handler(void);
 #endif /* OS_SUP_H_ */

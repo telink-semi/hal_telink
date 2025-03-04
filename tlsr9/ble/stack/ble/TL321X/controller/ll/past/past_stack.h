@@ -21,7 +21,9 @@
 
 #include "stack/ble/ble_stack.h"
 
-typedef struct{
+/* refer to BLE SPEC: Vol 6, Part B, 2.4.2.27 "LL_PERIODIC_SYNC_IND" for more information. */
+typedef struct __attribute__((packed))
+{
     u8          llid;
     u8          rf_len;
     u8          opcode;
@@ -29,38 +31,20 @@ typedef struct{
     sync_info_t syncInfo;
     u16         connEvtCnt;
     u16         lastPaEvtCnt;
-    u8          sid  : 4;
-    u8          aType: 1;
-    u8          sca  : 3;
+    u8          sid   : 4;
+    u8          aType : 1;
+    u8          sca   : 3;
     u8          phy;
     u8          advA[6];
     u16         syncConnEvtCnt;
-}rf_pkt_ll_periodic_sync_ind_t; //LL_PERIODIC_SYNC_IND
-
+} rf_pkt_ll_periodic_sync_ind_t;
 
 /////////////////// PAwR ///////////////////////
-typedef struct{
+/* refer to BLE SPEC: Vol 6, Part B, 2.4.2.40 "LL_PERIODIC_SYNC_WR_IND" for more information. */
+typedef struct __attribute__((packed))
+{
     rf_pkt_ll_periodic_sync_ind_t pastInd;
-    pawr_acad_t pawrTimingInfo;
-}rf_pkt_ll_periodic_sync_wr_ind_t; //LL_PERIODIC_SYNC_WR_IND
+    pawr_acad_t                   pawrAcadInfo;
+} rf_pkt_ll_periodic_sync_wr_ind_t;
 
-typedef struct{
-    u8          llid;
-    u8          rf_len;
-    u8          opcode;
-    u16         id;
-    sync_info_t syncInfo; //18B
-    u16         connEvtCnt;
-    u16         lastPaEvtCnt;
-    u8          sid  : 4;
-    u8          aType: 1;
-    u8          sca  : 3;
-    u8          phy;
-    u8          advA[6];
-    u16         syncConnEvtCnt;
-    ////above is 36B and align 4B
-
-    pawr_acad_t pawrAcadInfo;
-
-}rf_pkt_ll_periodicSyncWrInd_t;
 #endif /* PAST_STACK_H_ */

@@ -19,8 +19,8 @@
 #define STACK_BLE_CONTROLLER_LL_ACL_CONN_ACL_SUBRATE_H_
 
 ble_sts_t blc_hci_le_subrate_request(hci_le_subrateRequestCmdParams_t *pCmdPara);
-void        blc_ll_initConnSubrate_feature(void);
-ble_sts_t   blc_setHostFeatureConnSubrate_en(u8 en);
-ble_sts_t   blc_hci_le_set_default_subrate(hci_le_setDefaultSubrateCmdParams_t *pCmdPara);
+void      blc_ll_initConnSubrate_feature(void);
+ble_sts_t blc_setHostFeatureConnSubrate_en(u8 en);
+ble_sts_t blc_hci_le_set_default_subrate(hci_le_setDefaultSubrateCmdParams_t *pCmdPara);
 
 #endif /* STACK_BLE_CONTROLLER_LL_ACL_CONN_ACL_SUBRATE_H_ */

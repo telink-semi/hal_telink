@@ -15,15 +15,21 @@
  * limitations under the License.
  *
  *****************************************************************************/
-#ifndef STACK_BLE_CONTROLLER_LL_CHN_SOUND_CHN_REFLECTOR_H_
-#define STACK_BLE_CONTROLLER_LL_CHN_SOUND_CHN_REFLECTOR_H_
+#ifndef OS_SUP_STACK_H_
+#define OS_SUP_STACK_H_
+
+
+extern os_give_sem_t blt_os_giveSem_cb;
+extern os_give_sem_t blt_os_giveSemFromIrq_cb;
+
+extern os_give_sem_t blt_os_semCountIncrement_cb;
+extern os_give_sem_t blt_os_semCountIncrementIrq_cb;
+
 
 /**
- * @brief      for user to initialize channel sounding module of reflect role.
- * @return     status, 0x00:  succeed
- *                     other: failed
+ * @brief srack use
  */
-ble_sts_t   blc_ll_initCsReflectorModule(void);
+extern bool is_os_sup_en;
+#define blt_isOsSupEnable() (is_os_sup_en)
 
-
-#endif /* STACK_BLE_CONTROLLER_LL_CHN_SOUND_CHN_REFLECTOR_H_ */
+#endif /* OS_SUP_STACK_H_ */

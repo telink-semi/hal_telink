@@ -18,17 +18,17 @@
 #ifndef SCAN_H_
 #define SCAN_H_
 
-typedef enum{
+typedef enum
+{
     SCAN_STRATEGY_0 = 0, /*!< The number of scans corresponds to the number of connections,
                                   that is to say, after the number of connections reaches the
                                   maximum allowed number, scan cannot be started. >!*/
     SCAN_STRATEGY_1 = 1, /*!< When 1m is configured, if a master establishes a link,
                                   scan continues to work and scan can be turned on and off normally by the scan enable API---
                                   "blc_ll_setExtScanEnable" or "blc_ll_setScanEnable". >!*/
-}scan_en_strtg_t;
+} scan_en_strtg_t;
 
-
-void        blc_ll_configScanEnableStrategy (scan_en_strtg_t scanStrategy);
+void blc_ll_configScanEnableStrategy(scan_en_strtg_t scanStrategy);
 
 
 #endif /* SCAN_H_ */

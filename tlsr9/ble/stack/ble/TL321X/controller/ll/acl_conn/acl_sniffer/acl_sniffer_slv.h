@@ -23,59 +23,59 @@
 /**
  * @brief   acl slave status for compatible mode.
  */
-enum{
+enum
+{
     //0x00
-    SLAVE_STATUS_STANDBY            = 0,            //
-    SLAVE_STATUS_CONNECTION_SETUP,                  //
-    SLAVE_STATUS_CONNECTION_GENERAL,                //
-    SLAVE_STATUS_CONNECTION_UPDATE,                 //
-    SLAVE_STATUS_CONNECTION_CHANNEL_MAP,            //
+    SLAVE_STATUS_STANDBY = 0,            //
+    SLAVE_STATUS_CONNECTION_SETUP,       //
+    SLAVE_STATUS_CONNECTION_GENERAL,     //
+    SLAVE_STATUS_CONNECTION_UPDATE,      //
+    SLAVE_STATUS_CONNECTION_CHANNEL_MAP, //
 };
-
 
 /**
  * @brief   acl slave compatible mode parameter, 24Bytes
  */
-typedef struct {
-    u8      slave_index;        //0~3
-    u8      slave_status;
-    u8      slave_accessAddress[4]; //Little-Endian
-    u8      slave_crcInit[3];   //Little-Endian
-    u16     slave_winOffset;    //unit: 1.25 ms
-    u16     slave_connInterval; //unit: 1.25 ms
-    u16     slave_connTimeout;  //unit: 10 ms
-    u8      slave_connChannelMap[5];//Little-Endian
-    u8      slave_connHop;      //5~16
-    u16     slave_instant;
-    u8      slave_CI_ChSel_PHY; //Bit7~Bit4: coding_ind 2 or 8, Bit3: ChSel 0 or 1, Bit1~Bit0: le_phy_type_t 1~3
+typedef struct __attribute__((packed))
+{
+    u8  slave_index;             //0~3
+    u8  slave_status;
+    u8  slave_accessAddress[4];  //Little-Endian
+    u8  slave_crcInit[3];        //Little-Endian
+    u16 slave_winOffset;         //unit: 1.25 ms
+    u16 slave_connInterval;      //unit: 1.25 ms
+    u16 slave_connTimeout;       //unit: 10 ms
+    u8  slave_connChannelMap[5]; //Little-Endian
+    u8  slave_connHop;           //5~16
+    u16 slave_instant;
+    u8  slave_CI_ChSel_PHY;      //Bit7~Bit4: coding_ind 2 or 8, Bit3: ChSel 0 or 1, Bit1~Bit0: le_phy_type_t 1~3
 } acl_slave_compatible_param_t;
-
 
 /**
  * @brief   acl slave interoperable mode parameter, 28Bytes
  */
-typedef struct {
-    u8      slave_index;        //0~3
-    u32     slave_connExpectTime;
-    u16     slave_connEventCounter;
-    u16     slave_connInterval; //unit: 1.25 ms
-    u16     slave_connTimeout;  //unit: 10 ms
-    u8      slave_accessAddress[4];//Little-Endian
-    u8      slave_crcInit[3];   //Little-Endian
-    u8      slave_connChannelMap[5];//Little-Endian
-    u8      slave_connHop;      //5~16
-    u8      slave_connChannelIndex;//0~36, each interval is incremented by 1
-    u8      slave_CI_ChSel_PHY; //Bit7~Bit4: coding_ind 2 or 8, Bit3: ChSel 0 or 1, Bit1~Bit0: le_phy_type_t 1~3
-    u16     u16_rsvd1;
+typedef struct __attribute__((packed))
+{
+    u8  slave_index;             //0~3
+    u32 slave_connExpectTime;
+    u16 slave_connEventCounter;
+    u16 slave_connInterval;      //unit: 1.25 ms
+    u16 slave_connTimeout;       //unit: 10 ms
+    u8  slave_accessAddress[4];  //Little-Endian
+    u8  slave_crcInit[3];        //Little-Endian
+    u8  slave_connChannelMap[5]; //Little-Endian
+    u8  slave_connHop;           //5~16
+    u8  slave_connChannelIndex;  //0~36, each interval is incremented by 1
+    u8  slave_CI_ChSel_PHY;      //Bit7~Bit4: coding_ind 2 or 8, Bit3: ChSel 0 or 1, Bit1~Bit0: le_phy_type_t 1~3
+    u16 u16_rsvd1;
 } acl_slave_interoperable_param_t;
-
 
 /**
  * @brief      for user to initialize ACL sniffer for monitor peer-master.
  * @param      none
  * @return     none
  */
-void        blc_ll_initAclSnifferSlv_module(void);
+void blc_ll_initAclSnifferSlv_module(void);
 
 
 /**
@@ -83,7 +83,7 @@ void        blc_ll_initAclSnifferSlv_module(void);
  * @param[in]   earlyTime_us
  * @return      none.
  */
-void        blc_ll_addAclSnifferSlvSyncEarlyTime(u32 earlyTime_us);
+void blc_ll_addAclSnifferSlvSyncEarlyTime(u32 earlyTime_us);
 
 
 /**
@@ -92,7 +92,7 @@ void        blc_ll_addAclSnifferSlvSyncEarlyTime(u32 earlyTime_us);
  * @return      status, 0x00:  succeed
  *                      other: failed
  */
-ble_sts_t   blc_ll_setAclSnifferSlvReportRssiType(acl_sniffer_rssi_report_type_t rssi_type);
+ble_sts_t blc_ll_setAclSnifferSlvReportRssiType(acl_sniffer_rssi_report_type_t rssi_type);
 
 
 /**
@@ -101,7 +101,7 @@ ble_sts_t   blc_ll_setAclSnifferSlvReportRssiType(acl_sniffer_rssi_report_type_t
  *                      0: disable
  * @return     none
  */
-void        blc_ll_setAclSnifferSlv1stSyncWinMaxEnable(u8 enable);
+void blc_ll_setAclSnifferSlv1stSyncWinMaxEnable(u8 enable);
 
 
 /**
@@ -109,7 +109,7 @@ void        blc_ll_setAclSnifferSlv1stSyncWinMaxEnable(u8 enable);
  * @param[in]  none.
  * @return     The number of all ACL sniffer sync.
  */
-int         blc_ll_getAclSnifferSlvSyncNumber(void);
+int blc_ll_getAclSnifferSlvSyncNumber(void);
 
 
 /**
@@ -117,7 +117,7 @@ int         blc_ll_getAclSnifferSlvSyncNumber(void);
  * @param[in]  snifHandle - ACL sniffer handle.
  * @return     The status of currently ACL sniffer sync.
  */
-int         blc_ll_getAclSnifferSlvSyncStatus(u16 snifHandle);
+int blc_ll_getAclSnifferSlvSyncStatus(u16 snifHandle);
 
 
 /**
@@ -126,7 +126,7 @@ int         blc_ll_getAclSnifferSlvSyncStatus(u16 snifHandle);
  * @return     status, 0x00:   succeed
  *                      other: failed
  */
-int         blc_ll_setAclSnifferSlvTerminateSync(u16 snifHandle);
+int blc_ll_setAclSnifferSlvTerminateSync(u16 snifHandle);
 
 
 /**
@@ -136,7 +136,7 @@ int         blc_ll_setAclSnifferSlvTerminateSync(u16 snifHandle);
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-int         blc_ll_updateAclSnifferSlvSync_v2(u8 *cmd, u32 latencyTime);
+int blc_ll_updateAclSnifferSlvSync_v2(u8 *cmd, u32 latencyTime);
 
 
 /**
@@ -146,7 +146,7 @@ int         blc_ll_updateAclSnifferSlvSync_v2(u8 *cmd, u32 latencyTime);
  *                  0x00:  input parameter is incorrect
  *                  other: correct sniffer handle
  */
-u16         blc_ll_getAclSnifferSlvHandle_v2(u8 slave_index);
+u16 blc_ll_getAclSnifferSlvHandle_v2(u8 slave_index);
 
 
 /**
@@ -155,7 +155,7 @@ u16         blc_ll_getAclSnifferSlvHandle_v2(u8 slave_index);
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-int         blc_ll_updateAclSnifferSlvSync_v3(u8 *cmd);
+int blc_ll_updateAclSnifferSlvSync_v3(u8 *cmd);
 
 
 /**
@@ -165,7 +165,7 @@ int         blc_ll_updateAclSnifferSlvSync_v3(u8 *cmd);
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_getAclSlaveConnectionTimingParameter(u16 connHandle, u8* aclSlaveParam);
+ble_sts_t blc_ll_getAclSlaveConnectionTimingParameter(u16 connHandle, u8 *aclSlaveParam);
 
 
 /**
@@ -175,21 +175,21 @@ ble_sts_t   blc_ll_getAclSlaveConnectionTimingParameter(u16 connHandle, u8* aclS
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_getAclSlaveConnectionSetupParameter(u16 connHandle, acl_slave_compatible_param_t *aclSlaveConnSetupParam);
+ble_sts_t blc_ll_getAclSlaveConnectionSetupParameter(u16 connHandle, acl_slave_compatible_param_t *aclSlaveConnSetupParam);
 
 
 /**
  * @brief   Compatible with old API names
  */
-#define     blc_ll_initAclSniffer_module                    blc_ll_initAclSnifferSlv_module
-#define     blc_ll_addAclSnifferSyncEarlyTime               blc_ll_addAclSnifferSlvSyncEarlyTime
-#define     blc_ll_setAclSnifferReportRssiType              blc_ll_setAclSnifferSlvReportRssiType
-#define     blc_ll_setAclSnifferFirstSyncWindowMaxEnable    blc_ll_setAclSnifferSlv1stSyncWinMaxEnable
-#define     blc_ll_getAclSnifferSyncNumber                  blc_ll_getAclSnifferSlvSyncNumber
-#define     blc_ll_getAclSnifferSyncStatus                  blc_ll_getAclSnifferSlvSyncStatus
-#define     blc_ll_setAclSnifferTerminateSync               blc_ll_setAclSnifferSlvTerminateSync
-#define     blc_ll_updateAclSnifferSync_v2                  blc_ll_updateAclSnifferSlvSync_v2
-#define     blc_ll_getAclSnifferHandle_v2                   blc_ll_getAclSnifferSlvHandle_v2
+#define blc_ll_initAclSniffer_module                 blc_ll_initAclSnifferSlv_module
+#define blc_ll_addAclSnifferSyncEarlyTime            blc_ll_addAclSnifferSlvSyncEarlyTime
+#define blc_ll_setAclSnifferReportRssiType           blc_ll_setAclSnifferSlvReportRssiType
+#define blc_ll_setAclSnifferFirstSyncWindowMaxEnable blc_ll_setAclSnifferSlv1stSyncWinMaxEnable
+#define blc_ll_getAclSnifferSyncNumber               blc_ll_getAclSnifferSlvSyncNumber
+#define blc_ll_getAclSnifferSyncStatus               blc_ll_getAclSnifferSlvSyncStatus
+#define blc_ll_setAclSnifferTerminateSync            blc_ll_setAclSnifferSlvTerminateSync
+#define blc_ll_updateAclSnifferSync_v2               blc_ll_updateAclSnifferSlvSync_v2
+#define blc_ll_getAclSnifferHandle_v2                blc_ll_getAclSnifferSlvHandle_v2
 
 
 #endif /* ACL_SNIFFER_SLV_H_ */

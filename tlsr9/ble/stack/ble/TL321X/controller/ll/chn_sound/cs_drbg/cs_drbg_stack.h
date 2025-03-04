@@ -15,13 +15,50 @@
  * limitations under the License.
  *
  *****************************************************************************/
-extern u8 randomBits[10][16];
-extern u8 randomBits_num[10];
-extern u8 kdrbg_global[16];
-extern u8 vdrbg_global[16];
-extern u16 step_cnt_global;
-extern u8 transaction_id_global;
-extern u8 transaction_cnt_global[10];
+//Randomization of hop channel set for non-mode-0 steps
+#define CSTransactionID_0 0
+//Randomization of hop channel set for mode-0 steps
+#define CSTransactionID_1 1
+//Randomization of subevent sub-mode (into main-mode cycle).
+#define CSTransactionID_2 2
+//T_PM CS tone extension slot transmission presence
+#define CSTransactionID_3 3
+//Antenna path permutation index selection
+#define CSTransactionID_4 4
+//RTT PN sequence CS Access Address generation
+#define CSTransactionID_5 5
+//Sounding sequence marker position randomization
+#define CSTransactionID_6 6
+//Sounding sequence marker signal selection
+#define CSTransactionID_7 7
+//Random sequence generation
+#define CSTransactionID_8 8
+//Backtracking resistance
+#define CSTransactionID_9     9
+
+#define CSTransactionMaxIDNum (CSTransactionID_9 + 1)
+
+#define CS_DRBG_3C_SALTRATE   2
+
+typedef struct __attribute__((packed))
+{
+    u8 transactionCnt;
+    u8 randomBitsNum;
+    u8 randomBits[16];
+} drbg_id_param_t;
+
+typedef struct __attribute__((packed))
+{
+    u16             stepCnt;
+    u8              kdrbg[16];
+    u8              vdrbg[16];
+    drbg_id_param_t idParam[CSTransactionMaxIDNum];
+} drbg_param_t;
+
+extern drbg_param_t *drbg;
+
+typedef u32 (*chn_sel_3c_callback_t)(u8 *chm, u8 CSShapeSelection, u8 CSChannelJump, u8 CSNumRepetitions, u8 *NonMode0ShuffledChannelArray);
+extern chn_sel_3c_callback_t chn_sel_3c_cb;
 
 /**
  * @brief       This function is DRBG instantiation function h9.
@@ -30,9 +67,9 @@ extern u8 transaction_cnt_global[10];
  *                  cs_pv: 128-bit. the result of the CS Security Start procedure
  *                  kdrbg: the result of this function.128-bit temporal key
  *                  vdrbg: the result of this function.128-bit nonce vector
- * @return      result - 0:success 1:fail
+ * @return      none
  */
-unsigned char drbg_instantiation_func_h9(u8* cs_iv, u8* cs_in, u8* cs_pv, u8* kdrbg, u8* vdrbg);
+void drbg_instantiation_func_h9(u8 *cs_iv, u8 *cs_in, u8 *cs_pv, u8 *kdrbg, u8 *vdrbg);
 
 /**
  * @brief       This function is to generate 128 random bits
@@ -41,29 +78,26 @@ unsigned char drbg_instantiation_func_h9(u8* cs_iv, u8* cs_in, u8* cs_pv, u8* kd
  *                  step_cnt: CS step counter
  *                  transaction_id: transaction ID
  *                  transaction_cnt: transaction counter
- * @return      result - 0:success 1:fail
+ * @return      none
  */
-_attribute_ram_code_
-unsigned char drbg_randomBits_func(u8* kdrbg, u8* vdrbg, u16 step_cnt, u8 transaction_id, u8 transaction_cnt);
+_attribute_ram_code_ void drbg_randomBits_func(u8 transaction_id, u8 *kdrbg, u8 *vdrbg);
 
 /**
  * @brief       This function is  DRBG backtracking resistance.it shall be invoked to update the KDRBG and VDRBG
  *              every time the CSProcCount is incremented.
  * @param[in]   kdrbg: 128-bit temporal key
  *                  vdrbg: 128-bit nonce vector
- * @return      result - 0:success 1:fail
+ * @return      none
  */
-_attribute_ram_code_
-unsigned char drbg_backtracking_resistance(u8* kdrbg, u8* vdrbg);
+_attribute_ram_code_ void drbg_backtracking_resistance(u8 *kdrbg, u8 *vdrbg);
 
 /**
  * @brief       This function is to calculate CS Access Address.
  * @param[in]   reflector_accessaddr:  32-bit CS Access Address used in the CS SYNC from the reflector to initiator
                     initiator_accessaddr: 32-bit CS Access Address used in the CS SYNC from the initiator to reflector
- * @return      result - 0:success 1:fail
+ * @return      none
  */
-_attribute_ram_code_
-u8 cs_access_addr(u8* reflector_accessaddr, u8* initiator_accessaddr);
+_attribute_ram_code_ void cs_access_addr(u8 *reflector_accessaddr, u8 *initiator_accessaddr);
 
 /**
  * @brief       This function is to calculate the number of Main_Mode steps to execute.
@@ -77,11 +111,13 @@ u8 cs_sub_mode_insertion(u8 main_mode_max, u8 main_mode_min);
 
 /**
  * @brief       This function is to generate the random sequence.
- * @param[in]   seq: the random sequence
+ * @param[in]   seqInit: the initiator random sequence
+ *                  seqRefl:the reflector random sequence
  *                  seqbit_len:  the length of random sequence
- * @return      result - 0:success 1:fail
+ * @return      none
  */
-u8 cs_random_seq(u8* seq, u8 seqbit_len);
+void cs_random_seq(u8 *seqInit, u8 *seqRefl, u8 seqbit_len);
+
 /**
  * @brief       This function is to calculate the antenna path permutation index.
  * @param[in]   na_p: The number of antenna path
@@ -94,71 +130,65 @@ u8 cs_antenna_path_perm(u8 na_p);
  * @param[in]   seqbit_len:   length of sounding sequence
  *                  pos_initiator: position of the marker in initiator
  *                  pos_reflector: position of the marker in reflector
- * @return      result - 0:success 1:fail
+ *                  sig_initiator: the marker signal in initiator
+ *                  sig_reflector:  the marker signal in reflector
+ * @return      None.
  */
-u8 cs_ss_marker_position(u8 seqbit_len, u8* pos_initiator, u8* pos_reflector);
+void cs_ss_marker(u8 seqbit_len, u8 *pos_initiator, u8 *pos_reflector, u8 *sig_initiator, u8 *sig_reflector);
 
 /**
- * @brief       This function is to calculate the sounding sequence marker signal.
+ * @brief       This function is to calculate the position of the sounding sequence marker.
+ * @param[in]   seqbit_len:   length of sounding sequence
+ *                  pos_initiator: position of the marker in initiator
+ *                  pos_reflector: position of the marker in reflector
+ * @return      none
+ */
+void cs_ss_marker_position(u8 seqbit_len, u8 *pos_initiator, u8 *pos_reflector);
+
+/**
+ * @brief       This function is to calculate the sounding sequence marker signal according to marker signal number.
  * @param[in]   sig_initiator: the marker signal in initiator
  *                  sig_reflector:  the marker signal in reflector
- * @return      result - 0:success 1:fail
+ * @return      none
  */
-u8 cs_ss_marker_sig_sel(u8* sig_initiator, u8* sig_reflector);
+void cs_ss_marker_sig_sel(u8 *sig_initiator, u8 *sig_reflector, u8 *pos_initiator, u8 *pos_reflector);
 
 /**
  * @brief       This function is channel selection Algorithm #3a for mode-0 steps.
  * @param[in]   chn_num:  the length of all available channel indices.
                     s_chn: all available channel indices
                     d_chn: shuffled channel
- * @return      result - 0:success 1:fail
+ * @return      none
  */
-_attribute_ram_code_
-u8 chn_sel_3a(u8 chn_num,u8* s_chn,u8* d_chn);
+_attribute_ram_code_ void chn_sel_3a(u8 chn_num, u8 *s_chn, u8 *d_chn);
 
 /**
  * @brief       This function is channel selection Algorithm #3b for non-mode-0 steps.
  * @param[in]   chn_num:  the length of all available channel indices.
                     s_chn: all available channel indices
                     d_chn: shuffled channel
- * @return      result - 0:success 1:fail
- */
-_attribute_ram_code_
-u8 chn_sel_3b(u8 chn_num,u8* s_chn,u8* d_chn);
-
-/**
- * @brief       This function should be used when step ascends.
- * @param[in]   none
  * @return      none
  */
-_attribute_ram_code_
-void cs_step_add(void);
+_attribute_ram_code_ void chn_sel_3b(u8 chn_num, u8 *s_chn, u8 *d_chn);
 
-/**
- * @brief       This function should be used when step need to set up.
- * @param[in]   step: current step
- * @return      none
- */
-_attribute_ram_code_
-void cs_step_set(u16 step);
 
 /**
  * @brief       This function is to calculate the presence of an actual transmission in CS tone extension slot.
  * @param[in]   tpm_ext: the presence of  CS tone extension slot.
- * @return       result - 0:success 1:fail
+ * @return       none
  */
-_attribute_ram_code_
-u8 cs_tpm_ext(u8* tpm_ext);
+_attribute_ram_code_ void cs_tpm_ext(u8 *tpm_ext);
 
 /**
  * @brief       This function is to convert channel map to channel array.
  * @param[in]   chm: channel map.
  *                  Filtered_channel: channel array
  *                  Filtered_channel_num: length of channel array
- * @return       result - 0:success 1:fail
+ * @return       ble_sts_t - 0:success 
  */
 _attribute_ram_code_
-u8 blt_cs_extractEnableChnMap(u8* chm, u8* Filtered_channel);
+    ble_sts_t
+    blt_cs_extractEnableChnMap(u8 *chm, u8 *Filtered_channel, u8 *Filtered_channel_num);
 
 /**
  * @brief       Channel Selection Algorithm #3c integrates rising and falling ramps into the resulting channel map for
@@ -168,11 +198,11 @@ u8 blt_cs_extractEnableChnMap(u8* chm, u8* Filtered_channel);
  *                  CSChannelJump
  *                  CSNumRepetitions
  *                  NonMode0ShuffledChannelArray
- *                  NonMode0ShuffledChannelArrayNum: length of NonMode0ShuffledChannelArray
- * @return       result - 0:success 1:fail
+ * @return       NonMode0ShuffledChannelArrayNum: length of NonMode0ShuffledChannelArray
  */
 _attribute_ram_code_
-u8 chn_sel_3c(u8* chm, u8 CSShapeSelection, u8 CSChannelJump, u8 CSNumRepetitions, u8* NonMode0ShuffledChannelArray, u8* NonMode0ShuffledChannelNum);
+    u32
+    chn_sel_3c(u8 *chm, u8 CSShapeSelection, u8 CSChannelJump, u8 CSNumRepetitions, u8 *NonMode0ShuffledChannelArray);
 
 
 /**

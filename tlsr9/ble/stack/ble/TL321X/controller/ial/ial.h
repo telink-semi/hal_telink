@@ -19,7 +19,4 @@
 #define IAL_H_
 
 
-
 #endif
-
-

@@ -49,14 +49,14 @@
 #include "lib/include/clock.h"
 #include "compiler.h"
 
-#define wd_clear_cnt        wd_clear
+#define wd_clear_cnt wd_clear
 
 /**
  * @brief     start watchdog.
  * @return    none
  */
-static inline void wd_start(void){
-
+static inline void wd_start(void)
+{
     BM_SET(reg_tmr_wd_en, FLD_TMR_WD_EN);
 }
 
@@ -65,7 +65,8 @@ static inline void wd_start(void){
  * @brief     stop watchdog.
  * @return    none
  */
-static inline void wd_stop(void){
+static inline void wd_stop(void)
+{
     BM_CLR(reg_tmr_wd_en, FLD_TMR_WD_EN);
 }
 
@@ -113,15 +114,15 @@ static inline void wd_clear(void)
 static inline void wd_set_interval_ms(unsigned int period_ms)
 {
     static unsigned int tmp_period_ms = 0;
-    tmp_period_ms=period_ms*sys_clk.pclk*1000;
-    reg_wt_target=tmp_period_ms;
+    tmp_period_ms                     = period_ms * sys_clk.pclk * 1000;
+    reg_wt_target                     = tmp_period_ms;
 }
 
 /**
  * @brief     start 32k watchdog.
  * @return    none.
  */
-_attribute_ram_code_sec_noinline_ void wd_32k_start(void);
+_attribute_ram_code_com_sec_noinline_ void wd_32k_start(void);
 
 /**
  * @brief     stop 32k watchdog.
@@ -129,7 +130,7 @@ _attribute_ram_code_sec_noinline_ void wd_32k_start(void);
  * @note      -# the interface sys_init() must be called before this interface can be invoked.
  *            -# after calling this interface, wd_32k_get_status() will be cleared.
  */
-_attribute_ram_code_sec_noinline_ void wd_32k_stop(void);
+_attribute_ram_code_com_sec_noinline_ void wd_32k_stop(void);
 
 /**
  * @brief     get 32k watchdog overflow status.
@@ -140,20 +141,20 @@ _attribute_ram_code_sec_noinline_ void wd_32k_stop(void);
  *                - software reboot(sys_reboot())/deep/deepretation/32k watchdog come back,the interface status remains;
  *                - power cyele/reset pin/vbus detect come back, the status of the interface is lost;
  */
-_attribute_ram_code_sec_noinline_ unsigned char wd_32k_get_status(void);
+_attribute_ram_code_com_sec_noinline_ unsigned char wd_32k_get_status(void);
 
 /**
  * @brief     Clear the reset state caused by the 32k watchdog overflow.
  * @return    none.
  * @note      -# the interface sys_init() must be called before this interface can be invoked.
  */
-_attribute_ram_code_sec_noinline_ void wd_32k_clear_status(void);
+_attribute_ram_code_com_sec_noinline_ void wd_32k_clear_status(void);
 
 /**
  * @brief     This function set the watchdog trigger time.
  * @param[in] period_ms - The watchdog trigger time. Unit is  millisecond,the lower 8bit of the wd timer register is invalid,so ranges from 8~134,217,720ms.
  * @return    none
  */
-_attribute_ram_code_sec_noinline_ void wd_32k_set_interval_ms(unsigned int period_ms);
+_attribute_ram_code_com_sec_noinline_ void wd_32k_set_interval_ms(unsigned int period_ms);
 
 #endif

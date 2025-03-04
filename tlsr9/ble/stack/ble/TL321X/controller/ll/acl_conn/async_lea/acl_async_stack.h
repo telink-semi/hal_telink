@@ -20,33 +20,36 @@
 #include "vendor/common/user_config.h"
 #include "acl_async.h"
 #if (LL_ASYNC_LEA_EN)
-typedef struct __attribute__((packed)){
+typedef struct __attribute__((packed))
+{
     u32 aclAPTick;
     u32 cisAPTick;
     u32 cisSyncDelayTick;
     u32 isoIntervalUs;
-}async_timing_info_t;
+} async_timing_info_t;
 
-typedef struct __attribute__((packed)){
+typedef struct __attribute__((packed))
+{
     u8  blockValid;
     u8  rsvd;
     u16 rsvd1;
     u32 start_us;
     u32 end_us;
-}async_timer_block_t;
+} async_timer_block_t;
 
-typedef struct __attribute__((packed)){
-    u8  conuts;//max 5
+typedef struct __attribute__((packed))
+{
+    u8                  conuts; //max 5
     async_timer_block_t block[5];
-}async_timer_shaft_t;
+} async_timer_shaft_t;
 
-/**
+    /**
  *  @brief  MACRO: define the async flow control options for async central and peripheral
  */
-#define ASYNC_FLOW_SEND_NONE                        0
+    #define ASYNC_FLOW_SEND_NONE              0
 
-#define ASYNC_FLOW_PERIPHERAL_SEND_TIMING           1
-#define ASYNC_FLOW_CENTRAL_PARAM_UPDATE             2
+    #define ASYNC_FLOW_PERIPHERAL_SEND_TIMING 1
+    #define ASYNC_FLOW_CENTRAL_PARAM_UPDATE   2
 
 void blc_async_rx_handler(u8 *p);
 
@@ -62,9 +65,9 @@ void blt_async_cisConnCallback(u32 ownCisSyncDlyUs, u32 isoIntervalUs);
 
 void blt_async_connUpdateCallback(u16 connHandle);
 
-void blt_async_connStateCallback(u16 connHandle,u8 connState);
+void blt_async_connStateCallback(u16 connHandle, u8 connState);
 
-void blt_async_savePeerTimingInfo(u32 T1,u32 T2,u32 T3,u32 T4, u32 T5);
+void blt_async_savePeerTimingInfo(u32 T1, u32 T2, u32 T3, u32 T4, u32 T5);
 
 void blt_async_timingInfoProcess(u8 *data);
 

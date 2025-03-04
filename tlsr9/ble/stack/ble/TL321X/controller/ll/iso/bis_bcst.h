@@ -19,9 +19,7 @@
 #define BIS_BCST_H_
 
 
-
-#define     BIG_BCST_PARAM_LENGTH                           844  //user can't modify this value !!!
-
+#define BIG_BCST_PARAM_LENGTH 736 //user can't modify this value !!!
 
 
 /**
@@ -31,7 +29,7 @@
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_initBigBcstModule_initBigBcstParametersBuffer(u8 *pBigBcstPara, u8 bigBcstNum);
+ble_sts_t blc_ll_initBigBcstModule_initBigBcstParametersBuffer(u8 *pBigBcstPara, u8 bigBcstNum);
 
 
 /**
@@ -42,7 +40,7 @@ ble_sts_t   blc_ll_initBigBcstModule_initBigBcstParametersBuffer(u8 *pBigBcstPar
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_initBisTxFifo(u8 *pTxbuf, int fifo_size, int fifo_number);
+ble_sts_t blc_ll_initBisTxFifo(u8 *pTxbuf, int fifo_size, int fifo_number);
 
 /*
  * @brief      This function is used to initialize broadcast sdu in fifo buffer.
@@ -53,7 +51,7 @@ ble_sts_t   blc_ll_initBisTxFifo(u8 *pTxbuf, int fifo_size, int fifo_number);
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t blc_ll_initBisBcstSduInBuffer(u8 *in_fifo,u16 in_fifo_size, u8 in_fifo_num);
+ble_sts_t blc_ll_initBisBcstSduInBuffer(u8 *in_fifo, u16 in_fifo_size, u8 in_fifo_num);
 
 
 /**
@@ -63,9 +61,6 @@ ble_sts_t blc_ll_initBisBcstSduInBuffer(u8 *in_fifo,u16 in_fifo_size, u8 in_fifo
  *                       other:  valid buffer number.
  */
 int blc_ll_getBisSduInBufferFreeNum(u16 bisHandle);
-
-
-
 
 
 #endif /* BIS_BCST_H_ */

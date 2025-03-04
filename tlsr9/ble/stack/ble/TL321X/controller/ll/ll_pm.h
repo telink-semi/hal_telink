@@ -23,37 +23,51 @@
 /**
  *  @brief
  */
-typedef enum {
-    PM_SLEEP_DISABLE            = 0,
-    PM_SLEEP_LEG_ADV            = BIT(0),
-    PM_SLEEP_LEG_SCAN           = BIT(1),
-    PM_SLEEP_ACL_PERIPHR        = BIT(2),
-    PM_SLEEP_ACL_CENTRAL        = BIT(3),
+typedef enum
+{
+    PM_SLEEP_DISABLE     = 0,
+    PM_SLEEP_LEG_ADV     = BIT(0),
+    PM_SLEEP_LEG_SCAN    = BIT(1),
+    PM_SLEEP_ACL_PERIPHR = BIT(2),
+    PM_SLEEP_ACL_CENTRAL = BIT(3),
 
-    PM_SLEEP_EXT_ADV            = BIT(4),
+    PM_SLEEP_EXT_ADV = BIT(4),
 
-    PM_SLEEP_CIS_PERIPHR        = BIT(8),
-    PM_SLEEP_CIS_CENTRAL        = BIT(9),
-}sleep_mask_t;
+    PM_SLEEP_PAWRS_SUB = BIT(6),
 
+    PM_SLEEP_PAWRS_RSP = BIT(7),
 
+    PM_SLEEP_CIS_PERIPHR = BIT(8),
+    PM_SLEEP_CIS_CENTRAL = BIT(9),
+} sleep_mask_t;
+
+typedef enum
+{
+    WFI_DISABLE = 0,
+    WFI_LEG_ADV = BIT(0),
+    WFI_EXT_ADV = BIT(1),
+
+    WFI_ACL_PERIPHR = BIT(2),
+    WFI_ACL_CENTRAL = BIT(3),
+
+} wfi_mask_t;
 
 /**
  *  @brief
  */
 /* DeepSleepRetention_Enable */
-typedef enum {
+typedef enum
+{
     PM_DeepRetn_Disable = 0x00,
     PM_DeepRetn_Enable  = 0x01,
 } deep_retn_en_t;
-
 
 /**
  * @brief   for user to initialize low power mode
  * @param   none
  * @return  none
  */
-void        blc_ll_initPowerManagement_module(void);
+void blc_ll_initPowerManagement_module(void);
 
 
 /**
@@ -61,7 +75,7 @@ void        blc_ll_initPowerManagement_module(void);
  * @param   none
  * @return  none
  */
-void        blc_ll_recoverDeepRetention(void);
+void blc_ll_recoverDeepRetention(void);
 
 
 /**
@@ -69,21 +83,30 @@ void        blc_ll_recoverDeepRetention(void);
  * @param   mask - low power mode mask
  * @return  none
  */
-void        blc_pm_setSleepMask (sleep_mask_t mask);
+void blc_pm_setSleepMask(sleep_mask_t mask);
+
+
+/**
+ * @brief   Set the WFI (Wait For Interrupt) mask.
+ * @param   mask    The WFI mask to be set.
+ * @return  0x00: command succeeded; others is not supported.
+ */
+unsigned char blc_pm_setWfiMask(wfi_mask_t mask);
+
 
 /**
  * @brief   for user to enable or disable deepSleep retention function
  * @param   en -  deepSleep retention enable, 1: enable; 0: disable
  * @return  none
  */
-void        blc_pm_setDeepsleepRetentionEnable (deep_retn_en_t en);
+void blc_pm_setDeepsleepRetentionEnable(deep_retn_en_t en);
 
 /**
  * @brief   for user to set low power mode wake up source
  * @param   wakeup_src - low power mode wake_up source
  * @return  none
  */
-void        blc_pm_setWakeupSource (pm_sleep_wakeup_src_e wakeup_src);
+void blc_pm_setWakeupSource(pm_sleep_wakeup_src_e wakeup_src);
 
 
 /**
@@ -91,42 +114,41 @@ void        blc_pm_setWakeupSource (pm_sleep_wakeup_src_e wakeup_src);
  * @param   none
  * @return  bltPm.current_wakeup_tick
  */
-u32         blc_pm_getWakeupSystemTick(void);
+u32 blc_pm_getWakeupSystemTick(void);
 
 /**
  * @brief   for user to set latency manually for acl_peripheral role
  * @param   latency
  * @return  none
  */
-void        bls_pm_setManualLatency(u16 latency);
+void bls_pm_setManualLatency(u16 latency);
 
 /**
  * @brief   for user to set the threshold of sleep tick for entering deep retention mode
  * @param   threshold_ms - the threshold of time for suspend or deepsleep retention
  * @return  none.
  */
-void        blc_pm_setDeepsleepRetentionThreshold(u32 threshold_ms);
+void blc_pm_setDeepsleepRetentionThreshold(u32 threshold_ms);
 
 /**
  * @brief   for user to set early wake up tick for deep retention mode
  * @param   earlyWakeup_us - early wake up tick for deep retention mode
  * @return  none.
  */
-void        blc_pm_setDeepsleepRetentionEarlyWakeupTiming(u32 earlyWakeup_us);
+void blc_pm_setDeepsleepRetentionEarlyWakeupTiming(u32 earlyWakeup_us);
 
 /**
  * @brief   for user to set the type of deep retention mode
  * @param   sleep_type - the type of deep retention mode
  * @return  none.
  */
-void        blc_pm_setDeepsleepRetentionType(pm_sleep_mode_e sleep_type);
-
+void blc_pm_setDeepsleepRetentionType(pm_sleep_mode_e sleep_type);
 
 
 /**
  * @brief   application wake up low power mode process callback function
  */
-typedef     void (*pm_appWakeupLowPower_callback_t)(int);
+typedef void (*pm_appWakeupLowPower_callback_t)(int);
 
 /**
  * @brief   for user to set application wake up low power mode
@@ -134,21 +156,21 @@ typedef     void (*pm_appWakeupLowPower_callback_t)(int);
  * @param   enable - low power mode application wake up enable
  * @return  none
  */
-void        blc_pm_setAppWakeupLowPower(u32 wakeup_tick, u8 enable);
+void blc_pm_setAppWakeupLowPower(u32 wakeup_tick, u8 enable);
 
 /**
  * @brief   for user to register the callback for application wake up low power mode process
  * @param   cb - the pointer of callback function
  * @return  none.
  */
-void        blc_pm_registerAppWakeupLowPowerCb(pm_appWakeupLowPower_callback_t cb);
+void blc_pm_registerAppWakeupLowPowerCb(pm_appWakeupLowPower_callback_t cb);
 
 /**
  * @brief   This function enables low power mode in OS usage
  * @param   none
  * @return  none
  */
-void        blc_ll_enOsPowerManagement_module(void);
+void blc_ll_enOsPowerManagement_module(void);
 
 /**
  *@brief      This function is used to tell stack that application have not task to handle immediately.
@@ -159,5 +181,5 @@ void        blc_ll_enOsPowerManagement_module(void);
  *                 0: stack can not stall MCU
  *@return     none
  */
-void        blc_ll_appAllowMCUstall(u8 en);
+void blc_ll_appAllowMCUstall(u8 en);
 #endif /* LL_PM_H_ */

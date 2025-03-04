@@ -20,46 +20,46 @@
 
 #if (LL_FEATURE_ENABLE_ISO)
 
-#include "stack/ble/controller/ll/iso/iso.h"
-#include "stack/ble/controller/ll/iso/iso_stack.h"
-#include "stack/ble/controller/ll/iso/bis_stack.h"
-#include "stack/ble/controller/ll/iso/cis_stack.h"
+    #include "stack/ble/controller/ll/iso/iso.h"
+    #include "stack/ble/controller/ll/iso/iso_stack.h"
+    #include "stack/ble/controller/ll/iso/bis_stack.h"
+    #include "stack/ble/controller/ll/iso/cis_stack.h"
 
 
-/******************************* Macro & Enumeration & Structure Definition for Stack Begin, user can not use!!!!  *****/
-#define         SPILT_SDU2PDU_PRE_PROCESS_US        2000
+    /******************************* Macro & Enumeration & Structure Definition for Stack Begin, user can not use!!!!  *****/
+    #define SPILT_SDU2PDU_PRE_PROCESS_US 2000
 
-
-typedef enum{
+typedef enum
+{
     UNFRAMED_START,
     UNFRAMED_CONTINUE,
     UNFRAMED_END,
     UNFRAMED_COMPLETE,
     UNFRAMED_INVALID,
-}ll_iso_unframe_type_t;
+} ll_iso_unframe_type_t;
 
-
-typedef enum{
+typedef enum
+{
     SDU_STATE_NEW,
     SDU_STATE_CONTINUE,
-}ll_iso_sdu_unframe_state_t;
+} ll_iso_sdu_unframe_state_t;
 
-typedef struct{
-    u8 sc   :1;
-    u8 cmplt:1;
-    u8 RFU  :6;
+typedef struct
+{
+    u8 sc    : 1;
+    u8 cmplt : 1;
+    u8 RFU   : 6;
 
     u8 length;
 
-    u32 time_offset:24;
-}iso_framed_segmHdr_t;
-
-
+    u32 time_offset : 24;
+} iso_framed_segmHdr_t;
 
 /************************
  * sdu buff manage
  */
-typedef struct{
+typedef struct
+{
     u8 *in_fifo_b;
     u8 *out_fifo_b;
 
@@ -71,39 +71,32 @@ typedef struct{
     u16 max_in_fifo_size;
     u16 max_out_fifo_size;
 
-}iso_sdu_mng_t;
+} iso_sdu_mng_t;
 
 extern iso_sdu_mng_t sdu_mng;
-
-
 
 
 extern iso_sdu_mng_t sduCisMng;
 extern iso_sdu_mng_t sduBisMng;
 
 
+int blt_ial_interrupt_task(int flag);
 
 
-int     blt_ial_interrupt_task (int flag);
+int blc_hci_iso_data_loop(void);
 
 
-
-int     blc_hci_iso_data_loop(void);
-
-
-int     blt_ial_bisBroadcast_mainloop(ll_bis_t *pBis);
-int     blt_ial_bisSync_mainloop(void);
-int     blt_ial_isochronous_testMode_mainloop(void);
+int blt_ial_bisBroadcast_mainloop(ll_bis_t *pBis);
+int blt_ial_bisSync_mainloop(void);
+int blt_ial_isochronous_testMode_mainloop(void);
 
 
-ble_sts_t   blt_ial_reassembleCisPdu2Sdu(ll_cis_conn_t*, iso_rx_evt_t*);
+ble_sts_t blt_ial_reassembleCisPdu2Sdu(ll_cis_conn_t *, iso_rx_evt_t *);
 
 ble_sts_t blt_ial_bisSync_reassemblePdu2Sdu(ll_bis_t *pBis, bis_rx_pdu_t *pBisPdu);
 
 
-ble_sts_t blt_bis_splitSdu2FramedPdu(u16 bisHandle, u8*pNumOfCmpPkt);
-
-
+ble_sts_t blt_bis_splitSdu2FramedPdu(u16 bisHandle, u8 *pNumOfCmpPkt);
 
 
 /**
@@ -112,7 +105,7 @@ ble_sts_t blt_bis_splitSdu2FramedPdu(u16 bisHandle, u8*pNumOfCmpPkt);
  * @return      Status - 0x00: command succeeded; IAL_ERR_SDU_LEN_EXCEED_SDU_MAX
  *                       LL_ERR_INVALID_PARAMETER: command failed
  */
-ble_sts_t blt_cis_splitSdu2FramedPdu(ll_cis_conn_t *,  u8*);
+ble_sts_t blt_cis_splitSdu2FramedPdu(ll_cis_conn_t *, u8 *);
 
 
 /**
@@ -122,9 +115,7 @@ ble_sts_t blt_cis_splitSdu2FramedPdu(ll_cis_conn_t *,  u8*);
  * @return      Status - 0x00: command succeeded; IAL_ERR_SDU_LEN_EXCEED_SDU_MAX
  *                       LL_ERR_INVALID_PARAMETER: command failed
  */
-ble_sts_t blt_cis_splitSdu2UnframedPdu(ll_cis_conn_t *, sdu_packet_t *, u8*);
-
-
+ble_sts_t blt_cis_splitSdu2UnframedPdu(ll_cis_conn_t *, sdu_packet_t *, u8 *);
 
 
 /**
@@ -134,7 +125,7 @@ ble_sts_t blt_cis_splitSdu2UnframedPdu(ll_cis_conn_t *, sdu_packet_t *, u8*);
  * @return      Status - 0x00: command succeeded; IAL_ERR_SDU_LEN_EXCEED_SDU_MAX
  *                       LL_ERR_INVALID_PARAMETER: command failed
  */
-ble_sts_t   blt_bis_splitSdu2UnframedPdu(u16 bis_connHandle, sdu_packet_t *sdu, u8 *pNumOfCmpPkt);
+ble_sts_t blt_bis_splitSdu2UnframedPdu(u16 bis_connHandle, sdu_packet_t *sdu, u8 *pNumOfCmpPkt);
 
 #endif
 

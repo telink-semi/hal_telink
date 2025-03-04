@@ -24,7 +24,7 @@
 #elif CONFIG_SOC_RISCV_TELINK_B92
 #include <stack/ble/B92/controller/os_sup.h>
 #elif CONFIG_SOC_RISCV_TELINK_TL321X
-#include <stack/ble/TL321X/controller/os_sup.h>
+#include <stack/ble/TL321X/os_sup/os_sup.h>
 #elif CONFIG_SOC_RISCV_TELINK_TL721X
 #include <stack/ble/TL721X/os_sup/os_sup.h>
 #endif

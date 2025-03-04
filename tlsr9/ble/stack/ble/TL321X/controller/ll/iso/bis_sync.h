@@ -19,8 +19,7 @@
 #define BIS_SYNC_H_
 
 
-#define     BIG_SYNC_PARAM_LENGTH                           928  //user can't modify this value !!!
-
+#define BIG_SYNC_PARAM_LENGTH 816 //user can't modify this value !!!
 
 
 /**
@@ -30,7 +29,7 @@
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_initBigSyncModule_initBigSyncParametersBuffer(u8 *pBigSyncPara, u8 bigSyncNum);
+ble_sts_t blc_ll_initBigSyncModule_initBigSyncParametersBuffer(u8 *pBigSyncPara, u8 bigSyncNum);
 
 
 /*
@@ -64,7 +63,7 @@ ble_sts_t blc_ll_initBisRxFifo(u8 *pRxbuf, int full_size, int fifo_number, u8 bi
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_bigTerminateSync(u8 bigHandle);
+ble_sts_t blc_ll_bigTerminateSync(u8 bigHandle);
 
 
 /**
@@ -72,7 +71,7 @@ ble_sts_t   blc_ll_bigTerminateSync(u8 bigHandle);
  * @param[in]  bis_connHandle - Identifier of the bis handle.
  * @return     sdu_packet_t, PDU packet to SDU data structure
  */
-sdu_packet_t* blc_ll_popBisSyncRxSduData(u16 bis_connHandle);
+sdu_packet_t *blc_ll_popBisSyncRxSduData(u16 bis_connHandle);
 
 
 #endif /* BIS_SYNC_H_ */
