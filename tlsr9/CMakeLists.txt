@@ -92,7 +92,7 @@ endif()
 
 # PWM driver reference sources
 if(CONFIG_PWM_TELINK_B9X OR CONFIG_PWM_TELINK_TLX 
-	OR CONFIG_SOC_RISCV_TELINK_TL721X OR CONFIG_SOC_RISCV_TELINK_TL321X)
+	OR CONFIG_SOC_RISCV_TELINK_TLX)
 	zephyr_library_sources(drivers/${SOC}/pwm.c)
 endif()
 
