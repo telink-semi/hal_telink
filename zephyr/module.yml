@@ -8,7 +8,7 @@ blobs:
     type: lib
     version: 'tl-wiki-0002'
     license-path: tlsr9/ble/license.txt
-    url: http://wiki.telink-semi.cn/wiki/protocols/Zephyr/binaries/public/b91_lib/lib_zephyr_b91_13ca3999c731bbd5bab0ea73ccb24e9d0a80a2d2.a
+    url: https://doc.telink-semi.cn/Zephyr/binaries/public/b91_lib/lib_zephyr_b91_13ca3999c731bbd5bab0ea73ccb24e9d0a80a2d2.a
     description: "Binary libraries supporting Telink B91 series BLE subsystems"
 
   - path: lib_zephyr_b92.a
@@ -16,7 +16,7 @@ blobs:
     type: lib
     version: 'tl-wiki-0002'
     license-path: tlsr9/ble/license.txt
-    url: http://wiki.telink-semi.cn/wiki/protocols/Zephyr/binaries/public/b92_lib/lib_zephyr_b92_60ee93696be87a14b06f67a938aa8c9efaa0fc42.a
+    url: https://doc.telink-semi.cn/Zephyr/binaries/public/b92_lib/lib_zephyr_b92_60ee93696be87a14b06f67a938aa8c9efaa0fc42.a
     description: "Binary libraries supporting Telink B92 series BLE subsystems"
 
   - path: lib_zephyr_tl321x.a
@@ -24,7 +24,7 @@ blobs:
     type: lib
     version: 'V4.0.4.3'
     license-path: tlsr9/ble/license.txt
-    url: http://wiki.telink-semi.cn/wiki/protocols/Zephyr/binaries/public/tl321x_lib/lib_zephyr_tl321x_e21ff4c6b90ca0e5bc3f9a0c8abe9239679a8f1c.a
+    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl321x_lib/lib_zephyr_tl321x_f44642133421864883e67eb8b94193ab71bf956d.a
     description: "Binary libraries supporting Telink TL321X series BLE subsystems"
 
   - path: lib_zephyr_tl321x_pm.a
@@ -32,7 +32,7 @@ blobs:
     type: lib
     version: 'V4.0.4.3'
     license-path: tlsr9/ble/license.txt
-    url: http://wiki.telink-semi.cn/wiki/protocols/Zephyr/binaries/public/tl321x_lib/lib_zephyr_tl321x_f44642133421864883e67eb8b94193ab71bf956d_pm.a
+    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl321x_lib/lib_zephyr_tl321x_f44642133421864883e67eb8b94193ab71bf956d_pm.a
     description: "Binary libraries for the Telink TL321X series BLE subsystems, optimized for low-power mode"
     
   - path: lib_zephyr_tl721x.a
@@ -40,7 +40,7 @@ blobs:
     type: lib
     version: 'V4.0.4.2-c8c196e0'
     license-path: tlsr9/ble/license.txt
-    url: http://wiki.telink-semi.cn/wiki/protocols/Zephyr/binaries/public/tl721x_lib/lib_zephyr_tl721x_231ff74e827641da44db7cb8e5b09248b3697403.a
+    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl721x_lib/lib_zephyr_tl721x_231ff74e827641da44db7cb8e5b09248b3697403.a
     description: "Binary libraries supporting Telink TL721X series BLE subsystems"
 
   - path: lib_zephyr_tl721x_pm.a
@@ -48,5 +48,5 @@ blobs:
     type: lib
     version: 'V4.0.4.2-c8c196e0'
     license-path: tlsr9/ble/license.txt
-    url: http://wiki.telink-semi.cn/wiki/protocols/Zephyr/binaries/public/tl721x_lib/lib_zephyr_tl721x_231ff74e827641da44db7cb8e5b09248b3697403_pm.a
+    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl721x_lib/lib_zephyr_tl721x_231ff74e827641da44db7cb8e5b09248b3697403_pm.a
     description: "Binary libraries supporting Telink TL721X series BLE subsystems, optimized for low-power mode"

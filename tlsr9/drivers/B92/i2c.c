@@ -203,7 +203,7 @@ unsigned char i2c_master_write(unsigned char id, unsigned char *data, unsigned i
 {
 	i2c_clr_irq_status(I2C_TX_BUF_STATUS);
 #if CONFIG_I2C_LED
-    reg_i2c_id = id; //BIT(0):R:High  W:Low
+	reg_i2c_id = id; //BIT(0):R:High  W:Low
 #else
 	reg_i2c_id = id & (~FLD_I2C_WRITE_READ_BIT); //BIT(0):R:High  W:Low
 #endif

@@ -59,7 +59,6 @@
  *                                      global function prototype                                                     *
  *********************************************************************************************************************/
 
-
 /**
  * @brief      This function serves to analog register read by byte.
  * @param[in]  addr - address need to be read.

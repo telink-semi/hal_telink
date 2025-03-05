@@ -134,7 +134,9 @@ static inline void pwm_set_tmax(pwm_id_e id, unsigned short tmax){
  */
 static inline void pwm_start(pwm_en_e en){
 	if(!(reg_pwm_enable & en))
+	{
 		reg_pwm_enable|=en;
+	}
 }
 
 
