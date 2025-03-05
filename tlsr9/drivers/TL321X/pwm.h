@@ -122,9 +122,12 @@ static inline void pwm_set_tmax(pwm_id_e id, unsigned short tmax)
  * @param[in] en - variable of enum to select the pwm.
  * @return    none.
  */
-static inline void pwm_start(pwm_en_e en){
+static inline void pwm_start(pwm_en_e en)
+{
     if(!(reg_pwm_enable & en))
+    {
         reg_pwm_enable |= en;
+    }
 }
 
 /**
