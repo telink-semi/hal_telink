@@ -1,0 +1,71 @@
+/********************************************************************************************************
+ * @file    app_uart.h
+ *
+ * @brief   This is the header file for BLE SDK
+ *
+ * @author  BLE GROUP
+ * @date    06,2022
+ *
+ * @par     Copyright (c) 2022, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
+ *
+ *******************************************************************************************************/
+#pragma once
+
+#include "../bis_source_config.h"
+
+#if (PRODUCT_BIS_SOURCE_SELECT == PRODUCT_GOOGLE_BROADCAST_SOURCE)
+
+#ifndef UART_PORT
+#define UART_PORT                   UART1
+#endif
+
+#ifndef UART_TX_DMA
+#define UART_TX_DMA                 DMA5
+#endif
+
+#ifndef UART_RX_DMA
+#define UART_RX_DMA                 DMA6
+#endif
+
+#ifndef UART_TX_PIN
+#define UART_TX_PIN                 UART1_TX_PC6
+#endif
+
+#ifndef UART_RX_PIN
+#define UART_RX_PIN                 UART1_RX_PC7
+#endif
+
+#ifndef UART_RTS_PIN
+#define UART_RTS_PIN                UART1_RTS_PC5
+#endif
+
+#ifndef UART_BAUDRATE
+#define UART_BAUDRATE               1000000
+#endif
+
+#ifndef UART_BUFF_SIZE
+#define UART_BUFF_SIZE              512
+#endif
+
+#ifndef UART_CHECK_RX_DMA_TIMEOUT
+#define UART_CHECK_RX_DMA_TIMEOUT   2000
+#endif
+
+void app_uart_init(void);
+void app_uart_loop(void);
+int app_uart_getRecvData(u8* outBuf, int maxSize);
+int app_uart_getRecvDataLen(void);
+
+#endif

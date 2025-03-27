@@ -1,0 +1,128 @@
+/********************************************************************************************************
+ * @file    app_config.h
+ *
+ * @brief   This is the header file for BLE SDK
+ *
+ * @author  BLE GROUP
+ * @date    06,2022
+ *
+ * @par     Copyright (c) 2022, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ *
+ *          Licensed under the Apache License, Version 2.0 (the "License");
+ *          you may not use this file except in compliance with the License.
+ *          You may obtain a copy of the License at
+ *
+ *              http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *          Unless required by applicable law or agreed to in writing, software
+ *          distributed under the License is distributed on an "AS IS" BASIS,
+ *          WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *          See the License for the specific language governing permissions and
+ *          limitations under the License.
+ *
+ *******************************************************************************************************/
+#pragma once
+
+#include "config.h"
+#include "bqb_config.h"
+
+
+#if (BQB_SELECT == BQB_GAOQIU || BQB_SELECT == BQB_YAFEI)
+    #define RF_ACCESS_CODE_DEFAULT_THRESHOLD  32
+#endif
+
+
+#define HCI_TR_EN                                   1
+#if HCI_TR_EN
+    /*! HCI UART transport pin define */
+    #if(MCU_CORE_TYPE == MCU_CORE_B91)
+        #define HCI_TR_UART_ID       UART0
+        #define HCI_TR_RX_PIN        UART0_RX_PD3 //UART0_RX_PB3 //--->EBQ TX
+        #define HCI_TR_TX_PIN        UART0_TX_PD2 //UART0_TX_PB2 //--->EBQ RX
+        #define HCI_TR_BAUDRATE      (1000000)
+        #define HCI_UART_SoftwareRxDone_EN    0
+        /*** RTS/CTS Pin ***/
+        #if (HCI_UART_SoftwareRxDone_EN)
+            #define HCI_TR_RTS_PIN       UART0_RTS_PD1
+            #define HCI_TR_CTS_PIN       UART0_CTS_PD0
+        #endif
+    #elif(MCU_CORE_TYPE == MCU_CORE_B92)
+        #define HCI_TR_RX_PIN        GPIO_FC_PC6
+        #define HCI_TR_TX_PIN        GPIO_FC_PC7
+        #define HCI_TR_BAUDRATE      (1000000)
+    #elif (MCU_CORE_TYPE == MCU_CORE_TL721X)
+        #define HCI_TR_RX_PIN        GPIO_FC_PB4
+        #define HCI_TR_TX_PIN        GPIO_FC_PB5
+        #define HCI_TR_BAUDRATE      (1000000)
+    #elif (MCU_CORE_TYPE == MCU_CORE_TL321X)
+        #define HCI_TR_RX_PIN        GPIO_FC_PC4
+        #define HCI_TR_TX_PIN        GPIO_FC_PC5
+        #define HCI_TR_BAUDRATE      (1000000)
+    #else
+        #error "This chip configuration is not supported"
+    #endif
+
+    /*! HCI transport buffer size define. */
+    #define HCI_TR_RX_BUF_SIZE     (760)
+    #define HCI_TR_TX_BUF_SIZE     (760)
+
+    #define HCI_DFU_EN                              0
+#else
+    #define HCI_DFU_EN                              0
+#endif
+
+
+#define ACL_CENTRAL_MAX_NUM                         2 // ACL central maximum number
+#define ACL_PERIPHR_MAX_NUM                         2 // ACL peripheral maximum number
+
+
+
+
+///////////////////////// Feature Configuration////////////////////////////////////////////////
+#define ACL_PERIPHR_SMP_ENABLE                      0   //1 for smp,  0 no security
+#define ACL_CENTRAL_SMP_ENABLE                      0  //1 for smp,  0 no security
+#define EBQ_TEST_EN                                 1  //very important !!!
+#define BQB_TEST_EN                                 1  //very important !!!
+
+#define BLMS_PM_ENABLE                              1  //save some RamCode
+
+#define TIFS_VARIATION_WORKAROUND_MLP_CODE_IN_RAM   1
+#define ACL_TXFIFO_4K_LIMITATION_WORKAROUND         0
+
+///////////////////////// UI Configuration ////////////////////////////////////////////////////
+#define UI_LED_ENABLE                               1
+#define UI_KEYBOARD_ENABLE                          1
+
+///////////////////////// DEBUG  Configuration ////////////////////////////////////////////////
+#define DEBUG_GPIO_ENABLE                           0
+#define DEBUG_CS_GPIO_ENABLE                        1
+
+
+#define TLKAPI_DEBUG_ENABLE                         1
+#define TLKAPI_DEBUG_CHANNEL                        TLKAPI_DEBUG_CHANNEL_GSUART
+
+#define APP_LOG_EN                                  1
+#define IUT_HCI_LOG_EN                              1
+
+
+///////////////////// Flash Sector Usage Configuration for 512K Flash //////////////////////////
+/*If Peripheral or Central SMP enable, default 0xFA000~0xFDFFF (4 sector, 16K) is used for SMP pairing
+  information storage, it is set in BLE stack library, same as initialization below:
+  blc_smp_configPairingSecurityInfoStorageAddressAndSize(flash_sector_smp_storage, FLASH_SMP_PAIRING_MAX_SIZE)
+  First 8K is for normal use, second 8K is a backup to guarantee SMP information never lose.  */
+#if (ACL_PERIPHR_SMP_ENABLE || ACL_CENTRAL_SMP_ENABLE)
+    #define flash_sector_smp_storage                    0xFA000
+    #define FLASH_SMP_PAIRING_MAX_SIZE              (2*4096)   //normal 8K + backup 8K = 16K
+#endif
+
+
+
+
+
+
+
+
+
+
+#include "../common/default_config.h"
+#include "bqb_config.h"

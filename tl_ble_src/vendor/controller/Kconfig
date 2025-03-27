@@ -1,0 +1,164 @@
+# Copyright (c) 2022 Telink Semiconductor
+# SPDX-License-Identifier: Apache-2.0
+
+menu "Telink BLE Controller"
+	depends on BT_B9X || BT_TLX
+
+choice TL_BLE_CTRL_MAC_TYPE
+	prompt "MAC address type"
+	default TL_BLE_CTRL_MAC_TYPE_PUBLIC
+config TL_BLE_CTRL_MAC_TYPE_PUBLIC
+	bool "Public"
+config TL_BLE_CTRL_MAC_TYPE_RANDOM_STATIC
+	bool "Random static"
+endchoice
+
+config TL_BLE_PUBLIC_MAC_ADDR
+	depends on TL_BLE_CTRL_MAC_TYPE_PUBLIC
+	string "Default Development Public BLE Address"
+	default "10:10:10:21:21:21"
+	help
+	  Development Public BLE Address
+
+config TL_BLE_CTRL_MAC_FLASH
+	depends on TL_BLE_CTRL_MAC_TYPE_RANDOM_STATIC
+	bool "Store static BLE MAC address in flash"
+	default n
+	help
+	  Store once generated static BLE MAC address in flash
+
+config TL_BLE_CTRL_CONNECTION_INTERVAL_IDX
+	int "Connection interval, idx (time = idx * 1.25 ms)"
+	default 10
+	range 1 255
+	help
+	  ACL master connection interval index (time = index * 1.25 ms).
+
+config TL_BLE_CTRL_CONNECTION_TIMEOUT_MS
+	int "Connection timeout, ms"
+	default 4000
+	help
+	  ACL connection timeout, ms.
+
+if BT_B9X
+config TL_BLE_CTRL_RF_POWER
+	int "Tx power, dbm"
+	default 3
+	range -30 9
+	help
+	  Telink B9X BLE TX power
+endif
+
+if SOC_RISCV_TELINK_TL321X
+config TL_BLE_CTRL_RF_POWER
+	int "Tx power, dbm"
+	default 3
+	range -20 11
+	help
+	  Telink TLX BLE TX power
+endif
+
+if SOC_RISCV_TELINK_TL721X
+config TL_BLE_CTRL_RF_POWER
+	int "Tx power, dbm"
+	default 3
+	range -20 10
+	help
+	  Telink TLX BLE TX power
+endif
+
+config TL_BLE_CTRL_MASTER_MAX_NUM
+	int "Maximum number of master connections"
+	default 0
+	range 0 4
+	help
+	  Number of master ACL connections supported.
+
+config TL_BLE_CTRL_SLAVE_MAX_NUM
+	int "Maximum number of slave connections"
+	default 1
+	range 0 4
+	help
+	  Number of slave ACL connections supported.
+
+config TL_BLE_CTRL_EXT_ADV
+	bool "Enable extended advertising"
+	default y if BT_EXT_ADV
+	help
+	  Enable extended advertising.
+
+if TL_BLE_CTRL_EXT_ADV
+
+config TL_BLE_CTRL_EXT_ADV_SETS_NUM
+	int "Number of supported extended advertising sets"
+	default 3
+	help
+	  Number of supported extended advertising sets.
+
+config TL_BLE_CTRL_EXT_ADV_DATA_LEN_MAX
+	int "Maximum extended advertising data length"
+	default 320
+	help
+	  Maximum extended advertising data length.
+
+config TL_BLE_CTRL_EXT_ADV_SCAN_DATA_LEN_MAX
+	int "Maximum extended scan response data length"
+	default 320
+	help
+	  Maximum extended scan response data length.
+
+endif # TL_BLE_CTRL_EXT_ADV
+
+config TL_BLE_CTRL_EXT_SCAN
+	bool "Enable extended scanning"
+	default y if BT_EXT_ADV
+	help
+	  Enable extended scanning.
+
+config TL_BLE_CTRL_PER_ADV
+	bool "Enable periodic advertising"
+	default y if BT_PER_ADV
+	help
+	  Enable periodic advertising.
+
+if TL_BLE_CTRL_PER_ADV
+
+config TL_BLE_CTRL_PER_ADV_SETS_NUM
+	int "Number of supported periodic advertising sets"
+	default 2
+	help
+	  Number of supported periodic advertising sets.
+
+config TL_BLE_CTRL_PER_ADV_DATA_LEN_MAX
+	int "Maximum periodic advertising data length"
+	default 512
+	help
+	  Maximum periodic advertising data length.
+
+endif # TL_BLE_CTRL_PER_ADV
+
+config TL_BLE_CTRL_PER_ADV_SYNC
+	bool "Enable periodic advertising sync"
+	default y if BT_PER_ADV_SYNC
+	help
+	  Enable periodic advertising sync.
+
+config TL_BLE_CTRL_THREAD_STACK_SIZE
+	int "Controller thread stack size"
+	default 2048
+	help
+	  Telink BLE Controller thread stack size.
+
+config TL_BLE_CTRL_THREAD_PRIORITY
+	int "Controller thread priority"
+	default 2
+	help
+	  Telink BLE Controller thread priority.
+
+config TL_BLE_CTRL_THREAD_PERIOD_MS
+	int "Controller thread period, ms"
+	default 10
+	help
+	  Telink BLE Controller thread period in ms.
+
+endmenu
