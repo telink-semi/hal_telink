@@ -648,22 +648,20 @@ flash_capacity_e flash_get_capacity(unsigned int flash_mid)
 }
 
 /*******************************************************************************************************************
- *									This function serves to 1m area flash protection
+ *									This function serves to 1920k area flash protection
  ******************************************************************************************************************/
 #define FLASH_1M_ADR_OFFSET 		0x100000
-#define FLASH_2M_ADR_OFFSET 		0x200000
-#define FLASH_3M_ADR_OFFSET 		0x300000
-#define FLASH_3M5_ADR_OFFSET 		0x380000
+#define FLASH_1920K_ADR_OFFSET 		0x1e0000
 
-#define FLASH_ADR_OFFSET_SELECT		FLASH_1M_ADR_OFFSET
+#define FLASH_ADR_OFFSET_SELECT		FLASH_1920K_ADR_OFFSET
 
-#define FLASH_PROTECT_BLOCK_SIZE	FLASH_LOCK_FW_LOW_1M
+#define FLASH_PROTECT_BLOCK_SIZE	FLASH_LOCK_FW_LOW_1920K
 
 void flash_protection_lock_init(void)
 {
     flash_protection_init();
 
-    unsigned int app_lockBlock = FLASH_PROTECT_BLOCK_SIZE; // init is 1M, in the ble lib, actual area will be less than 1m, so we protect 1m.
+    unsigned int app_lockBlock = FLASH_PROTECT_BLOCK_SIZE; // we will default to protect 1920KB flash for 2M TL321x.
 
     unsigned int flash_lockBlock_cmd = flash_change_app_lock_block_to_flash_lock_block(app_lockBlock);
 
