@@ -213,7 +213,7 @@ void clock_cal_32k_rc(void)
  * @param  tick - the value of to be set to 32k.
  * @return none.
  */
-_attribute_ram_code_sec_optimize_o2_ void clock_set_32k_tick(unsigned int tick)
+_attribute_ram_code_com_sec_optimize_o2_ void clock_set_32k_tick(unsigned int tick)
 {
 	reg_system_ctrl |= FLD_SYSTEM_32K_WR_EN;	//r_32k_wr = 1;
 	while(reg_system_st & FLD_SYSTEM_RD_BUSY);
@@ -253,7 +253,7 @@ unsigned int clock_get_32k_tick(void)
 	return timer_32k_tick;
 }
 #else
-_attribute_ram_code_sec_optimize_o2_ unsigned int clock_get_32k_tick(void)
+_attribute_ram_code_com_sec_optimize_o2_ unsigned int clock_get_32k_tick(void)
 {
     unsigned int t0 = 0;
     unsigned int t1 = 0;
