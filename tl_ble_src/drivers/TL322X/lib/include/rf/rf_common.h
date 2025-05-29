@@ -45,6 +45,15 @@
  */
 #define rf_tx_packet_dma_len(rf_data_len) (((rf_data_len) + 3) / 4) | (((rf_data_len) % 4) << 22)
 
+/*
+ * This macro is defined to enable RX DCOC software calibration.
+ * After opening this macro, the rf_mode_init() function uses DCOC software calibration to minimize the DC offset of the chip, thereby improving its out of band anti-interference ability (including DC offset).
+ * This operation can restore the sensitivity performance of chips with larger DC offsets to the normal range. But it will increase the execution time of the rf_mode_init() function
+ * Attention :
+ * (1) When the macro definition RF_RX_DCOC_SOFTWARE_CAL_EN is set to 1, the execution time of rf_mode_init becomes longer.
+ * */
+#define RF_RX_DCOC_SOFTWARE_CAL_EN     0 //BLE SDK move the macro here
+
 /**********************************************************************************************************************
  *                                       RF global data type                                                          *
  *********************************************************************************************************************/

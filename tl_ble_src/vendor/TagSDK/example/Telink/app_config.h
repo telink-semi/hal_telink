@@ -30,10 +30,6 @@
 #define ACL_PERIPHR_MAX_NUM 2 // ACL peripheral maximum number
 
 
-//    #define APP_EXT_ADV_SETS_NUMBER     1    //user set value
-//    #define APP_EXT_ADV_DATA_LENGTH     251 //2048//1664//1024   //user set value
-//    #define APP_EXT_SCANRSP_DATA_LENGTH 251 //2048//1664//1024   //user set value
-
 ///////////////////////// Feature Configuration////////////////////////////////////////////////
 #define ACL_PERIPHR_SMP_ENABLE        1 //1 for smp,  0 no security
 #define BLE_OTA_SERVER_ENABLE         1
@@ -64,7 +60,6 @@
 // #define configISR_PLIC_STACK_SIZE 640
 #define configISR_PLIC_STACK_SIZE 1024
 
-//#define TLKAPI_DEBUG_UART_TX_PIN                    GPIO_FC_PD5
 
 /////////////////////// Board Select Configuration ///////////////////////////////
 #if (MCU_CORE_TYPE == MCU_CORE_B91)
@@ -106,8 +101,6 @@
 
 #if FREERTOS_ENABLE
     /////////////////////////////////////// PRINT DEBUG INFO ///////////////////////////////////////
-//    #undef UI_KEYBOARD_ENABLE
-//    #define UI_KEYBOARD_ENABLE           0
 
 
     #define traceAPP_LED_Task_Toggle()   //gpio_toggle(GPIO_CH01);
@@ -128,4 +121,3 @@
 
 #include "../../../common/default_config.h"
 
-//#define  MBEDTLS_CONFIG_FILE  "mbedtls_config.h"

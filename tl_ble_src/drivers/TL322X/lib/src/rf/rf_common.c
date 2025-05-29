@@ -117,15 +117,6 @@ _attribute_data_retention_sec_ float g_hpmc_linear_fit_b = 0; //HPMC linear fitt
 
 
 /*
- * This macro is defined to enable RX DCOC software calibration.
- * After opening this macro, the rf_mode_init() function uses DCOC software calibration to minimize the DC offset of the chip, thereby improving its out of band anti-interference ability (including DC offset).
- * This operation can restore the sensitivity performance of chips with larger DC offsets to the normal range. But it will increase the execution time of the rf_mode_init() function
- * Attention :
- * (1) When the macro definition RF_RX_DCOC_SOFTWARE_CAL_EN is set to 1, the execution time of rf_mode_init becomes longer.
- * */
-#define RF_RX_DCOC_SOFTWARE_CAL_EN     0
-
-/*
 *This macro is defined to restore the use of hardware HPMC when debugging software issues.
 *Note: According to the given design scheme, it is necessary to enable HPMC fitting+compensation values and only use this macro definition
 *Used for internal debugging. When it is necessary to restore hardware HPMC, set this macro to 0 (modified by kun.he, confirmed by wenfeng.lou, 20250310)

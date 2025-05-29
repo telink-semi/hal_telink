@@ -127,11 +127,21 @@ __INLINE void blc_app_system_init(void)
     rf_n22_dig_init();
 
     /* These parameters must remain consistent with the D25F configuration. */
+#if 0
+    //PLL_144M_CCLK_72M_HCLK_D25F_N22_36M_PCLK_36M_MSPI_48M;
     sys_clk.pll_clk  = 144;
     sys_clk.cclk     = 72;
     sys_clk.hclk_n22 = 36;
     sys_clk.pclk     = 36;
     sys_clk.mspi_clk = 48;
+#else
+    //PLL_192M_CCLK_192M_HCLK_D25F_N22_96M_PCLK_96M_MSPI_48M;
+    sys_clk.pll_clk  = 192;
+    sys_clk.cclk     = 192;
+    sys_clk.hclk_n22 = 96;
+    sys_clk.pclk     = 96;
+    sys_clk.mspi_clk = 48;
+#endif
 }
 
 
@@ -145,7 +155,7 @@ int main(void)
 #if HCI_DFU_EN
     blc_ota_setFirmwareSizeAndBootAddress(DFU_NEW_FW_MAX_SIZE, DFU_NEW_FW_ADDR_BASE);
 #endif
-    gpio_write(GPIO_PG4, 0);
+    gpio_write(GPIO_PB0, 0);
     /* this function must called before "sys_init()" when:
      * (1). For all IC: using 32K RC for power management,
        (2). For B91 only: even no power management */
@@ -157,7 +167,7 @@ int main(void)
     int deepRetWakeUp = pm_is_MCU_deepRetentionWakeup(); //MCU deep retention wakeUp
 
     rf_drv_ble_init();
-    gpio_write(GPIO_PG4, 1);
+    gpio_write(GPIO_PB0, 1);
     if (deepRetWakeUp) { //MCU wake_up from deepSleep retention mode
         user_init_deepRetn();
     }
@@ -169,7 +179,7 @@ int main(void)
 
     irq_enable();
 
-    gpio_write(GPIO_PG4, 0);
+    gpio_write(GPIO_PB0, 0);
 
     while (1)
     {

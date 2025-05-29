@@ -1915,7 +1915,6 @@ u8 *blt_smp_l2capSmpCmdHandler(u16 connHandle, u8 *p)
                     start_enc_cp.div = blms_p_peer->peer_ediv;
                     // start_enc_cp.rand = *(u64 *)blms_p_peer->peer_random;
                     memcpy(&start_enc_cp.rand, blms_p_peer->peer_random, 8);
-                    tlkapi_printf(1,"ble_host_hci_le_start_encryption");
                     ble_host_hci_le_start_encryption(&start_enc_cp);
 #else
                     //send LL_ENC_REQ

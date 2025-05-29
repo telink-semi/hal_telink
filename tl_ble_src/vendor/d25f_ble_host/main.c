@@ -41,7 +41,12 @@ void tlkapp_system_init(void)
     gpio_set_up_down_res(GPIO_SWS, GPIO_PIN_PULLUP_1M);
     wd_32k_stop();
     wd_stop();
-    PLL_144M_CCLK_72M_HCLK_D25F_N22_36M_PCLK_36M_MSPI_48M;
+    #if 0
+        PLL_144M_CCLK_72M_HCLK_D25F_N22_36M_PCLK_36M_MSPI_48M;
+    #else
+        pm_set_dig_ldo(DIG_VOL_1V1_MODE, 1000);
+        PLL_192M_CCLK_192M_HCLK_D25F_N22_96M_PCLK_96M_MSPI_48M;
+    #endif
 #endif
 }
 

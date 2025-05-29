@@ -192,7 +192,7 @@ void proc_central_role_unpair(void)
 
     #if (ACL_CENTRAL_SIMPLE_SDP_ENABLE)
                     // delete ATT handle storage on flash
-                dev_char_info_delete_peer_att_handle_by_peer_mac(dev_char_info->peer_adrType, dev_char_info->peer_addr);
+//                dev_char_info_delete_peer_att_handle_by_peer_mac(dev_char_info->peer_adrType, dev_char_info->peer_addr);
     #endif
 
 

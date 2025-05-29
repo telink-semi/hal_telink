@@ -197,40 +197,52 @@ void blt_cs_testMode_calcStepConfig(void)
         first_cal_non_mode0_chn            = 1;
     }
 
-    for (int i = 0; subevent_len < gCsMng.blt_pCsCfg->Subevent_Len; i++) {
+        for (int i = 0; subevent_len < gCsMng.blt_pCsCfg->Subevent_Len; i++) {
         if (step_cnt >= SLIP_WINDOW_STEP_NUM) {
             break;
         }
-        u8                  writeSlipIdx      = gCsMng.blt_pCsCfg->slip_stepWriteIdx % SLIP_WINDOW_STEP_NUM;
-        slip_window_step_t *pslip_window_step = &gCsMng.blt_pCsCfg->slip_window_step[writeSlipIdx];
+            u8                  writeSlipIdx      = gCsMng.blt_pCsCfg->slip_stepWriteIdx % SLIP_WINDOW_STEP_NUM;
+            slip_window_step_t *pslip_window_step = &gCsMng.blt_pCsCfg->slip_window_step[writeSlipIdx];
 
-        //step 1: calculate current mode
-        if (step_cnt < gCsMng.blt_pCsCfg->Mode_0_Steps) { //mode0
-            cur_step_mode = STEP_MODE_0;
-        }
-        //main mode + sub mode   todo-yuexin
-        else {
-            cur_step_mode = gCsMng.blt_pCsCfg->Main_Mode; //include mainmode repeat
-            if (main_mode_repeat_cnt == 0) {            //no main mode need repeat
-                if (gCsMng.blt_pCsCfg->Sub_Mode != SUBMODE_TYPE_MODE_UNUSED) {
-                    //cal sub mode insertion
-                    if (!gCsMng.blt_pCsCfg->submode_insertion) {
-                        if (pOverConfig2) {
-                            gCsMng.blt_pCsCfg->Main_Mode_Max_Steps = gCsMng.blt_pCsCfg->Main_Mode_Min_Steps = pOverConfig2->main_mode_steps;
+            //step 1: calculate current mode
+            //mode0
+            if (step_cnt < gCsMng.blt_pCsCfg->Mode_0_Steps) {
+                cur_step_mode = STEP_MODE_0;
+            }
+            //main mode + sub mode
+            else {
+                cur_step_mode = gCsMng.blt_pCsCfg->Main_Mode; //include mainmode repeat
+                if (main_mode_repeat_cnt == 0) {              //no main mode need repeat
+                    if (gCsMng.blt_pCsCfg->Sub_Mode != SUBMODE_TYPE_MODE_UNUSED) {
+                        //cal sub mode insertion
+                        if (!gCsMng.blt_pCsCfg->submode_insertion) {
+                            if (pOverConfig2) {
+                                gCsMng.blt_pCsCfg->Main_Mode_Max_Steps = gCsMng.blt_pCsCfg->Main_Mode_Min_Steps = pOverConfig2->main_mode_steps;
+                            }
+                            gCsMng.blt_pCsCfg->submode_insertion = cs_sub_mode_insertion(gCsMng.blt_pCsCfg->Main_Mode_Max_Steps, gCsMng.blt_pCsCfg->Main_Mode_Min_Steps) + 1;
                         }
-                        gCsMng.blt_pCsCfg->submode_insertion = cs_sub_mode_insertion(gCsMng.blt_pCsCfg->Main_Mode_Max_Steps, gCsMng.blt_pCsCfg->Main_Mode_Min_Steps) + 1;
-                    }
 
-                    if (gCsMng.blt_pCsCfg->submode_insertion == 1) { //sub mode
-                        cur_step_mode = gCsMng.blt_pCsCfg->Sub_Mode;
+                        if (gCsMng.blt_pCsCfg->submode_insertion == 1) { //sub mode
+                            cur_step_mode = gCsMng.blt_pCsCfg->Sub_Mode;
+                        }
+                        gCsMng.blt_pCsCfg->submode_insertion--;
                     }
-                    gCsMng.blt_pCsCfg->submode_insertion--;
                 }
             }
-        }
 
-        // step2: check task according to step mode
-        if (cur_step_mode == STEP_MODE_0) {
+            //step 2: calculate next step mode
+            if ((step_cnt + 1) < gCsMng.blt_pCsCfg->Mode_0_Steps) {
+                next_step_mode = STEP_MODE_0;
+            } else {
+                if (gCsMng.blt_pCsCfg->submode_insertion == 1) {
+                    next_step_mode = gCsMng.blt_pCsCfg->Sub_Mode;
+                } else {
+                    next_step_mode = gCsMng.blt_pCsCfg->Main_Mode;
+                }
+            }
+
+            //step 3: create drbg task
+            if (cur_step_mode == STEP_MODE_0) {
             access_code_task = 1;
         } else if (cur_step_mode == STEP_MODE_1) {
             access_code_task = 1;
@@ -251,18 +263,6 @@ void blt_cs_testMode_calcStepConfig(void)
         } else if (cur_step_mode == STEP_MODE_2) {
             tone_task = 1;
         }
-
-        // step3: calculate next step mode
-        if ((step_cnt + 1) < gCsMng.blt_pCsCfg->Mode_0_Steps) {
-            next_step_mode = STEP_MODE_0;
-        } else {
-            if (gCsMng.blt_pCsCfg->submode_insertion == 1) {
-                next_step_mode = gCsMng.blt_pCsCfg->Sub_Mode;
-            } else {
-                next_step_mode = gCsMng.blt_pCsCfg->Main_Mode;
-            }
-        }
-
         // step3 calculate cs channel
         if (pOverConfig1) // override config bit0 is not set, calc cs channel accroding to DRBG
         {
@@ -274,13 +274,12 @@ void blt_cs_testMode_calcStepConfig(void)
                     gCsMng.blt_pCsCfg->mode0_chnReadIdx = 0; //restart
                 }
 
-                u8 tChnIdx                     = gCsMng.blt_pCsCfg->mode0_chnReadIdx % gCsMng.blt_pCsCfg->Chn_en_num;
-                pslip_window_step->step_chnIdx = gCsMng.blt_pCsCfg->mode0ShuffledChnArray[tChnIdx];
+                    u8 tChnIdx                     = gCsMng.blt_pCsCfg->mode0_chnReadIdx % gCsMng.blt_pCsCfg->Chn_en_num;
+                    pslip_window_step->step_chnIdx = gCsMng.blt_pCsCfg->mode0ShuffledChnArray[tChnIdx];
                 gCsMng.blt_pCsCfg->mode0_chnReadIdx++;
                 ////mode0 chn function end////
                 //access code
-            } else                          // non mode0 step
-            {
+            } else {                        //non mode0
                 if (main_mode_repeat_cnt) { // repeat main mode
                     main_mode_repeat_cnt--;
                     pslip_window_step->step_chnIdx = gCsMng.blt_pCsCfg->mainmode_repeat_chn[gCsMng.blt_pCsCfg->mainmode_repeat_rptr];
@@ -293,14 +292,10 @@ void blt_cs_testMode_calcStepConfig(void)
                             first_cal_non_mode0_chn = 0;
                             if (gCsMng.blt_pCsCfg->ChSel) { // channel select #3c
                                 drbg->stepCnt -= gCsMng.blt_pCsCfg->Mode_0_Steps;
-                                //                              tlkapi_send_string_data(1,"3c map",gCsMng.blt_pCsCfg->Channel_Map,10);
-                                //                              tlkapi_printf(1,"3c shape:%d",gCsMng.blt_pCsCfg->Ch3c_Shape);
-                                //                              tlkapi_printf(1,"3c jump:%d",gCsMng.blt_pCsCfg->Ch3c_Jump);
-                                //                              tlkapi_printf(1,"3c repeat:%d",gCsMng.blt_pCsCfg->Channel_Map_Repetition);
                                 gCsMng.blt_pCsCfg->noneMode0ShuffledChannelNum = chn_sel_3c(gCsMng.blt_pCsCfg->Channel_Map, gCsMng.blt_pCsCfg->Ch3c_Shape, gCsMng.blt_pCsCfg->Ch3c_Jump, gCsMng.blt_pCsCfg->Channel_Map_Repetition, gCsMng.blt_pCsCfg->nonmode0ShuffledChnArray);
                                 drbg->stepCnt += gCsMng.blt_pCsCfg->Mode_0_Steps;
-                                tlkapi_send_string_data(1, "3c chn", gCsMng.blt_pCsCfg->nonmode0ShuffledChnArray, gCsMng.blt_pCsCfg->noneMode0ShuffledChannelNum);
-                            } else {                                  // channel select #3b
+
+                            } else { // channel select #3b
                                 chn_sel_3b(gCsMng.blt_pCsCfg->Chn_en_num, gCsMng.blt_pCsCfg->filteredChnArray, gCsMng.blt_pCsCfg->nonmode0ShuffledChnArray);
                             }
                             gCsMng.blt_pCsCfg->nonMode0_chnReadIdx = 0; //restart
@@ -320,10 +315,9 @@ void blt_cs_testMode_calcStepConfig(void)
                         gCsMng.blt_pCsCfg->mainmode_repeat_chn[gCsMng.blt_pCsCfg->mainmode_repeat_wptr % CHN_REPEAT_BUFF_LEN] = pslip_window_step->step_chnIdx;
                         gCsMng.blt_pCsCfg->mainmode_repeat_wptr++;
                         gCsMng.blt_pCsCfg->mainmode_repeat_wptr = gCsMng.blt_pCsCfg->mainmode_repeat_wptr % CHN_REPEAT_BUFF_LEN;
-                        chn_lll                               = pslip_window_step->step_chnIdx;
-                    } else { //sub mode
-                        pslip_window_step->step_chnIdx = chn_lll;
-                        tlkapi_send_string_u8s(1, "sub mode", chn_lll);
+                        chn_lll                                 = pslip_window_step->step_chnIdx;
+                    } else {                                      //sub mode
+                        pslip_window_step->step_chnIdx = chn_lll; //gCsMng.blt_pCsCfg->mainmode_repeat_chn[(gCsMng.blt_pCsCfg->mainmode_repeat_wptr + 4 - 1)&0x03];
                     }
                 }
             }
@@ -431,51 +425,51 @@ void blt_cs_testMode_calcStepConfig(void)
                 }
             } else { // get marker signal according to DRBG
                 cs_ss_marker_sig_sel(pslip_window_step->step_initRttSeq, pslip_window_step->step_reflRttSeq, &position[0], &position[2]);
-                select[0] = pslip_window_step->step_initRttSeq[0] & BIT(0);
-                select[1] = pslip_window_step->step_initRttSeq[1] & BIT(0);
-                select[2] = pslip_window_step->step_reflRttSeq[0] & BIT(0);
-                select[3] = pslip_window_step->step_reflRttSeq[1] & BIT(0);
-            }
-
-            // generate sounding sequence
-            for (int j = 0; j < (seqbit_len >> 3); j++) {
-                pslip_window_step->step_initRttSeq[j] = 0xaa;
-                pslip_window_step->step_reflRttSeq[j] = 0xaa;
-            }
-            for (int k = 0; k < 4; k++) {
-                u8 *pRTT = NULL;
-                if (k < 2) {
-                    pRTT = (u8 *)(&pslip_window_step->step_initRttSeq[0]);
-                } else {
-                    pRTT = (u8 *)(&pslip_window_step->step_reflRttSeq[0]);
+                    select[0]    = pslip_window_step->step_initRttSeq[0] & BIT(0);
+                    select[1]    = pslip_window_step->step_initRttSeq[1] & BIT(0);
+                    select[2]    = pslip_window_step->step_reflRttSeq[0] & BIT(0);
+                    select[3]    = pslip_window_step->step_reflRttSeq[1] & BIT(0);
                 }
 
-                if (position[k] != 0xff) {
-                    if (select[k]) { //0011
-                        pRTT[position[k] / 8] &= ~BIT(position[k] % 8);
-                        position[k]++;
-                        pRTT[position[k] / 8] &= ~BIT(position[k] % 8);
-                        position[k]++;
-                        pRTT[position[k] / 8] |= BIT(position[k] % 8);
-                        position[k]++;
-                        pRTT[position[k] / 8] |= BIT(position[k] % 8);
-                    } else { //1100
-                        pRTT[position[k] / 8] |= BIT(position[k] % 8);
-                        position[k]++;
-                        pRTT[position[k] / 8] |= BIT(position[k] % 8);
-                        position[k]++;
-                        pRTT[position[k] / 8] &= ~BIT(position[k] % 8);
-                        position[k]++;
-                        pRTT[position[k] / 8] &= ~BIT(position[k] % 8);
+                for (int j = 0; j < (seqbit_len >> 3); j++) {
+                    pslip_window_step->step_initRttSeq[j] = 0xaa;
+                    pslip_window_step->step_reflRttSeq[j] = 0xaa;
+                }
+                for (int k = 0; k < 4; k++) {
+                    u8 *pRTT = NULL;
+                    if (k < 2) {
+                        pRTT = (u8 *)(&pslip_window_step->step_initRttSeq[0]);
+                    } else {
+                        pRTT = (u8 *)(&pslip_window_step->step_reflRttSeq[0]);
+                    }
+
+                    if (position[k] != 0xff) {
+                        if (select[k]) { //0011
+                            pRTT[position[k] / 8] &= ~BIT(position[k] % 8);
+                            position[k]++;
+                            pRTT[position[k] / 8] &= ~BIT(position[k] % 8);
+                            position[k]++;
+                            pRTT[position[k] / 8] |= BIT(position[k] % 8);
+                            position[k]++;
+                            pRTT[position[k] / 8] |= BIT(position[k] % 8);
+                        } else { //1100
+                            pRTT[position[k] / 8] |= BIT(position[k] % 8);
+                            position[k]++;
+                            pRTT[position[k] / 8] |= BIT(position[k] % 8);
+                            position[k]++;
+                            pRTT[position[k] / 8] &= ~BIT(position[k] % 8);
+                            position[k]++;
+                            pRTT[position[k] / 8] &= ~BIT(position[k] % 8);
+                        }
                     }
                 }
+
+                pslip_window_step->seqMode = 1; //sounding sequence
             }
 
-            pslip_window_step->seqMode = 1; //sounding sequence
-        }
-
         if (rs_task == RS_TASK_NO_SYNC_PAYLOAD) {
-            cs_random_seq(pslip_window_step->step_initRttSeq, pslip_window_step->step_reflRttSeq, seqbit_len);
+                //random sequence generation
+                cs_random_seq(pslip_window_step->step_initRttSeq, pslip_window_step->step_reflRttSeq, seqbit_len);
             pslip_window_step->seqMode = 2; //random sequence
         }
 
@@ -512,8 +506,8 @@ void blt_cs_testMode_calcStepConfig(void)
         pslip_window_step->subeventEndFlag = 0;
         pslip_window_step->proceStopFlag   = 0;
 
-        // check whether subevent is done
-        u32  next_step_len = 0;
+            //step 5: check subevent whether is done.
+            u32  next_step_len = 0;
             u16 *pDurUs        = (u16 *)&gCsMng.blt_pCsCfg->mode0Step_durUs; //mode0Step_durUs ~ mode3Step_durUs address are continuously
             subevent_len += pDurUs[cur_step_mode & 0x03];
             next_step_len += pDurUs[next_step_mode & 0x03];
@@ -613,6 +607,8 @@ ble_sts_t blt_cs_testMode_setCSParam(hci_le_cs_test_cmdParam_t *cmdParam)
     // DRBG_NONCE
     drbg = (drbg_param_t *)&testMode_drbg_data[0];
     cs_drbg_init();
+    smemset(drbg->vdrbg,0,16);
+    smemset(drbg->kdrbg,0,16);
     gCsMng.blt_pCsCfg->drbg_nonce = U16_HI(gCsMng.blt_pCsCfg->drbg_nonce) | (U16_LO(gCsMng.blt_pCsCfg->drbg_nonce) << 8);
     smemcpy(&drbg->vdrbg[14], (u8 *)&gCsMng.blt_pCsCfg->drbg_nonce, 2);
 

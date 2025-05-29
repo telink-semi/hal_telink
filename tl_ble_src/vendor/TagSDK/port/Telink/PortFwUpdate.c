@@ -42,7 +42,7 @@
 #define  UNUSEDARG(x)  ((void )x);
 #define MAX_ALLOWED_WRITE_WITHOUT_RESPONSE (40)
 
-//extern unsigned int ota_program_bootAddr;
+extern unsigned int ota_program_bootAddr;
 //extern unsigned int ota_firmware_max_size;
 //extern unsigned int ota_program_offset;
 

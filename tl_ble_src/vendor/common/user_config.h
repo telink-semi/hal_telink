@@ -245,6 +245,8 @@
     #include "vendor/2p4g_feature_test/app_config.h"
 #elif (__PROJECT_TAG_SDK_DEMO__)
     #include "vendor/TagSDK/example/Telink/app_config.h"
+#elif (__PROJECT_D25F_BLE_HOST_FEA_TEST__)
+    #include "vendor/ble_host_feature_test/app_config.h"
 #else
     #include "vendor/common/default_config.h"
 #endif

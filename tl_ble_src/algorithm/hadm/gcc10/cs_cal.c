@@ -1917,3 +1917,160 @@ void blc_cs_initInternalDelay(void){
     blt_cs_loadFixedOffsetFromFlash();
 }
 
+
+#ifdef HOST_V2_ENABLE
+_attribute_ram_code_ void blt_calcFreq(u8 *data)
+{
+    volatile calcFreq_t *p = (calcFreq_t *)data;
+
+    if (tlk_sm_cs_raw_buff_is_ready()) {
+        // cs_cfo = calcFreq(&IQData_float[0], sample_num, cfoCoarse, SAMPLERATE);
+        p->cs_cfo = calcFreq(p->IQdata, p->IQLen, p->cfoCoarse, p->sampleRate);
+        p->mfo = (float)((p->cs_cfo) / (2402 + p->chn));
+        p->status = BLC_FPU_CALC_FINISHED;
+        tlkapi_send_string_data(0, "blt_calcFreq success",0,0);
+    }
+    else {
+        tlkapi_send_string_data(0, "blt_calcFreq error!!! buff not ready!!!",0,0);
+    }
+}
+
+_attribute_ram_code_ void blt_pesCollectDataInitSDK(u8 *data)
+{
+    volatile pesCollectDataInitSDK_t *p = (pesCollectDataInitSDK_t *)data;
+
+    if (tlk_sm_cs_raw_buff_is_ready()) {
+        //parameterPesCollectDataSDK pesCollectDataInitSDK(int n, int role, int dataRate, signed char internalDelay[], int ICMode);
+        parameterPesCollectDataSDK paraPesSDK = pesCollectDataInitSDK(p->n, p->role, p->dataRate, p->internalDelay, p->ICMode);
+        memcpy((u8 *)&p->paraPesSDK, (u8 *)&paraPesSDK, sizeof(parameterPesCollectDataSDK));
+        p->status = BLC_FPU_CALC_FINISHED;
+        tlkapi_send_string_data(0, "blt_pesCollectDataInitSDK success",0,0);
+    }
+    else {
+        tlkapi_send_string_data(0, "blt_pesCollectDataInitSDK error!!! buff not ready!!!",0,0);
+    }
+}
+
+_attribute_ram_code_ void blt_calcPesInfoFine(u8 *data)
+{
+    tlkapi_send_string_data(1, "app_calcPesInfoFine",0,0);
+    volatile calcPesInfoFine_t  *p = (calcPesInfoFine_t *)data;
+
+    if (tlk_sm_cs_raw_buff_is_ready()) {
+        calcPesInfoFine(&p->tx_timestamp, &p->sync_timestamp, p->t_sy_center_delta, (char *)p->chan_idx, p->cte_sync, p->parameterPesCollectData);
+        p->status = BLC_FPU_CALC_FINISHED;
+        tlkapi_send_string_data(0, "blt_calcPesInfoFine success",0,0);
+    }
+    else {
+        tlkapi_send_string_data(0, "blt_calcPesInfoFine error!!! buff not ready!!!",0,0);
+    }
+}
+
+_attribute_ram_code_ void blt_calcPesInfoSDK(u8 *data)
+{
+    volatile calcPesInfoSDK_t  *p = (calcPesInfoSDK_t *)data;
+
+    if (tlk_sm_cs_raw_buff_is_ready()) {
+        //calcPesInfoSDK((int*)&tx_on_start_tstamp, (int *)&rx_pkt_iq_sync_tstamp, csCfg->t_sy_center_delta, (char *)&csChannel, &cte, paraPesSDK);
+        p->status = BLC_FPU_CALC_FINISHED;
+        tlkapi_send_string_data(0, "blt_calcPesInfoSDK success",0,0);
+    }
+    else {
+        tlkapi_send_string_data(0, "blt_calcPesInfoSDK error!!! buff not ready!!!",0,0);
+    }
+}
+
+_attribute_ram_code_ void blt_cs_nadm_detect(u8 *data)
+{
+    volatile blt_cs_nadm_detect_t  *p = (blt_cs_nadm_detect_t *)data;
+
+    if (tlk_sm_cs_raw_buff_is_ready()) {
+        //*pktNADM = blt_cs_nadm_detect(raw_pkt, csCfg, cs_rx_para, paraPesSDK);
+        p->status = BLC_FPU_CALC_FINISHED;
+        tlkapi_send_string_data(0, "blt_cs_nadm_detect success",0,0);
+    }
+    else {
+        tlkapi_send_string_data(0, "blt_cs_nadm_detect error!!! buff not ready!!!",0,0);
+    }
+
+}
+
+
+_attribute_ram_code_ void blt_calcTesInfoAsicHardFix(u8 *data)
+{
+    gpio_write(GPIO_PD0,1);
+    volatile calcTesInfoAsicHardFix_t *p = (calcTesInfoAsicHardFix_t *)data;
+
+    if (tlk_sm_cs_raw_buff_is_ready()) {
+        // int calcTesInfoAsicHardFix(int IQData[], int IQLen,int qualityLevels[], signed char* ampFactor, int *realValOut, int *imagValOut);
+        // toneQuality   = calcTesInfoAsicHardFix(&initial_IQData[0], csCfg->mode2IQ_ValidPMLen, rawQualityLevels, &ampFactor, &realValOut, &imagValOut);
+        p->toneQuality = calcTesInfoAsicHardFix(p->IQData, p->IQLen, p->qualityLevels, &p->ampFactor, &p->realValOut, &p->imagValOut);
+        p->status = BLC_FPU_CALC_FINISHED;
+        tlkapi_send_string_data(0, "blt_calcTesInfoAsicHardFix,success",data,32);
+    }
+    else {
+        tlkapi_send_string_data(0, "blt_calcTesInfoAsicHardFix error!!! buff not ready!!!",0,0);
+    }
+    gpio_write(GPIO_PD0,0);
+}
+_attribute_ram_code_ void blt_calcTesInfoAsicSoft(u8 *data)
+{
+    gpio_write(GPIO_PD1,1);
+    volatile calcTesInfoAsicSoft_t *p = (calcTesInfoAsicSoft_t *)data;
+//    int calcTesInfoAsicSoft(int realVal,
+//                            int imagVal,
+//                            int iq_timeStamp,
+//                            int trx_timeStamp,
+//                            const float fae,
+//                            const int t_pm_center_delta,
+//                            const int role,
+//                            float if_adjustment,
+//                            const signed char cali[],
+//                            int ICMode,
+//                            DIGITTYPE output[]);
+
+    if (tlk_sm_cs_raw_buff_is_ready()) {
+        p->fae = p->fae_channel * 61.0351562500;
+        p->if_adjustment = p->cs_if_adjustment_channel * 61.0351562500;
+
+        calcTesInfoAsicSoft(p->realVal,
+                            p->imagVal,
+                            p->iq_timeStamp,
+                            p->trx_timeStamp,
+                            p->fae,
+                            p->t_pm_center_delta,
+                            p->role,
+                            p->if_adjustment,
+                            p->cali,
+                            p->ICMode,
+                            p->output);
+        p->status = BLC_FPU_CALC_FINISHED;
+        tlkapi_send_string_data(0, "blt_calcTesInfoAsicSoft,   success",p,56);
+    }
+    else {
+        tlkapi_send_string_data(0, "blt_calcTesInfoAsicSoft error!!! buff not ready!!!",0,0);
+    }
+    gpio_write(GPIO_PD1,0);
+}
+_attribute_ram_code_ void blt_compressTesInfo(u8 *data)
+{
+    gpio_write(GPIO_PD2,1);
+    volatile compressTesInfo_t *p = (compressTesInfo_t *)data;
+
+    if (tlk_sm_cs_raw_buff_is_ready()) {
+        // int compressTesInfo(DIGITTYPE ipm[], signed char ampFactors[], int len, int bits, float rpl_before, int rpl_max, int rpl_min);
+        // rpl_after = compressTesInfo(g_pctRawDataBuff, ampFactors, pctRawBuffIdx, 12, rpl_before, 20, -127);
+        p->rpl_before = -44.0981 - (p->gain - 15);
+        p->rpl_after = compressTesInfo((DIGITTYPE *)p->ipm, p->ampFactors, p->len, 12, p->rpl_before , 20, -127);
+        p->status = BLC_FPU_CALC_FINISHED;
+        tlkapi_send_string_data(0, "blt_compressTesInfo,       success",p,32);
+    }
+    else {
+        tlkapi_send_string_data(0, "blt_compressTesInfo error!!! buff not ready!!!",0,0);
+    }
+    gpio_write(GPIO_PD2,0);
+}
+
+#endif
+
+

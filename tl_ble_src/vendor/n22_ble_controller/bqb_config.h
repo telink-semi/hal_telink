@@ -83,6 +83,10 @@
  */
 #define APP_LE_CHANNEL_SOUNDING 1
 
+#if (APP_LE_CHANNEL_SOUNDING)
+    #define FAST_SETTLE         0 // 20250529, temporarily closed, conflict with CS
+#endif
+
 /**
  * @brief         enable the channel sounding test mode feature.
  */

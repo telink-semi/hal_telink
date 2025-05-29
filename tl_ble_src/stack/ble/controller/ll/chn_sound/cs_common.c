@@ -410,6 +410,7 @@ void blc_cs_set_tx_power_level(u8 power_level){
     gCsMng.cs_tx_power = power_level;
 }
 
+_attribute_ram_code_
 void blt_ll_cs_tx_power_init(void){
     gCsMng.acl_tx_power = blt_extRF.txPower_level;
     if (gCsMng.cs_tx_power) {
@@ -417,6 +418,7 @@ void blt_ll_cs_tx_power_init(void){
     }
 }
 
+_attribute_ram_code_
 void blt_ll_cs_tx_power_deinit(void){
     if (gCsMng.acl_tx_power) {
         rf_set_power_level(gCsMng.acl_tx_power);

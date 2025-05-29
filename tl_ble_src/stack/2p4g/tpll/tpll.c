@@ -907,16 +907,12 @@ __attribute__((section(".ram_code"))) uint32_t TPLL_WriteTxPayload(unsigned char
     wptr = read_reg8(REG_DMA_TX_FIFO_WPTR_PIPE0 + (pipe_id << 1));
     rptr = read_reg8(REG_DMA_TX_FIFO_RPTR_PIPE0 + (pipe_id << 1));
 
-    wptr = (wptr + 1) % (32 + 1);
-    if (wptr == 0) { //skip default packet
-        wptr = 1;
-    }
-
     if (((wptr + 1) % TPLL_TX_FIFO_NUM) == (rptr % TPLL_TX_FIFO_NUM)) { // if the tx-fifo is full, return  immediately
         return TPLL_ERROR_NO_MEM;
     }
 
-    p_tx_fifo = ptx_buffer + pipe_id * TPLL_TX_FIFO_SIZE * TPLL_TX_FIFO_NUM + (wptr % (TPLL_TX_FIFO_NUM + 1)) * TPLL_TX_FIFO_SIZE;
+    p_tx_fifo = ptx_buffer + pipe_id * TPLL_TX_FIFO_SIZE * TPLL_TX_FIFO_NUM + ((wptr++ % TPLL_TX_FIFO_NUM) + 1) * TPLL_TX_FIFO_SIZE;
+
     if (TPLL_MODE_LEGACY_FORMAT == rf_mode_format) {
         if (length == 0 || length > TPLL_MAX_LEGACY_VARIABLE_PAYLOAD_LENGTH) {
             return TPLL_ERROR_INVALID_LENGTH;

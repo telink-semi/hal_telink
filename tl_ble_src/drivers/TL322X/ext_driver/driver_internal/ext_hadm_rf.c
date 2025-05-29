@@ -1438,7 +1438,7 @@ _attribute_ram_code_ void ble_rf_cs_settle_cali_init(void)
 
     reg_rf_ll_cmd = 0x80;//STOP_RF_STATE_MACHINE;
     rf_set_tx_rx_off ();
-    rf_clr_irq_status(0xffff);//CLEAR_ALL_RFIRQ_STATUS;
+    rf_clr_irq_status(FLD_RF_IRQ_ALL);
 
 //    rf_tx_settle_us(110);//adjust TX settle time
 //    rf_set_rx_settle_time(85);
@@ -1455,7 +1455,7 @@ _attribute_ram_code_ void ble_rf_cs_settle_cali_init(void)
         rf_clr_irq_status(FLD_RF_IRQ_TX|FLD_RF_IRQ_TR_TURNAROUND);
 
         reg_rf_ll_cmd = 0x80;
-        rf_clr_irq_status(0xffff);
+        rf_clr_irq_status(FLD_RF_IRQ_ALL);
 //      fast_settle.cal_tbl[i] = rf_get_hpmc_cal_val();
     }
 
@@ -1468,7 +1468,8 @@ _attribute_ram_code_ void ble_rf_cs_settle_cali_init(void)
 //  rf_get_dcoc_cal_val(&fast_settle.dcoc_cal);
 
     reg_rf_ll_cmd = 0x80;
-//
+    rf_clr_irq_status(FLD_RF_IRQ_ALL);
+
 //    rf_set_tx_rx_off ();
 //    rf_clr_irq_status(0xffff);
 //    reg_rf_ll_cmd = 0x80;
@@ -1543,6 +1544,7 @@ _attribute_ram_code_ void ble_rf_channel_sounding_init(void)
 {
     reg_rf_mode_ctrl0 |= FLD_RF_INFO_EXTENSION;
     reg_dma_ctr3(1) = ((reg_dma_ctr3(1) & 0xf8) | RF_QWORLD_WIDTH);
+//    reg_bb_dma_ctr3(1) = ((reg_bb_dma_ctr3(1) & 0xf8) | RF_QWORLD_WIDTH);
     reg_rf_burst_size = ((reg_rf_burst_size & 0xfc) | RF_QWORLD_WIDTH);
     write_reg8(0x170033,read_reg8(0x170033)|BIT(6));  //iq_sample_align
     write_reg8(0x170641,read_reg8(0x170641)|BIT(7));  //txc_align_tx_en
@@ -1552,8 +1554,12 @@ _attribute_ram_code_ void ble_rf_channel_sounding_init(void)
 //        write_reg8(0x170752,read_reg8(0x170752)|0x03);      //FCAL_BIAS
 //    }
 
-    write_reg8(0x170030, 0x3e); //enable tx timestamp
+    reg_rf_rxtcrcpkt |= FLD_RF_EN_TS_TX; //enable tx timestamp
 
+    /*
+     * [1] Set to 1, hadm ststamp through the system timer;Otherwise system timer bb is used
+     */
+//    reg_rf_tstimp_ctrl |= FLD_RF_R_ST_HADM_REVERT_EN; //Switching RF hadm clock to stimer
 
     //ble_rf_tx_channel_sounding_mode_en();
     BM_CLR(reg_rf_tx_mode1,FLD_RF_CRC_EN);
@@ -1589,15 +1595,22 @@ _attribute_ram_code_ void ble_rf_channel_sounding_deinit(void)
 
     reg_rf_mode_ctrl0 &= (~FLD_RF_INFO_EXTENSION);
     reg_dma_ctr3(1) = ((reg_dma_ctr3(1) & 0xf8) | RF_WORLD_WIDTH);
+//    reg_bb_dma_ctr3(1) = ((reg_bb_dma_ctr3(1) & 0xf8) | RF_WORLD_WIDTH);
     reg_rf_burst_size = ((reg_rf_burst_size & 0xfc) | RF_WORLD_WIDTH);
 
     reg_rf_rxlatf |= FLD_RF_R_IQ_SAMP_MODE;
 
-    write_reg8(0x170030, 0x36); //disable tx timestamp
+    reg_rf_rxtcrcpkt &= ~FLD_RF_EN_TS_TX; //disable tx timestamp
+
+//    reg_rf_tstimp_ctrl &= ~FLD_RF_R_ST_HADM_REVERT_EN; //Switching RF hadm clock to bbtimer.
 
     rf_agc_enable();
     reg_rf_lnm_pa_ow_ctrl_val |=FLD_RF_PA_RAMP_TSEQ_OR_TX_ON;
     write_reg8(0x170624, 0x4b);
+
+    write_reg8(0x170033,read_reg8(0x170033)&(~BIT(6)));  //disable iq_sample_align
+    write_reg8(0x170641,read_reg8(0x170641)&(~BIT(7)));  //disable txc_align_tx_en
+    write_reg8(0x170798,read_reg8(0x170798)&(~BIT(0)));  //disable TX_FRAC_TIME_MUX
 }
 
 /**

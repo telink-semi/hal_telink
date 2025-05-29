@@ -24,7 +24,9 @@
 
 #pragma once
 
-// #include <sys/queue.h>
+#if BLC_ZEPHYR_BLE_INTEGRATION != 1
+    #include <sys/queue.h>
+#endif
 
 #define BLC_PRF_DBG(en, fmt, ...) tlkapi_printf(en, "[PRF]" fmt "\n", ##__VA_ARGS__)
 

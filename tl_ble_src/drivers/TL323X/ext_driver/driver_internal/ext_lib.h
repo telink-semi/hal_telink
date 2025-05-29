@@ -1231,7 +1231,7 @@ static inline void rf_ble_set_coded_phy_common(void)
     * At present, TX adopts the method of pa_ramp starting first and preamble sending later, so the preamble adopts this length setting
     * modified by chenxi.wang,confirmed by wenfeng.lou 20250114.
     */
-    write_reg8(0x170002, 0x4a); //preamble len.
+    write_reg8(0x170002, 0x40|PRMBL_LENGTH_Coded); //preamble len.
     write_reg8(0x170003, 0x54); //bit<0:1>private mode control.
     write_reg8(0x170004, 0xf1); //bit<4>mode:1->1m;bit<0:3>:ble head.
 

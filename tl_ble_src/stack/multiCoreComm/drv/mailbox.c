@@ -2,7 +2,7 @@
 #include"mailbox.h"
 #include"../comm.h"
 #include"drivers.h"
-
+#include "../service/service_mailbox.h"
 #if (MCU_CORE_TYPE == CHIP_TYPE_TL322X)
 
 static mailbox_rx_cb_f mailboxRxCb;
@@ -24,15 +24,27 @@ _attribute_ram_code_ void mailbox_init(mailbox_rx_cb_f cb)
 _attribute_ram_code_ void mailbox_send_data(u8* data)
 {
     #if(TLK_MESSAGE_N22 == 1)
-    if(mailbox_get_irq_status_d25f())
+    if ((data[0]==TLK_MESSAGE_FROM_N22_TO_D25F_CS_CALC_FREQ_TRIGGER) ||
+        (data[0]==TLK_MESSAGE_FROM_N22_TO_D25F_CS_CALC_PES_INFO_FINE_TRIGGER) ||
+        (data[0]==TLK_MESSAGE_FROM_N22_TO_D25F_CS_CALC_PES_INFO_SDK_TRIGGER) ||
+        (data[0]==TLK_MESSAGE_FROM_N22_TO_D25F_CS_NADM_DETECT_TRIGGER) ||
+        (data[0]==TLK_MESSAGE_FROM_N22_TO_D25F_CS_CALC_TES_INFO_ASIC_HARD_FIX_TRIGGER) ||
+        (data[0]==TLK_MESSAGE_FROM_N22_TO_D25F_CS_CALC_TES_INFO_ASIC_SOFT_TRIGGER) ||
+        (data[0]==TLK_MESSAGE_FROM_N22_TO_D25F_CS_COMPRESS_TEST_INFO_TRIGGER))
     {
-        u8* p      = mailboxFifo.p + (mailboxFifo.wptr & (mailboxFifo.num - 1)) * mailboxFifo.size;
-        tmemcpy(p,data,8);
-        mailboxFifo.wptr++;
+        while(mailbox_get_irq_status_d25f()){};
+        mailbox_n22_set_d25f_msg((u32*)data);
     }
     else
     {
-        mailbox_n22_set_d25f_msg((u32*)data);
+        if (mailbox_get_irq_status_d25f()) {
+            u8* p      = mailboxFifo.p + (mailboxFifo.wptr & (mailboxFifo.num - 1)) * mailboxFifo.size;
+            tmemcpy(p,data,8);
+            mailboxFifo.wptr++;
+        }
+        else {
+            mailbox_n22_set_d25f_msg((u32*)data);
+        }
     }
     #elif(TLK_MESSAGE_D25F == 1)
     if(mailbox_get_irq_status_n22())

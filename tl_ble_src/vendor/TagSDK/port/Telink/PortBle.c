@@ -327,7 +327,7 @@ int portble_writeccc(u16 connHandle, app_ble_rf_packet_att_write_t *p)
     TAG_LOG_D("portble_writeccc [%d] %d %d", att_handle,tagCharIndex,connHandle);
 //    connHandle &= 0x0f;
     u16 data = *((u16 *)&p->value);
-    smemcpy(my_Attributes[att_handle].pAttrValue,(u8 *)&p->value,2);
+    memcpy(my_Attributes[att_handle].pAttrValue,(u8 *)&p->value,2);
     default_ccc_cfg_changed(connHandle,att_handle,tagCharIndex,data);
     return 0;
 }

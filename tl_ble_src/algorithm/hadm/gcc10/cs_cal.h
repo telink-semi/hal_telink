@@ -53,6 +53,122 @@ typedef enum{
     BLC_RANGING_ALGORITHM_3                 = BIT(2),
 } blc_ranging_algorithm_enum;
 
+#ifdef HOST_V2_ENABLE
+#include "stack/ble/controller/ll/chn_sound/cs_stack.h"
+#include "algorithm/hadm/gcc10/tlk_algo1/include/libcs_tlk1.h"
+
+#define BLC_FPU_CALC_UNFINISHED     0x00
+#define BLC_FPU_CALC_FINISHED       0x55
+
+//float calcFreq(float IQData[], int IQLen, float cfoCoarse, float sampleRate);
+typedef struct
+{
+    float   *IQdata;
+    int     IQLen;
+    float   cfoCoarse;
+    float   sampleRate;
+    float   cs_cfo;
+
+    int     chn;
+    float   mfo;
+    int     status;
+}calcFreq_t;
+
+//parameterPesCollectDataSDK pesCollectDataInitSDK(int n, int role, int dataRate, signed char internalDelay[], int ICMode);
+typedef struct
+{
+    int         n;
+    int         role;
+    int         dataRate;
+    signed char *internalDelay;
+    int         ICMode;
+    parameterPesCollectDataSDK paraPesSDK;
+    int         status;
+}pesCollectDataInitSDK_t;
+
+
+//int calcPesInfoFine(int tx_timestamp[], double sync_timestamp[], int t_sy_center_delta, char chan_idx[], short cte_sync[], parameterPesCollectDataSDK para);
+typedef struct
+{
+    int     tx_timestamp;
+    double  sync_timestamp;
+    int     t_sy_center_delta;
+    char    chan_idx;
+    short   cte_sync;
+    parameterPesCollectDataSDK parameterPesCollectData;
+    int     status;
+}calcPesInfoFine_t;
+
+//int calcPesInfoSDK(int tx_timestamp[], int sync_timestamp[], int t_sy_center_delta, char chan_idx[], short cte_sync[], parameterPesCollectDataSDK para);
+typedef struct
+{
+    int     *tx_timestamp;
+    int     *sync_timestamp;
+    int     t_sy_center_delta;
+    char    *chan_idx;
+    short   *cte_sync;
+    parameterPesCollectDataSDK param;
+    int     status;
+}calcPesInfoSDK_t;
+
+//u8 blt_cs_nadm_detect(u8 *raw_pkt, cs_config_t *csCfg, cs_rx_para_t *cs_rx_para, parameterPesCollectDataSDK paraPesSDK)
+typedef struct
+{
+    u8              *raw_pkt;
+    cs_config_t     *csCfg;
+    cs_rx_para_t    *cs_rx_para;
+    parameterPesCollectDataSDK  paraPesSDK;
+    int             status;
+}blt_cs_nadm_detect_t;
+
+//int calcTesInfoAsicHardFix(int IQData[], int IQLen,int qualityLevels[], signed char* ampFactor, int *realValOut, int *imagValOut);
+typedef struct
+{
+    int          *IQData;
+    int          IQLen;
+    int          *qualityLevels;
+    u8           ampFactor;
+    int          realValOut;
+    int          imagValOut;
+    int          toneQuality;
+    int          status;
+}calcTesInfoAsicHardFix_t;
+
+//int calcTesInfoAsicSoft(int realVal, int imagVal, int iq_timeStamp, int trx_timeStamp, const float fae, const int t_pm_center_delta,const int role, float if_adjustment, const signed char cali[], int ICMode, DIGITTYPE output[]);
+typedef struct
+{
+    float               fae_channel;
+    float               cs_if_adjustment_channel;
+    int                 realVal;
+    int                 imagVal;
+    int                 iq_timeStamp;
+    int                 trx_timeStamp;
+    float               fae;
+    int                 t_pm_center_delta;
+    int                 role;
+    float               if_adjustment;
+    signed char         *cali;
+    int                 ICMode;
+    DIGITTYPE           *output;
+    int                 status;
+}calcTesInfoAsicSoft_t;
+
+//int compressTesInfo(DIGITTYPE ipm[], signed char ampFactors[], int len, int bits, float rpl_before, int rpl_max, int rpl_min);
+typedef struct
+{
+    DIGITTYPE   *ipm;
+    signed char *ampFactors;
+    int         len;
+    int         bits;
+    int         rpl_max;
+    int         rpl_min;
+    int         gain;
+    float       rpl_before;
+    int         rpl_after;
+    int         status;
+}compressTesInfo_t;
+#endif
+
 /**
  * @brief       Copy config complete Data for distance calculate algorithm 2
  * @param[in]   pData: config complete Data

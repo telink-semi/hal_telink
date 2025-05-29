@@ -69,18 +69,12 @@ volatile u32 AAA_FLASH_WR_ADDRESS = 0;
 _attribute_ram_code_ void tlk_mailbox_n22_set_falsh_wr_fifo(u8* data)
 {
     if (n22FlashWRFifo == NULL) {
-       // tlkapi_send_string_data(1, "tlk_mailbox_n22_set_falsh_wr_fifo",data,8);
         n22FlashWRFifo = (tlk_sm_fifo_t*)((u32)data[3] + ((u32)data[4]<<8) + ((u32)(data)[5]<<16) + ((u32)(data)[6]<<24));
         AAA_FLASH_WR_ADDRESS = (u32)(n22FlashWRFifo);
         share_memory_set_fifo_status(n22FlashWRFifo,TLK_SHARE_MEMOTY_STATUS_READY);
     }
     else if (n22FlashWRFifo->status == TLK_SHARE_MEMOTY_STATUS_READY) {
-//        u8 *p = n22FlashWRFifo->fifo.p;
-//        tlkapi_send_string_data(1, "wait d25f falsh wr complete step1!!!,\r\n",&n22FlashWRFifo->reserved,2);
-//        tlkapi_debug_handler();
         while (n22FlashWRFifo->reserved == 1) {
-//            tlkapi_send_string_data(1, "wait d25f falsh wr complete!!!\r\n",0,0);
-//            tlkapi_debug_handler();
             gpio_toggle(GPIO_PG6);
         }
     }
@@ -124,6 +118,29 @@ _attribute_ram_code_ void tlk_mailbox_d25f_set_cs_raw_pct_data_ready(u8* data)
         //tlkapi_send_string_data(1, "d25f_rx_cs_raw_pct_data",p,8);
     }
 }
+
+_attribute_ram_code_ void tlk_mailbox_d25f_cs_fpu_calc(u8* data)
+{
+    u8 *fp = (u8 *)tlk_sm_get_cs_raw_buff_addr();
+
+    if (fp == NULL) {
+        return;
+    }
+
+    u32 type = *((u32 *)fp);
+
+    switch(type)
+    {
+    case 0:
+        break;
+    case 1:
+        break;
+    default:
+        tlkapi_send_string_data(1, "tlk_mailbox_d25f_cs_fpu_calc, error calc type!!!",0,0);
+        break;
+    }
+}
+
 #endif
 
 
@@ -131,7 +148,7 @@ _attribute_ram_code_ void tlk_mailbox_send_data(u8 cmd,u8* data)
 {
     u8 sendData[8] = {0};
     sendData[0] = cmd;
-    memcpy(&sendData[1],data,7);
+    tmemcpy(&sendData[1],data,7);
     mailbox_send_data(sendData);
 }
 
@@ -142,6 +159,68 @@ _attribute_ram_code_ void tlk_mailbox_register_message_cb(u8 cmd,tlk_mailbox_rec
         tlkMailboxReceiveCb[cmd] = cb;
     }
 }
+
+_attribute_ram_code_ void tlk_mailbox_d25f_calcFreq(u8* data)
+{
+    (void) data;
+    u8 *fp = (u8 *)tlk_sm_get_cs_raw_buff_addr();
+    extern void blt_calcFreq(u8* data);
+    blt_calcFreq(fp);
+}
+_attribute_ram_code_ void tlk_mailbox_d25f_pesCollectDataInitSDK(u8* data)
+{
+    (void) data;
+    u8 *fp = (u8 *)tlk_sm_get_cs_raw_buff_addr();
+    extern void blt_pesCollectDataInitSDK(u8* data);
+    blt_pesCollectDataInitSDK(fp);
+}
+
+_attribute_ram_code_ void tlk_mailbox_d25f_calcPesInfoFine(u8* data)
+{
+    (void) data;
+    u8 *fp = (u8 *)tlk_sm_get_cs_raw_buff_addr();
+    extern void blt_calcPesInfoFine(u8* data);
+    blt_calcPesInfoFine(fp);
+}
+
+_attribute_ram_code_ void tlk_mailbox_d25f_calcPesInfoSDK(u8* data)
+{
+    (void) data;
+    u8 *fp = (u8 *)tlk_sm_get_cs_raw_buff_addr();
+    extern void blt_calcPesInfoSDK(u8* data);
+    blt_calcPesInfoSDK(fp);
+}
+
+_attribute_ram_code_ void tlk_mailbox_d25f_cs_nadm_detect(u8* data)
+{
+    (void) data;
+    u8 *fp = (u8 *)tlk_sm_get_cs_raw_buff_addr();
+    extern void blt_cs_nadm_detect(u8* data);
+    blt_cs_nadm_detect(fp);
+}
+
+_attribute_ram_code_ void tlk_mailbox_d25f_calcTesInfoAsicHardFix(u8* data)
+{
+    (void) data;
+    u8 *fp = (u8 *)tlk_sm_get_cs_raw_buff_addr();
+    extern void blt_calcTesInfoAsicHardFix(u8* data);
+    blt_calcTesInfoAsicHardFix(fp);
+}
+_attribute_ram_code_ void tlk_mailbox_d25f_calcTesInfoAsicSoft(u8* data)
+{
+    (void) data;
+    u8 *fp = (u8 *)tlk_sm_get_cs_raw_buff_addr();
+    extern void blt_calcTesInfoAsicSoft(u8* data);
+    blt_calcTesInfoAsicSoft(fp);
+}
+_attribute_ram_code_ void tlk_mailbox_d25f_compressTesInfo(u8* data)
+{
+    (void) data;
+    u8 *fp = (u8 *)tlk_sm_get_cs_raw_buff_addr();
+    extern void blt_compressTesInfo(u8* data);
+    blt_compressTesInfo(fp);
+}
+
 _attribute_ram_code_ void tlk_mailbox_service_init(void)
 {
     mailbox_init(tlk_mailbox_receive_process);//register general mailbox receive entry.
@@ -159,9 +238,20 @@ _attribute_ram_code_ void tlk_mailbox_service_init(void)
     #elif(TLK_MESSAGE_D25F == 1)
     extern  u8 malbox_status;
     tlk_mailbox_register_message_cb(TLK_MESSAGE_FROM_N22_TO_D25F_SYNC_DATA_READY,tlk_mailbox_d25f_sync_data_process);
+    tlk_mailbox_register_message_cb(TLK_MESSAGE_FROM_N22_TO_D25F_TEST,tlk_mailbox_d25f_test_process);
+    /* Channel Sounding */
     tlk_mailbox_register_message_cb(TLK_MESSAGE_FROM_N22_TO_D25F_CS_RAW_PCT_ADDRESS,tlk_mailbox_d25f_set_cs_raw_pct_fifo);
     tlk_mailbox_register_message_cb(TLK_MESSAGE_FROM_N22_TO_D25F_CS_RAW_PCT_DATA_READY,tlk_mailbox_d25f_set_cs_raw_pct_data_ready);
-    tlk_mailbox_register_message_cb(TLK_MESSAGE_FROM_N22_TO_D25F_TEST,tlk_mailbox_d25f_test_process);
+    tlk_mailbox_register_message_cb(TLK_MESSAGE_FROM_N22_TO_D25F_CS_FPU_CALC_TRIGGER,tlk_mailbox_d25f_cs_fpu_calc);
+    tlk_mailbox_register_message_cb(TLK_MESSAGE_FROM_N22_TO_D25F_CS_CALC_FREQ_TRIGGER,tlk_mailbox_d25f_calcFreq);
+    tlk_mailbox_register_message_cb(TLK_MESSAGE_FROM_N22_TO_D25F_CS_PES_COLLECT_DATA_INIT_SDK_TRIGGER,tlk_mailbox_d25f_pesCollectDataInitSDK);
+    tlk_mailbox_register_message_cb(TLK_MESSAGE_FROM_N22_TO_D25F_CS_CALC_PES_INFO_FINE_TRIGGER,tlk_mailbox_d25f_calcPesInfoFine);
+    tlk_mailbox_register_message_cb(TLK_MESSAGE_FROM_N22_TO_D25F_CS_CALC_PES_INFO_SDK_TRIGGER,tlk_mailbox_d25f_calcPesInfoSDK);
+    tlk_mailbox_register_message_cb(TLK_MESSAGE_FROM_N22_TO_D25F_CS_NADM_DETECT_TRIGGER,tlk_mailbox_d25f_cs_nadm_detect);
+    tlk_mailbox_register_message_cb(TLK_MESSAGE_FROM_N22_TO_D25F_CS_CALC_TES_INFO_ASIC_HARD_FIX_TRIGGER,tlk_mailbox_d25f_calcTesInfoAsicHardFix);
+    tlk_mailbox_register_message_cb(TLK_MESSAGE_FROM_N22_TO_D25F_CS_CALC_TES_INFO_ASIC_SOFT_TRIGGER,tlk_mailbox_d25f_calcTesInfoAsicSoft);
+    tlk_mailbox_register_message_cb(TLK_MESSAGE_FROM_N22_TO_D25F_CS_COMPRESS_TEST_INFO_TRIGGER,tlk_mailbox_d25f_compressTesInfo);
+
     mailbox_set_irq_mask_d25f();
     plic_interrupt_enable(IRQ_MAILBOX_N22_TO_D25);
     core_interrupt_enable();
@@ -173,6 +263,4 @@ _attribute_ram_code_ void tlk_mailbox_service_loop(void)
 {
     mailbox_loop();
 }
-
-
 

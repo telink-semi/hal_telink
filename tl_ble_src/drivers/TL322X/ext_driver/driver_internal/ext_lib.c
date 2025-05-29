@@ -175,7 +175,7 @@ void rf_enable_bb_debug(void)
         5       RX
         6       TXWAIT
     */
-#if (1)
+#if (0)
     dbg_bb_set_pin(GPIO_PB7); //ll_ss[0]
     dbg_bb_set_pin(GPIO_PC0); //ll_ss[1]
     dbg_bb_set_pin(GPIO_PC1); //ll_ss[2]
@@ -188,7 +188,7 @@ void rf_enable_bb_debug(void)
         3       HD
         4       FOOT
     */
-#if (1)
+#if (0)
     dbg_bb_set_pin(GPIO_PC2); //rx_ss[0]
     dbg_bb_set_pin(GPIO_PC3); //rx_ss[1]
     dbg_bb_set_pin(GPIO_PC4); //rx_ss[2]

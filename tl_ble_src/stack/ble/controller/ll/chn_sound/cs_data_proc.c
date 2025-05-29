@@ -33,6 +33,11 @@
 
 #include <math.h>
 
+#ifdef HOST_V2_ENABLE
+#include "stack/multiCoreComm/service/service_mailbox.h"
+#include "stack/multiCoreComm/service/service_shareMemory.h"
+#endif
+
 #if (LL_FEATURE_ENABLE_CHANNEL_SOUNDING)
 
     #if OS_SUP_EN
@@ -433,7 +438,30 @@ _attribute_ram_code_sec_optimize_o2_
         cfoCoarse          = (float)rx_freq_offset;
 
         #ifdef MCU_CORE_N22_ENABLE
-            //TODO
+            /* must volatile */
+            volatile calcFreq_t *fp = (calcFreq_t *) tlk_sm_get_cs_raw_buff_addr();
+            if (fp != NULL) {
+                fp->IQdata     = (float *)((u32)IQData_float+(u32)BIT(31));
+                fp->IQLen      = sample_num;
+                fp->cfoCoarse  = cfoCoarse;
+                fp->sampleRate = SAMPLERATE;
+                fp->chn        = chn;
+
+                fp->status = BLC_FPU_CALC_UNFINISHED;
+                /* Delegate floating-point operations to the D25F core */
+                tlk_mailbox_send_data(TLK_MESSAGE_FROM_N22_TO_D25F_CS_CALC_FREQ_TRIGGER, 0);
+                u32 tick = clock_time();
+                while(fp->status == 0) {
+                    if(clock_time_exceed(tick,251)) {
+                        tlkapi_send_string_data(1, "calcFreq -> waiting for D25F calc reseul timeout!!!!",0,0);
+                        break;
+                    }
+                }
+            }
+            else {
+                tlkapi_send_string_data(1, "tlk_sm_get_cs_raw_buff_addr error!!!!",0,0);
+            }
+
         #else
             cs_cfo = calcFreq(&IQData_float[0], sample_num, cfoCoarse, SAMPLERATE);
         #endif
@@ -443,12 +471,18 @@ _attribute_ram_code_sec_optimize_o2_
             cs_angleStep = 2 * PI * cs_cfo / SAMPLERATE;
             calcCompensate(cs_compArr, sample_num, -cs_angleStep); // don't need calculate cs_compArr
         #endif
-        //      mfo = (float)((2402 + chn) * 1000); //kHz
-        //      mfo = (cs_cfo / 1000) / mfo;
-        //      mfo = mfo * (1e6);//Units: 1 ppm
-        float mfo = (float)((cs_cfo) / (2402 + chn));
 
-        cs_mfo = (s16)(mfo * 100); //Units: 0.01 ppm
+        #ifdef MCU_CORE_N22_ENABLE
+            float mfo = fp->mfo;
+        #else
+            //      mfo = (float)((2402 + chn) * 1000); //kHz
+            //      mfo = (cs_cfo / 1000) / mfo;
+            //      mfo = mfo * (1e6);//Units: 1 ppm
+            float mfo = (float)((cs_cfo) / (2402 + chn));
+        #endif
+
+            cs_mfo = (s16)(mfo * 100); //Units: 0.01 ppm
+
         #if CAP_CALIB_EN
             capCalib(-cs_cfo);
         #endif
@@ -569,7 +603,59 @@ _attribute_ram_code_ short blt_cs_m1_process(u8 *raw_pkt, cs_config_t *csCfg, cs
             #endif
 
             #ifdef MCU_CORE_N22_ENABLE
-                //TODO
+                #if (MODE1_FINE_RTT &&((CHIP_TYPE == CHIP_TYPE_TL721X)||(CHIP_TYPE == CHIP_TYPE_TL322X)))
+                    /* must volatile */
+                    volatile pesCollectDataInitSDK_t *fp1 = (pesCollectDataInitSDK_t *) tlk_sm_get_cs_raw_buff_addr();
+                    if (fp1 != NULL) {
+                        fp1->n              = 1;
+                        fp1->role           = csCfg->Role;
+                        fp1->dataRate       = dataRate;
+                        fp1->internalDelay  = cs_mode1_phy1M_internalDelay;
+                        fp1->ICMode         = ICMODE;
+                        fp1->status         = 0;
+                        /* Delegate floating-point operations to the D25F core */
+                        tlk_mailbox_send_data(TLK_MESSAGE_FROM_N22_TO_D25F_CS_PES_COLLECT_DATA_INIT_SDK_TRIGGER, 0);
+                        u32 tick = clock_time();
+                           while(fp1->status == 0){
+                               if(clock_time_exceed(tick,1000)){
+                                   tlkapi_send_string_data(1, "pesCollectDataInitSDK -> waiting for D25F calc reseul timeout!!!!",0,0);
+                                   break;
+                               }
+                           }
+                    }
+                    else {
+
+                    }
+                    calcPesInfoFine_t *fp2 = (calcPesInfoFine_t *) tlk_sm_get_cs_raw_buff_addr();
+                    if (fp2 != NULL) {
+                        fp2->tx_timestamp       = tx_on_start_tstamp;
+                        fp2->sync_timestamp     = fte_sync;
+                        fp2->t_sy_center_delta  = csCfg->t_sy_center_delta; // u32 -> int ?
+                        fp2->chan_idx           = csChannel;
+                        fp2->cte_sync           = cte;
+                        memcpy((u8 *)&fp2->parameterPesCollectData, (u8 *)&fp1->paraPesSDK, sizeof(parameterPesCollectDataSDK));
+                        fp2->status         = 0;
+                        /* Delegate floating-point operations to the D25F core */
+                        tlk_mailbox_send_data(TLK_MESSAGE_FROM_N22_TO_D25F_CS_CALC_PES_INFO_FINE_TRIGGER, 0);
+                        u32 tick = clock_time();
+                        while(fp2->status == 0){
+                            if(clock_time_exceed(tick,1000000)){
+                                tlkapi_send_string_data(1, "calcPesInfoFine -> waiting for D25F calc reseul timeout!!!!",0,0);
+                                break;
+                            }
+                        }
+                    }
+                    else {
+
+                    }
+                #else
+                    calcPesInfoSDK((int*)&tx_on_start_tstamp, (int *)&rx_pkt_iq_sync_tstamp, csCfg->t_sy_center_delta, (char *)&csChannel, &cte, paraPesSDK);
+                #endif
+
+                #if (CS_NADM_EN)
+                    *pktNADM = blt_cs_nadm_detect(raw_pkt, csCfg, cs_rx_para, paraPesSDK);
+                #endif
+
             #else
                 /**
                  *  First param: number of step
@@ -631,7 +717,7 @@ _attribute_ram_code_sec_optimize_o2_
 
     cs_step_mode2_t *pMode2           = (cs_step_mode2_t *)(&pStep->data[0]);
     pMode2->Antenna_Permutation_Index = cs_rx_para->ant_path_perm_idx;
-
+    //pRxFlag->flag.rx_valid = 1;
     for (int atn_path_cnt = 0; atn_path_cnt < (csCfg->antennaPathNum + 1); atn_path_cnt++)
     {
         if ((atn_path_cnt < (csCfg->antennaPathNum + ext_slot)) && pRxFlag->flag.rx_valid)
@@ -651,19 +737,86 @@ _attribute_ram_code_sec_optimize_o2_
             int rawQualityLevelLen = sizeof(rawQualityLevels)/sizeof(int);
 
             #ifdef MCU_CORE_N22_ENABLE
-                //TODO
+                gpio_write(GPIO_PB1,1);
+                /* must volatile */
+                volatile calcTesInfoAsicHardFix_t *fp1 = (calcTesInfoAsicHardFix_t *) tlk_sm_get_cs_raw_buff_addr();
+                if (fp1 != NULL)
+                {
+                    fp1->IQData        = (int *)((u32)initial_IQData+(u32)BIT(31));
+                    fp1->IQLen         = csCfg->mode2IQ_ValidPMLen;
+                    fp1->qualityLevels = (int *)((u32)rawQualityLevels+(u32)BIT(31));
+                    //fp1->ampFactor     = ampFactor;
+                    //fp1->realValOut    = realValOut;
+                    //fp1->imagValOut    = imagValOut;
+                    fp1->status        = BLC_FPU_CALC_UNFINISHED;
+                    tlk_mailbox_send_data(TLK_MESSAGE_FROM_N22_TO_D25F_CS_CALC_TES_INFO_ASIC_HARD_FIX_TRIGGER, 0);
+
+                    u32 tick = clock_time();
+                    while(fp1->status == BLC_FPU_CALC_UNFINISHED)
+                    {
+                        if(clock_time_exceed(tick,251))
+                        {
+                            tick = clock_time();
+                            gpio_toggle(GPIO_PF1);
+                            tlkapi_send_string_data(1, "calcTesInfoAsicHardFix -> waiting for D25F calc reseul timeout!!!!",0,0);
+                            break;
+                        }
+                    }
+                    ampFactor  = fp1->ampFactor;
+                    realValOut = fp1->realValOut;
+                    imagValOut = fp1->imagValOut;
+                }
+                else
+                {
+
+                }
+                gpio_write(GPIO_PB1,0);
             #else
                 toneQuality   = calcTesInfoAsicHardFix(&initial_IQData[0], csCfg->mode2IQ_ValidPMLen, rawQualityLevels, &ampFactor, &realValOut, &imagValOut);
             #endif
 
             // note: chip internal delay cali value is relevant with csChannel, if without cali value, use chip_intlDly_noCalVal
             // Now, chip_intlDly_calVal is used for TLSR9528B, need cali for 9528A later.
-            float fae_channel              = ((float)fae79[csChannel]) * 61.0351562500;
-            float cs_if_adjustment_channel = ((float)cs_if_adjustment79[csChannel]) * 61.0351562500;
+
 
             #ifdef MCU_CORE_N22_ENABLE
-                //TODO
+                gpio_write(GPIO_PB2,1);
+                /* must volatile */
+                volatile calcTesInfoAsicSoft_t *fp2 = (calcTesInfoAsicSoft_t *) tlk_sm_get_cs_raw_buff_addr();
+                if (fp2 != NULL) {
+                    fp2->fae_channel              = ((float)fae79[csChannel]);// * 61.0351562500;
+                    fp2->cs_if_adjustment_channel = ((float)cs_if_adjustment79[csChannel]);// * 61.0351562500;
+
+                    fp2->realVal           = realValOut;
+                    fp2->imagVal           = imagValOut;
+                    fp2->iq_timeStamp      = (u32)(rx_iq_start_tstamp + IQ_OffsetTick - tick_cs_proc_start);
+                    fp2->trx_timeStamp     = (u32)(tx_turnaround_time - tick_cs_proc_start);
+                    //fp2->fae               = fae_channel;
+                    fp2->t_pm_center_delta = t_pm_center_delta;
+                    fp2->role              = csCfg->Role;
+                    //fp2->if_adjustment     = cs_if_adjustment_channel;
+                    fp2->cali              = (signed char *)((u32)&chip_intlDly_calVal[csChannel * 2]+(u32)BIT(31));
+                    fp2->ICMode            = ICMODE;
+                    fp2->output            = (DIGITTYPE *)((u32)pct+(u32)BIT(31));
+                    fp2->status            = BLC_FPU_CALC_UNFINISHED;
+                    tlk_mailbox_send_data(TLK_MESSAGE_FROM_N22_TO_D25F_CS_CALC_TES_INFO_ASIC_SOFT_TRIGGER, 0);
+                    u32 tick = clock_time();
+                    while(fp2->status == BLC_FPU_CALC_UNFINISHED) {
+                        if (clock_time_exceed(tick,300)) {
+                            tlkapi_send_string_data(1, "calcTesInfoAsicSoft -> waiting for D25F calc reseul timeout!!!!",0,0);
+                            break;
+                        }
+                    }
+
+
+                }
+                else {
+
+                }
+                gpio_write(GPIO_PB2,0);
             #else
+                float fae_channel              = ((float)fae79[csChannel]) * 61.0351562500;
+                float cs_if_adjustment_channel = ((float)cs_if_adjustment79[csChannel]) * 61.0351562500;
                 calcTesInfoAsicSoft(realValOut,
                                     imagValOut,
                                     (u32)(rx_iq_start_tstamp + IQ_OffsetTick - tick_cs_proc_start),
@@ -1073,11 +1226,37 @@ _attribute_ram_code_sec_optimize_o2_
     int gain = gain_lat[agcGain];
 
     //-44.81 comes from matlab, tx_power + gain(15dB) - 20*log10(abs(IQ/2048))
-    float rpl_before = -44.0981 - (gain - 15); //gCsMng.rpl_factor- gain;
+    //float rpl_before = -44.0981 - (gain - 15); //gCsMng.rpl_factor- gain;
+
     int   rpl_after;
     #ifdef MCU_CORE_N22_ENABLE
-        //TODO
+        gpio_write(GPIO_PB3,1);
+        volatile compressTesInfo_t *fp = (compressTesInfo_t *) tlk_sm_get_cs_raw_buff_addr();
+        if (fp != NULL) {
+            fp->ipm         = (DIGITTYPE *)((u32)g_pctRawDataBuff+(u32)(BIT(31)));
+            fp->ampFactors  = (signed char *)((u32)ampFactors+(u32)(BIT(31)));
+            fp->len         = pctRawBuffIdx;
+            fp->bits        = 12;
+//            fp->rpl_before  = rpl_before;
+            fp->rpl_max     = 20;
+            fp->rpl_min     = -127;
+            fp->gain        = gain;
+            fp->status      = BLC_FPU_CALC_UNFINISHED;
+            tlk_mailbox_send_data(TLK_MESSAGE_FROM_N22_TO_D25F_CS_COMPRESS_TEST_INFO_TRIGGER, 0);
+            u32 tick = clock_time();
+            while(fp->status == BLC_FPU_CALC_UNFINISHED) {
+                if (clock_time_exceed(tick,251)) {
+                    tlkapi_send_string_data(1, "compressTesInfo -> waiting for D25F calc reseul timeout!!!!",0,0);
+                    break;
+                }
+            }
+        }
+        else {
+
+        }
+        gpio_write(GPIO_PB3,0);
     #else
+        float rpl_before = -44.0981 - (gain - 15); //gCsMng.rpl_factor- gain;
         rpl_after = compressTesInfo(g_pctRawDataBuff, ampFactors, pctRawBuffIdx, 12, rpl_before, 20, -127);
     #endif
 

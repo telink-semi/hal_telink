@@ -39,17 +39,18 @@
 
 #define TAG_NV_AGING_CNT_ID     (TAG_NV_VENDOR_ITEM_LAST + 1)
 
+#ifndef CFG_ADR_TAG_RO_2M_FLASH
+#define CFG_ADR_TAG_RO_2M_FLASH 0x1F2000
+#endif
+
 #define TAG_NV_FLASH_OFFSET CFG_ADR_TAG_2M_FLASH
 
 typedef struct {
     unsigned short int data_id;
 } PortNvsNVParam_t;
 
-#define TAG_NV_RO_OFFSET (TAG_NV_FLASH_OFFSET + 0)
+#define TAG_NV_RO_OFFSET (CFG_ADR_TAG_RO_2M_FLASH + 0)
 #define TAG_NV_RO_SIZE 1024
-
-#define TAG_NV_RW_OFFSET (TAG_NV_RO_OFFSET+TAG_NV_RO_SIZE)
-#define TAG_NV_RW_SIZE 2048
 
 #define TAG_NV_VERDOR_OFFSET (TAG_NV_RW_OFFSET + TAG_NV_RW_SIZE)
 #define TAG_NV_VERDOR_SIZE 1024
@@ -59,7 +60,7 @@ typedef struct {
 
 #define NV_MAX_BUF_SIZE 1100
 
-
+#define PORTNV_DEVICE_SECKEY_LEN 44
 #define PORTNV_MALLOC(x)  TagMalloc(x)
 #define PORTNV_FREE(x)  TagFree(x)
 typedef struct
@@ -68,120 +69,7 @@ typedef struct
     uint32_t offset; // TODO:FIX
 } PortNVDataInfo_t;
 #define PORT_NV_SIZE_PAD 4
-//static PortNVDataInfo_t portNVDataRW[TAG_NV_RW_ITEM_CNT_MAX(RAM_NV_RW_ITEM_LAST)] = {
-//#if defined(TAG_ACCESSORY_OPTION_BUTTON_ACTION) && (TAG_ACCESSORY_OPTION_BUTTON_ACTION == 1)
-//    [TAG_NV_RW_ITEM_IDX(TAG_NV_BUTTON_PUSH_ACTION)] = {
-//        .maxSize = 1,
-//        .offset = 0,
-//    },
-//    [TAG_NV_RW_ITEM_IDX(TAG_NV_BUTTON_HOLD_ACTION)] = {
-//        .maxSize = 1,
-//        .offset = 8,
-//    },
-//#endif // TAG_ACCESSORY_OPTION_BUTTON_ACTION
-//    [TAG_NV_RW_ITEM_IDX(TAG_NV_E2E_ENCRYPTION)] = {
-//        .maxSize = 1,
-//        .offset = 16,
-//    },
-//    [TAG_NV_RW_ITEM_IDX(TAG_NV_E2E_ENCRYPTION_KEY_AES)] = {
-//        .maxSize = 100,
-//        .offset = 24,
-//    },
-//    [TAG_NV_RW_ITEM_IDX(TAG_NV_PREMATURE_OFFLINE_TIMEOUT)] = {
-//        .maxSize = 2,
-//        .offset = 132,
-//    },
-//    [TAG_NV_RW_ITEM_IDX(TAG_NV_OVERMATURE_OFFLINE_TIMEOUT)] = {
-//        .maxSize = 4,
-//        .offset = 140,
-//    },
-//    [TAG_NV_RW_ITEM_IDX(TAG_NV_RINGTONE_NAME)] = {
-//        .maxSize = 61,
-//        .offset = 152,
-//    },
-//    [TAG_NV_RW_ITEM_IDX(TAG_NV_RINGTONE_DATA)] = {
-//        .maxSize = 1100,
-//        .offset = 220,
-//    },
-//    [TAG_NV_RW_ITEM_IDX(TAG_NV_MAX_ALLOWED_BLE_CONNECTION)] = {
-//        .maxSize = 1,
-//        .offset = 1328,
-//    },
-//    [TAG_NV_RW_ITEM_IDX(TAG_NV_MASTER_SECRET_AES)] = {
-//        .maxSize = 32,
-//        .offset = 1336,
-//    },
-//    [TAG_NV_RW_ITEM_IDX(TAG_NV_SOUND_VOLUME)] = {
-//        .maxSize = 1,
-//        .offset = 1376,
-//    },
-//    [TAG_NV_RW_ITEM_IDX(TAG_NV_REGION)] = {
-//        .maxSize = 1,
-//        .offset = 1384,
-//    },
-//    [TAG_NV_RW_ITEM_IDX(TAG_NV_ONBOARDED)] = {
-//        .maxSize = 1,
-//        .offset = 1392,
-//    },
-//    [TAG_NV_RW_ITEM_IDX(TAG_NV_OTA_MODE_ENABLED)] = {
-//        .maxSize = 1,
-//        .offset = 1400,
-//    },
-//    [TAG_NV_RW_ITEM_IDX(TAG_NV_PRIVACY_ID_SEED)] = {
-//        .maxSize = 8,
-//        .offset = 1408,
-//    },
-//    [TAG_NV_RW_ITEM_IDX(TAG_NV_PRIVACY_ID_IV)] = {
-//        .maxSize = 16,
-//        .offset = 1424,
-//    },
-//    [TAG_NV_RW_ITEM_IDX(TAG_NV_BOOT_REASON)] = {
-//        .maxSize = 1,
-//        .offset = 1448,
-//    },
-//    [TAG_NV_RW_ITEM_IDX(TAG_NV_SAVED_RTC)] = {
-//        .maxSize = 8,
-//        .offset = 1456,
-//    },
-//    [TAG_NV_RW_ITEM_IDX(TAG_NV_BLE_IRK)] = {
-//        .maxSize = 16,
-//        .offset = 1472,
-//    },
-//    [TAG_NV_RW_ITEM_IDX(TAG_NV_RINGTONE_DATA_SIZE)] = {
-//        .maxSize = 2,
-//        .offset = 1496,
-//    },
-//    [TAG_NV_RW_ITEM_IDX(TAG_NV_NUMBER_OF_PRIVACY_ID)] = {
-//        .maxSize = 4,
-//        .offset = 1504,
-//    },
-//    [TAG_NV_RW_ITEM_IDX(TAG_NV_ACTIVITY_MODE)] = {
-//        .maxSize = 1,
-//        .offset = 1516,
-//    },
-//#ifdef TAG_CONFIG_USE_UWB_CHARACTERISTICS
-//    [TAG_NV_RW_ITEM_IDX(TAG_NV_UWB_GROUP_DELAY_CALIBRATED)] = {
-//        .maxSize = 1,
-//        .offset = 1524,
-//    },
-//#endif
-//#ifdef TAG_CONFIG_USE_DEBUG_CHARACTERISTICS
-//    [TAG_NV_RW_ITEM_IDX(TAG_NV_FLASH_LOGGING_BLOCK_POS)] = {
-//        .maxSize = 1,
-//        .offset = 1532,
-//    },
-//#endif /* TAG_CONFIG_USE_DEBUG_CHARACTERISTICS */
-//    [TAG_NV_RW_ITEM_IDX(TAG_NV_BATTERY_LEVEL)] = {
-//        .maxSize = 1,
-//        .offset = 1540,
-//    },
-//    [TAG_NV_RW_ITEM_IDX(TAG_NV_TX_POWER)] = {
-//        .maxSize = 1,
-//        .offset = 1548,
-//    },
-//};
-//
-//
+
 static const  PortNVDataInfo_t portNVDataRO[TAG_NV_RO_ITEM_CNT_MAX(RAM_NV_RO_ITEM_LAST)] = {
 
     [TAG_NV_RO_ITEM_IDX(TAG_NV_MODEL_NAME)] = {
@@ -190,27 +78,27 @@ static const  PortNVDataInfo_t portNVDataRO[TAG_NV_RO_ITEM_CNT_MAX(RAM_NV_RO_ITE
     },
     [TAG_NV_RO_ITEM_IDX(TAG_NV_VENDOR_ID)] = {
         .maxSize = TAG_NV_VENDOR_ID_MAX_SZ,
-        .offset = TAG_NV_MODEL_NAME_MAX_SZ + 4,
+        .offset = TAG_NV_MODEL_NAME_MAX_SZ ,
     },
     [TAG_NV_RO_ITEM_IDX(TAG_NV_MANUFACTURER_ID)] = {
         .maxSize = TAG_NV_MANUFACTURER_ID_MAX_SZ,
-        .offset = TAG_NV_MODEL_NAME_MAX_SZ+TAG_NV_VENDOR_ID_MAX_SZ + TAG_NV_RO_ITEM_IDX(TAG_NV_MANUFACTURER_ID)*4,
+        .offset = TAG_NV_MODEL_NAME_MAX_SZ+TAG_NV_VENDOR_ID_MAX_SZ ,
     },
     [TAG_NV_RO_ITEM_IDX(TAG_NV_MANUFACTURER_NAME)] = {
         .maxSize = TAG_NV_MANUFACTURER_NAME_MAX_SZ,
-        .offset = TAG_NV_MODEL_NAME_MAX_SZ+TAG_NV_VENDOR_ID_MAX_SZ+TAG_NV_MANUFACTURER_ID_MAX_SZ + TAG_NV_RO_ITEM_IDX(TAG_NV_MANUFACTURER_NAME)*4,
+        .offset = TAG_NV_MODEL_NAME_MAX_SZ+TAG_NV_VENDOR_ID_MAX_SZ+TAG_NV_MANUFACTURER_ID_MAX_SZ ,
     },
     [TAG_NV_RO_ITEM_IDX(TAG_NV_SETUP_ID)] = {
         .maxSize = TAG_NV_SETUP_ID_MAX_SZ,
-        .offset =  TAG_NV_MODEL_NAME_MAX_SZ+TAG_NV_VENDOR_ID_MAX_SZ+TAG_NV_MANUFACTURER_ID_MAX_SZ + TAG_NV_MANUFACTURER_NAME_MAX_SZ + TAG_NV_RO_ITEM_IDX(TAG_NV_SETUP_ID)*4,
+        .offset =  TAG_NV_MODEL_NAME_MAX_SZ+TAG_NV_VENDOR_ID_MAX_SZ+TAG_NV_MANUFACTURER_ID_MAX_SZ + TAG_NV_MANUFACTURER_NAME_MAX_SZ ,
     },
     [TAG_NV_RO_ITEM_IDX(TAG_NV_SERIAL_NUMBER)] = {
         .maxSize = TAG_NV_SERIAL_NUMBER_MAX_SZ,
-        .offset = TAG_NV_MODEL_NAME_MAX_SZ+TAG_NV_VENDOR_ID_MAX_SZ+TAG_NV_MANUFACTURER_ID_MAX_SZ + TAG_NV_MANUFACTURER_NAME_MAX_SZ +TAG_NV_SETUP_ID_MAX_SZ+ TAG_NV_RO_ITEM_IDX(TAG_NV_SERIAL_NUMBER)*4,
+        .offset = TAG_NV_MODEL_NAME_MAX_SZ+TAG_NV_VENDOR_ID_MAX_SZ+TAG_NV_MANUFACTURER_ID_MAX_SZ + TAG_NV_MANUFACTURER_NAME_MAX_SZ +TAG_NV_SETUP_ID_MAX_SZ,
     },
     [TAG_NV_RO_ITEM_IDX(TAG_NV_PRIVATE_KEY_CURVED)] = {
         .maxSize = TAG_NV_PRIVATE_KEY_CURVED_MAX_SZ,
-        .offset = TAG_NV_MODEL_NAME_MAX_SZ+TAG_NV_VENDOR_ID_MAX_SZ+TAG_NV_MANUFACTURER_ID_MAX_SZ + TAG_NV_MANUFACTURER_NAME_MAX_SZ +TAG_NV_SETUP_ID_MAX_SZ +TAG_NV_SERIAL_NUMBER_MAX_SZ+ TAG_NV_RO_ITEM_IDX(TAG_NV_PRIVATE_KEY_CURVED)*4,
+        .offset = TAG_NV_MODEL_NAME_MAX_SZ+TAG_NV_VENDOR_ID_MAX_SZ+TAG_NV_MANUFACTURER_ID_MAX_SZ + TAG_NV_MANUFACTURER_NAME_MAX_SZ +TAG_NV_SETUP_ID_MAX_SZ +TAG_NV_SERIAL_NUMBER_MAX_SZ +4,
     },
 
 };
@@ -310,13 +198,50 @@ TagError_t tag_flash_read( TagNVItem_t id,void *dataBuf, size_t bufSz, size_t *r
             *readSz = 0;
             rt = TAG_ERROR_NV_INVALID_PARAM;
         }
-        else
+        if((id >= TAG_NV_MODEL_NAME) && (id <= TAG_NV_SETUP_ID))
+        {
+            size_t data_len = 0;
+            flash_read_page(TAG_NV_RO_OFFSET  + portNVDataRO [TAG_NV_RO_ITEM_IDX(id)].offset, portNVDataRO [TAG_NV_RO_ITEM_IDX(id)].maxSize ,(u8*)dataBuf);
+            TAG_LOG_D("tag_flash_read %d %d:%d 0x%x",id,data_len,portNVDataRO [TAG_NV_RO_ITEM_IDX(id)].maxSize,TAG_NV_RO_OFFSET);
+//            tlkapi_send_string_data(APP_LOG_EN, " ", dataBuf, portNVDataRO [TAG_NV_RO_ITEM_IDX(id)].maxSize);
+            tlkapi_printf(1,"%s\r\n",dataBuf);
+            *readSz = strlen(dataBuf);
+        }
+        if(id == TAG_NV_SERIAL_NUMBER)
         {
             size_t data_len = 0;
             flash_read_page(TAG_NV_RO_OFFSET  + portNVDataRO [TAG_NV_RO_ITEM_IDX(id)].offset, PORT_NV_SIZE_PAD,(u8*)&data_len);
-
-            flash_read_page(TAG_NV_RO_OFFSET  + portNVDataRO [TAG_NV_RO_ITEM_IDX(id)].offset + PORT_NV_SIZE_PAD,portNVDataRO [TAG_NV_RO_ITEM_IDX(id)].maxSize ,(u8*)dataBuf);
+            if(data_len < portNVDataRO [TAG_NV_RO_ITEM_IDX(id)].maxSize)
+            flash_read_page(TAG_NV_RO_OFFSET  + portNVDataRO [TAG_NV_RO_ITEM_IDX(id)].offset + PORT_NV_SIZE_PAD,data_len ,(u8*)dataBuf);
             *readSz = data_len;
+            //TAG_LOG_D("tag_flash_read %d %d",id,data_len);
+            //tlkapi_printf(1,"%s\r\n",dataBuf);
+        }
+        else if(id == TAG_NV_PRIVATE_KEY_CURVED)
+        {
+            size_t data_len = 0;
+            uint8_t temp_buf[PORTNV_DEVICE_SECKEY_LEN];
+            flash_read_page(TAG_NV_RO_OFFSET  + portNVDataRO [TAG_NV_RO_ITEM_IDX(id)].offset, PORT_NV_SIZE_PAD,(u8*)&data_len);
+            if(data_len ==  PORTNV_DEVICE_SECKEY_LEN)
+            flash_read_page(TAG_NV_RO_OFFSET  + portNVDataRO [TAG_NV_RO_ITEM_IDX(id)].offset + PORT_NV_SIZE_PAD,data_len ,(u8*)temp_buf);
+            //tlkapi_printf(1,"%s : %d 0x %x"
+            //    "\r\n",temp_buf,data_len, TAG_NV_RO_OFFSET  + portNVDataRO [TAG_NV_RO_ITEM_IDX(id)].offset);
+            //tlkapi_send_string_data(APP_LOG_EN, " ", temp_buf, data_len);
+            if (TagCryptoBase64Decode((unsigned char *)temp_buf,
+                PORTNV_DEVICE_SECKEY_LEN, dataBuf,
+                                       TAG_NV_PRIVATE_KEY_CURVED_MAX_SZ, readSz) != TAG_ERROR_NONE)
+            {
+                TAG_LOG_E("Failed to decode PrivateKeyCurved");
+                return TAG_ERROR_SECURITY_BASE64_DECODE;
+            }
+
+            if (*readSz != 32)
+            {
+                TAG_LOG_E("Failed to check length, decoded length is abnormal(%d)", (int)*readSz);
+                return TAG_ERROR_SECURITY_BASE64_DECODE;
+            }
+            //TAG_LOG_D("tag_flash_read %d %d",id,data_len);
+            //tlkapi_printf(1,"%s\r\n",dataBuf);
         }
     }
     else if ((id >= TAG_NV_RW_ITEM_FIRST) && (id <= TAG_NV_RW_ITEM_LAST))
@@ -389,7 +314,7 @@ TagError_t PortNVWrite(PortNVHandle_t *handle, const void *data, size_t dataSz, 
         TAG_LOG_E("Invalid input parameters!");
         return TAG_ERROR_NV_INVALID_PARAM;
     }
-    smemcpy(write_buf,data,dataSz);
+    memcpy(write_buf,data,dataSz);
     TAG_LOG_I("PortNVWrite %d %d",id,dataSz);
     tlkapi_send_string_data(APP_LOG_EN, "write ", data, dataSz);
     int rt =  app_tag_stoage_set_data(id, write_buf, dataSz);

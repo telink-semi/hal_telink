@@ -415,11 +415,11 @@ u16 blt_smp_getBondingIndex_by_FlashAddr(u8 isCentral, u8 perDevIdx, u32 flash_a
 u32 bls_smp_loadLTK_by_EdivRand(u8 perDevIdx, u16 ediv, u8 *random, u8 *ltk)
 {
     u32  flash_addr   = 0;
-    u8   CurBondNum   = 0;
-    u16 *pFlashOffset = 0;
+    u16   CurBondNum   = 0;
+    u32 *pFlashOffset = 0;
 
     CurBondNum   = smpMStblBondDevice.slave_cur_bondNum[perDevIdx];
-    pFlashOffset = (u16 *)&smpMStblBondDevice.slave_bond_flash_idx[perDevIdx][0];
+    pFlashOffset = (u32 *)&smpMStblBondDevice.slave_bond_flash_idx[perDevIdx][0];
 
     //generate random value for EDIV,RAND
     for (int i = 0; i < CurBondNum; i++) {

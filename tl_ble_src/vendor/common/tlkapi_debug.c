@@ -217,7 +217,7 @@ int tlkapi_debug_init(void)
     extern my_fifo_t *myudb_print_fifo;
     myudb_print_fifo          = tlkapi_print_fifo;
     tlkDbgCtl.dbg_chn         = TLKAPI_DEBUG_CHANNEL_UDB;
-    tlkDbgCtl.fifo_format_len = 12;
+    tlkDbgCtl.fifo_format_len = 9 + 6;// 9 bytes USB head + 6 bytes g_debug_serial, in tlk_printf func
     myudb_usb_init(tlkDbgCtl.usb_id, NULL);
 #if (MCU_CORE_TYPE != MCU_CORE_TL322X)
     usb_set_pin_en();

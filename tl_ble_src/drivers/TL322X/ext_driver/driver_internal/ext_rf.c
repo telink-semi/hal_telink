@@ -319,12 +319,12 @@ void rf_drv_ble_init(void){
 
     write_reg8(0x17044e,RF_ACCESS_CODE_DEFAULT_THRESHOLD);//ble sync threshold:To modem.
 
-    write_reg8(0x170002,0x40| PRMBL_LENGTH_1M<<16);//preamble length
+    write_reg8(0x170002, 0x40|PRMBL_LENGTH_1M);//preamble length
 
     //access code, can save
     //write_reg32(0x170008,0x00000000);   //default:0xf8118ac9;
 
-    write_reg8(0x170030, 0x36);         //default:0x3c;disable tx timestamp en, add by LiBiao
+    reg_rf_rxtcrcpkt &= ~FLD_RF_EN_TS_TX; //disable tx timestamp, add by lijing
 
     write_reg8(0x80170206, 0x00);       //LL_RXWAIT, default 0x0009
     write_reg8(0x8017020c, 0x50);       //LL_RXSTL   default 0x0095

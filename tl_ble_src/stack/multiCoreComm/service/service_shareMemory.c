@@ -162,6 +162,26 @@ _attribute_ram_code_ void tlk_n22_register_hci_receive_cb(tlk_sm_message_type_e 
 }
 #endif
 
+_attribute_ram_code_ int tlk_sm_cs_raw_buff_is_ready(void)
+{
+#if (TLK_MESSAGE_D25F == 1)
+    return d25fCSRawPctFifo->status;
+#elif(TLK_MESSAGE_N22 == 1)
+    return n22CSRawPctFifo.status;
+#endif
+}
+
+u32 tlk_sm_get_cs_raw_buff_addr(void)
+{
+#if (TLK_MESSAGE_D25F == 1)
+    return ((u32)d25fCSRawPctFifo->fifo.p + (u32)BIT(31));
+#elif(TLK_MESSAGE_N22 == 1)
+    return (u32)n22CSRawPctBuffer;
+//    return (u32)n22CSRawPctFifo.fifo.p;
+//    return (u32)n22CSRawPctFifo.fifo.p + (u32)BIT(31);
+#endif
+}
+
 volatile u32 AAA_MESSAGE_LOOP = 0;
 extern volatile u32 AAA_SYNC_TX_ADDRESS;
 extern volatile u32 AAA_FLASH_WR_ADDRESS;
@@ -298,33 +318,36 @@ _attribute_ram_code_ void tlk_share_memory_service_loop(void)
 #elif(TLK_MESSAGE_N22 == 1)
     share_memory_data_pop(n22HciRxFifo);
 
-//    static volatile unsigned int tickCSCheck = 0;
-//    if (clock_time_exceed(tickCSCheck, 500*1000)) {
-//        tickCSCheck = clock_time();
-//        tlkapi_printf(1, "d25f_rx_cs_raw_pct_data:%x\r\n",n22CSRawPctFifo.fifo.wptr);
-//        u8 *p = n22CSRawPctFifo.fifo.p + (n22CSRawPctFifo.fifo.wptr & (n22CSRawPctFifo.fifo.num-1)) * n22CSRawPctFifo.fifo.size;
-//        numt++;
-//        p[0] = numt;
-//        p[1] = 1;
-//        p[2] = 2;
-//        p[3 ]= 3;
-//        p[4] = 4;
-//        p[5] = 5;
-//        p[6] = 6;
-//        p[7] = numt;
-//        n22CSRawPctFifo.fifo.wptr++;
-//
-//        tlkapi_send_string_data(1, "n22 mailbox_send_data", p, 8);
-//        u8 cmd[7]={0};
-//        u32 address = (u32)&n22CSRawPctFifo;
-//        cmd[3] = (u8)(address&0xff);
-//        cmd[4] = (u8)(address>>8&0xff);
-//        cmd[5] = (u8)(address>>16&0xff);
-//        cmd[6] = (u8)(address>>24&0xff);
-//        tlk_mailbox_send_data(TLK_MESSAGE_FROM_N22_TO_D25F_CS_RAW_PCT_DATA_READY,cmd);
-//
-//        gpio_toggle(GPIO_PG6);
-//    }
+    #if 0
+    static volatile unsigned int tickCSCheck = 0;
+    if (clock_time_exceed(tickCSCheck, 500*1000)) {
+        tickCSCheck = clock_time();
+        tlkapi_printf(1, "d25f_rx_cs_raw_pct_data:%x\r\n",n22CSRawPctFifo.fifo.wptr);
+        u8 *p = n22CSRawPctFifo.fifo.p + (n22CSRawPctFifo.fifo.wptr & (n22CSRawPctFifo.fifo.num-1)) * n22CSRawPctFifo.fifo.size;
+        static u8 numt = 0;
+        numt++;
+        p[0] = numt;
+        p[1] = 1;
+        p[2] = 2;
+        p[3 ]= 3;
+        p[4] = 4;
+        p[5] = 5;
+        p[6] = 6;
+        p[7] = numt;
+        n22CSRawPctFifo.fifo.wptr++;
+
+        tlkapi_send_string_data(1, "n22 mailbox_send_data", p, 8);
+        u8 cmd[7]={0};
+        u32 address = (u32)&n22CSRawPctFifo;
+        cmd[3] = (u8)(address&0xff);
+        cmd[4] = (u8)(address>>8&0xff);
+        cmd[5] = (u8)(address>>16&0xff);
+        cmd[6] = (u8)(address>>24&0xff);
+        tlk_mailbox_send_data(TLK_MESSAGE_FROM_N22_TO_D25F_CS_RAW_PCT_DATA_READY,cmd);
+
+        gpio_toggle(GPIO_PG6);
+    }
+    #endif
 #endif
 }
 

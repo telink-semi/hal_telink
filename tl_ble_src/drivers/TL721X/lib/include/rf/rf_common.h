@@ -1455,12 +1455,4 @@ void rf_rx_fast_settle_get_cal_val(rf_rx_fast_settle_time_e rx_settle_time, unsi
 */
 void rf_rx_fast_settle_set_cal_val(rf_rx_fast_settle_time_e rx_settle_time, unsigned char chn, rf_fast_settle_t *fs_cv);
 
-/* Compatible macros */
-#define rf_baseband_reset			rf_clr_dig_logic_state
-
-#define rf_radio_reset				rf_reset_register_value
-
-#define rf_reset_dma				rf_dma_reset
-
-
 #endif

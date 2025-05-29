@@ -57,9 +57,9 @@ _attribute_ram_code_sec_optimize_o2_
     DBG_CS_CHN2_HIGH;
     u32 tick_fcal_start = 0;
     u16 rx_early_us     = (gCsMng.blt_pCsCfg->CS_SYNC_PHY == BLE_1M_PHY) ? CS_RFRXEN_MODE_1M_EARLY_US : CS_RFRXEN_MODE_2M_EARLY_US;
-    u8  tx_settle_us    = TX_STL_TIFS_REAL_COMMON;
-    u8  rx_settle_us    = gCsMng.blt_pCsCfg->phaseContinue_cal_flag ? CS_PHASE_CON_RX_SETTLE_US : CS_COMMON_RX_SETTLE_US;
-    u32 permu  = 0;
+    u8  tx_settle_us    = gCsMng.blt_pCsCfg->phaseContinue_cal_flag ? CS_COMMON_TX_SETTLE_US : TX_STL_TIFS_REAL_COMMON;
+    u8  rx_settle_us    = gCsMng.blt_pCsCfg->phaseContinue_cal_flag ? CS_COMMON_RX_SETTLE_US : RX_SETTLE_US;
+    u32 permu           = 0;
 
     #if (SL01_cs_refl_step_start_post)
     log_task_begin_irq(DBG_CS_LOG_REFL_TIM_VCD_EN, SL01_cs_refl_step_start_post);
@@ -274,8 +274,6 @@ _attribute_ram_code_sec_optimize_o2_
             gCsMng.blt_pCsCfg->mode0_rx_flag = 1;
         }
 
-        //u8 tx_settle_us = TX_STL_TIFS_REAL_COMMON;
-
         /* receive packet,calibrate the step expect tick.
          * RXPATHDLY:   1M: 12; 2M: 5us
          * Access code: 1M PHY: 32bit,32us; 2M PHY: 32bits, 16us
@@ -415,7 +413,7 @@ _attribute_ram_code_sec_optimize_o2_
      *  Theoretical tx point = timestamp - RXPATHDLY + 4 + 5 + T_IP1 = timestamp + T_IP1 - 3    //SYNC MODE
      *  49: 1B preamble(8us) + 4B access code(32us) + 4bit trailer(4us) + 5us T_RD; 1M PHY
      */
-    u8 tx_settle_us = CS_COMMON_TX_SETTLE_US;
+    u8 tx_settle_us = gCsMng.blt_pCsCfg->phaseContinue_cal_flag ? CS_COMMON_TX_SETTLE_US : TX_STL_TIFS_REAL_COMMON;
 
     u32 tx_tick     = 0;
     u32 tick_now    = clock_time();
@@ -539,7 +537,7 @@ _attribute_ram_code_sec_optimize_o2_
     u32 tx_tick     = 0;
 
 
-    u8                  tx_settle_us = CS_COMMON_TX_SETTLE_US;
+    u8                  tx_settle_us = gCsMng.blt_pCsCfg->phaseContinue_cal_flag ? CS_COMMON_TX_SETTLE_US : TX_STL_TIFS_REAL_COMMON;
     slip_window_step_t *slipRef      = (slip_window_step_t *)(&gCsMng.blt_pCsCfg->slip_window_step[gCsMng.blt_pCsCfg->slip_stepReadIdx % SLIP_WINDOW_STEP_NUM]);
 
 

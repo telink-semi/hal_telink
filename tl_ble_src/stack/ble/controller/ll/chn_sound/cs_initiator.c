@@ -83,11 +83,12 @@ _attribute_ram_code_sec_optimize_o2_
     /****************just for debug end**************************/
     #endif
 
-    u8 tx_early_us = (gCsMng.blt_pCsCfg->CS_SYNC_PHY == BLE_1M_PHY) ? CS_tx_early_1M_phy[mode] : CS_tx_early_2M_phy[mode];
-    rf_ble_set_tx_settle(CS_COMMON_TX_SETTLE_US-1);
+    u8 tx_early_us  = (gCsMng.blt_pCsCfg->CS_SYNC_PHY == BLE_1M_PHY) ? CS_tx_early_1M_phy[mode] : CS_tx_early_2M_phy[mode];
+    u8 tx_settle_us = gCsMng.blt_pCsCfg->phaseContinue_cal_flag ? CS_COMMON_TX_SETTLE_US : TX_STL_TIFS_REAL_COMMON;
+    rf_ble_set_tx_settle(tx_settle_us-1);
 
     u8  t_sw_us  = (mode == STEP_MODE_2) ? gCsMng.blt_pCsCfg->T_SW_Us : 0;
-    u32 tx_tick  = gCsMng.blt_pCsCfg->step_expect_tick + t_sw_us * SYSTEM_TIMER_TICK_1US - (tx_early_us + CS_COMMON_TX_SETTLE_US) * SYSTEM_TIMER_TICK_1US; //gCsMng.blt_pCsCfg->T_SW_Us
+    u32 tx_tick  = gCsMng.blt_pCsCfg->step_expect_tick + t_sw_us * SYSTEM_TIMER_TICK_1US - (tx_early_us + tx_settle_us) * SYSTEM_TIMER_TICK_1US; //gCsMng.blt_pCsCfg->T_SW_Us
     u32 tick_now = clock_time();
     if (tick1_exceed_tick2(tick_now, tx_tick)) {
         write_dbg32(0x0018, tick_now);
@@ -202,9 +203,7 @@ _attribute_ram_code_sec_optimize_o2_
     u8                  mode      = pStepInit->step_modeType;
     u32                 ac        = pStepInit->step_reflAA;
 
-    u8 rx_settle_us = CS_COMMON_RX_SETTLE_US;
-
-    rx_settle_us = gCsMng.blt_pCsCfg->phaseContinue_cal_flag ? CS_PHASE_CON_RX_SETTLE_US : CS_COMMON_RX_SETTLE_US;
+    u8 rx_settle_us = gCsMng.blt_pCsCfg->phaseContinue_cal_flag ? CS_COMMON_RX_SETTLE_US : RX_SETTLE_US;
     rf_ble_set_rx_settle(rx_settle_us-1);
 
     cs_rx_fifo.pCsRxAddr = cs_rx_fifo.p_base + (cs_rx_fifo.wptr & cs_rx_fifo.mask) * cs_rx_fifo.size;

@@ -818,7 +818,7 @@ void rf_mode_init(void)
 /**
  * @brief      This setting serve to set the configuration of Tx DMA.
  */
-// _attribute_data_sec_    //BLE USED: in IRQ
+_attribute_data_sec_    //BLE USED: in IRQ, be caution in zephyr
 rf_dma_config_t rf_tx_dma_config = {
     .dst_req_sel    = 8,                  //tx req.(must 8)
     .src_req_sel    = 0,
@@ -865,7 +865,7 @@ void rf_set_tx_dma(unsigned char fifo_dep, unsigned short fifo_byte_size)
 /**
  * @brief      This setting serve to set the configuration of Rx DMA.
  */
-// _attribute_data_sec_    //BLE USED: in IRQ
+_attribute_data_sec_    //BLE USED: in IRQ, be caution in zephyr
 rf_dma_config_t rf_rx_dma_config = {
     .dst_req_sel    = 0,                  //tx req.
     .src_req_sel    = 9,                  //must 9

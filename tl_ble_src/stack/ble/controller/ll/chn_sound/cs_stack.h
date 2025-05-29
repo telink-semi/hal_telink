@@ -946,8 +946,7 @@ typedef struct CS_BUFF_FLAG            cs_rx_flag;
 #if (HADM_PHASE_CONTINUITY | 1)
     #define RF_FCAL_MANUAL_START2DONE_TIME_US 18 // driver recommend 22, theoretical value 12.5
     #define CS_COMMON_TX_SETTLE_US            53 // todo, cs tx settle set to 53, INTERNAL_DELAY_MEDIAN need change.
-    #define CS_COMMON_RX_SETTLE_US            RX_SETTLE_US
-    #define CS_PHASE_CON_RX_SETTLE_US         50
+    #define CS_COMMON_RX_SETTLE_US            50
 //  #define CS_RF_TX_SETTLE_US                  53 // driver recommend 78
 //  #define CS_RF_RX_SETTLE_US                  50 // driver recommend
 //  #define CS_RF_TX_SETTLE_US                  108 // only for debug

@@ -61,6 +61,7 @@
 
 
 #define N22_FW_DOWNLOAD_FLASH_ADDR  0x20080000
+#define N22_FW_DOWNLOAD_NVM_ADDR    0x00500000
 
 ///////////////////////// OS settings /////////////////////////////////////////////////////////
 #define FREERTOS_ENABLE         0
@@ -100,6 +101,7 @@
 #define APP_HCI_LOG_EN        0
 #define APP_MAILBOX_LOG_EN    1
 #define APP_MESSAGE_LOG_EN    0
+#define APP_D25F_FPU_LOG_EN   1
 
 #define JTAG_DEBUG_DISABLE    1 //if use JTAG, change this
 

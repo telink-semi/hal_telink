@@ -48,7 +48,7 @@
 
 
 /******************************* core_start ******************************************************************/
-#ifdef BLC_ZEPHYR_BLE_INTEGRATION
+#if BLC_ZEPHYR_BLE_INTEGRATION != 1
 #undef irq_disable
 #undef irq_enable
 #define irq_disable                 core_interrupt_disable

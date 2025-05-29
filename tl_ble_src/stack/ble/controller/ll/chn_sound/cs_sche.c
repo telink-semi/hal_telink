@@ -718,6 +718,7 @@ _attribute_ram_code_sec_optimize_o2_
     }
 
     ble_rf_channel_sounding_deinit();
+    blt_ll_cs_tx_power_deinit();
 
     ble_rf_set_accessCodeThreshold(gCsMng.blt_pCsCfg->acl_ac_threshold);
 

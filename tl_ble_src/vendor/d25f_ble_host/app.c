@@ -35,6 +35,11 @@
 _attribute_data_retention_ static u8 mac_public[6]={0};
 _attribute_data_retention_ static u8 mac_random_static[6]={0};
 
+#if (ACL_CENTRAL_SMP_ENABLE)
+// todo We don't have GAP_EVT_SMP_PAIRING_FAIL event now, after we had, should clear central_smp_pending in SMP_PAIRING_FAIL callback.
+int central_smp_pending = 0; // SMP: security & encryption;
+#endif
+
 void main_lopp_hci(void);
 extern int blt_gap_mainloop_v1(void);
 extern void ble_host_v1_main_loop(void);
@@ -229,16 +234,27 @@ void ble_host_hci_set_leg_scan(void)
 
 static void app_acl_connected_event_callback(u16 aclHandle, const void *pEvent)
 {
-    (void) aclHandle;
     const blc_prf_aclConnEvt_t *pAclConnEvt = pEvent;
     tlkapi_send_string_data(APP_LOG_EN, "ble connect event",
                             (u8 *)(uintptr_t)(const void*)pAclConnEvt, sizeof(blc_prf_aclConnEvt_t));
+
     hci_le_connectionCompleteEvt_t conn_info;
-    conn_info.connHandle = pAclConnEvt->aclHandle;
-    conn_info.role = pAclConnEvt->aclHandle & 0x80 ? ACL_ROLE_CENTRAL : ACL_ROLE_PERIPHERAL;
+    conn_info.connHandle = aclHandle;
+    conn_info.role = aclHandle & 0x80 ? ACL_ROLE_CENTRAL : ACL_ROLE_PERIPHERAL;
     memcpy(conn_info.peerAddr, pAclConnEvt->PeerAddr, 6);
     conn_info.peerAddrType = pAclConnEvt->PeerAddrType;
     dev_char_info_insert_by_conn_event(&conn_info);
+
+    if (conn_info.role == ACL_ROLE_CENTRAL)         // central role, process SMP and SDP if necessary
+    {
+#if (ACL_CENTRAL_SMP_ENABLE)
+        central_smp_pending = aclHandle; // this connection need SMP
+#endif
+    }
+
+    if (acl_conn_periphr_num < ACL_PERIPHR_MAX_NUM) {
+        app_ble_adv_start();
+    }
 }
 
 static void app_acl_disconnected_event_callback(u16 aclHandle, const void *pEvent)
@@ -248,17 +264,32 @@ static void app_acl_disconnected_event_callback(u16 aclHandle, const void *pEven
     tlkapi_send_string_data(APP_LOG_EN, "ble disconnect event",
                             (u8 *)(uintptr_t)(const void*)pAclDisconnectEvt, sizeof(blc_prf_aclDisconnEvt_t));
 
-    app_ble_adv_start();
+    //if previous connection SMP & SDP not finished, clear flag
+#if (ACL_CENTRAL_SMP_ENABLE)
+    if (central_smp_pending == aclHandle) {
+        central_smp_pending = 0;
+    }
+#endif
 
     if (central_disconnect_connhandle == aclHandle) { //un_pair disconnection flow finish, clear flag
         central_disconnect_connhandle = 0;
     }
+
     dev_char_info_delete_by_connhandle(aclHandle);
+
+    app_ble_adv_start();
 }
 
 static void app_acl_connect_security_done_callback(u16 aclHandle, const void *pEvent)
 {
     (void)pEvent;
+#if (ACL_CENTRAL_SMP_ENABLE)
+        if (dev_char_get_conn_role_by_connhandle(aclHandle) == ACL_ROLE_CENTRAL) {
+            if (central_smp_pending == aclHandle) {
+                central_smp_pending = 0;
+            }
+        }
+#endif
     tlkapi_printf(APP_LOG_EN, "ble connect security done, handle: 0x%x\n", aclHandle);
 }
 
@@ -305,13 +336,12 @@ _attribute_ram_code_ void app_le_adv_report_callback(u16 param1, const void *pEv
     event_adv_report_t *pa = (event_adv_report_t *)(uintptr_t)(const void*)pEvent;
     s8 rssi = pa->data[pa->len];
     //tlkapi_send_string_data(APP_CONTR_EVT_LOG_EN, "[APP][EVT] Adv report", (u8 *)pa, pa->len+12);
-
     /*********************** Central Create connection demo: Key press or ADV pair packet triggers pair  ********************/
-    #if 0//(ACL_CENTRAL_SMP_ENABLE)
-        if (central_smp_pending) { //if previous connection SMP not finish, can not create a new connection
-            return ;
-        }
-    #endif
+#if (ACL_CENTRAL_SMP_ENABLE)
+    if (central_smp_pending) { //if previous connection SMP not finish, can not create a new connection
+        return ;
+    }
+#endif
 
     #if (ACL_CENTRAL_SIMPLE_SDP_ENABLE)
         if (central_sdp_pending) { //if previous connection SDP not finish, can not create a new connection
@@ -413,15 +443,6 @@ void app_ble_profile_init(void)
 #define MKEY_VOL_UP 0x00E9
 #define MKEY_VOL_DN 0x00EA
 
-//void app_ble_hid_initial(void)
-//{
-//    blc_basic_registerDISControlServer(NULL);
-//    blc_basic_registerSCPSControlServer(NULL);
-//    blc_hid_registerHIDControlServer(NULL);
-////    tlkdrv_key_registerVendorConfig1Callback(app_ble_hid_report_volume_increment);
-////    tlkdrv_key_registerVendorConfig2Callback(app_ble_hid_report_volume_decrement);
-//}
-
 static uint16_t acl_hid_connHandle;
 
 static void app_ble_hid_report_consume_control(uint16_t consumer_key)
@@ -505,7 +526,7 @@ void user_ble_init(void)
 
 void app_ble_host_cs_raw_pct_process(uint8_t *data, unsigned int len)
 {
-    tlkapi_send_string_data(1, "app_ble_host_cs_raw_pct_process",data,len);
+   // tlkapi_send_string_data(1, "app_ble_host_cs_raw_pct_process",data,len);
 }
 
 
@@ -531,7 +552,10 @@ void user_init(void)
 {
     #if 1
         /* Debug GPIO */
-        gpio_pin_e debug_gpio[] = {GPIO_PG4, GPIO_PG5, GPIO_PG6, GPIO_PG7, GPIO_PH0, GPIO_PH1, GPIO_PH2, GPIO_PH3, GPIO_PH4, GPIO_PH5, GPIO_PH6, GPIO_PH7 };
+        gpio_pin_e debug_gpio[] = {GPIO_PB0, GPIO_PB1, GPIO_PB2, GPIO_PB3, GPIO_PB4, GPIO_PB5, GPIO_PB6, GPIO_PB7,
+                                   GPIO_PD0, GPIO_PD1, GPIO_PD2, GPIO_PD3, GPIO_PD4, GPIO_PD5, GPIO_PD6, GPIO_PD7,
+                                   GPIO_PF0, GPIO_PF1, GPIO_PF2, GPIO_PF3, GPIO_PF4, GPIO_PF5, GPIO_PF6, GPIO_PF7};
+
         for(u32 i=0; i<(sizeof(debug_gpio)/sizeof(debug_gpio[0])); i++) {
             gpio_function_en(debug_gpio[i]);
             gpio_input_dis(debug_gpio[i]);
@@ -573,7 +597,7 @@ void user_init(void)
 
     sys_n22_init(N22_FW_DOWNLOAD_FLASH_ADDR);
     sys_n22_start();
-    gpio_write(GPIO_PG4, 1);
+    gpio_write(GPIO_PB0, 1);
     /* Condor-A0: delay cannot be less than 136ms */
     delay_ms(300);
 

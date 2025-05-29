@@ -26,7 +26,7 @@
 
 #include "macro_trick.h"
 
-#ifndef BLC_ZEPHYR_BLE_INTEGRATION
+#if BLC_ZEPHYR_BLE_INTEGRATION != 1
 #define BIT(n) (1ULL << (n))
 #else
 #undef BIT

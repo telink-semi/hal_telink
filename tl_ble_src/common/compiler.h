@@ -26,20 +26,13 @@
 
 #define _attribute_noinline_                __attribute__((noinline))
 
-#if (BLC_ZEPHYR_BLE_INTEGRATION)
-#define _attribute_ram_code_      				__attribute__((section(".ram_code_ble"))) __attribute__((noinline))
-#define _attribute_ram_code_only_               __attribute__((section(".ram_code_ble")))
-#define _attribute_ram_code_sec_      			__attribute__((section(".ram_code_ble")))
-#define _attribute_ram_code_sec_noinline_      	__attribute__((section(".ram_code_ble"))) __attribute__((noinline))
-#define _attribute_ram_code_com_      				__attribute__((section(".ram_code"))) __attribute__((noinline))
-#define _attribute_ram_code_com_only_               __attribute__((section(".ram_code")))
-#define _attribute_ram_code_com_sec_      			__attribute__((section(".ram_code")))
-#define _attribute_ram_code_com_sec_noinline_      	__attribute__((section(".ram_code"))) __attribute__((noinline))
-#else
-#define _attribute_ram_code_      				__attribute__((section(".ram_code"))) __attribute__((noinline))
-#define _attribute_ram_code_only_               __attribute__((section(".ram_code")))
 #define _attribute_ram_code_sec_            __attribute__((section(".ram_code")))
 #define _attribute_ram_code_sec_noinline_   __attribute__((section(".ram_code"))) __attribute__((noinline))
+
+#if (defined(MCU_CORE_N22_ENABLE) || defined(MCU_CORE_D25F_ENABLE))
+#define _attribute_retention_code_          __attribute__((section(".ram_code"))) __attribute__((noinline))
+#else
+#define _attribute_retention_code_
 #endif
 
 #define _attribute_text_sec_                __attribute__((section(".text")))
@@ -68,8 +61,6 @@
 #else
     #define _attribute_ram_code_sec_optimize_o2_          __attribute__((section(".ram_code"))) __attribute__((optimize("O2")))
     #define _attribute_ram_code_sec_optimize_o2_noinline_ __attribute__((noinline)) __attribute__((section(".ram_code"))) __attribute__((optimize("O2")))
-#define _attribute_ram_code_com_sec_optimize_o2_    __attribute__((section(".ram_code"))) __attribute__((optimize("O2")))
-#define _attribute_ram_code_com_sec_optimize_o2_noinline_    __attribute__((noinline)) __attribute__((section(".ram_code"))) __attribute__((optimize("O2")))
 #endif
 
 /// Pack a structure field
@@ -85,7 +76,6 @@
 #define _inline_                            inline
 #define _attribute_data_dlm_                _attribute_session_(".dlm_data") // dlm:Data Local Memory
 #define _attribute_data_sec_                _attribute_session_(".data")     // Force only read data to be stored in data segments to avoid compiler optimization
-#define _attribute_data_                __attribute__((section(".data")))
 
 #define _attribute_iram_noinit_data_        __attribute__((section(".iram_noinit_data")))
 #define _attribute_iram_bss_                __attribute__((section(".iram_bss")))
@@ -94,17 +84,14 @@
     #define _attribute_data_retention_sec_ __attribute__((section(".retention_data")))
     #define _attribute_data_retention_     __attribute__((section(".retention_data")))
     #define _attribute_ble_data_retention_ __attribute__((section(".retention_data")))
-#elif (BLC_PM_RETENTION_DRIVERS_ONLY)
-    #define _attribute_data_retention_sec_          __attribute__((section(".retention_data")))
-	#define _attribute_data_retention_              __attribute__((section(".retention_data")))
-    #define _attribute_ble_data_retention_          /* BLE controller stack data retention not required */
 #else
     #define _attribute_data_retention_sec_
     #define _attribute_data_retention_
     #define _attribute_ble_data_retention_
 #endif
 
-
+#define _attribute_ram_code_      __attribute__((section(".ram_code"))) __attribute__((noinline))
+#define _attribute_ram_code_only_ __attribute__((section(".ram_code")))
 
 #define _attribute_text_code_     __attribute__((section(".text")))
 
