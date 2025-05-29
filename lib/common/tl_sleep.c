@@ -44,34 +44,34 @@
  */
 bool tl_suspend(uint32_t wake_stimer_tick)
 {
-	bool result = false;
+    bool result = false;
 
 #if (CONFIG_BT_B9X || CONFIG_BT_TLX)
-	enum tl_bt_controller_state state = tl_bt_controller_state();
+    enum tl_bt_controller_state state = tl_bt_controller_state();
 
-	if (state == TL_BT_CONTROLLER_STATE_ACTIVE ||
-		state == TL_BT_CONTROLLER_STATE_STOPPING) {
-		blc_pm_setAppWakeupLowPower(wake_stimer_tick, 1);
-		if (!blc_pm_handler()) {
-			rf_set_power_level(tl_tx_pwr_lt[CONFIG_TL_BLE_CTRL_RF_POWER
-			- TL_TX_POWER_MIN]);
-			result = true;
-		}
-		blc_pm_setAppWakeupLowPower(0, 0);
-	} else {
-		if (cpu_sleep_wakeup_32k_rc(SUSPEND_MODE, PM_WAKEUP_TIMER | PM_WAKEUP_PAD,
-			wake_stimer_tick) != STATUS_GPIO_ERR_NO_ENTER_PM) {
-			result = true;
-		}
-	}
+    if (state == TL_BT_CONTROLLER_STATE_ACTIVE ||
+        state == TL_BT_CONTROLLER_STATE_STOPPING) {
+        blc_pm_setAppWakeupLowPower(wake_stimer_tick, 1);
+        if (!blc_pm_handler()) {
+            rf_set_power_level(tl_tx_pwr_lt[CONFIG_TL_BLE_CTRL_RF_POWER
+            - TL_TX_POWER_MIN]);
+            result = true;
+        }
+        blc_pm_setAppWakeupLowPower(0, 0);
+    } else {
+        if (cpu_sleep_wakeup_32k_rc(SUSPEND_MODE, PM_WAKEUP_TIMER | PM_WAKEUP_PAD,
+            wake_stimer_tick) != STATUS_GPIO_ERR_NO_ENTER_PM) {
+            result = true;
+        }
+    }
 #else
-	if (cpu_sleep_wakeup_32k_rc(SUSPEND_MODE, PM_WAKEUP_TIMER | PM_WAKEUP_PAD,
-		wake_stimer_tick) != STATUS_GPIO_ERR_NO_ENTER_PM) {
-		result = true;
-	}
+    if (cpu_sleep_wakeup_32k_rc(SUSPEND_MODE, PM_WAKEUP_TIMER | PM_WAKEUP_PAD,
+        wake_stimer_tick) != STATUS_GPIO_ERR_NO_ENTER_PM) {
+        result = true;
+    }
 #endif /* CONFIG_BT_B9X || CONFIG_BT_TL */
 
-	return result;
+    return result;
 }
 
 #if (CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION || \
@@ -89,67 +89,67 @@ CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION)
 
 bool tl_deep_sleep(uint32_t wake_stimer_tick)
 {
-	bool result = false;
-	static volatile bool tl_sleep_retention
-	__attribute__ ((section (".retention_data"))) = false;
+    bool result = false;
+    static volatile bool tl_sleep_retention
+    __attribute__ ((section (".retention_data"))) = false;
 
-	extern void tl_context_save(void);
+    extern void tl_context_save(void);
 #if CONFIG_BT_B9X
-	extern void soc_b9x_restore(void);
+    extern void soc_b9x_restore(void);
 #elif CONFIG_BT_TLX
-	extern void soc_tlx_restore(void);
+    extern void soc_tlx_restore(void);
 #endif
 
 #if (CONFIG_BT_B9X || CONFIG_BT_TLX)
-	enum tl_bt_controller_state state = tl_bt_controller_state();
+    enum tl_bt_controller_state state = tl_bt_controller_state();
 
-	if (state == TL_BT_CONTROLLER_STATE_ACTIVE ||
-		state == TL_BT_CONTROLLER_STATE_STOPPING) {
-		blc_pm_setAppWakeupLowPower(wake_stimer_tick, 1);
-		if (!blc_pm_handler()) {
-			rf_set_power_level(tl_tx_pwr_lt[CONFIG_TL_BLE_CTRL_RF_POWER
-			- TL_TX_POWER_MIN]);
-			result = true;
-		}
-		blc_pm_setAppWakeupLowPower(0, 0);
-	} else {
-		tl_context_save();
-		if (!tl_sleep_retention) {
-			tl_sleep_retention = true;
-			(void)cpu_sleep_wakeup_32k_rc(DEEPSLEEP_MODE_RET_SRAM,
-				PM_WAKEUP_TIMER | PM_WAKEUP_PAD,
-				wake_stimer_tick);
-			tl_sleep_retention = false;
-		} else {
+    if (state == TL_BT_CONTROLLER_STATE_ACTIVE ||
+        state == TL_BT_CONTROLLER_STATE_STOPPING) {
+        blc_pm_setAppWakeupLowPower(wake_stimer_tick, 1);
+        if (!blc_pm_handler()) {
+            rf_set_power_level(tl_tx_pwr_lt[CONFIG_TL_BLE_CTRL_RF_POWER
+            - TL_TX_POWER_MIN]);
+            result = true;
+        }
+        blc_pm_setAppWakeupLowPower(0, 0);
+    } else {
+        tl_context_save();
+        if (!tl_sleep_retention) {
+            tl_sleep_retention = true;
+            (void)cpu_sleep_wakeup_32k_rc(DEEPSLEEP_MODE_RET_SRAM,
+                PM_WAKEUP_TIMER | PM_WAKEUP_PAD,
+                wake_stimer_tick);
+            tl_sleep_retention = false;
+        } else {
 #if CONFIG_BT_B9X
-			soc_b9x_restore();
+            soc_b9x_restore();
 #elif CONFIG_BT_TLX
-			soc_tlx_restore();
+            soc_tlx_restore();
 #endif
-			tl_sleep_retention = false;
-			result = true;
-		}
-	}
+            tl_sleep_retention = false;
+            result = true;
+        }
+    }
 #else
-	tl_context_save();
-	if (!tl_sleep_retention) {
-		tl_sleep_retention = true;
-		(void)cpu_sleep_wakeup_32k_rc(DEEPSLEEP_MODE_RET_SRAM,
-			PM_WAKEUP_TIMER | PM_WAKEUP_PAD,
-			wake_stimer_tick);
-		tl_sleep_retention = false;
-	} else {
+    tl_context_save();
+    if (!tl_sleep_retention) {
+        tl_sleep_retention = true;
+        (void)cpu_sleep_wakeup_32k_rc(DEEPSLEEP_MODE_RET_SRAM,
+            PM_WAKEUP_TIMER | PM_WAKEUP_PAD,
+            wake_stimer_tick);
+        tl_sleep_retention = false;
+    } else {
 #if CONFIG_BT_B9X
-		soc_b9x_restore();
+        soc_b9x_restore();
 #elif CONFIG_BT_TLX
-		soc_tlx_restore();
+        soc_tlx_restore();
 #endif
-		tl_sleep_retention = false;
-		result = true;
-	}
+        tl_sleep_retention = false;
+        result = true;
+    }
 #endif /* CONFIG_BT_B9X || CONFIG_BT_TLX */
 
-	return result;
+    return result;
 }
 
 #endif /* (CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION || \ */

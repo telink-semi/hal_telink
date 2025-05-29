@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (c) 2022 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * Copyright (c) 2024 Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,56 +15,55 @@
  * limitations under the License.
  *
  *****************************************************************************/
-
-#ifndef B9X_BT_H_
-#define B9X_BT_H_
+#ifndef TLX_BT_H_
+#define TLX_BT_H_
 
 /**
- *  @brief b9x_bt_contriller_state
- *  B9X Bluetooth controller state
+ *  @brief tl_bt_contriller_state
+ *  TLX Bluetooth controller state
  */
 enum tl_bt_controller_state {
-	TL_BT_CONTROLLER_STATE_STOPPED = 0,
-	TL_BT_CONTROLLER_STATE_ACTIVE,
-	TL_BT_CONTROLLER_STATE_STOPPING
+    TL_BT_CONTROLLER_STATE_STOPPED = 0,
+    TL_BT_CONTROLLER_STATE_ACTIVE,
+    TL_BT_CONTROLLER_STATE_STOPPING
 };
 
 /**
- *  @brief b9x_bt_host_callback
+ *  @brief tlx_bt_host_callback
  *  used for vhci call host function to notify what host need to do
  */
-typedef struct b9x_bt_host_callback {
+typedef struct tlx_bt_host_callback {
     void (*host_send_available)(void);                      /* the host can send packet to the controller */
     void (*host_read_packet)(uint8_t *data, uint16_t len);  /* the controller has a packet to send to the host */
-} b9x_bt_host_callback_t;
+} tlx_bt_host_callback_t;
 
 /**
  * @brief register the host reference callback
  */
-void b9x_bt_host_callback_register(const b9x_bt_host_callback_t *callback);
+void tlx_bt_host_callback_register(const tlx_bt_host_callback_t *callback);
 
 /**
  * @brief     Host send HCI packet to controller
  * @param     data the packet point
  * @param     len the packet length
  */
-void b9x_bt_host_send_packet(uint8_t type, const uint8_t *data, uint16_t len);
+void tlx_bt_host_send_packet(uint8_t type, const uint8_t *data, uint16_t len);
 
 /**
- * @brief     Telink B9X BLE Controller initialization
+ * @brief     Telink TLX BLE Controller initialization
  * @return    Status - 0: command succeeded; -1: command failed
  */
-int b9x_bt_controller_init(void);
+int tlx_bt_controller_init(void);
 
 /**
- * @brief     Telink B9X BLE Controller deinitialization
+ * @brief     Telink TLX BLE Controller deinitialization
  */
-void b9x_bt_controller_deinit(void);
+void tlx_bt_controller_deinit(void);
 
 /**
- * @brief     Get state of Telink B9X BLE Controller
+ * @brief     Get state of Telink TLX BLE Controller
  */
 enum tl_bt_controller_state tl_bt_controller_state(void);
 
 
-#endif /* B9X_BT_H_ */
+#endif /* TLX_BT_H_ */

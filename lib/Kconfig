@@ -1,4 +1,4 @@
 # Copyright (c) 2022 Telink Semiconductor
 # SPDX-License-Identifier: Apache-2.0
 
-rsource "hal_zephyr/controller/Kconfig"
+rsource "controller/Kconfig"

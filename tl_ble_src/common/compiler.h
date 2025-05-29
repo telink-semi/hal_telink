@@ -27,16 +27,16 @@
 #define _attribute_noinline_                __attribute__((noinline))
 
 #if (BLC_ZEPHYR_BLE_INTEGRATION)
-#define _attribute_ram_code_      				__attribute__((section(".ram_code_ble"))) __attribute__((noinline))
+#define _attribute_ram_code_                    __attribute__((section(".ram_code_ble"))) __attribute__((noinline))
 #define _attribute_ram_code_only_               __attribute__((section(".ram_code_ble")))
-#define _attribute_ram_code_sec_      			__attribute__((section(".ram_code_ble")))
-#define _attribute_ram_code_sec_noinline_      	__attribute__((section(".ram_code_ble"))) __attribute__((noinline))
-#define _attribute_ram_code_com_      				__attribute__((section(".ram_code"))) __attribute__((noinline))
+#define _attribute_ram_code_sec_                __attribute__((section(".ram_code_ble")))
+#define _attribute_ram_code_sec_noinline_       __attribute__((section(".ram_code_ble"))) __attribute__((noinline))
+#define _attribute_ram_code_com_                    __attribute__((section(".ram_code"))) __attribute__((noinline))
 #define _attribute_ram_code_com_only_               __attribute__((section(".ram_code")))
-#define _attribute_ram_code_com_sec_      			__attribute__((section(".ram_code")))
-#define _attribute_ram_code_com_sec_noinline_      	__attribute__((section(".ram_code"))) __attribute__((noinline))
+#define _attribute_ram_code_com_sec_                __attribute__((section(".ram_code")))
+#define _attribute_ram_code_com_sec_noinline_       __attribute__((section(".ram_code"))) __attribute__((noinline))
 #else
-#define _attribute_ram_code_      				__attribute__((section(".ram_code"))) __attribute__((noinline))
+#define _attribute_ram_code_                    __attribute__((section(".ram_code"))) __attribute__((noinline))
 #define _attribute_ram_code_only_               __attribute__((section(".ram_code")))
 #define _attribute_ram_code_sec_            __attribute__((section(".ram_code")))
 #define _attribute_ram_code_sec_noinline_   __attribute__((section(".ram_code"))) __attribute__((noinline))
@@ -96,7 +96,7 @@
     #define _attribute_ble_data_retention_ __attribute__((section(".retention_data")))
 #elif (BLC_PM_RETENTION_DRIVERS_ONLY)
     #define _attribute_data_retention_sec_          __attribute__((section(".retention_data")))
-	#define _attribute_data_retention_              __attribute__((section(".retention_data")))
+    #define _attribute_data_retention_              __attribute__((section(".retention_data")))
     #define _attribute_ble_data_retention_          /* BLE controller stack data retention not required */
 #else
     #define _attribute_data_retention_sec_

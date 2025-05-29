@@ -17,23 +17,23 @@
  *****************************************************************************/
 
 /********************************************************************************************************
- * @file	fifo.h
+ * @file    fifo.h
  *
- * @brief	This is the header file for B9x
+ * @brief   This is the header file for B9x
  *
- * @author	Driver Group
+ * @author  Driver Group
  *
  *******************************************************************************************************/
 #ifndef FIFO_H_
 #define FIFO_H_
 
-typedef	struct {
-	unsigned int		size;
-	unsigned short		num;
-	unsigned char		wptr;
-	unsigned char		rptr;
-	unsigned char*		p;
-}	my_fifo_t;
+typedef struct {
+    unsigned int        size;
+    unsigned short      num;
+    unsigned char       wptr;
+    unsigned char       rptr;
+    unsigned char*      p;
+}   my_fifo_t;
 
 
 #endif /* FIFO_H_ */

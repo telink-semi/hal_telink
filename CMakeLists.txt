@@ -6,6 +6,6 @@
 
 if(CONFIG_HAS_TELINK_DRIVERS)
 
-add_subdirectory(tl_ble_src)
+add_subdirectory(lib)
 
 endif() # CONFIG_HAS_TELINK_DRIVERS

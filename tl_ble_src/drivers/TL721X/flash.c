@@ -675,16 +675,16 @@ flash_capacity_e flash_get_capacity(unsigned int flash_mid)
 }
 
 /*******************************************************************************************************************
- *									This function serves to 1m area flash protection
+ *                                  This function serves to 1m area flash protection
  ******************************************************************************************************************/
-#define FLASH_1M_ADR_OFFSET 		0x100000
-#define FLASH_2M_ADR_OFFSET 		0x200000
-#define FLASH_3M_ADR_OFFSET 		0x300000
-#define FLASH_3M5_ADR_OFFSET 		0x380000
+#define FLASH_1M_ADR_OFFSET         0x100000
+#define FLASH_2M_ADR_OFFSET         0x200000
+#define FLASH_3M_ADR_OFFSET         0x300000
+#define FLASH_3M5_ADR_OFFSET        0x380000
 
-#define FLASH_ADR_OFFSET_SELECT		FLASH_1M_ADR_OFFSET
+#define FLASH_ADR_OFFSET_SELECT     FLASH_1M_ADR_OFFSET
 
-#define FLASH_PROTECT_BLOCK_SIZE	3
+#define FLASH_PROTECT_BLOCK_SIZE    3
 
 void flash_protection_lock_init(void)
 {
@@ -699,16 +699,16 @@ void flash_protection_lock_init(void)
 
 void flash_protection_lock_operation(unsigned int offset)
 {
-	/* no need to lock again, detect fw addr will unlock flash. */
-	if(offset < FLASH_ADR_OFFSET_SELECT){
-		flash_unlock();
-	}
+    /* no need to lock again, detect fw addr will unlock flash. */
+    if(offset < FLASH_ADR_OFFSET_SELECT){
+        flash_unlock();
+    }
 }
 
 void flash_protection_unlock_operation(unsigned int offset)
 {
-	/* suppose we will operate lock area, it will do ota, will unlock first and not lock again until it will reboot. */
-	if(offset < FLASH_ADR_OFFSET_SELECT){
-		flash_unlock();
-	}
+    /* suppose we will operate lock area, it will do ota, will unlock first and not lock again until it will reboot. */
+    if(offset < FLASH_ADR_OFFSET_SELECT){
+        flash_unlock();
+    }
 }
