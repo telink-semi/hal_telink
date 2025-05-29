@@ -65,5 +65,12 @@ void tlx_bt_controller_deinit(void);
  */
 enum tl_bt_controller_state tl_bt_controller_state(void);
 
+/* Compatible macros */
+#define rf_baseband_reset			rf_clr_dig_logic_state
+
+#define rf_radio_reset				rf_reset_register_value
+
+#define rf_reset_dma				rf_dma_reset
+
 
 #endif /* TLX_BT_H_ */

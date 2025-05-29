@@ -18,14 +18,14 @@
 #include "tlx_bt_buffer.h"
 
 /******* ACL connection LinkLayer TX & RX data FIFO allocation, Begin ********/
-_attribute_data_ u8* app_acl_rxfifo;
+_attribute_data_sec_ u8* app_acl_rxfifo;
 #ifdef CONFIG_BT_CENTRAL
-_attribute_data_ u8* app_acl_mstTxfifo;
+_attribute_data_sec_ u8* app_acl_mstTxfifo;
 #endif /* CONFIG_BT_CENTRAL */
 #ifdef CONFIG_BT_PERIPHERAL
-_attribute_data_ u8* app_acl_slvTxfifo;
+_attribute_data_sec_ u8* app_acl_slvTxfifo;
 #endif /* CONFIG_BT_PERIPHERAL */
 /******** HCI TX & RX data FIFO allocation, Begin  ***************************/
-_attribute_data_ u8* app_hci_rxfifo;
-_attribute_data_ u8* app_hci_txfifo;
-_attribute_data_ u8* app_hci_rxAclfifo;
+_attribute_data_sec_ u8* app_hci_rxfifo;
+_attribute_data_sec_ u8* app_hci_txfifo;
+_attribute_data_sec_ u8* app_hci_rxAclfifo;
