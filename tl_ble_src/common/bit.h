@@ -26,7 +26,12 @@
 
 #include "macro_trick.h"
 
+#ifndef BLC_ZEPHYR_BLE_INTEGRATION
 #define BIT(n) (1ULL << (n))
+#else
+#undef BIT
+#define BIT(n) (1ULL << (n))
+#endif
 
 // BITSx  are internal used macro, please use BITS instead
 #define BITS1(a)                      BIT(a)

@@ -3,6 +3,6 @@
 
 if HAS_TELINK_DRIVERS
 
-rsource "lib/Kconfig"
+rsource "wrapper/Kconfig"
 
 endif # HAS_TELINK_DRIVERS

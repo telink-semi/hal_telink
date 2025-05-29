@@ -1079,6 +1079,8 @@ _attribute_ram_code_
         blt_sche_removeTaskMask(TSKMSK_PRICHN_SCAN);
         update_en = SLOT_UPDT_EXT_SCAN_DISABLE;
     }
+#else
+    (void)prichn_scan_sche_en;
 #endif /*< #if (LL_ACL_CEN_EN || LL_FEATURE_ENABLE_LE_EXTENDED_SCAN || LL_FEATURE_SUPPORT_LE_LEGACY_SCANNING) */
 
 

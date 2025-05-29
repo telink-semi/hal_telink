@@ -1016,7 +1016,6 @@ ble_sts_t blc_hci_readLocalSupportedCommands(hci_readLocSupCmds_retParam_t *pRet
 #else
         0x00,
         0x00,
-        0x00,
 #endif
     };
 

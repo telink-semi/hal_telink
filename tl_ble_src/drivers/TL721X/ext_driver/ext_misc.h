@@ -48,8 +48,13 @@
 
 
 /******************************* core_start ******************************************************************/
+#ifdef BLC_ZEPHYR_BLE_INTEGRATION
+#undef irq_disable
+#undef irq_enable
 #define irq_disable                 core_interrupt_disable
 #define irq_enable                  core_interrupt_enable
+#endif
+
 #define irq_restore(en)             core_restore_interrupt(en)
 
 #define start_reboot                sys_reboot   //This function serves to reboot chip.

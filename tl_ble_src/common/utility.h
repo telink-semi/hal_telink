@@ -58,7 +58,12 @@
 #endif
 
 #define OFFSETOF(type, member)          ((unsigned int)&((type *)0)->member)
+
+#ifndef BLC_ZEPHYR_BLE_INTEGRATION
 #define CONTAINER_OF(ptr, type, member) ({const typeof(((type *)0)->member)*__mptr = (ptr); (type *)((char *)__mptr - OFFSETOF(type, member)); })
+#else
+#include <zephyr/sys/util.h>
+#endif
 
 #define ROUND_INT(x, r)                 (((x) + (r) - 1) / (r) * (r))
 #define ROUND_TO_POW2(x, r)             (((x) + (r) - 1) & ~((r) - 1))
@@ -134,7 +139,11 @@
 #define foreach_range(i, s, e) for (int i = (s); i < (e); ++i)
 #define foreach_arr(i, arr)    for (unsigned int i = 0; i < ARRAY_SIZE(arr); ++i)
 
+#ifndef BLC_ZEPHYR_BLE_INTEGRATION
 #define ARRAY_SIZE(a)          (sizeof(a) / sizeof(*a))
+#else
+#include <zephyr/sys/util.h>
+#endif
 
 #define everyN(i, n)           \
     ++(i);                     \
