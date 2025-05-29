@@ -27,28 +27,24 @@
 
 const blc_audio_pacParam_t defaultPac[] = {
     {
-        LC3_CAP_16_2(BLC_AUDIO_CHANNEL_COUNTS_1, 1),
-        METADATA_CONTEXTS_MEDIA,
-    },
+     LC3_CAP_16_2(BLC_AUDIO_CHANNEL_COUNTS_1, 1),
+     METADATA_CONTEXTS_MEDIA,
+     },
     {
-        LC3_CAP_24_2(BLC_AUDIO_CHANNEL_COUNTS_1, 1),
-        METADATA_CONTEXTS_MEDIA,
-    },
+     LC3_CAP_24_2(BLC_AUDIO_CHANNEL_COUNTS_1,                                       1),
+     METADATA_CONTEXTS_MEDIA,
+     },
 };
 
 const blc_pacss_regParam_t defaultPacsParam = {
-    .sinkPacNum = 1,
-    .sinkPac = defaultPac,
-    .sinkAudioLocations = BLC_AUDIO_LOCATION_FLAG_FL,
-    .sourcePacNum = 1,
-    .sourcePac = defaultPac,
-    .sourceAudioLocations = BLC_AUDIO_LOCATION_FLAG_FL,
-    .availableSinkContexts = BLC_AUDIO_CONTEXT_TYPE_UNSPECIFIED|BLC_AUDIO_CONTEXT_TYPE_CONVERSATIONAL|BLC_AUDIO_CONTEXT_TYPE_MEDIA,
-    .availableSourceContexts = BLC_AUDIO_CONTEXT_TYPE_UNSPECIFIED|BLC_AUDIO_CONTEXT_TYPE_CONVERSATIONAL|BLC_AUDIO_CONTEXT_TYPE_MEDIA,
-    .supportedSinkContexts = BLC_AUDIO_CONTEXT_TYPE_UNSPECIFIED|BLC_AUDIO_CONTEXT_TYPE_CONVERSATIONAL|BLC_AUDIO_CONTEXT_TYPE_MEDIA,
-    .supportedSourceContexts = BLC_AUDIO_CONTEXT_TYPE_UNSPECIFIED|BLC_AUDIO_CONTEXT_TYPE_CONVERSATIONAL|BLC_AUDIO_CONTEXT_TYPE_MEDIA,
+    .sinkPacNum              = 1,
+    .sinkPac                 = defaultPac,
+    .sinkAudioLocations      = BLC_AUDIO_LOCATION_FLAG_FL,
+    .sourcePacNum            = 1,
+    .sourcePac               = defaultPac,
+    .sourceAudioLocations    = BLC_AUDIO_LOCATION_FLAG_FL,
+    .availableSinkContexts   = BLC_AUDIO_CONTEXT_TYPE_UNSPECIFIED | BLC_AUDIO_CONTEXT_TYPE_CONVERSATIONAL | BLC_AUDIO_CONTEXT_TYPE_MEDIA,
+    .availableSourceContexts = BLC_AUDIO_CONTEXT_TYPE_UNSPECIFIED | BLC_AUDIO_CONTEXT_TYPE_CONVERSATIONAL | BLC_AUDIO_CONTEXT_TYPE_MEDIA,
+    .supportedSinkContexts   = BLC_AUDIO_CONTEXT_TYPE_UNSPECIFIED | BLC_AUDIO_CONTEXT_TYPE_CONVERSATIONAL | BLC_AUDIO_CONTEXT_TYPE_MEDIA,
+    .supportedSourceContexts = BLC_AUDIO_CONTEXT_TYPE_UNSPECIFIED | BLC_AUDIO_CONTEXT_TYPE_CONVERSATIONAL | BLC_AUDIO_CONTEXT_TYPE_MEDIA,
 };
-
-
-
-

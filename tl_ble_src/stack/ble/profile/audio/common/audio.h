@@ -26,9 +26,13 @@
 /*
  * bluetooth LE Audio profile debug log.
  */
-#define BLC_AUDIO_PRF_DBG(en, fmt, ...)     if(DBG_PRF_AUD_LOG){BLC_PROFILE_DEBUG(en, fmt, ##__VA_ARGS__);}
+#define BLC_AUDIO_PRF_DBG(en, fmt, ...)            \
+    if (DBG_PRF_AUD_LOG) {                         \
+        BLC_PROFILE_DEBUG(en, fmt, ##__VA_ARGS__); \
+    }
 
-typedef enum{
+typedef enum
+{
     AUDIO_ESUCC = 0x00, /* Success */
     AUDIO_EFAIL,
     AUDIO_EMPTY,
@@ -68,87 +72,87 @@ typedef enum{
     AUDIO_ERR_INPUT_NULL_PTR,
 } audio_error_enum;
 
-
 /**
  * profile client/server ID enumeration.
  */
-typedef enum{
-    AUDIO_CLIENT_START = PRF_LE_AUDIO_CLIENT_START-1,
-    AUDIO_CSIS_CLIENT,      /* Coordinated Set Identification Service Client */
-    AUDIO_PACS_CLIENT,      /* Published Audio Capabilities Service Client */
-    AUDIO_ASCS_CLIENT,      /* Audio Stream Control Service Client */
-    AUDIO_BASS_CLIENT,      /* Broadcast Audio Scan Service Client */
-    AUDIO_GMCS_CLIENT,      /* Generic Media Control Service Client */
-    AUDIO_GTBS_CLIENT,      /* Generic Telephone Bearer Service Client */
-    AUDIO_VCP_CLIENT,       /* Volume Controller Profile Client, include VOCS+AISC*/
-    AUDIO_MICS_CLIENT,      /* Microphone Control Service Client include AICS*/
-    AUDIO_TMAS_CLIENT,      /* Telephony And Media Audio Service Client */
-    AUDIO_HAS_CLIENT,       /* Hearing Access Service Client */
+typedef enum
+{
+    AUDIO_CLIENT_START = PRF_LE_AUDIO_CLIENT_START - 1,
+    AUDIO_CSIS_CLIENT, /* Coordinated Set Identification Service Client */
+    AUDIO_PACS_CLIENT, /* Published Audio Capabilities Service Client */
+    AUDIO_ASCS_CLIENT, /* Audio Stream Control Service Client */
+    AUDIO_BASS_CLIENT, /* Broadcast Audio Scan Service Client */
+    AUDIO_GMCS_CLIENT, /* Generic Media Control Service Client */
+    AUDIO_GTBS_CLIENT, /* Generic Telephone Bearer Service Client */
+    AUDIO_VCP_CLIENT,  /* Volume Controller Profile Client, include VOCS+AISC*/
+    AUDIO_MICS_CLIENT, /* Microphone Control Service Client include AICS*/
+    AUDIO_TMAS_CLIENT, /* Telephony And Media Audio Service Client */
+    AUDIO_HAS_CLIENT,  /* Hearing Access Service Client */
 
     AUDIO_SERVER_START = AUDIO_CLIENT_START + PRF_SERVER_OFFSET,
-    AUDIO_CSIS_SERVER,      /* Coordinated Set Identification Service Server */
-    AUDIO_PACS_SERVER,      /* Published Audio Capabilities Service Server */
-    AUDIO_ASCS_SERVER,      /* Audio Stream Control Service Server */
-    AUDIO_BASS_SERVER,      /* Broadcast Audio Scan Service Server */
-    AUDIO_GMCS_SERVER,      /* Generic Media Control Service Server */
-    AUDIO_GTBS_SERVER,      /* Generic Telephone Bearer Service Server */
-    AUDIO_VCP_SERVER,       /* Volume Controller Profile Server, include VOCS+AISC*/
-    AUDIO_MICS_SERVER,      /* Microphone Control Service Server include AICS*/
-    AUDIO_TMAS_SERVER,      /* Telephony And Media Audio Service Server */
-    AUDIO_HAS_SERVER,       /* Hearing Access Service Server */
+    AUDIO_CSIS_SERVER, /* Coordinated Set Identification Service Server */
+    AUDIO_PACS_SERVER, /* Published Audio Capabilities Service Server */
+    AUDIO_ASCS_SERVER, /* Audio Stream Control Service Server */
+    AUDIO_BASS_SERVER, /* Broadcast Audio Scan Service Server */
+    AUDIO_GMCS_SERVER, /* Generic Media Control Service Server */
+    AUDIO_GTBS_SERVER, /* Generic Telephone Bearer Service Server */
+    AUDIO_VCP_SERVER,  /* Volume Controller Profile Server, include VOCS+AISC*/
+    AUDIO_MICS_SERVER, /* Microphone Control Service Server include AICS*/
+    AUDIO_TMAS_SERVER, /* Telephony And Media Audio Service Server */
+    AUDIO_HAS_SERVER,  /* Hearing Access Service Server */
     AUDIO_SERVER_MAX,
 } le_audio_service_role_enum;
 
-typedef enum{
+typedef enum
+{
     /*********** Event for Client *************/
     AUDIO_EVT_TYPE_CLIENT_START = PRF_EVTID_LE_AUDIO_START, //refer to each XXXP modules XXXS.h
-    AUDIO_EVT_TYPE_CSISC = AUDIO_EVT_TYPE_CLIENT_START,
-    AUDIO_EVT_TYPE_PACSC = AUDIO_EVT_TYPE_CSISC + PRF_EVENT_ID_SIZE,
-    AUDIO_EVT_TYPE_ASCSC = AUDIO_EVT_TYPE_PACSC + PRF_EVENT_ID_SIZE,
-    AUDIO_EVT_TYPE_BASSC = AUDIO_EVT_TYPE_ASCSC + PRF_EVENT_ID_SIZE,
-    AUDIO_EVT_TYPE_BAPUC = AUDIO_EVT_TYPE_BASSC + PRF_EVENT_ID_SIZE,
-    AUDIO_EVT_TYPE_BAPBA = AUDIO_EVT_TYPE_BAPUC + PRF_EVENT_ID_SIZE,
-    AUDIO_EVT_TYPE_GMCSC = AUDIO_EVT_TYPE_BAPBA + PRF_EVENT_ID_SIZE,
-    AUDIO_EVT_TYPE_GTBSC = AUDIO_EVT_TYPE_GMCSC + PRF_EVENT_ID_SIZE,
-    AUDIO_EVT_TYPE_VCSC  = AUDIO_EVT_TYPE_GTBSC + PRF_EVENT_ID_SIZE,
-    AUDIO_EVT_TYPE_VOCSC = AUDIO_EVT_TYPE_VCSC  + PRF_EVENT_ID_SIZE,
-    AUDIO_EVT_TYPE_AICSC = AUDIO_EVT_TYPE_VOCSC + PRF_EVENT_ID_SIZE,
-    AUDIO_EVT_TYPE_MICSC = AUDIO_EVT_TYPE_AICSC + PRF_EVENT_ID_SIZE,
-    AUDIO_EVT_TYPE_TMASC = AUDIO_EVT_TYPE_MICSC + PRF_EVENT_ID_SIZE,
-    AUDIO_EVT_TYPE_HASC  = AUDIO_EVT_TYPE_TMASC + PRF_EVENT_ID_SIZE,
+    AUDIO_EVT_TYPE_CSISC        = AUDIO_EVT_TYPE_CLIENT_START,
+    AUDIO_EVT_TYPE_PACSC        = AUDIO_EVT_TYPE_CSISC + PRF_EVENT_ID_SIZE,
+    AUDIO_EVT_TYPE_ASCSC        = AUDIO_EVT_TYPE_PACSC + PRF_EVENT_ID_SIZE,
+    AUDIO_EVT_TYPE_BASSC        = AUDIO_EVT_TYPE_ASCSC + PRF_EVENT_ID_SIZE,
+    AUDIO_EVT_TYPE_BAPUC        = AUDIO_EVT_TYPE_BASSC + PRF_EVENT_ID_SIZE,
+    AUDIO_EVT_TYPE_BAPBA        = AUDIO_EVT_TYPE_BAPUC + PRF_EVENT_ID_SIZE,
+    AUDIO_EVT_TYPE_GMCSC        = AUDIO_EVT_TYPE_BAPBA + PRF_EVENT_ID_SIZE,
+    AUDIO_EVT_TYPE_GTBSC        = AUDIO_EVT_TYPE_GMCSC + PRF_EVENT_ID_SIZE,
+    AUDIO_EVT_TYPE_VCSC         = AUDIO_EVT_TYPE_GTBSC + PRF_EVENT_ID_SIZE,
+    AUDIO_EVT_TYPE_VOCSC        = AUDIO_EVT_TYPE_VCSC + PRF_EVENT_ID_SIZE,
+    AUDIO_EVT_TYPE_AICSC        = AUDIO_EVT_TYPE_VOCSC + PRF_EVENT_ID_SIZE,
+    AUDIO_EVT_TYPE_MICSC        = AUDIO_EVT_TYPE_AICSC + PRF_EVENT_ID_SIZE,
+    AUDIO_EVT_TYPE_TMASC        = AUDIO_EVT_TYPE_MICSC + PRF_EVENT_ID_SIZE,
+    AUDIO_EVT_TYPE_HASC         = AUDIO_EVT_TYPE_TMASC + PRF_EVENT_ID_SIZE,
 
     /*********** Event for Server *************/
-    AUDIO_EVT_TYPE_SERVER_START = PRF_EVTID_LE_AUDIO_START + PRF_EVENT_ID_SIZE*PRF_SERVER_OFFSET, //refer to each XXXP modules XXXS.h
-    AUDIO_EVT_TYPE_CSISS = AUDIO_EVT_TYPE_SERVER_START,
-    AUDIO_EVT_TYPE_PACSS = AUDIO_EVT_TYPE_CSISS + PRF_EVENT_ID_SIZE,
-    AUDIO_EVT_TYPE_ASCSS = AUDIO_EVT_TYPE_PACSS + PRF_EVENT_ID_SIZE,
-    AUDIO_EVT_TYPE_BASSS = AUDIO_EVT_TYPE_ASCSS + PRF_EVENT_ID_SIZE,
-    AUDIO_EVT_TYPE_BAPUS = AUDIO_EVT_TYPE_BASSS + PRF_EVENT_ID_SIZE,
-    AUDIO_EVT_TYPE_BAPBS = AUDIO_EVT_TYPE_BAPUS + PRF_EVENT_ID_SIZE,
-    AUDIO_EVT_TYPE_GMCSS = AUDIO_EVT_TYPE_BAPBS + PRF_EVENT_ID_SIZE,
-    AUDIO_EVT_TYPE_GTBSS = AUDIO_EVT_TYPE_GMCSS + PRF_EVENT_ID_SIZE,
-    AUDIO_EVT_TYPE_VCSS  = AUDIO_EVT_TYPE_GTBSS + PRF_EVENT_ID_SIZE,
-    AUDIO_EVT_TYPE_VOCSS = AUDIO_EVT_TYPE_VCSS  + PRF_EVENT_ID_SIZE,
-    AUDIO_EVT_TYPE_AICSS = AUDIO_EVT_TYPE_VOCSS + PRF_EVENT_ID_SIZE,
-    AUDIO_EVT_TYPE_MICSS = AUDIO_EVT_TYPE_AICSS + PRF_EVENT_ID_SIZE,
-    AUDIO_EVT_TYPE_TMASS = AUDIO_EVT_TYPE_MICSS + PRF_EVENT_ID_SIZE,
-    AUDIO_EVT_TYPE_HASS  = AUDIO_EVT_TYPE_TMASS + PRF_EVENT_ID_SIZE,
+    AUDIO_EVT_TYPE_SERVER_START = PRF_EVTID_LE_AUDIO_START + PRF_EVENT_ID_SIZE * PRF_SERVER_OFFSET, //refer to each XXXP modules XXXS.h
+    AUDIO_EVT_TYPE_CSISS        = AUDIO_EVT_TYPE_SERVER_START,
+    AUDIO_EVT_TYPE_PACSS        = AUDIO_EVT_TYPE_CSISS + PRF_EVENT_ID_SIZE,
+    AUDIO_EVT_TYPE_ASCSS        = AUDIO_EVT_TYPE_PACSS + PRF_EVENT_ID_SIZE,
+    AUDIO_EVT_TYPE_BASSS        = AUDIO_EVT_TYPE_ASCSS + PRF_EVENT_ID_SIZE,
+    AUDIO_EVT_TYPE_BAPUS        = AUDIO_EVT_TYPE_BASSS + PRF_EVENT_ID_SIZE,
+    AUDIO_EVT_TYPE_BAPBS        = AUDIO_EVT_TYPE_BAPUS + PRF_EVENT_ID_SIZE,
+    AUDIO_EVT_TYPE_GMCSS        = AUDIO_EVT_TYPE_BAPBS + PRF_EVENT_ID_SIZE,
+    AUDIO_EVT_TYPE_GTBSS        = AUDIO_EVT_TYPE_GMCSS + PRF_EVENT_ID_SIZE,
+    AUDIO_EVT_TYPE_VCSS         = AUDIO_EVT_TYPE_GTBSS + PRF_EVENT_ID_SIZE,
+    AUDIO_EVT_TYPE_VOCSS        = AUDIO_EVT_TYPE_VCSS + PRF_EVENT_ID_SIZE,
+    AUDIO_EVT_TYPE_AICSS        = AUDIO_EVT_TYPE_VOCSS + PRF_EVENT_ID_SIZE,
+    AUDIO_EVT_TYPE_MICSS        = AUDIO_EVT_TYPE_AICSS + PRF_EVENT_ID_SIZE,
+    AUDIO_EVT_TYPE_TMASS        = AUDIO_EVT_TYPE_MICSS + PRF_EVENT_ID_SIZE,
+    AUDIO_EVT_TYPE_HASS         = AUDIO_EVT_TYPE_TMASS + PRF_EVENT_ID_SIZE,
 
     /*********** Event for controller *************/
     AUDIO_EVT_TYPE_CONTROLLER_START = AUDIO_EVT_TYPE_HASS + PRF_EVENT_ID_SIZE,
-    AUDIO_EVT_CIS_CONNECT,          //refer to 'blc_audio_cisConnEvt_t'
-    AUDIO_EVT_CIS_DISCONNECT,       //refer to 'blc_audio_cisDisconnEvt_t'
-    AUDIO_EVT_CIS_REQUEST,          //refer to 'blc_audio_cisReqEvt_t'
+    AUDIO_EVT_CIS_CONNECT,    //refer to 'blc_audio_cisConnEvt_t'
+    AUDIO_EVT_CIS_DISCONNECT, //refer to 'blc_audio_cisDisconnEvt_t'
+    AUDIO_EVT_CIS_REQUEST,    //refer to 'blc_audio_cisReqEvt_t'
 
 
 } audio_event_enum;
 
-
-
 /**
  *  @brief  Event Parameters for "AUDIO_EVT_CIS_CONNECT"
  */
-typedef struct{
+typedef struct
+{
     u16 cisHandle;
     u8  cigSyncDly[3];
     u8  cisSyncDly[3];
@@ -169,7 +173,8 @@ typedef struct{
 /**
  *  @brief  Event Parameters for "PRF_EVTID_ACL_DISCONNECT"
  */
-typedef struct{
+typedef struct
+{
     u16 cisHandle;
     u8  reason;
 } blc_audio_cisDisconnEvt_t;
@@ -177,28 +182,19 @@ typedef struct{
 /**
  *  @brief  Event Parameters for "AUDIO_EVT_CIS_REQUEST"
  */
-typedef struct{
+typedef struct
+{
     u16 aclHandle;
     u16 cisHandle;
     u8  cigId;
     u8  cisId;
 } blc_audio_cisReqEvt_t;
 
-
-
-
-
-
 /////////////////////////////////////only for add new profile used///////////////////////////////////////////////
-
-
 
 
 void blc_audio_initialModule(prf_evt_cb_t evtCb);
 
 
-
 //used for KMA dongle
-void blc_audio_setAclCentralIndexForCIS(u8 aclIdx1,u8 aclIdx2,u8 aclIdx3,u8 aclIdx4);
-
-
+void blc_audio_setAclCentralIndexForCIS(u8 aclIdx1, u8 aclIdx2, u8 aclIdx3, u8 aclIdx4);

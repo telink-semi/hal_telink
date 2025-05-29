@@ -26,6 +26,7 @@
  *
  *******************************************************************************************************/
 #include "lib/include/pke/pke_portable.h"
+
 /**
  * @brief Initialize PKE-related generic configurations.
  * @note        Only after calling this function can other PKE related functions be called.

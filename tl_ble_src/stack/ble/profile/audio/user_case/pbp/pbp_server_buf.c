@@ -26,16 +26,15 @@
 #include "stack/ble/ble.h"
 
 const blc_adv_broadcastName_t advDefBcastName = {
-    .ltv.len = sizeof(DEFAULT_BROADCAST_NAME),
-    .ltv.type = DT_BROADCAST_NAME,
+    .ltv.len   = sizeof(DEFAULT_BROADCAST_NAME),
+    .ltv.type  = DT_BROADCAST_NAME,
     .bcastName = DEFAULT_BROADCAST_NAME,
 };
 
 
 blc_adv_pbpFeature_t advDefPbpFeature = {
-    .ltv.len = 0x05,
+    .ltv.len  = 0x05,
     .ltv.type = DT_SERVICE_DATA,
     .pbasUuid = SERVICE_UUID_PUBLIC_BROADCAST_ANNOUNCEMENT,
-    .feature = 0x00,
+    .feature  = 0x00,
 };
-

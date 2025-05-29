@@ -23,21 +23,21 @@
  *******************************************************************************************************/
 #pragma once
 
-
-typedef struct {
-
+typedef struct
+{
     gattc_sub_ccc_msg_t ntfInput;
 
     /* Characteristic value handle */
     u16 muteHdl;
 
     /* Characteristic value */
-    u8  muteValue;
+    u8 muteValue;
     u8 reserved[1];
 
 } blc_mics_client_t;
 
-typedef struct {
+typedef struct
+{
     blc_mics_client_t micsClient;
 
     /* AICS instances number */
@@ -48,11 +48,12 @@ typedef struct {
     blc_aics_client_t *pAicsClient[STACK_AUDIO_MICS_CLIENT_INCLUDE_AICS_INSTANCE_NUM];
 } blc_micp_client_t;
 
-typedef struct blc_micp_client_ctrl{
-    blc_prf_proc_t process;
+typedef struct blc_micp_client_ctrl
+{
+    blc_prf_proc_t     process;
     blc_micp_client_t *pMicpClient[STACK_PRF_ACL_CENTRAL_MAX_NUM];
 } blc_micp_client_ctrl_t;
 
-typedef struct {
-
+typedef struct
+{
 } blc_micsc_regParam_t;

@@ -31,6 +31,7 @@
 #include "stimer.h"
 #include "core.h"
 
+#include "ext_driver/driver_internal/ext_rf.h" //add by BLE
 
 /**********************************************************************************************************************
  *                                         RF global constants                                                        *
@@ -559,7 +560,7 @@ void rf_mode_init(void)
 /**
  * @brief      This setting serve to set the configuration of Tx DMA.
  */
-__attribute__((section(".data")))
+_attribute_data_sec_    //BLE USED: in IRQ
 rf_dma_config_t rf_tx_dma_config={
     .dst_req_sel= 8,//tx req.(must 8)
     .src_req_sel=0,
@@ -582,7 +583,7 @@ rf_dma_config_t rf_tx_dma_config={
  * @param[in] none
  * @return    none.
  */
-_attribute_ram_code_
+_attribute_ram_code_  //BLE SDK use
 void rf_set_tx_dma_config(void)
 {
     reg_rf_bb_auto_ctrl |= (FLD_RF_TX_MULTI_EN|FLD_RF_CH_0_RNUM_EN_BK);//u_pd_mcu.u_dmac.atcdmac100_ahbslv.tx_multi_en,rx_multi_en,ch_0_rnum_en_bk.
@@ -596,7 +597,7 @@ void rf_set_tx_dma_config(void)
  * @param[in] fifo_byte_size    - The length of one dma fifo,the range is 1~0xffff(the corresponding number of fifo bytes is fifo_byte_size).
  * @return    none.
  */
-_attribute_ram_code_
+_attribute_ram_code_  //BLE SDK use
 void rf_set_tx_dma(unsigned char fifo_dep,unsigned short fifo_byte_size)
 {
     rf_set_tx_dma_config();
@@ -609,7 +610,7 @@ void rf_set_tx_dma(unsigned char fifo_dep,unsigned short fifo_byte_size)
 /**
  * @brief      This setting serve to set the configuration of Rx DMA.
  */
-__attribute__((section(".data")))
+_attribute_data_sec_    //BLE USED: in IRQ
 rf_dma_config_t rf_rx_dma_config={
         .dst_req_sel= 0,//tx req.
         .src_req_sel=9,//must 9
@@ -633,7 +634,7 @@ rf_dma_config_t rf_rx_dma_config={
  * @param[in]   none
  * @return      none
  */
-_attribute_ram_code_
+_attribute_ram_code_  //BLE SDK use
 void rf_set_rx_dma_config(void)
 {
     reg_rf_bb_auto_ctrl |= (FLD_RF_RX_MULTI_EN|FLD_RF_CH_0_RNUM_EN_BK);//ch0_rnum_en_bk,tx_multi_en,rx_multi_en.
@@ -657,7 +658,7 @@ void rf_set_rx_dma_config(void)
  * @param[in]  fifo_byte_size  - The length of one dma fifo,the range is 1~0xffff(the corresponding number of fifo bytes is fifo_byte_size).
  * @return     none.
  */
-_attribute_ram_code_
+_attribute_ram_code_  //BLE SDK use
 void rf_set_rx_dma(unsigned char *buff,unsigned char wptr_mask,unsigned short fifo_byte_size)
 {
     rf_set_rx_dma_config();
@@ -672,7 +673,6 @@ void rf_set_rx_dma(unsigned char *buff,unsigned char wptr_mask,unsigned short fi
  * @param[in]   tick  - Trigger tx after tick delay.
  * @return      none.
  */
-_attribute_ram_code_
 void rf_start_stx  (void* addr,  unsigned int tick)
 {
     rf_dma_set_src_address(RF_TX_DMA,(unsigned int)(addr));
@@ -687,7 +687,6 @@ void rf_start_stx  (void* addr,  unsigned int tick)
  * @param[in] tick  - Trigger rx receive packet after tick delay.
  * @return    none.
  */
-_attribute_ram_code_
 void rf_start_srx(unsigned int tick)
 {
     write_reg32 (0xd4170228, 0x0fffffff);                   // first timeout.
@@ -703,7 +702,6 @@ void rf_start_srx(unsigned int tick)
  * @param[in]   tick  - Trigger tx send packet after tick delay.
  * @return      none.
  */
-_attribute_ram_code_
 void rf_start_stx2rx  (void* addr, unsigned int tick)
 {
     rf_dma_set_src_address(RF_TX_DMA,(unsigned int)(addr));
@@ -719,7 +717,6 @@ volatile unsigned char  g_single_tong_freqoffset = 0;//for eliminate single carr
  * @param[in]   chn   - That you want to set the channel as 2402+chn.
  * @return      none.
  */
-_attribute_ram_code_
 void rf_set_chn(signed char chn)
 {
     reg_rf_trx_chn = chn ;
@@ -741,7 +738,6 @@ signed char rf_get_rssi(void)
  * @return      none.
  * @note        The default setting for the rx continue mode interval in manual mode is 14us.
  */
-_attribute_ram_code_
 void rf_set_rxmode(void)
 {
     write_reg8(0xd417024f,read_reg8(0xd417024f)|0x70);//bit<3~7>: rx ramp down delay in continue mode 14us
@@ -866,6 +862,9 @@ void rf_set_power_level_index(rf_power_level_index_e idx)
     {
         level = rf_power_Level_list[idx];
         reg_rf_tx_power = (unsigned char)(level & 0x3F);
+
+        blt_extRF.txPower_level = level;                /*!< added by BLE, important */
+        blt_extRF.txPower_index = (unsigned char)idx;   /*!< added by BLE, important */
     }
 }
 

@@ -25,7 +25,7 @@
 #define ANALOG_REG_H
 #include "soc.h"
 /*******************************      alg  registers: 140180      ******************************/
-#define ALG_BASE_ADDR              0x140180
+#define ALG_BASE_ADDR              0x80140180
 #define reg_ana_addr            REG_ADDR8(ALG_BASE_ADDR)
 #define reg_ana_ctrl            REG_ADDR8(ALG_BASE_ADDR+0x02)
 enum
@@ -40,9 +40,10 @@ enum
     FLD_ANA_BANK          = BIT(7),/**1:Other,0:PMU**/
 };
 #define reg_ana_len             REG_ADDR8(ALG_BASE_ADDR+0x03)
-#define reg_ana_data(n)         REG_ADDR8(ALG_BASE_ADDR+0x04+(n))
-#define reg_ana_addr_data16     REG_ADDR16(ALG_BASE_ADDR+0x04)
-#define reg_ana_addr_data32     REG_ADDR32(ALG_BASE_ADDR+0x04)
+#define ANALOG_DATA_REG_ADDR    (ALG_BASE_ADDR+0x04)
+#define reg_ana_data(n)         REG_ADDR8(ANALOG_DATA_REG_ADDR+(n))
+#define reg_ana_addr_data16     REG_ADDR16(ANALOG_DATA_REG_ADDR)
+#define reg_ana_addr_data32     REG_ADDR32(ANALOG_DATA_REG_ADDR)
 
 #define reg_ana_buf_cnt         REG_ADDR8(ALG_BASE_ADDR+0x08)
 enum{

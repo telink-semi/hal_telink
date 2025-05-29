@@ -24,10 +24,11 @@
 #ifndef AOA_H_
 #define AOA_H_
 
-typedef enum{
-    BYTE_NUM_2P5     = 0,
-    BYTE_NUM_4       = 1,
-}TypeDefByteNum;
+typedef enum
+{
+    BYTE_NUM_2P5 = 0,
+    BYTE_NUM_4   = 1,
+} TypeDefByteNum;
 
 /**
  * @brief       This function servers to find the average of a set of numbers
@@ -46,6 +47,6 @@ unsigned int abs_value(unsigned int data, TypeDefByteNum bytenum);
  */
 void frond_end(unsigned char *data_src, unsigned char *data_has_amplitude, unsigned char *data_no_amplitude);
 
-void rf_hadm_frond_end(unsigned char *data_src, int *data_has_amplitude,unsigned int len);
+void rf_hadm_frond_end(unsigned char *data_src, int *data_has_amplitude, unsigned int len);
 
 #endif /* DRIVERS_LIB_INCLUDE_AOA_H_ */

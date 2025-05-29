@@ -22,55 +22,107 @@
  *
  *******************************************************************************************************/
 #pragma once
-
-
-struct blc_hid_client{
+#if ((!defined(HOST_V2_ENABLE)))
+struct blc_hid_client
+{
     gattc_sub_ccc_msg_t ntfInput;
     /* Characteristic value handle */
-    u16 protocolModeHdl;                /* Protocol Mode */
-    u16 bootKeyboardInputReportHdl;     /* Boot Keyboard Input Report */
-    u16 bootKeyboardOutputReportHdl;    /* Boot Keyboard Output Report */
-    u16 bootMouseInputReportHdl;        /* Boot Mouse Input Report */
-    u16 HIDInformationHdl;              /* HID Information */
-    u16 HIDControlPointHdl;             /* HID Control Point */
-    u16 reportMapHdl;                   /* Report Map */
+    u16 protocolModeHdl;             /* Protocol Mode */
+    u16 bootKeyboardInputReportHdl;  /* Boot Keyboard Input Report */
+    u16 bootKeyboardOutputReportHdl; /* Boot Keyboard Output Report */
+    u16 bootMouseInputReportHdl;     /* Boot Mouse Input Report */
+    u16 HIDInformationHdl;           /* HID Information */
+    u16 HIDControlPointHdl;          /* HID Control Point */
+    u16 reportMapHdl;                /* Report Map */
 
-    u8 protocolModeProp;                /* Protocol Mode Properties */
-    u8 bootKeyboardInputReportProp;     /* Boot Keyboard Input Report Properties */
-    u8 bootKeyboardOutputReportProp;    /* Boot Keyboard Output Report Properties */
-    u8 bootMouseInputReportProp;        /* Boot Mouse Input Report Properties */
-    u8 HIDInformationProp;              /* HID Information Properties */
-    u8 HIDControlPointProp;             /* HID Control Point Properties */
-    u8 reportMapProp;                   /* Report Map Properties */
+    u8 protocolModeProp;             /* Protocol Mode Properties */
+    u8 bootKeyboardInputReportProp;  /* Boot Keyboard Input Report Properties */
+    u8 bootKeyboardOutputReportProp; /* Boot Keyboard Output Report Properties */
+    u8 bootMouseInputReportProp;     /* Boot Mouse Input Report Properties */
+    u8 HIDInformationProp;           /* HID Information Properties */
+    u8 HIDControlPointProp;          /* HID Control Point Properties */
+    u8 reportMapProp;                /* Report Map Properties */
 
-    struct __attribute__((packed)) {
-        u16 attrHandle;
-        u8 properties;
-        u16 reportLen;
-        u8 report[10];
-        u16 cccHandle;
-        u16 reportReferenceHandle;
+    struct __attribute__((packed))
+    {
+        u16                             attrHandle;
+        u8                              properties;
+        u16                             reportLen;
+        u8                              report[10];
+        u16                             cccHandle;
+        u16                             reportReferenceHandle;
         struct hid_reportReferenceValue reportReferenceValue;
-    }reportCharInfo[HID_SUPPORT_REPORT_HANDLE_MAX];
+    } reportCharInfo[HID_SUPPORT_REPORT_HANDLE_MAX];
 
-    u8 protocolMode;
+    u8                           protocolMode;
     hid_bootKeyboardInputValue_t bootKeyboardInputReport;
-    u16 bootKeyboardOutputReport;
-    hid_bootMouseInputValue_t bootMouseInputReport;
-    hid_hidInformationVale_t HIDInformation;
+    u16                          bootKeyboardOutputReport;
+    hid_bootMouseInputValue_t    bootMouseInputReport;
+    hid_hidInformationVale_t     HIDInformation;
 
     u16 reportMapLen;
-    u8 reportMap[512];
+    u8  reportMap[512];
 
     u8 reportCount;
     u8 reportFoundDescCount;
 
     u8 reserved;
-}__attribute__((packed));
+} __attribute__((packed));
 
-struct blc_hid_client_ctrl{
-    blc_prf_proc_t process;
-    struct blc_hid_client* pHidClient[STACK_PRF_ACL_CENTRAL_MAX_NUM];
-}__attribute__((packed));
+struct blc_hid_client_ctrl
+{
+    blc_prf_proc_t         process;
+    struct blc_hid_client *pHidClient[STACK_PRF_ACL_CENTRAL_MAX_NUM];
+} __attribute__((packed));
+#else
+struct blc_hid_client {
+    gattc_sub_ccc_msg_t ntfInput;
+    /* Characteristic value handle */
+    u16 protocolModeHdl;             /* Protocol Mode */
+    u16 bootKeyboardInputReportHdl;  /* Boot Keyboard Input Report */
+    u16 bootKeyboardOutputReportHdl; /* Boot Keyboard Output Report */
+    u16 bootMouseInputReportHdl;     /* Boot Mouse Input Report */
+    u16 HIDInformationHdl;           /* HID Information */
+    u16 HIDControlPointHdl;          /* HID Control Point */
+    u16 reportMapHdl;                /* Report Map */
 
+    u8 protocolModeProp;             /* Protocol Mode Properties */
+    u8 bootKeyboardInputReportProp;  /* Boot Keyboard Input Report Properties */
+    u8 bootKeyboardOutputReportProp; /* Boot Keyboard Output Report Properties */
+    u8 bootMouseInputReportProp;     /* Boot Mouse Input Report Properties */
+    u8 HIDInformationProp;           /* HID Information Properties */
+    u8 HIDControlPointProp;          /* HID Control Point Properties */
+    u8 reportMapProp;                /* Report Map Properties */
+
+    struct
+    {
+        u16                             attrHandle;
+        u8                              properties;
+        u16                             reportLen;
+        u8                              report[10];
+        u16                             cccHandle;
+        u16                             reportReferenceHandle;
+        struct hid_reportReferenceValue reportReferenceValue;
+    } reportCharInfo[HID_SUPPORT_REPORT_HANDLE_MAX];
+
+    u8                           protocolMode;
+    struct hid_bootKeyboardInputValue bootKeyboardInputReport;
+    u16                          bootKeyboardOutputReport;
+    struct hid_bootMouseInputValue    bootMouseInputReport;
+    struct hid_hidInformationVale     HIDInformation;
+
+    u16 reportMapLen;
+    u8  reportMap[256]; // u8 reportMap[512];
+
+    u8 reportCount;
+    u8 reportFoundDescCount;
+
+    u8 reserved;
+};
+
+struct blc_hid_client_ctrl {
+    struct blc_prf_process process;
+    struct blc_hid_client *pHidClient[STACK_PRF_ACL_CENTRAL_MAX_NUM];
+};
+#endif
 

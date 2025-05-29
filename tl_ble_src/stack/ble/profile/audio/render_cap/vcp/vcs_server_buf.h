@@ -23,16 +23,18 @@
  *******************************************************************************************************/
 #pragma once
 
-typedef struct {
+typedef struct
+{
     /* Characteristic value handle */
     u16 volumeStateHdl;
     u16 volCtrlPointHdl;
     u16 volumeFlagsHdl;
-    u8 volStep;
-    u8 reserved;
+    u8  volStep;
+    u8  reserved;
 } blc_vcs_server_t;
 
-typedef struct {
+typedef struct
+{
     blc_vcs_server_t vcsServer;
 
     /* AICS instances number */
@@ -48,28 +50,30 @@ typedef struct {
 
 } blc_vcp_server_t;
 
-typedef struct {
-    blc_prf_proc_t process;
+typedef struct
+{
+    blc_prf_proc_t   process;
     blc_vcp_server_t server;
 } blc_vcp_server_ctrl_t;
 
-typedef struct{
-    u8 step;        //Volume Setting Change Step;1-255
+typedef struct
+{
+    u8 step; //Volume Setting Change Step;1-255
 
     /* Volume State */
-    u8 volume;      //Volume Setting
-    bool mute;      //mute
+    u8   volume; //Volume Setting
+    bool mute;   //mute
 
 } blc_vcs_regParam_t;
 
-typedef struct{
-
+typedef struct
+{
     blc_vcs_regParam_t vcsParam;
 
     /* Register parameters for Audio Input Control Services(AICS) */
-    const blc_aicss_regParam_t* aicsParam;
+    const blc_aicss_regParam_t *aicsParam;
 
     /* Register parameters for Volume Offset Control Services(VOCS) */
-    const blc_vocss_regParam_t* vocsParam;
+    const blc_vocss_regParam_t *vocsParam;
 
 } blc_vcss_regParam_t;

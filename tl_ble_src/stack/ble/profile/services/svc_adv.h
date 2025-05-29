@@ -22,28 +22,43 @@
  *
  *******************************************************************************************************/
 #pragma once
-
-typedef struct{
+#if ((!defined(HOST_V2_ENABLE)))
+typedef struct
+{
     u8 len;
     u8 type;
     u8 value[0];
 } blc_adv_ltv_t;
+#else
+#include "stack/ble/ble_ad_type.h"
 
+typedef struct __attribute__((packed))
+{
+    u8 len;
+    u8 type;
+    u8 value[0];
+} blc_adv_ltv_t;
+int32_t ltv_pack(const struct ltv_data *ltv[], void *outData);
+#endif
+u16 blc_adv_buildAdvData(blc_adv_ltv_t **ltvs, u32 numLtvs, u8 *advBuf);
+#if (defined(HOST_V2_ENABLE))
+bool blc_advGetFlags(u8 *advData, u16 len, u8 *flags);
+#endif
+u8 *blc_adv_getAdvTypeInformation(u8 *advData, u16 len, u8 advType, u8 *outLen);
 
-u16 blc_adv_buildAdvData(blc_adv_ltv_t** ltvs, u32 numLtvs, u8* advBuf);
+u8 *blc_adv_getCompleteNameInformation(u8 *advData, u16 len, u8 *outLen);
 
-u8* blc_adv_getAdvTypeInformation(u8* advData, u16 len, u8 advType, u8* outLen);
+u8 *blc_adv_getBroadcastNameInformation(u8 *advData, u16 len, u8 *outLen);
 
-u8* blc_adv_getCompleteNameInformation(u8* advData, u16 len, u8* outLen);
+u8 *blc_adv_get16BitServiceDataInformation(u8 *advData, u16 len, u16 serviceUuid, u8 *outLen);
 
-u8* blc_adv_getBroadcastNameInformation(u8* advData, u16 len, u8* outLen);
+bool blc_advGetBroadcastID(u8 *advData, u16 len, u8 broadcastID[3]);
 
-u8* blc_adv_get16BitServiceDataInformation(u8* advData, u16 len, u16 serviceUuid, u8* outLen);
+bool blc_adv_getCsipRSI(u8 *advData, u16 len, u8 rsi[6]);
 
-bool blc_advGetBroadcastID(u8* advData, u16 len, u8 broadcastID[3]);
+u8 *blc_adv_getManufacturerDataInformationByCompanyId(u8 *advData, u16 len, u16 companyId, u8 *outLen);
 
-bool blc_adv_getCsipRSI(u8* advData, u16 len, u8 rsi[6]);
-
-u8* blc_adv_getManufacturerDataInformationByCompanyId(u8* advData, u16 len, u16 companyId, u8* outLen);
-
-bool blc_adv_get16BitServiceUuid(u8* advData, u16 len, u16 uuid);
+bool blc_adv_get16BitServiceUuid(u8 *advData, u16 len, u16 uuid);
+#if (defined(HOST_V2_ENABLE))
+bool blc_adv_get16BitAppearanceUuid(u8 *advData, u16 len, u16 uuid);
+#endif

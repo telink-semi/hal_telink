@@ -226,7 +226,7 @@ _attribute_ram_code_ void rf_ble_csem_set_tx_rx_settle(int adjust_tx_in_fsm, uns
 
     if(adjust_tx_in_fsm)  //FSM is working, can not change TX & RX settle value, change tx wait only
     {
-        reg_rf_ll_txwait_l = (tx_stl_us - RF_TX_WAIT_MIN_VALUE - ble_rf_tx_settle_value);
+        reg_rf_ll_txwait_l = (tx_stl_us + RF_TX_WAIT_MIN_VALUE - ble_rf_tx_settle_value);
         //reg_rf_ll_txwait_h = 0;
     }
     else

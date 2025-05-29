@@ -24,8 +24,7 @@
 #include "stack/ble/ble.h"
 
 
-
-#define OTS_START_HDL                   SERVICE_OBJECT_TRANSFER_HDL
+#define OTS_START_HDL SERVICE_OBJECT_TRANSFER_HDL
 
 static const struct svc_ots_feature otsFeatureValue = {
     .OACP_feature = 0,
@@ -33,36 +32,36 @@ static const struct svc_ots_feature otsFeatureValue = {
 };
 static const u16 otsFeatureValueLen = sizeof(otsFeatureValue);
 
-static const u8 otsObjectNameValue[] = "Telink-OTS-Service";
-static const u8 otsObjectNameValueLen = sizeof(otsObjectNameValue)-1;
+static const u8 otsObjectNameValue[]  = "Telink-OTS-Service";
+static const u8 otsObjectNameValueLen = sizeof(otsObjectNameValue) - 1;
 
-static const u16 otsObjectTypeValue = 0x0117;       //TODO: unknown
-static const u8 otsObjectTypeValueLen = sizeof(otsObjectTypeValue);
+static const u16 otsObjectTypeValue    = 0x0117; //TODO: unknown
+static const u8  otsObjectTypeValueLen = sizeof(otsObjectTypeValue);
 
 static const struct svc_ots_object_size otsObjectSizeValue = {
-    .currentSize = 0,
+    .currentSize   = 0,
     .allocatedSize = 100,
 };
 static const u8 otsObjectSizeValueLen = sizeof(otsObjectSizeValue);
 
 static const struct svc_ots_universal_time otsObjectFirstCreatedValue = {
-    .year = 0x2023,
-    .month = 0x01,
-    .day = 0x00,
-    .hour = 0x00,
+    .year   = 0x2023,
+    .month  = 0x01,
+    .day    = 0x00,
+    .hour   = 0x00,
     .minute = 0x00,
     .second = 0x00,
 };
 static const u8 otsObjectFirstCreatedValueLen = sizeof(otsObjectFirstCreatedValue);
 
 static const struct svc_ots_universal_time otsObjectLastModifiedValue;
-static const u8 otsObjectLastModifiedValueLen = sizeof(otsObjectLastModifiedValue);
+static const u8                            otsObjectLastModifiedValueLen = sizeof(otsObjectLastModifiedValue);
 
-static const u8 otsObjectIDValue[] = {0x01,0x00,0x00,0x00,0x00,0x00};
+static const u8 otsObjectIDValue[]  = {0x01, 0x00, 0x00, 0x00, 0x00, 0x00};
 static const u8 otsObjectIDValueLen = sizeof(otsObjectIDValue);
 
 static const u32 otsObjectPropertiesValue;
-static const u8 otsObjectPropertiesValueLen = sizeof(otsObjectPropertiesValue);
+static const u8  otsObjectPropertiesValueLen = sizeof(otsObjectPropertiesValue);
 
 static const u8 otsObjectListFilterValue;
 static const u8 otsObjectListFilterValueLen = sizeof(otsObjectListFilterValue);
@@ -71,64 +70,63 @@ static const u8 otsObjectListFilterValueLen = sizeof(otsObjectListFilterValue);
  * @brief the structure for default OTS service List.
  */
 static const atts_attribute_t otsList[] =
-{
-    ATTS_SECONDARY_SERVICE(serviceObjectTransferUuid),
+    {
+        ATTS_SECONDARY_SERVICE(serviceObjectTransferUuid),
 
-    //OTS-Feature
-    ATTS_CHAR_UUID_ENCR_READ_ENTITY_NOCB(charPropRead, characteristicOtsFeatureUuid, otsFeatureValue),
+        //OTS-Feature
+        ATTS_CHAR_UUID_ENCR_READ_ENTITY_NOCB(charPropRead, characteristicOtsFeatureUuid, otsFeatureValue),
 
-    //Object Name
-    ATTS_CHAR_UUID_ENCR_RDWR_POINT_NOCB(charPropReadWrite, characteristicObjectNameUuid, otsObjectNameValue),
+        //Object Name
+        ATTS_CHAR_UUID_ENCR_RDWR_POINT_NOCB(charPropReadWrite, characteristicObjectNameUuid, otsObjectNameValue),
 
-    //Object type
-    ATTS_CHAR_UUID_ENCR_READ_ENTITY_NOCB(charPropRead, characteristicObjectTypeUuid, otsObjectTypeValue),
+        //Object type
+        ATTS_CHAR_UUID_ENCR_READ_ENTITY_NOCB(charPropRead, characteristicObjectTypeUuid, otsObjectTypeValue),
 
-    //Object Size
-    ATTS_CHAR_UUID_ENCR_READ_ENTITY_NOCB(charPropRead, characteristicObjectSizeUuid, otsObjectSizeValue),
+        //Object Size
+        ATTS_CHAR_UUID_ENCR_READ_ENTITY_NOCB(charPropRead, characteristicObjectSizeUuid, otsObjectSizeValue),
 
-    //Object First-Created
-    ATTS_CHAR_UUID_ENCR_RDWR_ENTITY_NOCB(charPropReadWrite, characteristicObjectFirstCreatedUuid, otsObjectFirstCreatedValue),
+        //Object First-Created
+        ATTS_CHAR_UUID_ENCR_RDWR_ENTITY_NOCB(charPropReadWrite, characteristicObjectFirstCreatedUuid, otsObjectFirstCreatedValue),
 
-    //Object Lats-Modified
-    ATTS_CHAR_UUID_ENCR_RDWR_ENTITY_NOCB(charPropReadWrite, characteristicObjectLastModifiedUuid, otsObjectLastModifiedValue),
+        //Object Lats-Modified
+        ATTS_CHAR_UUID_ENCR_RDWR_ENTITY_NOCB(charPropReadWrite, characteristicObjectLastModifiedUuid, otsObjectLastModifiedValue),
 
-    //Object ID
-    ATTS_CHAR_UUID_ENCR_READ_POINT_NOCB(charPropRead, characteristicObjectIdUuid, otsObjectIDValue),
+        //Object ID
+        ATTS_CHAR_UUID_ENCR_READ_POINT_NOCB(charPropRead, characteristicObjectIdUuid, otsObjectIDValue),
 
-    //Object Properties
-    ATTS_CHAR_UUID_ENCR_RDWR_ENTITY_NOCB(charPropReadWrite, characteristicObjectPropertiesUuid, otsObjectPropertiesValue),
+        //Object Properties
+        ATTS_CHAR_UUID_ENCR_RDWR_ENTITY_NOCB(charPropReadWrite, characteristicObjectPropertiesUuid, otsObjectPropertiesValue),
 
-    //Object Action Control Point
-    ATTS_CHAR_UUID_ENCR_WRITE_NULL(charPropWriteIndicate, characteristicObjectActionControlPointUuid),
-    ATTS_COMMON_CCC_DEFINE,
+        //Object Action Control Point
+        ATTS_CHAR_UUID_ENCR_WRITE_NULL(charPropWriteIndicate, characteristicObjectActionControlPointUuid),
+        ATTS_COMMON_CCC_DEFINE,
 
-    //Object List Control Point
-    ATTS_CHAR_UUID_ENCR_WRITE_NULL(charPropWriteIndicate, characteristicObjectListControlPointUuid),
-    ATTS_COMMON_CCC_DEFINE,
+        //Object List Control Point
+        ATTS_CHAR_UUID_ENCR_WRITE_NULL(charPropWriteIndicate, characteristicObjectListControlPointUuid),
+        ATTS_COMMON_CCC_DEFINE,
 
-    //Object Changed
-    ATTS_CHAR_UUID_INDICATE_ONLY(characteristicObjectListFilterUuid),
-    ATTS_COMMON_CCC_DEFINE,
+        //Object Changed
+        ATTS_CHAR_UUID_INDICATE_ONLY(characteristicObjectListFilterUuid),
+        ATTS_COMMON_CCC_DEFINE,
 
-    //Object List Filter
-    ATTS_CHAR_UUID_ENCR_RDWR_ENTITY_NOCB(charPropReadWrite, characteristicObjectChangedUuid, otsObjectListFilterValue),
+        //Object List Filter
+        ATTS_CHAR_UUID_ENCR_RDWR_ENTITY_NOCB(charPropReadWrite, characteristicObjectChangedUuid, otsObjectListFilterValue),
 };
 
 /*
  * @brief the structure for default OTS service group.
  */
-_attribute_ble_data_retention_
-static atts_group_t svcOtsGroup =
-{
-    NULL,
-    otsList,
-    NULL,
-    NULL,
-    OTS_START_HDL,
-    0,
+_attribute_ble_data_retention_ static atts_group_t svcOtsGroup =
+    {
+        NULL,
+        otsList,
+        NULL,
+        NULL,
+        OTS_START_HDL,
+        0,
 };
 
-const u16 otsIncludeValue[3] = {OTS_START_HDL, OTS_START_HDL+ARRAY_SIZE(otsList)-1, SERVICE_UUID_OBJECT_TRANSFER};
+const u16 otsIncludeValue[3] = {OTS_START_HDL, OTS_START_HDL + ARRAY_SIZE(otsList) - 1, SERVICE_UUID_OBJECT_TRANSFER};
 
 /**
  * @brief      for user add default OTS service in all GAP server.
@@ -137,7 +135,7 @@ const u16 otsIncludeValue[3] = {OTS_START_HDL, OTS_START_HDL+ARRAY_SIZE(otsList)
  */
 void blc_svc_addOtsGroup(void)
 {
-    svcOtsGroup.endHandle = svcOtsGroup.startHandle+ARRAY_SIZE(otsList)-1;
+    svcOtsGroup.endHandle = svcOtsGroup.startHandle + ARRAY_SIZE(otsList) - 1;
     blc_gatts_addAttributeServiceGroup(&svcOtsGroup);
 }
 
@@ -159,6 +157,6 @@ void blc_svc_removeOtsGroup(void)
  */
 void blc_svc_otsCbackRegister(atts_r_cb_t readCback, atts_w_cb_t writeCback)
 {
-    svcOtsGroup.readCback = readCback;
+    svcOtsGroup.readCback  = readCback;
     svcOtsGroup.writeCback = writeCback;
 }

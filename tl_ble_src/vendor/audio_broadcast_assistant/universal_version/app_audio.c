@@ -25,25 +25,49 @@
 
 #if (ASSISTANT_VERSION == UNIVERSAL_VERSION)
 
-#include "tl_common.h"
-#include "drivers.h"
-#include "stack/ble/ble.h"
+    #include "tl_common.h"
+    #include "drivers.h"
+    #include "stack/ble/ble.h"
 
 
-#include "app_buffer.h"
-#include "app_audio.h"
-#include "app_audio_ui.h"
-#include "app_parse_char.h"
+    #include "app_buffer.h"
+    #include "app_audio.h"
+    #include "app_audio_ui.h"
+    #include "app_parse_char.h"
 
 const char locationStr[32][30] = {
-    {"Front Left"}, {"Front Right"}, {"Front Center"}, {"Low Frequency Effects 1"},
-    {"Back Left"}, {"Back Right"}, {"Front Left of Center"}, {"Front Right of Center"},
-    {"Back Center"}, {"Low Frequency Effects 2"}, {"Side Left"}, {"Side Right"},
-    {"Top Front Left"}, {"Top Front Right"}, {"Top Front Center"}, {"Top Center"},
-    {"Top Back Left"}, {"Top Back Right"}, {"Top Side Left"}, {"Top Side Right"},
-    {"Top Back Center"}, {"Bottom Front Center"}, {"Bottom Front Left"}, {"Bottom Front Right"},
-    {"Front Left Wide"}, {"Front Right Wide"}, {"Left Surround"}, {"Right Surround"},
-    {"RFU"}, {"RFU"}, {"RFU"}, {"RFU"},
+    {"Front Left"},
+    {"Front Right"},
+    {"Front Center"},
+    {"Low Frequency Effects 1"},
+    {"Back Left"},
+    {"Back Right"},
+    {"Front Left of Center"},
+    {"Front Right of Center"},
+    {"Back Center"},
+    {"Low Frequency Effects 2"},
+    {"Side Left"},
+    {"Side Right"},
+    {"Top Front Left"},
+    {"Top Front Right"},
+    {"Top Front Center"},
+    {"Top Center"},
+    {"Top Back Left"},
+    {"Top Back Right"},
+    {"Top Side Left"},
+    {"Top Side Right"},
+    {"Top Back Center"},
+    {"Bottom Front Center"},
+    {"Bottom Front Left"},
+    {"Bottom Front Right"},
+    {"Front Left Wide"},
+    {"Front Right Wide"},
+    {"Left Surround"},
+    {"Right Surround"},
+    {"RFU"},
+    {"RFU"},
+    {"RFU"},
+    {"RFU"},
 };
 
 bool muteFlag = 1;
@@ -55,23 +79,22 @@ bool muteFlag = 1;
 app_connect_info_t appConnInfo;
 
 source_info_t sourceInfoTable[MAX_SOURCE_INFO_NUM];
-int    sourceCnt = 0;
+int           sourceCnt = 0;
 
 sink_info_t sinkInfoTable[MAX_SINK_INFO_NUM];
-int sinkCnt = 0;
-int sinkFlag = 1;
-
+int         sinkCnt  = 0;
+int         sinkFlag = 1;
 
 /**
  * @brief       assistant set source information.
  * @param[in]   info: source information pointer.
  * @return      initial source count.
  */
-static int app_audio_setSourceInfo(blc_audio_source_head_t* info)
+static int app_audio_setSourceInfo(blc_audio_source_head_t *info)
 {
     source_info_t *source = &sourceInfoTable[sourceCnt++];
 
-    source->advSID = info->sid;
+    source->advSID      = info->sid;
     source->advAddrType = info->addrType;
     memcpy(source->advAddr, info->addr, 6);
     memcpy(source->broadcastId, info->broadcastId, 3);
@@ -87,7 +110,7 @@ static int app_audio_setSourceInfo(blc_audio_source_head_t* info)
 void app_audio_initSourceInfoBuf(void)
 {
     sourceCnt = 0;
-    memset(&sourceInfoTable[0], 0, sizeof(source_info_t)*MAX_SOURCE_INFO_NUM);
+    memset(&sourceInfoTable[0], 0, sizeof(source_info_t) * MAX_SOURCE_INFO_NUM);
 }
 
 /**
@@ -101,17 +124,14 @@ static source_info_t *app_audio_findSourceInfo(u8 advSID, u8 advAddrType, u8 adv
 {
     tlkapi_printf(0, "app event-assistant find source information");
 
-    if(sourceCnt >= MAX_SOURCE_INFO_NUM)
-    {
+    if (sourceCnt >= MAX_SOURCE_INFO_NUM) {
         return &sourceInfoTable[0];
     }
 
-    for(int i=0; i<sourceCnt; i++)
-    {
+    for (int i = 0; i < sourceCnt; i++) {
         source_info_t *source = &sourceInfoTable[i];
 
-        if(source->advSID == advSID && source->advAddrType == advAddrType && !memcmp(source->advAddr,advAddr,6))
-        {
+        if (source->advSID == advSID && source->advAddrType == advAddrType && !memcmp(source->advAddr, advAddr, 6)) {
             return source;
         }
     }
@@ -123,14 +143,17 @@ static source_info_t *app_audio_findSourceInfo(u8 advSID, u8 advAddrType, u8 adv
  * @param[in]   sourceInfo: source information pointer.
  * @return      source information index.
  */
-static int app_audio_getSourceInfoIndex(source_info_t* sourceInfo)
+static int app_audio_getSourceInfoIndex(source_info_t *sourceInfo)
 {
     int index = 0;
-    for(int i=0; i<sourceCnt; i++)
-    {
+    for (int i = 0; i < sourceCnt; i++) {
         source_info_t *source = &sourceInfoTable[i];
-        if(source->usedFlag)    index++;
-        if(source == sourceInfo)    break;
+        if (source->usedFlag) {
+            index++;
+        }
+        if (source == sourceInfo) {
+            break;
+        }
     }
     return index;
 }
@@ -142,20 +165,18 @@ static int app_audio_getSourceInfoIndex(source_info_t* sourceInfo)
  */
 source_info_t *app_audio_getSourceInfo(u8 index)
 {
-    if(sourceCnt < index)
-    {
+    if (sourceCnt < index) {
         return NULL;
     }
 
     int validIndex = 0;
-    for(int i=0; i<sourceCnt; i++)
-    {
+    for (int i = 0; i < sourceCnt; i++) {
         source_info_t *source = &sourceInfoTable[i];
-        if(source->usedFlag)
-        {
+        if (source->usedFlag) {
             validIndex++;
-            if(validIndex == index)
+            if (validIndex == index) {
                 return &sourceInfoTable[i];
+            }
         }
     }
 
@@ -171,38 +192,43 @@ static void app_audio_displaySourceInfo(source_info_t *source)
 {
     int i = app_audio_getSourceInfoIndex(source);
 
-    app_parse_printf("Found Source Info[%x]\r\n\t%s Address is %s\r\n", i, source->advAddrType?"random":"public", addr_to_str(source->advAddr));
+    app_parse_printf("Found Source Info[%x]\r\n\t%s Address is %s\r\n", i, source->advAddrType ? "random" : "public", addr_to_str(source->advAddr));
     app_parse_printf("\tDevice Name:%s\r\n\tBroadcast Name:%s\r\n", source->completeName, source->broadcastName);
 
     char samplingFreqStr[14][9] = {
         {""},
-        {"8kHz"}, {"11025Hz"}, {"16kHz"}, {"22050Hz"}, {"24kHz"},
-        {"32kHz"}, {"44.1kHz"}, {"48kHz"}, {"88.2Hz"}, {"96kHz"},
-        {"176.4kHz"}, {"192kHz"}, {"384kHz"}
-    };
+        {"8kHz"},
+        {"11025Hz"},
+        {"16kHz"},
+        {"22050Hz"},
+        {"24kHz"},
+        {"32kHz"},
+        {"44.1kHz"},
+        {"48kHz"},
+        {"88.2Hz"},
+        {"96kHz"},
+        {"176.4kHz"},
+        {"192kHz"},
+        {"384kHz"}};
 
-    for(int i=0; i<source->bisCnt; i++)
-    {
+    for (int i = 0; i < source->bisCnt; i++) {
         app_parse_printf("\t\tBIS Index: %d\r\n\t\tCodec ID: %s\r\n\t\tSampling Frequency: %s\r\n",
-                source->bisIndex[i], hex_to_str(&source->bisInfo[i].CodecId.id, 5),
-                &samplingFreqStr[source->bisInfo[i].codecCfg.frequency][0]);
+                         source->bisIndex[i],
+                         hex_to_str(&source->bisInfo[i].CodecId.id, 5),
+                         &samplingFreqStr[source->bisInfo[i].codecCfg.frequency][0]);
 
-        for(int j=0; j<32; j++)
-        {
-            if(source->bisInfo[i].codecCfg.allocation & BIT(j))
-            {
+        for (int j = 0; j < 32; j++) {
+            if (source->bisInfo[i].codecCfg.allocation & BIT(j)) {
                 app_parse_printf("\t\t%s: Supported\r\n", &locationStr[j][0]);
             }
         }
     }
 
-    if(source->enc) {
+    if (source->enc) {
         app_parse_printf("\tSource is Encrypted!!!\r\n");
-    }
-    else {
+    } else {
         app_parse_printf("\tSource is Unencrypted\r\n");
     }
-
 }
 
 /**
@@ -213,17 +239,17 @@ static void app_audio_displaySourceInfo(source_info_t *source)
 void app_audio_showSourceInfo(void)
 {
     int index = 0;
-    for(int i=0; i<sourceCnt; i++)
-    {
+    for (int i = 0; i < sourceCnt; i++) {
         source_info_t *source = &sourceInfoTable[i];
-        if(source->usedFlag){
+        if (source->usedFlag) {
             index++;
             app_audio_displaySourceInfo(source);
         }
     }
 
-    if(!index)          app_parse_printf("No Source Scanned\r\n");
-
+    if (!index) {
+        app_parse_printf("No Source Scanned\r\n");
+    }
 }
 
 /******************************************************************************/
@@ -238,22 +264,19 @@ void app_audio_showSourceInfo(void)
  */
 static connect_info_t *app_audio_allocateConnBuff(u16 connHandle, u8 addrType, u8 address[6])
 {
-    char* deviceName = NULL;
-    for(int i=0; i<MAX_SINK_INFO_NUM; i++)
-    {
-        if(memcmp(sinkInfoTable[i].address, address, 6) == 0 && sinkInfoTable[i].addrType == addrType)
-        {
+    char *deviceName = NULL;
+    for (int i = 0; i < MAX_SINK_INFO_NUM; i++) {
+        if (memcmp(sinkInfoTable[i].address, address, 6) == 0 && sinkInfoTable[i].addrType == addrType) {
             deviceName = sinkInfoTable[i].deviceName;
         }
     }
 
-    for(int i=0; i<MAX_LINK_NUM; i++)
-    {
+    for (int i = 0; i < MAX_LINK_NUM; i++) {
         connect_info_t *pConn = &appConnInfo.conn[i];
-        if(!pConn->isUsed){
-            pConn->isUsed = true;
+        if (!pConn->isUsed) {
+            pConn->isUsed     = true;
             pConn->connHandle = connHandle;
-            pConn->addrType = addrType;
+            pConn->addrType   = addrType;
             memcpy(pConn->address, address, 6);
             strncpy(pConn->deviceName, deviceName, sizeof(pConn->deviceName));
             return pConn;
@@ -267,12 +290,11 @@ static connect_info_t *app_audio_allocateConnBuff(u16 connHandle, u8 addrType, u
  * @param[in]   connHandle: ACL connect handle.
  * @return      connect information point/NULL.
  */
-connect_info_t * app_audio_getConn(u16 connHandle)
+connect_info_t *app_audio_getConn(u16 connHandle)
 {
-    for(int i=0; i<MAX_LINK_NUM; i++)
-    {
+    for (int i = 0; i < MAX_LINK_NUM; i++) {
         connect_info_t *pConn = &appConnInfo.conn[i];
-        if(pConn->isUsed && connHandle == pConn->connHandle){
+        if (pConn->isUsed && connHandle == pConn->connHandle) {
             return pConn;
         }
     }
@@ -296,11 +318,12 @@ bool app_audio_aclConnFull(void)
  */
 u16 app_audio_getConnHandle(u8 index)
 {
-    if(appConnInfo.connCnt < index)
+    if (appConnInfo.connCnt < index) {
         return 0x0000;
+    }
 
-    connect_info_t *pConn = &appConnInfo.conn[index-1];
-    return pConn->isUsed? pConn->connHandle: 0x0000;
+    connect_info_t *pConn = &appConnInfo.conn[index - 1];
+    return pConn->isUsed ? pConn->connHandle : 0x0000;
 }
 
 /**
@@ -310,17 +333,15 @@ u16 app_audio_getConnHandle(u8 index)
  */
 void app_audio_showConnInfo(void)
 {
-    if(!appConnInfo.connCnt)
-    {
+    if (!appConnInfo.connCnt) {
         app_parse_printf("No Connection information\r\n");
-        return ;
+        return;
     }
 
-    for(int i=0; i<appConnInfo.connCnt; i++)
-    {
-        u8*address = appConnInfo.conn[i].address;
+    for (int i = 0; i < appConnInfo.connCnt; i++) {
+        u8 *address = appConnInfo.conn[i].address;
 
-        app_parse_printf("[%d]Connect:%s %s name:%s\r\n", i+1, appConnInfo.conn[i].addrType?"random":"public", addr_to_str(address), appConnInfo.conn[i].deviceName);
+        app_parse_printf("[%d]Connect:%s %s name:%s\r\n", i + 1, appConnInfo.conn[i].addrType ? "random" : "public", addr_to_str(address), appConnInfo.conn[i].deviceName);
     }
 }
 
@@ -333,9 +354,9 @@ SourceInfo_t foundInfoTemp;
  */
 void app_audio_initSinkInfoBuf(void)
 {
-    sinkCnt = 0;
+    sinkCnt  = 0;
     sinkFlag = 1;
-    memset(&sinkInfoTable[0], 0, sizeof(sink_info_t)*MAX_SINK_INFO_NUM);
+    memset(&sinkInfoTable[0], 0, sizeof(sink_info_t) * MAX_SINK_INFO_NUM);
 }
 
 /**
@@ -366,17 +387,16 @@ void app_audio_closeScanSink(void)
  * @return      0: sink Already exist/ Insufficient buffer.
  *              other: sink index.
  */
-static u8 app_audio_findSinkInfo(u8 addrType, u8 address[6], char* deviceName)
+static u8 app_audio_findSinkInfo(u8 addrType, u8 address[6], char *deviceName)
 {
-    if(sinkCnt == MAX_SINK_INFO_NUM)
+    if (sinkCnt == MAX_SINK_INFO_NUM) {
         return 0;
+    }
 
-    for(int i=0; i<sinkCnt; i++)
-    {
+    for (int i = 0; i < sinkCnt; i++) {
         sink_info_t *sinkInfo = &sinkInfoTable[i];
 
-        if(sinkInfo->addrType == addrType && !memcmp(sinkInfo->address, address, 6))
-        {
+        if (sinkInfo->addrType == addrType && !memcmp(sinkInfo->address, address, 6)) {
             return 0;
         }
     }
@@ -394,14 +414,17 @@ static u8 app_audio_findSinkInfo(u8 addrType, u8 address[6], char* deviceName)
  */
 void app_audio_showSinkInfo(void)
 {
-    if(sinkFlag)    app_parse_printf("Now Stop Scan new Sink\r\n");
+    if (sinkFlag) {
+        app_parse_printf("Now Stop Scan new Sink\r\n");
+    }
 
-    if(!sinkCnt)    app_parse_printf("No Scan information\r\n");
+    if (!sinkCnt) {
+        app_parse_printf("No Scan information\r\n");
+    }
 
-    for(int i=0; i<sinkCnt; i++)
-    {
+    for (int i = 0; i < sinkCnt; i++) {
         sink_info_t *sinkInfo = &sinkInfoTable[i];
-        app_parse_printf("[%d] %s %s name:%s\r\n", i+1, sinkInfo->addrType?"random":"public", addr_to_str(sinkInfo->address), sinkInfo->deviceName);
+        app_parse_printf("[%d] %s %s name:%s\r\n", i + 1, sinkInfo->addrType ? "random" : "public", addr_to_str(sinkInfo->address), sinkInfo->deviceName);
     }
 }
 
@@ -413,14 +436,11 @@ void app_audio_showSinkInfo(void)
  */
 int app_audio_createSinkConn(int index)
 {
-    if(index > sinkCnt)
+    if (index > sinkCnt) {
         return 0;
+    }
 
-    blc_ll_extended_createConnection(INITIATE_FP_ADV_SPECIFY, OWN_ADDRESS_PUBLIC,
-                                    sinkInfoTable[index-1].addrType, sinkInfoTable[index-1].address, INIT_PHY_1M,
-                                    SCAN_INTERVAL_30MS, SCAN_INTERVAL_30MS, CONN_INTERVAL_18P75MS, CONN_INTERVAL_18P75MS, CONN_TIMEOUT_4S,
-                                    0,0,0,0,0,
-                                    0,0,0,0,0);
+    blc_ll_extended_createConnection(INITIATE_FP_ADV_SPECIFY, OWN_ADDRESS_PUBLIC, sinkInfoTable[index - 1].addrType, sinkInfoTable[index - 1].address, INIT_PHY_1M, SCAN_INTERVAL_30MS, SCAN_INTERVAL_30MS, CONN_INTERVAL_18P75MS, CONN_INTERVAL_18P75MS, CONN_TIMEOUT_4S, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     return 1;
 }
 
@@ -436,15 +456,15 @@ int app_audio_createSinkConn(int index)
  */
 static int app_common_aclConnect(u16 connHandle, u8 *pData, u16 dataLen)
 {
-    blc_prf_aclConnEvt_t* aclConn = (blc_prf_aclConnEvt_t*)pData;
+    blc_prf_aclConnEvt_t *aclConn = (blc_prf_aclConnEvt_t *)pData;
 
     app_parse_printf("acl connected Handle:%x, Addr %s\r\n", connHandle, addr_to_str(aclConn->PeerAddr));
     blc_hci_le_getRemoteSupportedFeatures(connHandle);
 
-#if UI_LED_ENABLE
+    #if UI_LED_ENABLE
     gpio_write(GPIO_LED_RED, 1);
-#endif
-    if(app_audio_allocateConnBuff(aclConn->aclHandle, aclConn->PeerAddrType, aclConn->PeerAddr)){
+    #endif
+    if (app_audio_allocateConnBuff(aclConn->aclHandle, aclConn->PeerAddrType, aclConn->PeerAddr)) {
         appConnInfo.connCnt++;
         tlkapi_printf(APP_PRF_EVT_LOG_EN, "[I] ACL connection complete:0x%x\n", aclConn->aclHandle);
     }
@@ -460,20 +480,19 @@ static int app_common_aclConnect(u16 connHandle, u8 *pData, u16 dataLen)
  */
 static int app_common_aclDisconnect(u16 connHandle, u8 *pData, u16 dataLen)
 {
-#if UI_LED_ENABLE
+    #if UI_LED_ENABLE
     gpio_write(GPIO_LED_RED, 0);
-#endif
+    #endif
 
-    for(int i=0; i<MAX_LINK_NUM; i++)
-    {
+    for (int i = 0; i < MAX_LINK_NUM; i++) {
         connect_info_t *pConn = &appConnInfo.conn[i];
-        if(pConn->isUsed && connHandle == pConn->connHandle){
+        if (pConn->isUsed && connHandle == pConn->connHandle) {
             app_parse_printf("acl disconnected Handle:%x, Addr %s\r\n", connHandle, addr_to_str(pConn->address));
             memset(pConn, 0, sizeof(connect_info_t));
         }
     }
 
-    if(appConnInfo.connCnt){
+    if (appConnInfo.connCnt) {
         appConnInfo.connCnt--;
     }
 
@@ -491,15 +510,14 @@ static int app_common_aclDisconnect(u16 connHandle, u8 *pData, u16 dataLen)
  */
 static int app_bapba_foundSink(u16 connHandle, u8 *pData, u16 dataLen)
 {
-    if(sinkFlag)    return 0;
+    if (sinkFlag) {
+        return 0;
+    }
 
-    blc_bapba_foundSinkEvt_t* foundSink = (blc_bapba_foundSinkEvt_t*)pData;
-    u8 index = app_audio_findSinkInfo(foundSink->addrType, foundSink->address, (char*)foundSink->completeName);
-    if(index)
-    {
-        app_parse_printf("[%d] %s %s name:%s\r\n", index, foundSink->addrType?"random":"public", addr_to_str(foundSink->address),
-                foundSink->completeName
-        );
+    blc_bapba_foundSinkEvt_t *foundSink = (blc_bapba_foundSinkEvt_t *)pData;
+    u8                        index     = app_audio_findSinkInfo(foundSink->addrType, foundSink->address, (char *)foundSink->completeName);
+    if (index) {
+        app_parse_printf("[%d] %s %s name:%s\r\n", index, foundSink->addrType ? "random" : "public", addr_to_str(foundSink->address), foundSink->completeName);
     }
     return 0;
 }
@@ -513,14 +531,12 @@ static int app_bapba_foundSink(u16 connHandle, u8 *pData, u16 dataLen)
  */
 static int app_client_sdpFail(u16 connHandle, u8 *pData, u16 dataLen)
 {
-    blc_prf_sdpFailEvt_t* sdpFail = (blc_prf_sdpFailEvt_t*)pData;
-    if(sdpFail->svcId == AUDIO_PACS_CLIENT) {
+    blc_prf_sdpFailEvt_t *sdpFail = (blc_prf_sdpFailEvt_t *)pData;
+    if (sdpFail->svcId == AUDIO_PACS_CLIENT) {
         app_parse_printf("ConnHandle:%x, PACS Found Failed.\r\n", connHandle);
-    }
-    else if(sdpFail->svcId == AUDIO_BASS_CLIENT) {
+    } else if (sdpFail->svcId == AUDIO_BASS_CLIENT) {
         app_parse_printf("ConnHandle:%x, BASS Found Failed.\r\n", connHandle);
-    }
-    else if(sdpFail->svcId == AUDIO_VCP_CLIENT) {
+    } else if (sdpFail->svcId == AUDIO_VCP_CLIENT) {
         app_parse_printf("ConnHandle:%x, VCP Volume Controller Found Failed.\r\n", connHandle);
     }
 
@@ -537,20 +553,17 @@ static int app_client_sdpFail(u16 connHandle, u8 *pData, u16 dataLen)
  */
 static int app_client_sdpFound(u16 connHandle, u8 *pData, u16 dataLen)
 {
-    blc_prf_sdpFoundEvt_t* sdpFound = (blc_prf_sdpFoundEvt_t*)pData;
+    blc_prf_sdpFoundEvt_t *sdpFound = (blc_prf_sdpFoundEvt_t *)pData;
 
-    if(sdpFound->svcId == AUDIO_PACS_CLIENT) {
+    if (sdpFound->svcId == AUDIO_PACS_CLIENT) {
         app_parse_printf("ConnHandle:%x, PACS Found Start.\r\n", connHandle);
-    }
-    else if(sdpFound->svcId == AUDIO_BASS_CLIENT) {
+    } else if (sdpFound->svcId == AUDIO_BASS_CLIENT) {
         app_parse_printf("ConnHandle:%x, BASS Found Start.\r\n", connHandle);
-    }
-    else if(sdpFound->svcId == AUDIO_VCP_CLIENT) {
+    } else if (sdpFound->svcId == AUDIO_VCP_CLIENT) {
         app_parse_printf("ConnHandle:%x, VCP Volume Controller Found Start.\r\n", connHandle);
     }
 
-    tlkapi_printf(APP_PRF_EVT_LOG_EN, "sdp Found, connHandle:0x%x ID:0x%x startHandle:0x%x endHandle:0x%x\n",
-            sdpFound->aclHandle, sdpFound->svcId, sdpFound->startHdl, sdpFound->endHdl);
+    tlkapi_printf(APP_PRF_EVT_LOG_EN, "sdp Found, connHandle:0x%x ID:0x%x startHandle:0x%x endHandle:0x%x\n", sdpFound->aclHandle, sdpFound->svcId, sdpFound->startHdl, sdpFound->endHdl);
 
     return 0;
 }
@@ -564,25 +577,22 @@ static int app_client_sdpFound(u16 connHandle, u8 *pData, u16 dataLen)
  */
 static int app_client_sdpEnd(u16 connHandle, u8 *pData, u16 dataLen)
 {
-    blc_prf_sdpFoundEvt_t* sdpFound = (blc_prf_sdpFoundEvt_t*)pData;
+    blc_prf_sdpFoundEvt_t *sdpFound = (blc_prf_sdpFoundEvt_t *)pData;
 
-    connect_info_t* pConn = app_audio_getConn(connHandle);
+    connect_info_t *pConn = app_audio_getConn(connHandle);
 
-    if(sdpFound->svcId == AUDIO_PACS_CLIENT) {
+    if (sdpFound->svcId == AUDIO_PACS_CLIENT) {
         pConn->PACS_server = 1;
         app_parse_printf("ConnHandle:%x, PACS Found End.\r\n", connHandle);
-    }
-    else if(sdpFound->svcId == AUDIO_BASS_CLIENT) {
+    } else if (sdpFound->svcId == AUDIO_BASS_CLIENT) {
         pConn->BASS_server = 1;
         app_parse_printf("ConnHandle:%x, BASS Found End.\r\n", connHandle);
-    }
-    else if(sdpFound->svcId == AUDIO_VCP_CLIENT) {
+    } else if (sdpFound->svcId == AUDIO_VCP_CLIENT) {
         pConn->VCS_server = 1;
         app_parse_printf("ConnHandle:%x, VCP Volume Controller Found End.\r\n", connHandle);
     }
 
-    tlkapi_printf(APP_PRF_EVT_LOG_EN, "sdp Found End, connHandle:0x%x ID:0x%x startHandle:0x%x endHandle:0x%x\n",
-            sdpFound->aclHandle, sdpFound->svcId, sdpFound->startHdl, sdpFound->endHdl);
+    tlkapi_printf(APP_PRF_EVT_LOG_EN, "sdp Found End, connHandle:0x%x ID:0x%x startHandle:0x%x endHandle:0x%x\n", sdpFound->aclHandle, sdpFound->svcId, sdpFound->startHdl, sdpFound->endHdl);
 
     return 0;
 }
@@ -596,18 +606,18 @@ static int app_client_sdpEnd(u16 connHandle, u8 *pData, u16 dataLen)
  */
 static int app_client_sdpOver(u16 connHandle, u8 *pData, u16 dataLen)
 {
-    connect_info_t* pConn = app_audio_getConn(connHandle);
+    connect_info_t *pConn = app_audio_getConn(connHandle);
 
     app_parse_printf("ConnHandle:%x, SDP over\r\n", connHandle);
     tlkapi_printf(APP_PRF_EVT_LOG_EN, "broadcast assistant sdk over\n");
 
     pConn->sdp_over = 1;
 
-    if(pConn->sinkState == CONNECT_SINK_HAD_SOURCE) {
+    if (pConn->sinkState == CONNECT_SINK_HAD_SOURCE) {
         app_parse_printf("Sink Had Sync BIS\r\n");
     }
 
-    blc_ll_updateConnection(connHandle, CONN_INTERVAL_100MS, CONN_INTERVAL_200MS, 0, CONN_TIMEOUT_3S, 0, 0xFFFF );
+    blc_ll_updateConnection(connHandle, CONN_INTERVAL_100MS, CONN_INTERVAL_200MS, 0, CONN_TIMEOUT_3S, 0, 0xFFFF);
     return 0;
 }
 
@@ -620,45 +630,39 @@ static int app_client_sdpOver(u16 connHandle, u8 *pData, u16 dataLen)
  */
 static int app_bassc_recvSinkState(u16 connHandle, u8 *pData, u16 dataLen)
 {
-    connect_info_t* pConn = app_audio_getConn(connHandle);
-    blc_bassc_recvSinkStateEvt_t* sinkStateEvt = (blc_bassc_recvSinkStateEvt_t*)pData;
-    source_info_t* sourceInfo = app_audio_getSourceInfo(pConn->sourceIndex);
+    connect_info_t               *pConn        = app_audio_getConn(connHandle);
+    blc_bassc_recvSinkStateEvt_t *sinkStateEvt = (blc_bassc_recvSinkStateEvt_t *)pData;
+    source_info_t                *sourceInfo   = app_audio_getSourceInfo(pConn->sourceIndex);
 
-    if(!dataLen){
+    if (!dataLen) {
         pConn->sinkState = SINK_STATE_NO_SOURCE;
 
         app_parse_printf("Sink no any Sync Source Info\r\n");
-        if(pConn->sourceIndex)
-        {
-            if(pConn->pastFlag) {
+        if (pConn->sourceIndex) {
+            if (pConn->pastFlag) {
                 blc_bapba_writeAddSourcePast(connHandle, (blc_audio_source_head_t *)sourceInfo, pConn->bisSync);
-            }
-            else {
+            } else {
                 blc_bapba_writeAddSourceNoPast(connHandle, (blc_audio_source_head_t *)sourceInfo, pConn->bisSync);
             }
 
             pConn->sourceIndex = 0;
         }
-    }
-    else
-    {
+    } else {
         pConn->remoteSourceId = sinkStateEvt->sourceID;
-        app_parse_printf("sink PA state is %s\r\nBIS Sync state is 0x%08x\r\n", sinkStateEvt->paState?"Sync":"Loss", sinkStateEvt->bisSyncState);
+        app_parse_printf("sink PA state is %s\r\nBIS Sync state is 0x%08x\r\n", sinkStateEvt->paState ? "Sync" : "Loss", sinkStateEvt->bisSyncState);
 
-        if(sinkStateEvt->paState)
-        {
+        if (sinkStateEvt->paState) {
             blc_bapba_stopPAST(connHandle);
         }
 
-        if(sinkStateEvt->bisSyncState && sinkStateEvt->paState) {
+        if (sinkStateEvt->bisSyncState && sinkStateEvt->paState) {
             pConn->sinkState = SINK_STATE_HAD_SOURCE;
         }
 
-        if(sinkStateEvt->bisSyncState == 0 && sinkStateEvt->paState == 0){
+        if (sinkStateEvt->bisSyncState == 0 && sinkStateEvt->paState == 0) {
             pConn->sinkState = SINK_STATE_REMOVE_SOURCE;
             blc_bapba_writeRemoveSource(connHandle, pConn->remoteSourceId);
         }
-
     }
 
     tlkapi_printf(APP_PRF_EVT_LOG_EN, "[APP]receiver sink state is %s\n", hex_to_str(pData, dataLen));
@@ -675,9 +679,9 @@ static int app_bassc_recvSinkState(u16 connHandle, u8 *pData, u16 dataLen)
  */
 static int app_bassc_bcstCodeReq(u16 connHandle, u8 *pData, u16 dataLen)
 {
-    connect_info_t* pConn = app_audio_getConn(connHandle);
+    connect_info_t *pConn = app_audio_getConn(connHandle);
 
-    blc_bapba_writeSetBroadcastCode(connHandle, pConn->remoteSourceId, (u8*)pConn->broadcastCode);
+    blc_bapba_writeSetBroadcastCode(connHandle, pConn->remoteSourceId, (u8 *)pConn->broadcastCode);
 
     return 0;
 }
@@ -691,19 +695,16 @@ static int app_bassc_bcstCodeReq(u16 connHandle, u8 *pData, u16 dataLen)
  */
 static int app_bassc_badBcstCode(u16 connHandle, u8 *pData, u16 dataLen)
 {
-    connect_info_t* pConn = app_audio_getConn(connHandle);
+    connect_info_t *pConn = app_audio_getConn(connHandle);
 
-    blc_bassc_badBroadcastCodeEvt_t* badBcastCodeEvt = (blc_bassc_badBroadcastCodeEvt_t*)pData;
+    blc_bassc_badBroadcastCodeEvt_t *badBcastCodeEvt = (blc_bassc_badBroadcastCodeEvt_t *)pData;
 
-    if(badBcastCodeEvt->paState)
-    {
+    if (badBcastCodeEvt->paState) {
         pConn->sourceIndex = 0;
         blc_bapba_writeModifySourceNotSyncPA(connHandle, pConn->remoteSourceId, 0);
         pConn->sinkState = SINK_STATE_BAD_CODE;
         app_parse_printf("Conn:%x, Sync BIS Failed, Error Broadcast Code is %.*s\r\n", connHandle, 16, badBcastCodeEvt->broadcastCode);
-    }
-    else
-    {
+    } else {
         pConn->sinkState = SINK_STATE_REMOVE_SOURCE;
         blc_bapba_writeRemoveSource(connHandle, pConn->remoteSourceId);
     }
@@ -720,13 +721,14 @@ static int app_bassc_badBcstCode(u16 connHandle, u8 *pData, u16 dataLen)
  */
 static int app_bapba_startedSyncPA(u16 connHandle, u8 *pData, u16 dataLen)
 {
-    blc_bapba_startSyncPaEvt_t *startSyncPA = (blc_bapba_startSyncPaEvt_t*)pData;
+    blc_bapba_startSyncPaEvt_t *startSyncPA = (blc_bapba_startSyncPaEvt_t *)pData;
 
-    if(app_audio_findSourceInfo(startSyncPA->sid, startSyncPA->addrType, startSyncPA->address))
+    if (app_audio_findSourceInfo(startSyncPA->sid, startSyncPA->addrType, startSyncPA->address)) {
         return 1;
+    }
 
     tlkapi_printf(APP_PRF_EVT_LOG_EN, "start sync pda, broadcast is %s\n", hex_to_str(startSyncPA->broadcastId, 3));
-    foundInfoTemp.head.sid = startSyncPA->sid;
+    foundInfoTemp.head.sid      = startSyncPA->sid;
     foundInfoTemp.head.addrType = startSyncPA->addrType;
     memcpy(foundInfoTemp.head.addr, startSyncPA->address, 6);
     memcpy(foundInfoTemp.head.broadcastId, startSyncPA->broadcastId, 3);
@@ -749,39 +751,33 @@ static int app_bapba_startedSyncPA(u16 connHandle, u8 *pData, u16 dataLen)
  */
 static int app_bapba_foundSourceInfo(u16 connHandle, u8 *pData, u16 dataLen)
 {
-    blc_bapba_foundSourceInfoEvt_t *sourceInfo = (blc_bapba_foundSourceInfoEvt_t*)pData;
-    if(sourceInfo->presentationDelay != 0xFFFFFFFF){
-        tlkapi_printf(APP_PRF_EVT_LOG_EN, "[APP][EVT]Found Source Info, address is %s presentation Delay is %dus\n",
-                    addr_to_str(sourceInfo->address), sourceInfo->presentationDelay);
+    blc_bapba_foundSourceInfoEvt_t *sourceInfo = (blc_bapba_foundSourceInfoEvt_t *)pData;
+    if (sourceInfo->presentationDelay != 0xFFFFFFFF) {
+        tlkapi_printf(APP_PRF_EVT_LOG_EN, "[APP][EVT]Found Source Info, address is %s presentation Delay is %dus\n", addr_to_str(sourceInfo->address), sourceInfo->presentationDelay);
     }
-    bisSyncInfo_t* bisInfo = &sourceInfo->bisInfo[0];
-    tlkapi_printf(APP_PRF_EVT_LOG_EN, " bisIndex:0x%x codecID:0x%x companyID:0x%x vendorID:0x%x\n",
-            sourceInfo->bisIndex, bisInfo->CodecId.id, bisInfo->CodecId.companyID, bisInfo->CodecId.vendorID);
-    tlkapi_printf(APP_PRF_EVT_LOG_EN, " CodecCfg SampleFreq:0x%x Duration:0x%x allocation:0x%x frameOctet:0x%x\n",
-            bisInfo->codecCfg.frequency, bisInfo->codecCfg.duration,
-            bisInfo->codecCfg.allocation, bisInfo->codecCfg.frameOcts);
+    bisSyncInfo_t *bisInfo = &sourceInfo->bisInfo[0];
+    tlkapi_printf(APP_PRF_EVT_LOG_EN, " bisIndex:0x%x codecID:0x%x companyID:0x%x vendorID:0x%x\n", sourceInfo->bisIndex, bisInfo->CodecId.id, bisInfo->CodecId.companyID, bisInfo->CodecId.vendorID);
+    tlkapi_printf(APP_PRF_EVT_LOG_EN, " CodecCfg SampleFreq:0x%x Duration:0x%x allocation:0x%x frameOctet:0x%x\n", bisInfo->codecCfg.frequency, bisInfo->codecCfg.duration, bisInfo->codecCfg.allocation, bisInfo->codecCfg.frameOcts);
     tlkapi_printf(APP_PRF_EVT_LOG_EN, " metadata is %s\n", hex_to_str(&bisInfo->metadata[1], bisInfo->metadata[0]));
 
     source_info_t *source = app_audio_findSourceInfo(foundInfoTemp.head.sid, foundInfoTemp.head.addrType, foundInfoTemp.head.addr);
-    source->usedFlag = 1;
-    if(sourceInfo->presentationDelay != 0xFFFFFFFF){
+    source->usedFlag      = 1;
+    if (sourceInfo->presentationDelay != 0xFFFFFFFF) {
         memcpy(source->completeName, foundInfoTemp.completeName, sizeof(foundInfoTemp.completeName));
         memcpy(source->broadcastName, foundInfoTemp.broadcastName, sizeof(foundInfoTemp.broadcastName));
-        source->bisCnt = 1;
+        source->bisCnt      = 1;
         source->bisIndex[0] = sourceInfo->bisIndex;
         memcpy(&source->bisInfo[0], sourceInfo->bisInfo, sizeof(bisSyncInfo_t));
-    }
-    else
-    {
+    } else {
         source->bisIndex[source->bisCnt] = sourceInfo->bisIndex;
         memcpy(&source->bisInfo[source->bisCnt], &sourceInfo->bisInfo, sizeof(bisSyncInfo_t));
-        source->bisCnt ++;
+        source->bisCnt++;
     }
 
 
-#if UI_LED_ENABLE
+    #if UI_LED_ENABLE
     gpio_toggle(GPIO_LED_WHITE);
-#endif
+    #endif
 
     return 0;
 }
@@ -795,11 +791,10 @@ static int app_bapba_foundSourceInfo(u16 connHandle, u8 *pData, u16 dataLen)
  */
 static int app_bapba_sourceEncState(u16 connHandle, u8 *pData, u16 dataLen)
 {
-    blc_bapba_sourceEncStateEvt_t *sourceEnc = (blc_bapba_sourceEncStateEvt_t*)pData;
+    blc_bapba_sourceEncStateEvt_t *sourceEnc = (blc_bapba_sourceEncStateEvt_t *)pData;
 
     source_info_t *source = app_audio_findSourceInfo(foundInfoTemp.head.sid, foundInfoTemp.head.addrType, foundInfoTemp.head.addr);
-    if(source->usedFlag)
-    {
+    if (source->usedFlag) {
         source->enc = sourceEnc->enc;
         app_audio_displaySourceInfo(source);
     }
@@ -815,15 +810,14 @@ static int app_bapba_sourceEncState(u16 connHandle, u8 *pData, u16 dataLen)
  */
 static int app_bapba_PastStartedReady(u16 connHandle, u8 *pData, u16 dataLen)
 {
-    connect_info_t* pConn = app_audio_getConn(connHandle);
-    source_info_t* sourceInfo = app_audio_getSourceInfo(pConn->sourceIndex);
+    connect_info_t *pConn      = app_audio_getConn(connHandle);
+    source_info_t  *sourceInfo = app_audio_getSourceInfo(pConn->sourceIndex);
 
-    if(pConn->sinkState == SINK_STATE_NO_SOURCE) {
-        blc_bapba_writeAddSourcePast(pConn->connHandle, (blc_audio_source_head_t*)sourceInfo, pConn->bisSync);
+    if (pConn->sinkState == SINK_STATE_NO_SOURCE) {
+        blc_bapba_writeAddSourcePast(pConn->connHandle, (blc_audio_source_head_t *)sourceInfo, pConn->bisSync);
     }
     return 0;
 }
-
 
 /**
  * @brief       vcsc changed volume state event.
@@ -834,8 +828,8 @@ static int app_bapba_PastStartedReady(u16 connHandle, u8 *pData, u16 dataLen)
  */
 static int app_vcsc_changedVolState(u16 connHandle, u8 *pData, u16 dataLen)
 {
-    blc_vcsc_volumeStateChangeEvt_t *volState = (blc_vcsc_volumeStateChangeEvt_t*)pData;
-    app_parse_printf("Conn:%x, volume(min:0, max:255) is %d, muteSate:%s\r\n", connHandle, volState->volumeSetting, volState->mute?"Mute":"Unmute");
+    blc_vcsc_volumeStateChangeEvt_t *volState = (blc_vcsc_volumeStateChangeEvt_t *)pData;
+    app_parse_printf("Conn:%x, volume(min:0, max:255) is %d, muteSate:%s\r\n", connHandle, volState->volumeSetting, volState->mute ? "Mute" : "Unmute");
 
     muteFlag = volState->mute;
 
@@ -851,7 +845,7 @@ static int app_vcsc_changedVolState(u16 connHandle, u8 *pData, u16 dataLen)
  */
 static int app_vocsc_changedVolOffset(u16 connHandle, u8 *pData, u16 dataLen)
 {
-    blc_vocsc_volumeOffsetStateChangeEvt_t *volOffset = (blc_vocsc_volumeOffsetStateChangeEvt_t*)pData;
+    blc_vocsc_volumeOffsetStateChangeEvt_t *volOffset = (blc_vocsc_volumeOffsetStateChangeEvt_t *)pData;
     app_parse_printf("Conn:%x, vocs index is %d volume offset(min:-255, max:255) is %d,\r\n", connHandle, volOffset->vocsIndex, volOffset->volumeOffset);
 
     return 0;
@@ -862,26 +856,26 @@ static int app_vocsc_changedVolOffset(u16 connHandle, u8 *pData, u16 dataLen)
  */
 static const app_audio_evtCb_t assistantCb[] = {
     /* Event for controller or Host */
-    {PRF_EVTID_ACL_CONNECT                  , app_common_aclConnect},
-    {PRF_EVTID_ACL_DISCONNECT               , app_common_aclDisconnect},
+    {PRF_EVTID_ACL_CONNECT,                 app_common_aclConnect     },
+    {PRF_EVTID_ACL_DISCONNECT,              app_common_aclDisconnect  },
     /* Event for controller or Host */
-    {PRF_EVTID_CLIENT_SDP_FAIL              , app_client_sdpFail},
-    {PRF_EVTID_CLIENT_SDP_FOUND             , app_client_sdpFound},
-    {PRF_EVTID_CLIENT_SDP_END               , app_client_sdpEnd},
-    {PRF_EVTID_CLIENT_ALL_SDP_OVER          , app_client_sdpOver},
+    {PRF_EVTID_CLIENT_SDP_FAIL,             app_client_sdpFail        },
+    {PRF_EVTID_CLIENT_SDP_FOUND,            app_client_sdpFound       },
+    {PRF_EVTID_CLIENT_SDP_END,              app_client_sdpEnd         },
+    {PRF_EVTID_CLIENT_ALL_SDP_OVER,         app_client_sdpOver        },
     /* Event for BAP Broadcast Assistant */
-    {AUDIO_EVT_BAPBA_FOUND_SINK             , app_bapba_foundSink},
-    {AUDIO_EVT_BAPBA_START_SYNC_PA          , app_bapba_startedSyncPA},
-    {AUDIO_EVT_BAPBA_FOUND_SOURCE_INFO      , app_bapba_foundSourceInfo},
-    {AUDIO_EVT_BAPBA_SOURCE_ENC_STATE       , app_bapba_sourceEncState},
-    {AUDIO_EVT_BAPBA_PAST_STARTED_READY     , app_bapba_PastStartedReady},
+    {AUDIO_EVT_BAPBA_FOUND_SINK,            app_bapba_foundSink       },
+    {AUDIO_EVT_BAPBA_START_SYNC_PA,         app_bapba_startedSyncPA   },
+    {AUDIO_EVT_BAPBA_FOUND_SOURCE_INFO,     app_bapba_foundSourceInfo },
+    {AUDIO_EVT_BAPBA_SOURCE_ENC_STATE,      app_bapba_sourceEncState  },
+    {AUDIO_EVT_BAPBA_PAST_STARTED_READY,    app_bapba_PastStartedReady},
     /* Event for BASS Client */
-    {AUDIO_EVT_BASSC_RECV_SINK_STATE        , app_bassc_recvSinkState},
-    {AUDIO_EVT_BASSC_BROADCAST_CODE_REQ     , app_bassc_bcstCodeReq},
-    {AUDIO_EVT_BASSC_BAD_BROADCAST_CODE     , app_bassc_badBcstCode},
+    {AUDIO_EVT_BASSC_RECV_SINK_STATE,       app_bassc_recvSinkState   },
+    {AUDIO_EVT_BASSC_BROADCAST_CODE_REQ,    app_bassc_bcstCodeReq     },
+    {AUDIO_EVT_BASSC_BAD_BROADCAST_CODE,    app_bassc_badBcstCode     },
     /* Event for VCS Client */
-    {AUDIO_EVT_VCSC_CHANGED_VOLUME_STATE    , app_vcsc_changedVolState},
-    {AUDIO_EVT_VOCSC_CHANGED_VOLUME_OFFSET  , app_vocsc_changedVolOffset},
+    {AUDIO_EVT_VCSC_CHANGED_VOLUME_STATE,   app_vcsc_changedVolState  },
+    {AUDIO_EVT_VOCSC_CHANGED_VOLUME_OFFSET, app_vocsc_changedVolOffset},
 };
 
 /**
@@ -894,10 +888,10 @@ static const app_audio_evtCb_t assistantCb[] = {
  */
 int app_audio_prfEvtCb(u16 aclHandle, int evtID, u8 *pData, u16 dataLen)
 {
-    for(int i=0; i < ARRAY_SIZE(assistantCb); i++)
-    {
-        if(assistantCb[i].id == evtID)
+    for (int i = 0; i < ARRAY_SIZE(assistantCb); i++) {
+        if (assistantCb[i].id == evtID) {
             return assistantCb[i].evtCb(aclHandle, pData, dataLen);
+        }
     }
     return 0;
 }
@@ -915,10 +909,10 @@ void app_audio_init(void)
     /* CAP Broadcast Commander initial */
     blc_cap_initBcstCommander();
 
-#if (ACL_PERIPHR_SMP_ENABLE || ACL_CENTRAL_SMP_ENABLE)
+    #if (ACL_PERIPHR_SMP_ENABLE || ACL_CENTRAL_SMP_ENABLE)
     /* Audio bonding initial */
     blc_prf_initPairingInfoStoreModule();
-#endif
+    #endif
 
     /* broadcast assistant UI initial */
     app_audio_ui_init();
@@ -927,11 +921,9 @@ void app_audio_init(void)
 
     tlkapi_printf(APP_LOG_EN, "[APP][INIT]user initial end. \n");
 
-    blc_ll_setExtScanParam( OWN_ADDRESS_PUBLIC, SCAN_FP_ALLOW_ADV_ANY, SCAN_PHY_1M,
-                            SCAN_TYPE_PASSIVE,  SCAN_INTERVAL_100MS,   SCAN_INTERVAL_100MS,
-                            0,                  0,                     0);
+    blc_ll_setExtScanParam(OWN_ADDRESS_PUBLIC, SCAN_FP_ALLOW_ADV_ANY, SCAN_PHY_1M, SCAN_TYPE_PASSIVE, SCAN_INTERVAL_100MS, SCAN_INTERVAL_100MS, 0, 0, 0);
 
-    blc_ll_setExtScanEnable( BLC_SCAN_ENABLE, DUP_FILTER_DISABLE, SCAN_DURATION_CONTINUOUS, SCAN_WINDOW_CONTINUOUS);
+    blc_ll_setExtScanEnable(BLC_SCAN_ENABLE, DUP_FILTER_DISABLE, SCAN_DURATION_CONTINUOUS, SCAN_WINDOW_CONTINUOUS);
 }
 
-#endif  //ASSISTANT_VERSION == UNIVERSAL_VERSION
+#endif //ASSISTANT_VERSION == UNIVERSAL_VERSION

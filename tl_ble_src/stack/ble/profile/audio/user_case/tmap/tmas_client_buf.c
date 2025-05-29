@@ -26,9 +26,8 @@
 #include "stack/ble/ble.h"
 
 
-
 _attribute_ble_data_retention_
-blc_tmas_client_t gTmasClient[APP_AUDIO_ACL_MAX_CONN];
+    blc_tmas_client_t gTmasClient[APP_AUDIO_ACL_MAX_CONN];
 
 blc_tmas_client_t *blt_tmasc_getClientBuf(u8 instIdx)
 {
@@ -36,5 +35,3 @@ blc_tmas_client_t *blt_tmasc_getClientBuf(u8 instIdx)
 
     return &gTmasClient[instIdx];
 }
-
-

@@ -94,7 +94,7 @@ void codec_close(void)
 
 void iis_base_init(u8 *Ibuffer,u16 IbufferLen,u8 *Obuffer,u16 ObufferLen)//le audio support 16bit default
 {
-    gpio_input_en(I2S_BCK_PC3|I2S_DAC_LR_PC6|I2S_DAC_DAT_PC7|I2S_ADC_LR_PC4|I2S_ADC_DAT_PC5);
+    gpio_input_en(I2S_BCK_PC3|I2S_ADC_LR_PC6|I2S_ADC_DAT_PC7|I2S_DAC_LR_PC4|I2S_DAC_DAT_PC5);
     reg_rst2&=(~FLD_RST2_AUD);
     reg_rst2 |=FLD_RST2_AUD;//reset audio
 

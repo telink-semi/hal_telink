@@ -99,6 +99,14 @@ typedef enum{
     CHIP_VERSION_A1 = 0x10,
 }sys_chip_version_e;
 
+
+
+typedef enum{
+   D25F = BIT(0),
+   N22  = BIT(1),
+   DSP  = BIT(2),
+}sys_core_e;
+
 /**********************************************************************************************************************
  *                                     global variable declaration                                                    *
  *********************************************************************************************************************/
@@ -113,25 +121,6 @@ extern unsigned int g_chip_version;
  * @return     none
  */
 _attribute_text_sec_ void sys_reboot(void);
-
-/**
- * @brief       This function serves to set dsp start up address.
- * @return      none
- */
-static inline void sys_set_dsp_startup_addr(unsigned int addr)
-{
-    reg_dsp_reset_vector = addr;
-}
-
-/**
- * @brief      This function serves to set n22 start up address.
- * @param[in]  addr - start up address
- * @return     none
- */
-static inline void sys_set_n22_startup_addr(unsigned int addr)
-{
-    reg_n22_rst_vector = addr;
-}
 
 /**
  * @brief       This function serves to initialize system.
@@ -156,11 +145,12 @@ void sys_set_vbat_type(vbat_type_e vbat_v);
 
 /**
  * @brief       This function serves to initialize dsp core system.
+ * @param[in]  addr - start up address
  * @return      none
  * @note        Only after calling this function can other DSP related functions be called. 
  *              Otherwise, other DSP function settings will not take effect.
  */
-void sys_dsp_init(void);
+void sys_dsp_init(unsigned int addr);
 
 /**
  * @brief       This function serves to start dsp core system.
@@ -170,11 +160,12 @@ void sys_dsp_start(void);
 
 /**
  * @brief      This function serves to initialize n22 core system.
+ * @param[in]  addr - start up address
  * @return     none
  * @note        Only after calling this function can other N22 related functions be called. 
  *              Otherwise, other N22 function settings will not take effect.
  */
-void sys_n22_init(void);
+void sys_n22_init(unsigned int addr);
 
 /**
  * @brief       This function serves to start n22 core system.
@@ -182,4 +173,77 @@ void sys_n22_init(void);
  */
 void sys_n22_start(void);
 
+/**
+ * @brief       This function serves to stall n22 by dis n22 core/ram clock.
+ * @return      none
+ */
+void sys_n22_clk_dis(void);
+
+/**
+ * @brief       This function serves to start n22.
+ * @return      none
+ */
+void sys_n22_clk_en(void);
+
+/**
+ * @brief       This function serves to stall dsp by dis dsp clock.
+ * @return      none
+ */
+void sys_dsp_clk_dis(void);
+
+/**
+ * @brief       This function serves to start dsp.
+ * @return      none
+ */
+void sys_dsp_clk_en(void);
+
+/**
+ * @brief       This function serves to save n22 clk reg.
+ * @return      none
+ */
+void sys_n22_clk_reg_save(void);
+
+/**
+ * @brief       This function serves to restore n22 clk reg.
+ * @return      none
+ */
+void sys_n22_clk_reg_restore(void);
+
+/**
+ * @brief       This function serves to save dsp clk reg.
+ * @return      none
+ */
+void sys_dsp_clk_reg_save(void);
+
+/**
+ * @brief       This function serves to restore dsp clk reg.
+ * @return      none
+ */
+void sys_dsp_clk_reg_restore(void);
+
+/**
+ * @brief       This function serves to judge whether the module power on.
+ * @module      - pm_pd_module_e
+ * @return      1: power down   0:power on.
+ */
+_Bool pm_dig_module_is_power_on(pm_pd_module_e module);
+
+/**
+ * @brief       This function serves to judge whether n22 reg write or read.
+ * @return      none
+ */
+unsigned char sys_n22_is_reg_rw_permitted(void);
+
+/**
+ * @brief       This function serves to judge whether dsp reg write or read.
+ * @return      none
+ */
+unsigned char sys_dsp_is_reg_rw_permitted(void);
+
+/**
+ * @brief       This function serves to judge whether dsp/n22 is init.
+ * @param[in]   core  - sys_core_e(n22/dsp)
+ * @return      0: is init   1/2: no init
+ */
+unsigned int sys_core_is_initialized(sys_core_e core);
 #endif

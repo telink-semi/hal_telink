@@ -31,7 +31,7 @@
 
 #if (INTER_TEST_MODE == TEST_ULL_HID_HOST)
 
-#if (UI_KEYBOARD_ENABLE)
+    #if (UI_KEYBOARD_ENABLE)
 /**
  * @brief   Check changed key value.
  * @param   none.
@@ -41,23 +41,15 @@ void key_change_proc(void)
 {
     u8 key0 = kb_event.keycode[0];
 
-    if (kb_event.cnt == 2)   //two key press
+    if (kb_event.cnt == 2) //two key press
     {
-
-    }
-    else if(kb_event.cnt == 1)
+    } else if (kb_event.cnt == 1) {
+    } else                 //kb_event.cnt == 0,  key release
     {
-
-    }
-    else   //kb_event.cnt == 0,  key release
-    {
-
     }
 }
 
-
-
-_attribute_ble_data_retention_      static u32 keyScanTick = 0;
+_attribute_ble_data_retention_ static u32 keyScanTick = 0;
 
 /**
  * @brief      keyboard task handler
@@ -66,31 +58,24 @@ _attribute_ble_data_retention_      static u32 keyScanTick = 0;
  * @param[in]  n    - the length of event parameter.
  * @return     none.
  */
-void proc_keyboard (u8 e, u8 *p, int n)
+void proc_keyboard(u8 e, u8 *p, int n)
 {
-    if(clock_time_exceed(keyScanTick, 10 * 1000)){  //keyScan interval: 10mS
+    if (clock_time_exceed(keyScanTick, 10 * 1000)) { //keyScan interval: 10mS
         keyScanTick = clock_time();
-    }
-    else{
+    } else {
         return;
     }
 
     kb_event.keycode[0] = 0;
-    int det_key = kb_scan_key (0, 1);
+    int det_key         = kb_scan_key(0, 1);
 
-    if (det_key){
+    if (det_key) {
         key_change_proc();
     }
 }
 
 
+    #endif //end of UI_KEYBOARD_ENABLE
 
 
-#endif   //end of UI_KEYBOARD_ENABLE
-
-
-#endif  //INTER_TEST_MODE == TEST_ULL_HID_HOST
-
-
-
-
+#endif     //INTER_TEST_MODE == TEST_ULL_HID_HOST

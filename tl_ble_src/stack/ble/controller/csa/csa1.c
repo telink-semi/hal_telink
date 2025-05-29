@@ -36,22 +36,22 @@ _attribute_ram_code_
 #endif
 void blt_csa1_calculateChannelTable(u8* chm, u8 hop, u8 *ptbl){
     u8 tableTemp[37], num = 0;
-    foreach(k, 37){
-        if(chm[k>>3] & BIT(k & 0x07)){
+    foreach (k, 37) {
+        if (chm[k >> 3] & BIT(k & 0x07)) {
             tableTemp[num++] = k;
         }
     }
     u8 k = 0, l = 0;
-    foreach(i, 37){
+    foreach (i, 37) {
         k += hop;
-        if(k >= 37){
+        if (k >= 37) {
             k -= 37;
         }
-        if(chm[k>>3] & BIT(k & 0x07)){
+        if (chm[k >> 3] & BIT(k & 0x07)) {
             ptbl[l] = k;
-        }else{
+        } else {
             u8 m = k;
-            while(m >= num){
+            while (m >= num) {
                 m -= num;
             }
             ptbl[l] = tableTemp[m];

@@ -25,8 +25,7 @@
 
 #include "reg_include/charger_reg.h"
 #include "compiler.h"
-#include "analog.h"
-
+#include "lib/include/analog.h"
 
 /**
  * @brief     open charger 1p0v.
@@ -51,5 +50,3 @@ static inline void charger_close(void)
  * @return  none
  */
 void charger_init(void);
-
-

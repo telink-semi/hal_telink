@@ -30,15 +30,14 @@
 #include "stack/ble/controller/ble_controller.h"
 
 
-_attribute_ble_data_retention_  ll_whiteListTbl_t       ll_whiteList_tbl;
-
+_attribute_ble_data_retention_ ll_whiteListTbl_t ll_whiteList_tbl;
 
 /**
  * @brief      This function is used to clear WhiteList
  * @param[in]  none
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t   blc_ll_clearWhiteList(void)
+ble_sts_t blc_ll_clearWhiteList(void)
 {
     ll_whiteList_tbl.wl_addr_tbl_index = 0;
 
@@ -51,32 +50,29 @@ ble_sts_t   blc_ll_clearWhiteList(void)
  * @param[in]  addr - device address
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t       blc_ll_addDeviceToWhiteList(u8 adr_type, u8 *addr)
+ble_sts_t blc_ll_addDeviceToWhiteList(u8 adr_type, u8 *addr)
 {
-    if(adr_type > BLE_ADDR_RANDOM){
+    if (adr_type > BLE_ADDR_RANDOM) {
         return HCI_ERR_INVALID_HCI_CMD_PARAMS;
     }
 
-    if(blt_ll_searchAddrInWhiteListTbl(adr_type, addr)){
+    if (blt_ll_searchAddrInWhiteListTbl(adr_type, addr)) {
         return BLE_SUCCESS;
     }
 
 
-    if(ll_whiteList_tbl.wl_addr_tbl_index < MAX_WHITE_LIST_SIZE) {
+    if (ll_whiteList_tbl.wl_addr_tbl_index < MAX_WHITE_LIST_SIZE) {
         ll_whiteList_tbl.wl_addr_tbl[ll_whiteList_tbl.wl_addr_tbl_index].type = adr_type;
         smemcpy(ll_whiteList_tbl.wl_addr_tbl[ll_whiteList_tbl.wl_addr_tbl_index].address, addr, BLE_ADDR_LEN);
         ll_whiteList_tbl.wl_addr_tbl_index++;
 
         return BLE_SUCCESS;
-    }
-    else {
+    } else {
         return HCI_ERR_MEM_CAP_EXCEEDED;
-
     }
 }
 
-
-ble_sts_t       blc_hci_le_addDeviceToAcceptList(hci_le_addDeviceAcceptlist_cmdParam_t *pCmdParam)
+ble_sts_t blc_hci_le_addDeviceToAcceptList(hci_le_addDeviceAcceptlist_cmdParam_t *pCmdParam)
 {
     /* core_5.3
     This command shall not be used when:
@@ -97,11 +93,10 @@ ble_sts_t       blc_hci_le_addDeviceToAcceptList(hci_le_addDeviceAcceptlist_cmdP
 
     Address shall be ignored when Address_Type is set to 0xFF.
     */
-    my_dump_str_data(IUT_HCI_LOG_EN, "[HCI][CMD] Add_Device_Accept_List", pCmdParam, sizeof(hci_le_addDeviceAcceptlist_cmdParam_t));
+    my_dump_str_data(IUT_HCI_LOG_EN, "[HCI][CMD] LE_Add_Device_Accept_List", pCmdParam, sizeof(hci_le_addDeviceAcceptlist_cmdParam_t));
 
     return blc_ll_addDeviceToWhiteList(pCmdParam->adr_type, pCmdParam->addr);
 }
-
 
 /**
  * @brief      This function is used to delete a device from WhiteList
@@ -109,20 +104,19 @@ ble_sts_t       blc_hci_le_addDeviceToAcceptList(hci_le_addDeviceAcceptlist_cmdP
  * @param[in]  addr - device mac address
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t       blc_ll_removeDeviceFromWhiteList(u8 adr_type, u8 *addr)
+ble_sts_t blc_ll_removeDeviceFromWhiteList(u8 adr_type, u8 *addr)
 {
     wl_addr_t *pWL = blt_ll_searchAddrInWhiteListTbl(adr_type, addr);
 
     /*If has not found the addr in irk_table, or addr_table, return  ? */
-    if(pWL){
+    if (pWL) {
         /*If it is not the last addr stored in the table, need to move the last addr to this index*/
-        if(!(pWL == &(ll_whiteList_tbl.wl_addr_tbl[ll_whiteList_tbl.wl_addr_tbl_index - 1]))) {
+        if (!(pWL == &(ll_whiteList_tbl.wl_addr_tbl[ll_whiteList_tbl.wl_addr_tbl_index - 1]))) {
             smemcpy((u8 *)pWL, (u8 *)(&(ll_whiteList_tbl.wl_addr_tbl[ll_whiteList_tbl.wl_addr_tbl_index - 1])), sizeof(wl_addr_t));
         }
 
         ll_whiteList_tbl.wl_addr_tbl_index--;
-    }
-    else{
+    } else {
         //The standard ble_sts_t must be returned when passing authentication,
         //Here returns BLE_SUCCESS, which is considered a success,JingQiao encountered
         //the host mistakenly delete the WL device, after return non-BLE_SUCCESS,Host err.
@@ -137,16 +131,16 @@ ble_sts_t       blc_ll_removeDeviceFromWhiteList(u8 adr_type, u8 *addr)
  * @param[out] pointer to size
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t blc_ll_readWhiteListSize(hci_le_readWhiteListSizeCmd_retParam_t *retPara) {
+ble_sts_t blc_ll_readWhiteListSize(hci_le_readWhiteListSizeCmd_retParam_t *retPara)
+{
     //*returnPublicAddrListSize = MAX_WHITE_LIST_SIZE - ll_whiteList_tbl.wl_addr_tbl_index;
 
     // "the total number of white list entries that can stored in controller"
-    retPara->status = BLE_SUCCESS;
+    retPara->status  = BLE_SUCCESS;
     retPara->wl_size = MAX_WHITE_LIST_SIZE;
 
     return BLE_SUCCESS;
 }
-
 
 /**
  * @brief   This function is used to check if address is existed in white list table
@@ -156,18 +150,15 @@ ble_sts_t blc_ll_readWhiteListSize(hci_le_readWhiteListSizeCmd_retParam_t *retPa
 /* must in RamCode:
  * 1. Some MCU,IRQ code must in RamCode to solve flash IRQ protect problem.
  * 2. timing is urgent for address filtering */
-_attribute_ram_code_sec_noinline_
-wl_addr_t*  blt_ll_searchAddrInWhiteListTbl(u8 type, u8 *addr)
+_attribute_ram_code_sec_noinline_ wl_addr_t *blt_ll_searchAddrInWhiteListTbl(u8 type, u8 *addr)
 {
     wl_addr_t *pWL = NULL;
-    for(int i = 0; i < ll_whiteList_tbl.wl_addr_tbl_index; i++){
+    for (int i = 0; i < ll_whiteList_tbl.wl_addr_tbl_index; i++) {
         pWL = (wl_addr_t *)&ll_whiteList_tbl.wl_addr_tbl[i];
-        if(!smemcmp(pWL->address, addr, BLE_ADDR_LEN) && pWL->type == type){
+        if (!smemcmp(pWL->address, addr, BLE_ADDR_LEN) && pWL->type == type) {
             return pWL;
         }
     }
 
     return NULL;
 }
-
-

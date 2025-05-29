@@ -25,13 +25,13 @@
 
 #include "config.h"
 
-#define SINK_ONLY_VERSION                   1
+#define SINK_ONLY_VERSION 1
 
 //this demo can sync telink source
-#define SINK_WITH_ASSISTANT_VERSION         2
+#define SINK_WITH_ASSISTANT_VERSION   2
 
-#define SINK_VERSION                        SINK_ONLY_VERSION
+#define SINK_VERSION                  SINK_ONLY_VERSION
 
 
-#define BLC_PM_EN                           0
-#define BLC_PM_DEEP_RETENTION_MODE_EN       0
+#define BLC_PM_EN                     0
+#define BLC_PM_DEEP_RETENTION_MODE_EN 0

@@ -44,68 +44,73 @@
 #include "compiler.h"
 
 
-#define PAGE_SIZE       256
-#define PAGE_SIZE_OTP   256
+#define PAGE_SIZE     256
+#define PAGE_SIZE_OTP 256
 
 /**
  * @brief     flash command definition
  */
-typedef enum{
+typedef enum
+{
     //The command called by the flash_mspi_read_ram() function.
-/* attention: The maximum frequency of some flash single line reads may be smaller than the mspi frequency configured by the chip, it is not recommended to use the function of single line reads,
+    /* attention: The maximum frequency of some flash single line reads may be smaller than the mspi frequency configured by the chip, it is not recommended to use the function of single line reads,
  * if you have to use it, please refer to the flash datasheet to ensure that the maximum frequency of flash single line reads is larger than the mspi frequency configured by the chip.(added by xiaobin.huang 20240717)
  */
-    FLASH_DREAD_CMD                     =   0x3B,
-    FLASH_X4READ_CMD                    =   0xEB,
-    FLASH_READ_SECURITY_REGISTERS_CMD   =   0x48,
-    FLASH_READ_UID_CMD_GD_PUYA_ZB_TH    =   0x4B,   //Flash Type = GD/PUYA/ZB/TH
-    FLASH_GET_JEDEC_ID                  =   0x9F,
-    FLASH_READ_STATUS_CMD_LOWBYTE       =   0x05,
-    FLASH_READ_STATUS_CMD_HIGHBYTE      =   0x35,
-    FLASH_READ_CONFIGURE_CMD            =   0x15,
+    FLASH_DREAD_CMD                   = 0x3B,
+    FLASH_X4READ_CMD                  = 0xEB,
+    FLASH_READ_SECURITY_REGISTERS_CMD = 0x48,
+    FLASH_READ_UID_CMD_GD_PUYA_ZB_TH  = 0x4B, //Flash Type = GD/PUYA/ZB/TH
+    FLASH_GET_JEDEC_ID                = 0x9F,
+    FLASH_READ_STATUS_CMD_LOWBYTE     = 0x05,
+    FLASH_READ_STATUS_CMD_HIGHBYTE    = 0x35,
+    FLASH_READ_CONFIGURE_CMD          = 0x15,
     //The command called by the flash_mspi_write_ram() function.
-    FLASH_WRITE_CMD                     =   0x02,
-    FLASH_QUAD_PAGE_PROGRAM_CMD         =   0x32,   //may different for different flash
-    FLASH_SECT_ERASE_CMD                =   0x20,
-    FLASH_WRITE_SECURITY_REGISTERS_CMD  =   0x42,
-    FLASH_ERASE_SECURITY_REGISTERS_CMD  =   0x44,
-    FLASH_WRITE_STATUS_CMD_LOWBYTE      =   0x01,
-    FLASH_WRITE_STATUS_CMD_HIGHBYTE     =   0x31,    // Flash Type = P25Q16SU/P25Q32SU/PY25Q128H for write status register-1;
-    FLASH_WRITE_CONFIGURE_CMD_1         =   0x31,    // Flash Type = P25Q80U  for write configure register;
-    FLASH_WRITE_CONFIGURE_CMD_2         =   0x11,    // Flash Type = P25Q16SU/P25Q32SU/PY25Q128H  for write configure register;
+    FLASH_WRITE_CMD                    = 0x02,
+    FLASH_QUAD_PAGE_PROGRAM_CMD        = 0x32, //may different for different flash
+    FLASH_SECT_ERASE_CMD               = 0x20,
+    FLASH_WRITE_SECURITY_REGISTERS_CMD = 0x42,
+    FLASH_ERASE_SECURITY_REGISTERS_CMD = 0x44,
+    FLASH_WRITE_STATUS_CMD_LOWBYTE     = 0x01,
+    FLASH_WRITE_STATUS_CMD_HIGHBYTE    = 0x31, // Flash Type = P25Q16SU/P25Q32SU/PY25Q128H for write status register-1;
+    FLASH_WRITE_CONFIGURE_CMD_1        = 0x31, // Flash Type = P25Q80U  for write configure register;
+    FLASH_WRITE_CONFIGURE_CMD_2        = 0x11, // Flash Type = P25Q16SU/P25Q32SU/PY25Q128H  for write configure register;
     //other command
-    FLASH_WRITE_DISABLE_CMD             =   0x04,
-    FLASH_WRITE_ENABLE_CMD              =   0x06,
-}flash_command_e;
+    FLASH_WRITE_DISABLE_CMD = 0x04,
+    FLASH_WRITE_ENABLE_CMD  = 0x06,
+} flash_command_e;
 
-typedef enum{
-    XIP_READ_CMD                        =   0x0003,
-    XIP_FREAD_CMD                       =   0x070B,
-    XIP_DREAD_CMD                       =   0x173B,
-    XIP_X2READ_CMD                      =   0x53BB,
-    XIP_QREAD_CMD                       =   0x276B,
-    XIP_X4READ_CMD                      =   0x65EB,
-}flash_xip_config_e;
+typedef enum
+{
+    XIP_READ_CMD   = 0x0003,
+    XIP_FREAD_CMD  = 0x070B,
+    XIP_DREAD_CMD  = 0x173B,
+    XIP_X2READ_CMD = 0x53BB,
+    XIP_QREAD_CMD  = 0x276B,
+    XIP_X4READ_CMD = 0x65EB,
+} flash_xip_config_e;
+
 /**
  * @brief     flash status type definition
  */
-typedef enum{
-    FLASH_TYPE_8BIT_STATUS              = 0,
-    FLASH_TYPE_16BIT_STATUS_ONE_CMD     = 1,
-    FLASH_TYPE_16BIT_STATUS_TWO_CMD     = 2,
-}flash_status_typedef_e;
+typedef enum
+{
+    FLASH_TYPE_8BIT_STATUS          = 0,
+    FLASH_TYPE_16BIT_STATUS_ONE_CMD = 1,
+    FLASH_TYPE_16BIT_STATUS_TWO_CMD = 2,
+} flash_status_typedef_e;
 
 /**
  * @brief     flash vendor and technology definition
  */
-typedef enum{
-    FLASH_ETOX_ZB       = 0x0100325E,   // 325E     bit[24]=1:ETOX: Byte Program Time != Page Programming Time
-    FLASH_ETOX_GD       = 0x010060C8,   // 60C8/4051
-    FLASH_ETOX_PUYA     = 0x01002085,   // 2085
-    FLASH_SONOS_PUYA    = 0x02006085,   // 6085     bit[25]=1:SONOS:Byte Program Time == Page Programming Time
-    FLASH_SONOS_TH      = 0x020060EB,   // 60EB
-    FLASH_SST_TH        = 0x040060CD,   // 60CD     bit[26]=1:SST:  Byte Program Time != Page Programming Time
-}flash_vendor_e;
+typedef enum
+{
+    FLASH_ETOX_ZB    = 0x0100325E, // 325E     bit[24]=1:ETOX: Byte Program Time != Page Programming Time
+    FLASH_ETOX_GD    = 0x010060C8, // 60C8/4051
+    FLASH_ETOX_PUYA  = 0x01002085, // 2085
+    FLASH_SONOS_PUYA = 0x02006085, // 6085     bit[25]=1:SONOS:Byte Program Time == Page Programming Time
+    FLASH_SONOS_TH   = 0x020060EB, // 60EB
+    FLASH_SST_TH     = 0x040060CD, // 60CD     bit[26]=1:SST:  Byte Program Time != Page Programming Time
+} flash_vendor_e;
 
 /**
  * @brief   flash capacity(Unit:Byte) definition.
@@ -115,38 +120,40 @@ typedef enum{
  *          The value of (mid&0x00ff0000)>>16 reflects flash capacity.
  * @note    If there is a new flash with different capacity, you need to add the corresponding calibration interface to user_read_flash_value_calib().
  */
-typedef enum {
-    FLASH_SIZE_64K     = 0x10,
-    FLASH_SIZE_128K    = 0x11,
-    FLASH_SIZE_256K    = 0x12,
-    FLASH_SIZE_512K    = 0x13,
-    FLASH_SIZE_1M      = 0x14,
-    FLASH_SIZE_2M      = 0x15,
-    FLASH_SIZE_4M      = 0x16,
-    FLASH_SIZE_8M      = 0x17,
-    FLASH_SIZE_16M      = 0x18,
-}flash_capacity_e;
+typedef enum
+{
+    FLASH_SIZE_64K  = 0x10,
+    FLASH_SIZE_128K = 0x11,
+    FLASH_SIZE_256K = 0x12,
+    FLASH_SIZE_512K = 0x13,
+    FLASH_SIZE_1M   = 0x14,
+    FLASH_SIZE_2M   = 0x15,
+    FLASH_SIZE_4M   = 0x16,
+    FLASH_SIZE_8M   = 0x17,
+    FLASH_SIZE_16M  = 0x18,
+} flash_capacity_e;
 
 /**
  * @brief     flash mid definition
  */
-typedef enum{
-    MID146085   =   0x146085,//P25Q80U
-    MID156085   =   0x156085,//P25Q16SU
-    MID166085   =   0x166085,//P25Q32SU
-    MID182085   =   0x182085,//PY25Q128H
-}flash_mid_e;
+typedef enum
+{
+    MID146085 = 0x146085, //P25Q80U
+    MID156085 = 0x156085, //P25Q16SU
+    MID166085 = 0x166085, //P25Q32SU
+    MID182085 = 0x182085, //PY25Q128H
+} flash_mid_e;
 
+typedef struct
+{
+    unsigned char flash_read_cmd;           /**< xip read command */
+    unsigned char flash_read_dummy     : 4; /**< dummy cycle = flash_read_dummy + 1 */
+    unsigned char flash_read_data_line : 2; /**< 0:single line;  1: dual line;  2:quad line; 3:quad line */
+    unsigned char flash_read_addr_line : 1; /**< 0:single line;  1:the same to dat_line_h */
+    unsigned char flash_read_cmd_line  : 1; /**< 0:single line;  1:the same to dat_line_h */
+} flash_xip_config_t;
 
-typedef struct{
-    unsigned char  flash_read_cmd;          /**< xip read command */
-    unsigned char  flash_read_dummy:4;      /**< dummy cycle = flash_read_dummy + 1 */
-    unsigned char  flash_read_data_line:2;  /**< 0:single line;  1: dual line;  2:quad line; 3:quad line */
-    unsigned char  flash_read_addr_line:1;  /**< 0:single line;  1:the same to dat_line_h */
-    unsigned char  flash_read_cmd_line:1;   /**< 0:single line;  1:the same to dat_line_h */
-}flash_xip_config_t;
-
-typedef void (*flash_handler_t)(unsigned long, unsigned long, unsigned char*);
+typedef void (*flash_handler_t)(unsigned long, unsigned long, unsigned char *);
 extern _attribute_data_retention_sec_ flash_handler_t flash_read_page;
 extern _attribute_data_retention_sec_ flash_handler_t flash_write_page;
 
@@ -162,7 +169,7 @@ extern _attribute_data_retention_sec_ flash_handler_t flash_write_page;
  */
 static inline void flash_change_rw_func(flash_handler_t read, flash_handler_t write)
 {
-    flash_read_page = read;
+    flash_read_page  = read;
     flash_write_page = write;
 }
 
@@ -354,5 +361,4 @@ unsigned int flash_get_vendor(unsigned int flash_mid);
  * @param[in]   flash_mid - MID of the flash(4 bytes).
  * @return      flash capacity.
  */
-flash_capacity_e  flash_get_capacity(unsigned int flash_mid);
-
+flash_capacity_e flash_get_capacity(unsigned int flash_mid);

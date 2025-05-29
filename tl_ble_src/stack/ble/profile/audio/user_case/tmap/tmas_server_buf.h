@@ -25,25 +25,28 @@
 
 #include "stack/ble/profile/services/svc_adv.h"
 
-typedef struct{
+typedef struct
+{
     u16 tmapRoleHandle;
     u16 reserved;
 } blc_tmas_server_t;
 
-typedef struct{
-    blc_prf_proc_t process;
+typedef struct
+{
+    blc_prf_proc_t    process;
     blc_tmas_server_t tmasServer;
 } blc_tmas_server_ctrl_t;
 
-
-typedef struct{
-    u16 role;       //blc_tamp_role_enum
+typedef struct
+{
+    u16 role; //blc_tamp_role_enum
 } blc_tmass_regParam_t;
 
-typedef struct{
+typedef struct
+{
     blc_adv_ltv_t ltv;
-    u16 tamsUuid;
-    u16 tmapRole;
+    u16           tamsUuid;
+    u16           tmapRole;
 } blc_adv_tmapRole_t;
 
 extern const blc_adv_tmapRole_t advDefTmapRole;

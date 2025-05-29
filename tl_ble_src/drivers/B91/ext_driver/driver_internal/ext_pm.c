@@ -534,7 +534,7 @@ void sys_init(power_mode_e power_mode, vbat_type_e vbat_v, cap_typedef_e cap)
     {
         if(cpu_sleep_wakeup){
             //Use PM_ANA_REG_POWER_ON_CLR_BUF0 BIT(1) to represent the reboot+deep process, which is related to the function pm_update_status_info.
-            analog_write_reg8(PM_ANA_REG_POWER_ON_CLR_BUF0, analog_read_reg8(PM_ANA_REG_POWER_ON_CLR_BUF0) | BIT(1));   //(add by weihua.zhang, confirmed by yi.bao 20201222)
+            analog_write_reg8(PM_ANA_REG_POWER_ON_CLR_BUF0, analog_read_reg8(PM_ANA_REG_POWER_ON_CLR_BUF0) | DEEP_AFTER_REBOOT);   //(add by weihua.zhang, confirmed by yi.bao 20201222)
 
             cpu_sleep_wakeup(DEEPSLEEP_MODE , PM_WAKEUP_TIMER, (clock_time () + 5*SYSTEM_TIMER_TICK_1MS));//TODO:deep time need to be validated
         }

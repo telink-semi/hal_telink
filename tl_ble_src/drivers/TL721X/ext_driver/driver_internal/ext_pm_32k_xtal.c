@@ -30,7 +30,8 @@
 #include "driver.h"
 #include "../driver_ext.h"
 
-_attribute_ram_code_com_ int cpu_sleep_wakeup_32k_xtal_ram(pm_sleep_mode_e sleep_mode,  pm_sleep_wakeup_src_e wakeup_src, unsigned int  wakeup_tick)
+#if 0 //Now TL721x do not support 32K crystal.
+_attribute_ram_code_ int cpu_sleep_wakeup_32k_xtal_ram(pm_sleep_mode_e sleep_mode,  pm_sleep_wakeup_src_e wakeup_src, unsigned int  wakeup_tick)
 {
   //todo
    (void)sleep_mode;
@@ -61,7 +62,7 @@ _attribute_text_sec_ _attribute_no_inline_ int cpu_sleep_wakeup_32k_xtal(pm_slee
     return status;
 }
 
-_attribute_ram_code_com_ unsigned int pm_tim_recover_32k_xtal(unsigned int now_tick_32k)
+_attribute_ram_code_ unsigned int pm_tim_recover_32k_xtal(unsigned int now_tick_32k)
 {
 //todo
     (void)now_tick_32k;
@@ -103,7 +104,7 @@ _attribute_no_inline_ void check_32k_clk_stable(void)
 //        start_reboot(); //reboot the MCU
 //    }
 }
-
+#endif
 
 
 

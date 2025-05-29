@@ -25,16 +25,19 @@
 #define VENDOR_APP_H_
 
 
+/**
+ * @brief       user initialization when MCU power on or wake_up from deepSleep mode
+ * @param[in]   none
+ * @return      none
+ */
+void user_init_normal(void);
 
 /**
- * @brief      use initialization
- * @param[in]  none.
- * @return     none.
+ * @brief       user initialization when MCU wake_up from deepSleep_retention mode
+ * @param[in]   none
+ * @return      none
  */
-void user_init_normal();
-
-
-void user_init_deepRetn();
+void user_init_deepRetn(void);
 
 
 /**
@@ -42,7 +45,7 @@ void user_init_deepRetn();
  * @param[in]  none.
  * @return     none.
  */
-int main_idle_loop (void);
+int main_idle_loop(void);
 
 
 /**
@@ -50,8 +53,7 @@ int main_idle_loop (void);
  * @param[in]  none.
  * @return     none.
  */
-void main_loop (void);
-
+void main_loop(void);
 
 
 #endif /* VENDOR_APP_H_ */

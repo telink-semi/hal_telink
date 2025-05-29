@@ -25,5 +25,4 @@
 #define STACK_BLE_DEBUG_SIHUI_VCD_H_
 
 
-
 #endif /* STACK_BLE_DEBUG_SIHUI_VCD_H_ */

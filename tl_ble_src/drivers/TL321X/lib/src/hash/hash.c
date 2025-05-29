@@ -26,94 +26,317 @@
  *
  *******************************************************************************************************/
 #include <stdio.h>
+
 #include "lib/include/crypto_common/utility.h"
 #include "lib/include/hash/hash.h"
 
 
 //HASH IV definition
-#if 1
+#ifndef HASH_CPU_BIG_ENDIAN
 
-#ifdef SUPPORT_HASH_SM3
-unsigned int const SM3_IV[8]         ={0x6F168073,0xB9B21449,0xD7422417,0x00068ADA,0xBC306FA9,0xAA383116,0x4DEE8DE3,0x4E0EFBB0,};
-#endif
+    #ifdef SUPPORT_HASH_SM3
+extern unsigned int SM3_IV[8];
+unsigned int        SM3_IV[8] = {
+    0x6F168073U,
+    0xB9B21449U,
+    0xD7422417U,
+    0x00068ADAU,
+    0xBC306FA9U,
+    0xAA383116U,
+    0x4DEE8DE3U,
+    0x4E0EFBB0U,
+};
+    #endif
 
-#ifdef SUPPORT_HASH_MD5
-unsigned int const MD5_IV[4]         ={0x67452301,0xefcdab89,0x98badcfe,0x10325476,};
-#endif
+    #ifdef SUPPORT_HASH_MD5
+extern unsigned int MD5_IV[4];
+unsigned int        MD5_IV[4] = {
+    0x67452301U,
+    0xefcdab89U,
+    0x98badcfeU,
+    0x10325476U,
+};
+    #endif
 
-#ifdef SUPPORT_HASH_SHA256
-unsigned int const SHA256_IV[8]      ={0x67E6096A,0x85AE67BB,0x72F36E3C,0x3AF54FA5,0x7F520E51,0x8C68059B,0xABD9831F,0x19CDE05B,};
-#endif
+    #ifdef SUPPORT_HASH_SHA256
+extern unsigned int SHA256_IV[8];
+unsigned int        SHA256_IV[8] = {
+    0x67E6096AU,
+    0x85AE67BBU,
+    0x72F36E3CU,
+    0x3AF54FA5U,
+    0x7F520E51U,
+    0x8C68059BU,
+    0xABD9831FU,
+    0x19CDE05BU,
+};
+    #endif
 
-#ifdef SUPPORT_HASH_SHA384
-unsigned int const SHA384_IV[16]     ={0x5D9DBBCB,0xD89E05C1,0x2A299A62,0x07D57C36,0x5A015991,0x17DD7030,0xD8EC2F15,0x39590EF7,
-                                   0x67263367,0x310BC0FF,0x874AB48E,0x11155868,0x0D2E0CDB,0xA78FF964,0x1D48B547,0xA44FFABE,};
-#endif
+    #ifdef SUPPORT_HASH_SHA384
+extern unsigned int SHA384_IV[16];
+unsigned int        SHA384_IV[16] = {
+    0x5D9DBBCBU,
+    0xD89E05C1U,
+    0x2A299A62U,
+    0x07D57C36U,
+    0x5A015991U,
+    0x17DD7030U,
+    0xD8EC2F15U,
+    0x39590EF7U,
+    0x67263367U,
+    0x310BC0FFU,
+    0x874AB48EU,
+    0x11155868U,
+    0x0D2E0CDBU,
+    0xA78FF964U,
+    0x1D48B547U,
+    0xA44FFABEU,
+};
+    #endif
 
-#ifdef SUPPORT_HASH_SHA512
-unsigned int const SHA512_IV[16]     ={0x67E6096A,0x08C9BCF3,0x85AE67BB,0x3BA7CA84,0x72F36E3C,0x2BF894FE,0x3AF54FA5,0xF1361D5F,
-                                   0x7F520E51,0xD182E6AD,0x8C68059B,0x1F6C3E2B,0xABD9831F,0x6BBD41FB,0x19CDE05B,0x79217E13,};
-#endif
+    #ifdef SUPPORT_HASH_SHA512
+extern unsigned int SHA512_IV[16];
+unsigned int        SHA512_IV[16] = {
+    0x67E6096AU,
+    0x08C9BCF3U,
+    0x85AE67BBU,
+    0x3BA7CA84U,
+    0x72F36E3CU,
+    0x2BF894FEU,
+    0x3AF54FA5U,
+    0xF1361D5FU,
+    0x7F520E51U,
+    0xD182E6ADU,
+    0x8C68059BU,
+    0x1F6C3E2BU,
+    0xABD9831FU,
+    0x6BBD41FBU,
+    0x19CDE05BU,
+    0x79217E13U,
+};
+    #endif
 
-#ifdef SUPPORT_HASH_SHA1
-unsigned int const SHA1_IV[5]        ={0x01234567,0x89ABCDEF,0xFEDCBA98,0x76543210,0xF0E1D2C3,};
-#endif
+    #ifdef SUPPORT_HASH_SHA1
+extern unsigned int SHA1_IV[5];
+unsigned int        SHA1_IV[5] = {
+    0x01234567U,
+    0x89ABCDEFU,
+    0xFEDCBA98U,
+    0x76543210U,
+    0xF0E1D2C3U,
+};
+    #endif
 
-#ifdef SUPPORT_HASH_SHA224
-unsigned int const SHA224_IV[8]      ={0xD89E05C1,0x07D57C36,0x17DD7030,0x39590EF7,0x310BC0FF,0x11155868,0xA78FF964,0xA44FFABE,};
-#endif
+    #ifdef SUPPORT_HASH_SHA224
+extern unsigned int SHA224_IV[8];
+unsigned int        SHA224_IV[8] = {
+    0xD89E05C1U,
+    0x07D57C36U,
+    0x17DD7030U,
+    0x39590EF7U,
+    0x310BC0FFU,
+    0x11155868U,
+    0xA78FF964U,
+    0xA44FFABEU,
+};
+    #endif
 
-#ifdef SUPPORT_HASH_SHA512_224
-unsigned int const SHA512_224_IV[16] ={0xC8373D8C,0xA24D5419,0x6699E173,0xD6D4DC89,0xAEB7FA1D,0x829CFF32,0x14D59D67,0xCF9F2F58,
-                                   0x692B6D0F,0xA84DD47B,0x736FE377,0x4289C404,0xA8859D3F,0xC8361D6A,0xADE61211,0xA192D691,};
-#endif
+    #ifdef SUPPORT_HASH_SHA512_224
+extern unsigned int SHA512_224_IV[16];
+unsigned int        SHA512_224_IV[16] = {
+    0xC8373D8CU,
+    0xA24D5419U,
+    0x6699E173U,
+    0xD6D4DC89U,
+    0xAEB7FA1DU,
+    0x829CFF32U,
+    0x14D59D67U,
+    0xCF9F2F58U,
+    0x692B6D0FU,
+    0xA84DD47BU,
+    0x736FE377U,
+    0x4289C404U,
+    0xA8859D3FU,
+    0xC8361D6AU,
+    0xADE61211U,
+    0xA192D691U,
+};
+    #endif
 
-#ifdef SUPPORT_HASH_SHA512_256
-unsigned int const SHA512_256_IV[16] ={0x94213122,0x2CF72BFC,0xA35F559F,0xC2644CC8,0x6BB89323,0x51B1536F,0x19773896,0xBDEA4059,
-                                   0xE23E2896,0xE3FF8EA8,0x251E5EBE,0x92398653,0xFC99012B,0xAAB8852C,0xDC2DB70E,0xA22CC581,};
-#endif
+    #ifdef SUPPORT_HASH_SHA512_256
+extern unsigned int SHA512_256_IV[16];
+unsigned int        SHA512_256_IV[16] = {
+    0x94213122U,
+    0x2CF72BFCU,
+    0xA35F559FU,
+    0xC2644CC8U,
+    0x6BB89323U,
+    0x51B1536FU,
+    0x19773896U,
+    0xBDEA4059U,
+    0xE23E2896U,
+    0xE3FF8EA8U,
+    0x251E5EBEU,
+    0x92398653U,
+    0xFC99012BU,
+    0xAAB8852CU,
+    0xDC2DB70EU,
+    0xA22CC581U,
+};
+    #endif
 
 #else
 
-#ifdef SUPPORT_HASH_SM3
-unsigned int const SM3_IV[8]         ={0x7380166f,0x4914b2b9,0x172442d7,0xda8a0600,0xa96f30bc,0x163138aa,0xe38dee4d,0xb0fb0e4e,};
-#endif
+    #ifdef SUPPORT_HASH_SM3
+extern unsigned int SM3_IV[8];
+unsigned int        SM3_IV[8] = {
+    0x7380166fU,
+    0x4914b2b9U,
+    0x172442d7U,
+    0xda8a0600U,
+    0xa96f30bcU,
+    0x163138aaU,
+    0xe38dee4dU,
+    0xb0fb0e4eU,
+};
+    #endif
 
-#ifdef SUPPORT_HASH_MD5
-unsigned int const MD5_IV[4]         ={0x01234567,0x89ABCDEF,0xFEDCBA98,0x76543210,};
-#endif
+    #ifdef SUPPORT_HASH_MD5
+extern unsigned int MD5_IV[4];
+unsigned int        MD5_IV[4] = {
+    0x01234567U,
+    0x89ABCDEFU,
+    0xFEDCBA98U,
+    0x76543210U,
+};
+    #endif
 
-#ifdef SUPPORT_HASH_SHA256
-unsigned int const SHA256_IV[8]      ={0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19,};
-#endif
+    #ifdef SUPPORT_HASH_SHA256
+extern unsigned int SHA256_IV[8];
+unsigned int        SHA256_IV[8] = {
+    0x6a09e667U,
+    0xbb67ae85U,
+    0x3c6ef372U,
+    0xa54ff53aU,
+    0x510e527fU,
+    0x9b05688cU,
+    0x1f83d9abU,
+    0x5be0cd19U,
+};
+    #endif
 
-#ifdef SUPPORT_HASH_SHA384
-unsigned int const SHA384_IV[16]     ={0xcbbb9d5d,0xc1059ed8,0x629a292a,0x367cd507,0x9159015a,0x3070dd17,0x152fecd8,0xf70e5939,
-                                   0x67332667,0xffc00b31,0x8eb44a87,0x68581511,0xdb0c2e0d,0x64f98fa7,0x47b5481d,0xbefa4fa4,};
-#endif
+    #ifdef SUPPORT_HASH_SHA384
+extern unsigned int SHA384_IV[16];
+unsigned int        SHA384_IV[16] = {
+    0xcbbb9d5dU,
+    0xc1059ed8U,
+    0x629a292aU,
+    0x367cd507U,
+    0x9159015aU,
+    0x3070dd17U,
+    0x152fecd8U,
+    0xf70e5939U,
+    0x67332667U,
+    0xffc00b31U,
+    0x8eb44a87U,
+    0x68581511U,
+    0xdb0c2e0dU,
+    0x64f98fa7U,
+    0x47b5481dU,
+    0xbefa4fa4U,
+};
+    #endif
 
-#ifdef SUPPORT_HASH_SHA512
-unsigned int const SHA512_IV[16]     ={0x6a09e667,0xf3bcc908,0xbb67ae85,0x84caa73b,0x3c6ef372,0xfe94f82b,0xa54ff53a,0x5f1d36f1,
-                                   0x510e527f,0xade682d1,0x9b05688c,0x2b3e6c1f,0x1f83d9ab,0xfb41bd6b,0x5be0cd19,0x137e2179,};
-#endif
+    #ifdef SUPPORT_HASH_SHA512
+extern unsigned int SHA512_IV[16];
+unsigned int        SHA512_IV[16] = {
+    0x6a09e667U,
+    0xf3bcc908U,
+    0xbb67ae85U,
+    0x84caa73bU,
+    0x3c6ef372U,
+    0xfe94f82bU,
+    0xa54ff53aU,
+    0x5f1d36f1U,
+    0x510e527fU,
+    0xade682d1U,
+    0x9b05688cU,
+    0x2b3e6c1fU,
+    0x1f83d9abU,
+    0xfb41bd6bU,
+    0x5be0cd19U,
+    0x137e2179U,
+};
+    #endif
 
-#ifdef SUPPORT_HASH_SHA1
-unsigned int const SHA1_IV[5]        ={0x67452301,0xefcdab89,0x98badcfe,0x10325476,0xc3d2e1f0,};
-#endif
+    #ifdef SUPPORT_HASH_SHA1
+extern unsigned int SHA1_IV[5];
+unsigned int        SHA1_IV[5] = {
+    0x67452301U,
+    0xefcdab89U,
+    0x98badcfeU,
+    0x10325476U,
+    0xc3d2e1f0U,
+};
+    #endif
 
-#ifdef SUPPORT_HASH_SHA224
-unsigned int const SHA224_IV[8]      ={0xc1059ed8,0x367cd507,0x3070dd17,0xf70e5939,0xffc00b31,0x68581511,0x64f98fa7,0xbefa4fa4,};
-#endif
+    #ifdef SUPPORT_HASH_SHA224
+extern unsigned int SHA224_IV[8];
+unsigned int        SHA224_IV[8] = {
+    0xc1059ed8U,
+    0x367cd507U,
+    0x3070dd17U,
+    0xf70e5939U,
+    0xffc00b31U,
+    0x68581511U,
+    0x64f98fa7U,
+    0xbefa4fa4U,
+};
+    #endif
 
-#ifdef SUPPORT_HASH_SHA512_224
-unsigned int const SHA512_224_IV[16] ={0x8C3D37C8,0x19544DA2,0x73E19966,0x89DCD4D6,0x1DFAB7AE,0x32FF9C82,0x679DD514,0x582F9FCF,
-                                   0x0F6D2B69,0x7BD44DA8,0x77E36F73,0x04C48942,0x3F9D85A8,0x6A1D36C8,0x1112E6AD,0x91D692A1,};
-#endif
+    #ifdef SUPPORT_HASH_SHA512_224
+extern unsigned int SHA512_224_IV[16];
+unsigned int        SHA512_224_IV[16] = {
+    0x8C3D37C8U,
+    0x19544DA2U,
+    0x73E19966U,
+    0x89DCD4D6U,
+    0x1DFAB7AEU,
+    0x32FF9C82U,
+    0x679DD514U,
+    0x582F9FCFU,
+    0x0F6D2B69U,
+    0x7BD44DA8U,
+    0x77E36F73U,
+    0x04C48942U,
+    0x3F9D85A8U,
+    0x6A1D36C8U,
+    0x1112E6ADU,
+    0x91D692A1U,
+};
+    #endif
 
-#ifdef SUPPORT_HASH_SHA512_256
-unsigned int const SHA512_256_IV[16] ={0x22312194,0xFC2BF72C,0x9F555FA3,0xC84C64C2,0x2393B86B,0x6F53B151,0x96387719,0x5940EABD,
-                                   0x96283EE2,0xA88EFFE3,0xBE5E1E25,0x53863992,0x2B0199FC,0x2C85B8AA,0x0EB72DDC,0x81C52CA2,};
-#endif
+    #ifdef SUPPORT_HASH_SHA512_256
+extern unsigned int SHA512_256_IV[16];
+unsigned int        SHA512_256_IV[16] = {
+    0x22312194U,
+    0xFC2BF72CU,
+    0x9F555FA3U,
+    0xC84C64C2U,
+    0x2393B86BU,
+    0x6F53B151U,
+    0x96387719U,
+    0x5940EABDU,
+    0x96283EE2U,
+    0xA88EFFE3U,
+    0xBE5E1E25U,
+    0x53863992U,
+    0x2B0199FCU,
+    0x2C85B8AAU,
+    0x0EB72DDCU,
+    0x81C52CA2U,
+};
+    #endif
 
 #endif
 
@@ -126,8 +349,7 @@ unsigned int check_hash_alg(HASH_ALG hash_alg)
 {
     unsigned int ret;
 
-    switch(hash_alg)
-    {
+    switch (hash_alg) {
 #ifdef SUPPORT_HASH_SM3
     case HASH_SM3:
 #endif
@@ -184,12 +406,11 @@ unsigned int check_hash_alg(HASH_ALG hash_alg)
       -# 1. please make sure hash_alg is valid.
   @endverbatim
  */
-unsigned int hash_get_block_word_len(HASH_ALG hash_alg)
+unsigned char hash_get_block_word_len(HASH_ALG hash_alg)
 {
-    unsigned int block_words = 0;
+    unsigned char block_words = 0;
 
-    switch(hash_alg)
-    {
+    switch (hash_alg) {
 #ifdef SUPPORT_HASH_SM3
     case HASH_SM3:
 #endif
@@ -246,18 +467,17 @@ unsigned int hash_get_block_word_len(HASH_ALG hash_alg)
 /**
  * @brief       get hash iterator word length
  * @param[in]   hash_alg                    - specific hash algorithm.
- * @return      hash block word length
+ * @return      hash iterator word length
  * @note
   @verbatim
       -# 1. please make sure hash_alg is valid.
   @endverbatim
  */
-unsigned int hash_get_iterator_word_len(HASH_ALG hash_alg)
+unsigned char hash_get_iterator_word_len(HASH_ALG hash_alg)
 {
-    unsigned int iterator_words;
+    unsigned char iterator_words = 0;
 
-    switch(hash_alg)
-    {
+    switch (hash_alg) {
 #ifdef SUPPORT_HASH_MD5
     case HASH_MD5:
         iterator_words = 4;
@@ -318,18 +538,17 @@ unsigned int hash_get_iterator_word_len(HASH_ALG hash_alg)
 /**
  * @brief       get hash digest word length
  * @param[in]   hash_alg                    - specific hash algorithm.
- * @return      hash block word length
+ * @return      hash digest word length
  * @note
   @verbatim
       -# 1. please make sure hash_alg is valid.
   @endverbatim
  */
-unsigned int hash_get_digest_word_len(HASH_ALG hash_alg)
+unsigned char hash_get_digest_word_len(HASH_ALG hash_alg)
 {
-    unsigned int digest_words = 0;
+    unsigned char digest_words = 0;
 
-    switch(hash_alg)
-    {
+    switch (hash_alg) {
 #ifdef SUPPORT_HASH_MD5
     case HASH_MD5:
         digest_words = 4;
@@ -396,12 +615,11 @@ unsigned int hash_get_digest_word_len(HASH_ALG hash_alg)
  * @param[in]   hash_alg                    - specific hash algorithm.
  * @return      IV address
  */
-const unsigned int *hash_get_IV(HASH_ALG hash_alg)
+unsigned int *hash_get_IV(HASH_ALG hash_alg)
 {
-    const unsigned int *iv;
+    unsigned int *iv;
 
-    switch(hash_alg)
-    {
+    switch (hash_alg) {
 #ifdef SUPPORT_HASH_SM3
     case HASH_SM3:
         iv = SM3_IV;
@@ -458,6 +676,7 @@ const unsigned int *hash_get_IV(HASH_ALG hash_alg)
 
     default:
         iv = NULL;
+        break;
     }
 
     return iv;
@@ -479,77 +698,98 @@ void hash_set_IV(HASH_ALG hash_alg, unsigned int hash_iterator_words)
  * @param[in]   a                - big number a, total byte length of hash message.
  * @param[in]   a_words          - word length of buffer a.
  * @param[in]   b                - integer to be added to a.
- * @return      0:success     other:error
+ * @return      0:success     other(error, hash total length overflow)
  */
 unsigned int hash_total_byte_len_add_uint32(unsigned int *a, unsigned int a_words, unsigned int b)
 {
     unsigned int i;
 
-    for(i=0; i<a_words; i++)
-    {
+    for (i = 0U; i < a_words; i++) {
         a[i] += b;
-        if(a[i] < b)
-        {
-            b = 1;
-        }
-        else
-        {
+        if (a[i] < b) {
+            b = 1U;
+        } else {
             break;
         }
     }
 
-    if(i == a_words)
+    if (i == a_words) {
+        return 1U;
+    } else if (0U != (a[a_words - 1U] & 0xE0000000U)) //bit length overflow
     {
-        return 1;
-    }
-    else if(a[a_words-1] & 0xE0000000)  //bit length overflow
-    {
-        return 1;
-    }
-    else
-    {
-        return 0;
+        return 1U;
+    } else {
+        return 0U;
     }
 }
 
 
-
-/**
- * @brief       transform hash message total byte length to bit length
- * @param[in/out]   a              - big number a.
- * @param[in]       a_words        - word length of buffer a.
- * @return      none
+#ifdef CONFIG_HASH_SUPPORT_ADDRESS_HIGH_LOW
+/* function: hash 64-bit address addition addr = addr+offset
+ * parameters:
+ *     addr_h --------------------- input&output, high address
+ *     addr_l --------------------- input&output, low address
+ *     offset --------------------- input, address offset
+ * return: 0(success), other(error, hash 64-bit address overflow)
+ * caution:
  */
-/*
-void hash_total_bytelen_2_bitlen(unsigned int *a, unsigned int a_words)
+unsigned int hash_addr64_add_uint32(unsigned int *addr_h, unsigned int *addr_l, unsigned int offset)
 {
-    int i;
-
-    for(i = a_words-1; i>0; i--)
-    {
-        a[i] <<= 3;
-        a[i] |= a[i-1]>>(32-3);
+    (*addr_l) += offset;
+    if ((*addr_l) < offset) {
+        offset = 1U;
+    } else {
+        return HASH_SUCCESS;
     }
 
+    (*addr_h) += offset;
+
+    if ((*addr_h) < offset) {
+        return HASH_LEN_OVERFLOW;
+    } else {
+        ;
+    }
+
+    return HASH_SUCCESS;
+}
+#endif
+
+#if 0
+/* function: transform hash message total byte length to bit length
+ * parameters:
+ *     a -------------------------- input&output, big number a
+ *     a_words -------------------- input, word length of buffer a
+ * return: none
+ * caution:
+ */
+void hash_total_bytelen_2_bitlen(unsigned int *a, unsigned int a_words)
+{
+    unsigned int i;
+
+    for(i = (a_words-1U); i>0U; i--)
+    {
+        a[i] <<= 3;
+        a[i] |= a[i-1U]>>(32-3);
+    }
     a[i] <<= 3;
-} */
+}
+#endif
 
 /**
  * @brief       start HASH iteration calc
- * @param[in]   ctx              - big number a, total byte length of hash message.
+ * @param[in]   ctx              - HASH_CTX context pointer
  * @return      none
  */
 void hash_start_calculate(HASH_CTX *ctx)
 {
     //if it is the first time to calculate, set the IV
-    if(ctx->first_update_flag)
-    {
+    if (0U != (ctx->first_update_flag)) {
         hash_set_IV(ctx->hash_alg, ctx->iterator_word_len);
 
-        ctx->first_update_flag = 0;   //clear the flag
+        ctx->first_update_flag = (unsigned char)0; //clear the flag
+    } else {
+        ;
     }
-    else
-    {;}
 
     hash_start();
 }
@@ -566,36 +806,85 @@ void hash_start_calculate(HASH_CTX *ctx)
  */
 unsigned int hash_init(HASH_CTX *ctx, HASH_ALG hash_alg)
 {
-    if(NULL == ctx)
-    {
+    if (NULL == ctx) {
         return HASH_BUFFER_NULL;
-    }
-    else if(HASH_SUCCESS != check_hash_alg(hash_alg))
-    {
+    } else if (HASH_SUCCESS != check_hash_alg(hash_alg)) {
         return HASH_INPUT_INVALID;
+    } else {
+        //handle other;
     }
-    else
-    {;}
-    
+
     //clear the context
-    memset_(ctx, 0, sizeof(HASH_CTX));
+    memset_((unsigned char *)ctx, 0, sizeof(HASH_CTX));
     //uint32_clear(ctx->total, sizeof(ctx->total)/4);
 
+#ifndef CONFIG_HASH_SUPPORT_MUL_THREAD
     hash_set_cpu_mode();
     hash_disable_interruption();
-    hash_set_last_block(0);//set not the last block
+    hash_set_last_block(0); //set not the last block
     hash_set_alg(hash_alg);
 
     hash_clear_msg_len();
+#endif
 
     //set context config
-    ctx->hash_alg = hash_alg;
-    ctx->block_byte_len = hash_get_block_word_len(hash_alg)<<2;
+    ctx->hash_alg          = hash_alg;
+    ctx->block_byte_len    = hash_get_block_word_len(hash_alg) << 2;
     ctx->iterator_word_len = hash_get_iterator_word_len(hash_alg);
-    ctx->digest_byte_len = hash_get_digest_word_len(hash_alg)<<2;
-    ctx->status.busy = 0;
-    ctx->first_update_flag = 1;
-    ctx->finish_flag = 0;
+    ctx->digest_byte_len   = hash_get_digest_word_len(hash_alg) << 2;
+    ctx->status.busy       = 0U;
+    ctx->first_update_flag = (unsigned char)1;
+    ctx->finish_flag       = (unsigned char)0;
+
+    return HASH_SUCCESS;
+}
+
+/**
+ * @brief       init HASH with iv and updated message length
+ * @param[in]   ctx                - HASH_CTX context pointer.
+ * @param[in]   hash_alg           - specific hash algorithm.
+ * @param[in]   iv                 - iv or iterator after updating some blocks.
+ * @param[in]   byte_length_h        - high 32 bit of updated message byte length.
+ * @param[in]   byte_length_l      - ow 32 bit of updated message byte length,
+ *                                   this must be a multiple of block byte length
+ * @return      0:success     other:error
+ * @note
+  @verbatim
+      -# 1.  please make sure the four parameters are valid.
+      -# 2.  updated message byte length must be a multiple of block byte length
+  @endverbatim
+ */
+unsigned int hash_init_with_iv_and_updated_length(HASH_CTX *ctx, HASH_ALG hash_alg, unsigned int *iv, unsigned int byte_length_h, unsigned int byte_length_l)
+{
+    unsigned int  ret;
+    unsigned char block_byte_len = hash_get_block_word_len(hash_alg) << 2;
+
+    if (0U != block_byte_len) {
+        if (0U != (byte_length_l % CAST2UINT32(block_byte_len))) {
+            return HASH_INPUT_INVALID;
+        } else {
+            ;
+        }
+    } else {
+        return HASH_INPUT_INVALID;
+    }
+
+    ret = hash_init(ctx, hash_alg);
+    if (HASH_SUCCESS != ret) {
+        return ret;
+    } else {
+        ;
+    }
+
+    ctx->first_update_flag = (unsigned char)0;
+    ctx->total[0]          = byte_length_l;
+    ctx->total[1]          = byte_length_h;
+
+#ifdef CONFIG_HASH_SUPPORT_MUL_THREAD
+    memcpy_((unsigned char *)ctx->iterator, (unsigned char *)iv, CAST2UINT32(ctx->iterator_word_len) << 2);
+#else
+    hash_set_iterator(iv, ctx->iterator_word_len);
+#endif
 
     return HASH_SUCCESS;
 }
@@ -603,7 +892,7 @@ unsigned int hash_init(HASH_CTX *ctx, HASH_ALG hash_alg)
 /**
  * @brief       hash iterate calc with some blocks
  * @param[in]   ctx                     - HASH_CTX context pointer.
- * @param[in]   msg                     - message of some blocks.
+ * @param[in]   msg                    - message of some blocks.
  * @param[in]   block_count             - count of blocks.
  * @return      none
  * @note
@@ -613,45 +902,40 @@ unsigned int hash_init(HASH_CTX *ctx, HASH_ALG hash_alg)
  */
 void hash_calc_blocks(HASH_CTX *ctx, const unsigned char *msg, unsigned int block_count)
 {
-    unsigned int block_word_len = (ctx->block_byte_len)>>2;
-
 #ifdef CONFIG_HASH_SUPPORT_MUL_THREAD
     //set the input iterator data
-    if(1 != ctx->first_update_flag)
-    {
+    if (((unsigned char)1) != ctx->first_update_flag) {
         hash_set_iterator(ctx->iterator, ctx->iterator_word_len);
+    } else {
+        ;
     }
-    else
-    {;}
 #endif
 
-    while(block_count--)
-    {
-        hash_input_msg(msg, block_word_len);
+    while (0U != (block_count--)) {
+        hash_input_msg_u8(msg, ctx->block_byte_len);
 
         hash_start_calculate(ctx);
 
-        msg += ctx->block_byte_len;
+        msg = &(msg[ctx->block_byte_len]);
 
         hash_wait_till_done();
     }
 
 #ifdef CONFIG_HASH_SUPPORT_MUL_THREAD
     //if message update not done, get the new iterator hash value
-    if(1 != ctx->finish_flag)
-    {
+    if (((unsigned char)1) != ctx->finish_flag) {
         hash_get_iterator((unsigned char *)(ctx->iterator), ctx->iterator_word_len);
+    } else {
+        ;
     }
-    else
-    {;}
 #endif
 }
 
 /**
- * @brief       hash iterate calc with some blocks
+ * @brief       hash iterate calc with padding
  * @param[in]   ctx                - HASH_CTX context pointer.
- * @param[in]   msg                - message that contains the last block(maybe not full).
- * @param[in]   bytes              - byte length of msg.
+ * @param[in]   msg               - message that contains the last block(maybe not full).
+ * @param[in]   msg_bytes          - byte length of msg.
  * @return      none
  * @note
   @verbatim
@@ -664,21 +948,20 @@ void hash_calc_blocks(HASH_CTX *ctx, const unsigned char *msg, unsigned int bloc
       -# 3.  before calling this function, some blocks(could be 0 block) must be calculated.
   @endverbatim
  */
-void hash_calc_rand_len_msg(HASH_CTX *ctx, const unsigned char *msg, unsigned int msg_bytes)
+void hash_calc_rand_len_msg(HASH_CTX *ctx, unsigned char *msg, unsigned int msg_bytes)
 {
 #ifdef CONFIG_HASH_SUPPORT_MUL_THREAD
     //set the input iterator data
-    if(1 != ctx->first_update_flag)
-    {
+    if (((unsigned char)1) != ctx->first_update_flag) {
         hash_set_iterator(ctx->iterator, ctx->iterator_word_len);
+    } else {
+        ;
     }
-    else
-    {;}
 #endif
 
     hash_set_last_block(1);
 
-    hash_input_msg(msg, (msg_bytes+3)/4);
+    hash_input_msg_u8((unsigned char *)msg, msg_bytes);
 
     hash_start_calculate(ctx);
 
@@ -686,9 +969,9 @@ void hash_calc_rand_len_msg(HASH_CTX *ctx, const unsigned char *msg, unsigned in
 }
 
 /**
- * @brief       hash iterate calc with some blocks
+ * @brief       hash update message
  * @param[in]   ctx                - HASH_CTX context pointer.
- * @param[in]   msg                - message.
+ * @param[in]   msg               - message.
  * @param[in]   msg_bytes          - byte length of the input message.
  * @return      none
  * @note
@@ -698,78 +981,68 @@ void hash_calc_rand_len_msg(HASH_CTX *ctx, const unsigned char *msg, unsigned in
  */
 unsigned int hash_update(HASH_CTX *ctx, const unsigned char *msg, unsigned int msg_bytes)
 {
-    unsigned int count;
+    unsigned int  count;
     unsigned char left, fill;
 
-    if((NULL == ctx))
-    {
+    if ((NULL == ctx)) {
         return HASH_BUFFER_NULL;
-    }
-    else if((NULL == msg) || (0 == msg_bytes))
-    {
+    } else if ((NULL == msg) || (0U == msg_bytes)) {
         return HASH_SUCCESS;
+    } else {
+        //handle other;
     }
-    else
-    {;}
 
-    ctx->status.busy = 1;                             //start to update processing
+    ctx->status.busy = 1U; //start to update processing
 
 #ifdef CONFIG_HASH_SUPPORT_MUL_THREAD
     hash_set_cpu_mode();
-    hash_set_last_block(0);//set not the last block
+    hash_set_last_block(0); //set not the last block
     hash_set_alg(ctx->hash_alg);
 #endif
 
-    left = ctx->total[0] % (ctx->block_byte_len);    //byte length of valid message left in block buffer
-    fill = (ctx->block_byte_len) - left;             //byte length that block buffer need to fill a block
+    left = (unsigned char)(ctx->total[0] % (ctx->block_byte_len)); //byte length of valid message left in block buffer
+    fill = (ctx->block_byte_len) - left;                           //byte length that block buffer need to fill a block
 
     //update total byte length
-    if(hash_total_byte_len_add_uint32(ctx->total, ctx->block_byte_len/32, msg_bytes))
-    {
+    if (0U != (hash_total_byte_len_add_uint32(ctx->total, CAST2UINT32(ctx->block_byte_len) / 32U, msg_bytes))) {
         return HASH_LEN_OVERFLOW;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    if(left)
-    {
-        if(msg_bytes >= fill)
-        {
-            memcpy_(ctx->hash_buffer + left, msg, fill);
+    if (0U != left) {
+        if (msg_bytes >= fill) {
+            memcpy_(&(ctx->hash_buffer[left]), msg, fill);
             hash_calc_blocks(ctx, ctx->hash_buffer, 1);
             msg_bytes -= fill;
-            msg += fill;
-        }
-        else
-        {
-            memcpy_(ctx->hash_buffer + left, msg, msg_bytes);
+            msg = &(msg[fill]);
+        } else {
+            memcpy_(&(ctx->hash_buffer[left]), msg, msg_bytes);
             goto END;
         }
+    } else {
+        ;
     }
-    else
-    {;}
 
     //process some blocks
-    count = msg_bytes/(ctx->block_byte_len);
-    if(count)
-    {
+    count = msg_bytes / (ctx->block_byte_len);
+    if (0U != count) {
         hash_calc_blocks(ctx, msg, count);
+    } else {
+        ;
     }
-    else
-    {;}
 
     //process the remainder
     msg_bytes = msg_bytes % (ctx->block_byte_len);
-    if(msg_bytes)
-    {
-        msg += (ctx->block_byte_len)*count;
+    if (0U != msg_bytes) {
+        msg = &(msg[(ctx->block_byte_len) * count]);
         memcpy_(ctx->hash_buffer, msg, msg_bytes);
+    } else {
+        ;
     }
-    else
-    {;}
 
 END:
-    ctx->status.busy = 0;   //update end, status becomes idle
+    ctx->status.busy = 0U; //update end, status becomes idle
 
     return HASH_SUCCESS;
 }
@@ -777,8 +1050,8 @@ END:
 /**
  * @brief       message update done, get the digest
  * @param[in]   ctx                - HASH_CTX context pointer.
- * @param[out]  digest             - hash digest.
- * @return      none
+ * @param[out]   digest               - hash digest.
+ * @return      HASH_SUCCESS(success), other(error)
  * @note
   @verbatim
       -# 1.  please make sure the ctx is valid and initialized.
@@ -789,12 +1062,11 @@ unsigned int hash_final(HASH_CTX *ctx, unsigned char *digest)
 {
     unsigned char tmp;
 
-    if((NULL == ctx) || (NULL == digest))
-    {
+    if ((NULL == ctx) || (NULL == digest)) {
         return HASH_BUFFER_NULL;
+    } else {
+        ;
     }
-    else
-    {;}
 
 #ifdef CONFIG_HASH_SUPPORT_MUL_THREAD
     hash_set_cpu_mode();
@@ -807,32 +1079,32 @@ unsigned int hash_final(HASH_CTX *ctx, unsigned char *digest)
 #endif
 
     // set total length of message
-    hash_set_msg_total_byte_len(ctx->total, ctx->block_byte_len/32);
+    hash_set_msg_total_byte_len(ctx->total, CAST2UINT32(ctx->block_byte_len) / 32U);
 
-    ctx->finish_flag = 1;
+    ctx->finish_flag = ((unsigned char)1); //the last block calc
 
     //get the byte length of the remainder msg(less than one block)
-    tmp = ctx->total[0] % (ctx->block_byte_len);
+    tmp = (unsigned char)(ctx->total[0] % (ctx->block_byte_len));
 
     //input the remainder msg(less than one block)
     hash_calc_rand_len_msg(ctx, ctx->hash_buffer, tmp);
 
     //get the hash result
-    hash_get_iterator(digest, (ctx->digest_byte_len)>>2);
+    hash_get_iterator(digest, CAST2UINT32(ctx->digest_byte_len) >> 2);
 
     //clear the context
-    memset_(ctx, 0, sizeof(HASH_CTX));
+    memset_((unsigned char *)ctx, 0, sizeof(HASH_CTX));
 
     return HASH_SUCCESS;
 }
 
 /**
- * @brief       message update done, get the digest
+ * @brief       input whole message and get its digest
  * @param[in]   hash_alg           - specific hash algorithm.
- * @param[in]   msg                - message.
- * @param[in]   msg_bytes          - byte length of the input message, it could be 0.
- * @param[out]  digest             - hash digest.
- * @return      0:success     other:error
+ * @param[in]   msg               - message.
+ * @param[in]   msg_bytes           - byte length of the input message, it could be 0.
+ * @param[out]   digest               - hash digest.
+ * @return      HASH_SUCCESS(success), other(error)
  * @note
   @verbatim
       -# 1.  please make sure the digest buffer is sufficient.
@@ -840,260 +1112,376 @@ unsigned int hash_final(HASH_CTX *ctx, unsigned char *digest)
  */
 unsigned int hash(HASH_ALG hash_alg, unsigned char *msg, unsigned int msg_bytes, unsigned char *digest)
 {
-    HASH_CTX ctx[1];
+    HASH_CTX     ctx[1];
     unsigned int ret;
 
-    ret = hash_init(ctx,  hash_alg);
-    if(HASH_SUCCESS != ret)
-    {
+    ret = hash_init(ctx, hash_alg);
+    if (HASH_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ret = hash_update(ctx, msg, msg_bytes);
-    if(HASH_SUCCESS != ret)
-    {
+    if (HASH_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ret = hash_final(ctx, digest);
-    if(HASH_SUCCESS != ret)
-    {
+    if (HASH_SUCCESS != ret) {
         memset_(digest, 0, ctx->digest_byte_len);
+    } else {
+        ;
     }
-    else
-    {;}
 
     //clear the context
-    memset_(ctx, 0, sizeof(HASH_CTX));
+    memset_((unsigned char *)ctx, 0, sizeof(HASH_CTX));
 
     return ret;
 }
 
 
+#ifdef SUPPORT_HASH_NODE
+/**
+ * @brief       input whole message and get its digest(node style)
+ * @param[in]   hash_alg            - specific hash algorithm.
+ * @param[in]   node                - message node pointer.
+ * @param[in]   node_num            - number of hash nodes, i.e. number of message segments.
+ * @param[in]   digest              - hash digest
+ * @return      0:success     other:error
+   @verbatim
+      -# 1.  please make sure the digest buffer is sufficient.
+      -# 2.  if the whole message consists of some segments, every segment is a node, a node includes address and byte length.
+   @endverbatim
+ */
+unsigned int hash_node_steps(HASH_ALG hash_alg, HASH_NODE *node, unsigned int node_num, unsigned char *digest)
+{
+    HASH_CTX     ctx[1];
+    unsigned int i, ret;
+
+    ret = hash_init(ctx, hash_alg);
+    if (HASH_SUCCESS != ret) {
+        return ret;
+    } else {
+        ;
+    }
+
+    for (i = 0U; i < node_num; i++) {
+        ret = hash_update(ctx, node[i].msg_addr, node[i].msg_bytes);
+        if (HASH_SUCCESS != ret) {
+            return ret;
+        } else {
+            ;
+        }
+    }
+
+    return hash_final(ctx, digest);
+}
+#endif
+
+
 #ifdef HASH_DMA_FUNCTION
-/* Initialization configuration of hash tx dma channel */
-static dma_config_t hash_tx_dma_config = {
-    .dst_req_sel = DMA_REQ_HASH_TX, // 34
-    .src_req_sel = 0,
-    .dst_addr_ctrl = DMA_ADDR_FIX,       // 2
-    .src_addr_ctrl = DMA_ADDR_INCREMENT, // 0
-    .dstmode = DMA_HANDSHAKE_MODE,       // handshake
-    .srcmode = DMA_NORMAL_MODE,
-    .dstwidth = DMA_CTR_WORD_WIDTH,     // must word
-    .srcwidth = DMA_CTR_WORD_WIDTH,     // must word
-    .src_burst_size = DMA_BURST_1_WORD, // must 0
-    .read_num_en = 0,
-    .priority = 0,
-    .write_num_en = 0,
-    .auto_en = 0,
-};
+/**
+ * @brief       dma hash digest calculate
+ * @param[in]   ctx                 - HASH_DMA_CTX context pointer.
+ * @param[in]   hash_alg            - specific hash algorithm.
+ * @param[in]   iv                    - iv or iterator after updating some blocks.
+ * @param[in]   byte_length_h       - high 32 bit of updated message byte length.
+ * @param[in]   byte_length_l       - low 32 bit of updated message byte length,
+ *                                    this must be a multiple of block byte length.
+ * @param[in]   callback            - callback function pointer.
+ * @return      0:success     other:error
+ * @note
+  @verbatim
+      -# 1.  please make sure the four parameters are valid.
+      -# 2. updated message byte length must be a multiple of block byte length
+  @endverbatim
+ */
+unsigned int hash_dma_init_with_iv_and_updated_length(HASH_DMA_CTX *ctx, HASH_ALG hash_alg, unsigned int *iv, unsigned int byte_length_h, unsigned int byte_length_l, HASH_CALLBACK callback)
+{
+    unsigned char block_word_len;
 
-/* Initialization configuration of hash rx dma channel */
-static dma_config_t hash_rx_dma_config = {
-    .dst_req_sel = 0,
-    .src_req_sel = DMA_REQ_HASH_RX, // rx req
-    .dst_addr_ctrl = DMA_ADDR_INCREMENT,
-    .src_addr_ctrl = DMA_ADDR_FIX,
-    .dstmode = DMA_NORMAL_MODE,
-    .srcmode = DMA_HANDSHAKE_MODE,
-    .dstwidth = DMA_CTR_WORD_WIDTH,     // must word
-    .srcwidth = DMA_CTR_WORD_WIDTH,     ////must word
-    .src_burst_size = DMA_BURST_1_WORD, // master rx dma support burst1(0-1 word,1-2 word,2-4 word,3-8 word).
-    .read_num_en = 0,
-    .priority = 0,
-    .write_num_en = 0,
-    .auto_en = 0, // must 0
-};
+    if (NULL == ctx) {
+        return HASH_BUFFER_NULL;
+    } else if (HASH_SUCCESS != check_hash_alg(hash_alg)) {
+        return HASH_INPUT_INVALID;
+    } else {
+        //handle other;
+    }
 
+    block_word_len = hash_get_block_word_len(hash_alg);
+    if (0U != block_word_len) {
+        if (0U != (byte_length_l % (CAST2UINT32(block_word_len) << 2))) {
+            return HASH_INPUT_INVALID;
+        } else {
+            ;
+        }
+    } else {
+        return HASH_INPUT_INVALID;
+    }
+
+    //clear the context
+    memset_((unsigned char *)ctx, 0, sizeof(HASH_DMA_CTX));
+
+    //init context
+    ctx->hash_alg       = hash_alg;
+    ctx->block_word_len = block_word_len;
+    ctx->callback       = callback;
+    ctx->total[0]       = byte_length_l;
+    ctx->total[1]       = byte_length_h;
+
+    #ifdef CONFIG_HASH_SUPPORT_MUL_THREAD
+    ctx->iterator_word_len = hash_get_iterator_word_len(hash_alg);
+    if (NULL != iv) {
+        ctx->first_update_flag = (unsigned char)0;
+        memcpy_((unsigned char *)(ctx->iterator), (unsigned char *)iv, CAST2UINT32(ctx->iterator_word_len) << 2);
+    } else {
+        ctx->first_update_flag = (unsigned char)1;
+    }
+    #else
+    hash_set_dma_mode();
+    hash_disable_interruption();
+    hash_set_alg(hash_alg);
+    hash_set_last_block(0); //set not the last block
+    hash_set_IV(hash_alg, hash_get_iterator_word_len(hash_alg));
+    hash_set_dma_output_len((unsigned int)hash_get_digest_word_len(hash_alg) << 2);
+    hash_clear_msg_len();
+
+    //set IV
+    if (NULL != iv) {
+        hash_set_iterator(iv, hash_get_iterator_word_len(hash_alg));
+    } else {
+        hash_set_IV(hash_alg, hash_get_iterator_word_len(hash_alg));
+    }
+    #endif
+
+    return HASH_SUCCESS;
+}
 
 /**
  * @brief       message update done, get the digest
  * @param[in]   ctx           - HASH_DMA_CTX context pointer.
  * @param[in]   hash_alg      - specific hash algorithm.
  * @param[in]   callback      - callback function pointer.
- * @return      0:success     other:error
+ * @return      HASH_SUCCESS(success), other(error)
  */
 unsigned int hash_dma_init(HASH_DMA_CTX *ctx, HASH_ALG hash_alg, HASH_CALLBACK callback)
 {
-    if(NULL == ctx)
-    {
+    if (NULL == ctx) {
         return HASH_BUFFER_NULL;
-    }
-    else if(HASH_SUCCESS != check_hash_alg(hash_alg))
-    {
+    } else if (HASH_SUCCESS != check_hash_alg(hash_alg)) {
         return HASH_INPUT_INVALID;
+    } else {
+        //handle other;
     }
-    else
-    {;}
 
     //init context
-    ctx->hash_alg = hash_alg;
+    ctx->hash_alg       = hash_alg;
     ctx->block_word_len = hash_get_block_word_len(hash_alg);
-    ctx->callback = callback;
-//    uint32_clear(ctx->total, sizeof(ctx->total)/4);
+    ctx->callback       = callback;
+    uint32_clear(ctx->total, sizeof(ctx->total) / 4U);
 
+    #ifdef CONFIG_HASH_SUPPORT_MUL_THREAD
+    ctx->iterator_word_len = hash_get_iterator_word_len(hash_alg);
+    ctx->first_update_flag = (unsigned char)1;
+    #else
     hash_set_dma_mode();
-
     hash_disable_interruption();
-
     hash_set_alg(hash_alg);
-
-    hash_set_last_block(0);//set not the last block
-
+    hash_set_last_block(0); //set not the last block
     hash_set_IV(hash_alg, hash_get_iterator_word_len(hash_alg));
-
-    hash_set_dma_output_len(hash_get_digest_word_len(hash_alg)<<2);
-
+    hash_set_dma_output_len((unsigned int)hash_get_digest_word_len(hash_alg) << 2);
     hash_clear_msg_len();
+    #endif
 
     return HASH_SUCCESS;
 }
 
-/**
+    /**
  * @brief       dma hash update some message blocks
  * @param[in]   ctx                - HASH_DMA_CTX context pointer.
- * @param[in]   msg                - message blocks.
- * @param[in]   msg_words          - word length of the input message, must be a multiple of hash block word length.
+ * @param[in]   msg               - message blocks.
+ * @param[in]   msg_words           - word length of the input message, must be a multiple of hash block word length.
  * @return      0:success     other:error
  * @note
   @verbatim
       -# 1.  please make sure the four parameters are valid, and ctx is initialized.
   @endverbatim
  */
-unsigned int hash_dma_update_blocks(HASH_DMA_CTX *ctx, unsigned int *msg, unsigned int msg_words)
+    #ifdef CONFIG_HASH_SUPPORT_ADDRESS_HIGH_LOW
+unsigned int hash_dma_update_blocks(HASH_DMA_CTX *ctx, unsigned int msg_h, unsigned int msg_l, unsigned int msg_bytes)
+    #else
+unsigned int hash_dma_update_blocks(HASH_DMA_CTX *ctx, unsigned int *msg, unsigned int msg_bytes)
+    #endif
 {
-    if(NULL == ctx)
-    {
+    if (NULL == ctx) {
         return HASH_BUFFER_NULL;
     }
-    else if((NULL == msg) || (0 == msg_words))
+    #ifdef CONFIG_HASH_SUPPORT_ADDRESS_HIGH_LOW
+    else if (((0U == msg_h) && (0U == msg_l)) || (0U == msg_bytes))
+    #else
+    else if ((NULL == msg) || (0U == msg_bytes))
+    #endif
     {
         return HASH_SUCCESS;
-    }
-    else if(msg_words % ctx->block_word_len)
-    {
+    } else if (0U != (msg_bytes % (CAST2UINT32(ctx->block_word_len) << 2))) {
         return HASH_INPUT_INVALID;
+    } else {
+        //handle other;
     }
-    else
-    {;}
 
     //update total byte length
-    if(hash_total_byte_len_add_uint32(ctx->total, ctx->block_word_len/8, msg_words<<2))
-    {
+    if (0U != (hash_total_byte_len_add_uint32(ctx->total, CAST2UINT32(ctx->block_word_len) / 8U, msg_bytes))) {
         return HASH_LEN_OVERFLOW;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    hash_dma_operate(msg, NULL, msg_words<<2, ctx->callback);
+    #ifdef CONFIG_HASH_SUPPORT_MUL_THREAD
+    hash_set_last_block(0);
+    hash_set_alg(ctx->hash_alg);
+    hash_set_dma_output_len(0);
+    hash_set_dma_mode();
+
+    //set the input iterator data
+    if (((unsigned char)0) != (ctx->first_update_flag)) {
+        hash_set_IV(ctx->hash_alg, ctx->iterator_word_len);
+
+        ctx->first_update_flag = (unsigned char)0; //clear the flag
+    } else {
+        hash_set_iterator(ctx->iterator, ctx->iterator_word_len);
+    }
+    #endif
+
+    #ifdef CONFIG_HASH_SUPPORT_ADDRESS_HIGH_LOW
+    hash_dma_operate(msg_h, msg_l, 0, 0, msg_bytes, ctx->callback);
+    #else
+    hash_dma_operate(msg, NULL, msg_bytes, ctx->callback);
+    #endif
+
+    #ifdef CONFIG_HASH_SUPPORT_MUL_THREAD
+    //get the new iterator hash value
+    hash_get_iterator((unsigned char *)(ctx->iterator), (unsigned int)(ctx->iterator_word_len));
+    #endif
 
     return HASH_SUCCESS;
 }
 
-/**
- * @brief       dma hash update some message blocks
+
+    /**
+ * @brief       dma hash final(input the remainder message and get the digest)
  * @param[in]   ctx                - HASH_DMA_CTX context pointer.
- * @param[in]   msg                - message blocks.
- * @param[in]   msg_words          - word length of the input message, must be a multiple of hash block word length.
- * @return      0:success     other:error
+ * @param[in]   remainder_msg      - remainder message.
+ * @param[in]   remainder_bytes    - byte length of the remainder message.
+ * @param[out]  digest             - hash digest
+ * @return      HASH_SUCCESS(success), other(error)
  * @note
   @verbatim
       -# 1.  please make sure the four parameters are valid, and ctx is initialized.
   @endverbatim
  */
+    #ifdef CONFIG_HASH_SUPPORT_ADDRESS_HIGH_LOW
+unsigned int hash_dma_final(HASH_DMA_CTX *ctx, unsigned int remainder_msg_h, unsigned int remainder_msg_l, unsigned int remainder_bytes, unsigned int digest_h, unsigned int digest_l)
+    #else
 unsigned int hash_dma_final(HASH_DMA_CTX *ctx, unsigned int *remainder_msg, unsigned int remainder_bytes, unsigned int *digest)
+    #endif
 {
-    HASH_CTX final_ctx[1];
+    unsigned int blocks_bytes;
+    #ifdef CONFIG_HASH_SUPPORT_ADDRESS_HIGH_LOW
     unsigned int ret;
+    #endif
 
-    if((NULL == ctx) || (NULL == digest))
+    #ifdef CONFIG_HASH_SUPPORT_ADDRESS_HIGH_LOW
+    if ((NULL == ctx) || ((0U == digest_h) && (0U == digest_l)))
+    #else
+    if ((NULL == ctx) || (NULL == digest))
+    #endif
     {
         return HASH_BUFFER_NULL;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    if((NULL == remainder_msg))
-    {
-        remainder_bytes = 0;
+    #ifdef CONFIG_HASH_SUPPORT_ADDRESS_HIGH_LOW
+    if ((0U == remainder_msg_h) && (0U == remainder_msg_l)) {
+    #else
+    if ((NULL == remainder_msg)) {
+        remainder_msg = digest;
+    #endif
+        remainder_bytes = 0U;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    if(remainder_bytes >= ((unsigned int)ctx->block_word_len<<2))
-    {
-        return HASH_INPUT_INVALID;
+    // update total byte length
+    if (0U != hash_total_byte_len_add_uint32(ctx->total, CAST2UINT32(ctx->block_word_len) / 8U, remainder_bytes)) {
+        return HASH_LEN_OVERFLOW;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    //for some remainder_msg length, transfer to CPU style
-    if(remainder_bytes >= (unsigned int)((ctx->block_word_len<<2)-3))
-    {
-        ret = hash_init(final_ctx, ctx->hash_alg);
-        if(HASH_SUCCESS != ret)
-        {
+    #ifdef CONFIG_HASH_SUPPORT_MUL_THREAD
+    hash_clear_msg_len();
+    hash_set_alg(ctx->hash_alg);
+    hash_disable_interruption();
+    hash_set_last_block(0);
+    hash_set_dma_mode();
+
+    //set the input iterator data
+    if (0U != ctx->first_update_flag) {
+        hash_set_IV(ctx->hash_alg, CAST2UINT32(ctx->iterator_word_len));
+
+        ctx->first_update_flag = (unsigned char)0; //clear the flag
+    } else {
+        hash_set_iterator(ctx->iterator, CAST2UINT32(ctx->iterator_word_len));
+    }
+    #endif
+
+    //update some whole blocks
+    blocks_bytes    = remainder_bytes - (remainder_bytes % (CAST2UINT32(ctx->block_word_len) << 2));
+    remainder_bytes = remainder_bytes - blocks_bytes;
+
+    if (0U != blocks_bytes) {
+    #ifdef CONFIG_HASH_SUPPORT_ADDRESS_HIGH_LOW
+        hash_dma_operate(remainder_msg_h, remainder_msg_l, 0, 0, blocks_bytes, ctx->callback);
+        ret = hash_addr64_add_uint32(&remainder_msg_h, &remainder_msg_l, blocks_bytes);
+        if (HASH_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
-
-        //do not input IV, since IV or iterator is held in hardware
-        final_ctx->first_update_flag = 0;
-
-        //keep total message length
-//        uint32_copy(final_ctx->total, ctx->total, HASH_TOTAL_LEN_MAX_WORD_LEN);
-
-        ret = hash_update(final_ctx, (unsigned char *)remainder_msg, remainder_bytes);
-        if(HASH_SUCCESS != ret)
-        {
-            return ret;
-        }
-        else
-        {;}
-
-        ret = hash_final(final_ctx, (unsigned char *)digest);
-        if(HASH_SUCCESS != ret)
-        {
-            memset_(digest, 0, final_ctx->digest_byte_len);
-            return ret;
-        }
-        else
-        {;}
+    #else
+        hash_dma_operate(remainder_msg, NULL, blocks_bytes, ctx->callback);
+        remainder_msg = &(remainder_msg[blocks_bytes / 4U]);
+    #endif
+    } else {
+        ;
     }
-    else  //for other cases, keep DMA style
-    {
-        // update total byte length
-        if(hash_total_byte_len_add_uint32(ctx->total, ctx->block_word_len/8, remainder_bytes))
-        {
-            return HASH_LEN_OVERFLOW;
-        }
-        else
-        {;}
 
-        // set total length of message
-        hash_set_msg_total_byte_len(ctx->total, ctx->block_word_len/8);
+    // set total length of message
+    hash_set_msg_total_byte_len(ctx->total, CAST2UINT32(ctx->block_word_len) / 8U);
+    hash_set_last_block(1);
+    hash_set_dma_output_len(CAST2UINT32(hash_get_digest_word_len(ctx->hash_alg)) << 2);
 
-        hash_set_last_block(1);
-
-        hash_set_dma_output_len(hash_get_digest_word_len(ctx->hash_alg)<<2);
-
-        hash_dma_operate(remainder_msg, digest, remainder_bytes, NULL);
-    }
+    //update the remainder message(maybe empty)
+    #ifdef CONFIG_HASH_SUPPORT_ADDRESS_HIGH_LOW
+    hash_dma_operate(remainder_msg_h, remainder_msg_l, digest_h, digest_l, remainder_bytes, ctx->callback);
+    #else
+    hash_dma_operate(remainder_msg, digest, remainder_bytes, ctx->callback);
+    #endif
 
     return HASH_SUCCESS;
 }
 
-/**
+
+    /**
  * @brief       dma hash digest calculate
  * @param[in]   hash_alg       - specific hash algorithm.
  * @param[in]   msg            - message.
  * @param[in]   msg_bytes      - byte length of the message, it could be 0.
- * @param[in]   digest         - hash digest.
+ * @param[in]   digest           - hash digest.
  * @param[in]   callback       - callback function pointer.
  * @return      0:success     other:error
  * @note
@@ -1101,80 +1489,104 @@ unsigned int hash_dma_final(HASH_DMA_CTX *ctx, unsigned int *remainder_msg, unsi
       -# 1.  please make sure the four parameters are valid.
   @endverbatim
  */
+    #ifdef CONFIG_HASH_SUPPORT_ADDRESS_HIGH_LOW
+unsigned int hash_dma(HASH_ALG hash_alg, unsigned int msg_h, unsigned int msg_l, unsigned int msg_bytes, unsigned int digest_h, unsigned int digest_l, HASH_CALLBACK callback)
+    #else
 unsigned int hash_dma(HASH_ALG hash_alg, unsigned int *msg, unsigned int msg_bytes, unsigned int *digest, HASH_CALLBACK callback)
+    #endif
 {
-    unsigned int blocks_words, remainder_bytes;
     unsigned int ret;
     HASH_DMA_CTX ctx[1];
 
-    if((NULL == msg))
-    {
-        msg_bytes = 0;
+    #ifdef CONFIG_HASH_SUPPORT_ADDRESS_HIGH_LOW
+    if ((0U == msg_h) && (0U == msg_l)) {
+    #else
+    if ((NULL == msg)) {
+        msg = digest;
+    #endif
+        msg_bytes = 0U;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    if(NULL == digest)
+    #ifdef CONFIG_HASH_SUPPORT_ADDRESS_HIGH_LOW
+    if ((0U == digest_h) && (0U == digest_l))
+    #else
+    if (NULL == digest)
+    #endif
     {
         return HASH_BUFFER_NULL;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ret = hash_dma_init(ctx, hash_alg, callback);
-    if(HASH_SUCCESS != ret)
-    {
+    if (HASH_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    remainder_bytes = msg_bytes % (ctx->block_word_len<<2);
-    blocks_words = (msg_bytes - remainder_bytes)/4;
+    #ifdef CONFIG_HASH_SUPPORT_ADDRESS_HIGH_LOW
+    return hash_dma_final(ctx, msg_h, msg_l, msg_bytes, digest_h, digest_l);
+    #else
+    return hash_dma_final(ctx, msg, msg_bytes, digest);
+    #endif
+}
 
-    ret = hash_dma_update_blocks(ctx, (unsigned int *)msg, blocks_words);
-    if(HASH_SUCCESS != ret)
-    {
+
+    #ifdef SUPPORT_HASH_DMA_NODE
+        /**
+ * @brief       input whole message and get its digest(dma node style)
+ * @param[in]   hash_alg       - specific hash algorithm.
+ * @param[in]   node           - message node pointer.
+ * @param[in]   node_num       - number of hash nodes, i.e. number of message segments.
+ * @param[out]   digest           - hash digest.
+ * @param[in]   callback       - callback function pointer.
+ * @return      0:success     other:error
+ * @note
+  @verbatim
+      -# 1.  please make sure the four parameters are valid.
+      -# 2.  if the whole message consists of some segments, every segment is a node, a node includes
+             address and byte length.
+      -# 3.  for every node or segment except the last, its message length must be a multiple of block length.
+  @endverbatim
+ */
+        #ifdef CONFIG_HASH_SUPPORT_ADDRESS_HIGH_LOW
+unsigned int hash_dma_node_steps(HASH_ALG hash_alg, HASH_DMA_NODE *node, unsigned int node_num, unsigned int digest_h, unsigned int digest_l, HASH_CALLBACK callback)
+        #else
+unsigned int hash_dma_node_steps(HASH_ALG hash_alg, HASH_DMA_NODE *node, unsigned int node_num, unsigned int *digest, HASH_CALLBACK callback)
+        #endif
+{
+    HASH_DMA_CTX ctx[1];
+    unsigned int i, ret;
+
+    ret = hash_dma_init(ctx, hash_alg, callback);
+    if (HASH_SUCCESS != ret) {
         return ret;
-    }
-    else
-    {
-        return hash_dma_final(ctx, (unsigned int *)(msg+blocks_words), remainder_bytes, digest);
+    } else {
+        ;
     }
 
+    for (i = 0; i < node_num - 1U; i++) {
+        #ifdef CONFIG_HASH_SUPPORT_ADDRESS_HIGH_LOW
+        ret = hash_dma_update_blocks(ctx, node[i].msg_addr_h, node[i].msg_addr_l, node[i].msg_bytes);
+        #else
+        ret = hash_dma_update_blocks(ctx, node[i].msg_addr, node[i].msg_bytes);
+        #endif
+        if (HASH_SUCCESS != ret) {
+            return ret;
+        } else {
+            ;
+        }
+    }
 
+        #ifdef CONFIG_HASH_SUPPORT_ADDRESS_HIGH_LOW
+    return hash_dma_final(ctx, node[i].msg_addr_h, node[i].msg_addr_l, node[i].msg_bytes, digest_h, digest_l);
+        #else
+    return hash_dma_final(ctx, node[i].msg_addr, node[i].msg_bytes, digest);
+        #endif
 }
+    #endif
 
-/**
- * @brief Sets the burst size for hash DMA transfers.
- * @param[in]  burst_size - The burst size to be set.
- * @return      none
- */
-static void hash_set_burst_size(dma_burst_size_e burst_size)
-{
-    /* set tx burst mode, rx max is 16 words so keep default burst 1 */
-    reg_hash_thres = ((1 << 0) << 4) | 1 << burst_size;
-    /**(1-1 word,2-2 word,4-4 word,8-8 word)**/
-}
-
-/**
- * @brief Initializes hash DMA for data transfers.
- * @param[in] tx_chn       - The DMA channel to be used for transmit.
- * @param[in] rx_chn       - The DMA channel to be used for receive.
- * @param[in] burst_size   - The burst size to be set for DMA transfers.
- * @return None.
- */
-void telink_hash_dma_init(dma_chn_e tx_chn, dma_chn_e rx_chn, dma_burst_size_e burst_size)
-{
-    /* set tx burst mode, rx max is 16 words so keep default burst 1 */
-    hash_tx_dma_config.src_burst_size = burst_size;
-    dma_config(tx_chn, &hash_tx_dma_config);
-    dma_config(rx_chn, &hash_rx_dma_config);
-    reg_dma_src_addr(rx_chn) = reg_hash_fifo;
-    reg_hash_dma_en = 0x03;
-    hash_set_burst_size(burst_size);
-    hash_set_tx_dma_channel(tx_chn);
-    hash_set_rx_dma_channel(rx_chn);
-}
 #endif
-

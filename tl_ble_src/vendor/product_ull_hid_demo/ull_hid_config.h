@@ -23,26 +23,26 @@
  *******************************************************************************************************/
 #pragma once
 
-#define ULL_HID_DEVICE 0
-#define ULL_HID_HOST 1
+#define ULL_HID_DEVICE       0
+#define ULL_HID_HOST         1
 
-#define ULL_HID_DEMO_SLECT ULL_HID_DEVICE
+#define ULL_HID_DEMO_SLECT   ULL_HID_DEVICE
 
-#define APP_ULL_HID_LOG_EN                          1
+#define APP_ULL_HID_LOG_EN   1
 
-#define APP_AUDIO_UI_UART                           1
-#define APP_AUDIO_UI_USB_CDC                        2
-#define APP_AUDIO_UI_IFACE                          APP_AUDIO_UI_UART
+#define APP_AUDIO_UI_UART    1
+#define APP_AUDIO_UI_USB_CDC 2
+#define APP_AUDIO_UI_IFACE   APP_AUDIO_UI_UART
 
 #if APP_AUDIO_UI_IFACE == APP_AUDIO_UI_UART
-#define TLKAPI_DEBUG_ENABLE                         1
-#define TLKAPI_DEBUG_CHANNEL                        TLKAPI_DEBUG_CHANNEL_UDB
+    #define TLKAPI_DEBUG_ENABLE  1
+    #define TLKAPI_DEBUG_CHANNEL TLKAPI_DEBUG_CHANNEL_UDB
 #else
-#define TLKAPI_DEBUG_ENABLE                         0
-#define MODULE_USB_ENABLE                           1
-#define USB_CDC_ENABLE                              1
-#define ID_VENDOR                                   0x248a          // for report
-#define ID_PRODUCT_BASE                             0x6102          //AUDIO_HOGP
+    #define TLKAPI_DEBUG_ENABLE 0
+    #define MODULE_USB_ENABLE   1
+    #define USB_CDC_ENABLE      1
+    #define ID_VENDOR           0x248a // for report
+    #define ID_PRODUCT_BASE     0x6102 //AUDIO_HOGP
 #endif
 
 #if (ULL_HID_DEMO_SLECT == ULL_HID_DEVICE)

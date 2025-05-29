@@ -25,59 +25,61 @@
 
 #if (PRODUCT_BIS_SOURCE_SELECT == PRODUCT_SIG_AURACAST_TRANSMITTER)
 
-#pragma once
+    #pragma once
 
-#include "tl_common.h"
-#include "app_config.h"
-#include "app_buffer.h"
-#include "stack/ble/ble.h"
+    #include "tl_common.h"
+    #include "app_config.h"
+    #include "app_buffer.h"
+    #include "stack/ble/ble.h"
 
-#define AURACAST_SOURCE_ADV_HANDLE                  ADV_HANDLE0
-#define AURACAST_SOURCE_BIG_HANDLE                  BIG_HANDLE_0
+    #define AURACAST_SOURCE_ADV_HANDLE ADV_HANDLE0
+    #define AURACAST_SOURCE_BIG_HANDLE BIG_HANDLE_0
 
-#define APP_AUDIO_INPUT_USB_MIC                     5
-#define APP_AUDIO_INPUT_NONE                        6
+    #define APP_AUDIO_INPUT_USB_MIC    5
+    #define APP_AUDIO_INPUT_NONE       6
 
-#define APP_AUDIO_INPUT_MODE                        APP_AUDIO_INPUT_USB_MIC
+    #define APP_AUDIO_INPUT_MODE       APP_AUDIO_INPUT_USB_MIC
 
-#if APP_AUDIO_INPUT_MODE == APP_AUDIO_INPUT_USB_MIC
-#if TLKAPI_DEBUG_ENABLE && (TLKAPI_DEBUG_CHANNEL == TLKAPI_DEBUG_CHANNEL_UDB)
-#error "use usb mic mode, must close tlk debug mode or not use usb debug mode."
-#endif
-#endif
+    #if APP_AUDIO_INPUT_MODE == APP_AUDIO_INPUT_USB_MIC
+        #if TLKAPI_DEBUG_ENABLE && (TLKAPI_DEBUG_CHANNEL == TLKAPI_DEBUG_CHANNEL_UDB)
+            #error "use usb mic mode, must close tlk debug mode or not use usb debug mode."
+        #endif
+    #endif
 
-#define APP_DATA_STORE_FLASH_ADDR                   0xD0000
-#define APP_DATA_HEAD_VALUE                         0x5DFEAB18
+    #define APP_DATA_STORE_FLASH_ADDR 0xD0000
+    #define APP_DATA_HEAD_VALUE       0x5DFEAB18
 
-/* Audio configuration */
-#define APP_AUDIO_FRAME_SAMPLE                      (240)// 24K => 10ms * 24sample
-#define APP_AUDIO_FRAME_BYTES                       (APP_AUDIO_FRAME_SAMPLE << 1) // 1 sample 16bits
+    /* Audio configuration */
+    #define APP_AUDIO_FRAME_SAMPLE (240)                         // 24K => 10ms * 24sample
+    #define APP_AUDIO_FRAME_BYTES  (APP_AUDIO_FRAME_SAMPLE << 1) // 1 sample 16bits
 
-typedef enum{
+typedef enum
+{
     APP_AUDIO_BRODCAST_SOURCE_STATE_IDLE,
     APP_AUDIO_BRODCAST_SOURCE_STATE_ENABLING,
     APP_AUDIO_BRODCAST_SOURCE_STATE_ACTIVE,
     APP_AUDIO_BRODCAST_SOURCE_STATE_DISABLING,
 } app_audio_brodcast_state_enum;
 
-
-typedef struct{
+typedef struct
+{
     u32 head;
-    u8 broadcastID[3];
-    u8 broadcastNameLen;
-    u8 broadcastName[31];
-    u8 encryptionFlag;
-    u8 broadcastCode[16];
-    u8 audioMode;
+    u8  broadcastID[3];
+    u8  broadcastNameLen;
+    u8  broadcastName[31];
+    u8  encryptionFlag;
+    u8  broadcastCode[16];
+    u8  audioMode;
     int checkSum;
 } app_auracastCfgParam_t;
 
-typedef struct{
-    app_audio_brodcast_state_enum state;
+typedef struct
+{
+    app_audio_brodcast_state_enum      state;
     blc_bcstAudioAnnouncements_param_t BASE;
 } app_bisSource_param_t;
 
-extern int codecFrameDataLen;
+extern int                   codecFrameDataLen;
 extern app_bisSource_param_t bisSource;
 
 /**
@@ -85,7 +87,7 @@ extern app_bisSource_param_t bisSource;
  * @param[in]   none.
  * @return      true: initial successful, fail: initial failed.
  */
-bool  app_audio_init(void);
+bool app_audio_init(void);
 
 /**
  * @brief      audio loop handler process.
@@ -113,7 +115,7 @@ void usb_audio_cleanUsbRxBuffer(void);
  * @param[in]   none
  * @return      none
  */
-void app_audio_getUsbMicData(u16* pcm);
+void app_audio_getUsbMicData(u16 *pcm);
 
 /**
  * @brief       usb audio handler.
@@ -141,11 +143,11 @@ void app_audio_cleanCodecRxBuffer(void);
  * @param[in]   none
  * @return      none
  */
-void app_audio_getCodecData(u16* pcm);
+void app_audio_getCodecData(u16 *pcm);
 
 
 bool app_audio_setBroadcastID(int bcstID);
-bool app_audio_setBroadcastName(char* bcstName, u8 bcstNameLen);
+bool app_audio_setBroadcastName(char *bcstName, u8 bcstNameLen);
 bool app_audio_closeEncryptBig(void);
 bool app_audio_setBroadcastCode(char bcstCode[16]);
 
@@ -153,11 +155,11 @@ typedef void (*bcast_state_changed_cb)(app_audio_brodcast_state_enum state);
 
 void bcast_set_state_changed_cb(bcast_state_changed_cb cb);
 
-u8 app_audio_getBroadcastState(void);
+u8   app_audio_getBroadcastState(void);
 bool app_audio_broadcastStart(void);
 bool app_audio_broadcastStop(void);
 void app_audio_setStereoAudio(void);
 void app_audio_setMonoAudio(void);
 void app_audio_storeInformation(void);
 
-#endif      //PRODUCT_BIS_SOURCE_SELECT == PRODUCT_SIG_AURACAST_TRANSMITTER
+#endif //PRODUCT_BIS_SOURCE_SELECT == PRODUCT_SIG_AURACAST_TRANSMITTER

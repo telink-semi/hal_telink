@@ -37,7 +37,10 @@
 
 //////////////////////////Basic Profile///////////////////////////////////
 #include "stack/ble/profile/basic_profile/prf_basic.h"
-
+#if (MCU_CORE_TYPE != CHIP_TYPE_TL322X)
+////////////////////// Electronic Shelf Label //////////////////////
+#include "stack/ble/profile/esl/prf_esl.h"
+#endif
 ////////////////////// Channel Sounding Ranging  //////////////////////
 #include "stack/ble/profile/channel_sounding/prf_cs.h"
 
@@ -53,7 +56,14 @@
 #include "stack/ble/profile/prf_common/storage/store_internal.h"
 
 /*********************************************************/
-
+#if (!defined(HOST_V2_ENABLE))
 #include "stack/ble/profile/audio/prf_audio.h"
+#endif
+
+#if (MCU_CORE_TYPE != CHIP_TYPE_TL322X)
+#include "stack/ble/profile/ota/prf_ota.h"
+#include "stack/ble/profile/spp/prf_spp.h"
+#endif
+
 
 #endif /* BLE_PROFILE_H_ */

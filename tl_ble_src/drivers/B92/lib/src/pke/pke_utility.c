@@ -28,7 +28,6 @@
 /********* pke version:1.1 *********/
 #include "lib/include/pke/pke_utility.h"
 
-
 /**
  * @brief       set uint32 buffer.
  * @param[out]  a       - output word buffer.
@@ -38,8 +37,7 @@
  */
 void uint32_set(volatile unsigned int *a, unsigned int value, unsigned int wordLen)
 {
-    while(wordLen)
-    {
+    while (wordLen) {
         a[--wordLen] = value;
     }
 }
@@ -55,10 +53,8 @@ void uint32_copy(volatile unsigned int *dst, volatile const unsigned int *src, u
 {
     unsigned int i;
 
-    if(dst != src)
-    {
-        for(i=0; i<wordLen; i++)
-        {
+    if (dst != src) {
+        for (i = 0; i < wordLen; i++) {
             dst[i] = src[i];
         }
     }
@@ -72,8 +68,7 @@ void uint32_copy(volatile unsigned int *dst, volatile const unsigned int *src, u
  */
 void uint32_clear(volatile unsigned int *a, unsigned int wordLen)
 {
-    while(wordLen)
-    {
+    while (wordLen) {
         a[--wordLen] = 0;
     }
 }
@@ -85,10 +80,9 @@ void uint32_clear(volatile unsigned int *a, unsigned int wordLen)
  */
 void uint32_sleep(unsigned int count)
 {
-    volatile unsigned int i=0;
+    volatile unsigned int i = 0;
 
-    while(i<count)
-    {
+    while (i < count) {
         i++;
     }
 }
@@ -105,29 +99,24 @@ void uint32_sleep(unsigned int count)
  */
 void reverse_word_array(unsigned char *in, unsigned int *out, unsigned int wordLen)
 {
-    unsigned int idx, round = wordLen >> 1;
-    unsigned int tmp;
+    unsigned int  idx, round = wordLen >> 1;
+    unsigned int  tmp;
     unsigned int *p_in;
 
-    if(((unsigned int)(in))&3)
-    {
-        memcpy(out, in, wordLen<<2);
+    if (((unsigned int)(in)) & 3) {
+        memcpy(out, in, wordLen << 2);
         p_in = out;
-    }
-    else
-    {
+    } else {
         p_in = (unsigned int *)in;
     }
 
-    for (idx = 0; idx < round; idx++)
-    {
-        tmp = p_in[idx];
-        out[idx] = p_in[wordLen - 1 - idx];
+    for (idx = 0; idx < round; idx++) {
+        tmp                    = p_in[idx];
+        out[idx]               = p_in[wordLen - 1 - idx];
         out[wordLen - 1 - idx] = tmp;
     }
 
-    if ((wordLen & 0x1) && (p_in != out))
-    {
+    if ((wordLen & 0x1) && (p_in != out)) {
         out[round] = p_in[round];
     }
 }
@@ -143,18 +132,16 @@ void reverse_word_array(unsigned char *in, unsigned int *out, unsigned int wordL
  */
 void reverse_byte_array(volatile const unsigned char *in, unsigned char *out, unsigned int byteLen)
 {
-    unsigned int idx, round = byteLen >> 1;
+    unsigned int  idx, round = byteLen >> 1;
     unsigned char tmp;
 
-    for (idx = 0; idx < round; idx++)
-    {
-        tmp = in[idx];
-        out[idx] = in[byteLen - 1 - idx];
+    for (idx = 0; idx < round; idx++) {
+        tmp                    = in[idx];
+        out[idx]               = in[byteLen - 1 - idx];
         out[byteLen - 1 - idx] = tmp;
     }
 
-    if ((byteLen & 0x1) && (in != out))
-    {
+    if ((byteLen & 0x1) && (in != out)) {
         out[round] = in[round];
     }
 }
@@ -275,8 +262,7 @@ void uint8_XOR(unsigned char *A, unsigned char *B, unsigned char *C, unsigned in
 {
     unsigned int i;
 
-    for(i=0; i<byteLen; i++)
-    {
+    for (i = 0; i < byteLen; i++) {
         C[i] = A[i] ^ B[i];
     }
 }
@@ -292,28 +278,22 @@ unsigned int get_valid_bits(const unsigned int *a, unsigned int wordLen)
     unsigned int i = 0;
     unsigned int j = 0;
 
-    if(0 == wordLen)
-    {
+    if (0 == wordLen) {
         return 0;
     }
 
-    for (i = wordLen; i > 0; i--)
-    {
-        if (a[i - 1])
-        {
+    for (i = wordLen; i > 0; i--) {
+        if (a[i - 1]) {
             break;
         }
     }
 
-    if(0 == i)
-    {
+    if (0 == i) {
         return 0;
     }
 
-    for (j = 32; j > 0; j--)
-    {
-        if (a[i - 1] & (((unsigned int)0x1) << (j - 1)))
-        {
+    for (j = 32; j > 0; j--) {
+        if (a[i - 1] & (((unsigned int)0x1) << (j - 1))) {
             break;
         }
     }
@@ -331,10 +311,8 @@ unsigned int get_valid_words(volatile const unsigned int *a, unsigned int max_wo
 {
     unsigned int i;
 
-    for (i = max_words; i > 0; i--)
-    {
-        if (a[i - 1])
-        {
+    for (i = max_words; i > 0; i--) {
+        if (a[i - 1]) {
             return i;
         }
     }
@@ -352,10 +330,8 @@ unsigned char uint8_BigNum_Check_Zero(unsigned char a[], unsigned int aByteLen)
 {
     unsigned int i;
 
-    for(i=0; i<aByteLen; i++)
-    {
-        if(a[i])
-        {
+    for (i = 0; i < aByteLen; i++) {
+        if (a[i]) {
             return 0;
         }
     }
@@ -373,10 +349,8 @@ unsigned char uint32_BigNum_Check_Zero(unsigned int a[], unsigned int aWordLen)
 {
     unsigned int i;
 
-    for(i=0; i<aWordLen; i++)
-    {
-        if(a[i])
-        {
+    for (i = 0; i < aWordLen; i++) {
+        if (a[i]) {
             return 0;
         }
     }
@@ -399,25 +373,20 @@ int uint32_BigNumCmp(volatile const unsigned int *a, unsigned int aWordLen, vola
     aWordLen = get_valid_words(a, aWordLen);
     bWordLen = get_valid_words(b, bWordLen);
 
-    if(aWordLen > bWordLen)
-    {
+    if (aWordLen > bWordLen) {
         return 1;
     }
 
-    if(aWordLen < bWordLen)
-    {
+    if (aWordLen < bWordLen) {
         return -1;
     }
 
-    for(i=(aWordLen-1);i>=0;i--)
-    {
-        if(a[i] > b[i])
-        {
+    for (i = (aWordLen - 1); i >= 0; i--) {
+        if (a[i] > b[i]) {
             return 1;
         }
 
-        if(a[i] < b[i])
-        {
+        if (a[i] < b[i]) {
             return -1;
         }
     }
@@ -433,21 +402,19 @@ int uint32_BigNumCmp(volatile const unsigned int *a, unsigned int aWordLen, vola
  */
 unsigned int Get_Multiple2_Number(unsigned int a[])
 {
-    unsigned int t, i=0, j=0;
+    unsigned int t, i = 0, j = 0;
 
-    while(0 == (a[i]))
-    {
+    while (0 == (a[i])) {
         i++;
     }
 
     t = a[i];
-    while(!(t&1))
-    {
+    while (!(t & 1)) {
         j++;
-        t>>=1;
+        t >>= 1;
     }
 
-    return (i<<5)+j;
+    return (i << 5) + j;
 }
 
 /**
@@ -461,46 +428,44 @@ unsigned int Get_Multiple2_Number(unsigned int a[])
  */
 unsigned int Big_Div2n(volatile unsigned int a[], signed int aWordLen, unsigned int n)
 {
-    signed int i;
+    signed int   i;
     unsigned int j;
 
     aWordLen = get_valid_words(a, aWordLen);
-    if(0 == n)
-    {
+    if (0 == n) {
         return aWordLen;
     }
 
-    if(!aWordLen)
+    if (!aWordLen) {
         return 0;
+    }
 
-    if(n<=32)
-    {
-        for(i=0; i<aWordLen-1; i++)
-        {
+    if (n <= 32) {
+        for (i = 0; i < aWordLen - 1; i++) {
             a[i] >>= n;
-            a[i] |= (a[i+1]<<(32-n));
+            a[i] |= (a[i + 1] << (32 - n));
         }
         a[i] >>= n;
 
-        if(!a[i])
+        if (!a[i]) {
             return i;
-        return aWordLen;
-    }
-    else        //general method
-    {
-        j=n>>5; //j=n/32;
-        n&=31;  //n=n%32;
-        for(i=0; i<aWordLen-(int)j-1; i++)
-        {
-            a[i] = a[i+j]>>n;
-            a[i] |= (a[i+j+1]<<(32-n));
         }
-        a[i] = a[i+j]>>n;
-        uint32_clear(a+aWordLen-j, j);
+        return aWordLen;
+    } else          //general method
+    {
+        j = n >> 5; //j=n/32;
+        n &= 31;    //n=n%32;
+        for (i = 0; i < aWordLen - (int)j - 1; i++) {
+            a[i] = a[i + j] >> n;
+            a[i] |= (a[i + j + 1] << (32 - n));
+        }
+        a[i] = a[i + j] >> n;
+        uint32_clear(a + aWordLen - j, j);
 
-        if(!a[i])
+        if (!a[i]) {
             return i;
-        return aWordLen-j;
+        }
+        return aWordLen - j;
     }
 }
 
@@ -514,20 +479,18 @@ unsigned char Bigint_Check_1(volatile unsigned int a[], unsigned int aWordLen)
 {
     unsigned int i;
 
-    if(!aWordLen)
-    {
+    if (!aWordLen) {
         return 0;
     }
 
-    if(a[0] != 1)
-    {
+    if (a[0] != 1) {
         return 0;
     }
 
-    for(i=1; i<aWordLen; i++)
-    {
-        if(a[i])
+    for (i = 1; i < aWordLen; i++) {
+        if (a[i]) {
             return 0;
+        }
     }
 
     return 1;
@@ -545,22 +508,19 @@ unsigned char Bigint_Check_p_1(unsigned int a[], unsigned int p[], unsigned int 
 {
     unsigned int i;
 
-    if(!wordLen)
-    {
+    if (!wordLen) {
         return 0;
     }
 
-    if(a[0] != p[0] - 1)
-    {
+    if (a[0] != p[0] - 1) {
         return 0;
     }
 
-    for(i=1; i<wordLen; i++)
-    {
-        if(a[i] != p[i])
+    for (i = 1; i < wordLen; i++) {
+        if (a[i] != p[i]) {
             return 0;
+        }
     }
 
     return 1;
 }
-

@@ -24,18 +24,18 @@
 #include "stack/ble/ble.h"
 
 #ifndef LE_AUDIO_HAS_HEARING_AID_PRESET_CONTROL_POINT
-#define LE_AUDIO_HAS_HEARING_AID_PRESET_CONTROL_POINT           1
+    #define LE_AUDIO_HAS_HEARING_AID_PRESET_CONTROL_POINT 1
 #endif
 
-#define HAS_START_HDL                   SERVICE_HEARING_ACCESS_HDL
+#define HAS_START_HDL SERVICE_HEARING_ACCESS_HDL
 
 _attribute_ble_data_retention_
-u8 hasHearingAidFeaturesValue = 0x00;
+    u8           hasHearingAidFeaturesValue    = 0x00;
 static const u16 hasHearingAidFeaturesValueLen = 1;
 
 #if LE_AUDIO_HAS_HEARING_AID_PRESET_CONTROL_POINT
 _attribute_ble_data_retention_
-u8 hasActivePresetIndexValue = 0x00;
+    u8           hasActivePresetIndexValue    = 0x00;
 static const u16 hasActivePresetIndexValueLen = 1;
 #endif
 
@@ -43,36 +43,35 @@ static const u16 hasActivePresetIndexValueLen = 1;
  * @brief the structure for default HAS service List.
  */
 static const atts_attribute_t hasList[] =
-{
-    ATTS_PRIMARY_SERVICE(serviceHearingAccessUuid),
+    {
+        ATTS_PRIMARY_SERVICE(serviceHearingAccessUuid),
 
-    //Hearing Aid Features
-    ATTS_CHAR_UUID_ENCR_READ_ENTITY_NOCB(charPropReadNotfiy, characteristicHearingAidFeaturesUuid, hasHearingAidFeaturesValue),
-    ATTS_COMMON_CCC_DEFINE,
+        //Hearing Aid Features
+        ATTS_CHAR_UUID_ENCR_READ_ENTITY_NOCB(charPropReadNotfiy, characteristicHearingAidFeaturesUuid, hasHearingAidFeaturesValue),
+        ATTS_COMMON_CCC_DEFINE,
 
 #if LE_AUDIO_HAS_HEARING_AID_PRESET_CONTROL_POINT
-    //Hearing Aid Preset Control Point
-    ATTS_CHAR_UUID_ENCR_WRITE_NULL(charPropWriteIndicate, characteristicHearingAidPresetControlPointUuid),
-    ATTS_COMMON_CCC_DEFINE,
+        //Hearing Aid Preset Control Point
+        ATTS_CHAR_UUID_ENCR_WRITE_NULL(charPropWriteIndicate, characteristicHearingAidPresetControlPointUuid),
+        ATTS_COMMON_CCC_DEFINE,
 
-    //Active Preset Index
-    ATTS_CHAR_UUID_ENCR_READ_ENTITY_NOCB(charPropReadNotfiy, characteristicActivePresetIndexUuid, hasActivePresetIndexValue),
-    ATTS_COMMON_CCC_DEFINE,
+        //Active Preset Index
+        ATTS_CHAR_UUID_ENCR_READ_ENTITY_NOCB(charPropReadNotfiy, characteristicActivePresetIndexUuid, hasActivePresetIndexValue),
+        ATTS_COMMON_CCC_DEFINE,
 #endif
 };
 
 /*
  * @brief the structure for default HAS service group.
  */
-_attribute_ble_data_retention_
-static atts_group_t svcHasGroup =
-{
-    NULL,
-    hasList,
-    NULL,
-    NULL,
-    HAS_START_HDL,
-    0,
+_attribute_ble_data_retention_ static atts_group_t svcHasGroup =
+    {
+        NULL,
+        hasList,
+        NULL,
+        NULL,
+        HAS_START_HDL,
+        0,
 };
 
 /**
@@ -82,7 +81,7 @@ static atts_group_t svcHasGroup =
  */
 void blc_svc_addHasGroup(void)
 {
-    svcHasGroup.endHandle = svcHasGroup.startHandle+ARRAY_SIZE(hasList)-1;
+    svcHasGroup.endHandle = svcHasGroup.startHandle + ARRAY_SIZE(hasList) - 1;
     blc_gatts_addAttributeServiceGroup(&svcHasGroup);
 }
 
@@ -104,6 +103,6 @@ void blc_svc_removeHasGroup(void)
  */
 void blc_svc_hasCbackRegister(atts_r_cb_t readCback, atts_w_cb_t writeCback)
 {
-    svcHasGroup.readCback = readCback;
+    svcHasGroup.readCback  = readCback;
     svcHasGroup.writeCback = writeCback;
 }

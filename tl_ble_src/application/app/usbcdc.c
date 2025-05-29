@@ -22,13 +22,13 @@
  *
  *******************************************************************************************************/
 #include "usbcdc.h"
-#if(USB_CDC_ENABLE)
-#include "../usbstd/usb.h"
+#if (USB_CDC_ENABLE)
+    #include "../usbstd/usb.h"
 
-unsigned char LineCoding[7]={0x00,0xC2,0x01,0x00,0x00,0x00,0x08};
+unsigned char            LineCoding[7] = {0x00, 0xC2, 0x01, 0x00, 0x00, 0x00, 0x08};
 static usb_cdc_read_cb_t rx_cb;
 
-unsigned short usb_cdc_write(unsigned char * data, unsigned short length)
+unsigned short usb_cdc_write(unsigned char *data, unsigned short length)
 {
     unsigned short written = 0;
 
@@ -38,14 +38,13 @@ unsigned short usb_cdc_write(unsigned char * data, unsigned short length)
     /*If the length of the data sent is equal to the wMaxPacketSize (CDC_TXRX_EPSIZE),
              the device must return a zero-length packet to indicate the end of the data stage,
              The following is the process of sending zero-length packet*/
-    if (length > CDC_TXRX_EPSIZE-1) {
-        length = CDC_TXRX_EPSIZE-1;
+    if (length > CDC_TXRX_EPSIZE - 1) {
+        length = CDC_TXRX_EPSIZE - 1;
     }
 
     usbhw_reset_ep_ptr(USB_EDP_CDC_IN);
 
-    for(; written<length; written++)
-    {
+    for (; written < length; written++) {
         reg_usb_ep_dat(USB_EDP_CDC_IN) = (*data);
         ++data;
     }
@@ -63,35 +62,33 @@ void usb_cdc_read(usb_cdc_read_cb_t cb)
 void usb_cdc_rx_data_from_host(void)
 {
     static unsigned char usb_cdc_data[CDC_TXRX_EPSIZE];
-    unsigned short usb_cdc_data_len;
-    unsigned char rx_from_usbhost_len = reg_usb_ep_ptr(USB_EDP_CDC_OUT);
+    unsigned short       usb_cdc_data_len;
+    unsigned char        rx_from_usbhost_len = reg_usb_ep_ptr(USB_EDP_CDC_OUT);
     usbhw_reset_ep_ptr(USB_EDP_CDC_OUT);
 
 
     if (rx_from_usbhost_len > 0 && rx_from_usbhost_len <= CDC_TXRX_EPSIZE) {
         for (int i = 0; i < rx_from_usbhost_len; ++i) {
             usb_cdc_data[i] = reg_usb_ep_dat(USB_EDP_CDC_OUT);
-
         }
-        usb_cdc_data_len = rx_from_usbhost_len&0xff;        //uart dma: first 4 bytes is the length of packet
+        usb_cdc_data_len = rx_from_usbhost_len & 0xff; //uart dma: first 4 bytes is the length of packet
 
         usb_cdc_read_cb_t cb = rx_cb;
-        rx_cb = NULL;
+        rx_cb                = NULL;
         cb(usb_cdc_data, usb_cdc_data_len);
     }
 }
-
 
 void usb_cdc_irq_data_process(void)
 {
     unsigned char irq = usbhw_get_eps_irq();
 
-    if(irq & FLD_USB_EDP4_IRQ ){
+    if (irq & FLD_USB_EDP4_IRQ) {
         usbhw_clr_eps_irq(FLD_USB_EDP4_IRQ);
         usbhw_reset_ep_ptr(USB_EDP_CDC_IN);
     }
 
-    if(irq & FLD_USB_EDP5_IRQ){
+    if (irq & FLD_USB_EDP5_IRQ) {
         if (rx_cb) {
             usbhw_clr_eps_irq(FLD_USB_EDP5_IRQ);
             usb_cdc_rx_data_from_host();
@@ -102,7 +99,7 @@ void usb_cdc_irq_data_process(void)
 
 void usb_cdc_set_line_encoding(int data_request)
 {
-    if (USB_IRQ_DATA_REQ==data_request) {
+    if (USB_IRQ_DATA_REQ == data_request) {
         usbhw_reset_ctrl_ep_ptr();
 
         for (unsigned short i = 0; i < sizeof(LineCoding); i++) {

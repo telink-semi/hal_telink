@@ -31,13 +31,10 @@
 
 #ifdef SUPPORT_ECIES
 
-#include "lib/include/pke/ecies.h"
-#include "lib/include/crypto_common/utility.h"
-#include "lib/include/trng/trng.h"
-#include "lib/include/hash/hash_kdf.h"
-
-
-
+    #include "lib/include/pke/ecies.h"
+    #include "lib/include/crypto_common/utility.h"
+    #include "lib/include/trng/trng.h"
+    #include "lib/include/hash/hash_kdf.h"
 
 /*************************************************************************************
  *                       KDF function Implementation
@@ -66,19 +63,16 @@
            output parameters, and set K2 and k2_bytes to NULL and 0 respectively.
   @endverbatim
  */
-unsigned int ansi_x963_kdf_core(HASH_ALG hash_alg, unsigned char *Z, unsigned int Z_bytes,
-        unsigned char *counter,  unsigned char *shared_info,unsigned int shared_info_bytes, unsigned char *k1,
-        unsigned int k1_bytes, unsigned char *k2, unsigned int k2_bytes)
+unsigned int ansi_x963_kdf_core(HASH_ALG hash_alg, unsigned char *Z, unsigned int Z_bytes, unsigned char *counter, unsigned char *shared_info, unsigned int shared_info_bytes, unsigned char *k1, unsigned int k1_bytes, unsigned char *k2, unsigned int k2_bytes)
 {
     HASH_NODE hash_node[3] = {
-        {Z, Z_bytes},
-        {counter, 4},
+        {Z,           Z_bytes          },
+        {counter,     4                },
         {shared_info, shared_info_bytes},
     };
 
     return ansi_x9_63_kdf_node(hash_alg, hash_node, 3, counter, k1, k1_bytes, k2, k2_bytes);
 }
-
 
 /**
  * @brief       ANSI-X963 KDF function.
@@ -103,16 +97,12 @@ unsigned int ansi_x963_kdf_core(HASH_ALG hash_alg, unsigned char *Z, unsigned in
            output parameters, and set K2 and k2_bytes to NULL and 0 respectively.
   @endverbatim
  */
-unsigned int ansi_x963_2001_kdf(HASH_ALG hash_alg, unsigned char *Z, unsigned int Z_bytes,
-         unsigned char *shared_info, unsigned int shared_info_bytes, unsigned char *k1, unsigned int k1_bytes,
-        unsigned char *k2, unsigned int k2_bytes)
+unsigned int ansi_x963_2001_kdf(HASH_ALG hash_alg, unsigned char *Z, unsigned int Z_bytes, unsigned char *shared_info, unsigned int shared_info_bytes, unsigned char *k1, unsigned int k1_bytes, unsigned char *k2, unsigned int k2_bytes)
 {
-    unsigned char counter[4] = {0x00,0x00,0x00,0x01};
+    unsigned char counter[4] = {0x00, 0x00, 0x00, 0x01};
 
-    return ansi_x963_kdf_core(hash_alg, Z, Z_bytes, counter, shared_info, shared_info_bytes,
-            k1, k1_bytes, k2, k2_bytes);
+    return ansi_x963_kdf_core(hash_alg, Z, Z_bytes, counter, shared_info, shared_info_bytes, k1, k1_bytes, k2, k2_bytes);
 }
-
 
 /**
  * @brief       NIST-SP800-56A-Concatenation-KDF function
@@ -136,17 +126,12 @@ unsigned int ansi_x963_2001_kdf(HASH_ALG hash_alg, unsigned char *Z, unsigned in
            output parameters, and set K2 and k2_bytes to NULL and 0 respectively.
   @endverbatim
  */
-unsigned int nist_sp800_56a_concatenation_kdf(HASH_ALG hash_alg, unsigned char *Z, unsigned int Z_bytes,
-        unsigned char *other_info, unsigned int other_info_bytes, unsigned char *k1, unsigned int k1_bytes,
-        unsigned char *k2, unsigned int k2_bytes)
+unsigned int nist_sp800_56a_concatenation_kdf(HASH_ALG hash_alg, unsigned char *Z, unsigned int Z_bytes, unsigned char *other_info, unsigned int other_info_bytes, unsigned char *k1, unsigned int k1_bytes, unsigned char *k2, unsigned int k2_bytes)
 {
-    unsigned char counter[4] = {0x00,0x00,0x00,0x01};
+    unsigned char counter[4] = {0x00, 0x00, 0x00, 0x01};
 
-    return ansi_x963_kdf_core(hash_alg, Z, Z_bytes, counter, other_info, other_info_bytes,
-            k1, k1_bytes, k2, k2_bytes);
+    return ansi_x963_kdf_core(hash_alg, Z, Z_bytes, counter, other_info, other_info_bytes, k1, k1_bytes, k2, k2_bytes);
 }
-
-
 
 /*************************************************************************************
  *                       KDF structure Implementation
@@ -163,21 +148,17 @@ void kdf_base_init(E_KDF_BASE *base_ctx, E_KDF_TYPE kdf_type)
 unsigned int ansi_x963_kdf_imp(E_KDF_BASE *self)
 {
     E_KDF_ANSI_X963_2001_CTX *kdf_ctx = (E_KDF_ANSI_X963_2001_CTX *)self;
-    unsigned int ret;
-//print_buf_U8(kdf_ctx->base.input,kdf_ctx->base.input_bytes, "msg");print_buf_U8(kdf_ctx->shared_info,kdf_ctx->shared_info_bytes, "msg");
-    ret = ansi_x963_2001_kdf(kdf_ctx->hash_alg, kdf_ctx->base.input, kdf_ctx->base.input_bytes,
-        kdf_ctx->shared_info, kdf_ctx->shared_info_bytes, kdf_ctx->base.out1,
-        kdf_ctx->base.out1_bytes, kdf_ctx->base.out2, kdf_ctx->base.out2_bytes);
-    if(HASH_SUCCESS == ret)
-    {//    print_buf_U8(kdf_ctx->base.out1,kdf_ctx->base.out1_bytes, "out1");print_buf_U8(kdf_ctx->base.out2,kdf_ctx->base.out2_bytes, "out2");
+    unsigned int              ret;
+    //print_buf_U8(kdf_ctx->base.input,kdf_ctx->base.input_bytes, "msg");print_buf_U8(kdf_ctx->shared_info,kdf_ctx->shared_info_bytes, "msg");
+    ret = ansi_x963_2001_kdf(kdf_ctx->hash_alg, kdf_ctx->base.input, kdf_ctx->base.input_bytes, kdf_ctx->shared_info, kdf_ctx->shared_info_bytes, kdf_ctx->base.out1, kdf_ctx->base.out1_bytes, kdf_ctx->base.out2, kdf_ctx->base.out2_bytes);
+    if (HASH_SUCCESS == ret) { //    print_buf_U8(kdf_ctx->base.out1,kdf_ctx->base.out1_bytes, "out1");print_buf_U8(kdf_ctx->base.out2,kdf_ctx->base.out2_bytes, "out2");
         return ECIES_SUCCESS;
+    } else {
+        ;
     }
-    else
-    {;}
 
     return ret;
 }
-
 
 /**
  * @brief       ANSI-X963 KDF CTX init.
@@ -195,38 +176,33 @@ unsigned int ansi_x963_kdf_imp(E_KDF_BASE *self)
  *       these two also must be initialized.
   @endverbatim
  */
-void ansi_x963_2001_kdf_init(E_KDF_ANSI_X963_2001_CTX *kdf_ctx,  unsigned char *shared_info,
-        unsigned int shared_info_bytes, HASH_ALG hash_alg)
+void ansi_x963_2001_kdf_init(E_KDF_ANSI_X963_2001_CTX *kdf_ctx, unsigned char *shared_info, unsigned int shared_info_bytes, HASH_ALG hash_alg)
 {
     kdf_base_init((E_KDF_BASE *)kdf_ctx, X963_KDF);
 
-    kdf_ctx->base.kdf_fun_imp  = ansi_x963_kdf_imp;
+    kdf_ctx->base.kdf_fun_imp = ansi_x963_kdf_imp;
 
     kdf_ctx->shared_info       = shared_info;
     kdf_ctx->shared_info_bytes = shared_info_bytes;
     kdf_ctx->hash_alg          = hash_alg;
 }
 
-
-
 /*************************************************************************************
  *                       ENC structure Implementation
  *************************************************************************************/
 
-void enc_base_init(E_ENC_BASE *base_ctx, unsigned int key_bytes,  unsigned char *input, unsigned int input_bytes,
-        ENC_TYPE type)
+void enc_base_init(E_ENC_BASE *base_ctx, unsigned int key_bytes, unsigned char *input, unsigned int input_bytes, ENC_TYPE type)
 {
     memset_((unsigned char *)base_ctx, 0, sizeof(E_ENC_BASE));
 
     //no base_ctx->key, since enc key depends on ENC_TYPE
     //no base_ctx->output, since this depends on 1st part of the whole output(when encrypting)
     //no base_ctx->output_bytes, since this is encryption or decryption output
-    base_ctx->key_bytes    = key_bytes;
-    base_ctx->input        = input;
-    base_ctx->input_bytes  = input_bytes;
-    base_ctx->enc_type     = type;
+    base_ctx->key_bytes   = key_bytes;
+    base_ctx->input       = input;
+    base_ctx->input_bytes = input_bytes;
+    base_ctx->enc_type    = type;
 }
-
 
 unsigned int xor_enc_imp(E_ENC_BASE *self)
 {
@@ -237,7 +213,6 @@ unsigned int xor_enc_imp(E_ENC_BASE *self)
 
     return ECIES_SUCCESS;
 }
-
 
 /**
  * @brief       XOR Encryption ENC CTX init.
@@ -253,14 +228,12 @@ unsigned int xor_enc_imp(E_ENC_BASE *self)
            key, output
   @endverbatim
  */
-void e_xor_enc_init(E_XOR_ENC_CTX *enc_ctx,  unsigned char *input, unsigned int input_bytes)
+void e_xor_enc_init(E_XOR_ENC_CTX *enc_ctx, unsigned char *input, unsigned int input_bytes)
 {
     enc_base_init((E_ENC_BASE *)enc_ctx, input_bytes, input, input_bytes, XOR_ENC);
     enc_ctx->base.enc_fun_imp = xor_enc_imp;
     enc_ctx->base.dec_fun_imp = xor_enc_imp;
 }
-
-
 
 /*************************************************************************************
  *                       MAC structure Implementation
@@ -270,14 +243,14 @@ void mac_base_init(E_MAC_BASE *base_ctx, unsigned char *key, unsigned int key_by
 {
     memset_((unsigned char *)base_ctx, 0, sizeof(E_MAC_BASE));
 
-    base_ctx->key         = key;
-    base_ctx->key_bytes   = key_bytes;
+    base_ctx->key       = key;
+    base_ctx->key_bytes = key_bytes;
 }
 
 unsigned int hmac_imp(E_MAC_BASE *self)
 {
-    E_HMAC_CTX *ctx;
-    HASH_NODE node[2];
+    E_HMAC_CTX  *ctx;
+    HASH_NODE    node[2];
     unsigned int ret;
 
     ctx = (E_HMAC_CTX *)self;
@@ -286,18 +259,16 @@ unsigned int hmac_imp(E_MAC_BASE *self)
     node[0].msg_bytes = ctx->base.msg_bytes;
     node[1].msg_addr  = ctx->base.appendix;
     node[1].msg_bytes = ctx->base.appendix_bytes;
-//print_buf_U8(node[0].msg_addr, node[0].msg_bytes, "msg");print_buf_U8(node[1].msg_addr, node[1].msg_bytes, "msg");print_buf_U8(ctx->base.key, ctx->base.key_bytes, "key");
-    ret = hmac_node_steps(ctx->hash_alg, ctx->base.key, 0, ctx->base.key_bytes, node, 2, ctx->base.mac);//print_buf_U8(ctx->base.mac, ctx->base.mac_bytes, "mac");
-    if(HASH_SUCCESS == ret)
-    {
+    //print_buf_U8(node[0].msg_addr, node[0].msg_bytes, "msg");print_buf_U8(node[1].msg_addr, node[1].msg_bytes, "msg");print_buf_U8(ctx->base.key, ctx->base.key_bytes, "key");
+    ret = hmac_node_steps(ctx->hash_alg, ctx->base.key, 0, ctx->base.key_bytes, node, 2, ctx->base.mac); //print_buf_U8(ctx->base.mac, ctx->base.mac_bytes, "mac");
+    if (HASH_SUCCESS == ret) {
         return ECIES_SUCCESS;
+    } else {
+        ;
     }
-    else
-    {;}
 
     return ret;
 }
-
 
 /**
  * @brief       HMAC MAC CTX init.
@@ -315,8 +286,7 @@ unsigned int hmac_imp(E_MAC_BASE *self)
           msg, msg_bytes, mac
   @endverbatim
  */
-void e_hmac_init(E_HMAC_CTX *mac_ctx, unsigned char *key_buffer, unsigned int key_bytes,  unsigned char *appendix,
-        unsigned int appendix_bytes, HASH_ALG hash_alg)
+void e_hmac_init(E_HMAC_CTX *mac_ctx, unsigned char *key_buffer, unsigned int key_bytes, unsigned char *appendix, unsigned int appendix_bytes, HASH_ALG hash_alg)
 {
     mac_base_init((E_MAC_BASE *)mac_ctx, key_buffer, key_bytes);
 
@@ -327,15 +297,14 @@ void e_hmac_init(E_HMAC_CTX *mac_ctx, unsigned char *key_buffer, unsigned int ke
     mac_ctx->base.appendix_bytes = appendix_bytes;
     mac_ctx->base.mac_imp        = hmac_imp;
 
-    mac_ctx->hash_alg            = hash_alg;
+    mac_ctx->hash_alg = hash_alg;
 }
-
 
 /*************************************************************************************
   *                       ECIES function Implementation
   *************************************************************************************/
 
-#ifdef ECIES_SUPPORT_EC_POINT_COMPRESSED
+    #ifdef ECIES_SUPPORT_EC_POINT_COMPRESSED
 /**
  * @brief    private function.
  *           lucas sequences:
@@ -355,11 +324,10 @@ void e_hmac_init(E_HMAC_CTX *mac_ctx, unsigned char *key_buffer, unsigned int ke
       -# 1. k can not be zero
   @endverbatim
  */
-unsigned int lucas_sequences(unsigned int *p, unsigned int *P, unsigned int *Q, unsigned int *k, unsigned int pBitLen,
-        unsigned int *u, unsigned int *v)
+unsigned int lucas_sequences(unsigned int *p, unsigned int *P, unsigned int *Q, unsigned int *k, unsigned int pBitLen, unsigned int *u, unsigned int *v)
 {
     unsigned int delta[ECCP_MAX_WORD_LEN];
-    unsigned int inv_2[ECCP_MAX_WORD_LEN];  //2^(-1) mod p
+    unsigned int inv_2[ECCP_MAX_WORD_LEN]; //2^(-1) mod p
     unsigned int tmp1[ECCP_MAX_WORD_LEN];
     unsigned int tmp2[ECCP_MAX_WORD_LEN];
     unsigned int tmp3[ECCP_MAX_WORD_LEN];
@@ -368,53 +336,48 @@ unsigned int lucas_sequences(unsigned int *p, unsigned int *P, unsigned int *Q, 
 
     //get inv_2 = 2 ^ (-1) mod p
     inv_2[0] = 2;
-    ret = pke_modinv(p, inv_2, inv_2, pWordLen, 1);
-    if(PKE_SUCCESS != ret)
-    {
+    ret      = pke_modinv(p, inv_2, inv_2, pWordLen, 1);
+    if (PKE_SUCCESS != ret) {
         goto END;
+    } else {
+        ;
     }
-    else
-    {;}
 
     /*********** get delta = (P ^ 2 - 4 * Q) mod p ***********/
     // delta = (P ^ 2) mod p
     ret = pke_modmul(p, P, P, delta, pWordLen);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         goto END;
+    } else {
+        ;
     }
-    else
-    {;}
 
     // tmp1 = (4 * Q) mod p
     uint32_clear(tmp1, pWordLen);
     tmp1[0] = 4;
-    ret = pke_modmul_internal(tmp1, Q, tmp1, pWordLen);
-    if(PKE_SUCCESS != ret)
-    {
+    ret     = pke_modmul_internal(tmp1, Q, tmp1, pWordLen);
+    if (PKE_SUCCESS != ret) {
         goto END;
+    } else {
+        ;
     }
-    else
-    {;}
 
     // delta = (P ^ 2) - (4 * Q) mod p
     ret = pke_modsub(p, delta, tmp1, delta, pWordLen);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         goto END;
+    } else {
+        ;
     }
-    else
-    {;}
 
     /*********** traversal k binary ***********/
     //set u1 and v1
-    uint32_clear(u, pWordLen);     //u = 1
+    uint32_clear(u, pWordLen);   //u = 1
     u[0] = 1;
-    uint32_copy(v, P, pWordLen);   //v = P
+    uint32_copy(v, P, pWordLen); //v = P
 
-    i = get_valid_bits(( unsigned int *)k, pWordLen);
-    if(0 == i)
-    {
+    i = get_valid_bits((unsigned int *)k, pWordLen);
+    if (0 == i) {
         //set u0 and v0
         u[0] = 0;                  //u = 0
         uint32_clear(v, pWordLen); //v = 2
@@ -422,139 +385,124 @@ unsigned int lucas_sequences(unsigned int *p, unsigned int *P, unsigned int *Q, 
 
         ret = PKE_SUCCESS;
         goto END;
+    } else {
+        ;
     }
-    else
-    {;}
 
     i--;
-    while(0U != (i--))
-    {
+    while (0U != (i--)) {
         /*********** (u,v)=(uv mod p, (v^2 + delta*u^2)/2 mod p) ***********/
         //tmp3 = (u * v) mod p ------ (u)
         ret = pke_modmul_internal(u, v, tmp3, pWordLen);
-        if(PKE_SUCCESS != ret)
-        {
+        if (PKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
         // tmp1 = (v ^ 2) mod p
         ret = pke_modmul_internal(v, v, tmp1, pWordLen);
-        if(PKE_SUCCESS != ret)
-        {
+        if (PKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
         //tmp2 = u ^ 2 mod p
         ret = pke_modmul_internal(u, u, tmp2, pWordLen);
-        if(PKE_SUCCESS != ret)
-        {
+        if (PKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
         //tmp2 = delta * (u ^ 2) mod p
         ret = pke_modmul_internal(delta, tmp2, tmp2, pWordLen);
-        if(PKE_SUCCESS != ret)
-        {
+        if (PKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
         //tmp2 = (v ^ 2) + delta * (u ^ 2) mod p
         ret = pke_modadd(p, tmp1, tmp2, tmp2, pWordLen);
-        if(PKE_SUCCESS != ret)
-        {
+        if (PKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
         //v = tmp2/2 mod p
         ret = pke_modmul_internal(tmp2, inv_2, v, pWordLen);
-        if(PKE_SUCCESS != ret)
-        {
+        if (PKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
         uint32_copy(u, tmp3, pWordLen);
 
-        if(get_bit_value_by_index(( unsigned int *)k, i))
-        {
+        if (get_bit_value_by_index((unsigned int *)k, i)) {
             /*********** (u, v) = ((Pu + v)/2 mod p, (Pv + delta * u)/2 mod p) ***********/
             //tmp1 = P * u mod p
             ret = pke_modmul_internal(P, u, tmp1, pWordLen);
-            if(PKE_SUCCESS != ret)
-            {
+            if (PKE_SUCCESS != ret) {
                 goto END;
+            } else {
+                ;
             }
-            else
-            {;}
 
             //tmp2 = (P * u + v) mod p
             ret = pke_modadd(p, tmp1, v, tmp2, pWordLen);
-            if(PKE_SUCCESS != ret)
-            {
+            if (PKE_SUCCESS != ret) {
                 goto END;
+            } else {
+                ;
             }
-            else
-            {;}
 
             //tmp3 = (P * u + v)/2 mod p ---- (u)
             ret = pke_modmul_internal(tmp2, inv_2, tmp3, pWordLen);
-            if(PKE_SUCCESS != ret)
-            {
+            if (PKE_SUCCESS != ret) {
                 goto END;
+            } else {
+                ;
             }
-            else
-            {;}
 
             //v = (P * v + delta * u) / 2 mod p
             // tmp2 = (P * v) mod p
             ret = pke_modmul_internal(P, v, tmp2, pWordLen);
-            if(PKE_SUCCESS != ret)
-            {
+            if (PKE_SUCCESS != ret) {
                 goto END;
+            } else {
+                ;
             }
-            else
-            {;}
 
             //tmp1 = (delta * u) mod p
             ret = pke_modmul_internal(delta, u, tmp1, pWordLen);
-            if(PKE_SUCCESS != ret)
-            {
+            if (PKE_SUCCESS != ret) {
                 goto END;
+            } else {
+                ;
             }
-            else
-            {;}
 
             //tmp2 = (P * v + delta * u) mod p
             ret = pke_modadd(p, tmp2, tmp1, tmp2, pWordLen);
-            if(PKE_SUCCESS != ret)
-            {
+            if (PKE_SUCCESS != ret) {
                 goto END;
+            } else {
+                ;
             }
-            else
-            {;}
 
             //v = (P * v + delta * u)/2 mod p
             ret = pke_modmul_internal(tmp2, inv_2, v, pWordLen);
-            if(PKE_SUCCESS != ret)
-            {
+            if (PKE_SUCCESS != ret) {
                 goto END;
+            } else {
+                ;
             }
-            else
-            {;}
             uint32_copy(u, tmp3, pWordLen);
+        } else {
+            ;
         }
-        else
-        {;}
     }
 
     ret = PKE_SUCCESS;
@@ -569,7 +517,6 @@ END:
 
     return ret;
 }
-
 
 /**
  * @brief    private function.
@@ -598,22 +545,20 @@ unsigned int quadratic_residue(unsigned int *p, unsigned int *a, unsigned int pB
 
     uint32_clear(flex_num, ECCP_MAX_WORD_LEN);
 
-    //set mod p
-#if (defined(PKE_LP) || defined(PKE_SECURE))
+        //set mod p
+        #if (defined(PKE_LP) || defined(PKE_SECURE))
     ret = pke_pre_calc_mont(p, pBitLen, NULL, NULL);
-#else
+        #else
     ret = pke_pre_calc_mont(p, pBitLen, NULL);
-#endif
-    if(PKE_SUCCESS != ret)
-    {
+        #endif
+    if (PKE_SUCCESS != ret) {
         goto END;
+    } else {
+        ;
     }
-    else
-    {;}
 
     // p = 3 mod 4 ?
-    if((p[0] & 0x00000003U) == 0x00000003U)
-    {
+    if ((p[0] & 0x00000003U) == 0x00000003U) {
         // 4 * u + 3 = p ---- u = ?
         // u = p - 3
         uint32_copy(u, p, pWordLen);
@@ -623,46 +568,39 @@ unsigned int quadratic_residue(unsigned int *p, unsigned int *a, unsigned int pB
 
         //tmp = u + 1
         flex_num[0] = 1;
-        ret = pke_add(u, flex_num, tmp, pWordLen);
-        if(PKE_SUCCESS != ret)
-        {
+        ret         = pke_add(u, flex_num, tmp, pWordLen);
+        if (PKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
         //u = a ^ (u+1) mod p
         ret = pke_modexp(p, tmp, a, u, pWordLen, pWordLen);
-        if(PKE_SUCCESS != ret)
-        {
+        if (PKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
-        // tmp = (u ^ 2) mod p
-#if (defined(PKE_LP) || defined(PKE_SECURE))
+            // tmp = (u ^ 2) mod p
+        #if (defined(PKE_LP) || defined(PKE_SECURE))
         pke_set_exe_cfg(PKE_EXE_CFG_ALL_NON_MONT);
-#endif
+        #endif
         ret = pke_modmul_internal(u, u, tmp, pWordLen);
-        if(PKE_SUCCESS != ret)
-        {
+        if (PKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
-        if(0 == uint32_BigNumCmp(tmp, pWordLen, a, pWordLen))
-        {
+        if (0 == uint32_BigNumCmp(tmp, pWordLen, a, pWordLen)) {
             uint32_copy(x, u, pWordLen);
             ret = PKE_SUCCESS;
-        }
-        else
-        {
+        } else {
             ret = PKE_ERROR;
         }
-    }
-    else if((p[0] & 0x00000007U) == 0x00000005U)// p = 5 mod 8 ?
+    } else if ((p[0] & 0x00000007U) == 0x00000005U) // p = 5 mod 8 ?
     {
         // p = 8 * u + 5 ---- u = ?
         // u = p - 5
@@ -673,183 +611,158 @@ unsigned int quadratic_residue(unsigned int *p, unsigned int *a, unsigned int pB
 
         // tmp = (2 * a) mod p
         ret = pke_modadd(p, a, a, tmp, pWordLen);
-        if(PKE_SUCCESS != ret)
-        {
+        if (PKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
         // gama = (tmp ^ u) mod p
         ret = pke_modexp(p, u, tmp, gama, pWordLen, pWordLen);
-        if(PKE_SUCCESS != ret)
-        {
+        if (PKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
-        /*********** i = 2 * a * (gama ^ 2) mod p ***********/
-        // u = gama ^ 2 mod p
-#if (defined(PKE_LP) || defined(PKE_SECURE))
+            /*********** i = 2 * a * (gama ^ 2) mod p ***********/
+            // u = gama ^ 2 mod p
+        #if (defined(PKE_LP) || defined(PKE_SECURE))
         pke_set_exe_cfg(PKE_EXE_CFG_ALL_NON_MONT);
-#endif
+        #endif
         ret = pke_modmul_internal(gama, gama, u, pWordLen);
-        if(PKE_SUCCESS != ret)
-        {
+        if (PKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
         // i = tmp * u mod p
         ret = pke_modmul_internal(tmp, u, i, pWordLen);
-        if(PKE_SUCCESS != ret)
-        {
+        if (PKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
         /*********** x = a * gama * (i - 1) mod p ***********/
         // tmp = (i - 1)
         flex_num[0] = 1;
-        ret = pke_sub(i, flex_num, tmp, pWordLen);
-        if(PKE_SUCCESS != ret)
-        {
+        ret         = pke_sub(i, flex_num, tmp, pWordLen);
+        if (PKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
         // u = gama * (i - 1) mod p
         ret = pke_modmul_internal(gama, tmp, u, pWordLen);
-        if(PKE_SUCCESS != ret)
-        {
+        if (PKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
         // x = a * u mod p
         ret = pke_modmul_internal(a, u, x, pWordLen);
-        if(PKE_SUCCESS != ret)
-        {
+        if (PKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
         // tmp = x ^ 2 mod p
         ret = pke_modmul_internal(x, x, tmp, pWordLen);
-        if(PKE_SUCCESS != ret)
-        {
+        if (PKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
-        if(0 == uint32_BigNumCmp(tmp, pWordLen, a, pWordLen))
-        {
+        if (0 == uint32_BigNumCmp(tmp, pWordLen, a, pWordLen)) {
             ret = PKE_SUCCESS;
-        }
-        else
-        {
+        } else {
             ret = PKE_ERROR;
         }
-    }
-    else if((p[0] & 0x00000003U) == 0x00000001U)// p = 1 mod 4
+    } else if ((p[0] & 0x00000003U) == 0x00000001U) // p = 1 mod 4
     {
         //set i = 2 * u + 1, here p = 4 * u + 1
         uint32_copy(i, p, pWordLen);
         (void)Big_Div2n(i, pWordLen, 1);
         i[0] |= 1;
 
-        //set x = 4 * a mod p
-#if (defined(PKE_LP) || defined(PKE_SECURE))
+            //set x = 4 * a mod p
+        #if (defined(PKE_LP) || defined(PKE_SECURE))
         pke_set_exe_cfg(PKE_EXE_CFG_ALL_NON_MONT);
-#endif
+        #endif
         flex_num[0] = 4;
-        ret = pke_modmul_internal(flex_num, a, x, pWordLen);
-        if(PKE_SUCCESS != ret)
-        {
+        ret         = pke_modmul_internal(flex_num, a, x, pWordLen);
+        if (PKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
         //flex_num = 2^(-1) mod p
         flex_num[0] = 2;
-        ret = pke_modinv(p, flex_num, flex_num, pWordLen, 1);
-        if(PKE_SUCCESS != ret)
-        {
+        ret         = pke_modinv(p, flex_num, flex_num, pWordLen, 1);
+        if (PKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
-        while(1)
-        {
+        while (1) {
             //generate random num in [0, p - 1]
             ret = get_rand((unsigned char *)tmp, GET_BYTE_LEN(pBitLen));
-            if(TRNG_SUCCESS != ret)
-            {
+            if (TRNG_SUCCESS != ret) {
                 goto END;
+            } else {
+                ;
             }
-            else
-            {;}
 
-            if(tmp[pWordLen - 1] >= p[pWordLen - 1])
-            {
-               tmp[pWordLen - 1] = p[pWordLen - 1] - 1;
+            if (tmp[pWordLen - 1] >= p[pWordLen - 1]) {
+                tmp[pWordLen - 1] = p[pWordLen - 1] - 1;
+            } else {
+                ;
             }
-            else
-            {;}
 
             // u --> U gama--> V
             ret = lucas_sequences(p, tmp, a, i, pBitLen, u, gama);
-            if(PKE_SUCCESS != ret)
-            {
+            if (PKE_SUCCESS != ret) {
                 goto END;
+            } else {
+                ;
             }
-            else
-            {;}
 
             // tmp = gama ^ 2 mod p
             ret = pke_modmul_internal(gama, gama, tmp, pWordLen);
-            if(PKE_SUCCESS != ret)
-            {
+            if (PKE_SUCCESS != ret) {
                 goto END;
+            } else {
+                ;
             }
-            else
-            {;}
 
             // gama ^ 2 = 4 * a mod p ?
-            if(0 == uint32_BigNumCmp(tmp, pWordLen, x, pWordLen))
-            {
+            if (0 == uint32_BigNumCmp(tmp, pWordLen, x, pWordLen)) {
                 //x = V/2 mod p
                 ret = pke_modmul_internal(gama, flex_num, x, pWordLen);
-                if(PKE_SUCCESS != ret)
-                {
+                if (PKE_SUCCESS != ret) {
                     goto END;
+                } else {
+                    ;
                 }
-                else
-                {;}
 
                 ret = PKE_SUCCESS;
                 break;
-            }
-            else if((Bigint_Check_1(u, pWordLen) != 1u) && (Bigint_Check_p_1(u, p, pWordLen) != 1u))
-            {
+            } else if ((Bigint_Check_1(u, pWordLen) != 1u) && (Bigint_Check_p_1(u, p, pWordLen) != 1u)) {
                 ret = PKE_ERROR;
                 break;
+            } else {
+                ;
             }
-            else
-            {;}
         }
-    }
-    else
-    {
+    } else {
         ret = PKE_ERROR;
     }
 
@@ -863,7 +776,7 @@ END:
 
     return ret;
 }
-#endif
+    #endif
 
 
 /**
@@ -883,29 +796,27 @@ END:
            length of curve parameter p
   @endverbatim
  */
-unsigned int point_to_octet_string_conversion( eccp_curve_t *curve, unsigned char *x, unsigned char *y,
-        EC_POINT_FORM point_form, unsigned char *result, unsigned int *r_bytes)
+unsigned int point_to_octet_string_conversion(eccp_curve_t *curve, unsigned char *x, unsigned char *y, EC_POINT_FORM point_form, unsigned char *result, unsigned int *r_bytes)
 {
     unsigned int pByteLen = GET_BYTE_LEN(curve->eccp_p_bitLen);
     unsigned int ret;
 
-    memcpy_(result+1, (unsigned char *)x, pByteLen);
+    memcpy_(result + 1, (unsigned char *)x, pByteLen);
 
-    switch(point_form)
-    {
-#ifdef ECIES_SUPPORT_EC_POINT_COMPRESSED
+    switch (point_form) {
+    #ifdef ECIES_SUPPORT_EC_POINT_COMPRESSED
     case POINT_COMPRESSED:
-        result[0] = POINT_COMPRESSED | (y[pByteLen-1] & 0x00000001);
-        *r_bytes = 1 + pByteLen;
-        ret = PKE_SUCCESS;
+        result[0] = POINT_COMPRESSED | (y[pByteLen - 1] & 0x00000001);
+        *r_bytes  = 1 + pByteLen;
+        ret       = PKE_SUCCESS;
         break;
-#endif
+    #endif
 
     case POINT_UNCOMPRESSED:
         result[0] = POINT_UNCOMPRESSED;
-        memcpy_(result+1+pByteLen, (unsigned char *)y, pByteLen);
+        memcpy_(result + 1 + pByteLen, (unsigned char *)y, pByteLen);
         *r_bytes = 1 + 2 * pByteLen;
-        ret = PKE_SUCCESS;
+        ret      = PKE_SUCCESS;
         break;
 
     default:
@@ -915,7 +826,6 @@ unsigned int point_to_octet_string_conversion( eccp_curve_t *curve, unsigned cha
 
     return ret;
 }
-
 
 /**
  * @brief       The representation value of the curve point (x, y) obtained through the
@@ -927,105 +837,94 @@ unsigned int point_to_octet_string_conversion( eccp_curve_t *curve, unsigned cha
  * @param[out]  y            - y coordinate of curve point, U32 little-endian.
  * @return      0:success     other:error
  */
- unsigned int octet_string_to_point_conversion( eccp_curve_t *curve, unsigned char* encode, unsigned int *x, unsigned int *y)
- {
+unsigned int octet_string_to_point_conversion(eccp_curve_t *curve, unsigned char *encode, unsigned int *x, unsigned int *y)
+{
     unsigned int z[ECCP_MAX_WORD_LEN];
     unsigned int pWordLen = GET_WORD_LEN(curve->eccp_p_bitLen);
     unsigned int pByteLen = GET_BYTE_LEN(curve->eccp_p_bitLen);
-    unsigned int ret = PKE_ERROR;
+    unsigned int ret      = PKE_ERROR;
 
     //little endian -> big endian
     reverse_byte_array(encode + 1, (unsigned char *)x, pByteLen);
 
-#ifdef ECIES_SUPPORT_EC_POINT_COMPRESSED
-    if((POINT_COMPRESSED == encode[0]) || ((POINT_COMPRESSED+1) == encode[0]))
-    {
+    #ifdef ECIES_SUPPORT_EC_POINT_COMPRESSED
+    if ((POINT_COMPRESSED == encode[0]) || ((POINT_COMPRESSED + 1) == encode[0])) {
         // z = x^3 + ax + b = x(x^2+a) + b mod p
         ret = pke_modmul(curve->eccp_p, x, x, z, pWordLen);
-        if(PKE_SUCCESS != ret)
-        {
+        if (PKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
         ret = pke_modadd(curve->eccp_p, curve->eccp_a, z, z, pWordLen);
-        if(PKE_SUCCESS != ret)
-        {
+        if (PKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
         ret = pke_modmul_internal(x, z, z, pWordLen);
-        if(PKE_SUCCESS != ret)
-        {
+        if (PKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
         ret = pke_modadd(curve->eccp_p, curve->eccp_b, z, z, pWordLen);
-        if(PKE_SUCCESS != ret)
-        {
+        if (PKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
         ret = quadratic_residue(curve->eccp_p, z, curve->eccp_p_bitLen, y);
-        if(PKE_SUCCESS != ret)
-        {
+        if (PKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
-        if((y[0] & 0x00000001) != (encode[0] - POINT_COMPRESSED))
-        {
+        if ((y[0] & 0x00000001) != (encode[0] - POINT_COMPRESSED)) {
             // y = p - y
             ret = pke_sub(curve->eccp_p, y, y, pWordLen);
-            if(PKE_SUCCESS != ret)
-            {
+            if (PKE_SUCCESS != ret) {
                 goto END;
+            } else {
+                ;
             }
-            else
-            {;}
+        } else {
+            ;
         }
-        else
-        {;}
 
         ret = PKE_SUCCESS;
         goto END;
+    } else {
+        ;
     }
-    else
-    {;}
-#endif
+    #endif
 
-    if(POINT_UNCOMPRESSED == encode[0])
-    {
+    if (POINT_UNCOMPRESSED == encode[0]) {
         reverse_byte_array(encode + 1 + pByteLen, (unsigned char *)y, pByteLen);
         ret = PKE_SUCCESS;
         goto END;
+    } else {
+        ;
     }
-    else
-    {;}
 
 END:
 
     uint32_clear(z, pWordLen);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         ret = PKE_ERROR;
+    } else {
+        ;
     }
-    else
-    {;}
 
     return ret;
 }
 
-
- /**
+/**
  * @brief       get the 1st part(a point) byte length in ECIES ciphertext.
  * @param[in]   curve            - ecc curve struct pointer, please make sure it is valid.
  * @param[in]   cipher           - ECIES ciphertext.
@@ -1033,25 +932,25 @@ END:
  * @param[out]  point_bytes      - the 1st part(a point) byte length in cipher.
  * @return      0:success     other:error
  */
-unsigned int ansi_x963_get_point_byte_len_from_ciphertext( eccp_curve_t *curve, unsigned char *cipher,
-        unsigned int cipher_bytes, unsigned int *point_bytes)
- {
+unsigned int ansi_x963_get_point_byte_len_from_ciphertext(eccp_curve_t *curve, unsigned char *cipher, unsigned int cipher_bytes, unsigned int *point_bytes)
+{
     unsigned int pByteLen = GET_BYTE_LEN(curve->eccp_p_bitLen);
     unsigned int ret;
     (void)cipher_bytes;
 
-    switch(cipher[0])
-    {
-#ifdef ECIES_SUPPORT_EC_POINT_COMPRESSED
+    switch (cipher[0]) {
+    #ifdef ECIES_SUPPORT_EC_POINT_COMPRESSED
     case POINT_COMPRESSED:
-    case (POINT_COMPRESSED+1):
-        *point_bytes = pByteLen + 1;;
+    case (POINT_COMPRESSED + 1):
+        *point_bytes = pByteLen + 1;
+        ;
         ret = PKE_SUCCESS;
         break;
-#endif
+    #endif
 
     case POINT_UNCOMPRESSED:
-        *point_bytes = 2 * pByteLen + 1;;
+        *point_bytes = 2 * pByteLen + 1;
+        ;
         ret = PKE_SUCCESS;
         break;
 
@@ -1063,20 +962,17 @@ unsigned int ansi_x963_get_point_byte_len_from_ciphertext( eccp_curve_t *curve, 
     return ret;
 }
 
-
-
 /*************************************************************************************
  *                       ECIES structure Implementation
  *************************************************************************************/
 
 void ecies_ansi_x963_ctx_init(ECIES_STD *ctx, ECIES_ENC_MAC_KEY_ORDER enc_mac_key_order)
 {
-    ctx->type_flag = ANSI_X963;
-    ctx->enc_mac_key_order = enc_mac_key_order;
+    ctx->type_flag                     = ANSI_X963;
+    ctx->enc_mac_key_order             = enc_mac_key_order;
     ctx->get_point_len_from_ciphertext = ansi_x963_get_point_byte_len_from_ciphertext;
-    ctx->point_decompress = octet_string_to_point_conversion;
-    ctx->point_compress = point_to_octet_string_conversion;
+    ctx->point_decompress              = octet_string_to_point_conversion;
+    ctx->point_compress                = point_to_octet_string_conversion;
 }
 
 #endif
-

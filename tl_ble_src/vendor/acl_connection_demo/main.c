@@ -27,11 +27,11 @@
 #include "app.h"
 #include "app_config.h"
 
-#if(FREERTOS_ENABLE)
-#include "tlk_riscv.h"
-#include <FreeRTOS.h>
-#include <task.h>
-#include "app_freertos.h"
+#if (FREERTOS_ENABLE)
+    #include "tlk_riscv.h"
+    #include <FreeRTOS.h>
+    #include <task.h>
+    #include "app_freertos.h"
 #endif
 
 /**
@@ -43,14 +43,18 @@ _attribute_ram_code_ void rf_irq_handler(void)
 {
     DBG_CHN14_HIGH;
 
-    blc_sdk_irq_handler ();
+    blc_sdk_irq_handler();
 
     DBG_CHN14_LOW;
 }
 #if (FREERTOS_ENABLE)
 PLIC_ISR_REGISTER_OS(rf_irq_handler, IRQ_ZB_RT)
 #else
+    #ifdef MCU_CORE_N22_ENABLE
+CLIC_ISR_REGISTER(rf_irq_handler, IRQ_ZB_RT)
+    #else
 PLIC_ISR_REGISTER(rf_irq_handler, IRQ_ZB_RT)
+    #endif
 #endif
 /**
  * @brief       System timer interrupt handler.
@@ -61,14 +65,18 @@ _attribute_ram_code_ void stimer_irq_handler(void)
 {
     DBG_CHN15_HIGH;
 
-    blc_sdk_irq_handler ();
+    blc_sdk_irq_handler();
 
     DBG_CHN15_LOW;
 }
 #if (FREERTOS_ENABLE)
 PLIC_ISR_REGISTER_OS(stimer_irq_handler, IRQ_SYSTIMER)
 #else
+    #ifdef MCU_CORE_N22_ENABLE
+CLIC_ISR_REGISTER(stimer_irq_handler, IRQ_SYSTIMER)
+    #else
 PLIC_ISR_REGISTER(stimer_irq_handler, IRQ_SYSTIMER)
+    #endif
 #endif
 
 
@@ -77,32 +85,55 @@ PLIC_ISR_REGISTER(stimer_irq_handler, IRQ_SYSTIMER)
  * @param[in]  none.
  * @return     none.
  */
- __INLINE void blc_app_system_init(void)
+__INLINE void blc_app_system_init(void)
 {
-    #if (MCU_CORE_TYPE == MCU_CORE_B91)
-        sys_init(DCDC_1P4_LDO_1P8, VBAT_MAX_VALUE_GREATER_THAN_3V6,INTERNAL_CAP_XTAL24M);
-        CCLK_48M_HCLK_48M_PCLK_24M;
-    #elif (MCU_CORE_TYPE == MCU_CORE_B92)
-        sys_init(DCDC_1P4_LDO_2P0, VBAT_MAX_VALUE_GREATER_THAN_3V6, GPIO_VOLTAGE_3V3, INTERNAL_CAP_XTAL24M);
-        wd_32k_stop();
-        CCLK_48M_HCLK_48M_PCLK_24M;
-    #elif (MCU_CORE_TYPE == MCU_CORE_TL721X)
-        sys_init(DCDC_0P94_DCDC_1P8,VBAT_MAX_VALUE_GREATER_THAN_3V6,INTERNAL_CAP_XTAL24M);
-        pm_update_status_info(1);
-        gpio_set_up_down_res(GPIO_SWS, GPIO_PIN_PULLUP_1M);
-        wd_32k_stop();
-        wd_stop();
-        PLL_240M_CCLK_48M_HCLK_48M_PCLK_48M_MSPI_48M;
-    #elif(MCU_CORE_TYPE == MCU_CORE_TL321X)
-         sys_init(DCDC_1P25_LDO_1P8, VBAT_MAX_VALUE_GREATER_THAN_3V6, INTERNAL_CAP_XTAL24M);
-        pm_update_status_info(1);
-        gpio_set_up_down_res(GPIO_SWS, GPIO_PIN_PULLUP_1M);
-        wd_32k_stop();
-        wd_stop();
-        PLL_192M_CCLK_48M_HCLK_24M_PCLK_24M_MSPI_48M;
+#if (MCU_CORE_TYPE == MCU_CORE_B91)
+    sys_init(DCDC_1P4_LDO_1P8, VBAT_MAX_VALUE_GREATER_THAN_3V6, INTERNAL_CAP_XTAL24M);
+    gpio_set_up_down_res(GPIO_SWS, GPIO_PIN_PULLUP_1M);
+    wd_stop();
+    CCLK_48M_HCLK_48M_PCLK_24M;
+#elif (MCU_CORE_TYPE == MCU_CORE_B92)
+    sys_init(DCDC_1P4_LDO_2P0, VBAT_MAX_VALUE_GREATER_THAN_3V6, GPIO_VOLTAGE_3V3, INTERNAL_CAP_XTAL24M);
+    pm_update_status_info(1);
+    gpio_set_up_down_res(GPIO_SWS, GPIO_PIN_PULLUP_1M);
+    wd_32k_stop();
+    CCLK_48M_HCLK_48M_PCLK_24M;
+#elif (MCU_CORE_TYPE == MCU_CORE_TL721X)
+    sys_init(DCDC_0P94_DCDC_1P8, VBAT_MAX_VALUE_GREATER_THAN_3V6, INTERNAL_CAP_XTAL24M);
+    pm_update_status_info(1);
+    gpio_set_up_down_res(GPIO_SWS, GPIO_PIN_PULLUP_1M);
+    wd_32k_stop();
+    wd_stop();
+    PLL_240M_CCLK_48M_HCLK_48M_PCLK_48M_MSPI_48M;
+#elif (MCU_CORE_TYPE == MCU_CORE_TL321X)
+    sys_init(DCDC_1P25_LDO_1P8, VBAT_MAX_VALUE_GREATER_THAN_3V6, INTERNAL_CAP_XTAL24M);
+    pm_update_status_info(1);
+    gpio_set_up_down_res(GPIO_SWS, GPIO_PIN_PULLUP_1M);
+    wd_32k_stop();
+    wd_stop();
+    PLL_192M_CCLK_48M_HCLK_24M_PCLK_24M_MSPI_48M;
+#elif (MCU_CORE_TYPE == MCU_CORE_TL322X)
+    #ifdef MCU_CORE_N22_ENABLE
+    clic_init();
+    rf_n22_dig_init();
+    /* These sys_clk parameters must remain consistent with the D25F configuration. */
+    sys_clk.pll_clk  = 144;
+    sys_clk.cclk     = 72;
+    sys_clk.hclk_n22 = 36;
+    sys_clk.pclk     = 36;
+    sys_clk.mspi_clk = 48;
+    debug_gpio_init();
     #endif
+#elif (MCU_CORE_TYPE == MCU_CORE_TL323X)
+    sys_init(LDO_1P25_LDO_1P8, VBAT_MAX_VALUE_GREATER_THAN_3V6, INTERNAL_CAP_XTAL24M);
+    gpio_set_up_down_res(GPIO_SWS, GPIO_PIN_PULLUP_1M);
+    wd_32k_stop();
+    wd_stop();
+//    PLL_240M_CCLK_120M_HCLK_60M_PCLK_60M_MSPI_48M;
+#else
+    #error "Not Supported Chip!!!"
+#endif
 }
-
 
 /**
  * @brief       This is main function
@@ -119,40 +150,39 @@ _attribute_ram_code_ int main(void)
     blc_app_system_init();
 
     /* detect if MCU is wake_up from deep retention mode */
-    int deepRetWakeUp = pm_is_MCU_deepRetentionWakeup();  //MCU deep retention wakeUp
-
+    int deepRetWakeUp = pm_is_MCU_deepRetentionWakeup(); //MCU deep retention wakeUp
 
 
     rf_drv_ble_init();
 
+#ifndef MCU_CORE_N22_ENABLE
     gpio_init(!deepRetWakeUp);
+#endif
 
-    if( deepRetWakeUp ){ //MCU wake_up from deepSleep retention mode
-        #if (FREERTOS_ENABLE)
+    if (deepRetWakeUp) { //MCU wake_up from deepSleep retention mode
+#if (FREERTOS_ENABLE)
         extern void vPortRestoreTick(void);
         vPortRestoreTick();
-        #endif
-        user_init_deepRetn ();
-    }
-    else{ //MCU power_on or wake_up from deepSleep mode
+#endif
+        user_init_deepRetn();
+    } else { //MCU power_on or wake_up from deepSleep mode
         user_init_normal();
     }
 
     irq_enable();
 
-#if(FREERTOS_ENABLE)
+#if (FREERTOS_ENABLE)
     app_TaskCreate();
 
     vTaskStartScheduler();
-    while(1);
+    while (1)
+        ;
 #else
 
-    while(1)
-    {
-        main_loop ();
+    while (1) {
+        main_loop();
     }
 
 #endif
     return 0;
 }
-

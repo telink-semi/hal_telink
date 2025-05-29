@@ -23,26 +23,25 @@
  *******************************************************************************************************/
 #pragma once
 
-typedef struct{
-
+typedef struct
+{
     gattc_sub_ccc_msg_t ntfInput;
 
     /* Characteristic value handle */
-    u16 featureHdl;                 /* OTS Feature */
-    u16 objectNameHdl;              /* Object Name */
-    u16 objectTypeHdl;              /* Object Type */
-    u16 objectSizeHdl;              /* Object Size */
-    u16 objectFirstCreatedHdl;      /* Object First Create */
-    u16 objectLastModifiedHdl;      /* Object Last Modified */
-    u16 objectIdHdl;                /* Object ID */
-    u16 objectPropertiesHdl;        /* Object Properties */
-    u16 objectActionControlPointHdl;/* Object Action Control Point */
-    u16 objectListControlPointHdl;  /* Object List Control Point */
-    u16 objectListFilterHdl;        /* Object List Filter */
-    u16 objectChangedHdl;           /* Object Changed */
+    u16 featureHdl;                  /* OTS Feature */
+    u16 objectNameHdl;               /* Object Name */
+    u16 objectTypeHdl;               /* Object Type */
+    u16 objectSizeHdl;               /* Object Size */
+    u16 objectFirstCreatedHdl;       /* Object First Create */
+    u16 objectLastModifiedHdl;       /* Object Last Modified */
+    u16 objectIdHdl;                 /* Object ID */
+    u16 objectPropertiesHdl;         /* Object Properties */
+    u16 objectActionControlPointHdl; /* Object Action Control Point */
+    u16 objectListControlPointHdl;   /* Object List Control Point */
+    u16 objectListFilterHdl;         /* Object List Filter */
+    u16 objectChangedHdl;            /* Object Changed */
 
     bool useFlag;
-    u8 reserved[3];
+    u8   reserved[3];
 
 } blc_ots_client_t;
-

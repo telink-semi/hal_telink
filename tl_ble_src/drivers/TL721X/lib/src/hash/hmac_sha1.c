@@ -28,9 +28,6 @@
 #include "lib/include/hash/hmac_sha1.h"
 
 
-
-
-
 #ifdef SUPPORT_HASH_SHA1
 
 
@@ -46,7 +43,6 @@ unsigned int hmac_sha1_init(HMAC_SHA1_CTX *ctx, unsigned char *key, unsigned sho
 {
     return hmac_init(ctx, HASH_SHA1, key, sp_key_idx, key_bytes);
 }
-
 
 /**
  * @brief       hmac-sha1 update message.
@@ -64,7 +60,6 @@ unsigned int hmac_sha1_update(HMAC_SHA1_CTX *ctx, const unsigned char *msg, unsi
     return hmac_update(ctx, msg, msg_bytes);
 }
 
-
 /**
  * @brief       hmac-sha1 update message.
  * @param[in]   ctx               - HMAC_CTX context pointer.
@@ -80,7 +75,6 @@ unsigned int hmac_sha1_final(HMAC_SHA1_CTX *ctx, unsigned char *mac)
 {
     return hmac_final(ctx, mac);
 }
-
 
 /**
  * @brief       input key and whole message, get the hmac.
@@ -102,7 +96,7 @@ unsigned int hmac_sha1(unsigned char *key, unsigned short sp_key_idx, unsigned i
 }
 
 
-#ifdef HASH_DMA_FUNCTION
+    #ifdef HASH_DMA_FUNCTION
 /**
  * @brief       input key and whole message, get the hmac.
  * @param[in]   ctx               - HMAC_SHA1_DMA_CTX context pointer.
@@ -112,8 +106,7 @@ unsigned int hmac_sha1(unsigned char *key, unsigned short sp_key_idx, unsigned i
  * @param[in]   callback          - callback function pointer.
  * @return      0:success     other:error
  */
-unsigned int hmac_sha1_dma_init(HMAC_SHA1_DMA_CTX *ctx, const unsigned char *key, unsigned short sp_key_idx, unsigned int key_bytes,
-        HASH_CALLBACK callback)
+unsigned int hmac_sha1_dma_init(HMAC_SHA1_DMA_CTX *ctx, const unsigned char *key, unsigned short sp_key_idx, unsigned int key_bytes, HASH_CALLBACK callback)
 {
     return hmac_dma_init(ctx, HASH_SHA1, key, sp_key_idx, key_bytes, callback);
 }
@@ -164,13 +157,12 @@ unsigned int hmac_sha1_dma_final(HMAC_SHA1_DMA_CTX *ctx, unsigned int *remainder
  * @param[in]   callback             - callback function pointer
  * @return      0:success     other:error
  */
-unsigned int hmac_sha1_dma(unsigned char *key, unsigned short sp_key_idx, unsigned int key_bytes, unsigned int *msg, unsigned int msg_bytes, unsigned int *mac,
-        HASH_CALLBACK callback)
+unsigned int hmac_sha1_dma(unsigned char *key, unsigned short sp_key_idx, unsigned int key_bytes, unsigned int *msg, unsigned int msg_bytes, unsigned int *mac, HASH_CALLBACK callback)
 {
     return hmac_dma(HASH_SHA1, key, sp_key_idx, key_bytes, msg, msg_bytes, mac, callback);
 }
 
-#endif
+    #endif
 
 
 #endif

@@ -27,24 +27,24 @@
 #include "vendor/common/user_config.h"
 
 
-
 #ifndef ACL_CENTRAL_CUSTOM_PAIR_ENABLE
-#define ACL_CENTRAL_CUSTOM_PAIR_ENABLE                  0
+    #define ACL_CENTRAL_CUSTOM_PAIR_ENABLE 0
 #endif
 
 
 #ifndef FLASH_CUSTOM_PAIRING_MAX_SIZE
-#define FLASH_CUSTOM_PAIRING_MAX_SIZE                   4096
+    #define FLASH_CUSTOM_PAIRING_MAX_SIZE 4096
 #endif
 
 
 /*!  Pair parameter manager type */
-typedef struct{
-    u8 manual_pair;
-    u8 mac_type;  //address type
-    u8 mac[6];
+typedef struct
+{
+    u8  manual_pair;
+    u8  mac_type; //address type
+    u8  mac[6];
     u32 pair_tick;
-}man_pair_t;
+} man_pair_t;
 
 extern man_pair_t blm_manPair;
 
@@ -66,7 +66,7 @@ void user_central_host_pairing_management_init(void);
  * @return     0:      invalid index
  *             others valid index
  */
-int user_tbl_peripheral_mac_search(u8 adr_type, u8 * adr);
+int user_tbl_peripheral_mac_search(u8 adr_type, u8 *adr);
 
 /**
  * @brief     Store bonding info to flash.
@@ -94,12 +94,11 @@ int user_tbl_peripheral_mac_delete_by_adr(u8 adr_type, u8 *adr);
 void user_tbl_peripheral_mac_delete_all(void);
 
 
-
 /* compatible with previous released SDK */
-#define user_master_host_pairing_management_init    user_central_host_pairing_management_init
-#define user_tbl_slave_mac_search                   user_tbl_peripheral_mac_search
-#define user_tbl_slave_mac_add                      user_tbl_peripheral_mac_add
-#define user_tbl_slave_mac_delete_by_adr            user_tbl_peripheral_mac_delete_by_adr
-#define user_tbl_slave_mac_delete_all               user_tbl_peripheral_mac_delete_all
+#define user_master_host_pairing_management_init user_central_host_pairing_management_init
+#define user_tbl_slave_mac_search                user_tbl_peripheral_mac_search
+#define user_tbl_slave_mac_add                   user_tbl_peripheral_mac_add
+#define user_tbl_slave_mac_delete_by_adr         user_tbl_peripheral_mac_delete_by_adr
+#define user_tbl_slave_mac_delete_all            user_tbl_peripheral_mac_delete_all
 
 #endif /* APP_PAIR_H_ */

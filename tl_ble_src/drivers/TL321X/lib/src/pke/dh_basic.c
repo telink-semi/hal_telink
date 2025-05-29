@@ -31,11 +31,9 @@
 
 #ifdef SUPPORT_DH
 
-#include "lib/include/pke/dh.h"
-#include "lib/include/trng/trng.h"
-#include "lib/include/crypto_common/utility.h"
-
-
+    #include "lib/include/pke/dh.h"
+    #include "lib/include/trng/trng.h"
+    #include "lib/include/crypto_common/utility.h"
 
 /**
  * @brief       DH parameters pointer init, set pointers of (p, q, g)
@@ -57,27 +55,19 @@
           (w+7)/8 bytes, here w is actually 32. if you do not have this, please set p_n0_buf to NULL.
   @endverbatim
  */
-unsigned int dh_param_pointer_init(DH_PARA *dh_para, unsigned int *p_buf, unsigned int p_bits, unsigned int *p_h_buf, 
-        unsigned int *p_n0_buf, unsigned int *q_buf, unsigned int q_bits, unsigned int *g_buf, unsigned int g_bits)
+unsigned int dh_param_pointer_init(DH_PARA *dh_para, unsigned int *p_buf, unsigned int p_bits, unsigned int *p_h_buf, unsigned int *p_n0_buf, unsigned int *q_buf, unsigned int q_bits, unsigned int *g_buf, unsigned int g_bits)
 {
-    if((NULL == dh_para) || (NULL == p_buf) || (NULL == q_buf) || (NULL == g_buf))
-    {
+    if ((NULL == dh_para) || (NULL == p_buf) || (NULL == q_buf) || (NULL == g_buf)) {
         return DH_POINTER_NULL;
-    }
-    else if((0 == p_bits) || (0 == q_bits) || (0 == g_bits))
-    {
+    } else if ((0 == p_bits) || (0 == q_bits) || (0 == g_bits)) {
         return DH_INVALID_INPUT;
-    }
-    else if((q_bits > p_bits) || (g_bits > p_bits))
-    {
+    } else if ((q_bits > p_bits) || (g_bits > p_bits)) {
         return DH_INVALID_INPUT;
-    }
-    else if(p_bits > DH_MAX_BIT_LEN)
-    {
+    } else if (p_bits > DH_MAX_BIT_LEN) {
         return DH_INVALID_INPUT;
+    } else {
+        ;
     }
-    else
-    {;}
 
     dh_para->p      = p_buf;
     dh_para->p_bits = p_bits;
@@ -90,7 +80,6 @@ unsigned int dh_param_pointer_init(DH_PARA *dh_para, unsigned int *p_buf, unsign
 
     return DH_SUCCESS;
 }
-
 
 /**
  * @brief       DH parameters value init, set pointers of (p, q, g)
@@ -117,84 +106,70 @@ unsigned int dh_param_value_init(DH_PARA *dh_para, unsigned char *p, unsigned ch
 {
     unsigned int pByteLen, qByteLen, gByteLen;
 
-    if((NULL == dh_para) || (NULL == p) || (NULL == q) || (NULL == g))
-    {
+    if ((NULL == dh_para) || (NULL == p) || (NULL == q) || (NULL == g)) {
         return DH_POINTER_NULL;
+    } else {
+        ;
     }
-    else
-    {;}
 
     pByteLen = GET_BYTE_LEN(dh_para->p_bits);
     qByteLen = GET_BYTE_LEN(dh_para->q_bits);
     gByteLen = GET_BYTE_LEN(dh_para->g_bits);
 
-    if(NULL != p_h)
-    {
-        if(NULL == dh_para->p_h)
-        {
+    if (NULL != p_h) {
+        if (NULL == dh_para->p_h) {
             return DH_POINTER_NULL;
-        }
-        else
-        {
+        } else {
             reverse_byte_array(p_h, (unsigned char *)dh_para->p_h, pByteLen);
         }
+    } else {
+        ;
     }
-    else
-    {;}
 
-    if(NULL != p_n0)
-    {
-        if(NULL == dh_para->p_n0)
-        {
+    if (NULL != p_n0) {
+        if (NULL == dh_para->p_n0) {
             return DH_POINTER_NULL;
-        }
-        else
-        {
+        } else {
             reverse_byte_array(p_n0, (unsigned char *)dh_para->p_n0, 1 << 2);
         }
+    } else {
+        ;
     }
-    else
-    {;}
 
     reverse_byte_array(p, (unsigned char *)dh_para->p, pByteLen);
     reverse_byte_array(q, (unsigned char *)dh_para->q, qByteLen);
     reverse_byte_array(g, (unsigned char *)dh_para->g, gByteLen);
 
     //p and q can not be even.
-    if((0u == (dh_para->p[0] & 1u)) || (0u == (dh_para->q[0] & 1u)))
-    {
+    if ((0u == (dh_para->p[0] & 1u)) || (0u == (dh_para->q[0] & 1u))) {
         return DH_INVALID_INPUT;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //to support p == dh_para->p
-    if(0u != (pByteLen & 3u))
-    {
+    if (0u != (pByteLen & 3u)) {
         memset_(((unsigned char *)dh_para->p) + pByteLen, 0, 4u - (pByteLen & 3u));
+    } else {
+        ;
     }
-    else
-    {;}
 
     //to support q == dh_para->q
-    if(0u != (qByteLen & 3u))
-    {
+    if (0u != (qByteLen & 3u)) {
         memset_(((unsigned char *)dh_para->q) + qByteLen, 0, 4u - (qByteLen & 3u));
+    } else {
+        ;
     }
-    else
-    {;}
 
     //to support g == dh_para->g
-    if(0u != (gByteLen & 3u))
-    {
+    if (0u != (gByteLen & 3u)) {
         memset_(((unsigned char *)dh_para->g) + gByteLen, 0, 4u - (gByteLen & 3u));
+    } else {
+        ;
     }
-    else
-    {;}
 
     return DH_SUCCESS;
 }
-
 
 /*
 unsigned int dh_parameter_check(DH_PARA *dh_para)
@@ -221,63 +196,50 @@ unsigned int dh_check_public_key(DH_PARA *dh_para, unsigned int *p_minus_1, unsi
 {
     //unsigned int tmp[DH_MAX_WORD_LEN];
     unsigned int *tmp;
-    unsigned int step_bytes, pWordLen, qWordLen;
-    unsigned int ret;
+    unsigned int  step_bytes, pWordLen, qWordLen;
+    unsigned int  ret;
 
-    if((NULL == dh_para) || (NULL == p_minus_1) || (NULL == pubkey))
-    {
+    if ((NULL == dh_para) || (NULL == p_minus_1) || (NULL == pubkey)) {
         return DH_POINTER_NULL;
+    } else {
+        ;
     }
-    else
-    {;}
 
     pWordLen = GET_WORD_LEN(dh_para->p_bits);
     qWordLen = GET_WORD_LEN(dh_para->q_bits);
 
     //make sure pubkey is in [2, p-2]
-    if(get_valid_bits(pubkey, pWordLen) <= 1)
-    {
+    if (get_valid_bits(pubkey, pWordLen) <= 1) {
         return DH_INVALID_INPUT;
-    }
-    else if(uint32_BigNumCmp(pubkey, pWordLen, p_minus_1, pWordLen) >= 0)
-    {
+    } else if (uint32_BigNumCmp(pubkey, pWordLen, p_minus_1, pWordLen) >= 0) {
         return DH_INVALID_INPUT;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    if((NULL == dh_para->p_h) || (NULL == dh_para->p_n0))
-    {
+    if ((NULL == dh_para->p_h) || (NULL == dh_para->p_n0)) {
         ret = pke_pre_calc_mont_for_modexp(dh_para->p, dh_para->p_bits, NULL, NULL);
-    }
-    else
-    {
+    } else {
         ret = pke_load_modulus_and_pre_monts(dh_para->p, dh_para->p_h, dh_para->p_n0, dh_para->p_bits);
     }
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     step_bytes = pke_get_operand_bytes();
-    tmp = (unsigned int *)(rPKE_A(0u,step_bytes));
-    ret = pke_modexp((unsigned int *)(rPKE_B(3u,step_bytes)), dh_para->q, pubkey, tmp, pWordLen, qWordLen);
-    if(PKE_SUCCESS != ret)
-    {
+    tmp        = (unsigned int *)(rPKE_A(0u, step_bytes));
+    ret        = pke_modexp((unsigned int *)(rPKE_B(3u, step_bytes)), dh_para->q, pubkey, tmp, pWordLen, qWordLen);
+    if (PKE_SUCCESS != ret) {
         return ret;
-    }
-    else if(1u != Bigint_Check_1(tmp, pWordLen))
-    {
+    } else if (1u != Bigint_Check_1(tmp, pWordLen)) {
         return DH_INVALID_INPUT;
+    } else {
     }
-    else
-    {}
 
     return DH_SUCCESS;
 }
-
 
 /**
  * @brief       DH generate public key from private key.
@@ -299,16 +261,15 @@ unsigned int dh_generate_pubkey_from_prikey(DH_PARA *dh_para, unsigned char *pri
     //unsigned int y[DH_MAX_WORD_LEN];
     unsigned int *g;
     unsigned int *y;
-    unsigned int pWordLen, qWordLen, gWordLen;
-    unsigned int pByteLen, qByteLen;
-    unsigned int tmpLen, ret;
+    unsigned int  pWordLen, qWordLen, gWordLen;
+    unsigned int  pByteLen, qByteLen;
+    unsigned int  tmpLen, ret;
 
-    if((NULL == dh_para) || (NULL == prikey) || (NULL == pubkey))
-    {
+    if ((NULL == dh_para) || (NULL == prikey) || (NULL == pubkey)) {
         return DH_POINTER_NULL;
+    } else {
+        ;
     }
-    else
-    {;}
 
     pWordLen = GET_WORD_LEN(dh_para->p_bits);
     qWordLen = GET_WORD_LEN(dh_para->q_bits);
@@ -325,63 +286,49 @@ unsigned int dh_generate_pubkey_from_prikey(DH_PARA *dh_para, unsigned char *pri
 
     // x should be in [2, q-2]
     tmpLen = get_valid_bits(x, qWordLen);
-    if(0u == tmpLen)
-    {
+    if (0u == tmpLen) {
         return DH_ZERO_ALL;
-    }
-    else if(1u == tmpLen)
-    {
+    } else if (1u == tmpLen) {
         return DH_VALUE_ONE;
-    }
-    else if(uint32_BigNumCmp(x, qWordLen, tmp, qWordLen) >= 0)
-    {
+    } else if (uint32_BigNumCmp(x, qWordLen, tmp, qWordLen) >= 0) {
         return DH_INTEGER_TOO_BIG;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    if((NULL == dh_para->p_h) || (NULL == dh_para->p_n0))
-    {
+    if ((NULL == dh_para->p_h) || (NULL == dh_para->p_n0)) {
         ret = pke_pre_calc_mont_for_modexp(dh_para->p, dh_para->p_bits, NULL, NULL);
-    }
-    else
-    {
+    } else {
         ret = pke_load_modulus_and_pre_monts(dh_para->p, dh_para->p_h, dh_para->p_n0, dh_para->p_bits);
     }
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     tmpLen = pke_get_operand_bytes();
-    y = (unsigned int *)(rPKE_A(0u,tmpLen));
+    y      = (unsigned int *)(rPKE_A(0u, tmpLen));
 
-    if(gWordLen < pWordLen)
-    {
-        g = (unsigned int *)(rPKE_B(0u,tmpLen));
+    if (gWordLen < pWordLen) {
+        g = (unsigned int *)(rPKE_B(0u, tmpLen));
         uint32_copy(g, dh_para->g, gWordLen);
-        uint32_clear(g+gWordLen, pWordLen - gWordLen);
-    }
-    else
-    {
+        uint32_clear(g + gWordLen, pWordLen - gWordLen);
+    } else {
         g = dh_para->g;
     }
 
-    ret = pke_modexp((unsigned int *)(rPKE_B(3u,tmpLen)), x, g, y, pWordLen, qWordLen);
-    if(PKE_SUCCESS != ret)
-    {
+    ret = pke_modexp((unsigned int *)(rPKE_B(3u, tmpLen)), x, g, y, pWordLen, qWordLen);
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     reverse_byte_array((unsigned char *)y, (unsigned char *)pubkey, pByteLen);
 
     return DH_SUCCESS;
 }
-
 
 /**
  * @brief       DH generate key pair.
@@ -401,32 +348,29 @@ unsigned int dh_generate_key(DH_PARA *dh_para, unsigned char *prikey, unsigned c
     unsigned int qByteLen;
     unsigned int tmpBitLen, ret;
 
-    if((NULL == dh_para) || (NULL == prikey) || (NULL == pubkey))
-    {
+    if ((NULL == dh_para) || (NULL == prikey) || (NULL == pubkey)) {
         return DH_POINTER_NULL;
+    } else {
+        ;
     }
-    else
-    {;}
 
     qByteLen = GET_BYTE_LEN(dh_para->q_bits);
 
     do {
         ret = get_rand((unsigned char *)prikey, qByteLen);
-        if(TRNG_SUCCESS != ret)
-        {
+        if (TRNG_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
 
         //make sure prikey has the same bit length as q
-        tmpBitLen = (dh_para->q_bits)&7u;
-        if(0u != tmpBitLen)
-        {
-            prikey[0u] &= (1u<<(tmpBitLen))-1u;
+        tmpBitLen = (dh_para->q_bits) & 7u;
+        if (0u != tmpBitLen) {
+            prikey[0u] &= (1u << (tmpBitLen)) - 1u;
+        } else {
+            ;
         }
-        else
-        {;}
 
         ret = dh_generate_pubkey_from_prikey(dh_para, prikey, pubkey);
 
@@ -437,4 +381,3 @@ unsigned int dh_generate_key(DH_PARA *dh_para, unsigned char *prikey, unsigned c
 }
 
 #endif
-

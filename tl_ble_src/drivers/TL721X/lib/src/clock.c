@@ -30,8 +30,6 @@
 #include "lib/include/pm/pm_internal.h"
 
 
-
-
 /**********************************************************************************************************************
  *                                            local constants                                                       *
  *********************************************************************************************************************/
@@ -51,26 +49,26 @@
  *                                              global variable                                                       *
  *********************************************************************************************************************/
 sys_clk_t sys_clk = {
-    .pll_clk = 240,
-    .cclk = 24,
-    .hclk = 24,
-    .pclk = 24,
+    .pll_clk  = 240,
+    .cclk     = 24,
+    .hclk     = 24,
+    .pclk     = 24,
     .mspi_clk = 24,
 };
 
 sys_clk_config_t sys_clk_config = {
-    .cclk_cfg = 0x01,
-    .hclk_pclk_cfg = 0x00,
-    .mspi_clk_cfg = 0x01,
+    .cclk_cfg       = 0x01,
+    .hclk_pclk_cfg  = 0x00,
+    .mspi_clk_cfg   = 0x01,
     .rc_24m_is_used = MODULE_CPU | MODULE_MSPI,
-    .bbpll_is_used = 0x00,
+    .bbpll_is_used  = 0x00,
 };
 
 _attribute_data_retention_sec_ unsigned char tl_24mrc_cal;
-clk_32k_type_e g_clk_32k_src;
-unsigned char pll_vco_itrim = 0;
-unsigned char g_24m_rc_is_used = MODULE_CPU | MODULE_MSPI;
-unsigned char g_bbpll_is_used = 0;
+clk_32k_type_e                               g_clk_32k_src;
+unsigned char                                pll_vco_itrim    = 0;
+unsigned char                                g_24m_rc_is_used = MODULE_CPU | MODULE_MSPI;
+unsigned char                                g_bbpll_is_used  = 0;
 
 /**********************************************************************************************************************
  *                                              local variable                                                     *
@@ -79,13 +77,12 @@ unsigned char g_bbpll_is_used = 0;
 /**********************************************************************************************************************
  *                                          local function prototype                                               *
  *********************************************************************************************************************/
-_attribute_ram_code_com_sec_ static _always_inline unsigned char clock_calculate_div_clk(sys_clock_src_e src, sys_clock_div_e div);
+_attribute_ram_code_sec_ static _always_inline unsigned char clock_calculate_div_clk(sys_clock_src_e src, sys_clock_div_e div);
 
 /**********************************************************************************************************************
  *                                         global function implementation                                             *
  *********************************************************************************************************************/
 extern void otp_clk_init(void);
-
 
 /**
  * @brief       This function use to configuer baseband pll clk.
@@ -97,20 +94,20 @@ extern void otp_clk_init(void);
  *              and many configuration changes are required if PLL clock is switched during operation.
  *              On the current interface, the switching frequency is not effective.
  */
-_attribute_ram_code_com_sec_optimize_o2_noinline_ void clock_bbpll_config(sys_pll_clk_e pll_clk)
+_attribute_ram_code_sec_optimize_o2_noinline_ void clock_bbpll_config(sys_pll_clk_e pll_clk)
 {
     /*
      * The default PLL clock is 192MHz, you need to make sure that you are not using PLL as the clock source.
      * add by weihua.zhang, confirmed by ya.yang 20240806
      */
-    if(g_bbpll_is_used == 1){
+    if (g_bbpll_is_used == 1) {
         return;
     }
 
     //pll clk
-//    analog_write_reg8(areg_0x85, (analog_read_reg8(areg_0x85) & 0x9f) | 0x60);//bpll_240M_refclk_sel
-    analog_write_reg8(areg_0x86, (analog_read_reg8(areg_0x86) & 0xe0) | (pll_clk & 0x1f));//bbpll_240M_div_ratio<4:0>
-    analog_write_reg8(areg_0x84, (analog_read_reg8(areg_0x84) & 0x1f) | (pll_clk & 0xe0));//vco_itrim<2:0>
+    //    analog_write_reg8(areg_0x85, (analog_read_reg8(areg_0x85) & 0x9f) | 0x60);//bpll_240M_refclk_sel
+    analog_write_reg8(areg_0x86, (analog_read_reg8(areg_0x86) & 0xe0) | (pll_clk & 0x1f)); //bbpll_240M_div_ratio<4:0>
+    analog_write_reg8(areg_0x84, (analog_read_reg8(areg_0x84) & 0x1f) | (pll_clk & 0xe0)); //vco_itrim<2:0>
 
     pll_vco_itrim = (pll_clk & 0xe0) >> 5;
 
@@ -126,18 +123,15 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ void clock_bbpll_config(sys_pl
  * @param[in]   src - variable of 32k type.
  * @return      none.
  */
-_attribute_ram_code_com_sec_noinline_ void clock_32k_init(clk_32k_type_e src)
+_attribute_ram_code_sec_noinline_ void clock_32k_init(clk_32k_type_e src)
 {
     unsigned char sel_32k   = analog_read_reg8(areg_aon_0x4e & (~FLD_CLK32K_SEL));
     unsigned char power_32k = analog_read_reg8(areg_aon_0x05) & (~(FLD_32K_RC_PD | FLD_32K_XTAL_PD));
     analog_write_reg8(areg_aon_0x4e, sel_32k | (src << 7));
-    if(src)
-    {
-        analog_write_reg8(areg_aon_0x05, power_32k | FLD_32K_RC_PD);//32k xtal
-    }
-    else
-    {
-        analog_write_reg8(areg_aon_0x05, power_32k | FLD_32K_XTAL_PD);//32k rc
+    if (src) {
+        analog_write_reg8(areg_aon_0x05, power_32k | FLD_32K_RC_PD);   //32k xtal
+    } else {
+        analog_write_reg8(areg_aon_0x05, power_32k | FLD_32K_XTAL_PD); //32k rc
     }
     g_clk_32k_src = src;
 }
@@ -151,21 +145,20 @@ unsigned char clock_kick_32k_xtal(unsigned char xtal_times)
 {
     int last_32k_tick;
     int curr_32k_tick;
-    for(unsigned char i = 0; i< xtal_times; i++)
-    {
-        unsigned char reg_c8a = read_reg8(0x140c8a);
-        unsigned char reg_c36 = read_reg8(0x140c36);
-        unsigned char reg_402 = read_reg8(0x140402);
+    for (unsigned char i = 0; i < xtal_times; i++) {
+        unsigned char  reg_c8a = read_reg8(0x140c8a);
+        unsigned char  reg_c36 = read_reg8(0x140c36);
+        unsigned char  reg_402 = read_reg8(0x140402);
         unsigned short reg_408 = read_reg16(0x140408);
         unsigned short reg_40a = read_reg16(0x14040a);
-        unsigned char reg_403 = read_reg8(0x140403);
+        unsigned char  reg_403 = read_reg8(0x140403);
         unsigned short reg_400 = read_reg16(0x140400);
 
         //set PD2 as pwm output
-        pwm_set_pin(GPIO_FC_PD2,PWM0);
+        pwm_set_pin(GPIO_FC_PD2, PWM0);
         pwm_set_clk(0);
-        pwm_set_tcmp(PWM0_ID,sys_clk.pclk*1000*1000/32768/2);
-        pwm_set_tmax(PWM0_ID,sys_clk.pclk*1000*1000/32768);
+        pwm_set_tcmp(PWM0_ID, sys_clk.pclk * 1000 * 1000 / 32768 / 2);
+        pwm_set_tmax(PWM0_ID, sys_clk.pclk * 1000 * 1000 / 32768);
         pwm_set_pwm0_mode(PWM_NORMAL_MODE);
         pwm_start(FLD_PWM0_EN);
 
@@ -173,20 +166,20 @@ unsigned char clock_kick_32k_xtal(unsigned char xtal_times)
         delay_ms(100);
 
         //Recover PD2 as Xtal pin
-        write_reg8(0x140c8a,reg_c8a);
-        write_reg8(0x140c36,reg_c36);
-        write_reg8(0x140402,reg_402);
-        write_reg16(0x140408,reg_408);
-        write_reg16(0x14040a,reg_40a);
-        write_reg8(0x140403,reg_403);
-        write_reg16(0x140400,reg_400);
+        write_reg8(0x140c8a, reg_c8a);
+        write_reg8(0x140c36, reg_c36);
+        write_reg8(0x140402, reg_402);
+        write_reg16(0x140408, reg_408);
+        write_reg16(0x14040a, reg_40a);
+        write_reg8(0x140403, reg_403);
+        write_reg16(0x140400, reg_400);
 
-        last_32k_tick = clock_get_32k_tick();   //clock_get_32k_tick()
-        delay_us(305);      //for 32k tick accumulator, tick period: 30.5us, dly 10 ticks
+        last_32k_tick = clock_get_32k_tick(); //clock_get_32k_tick()
+        delay_us(305);                        //for 32k tick accumulator, tick period: 30.5us, dly 10 ticks
         curr_32k_tick = clock_get_32k_tick();
-        if(last_32k_tick != curr_32k_tick)      //clock_get_32k_tick()
+        if (last_32k_tick != curr_32k_tick)   //clock_get_32k_tick()
         {
-            return 1;       //pwm kick 32k pad success
+            return 1;                         //pwm kick 32k pad success
         }
     }
     return 0;
@@ -213,16 +206,16 @@ void clock_cal_24m_rc(void)
 {
     pm_24mrc_power_up();
 
-    analog_write_reg8(areg_0xc8, 0x80);//wait 24m rc stable cycles
+    analog_write_reg8(areg_0xc8, 0x80); //wait 24m rc stable cycles
 
     analog_write_reg8(areg_aon_0x4f, analog_read_reg8(areg_aon_0x4f) | FLD_RC_24M_CAP_SEL);
 
     analog_write_reg8(areg_0xc7, FLD_CAL_24M_RC_DISABLE);
     analog_write_reg8(areg_0xc7, FLD_CAL_24M_RC_ENABLE);
 
-    wait_condition_fails_or_timeout(clock_24m_rc_cal_busy,g_drv_api_error_timeout_us,drv_timeout_handler,(unsigned int)DRV_API_ERROR_TIMEOUT_RC_24M_CAL);
+    wait_condition_fails_or_timeout(clock_24m_rc_cal_busy, g_drv_api_error_timeout_us, drv_timeout_handler, (unsigned int)DRV_API_ERROR_TIMEOUT_RC_24M_CAL);
 
-    analog_write_reg8(areg_aon_0x52, analog_read_reg8(areg_0xcb));//write 24m cap into manual register
+    analog_write_reg8(areg_aon_0x52, analog_read_reg8(areg_0xcb)); //write 24m cap into manual register
 
     analog_write_reg8(areg_aon_0x4f, analog_read_reg8(areg_aon_0x4f) & (~FLD_RC_24M_CAP_SEL));
 
@@ -239,7 +232,6 @@ void clock_cal_24m_rc(void)
 static bool clock_32k_rc_cal_busy(void)
 {
     return ((analog_read_reg8(areg_0xcf) & FLD_CAL_32K_DONE) == 0x00);
-
 }
 
 /**
@@ -252,12 +244,12 @@ void clock_cal_32k_rc(void)
 
     analog_write_reg8(areg_0xc6, FLD_CAL_32K_RC_DISABLE);
     analog_write_reg8(areg_0xc6, FLD_CAL_32K_RC_ENABLE);
-    wait_condition_fails_or_timeout(clock_32k_rc_cal_busy,g_drv_api_error_timeout_us,drv_timeout_handler,(unsigned int)DRV_API_ERROR_TIMEOUT_RC_32K_CAL);
+    wait_condition_fails_or_timeout(clock_32k_rc_cal_busy, g_drv_api_error_timeout_us, drv_timeout_handler, (unsigned int)DRV_API_ERROR_TIMEOUT_RC_32K_CAL);
 
-    analog_write_reg8(areg_aon_0x51, analog_read_reg8(areg_0xc9));//write 32k res[13:6] into manual register
-    analog_write_reg8(areg_aon_0x4f, (analog_read_reg8(areg_aon_0x4f) & 0xc0) | analog_read_reg8(areg_0xca));//write 32k res[5:0] into manual register
+    analog_write_reg8(areg_aon_0x51, analog_read_reg8(areg_0xc9));                                            //write 32k res[13:6] into manual register
+    analog_write_reg8(areg_aon_0x4f, (analog_read_reg8(areg_aon_0x4f) & 0xc0) | analog_read_reg8(areg_0xca)); //write 32k res[5:0] into manual register
     analog_write_reg8(areg_0xc6, FLD_CAL_32K_RC_DISABLE);
-    analog_write_reg8(areg_aon_0x4f, analog_read_reg8(areg_aon_0x4f) & (~FLD_RC_32K_CAP_SEL));//manual on
+    analog_write_reg8(areg_aon_0x4f, analog_read_reg8(areg_aon_0x4f) & (~FLD_RC_32K_CAP_SEL));                //manual on
 }
 
 /**
@@ -265,23 +257,23 @@ void clock_cal_32k_rc(void)
  * @param  tick - the value of to be set to 32k.
  * @return none.
  */
-_attribute_ram_code_com_sec_optimize_o2_noinline_ void clock_set_32k_tick(unsigned int tick)
+_attribute_ram_code_sec_optimize_o2_noinline_ void clock_set_32k_tick(unsigned int tick)
 {
-    stimer_set_32k_write_mode();    //r_32k_wr = 1;
+    stimer_set_32k_write_mode(); //r_32k_wr = 1;
     stimer_wait_read_32k_done();
     stimer_set_32k_tick(tick);
 
-    stimer_set_32k_tick_write_trig();   //cmd_sync = 1,trig write
+    stimer_set_32k_tick_write_trig(); //cmd_sync = 1,trig write
     /**
      * This delay time is about 1.38us under the calibrated 24M RC clock.
      * The minimum waiting time here is 3*pclk cycles+3*24M xtal cycles, a total of 0.25us,
      * wait 0.25us before you can use wr_busy signal for judgment, jianzhi suggested that this time to 1us is enough.
      * add by bingyu.li, confirmed by jianzhi.chen 20231115
-     * Each new chip needs to confirm this time with chip design colleagues, which tercel has confirmed.
+     * Each new chip needs to confirm this time with chip design colleagues, which tl721x has confirmed.
      */
-    core_cclk_delay_tick((unsigned long long)sys_clk.cclk);//1us
+    core_cclk_delay_tick((unsigned long long)sys_clk.cclk); //1us
 
-    stimer_wait_write_32k_done ();      //wait wr_busy = 0
+    stimer_wait_write_32k_done();                           //wait wr_busy = 0
 }
 
 /**
@@ -294,7 +286,7 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ void clock_set_32k_tick(unsign
  * Use digital register way to get 32k tick may read error tick,cause the wakeup time is
  * incorrect with the setting time,the sleep time will very little or very big,will not wakeup on time.
  */
-_attribute_ram_code_com_sec_noinline_ unsigned int clock_get_32k_tick(void)
+_attribute_ram_code_sec_noinline_ unsigned int clock_get_32k_tick(void)
 {
     unsigned int timer_32k_tick;
     reg_system_st = FLD_SYSTEM_CLR_RD_DONE; //clr rd_done
@@ -307,7 +299,7 @@ _attribute_ram_code_com_sec_noinline_ unsigned int clock_get_32k_tick(void)
 }
 #else
 
-_attribute_ram_code_com_sec_optimize_o2_noinline_ unsigned int clock_get_32k_tick(void)
+_attribute_ram_code_sec_optimize_o2_noinline_ unsigned int clock_get_32k_tick(void)
 {
     unsigned int t0 = 0;
     unsigned int t1 = 0;
@@ -318,16 +310,12 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ unsigned int clock_get_32k_tic
     //modify by weihua.zhang, confirmed by jianzhi at 20210126
     t0 = analog_read_reg32(0x60);
 
-    while(1)
-    {
+    while (1) {
         t1 = analog_read_reg32(0x60);
 
-        if((t1-t0) == 1)
-        {
+        if ((t1 - t0) == 1) {
             return t1;
-        }
-        else if(t1-t0)
-        {
+        } else if (t1 - t0) {
             t0 = t1;
         }
     }
@@ -352,11 +340,10 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ unsigned int clock_get_32k_tic
  *              because during the clock switching process, the system clock will be
  *              suspended for a period of time, which may cause data loss
  */
-_attribute_ram_code_com_sec_noinline_
-void clock_init(sys_clock_src_e src,
-                sys_clock_div_e cclk_div,
-                sys_cclk_div_to_hclk_pclk_e hclk_pclk_div,
-                sys_clock_div_e mspi_clk_div)
+_attribute_ram_code_sec_noinline_ void clock_init(sys_clock_src_e             src,
+                                                  sys_clock_div_e             cclk_div,
+                                                  sys_cclk_div_to_hclk_pclk_e hclk_pclk_div,
+                                                  sys_clock_div_e             mspi_clk_div)
 {
     clock_mspi_clk_config(src, mspi_clk_div);
 
@@ -370,25 +357,21 @@ void clock_init(sys_clock_src_e src,
  * @param[in]   div - the mspi clk source divider
  * @return      none.
  */
-_attribute_ram_code_com_sec_optimize_o2_noinline_ void clock_mspi_clk_config(sys_clock_src_e src, sys_clock_div_e div)
+_attribute_ram_code_sec_optimize_o2_noinline_ void clock_mspi_clk_config(sys_clock_src_e src, sys_clock_div_e div)
 {
     pm_24mrc_power_up();
 
-    if(src == RC_24M)
-    {
+    if (src == RC_24M) {
         g_24m_rc_is_used |= MODULE_MSPI;
-    }
-    else
-    {
+    } else {
         g_24m_rc_is_used &= (~MODULE_MSPI);
 
-        if(src == BASEBAND_PLL)
-        {
+        if (src == BASEBAND_PLL) {
             clock_bbpll_config(PLL_CLK);
         }
     }
 
-    write_reg8(0x140800, (read_reg8(0x140800) & 0xc0) | src | div);//src:bit[5:4], div:bit[3:0]
+    write_reg8(0x140800, (read_reg8(0x140800) & 0xc0) | src | div); //src:bit[5:4], div:bit[3:0]
     sys_clk.mspi_clk = clock_calculate_div_clk(src, div);
 
     pm_24mrc_power_down_if_unused();
@@ -403,21 +386,16 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ void clock_mspi_clk_config(sys
  * @param[in]   pclk_div - divider of PCLK.
  * @return      none
  */
-_attribute_ram_code_com_sec_optimize_o2_noinline_ void clock_cclk_hclk_pclk_config(sys_clock_src_e src, sys_clock_div_e cclk_div,
-                                sys_cclk_div_to_hclk_pclk_e hclk_pclk_div)
+_attribute_ram_code_sec_optimize_o2_noinline_ void clock_cclk_hclk_pclk_config(sys_clock_src_e src, sys_clock_div_e cclk_div, sys_cclk_div_to_hclk_pclk_e hclk_pclk_div)
 {
     pm_24mrc_power_up();
 
-    if(src == RC_24M)
-    {
+    if (src == RC_24M) {
         g_24m_rc_is_used |= MODULE_CPU;
-    }
-    else
-    {
+    } else {
         g_24m_rc_is_used &= (~MODULE_CPU);
 
-        if(src == BASEBAND_PLL)
-        {
+        if (src == BASEBAND_PLL) {
             clock_bbpll_config(PLL_CLK);
         }
     }
@@ -429,11 +407,11 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ void clock_cclk_hclk_pclk_conf
     write_reg8(0x140818, (read_reg8(0x140818) & 0xf8) | hclk_pclk_div);
 
     //Configure the CCLK clock frequency.
-    write_reg8(0x140828, (read_reg8(0x140828) & 0xc0) | src | cclk_div);//clock source. 0:rc 24m, 1:xtl_24m, 2:pll
+    write_reg8(0x140828, (read_reg8(0x140828) & 0xc0) | src | cclk_div); //clock source. 0:rc 24m, 1:xtl_24m, 2:pll
 
     sys_clk.cclk = clock_calculate_div_clk(src, cclk_div);
-    sys_clk.hclk = sys_clk.cclk / (1 << (hclk_pclk_div>>2));
-    sys_clk.pclk = sys_clk.hclk / (1 << (hclk_pclk_div&0x03));
+    sys_clk.hclk = sys_clk.cclk / (1 << (hclk_pclk_div >> 2));
+    sys_clk.pclk = sys_clk.hclk / (1 << (hclk_pclk_div & 0x03));
 
     pm_24mrc_power_down_if_unused();
 }
@@ -448,11 +426,11 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ void clock_cclk_hclk_pclk_conf
  *              RC 24M       | CCLK 24M, HCLK 24M, PCLK 24M, MSPI CLK 24M.
  *              -----------------------------------------------------------------------
  */
-_attribute_ram_code_com_sec_optimize_o2_noinline_ void clock_set_all_clock_to_default(void)
+_attribute_ram_code_sec_optimize_o2_noinline_ void clock_set_all_clock_to_default(void)
 {
     clock_cclk_hclk_pclk_config(RC_24M, CLK_DIV1, CCLK_DIV1_TO_HCLK_DIV1_TO_PCLK);
 
-    clock_mspi_clk_config(RC_24M, CLK_DIV1);//mspi clk to 24M rc clock, div 1, 24MHz
+    clock_mspi_clk_config(RC_24M, CLK_DIV1); //mspi clk to 24M rc clock, div 1, 24MHz
 }
 
 /**
@@ -460,7 +438,7 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ void clock_set_all_clock_to_de
  * @return      none.
  * @note        This function needs to be used in conjunction with clock_restore_clock_config().
  */
-_attribute_ram_code_com_sec_optimize_o2_noinline_ void clock_save_clock_config(void)
+_attribute_ram_code_sec_optimize_o2_noinline_ void clock_save_clock_config(void)
 {
     sys_clk_config.cclk_cfg = read_reg8(0x140828);
 
@@ -476,15 +454,16 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ void clock_save_clock_config(v
  * @return      none.
  * @note        This function needs to be used in conjunction with clock_save_clock_config().
  */
-_attribute_ram_code_com_sec_optimize_o2_noinline_ void clock_restore_clock_config(void)
+_attribute_ram_code_sec_optimize_o2_noinline_ void clock_restore_clock_config(void)
 {
     clock_cclk_hclk_pclk_config(sys_clk_config.cclk_cfg & BIT_RNG(4, 5),
                                 sys_clk_config.cclk_cfg & BIT_RNG(0, 3),
                                 sys_clk_config.hclk_pclk_cfg);
 
-    clock_mspi_clk_config(sys_clk_config.mspi_clk_cfg & BIT_RNG(4, 5),      //src
-                        sys_clk_config.mspi_clk_cfg & BIT_RNG(0, 3));       //mspiclk_div
+    clock_mspi_clk_config(sys_clk_config.mspi_clk_cfg & BIT_RNG(4, 5),  //src
+                          sys_clk_config.mspi_clk_cfg & BIT_RNG(0, 3)); //mspiclk_div
 }
+
 /**********************************************************************************************************************
  *                                          local function implementation                                             *
  *********************************************************************************************************************/
@@ -494,12 +473,12 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ void clock_restore_clock_confi
  * @param[in]   div - the clock source divider
  * @return      clk.
  */
-_attribute_ram_code_com_sec_ static _always_inline unsigned char clock_calculate_div_clk(sys_clock_src_e src, sys_clock_div_e div)
+_attribute_ram_code_sec_ static _always_inline unsigned char clock_calculate_div_clk(sys_clock_src_e src, sys_clock_div_e div)
 {
-    unsigned char clk = 0 ;
-    if(BASEBAND_PLL == src ){
+    unsigned char clk = 0;
+    if (BASEBAND_PLL == src) {
         clk = sys_clk.pll_clk / div;
-    }else{
+    } else {
         clk = 24 / div;
     }
     return clk;

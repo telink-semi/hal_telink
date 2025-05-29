@@ -24,30 +24,15 @@
 #include "tl_common.h"
 #if (FEATURE_TEST_MODE == TEST_PAWR_SYNC)
 
-#include "drivers.h"
-#include "stack/ble/ble.h"
+    #include "drivers.h"
+    #include "stack/ble/ble.h"
 
-#include <stdarg.h>
-
-
-
-
-
-
-
-
+    #include <stdarg.h>
 
 
 void app_gpio_simulate_uart_init(void);
 
 void app_gpio_simulate_uart_proc(void);
-
-
-
-
-
-
-
 
 
 #endif

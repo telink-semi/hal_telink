@@ -4,9 +4,9 @@
  * @brief   This is the source file for TL751X
  *
  * @author  Driver Group
- * @date    2023
+ * @date    2024
  *
- * @par     Copyright (c) 2023, Telink Semiconductor (Shanghai) Co., Ltd.
+ * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd.
  *          All rights reserved.
  *
  *          The information contained herein is confidential property of Telink
@@ -34,8 +34,24 @@
 
 
 
-
+/**
+ * @brief      set operand width
+ * @param[in]  bitLen            - bit length of operand.
+ * @return     none
+ * @note
+  @verbatim
+      -# 1. please make sure 0 < bitLen <= OPERAND_MAX_BIT_LEN
+  @endverbatim
+ */
 extern void pke_set_operand_width(unsigned int bitLen);
+/**
+ * @brief     get current operand byte length
+ * @return     none
+ * @note
+  @verbatim
+      -# 1. current operand byte length
+  @endverbatim
+ */
 extern unsigned int pke_get_operand_bytes(void);
 extern unsigned int get_H(unsigned int *n, unsigned int *H, unsigned int wordLen);
 
@@ -172,7 +188,7 @@ unsigned int RSA_CRTModExp(unsigned int *a, unsigned int *p, unsigned int *q, un
 //  {;}
     get_H(q, NULL, pWordLen);
 
-    ret = pke_mod(a, nWordLen, q, (unsigned int *)(PKE_A(3,tmp_step)), (unsigned int *)(PKE_B(4,tmp_step)), pWordLen, m2);
+    ret = pke_mod(a, nWordLen, q, (volatile unsigned int *)(PKE_A(3,tmp_step)), (volatile unsigned int *)(PKE_B(4,tmp_step)), pWordLen, m2);
     if(PKE_SUCCESS != ret)
     {
         return ret;
@@ -199,7 +215,7 @@ unsigned int RSA_CRTModExp(unsigned int *a, unsigned int *p, unsigned int *q, un
 //  {;}
     get_H(p, NULL, pWordLen);
 
-    ret = pke_mod(a, nWordLen, p, (unsigned int *)(PKE_A(3,tmp_step)), (unsigned int *)(PKE_B(4,tmp_step)), pWordLen, m1);
+    ret = pke_mod(a, nWordLen, p, (volatile unsigned int *)(PKE_A(3,tmp_step)), (volatile unsigned int *)(PKE_B(4,tmp_step)), pWordLen, m1);
     if(PKE_SUCCESS != ret)
     {
         return ret;
@@ -257,7 +273,7 @@ unsigned int RSA_CRTModExp(unsigned int *a, unsigned int *p, unsigned int *q, un
     tmp_step = pke_get_operand_bytes();
 
     //A1 = hq
-    ret = pke_mul(m1, q, (unsigned int *)(PKE_A(1,tmp_step)), pWordLen);
+    ret = pke_mul(m1, q, (volatile unsigned int *)(PKE_A(1,tmp_step)), pWordLen);
     if(PKE_SUCCESS != ret)
     {
         return ret;
@@ -266,9 +282,9 @@ unsigned int RSA_CRTModExp(unsigned int *a, unsigned int *p, unsigned int *q, un
     {;}
 
     //out = m2+hq
-    uint32_copy((unsigned int *)(PKE_A(2,tmp_step)), m2, pWordLen);
-    uint32_clear((unsigned int *)(PKE_A(2,tmp_step))+pWordLen, nWordLen-pWordLen);
-    return pke_add((unsigned int *)(PKE_A(1,tmp_step)), (unsigned int *)(PKE_A(2,tmp_step)), out, nWordLen);
+    uint32_copy((volatile unsigned int *)(PKE_A(2,tmp_step)), m2, pWordLen);
+    uint32_clear((volatile unsigned int *)(PKE_A(2,tmp_step))+pWordLen, nWordLen-pWordLen);
+    return pke_add((volatile unsigned int *)(PKE_A(1,tmp_step)), (volatile unsigned int *)(PKE_A(2,tmp_step)), out, nWordLen);
 }
 
 
@@ -395,7 +411,7 @@ unsigned int RSA_Get_E2(unsigned int e[], unsigned int fai_n[], unsigned int bit
       -# 2.if aBitLen%32 != 0, then the highest word of a should be 0.
   @endverbatim
  */
-unsigned int CheckValue_0x5a5a5a5a(unsigned int a[], unsigned int aBitLen)
+unsigned int CheckValue_0x5a5a5a5a(volatile unsigned int a[], unsigned int aBitLen)
 {
     unsigned int i, wordLen = aBitLen>>5;
 
@@ -441,7 +457,8 @@ unsigned int CheckValue_0x5a5a5a5a(unsigned int a[], unsigned int aBitLen)
 unsigned int RSA_GetKey(unsigned int *e, unsigned int *d, unsigned int *n, unsigned int eBitLen, unsigned int nBitLen)
 {
     unsigned int buf[MAX_RSA_WORD_LEN];
-    unsigned int *p, *q, *in, *out;
+    unsigned int *p, *q;
+    volatile unsigned int *in, *out;
     unsigned int pBitLen, pWordLen, eWordLen, nWordLen, tmpLen;
     unsigned int count,flag;
 
@@ -465,8 +482,8 @@ unsigned int RSA_GetKey(unsigned int *e, unsigned int *d, unsigned int *n, unsig
 
     pke_set_operand_width(nBitLen);
     tmpLen = pke_get_operand_bytes();
-    in = (unsigned int *)(PKE_B(0,tmpLen));
-    out = (unsigned int *)(PKE_A(2,tmpLen));
+    in = (volatile unsigned int *)(PKE_B(0,tmpLen));
+    out = (volatile unsigned int *)(PKE_A(2,tmpLen));
 
     eWordLen = GET_WORD_LEN(eBitLen);
     nWordLen = GET_WORD_LEN(nBitLen);

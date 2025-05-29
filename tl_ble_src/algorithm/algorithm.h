@@ -30,8 +30,4 @@
 #include "algorithm/ecc/ecc_ll.h"
 #include "algorithm/ecc/hw_ecc.h"
 
-
-#include "algorithm/hadm/hadm.h"
-
-
 #endif /* ALGORITHM_H_ */

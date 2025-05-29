@@ -25,9 +25,9 @@
 
 #if (ASSISTANT_VERSION == UNIVERSAL_VERSION)
 
-#pragma once
+    #pragma once
 
-#include "app_config.h"
+    #include "app_config.h"
 
 
 /**
@@ -51,7 +51,7 @@ void user_init_deepRetn(void);
  * @param[in]  none.
  * @return     none.
  */
-void main_loop (void);
+void main_loop(void);
 
 
-#endif  //ASSISTANT_VERSION == UNIVERSAL_VERSION
+#endif //ASSISTANT_VERSION == UNIVERSAL_VERSION

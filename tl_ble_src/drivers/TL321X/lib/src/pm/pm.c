@@ -41,11 +41,11 @@
  *******************************************************************************************************/
 //the code run time for preparation entering and exiting suspend sleep, 100-131(while waiting time).
 //Open the macro definition PM_SUSPEND_WHILE_DEBUG and test this using TEST_SLEEP_TIME_ACCURACY in the test demo.
-#define SUSPEND_CODE_US     321 //the code run time for preparation entering and exiting suspend sleep
+#define SUSPEND_CODE_US 354 //the code run time for preparation entering and exiting suspend sleep
 
 //the minimum code run time before sleep
 //Open the macro definition PM_MIN_CODE_DEBUG and test this using TEST_SLEEP_TIME_ACCURACY in the test demo.
-#define SLEEP_MIN_CODE_US   85 //the minimum code run time before sleep
+#define SLEEP_MIN_CODE_US 95 //the minimum code run time before sleep
 
 /********************************************************************************************************
  *                         The time required to test on a new chip.
@@ -55,7 +55,7 @@
 //In order to make this time compatible with more clocks, compatible with the most extreme cases, you need to do the following:
 //1. Use a calibrated 24M rc clock.
 //2. Call the PM function immediately after system initialization.
-#define SLEEP_START_CODE_US         60 //30-60
+#define SLEEP_START_CODE_US 60 //30-60
 
 /********************************************************************************************************
  *                         The time required to confirm on the new chip.
@@ -63,75 +63,73 @@
 //r_delay: 2*1/16k=125uS  3*1/16k=187.5uS  4*1/16k=250uS  11*1/16k=687.5uS
 //The 16k clock is derived from the 32k clock frequency division.
 //The 32k rc frequency is 32000. 32k pad frequency is 32768. Each tick varies by 0.73us, so 32k pad can use 32k rc data.
-#define SUSPEND_RET_R_DELAY_US      188 //suspend or deep retention r_delay(us)
-#define DEEP_R_DELAY_US             688 //deep r_delay(us).
-                                        //The minimum value can be the same as deep retention,
-                                        //because deep has a current pulse when it wakes up, so the value is set higher.
+#define SUSPEND_RET_R_DELAY_US 188 //suspend or deep retention r_delay(us)
+//deep r_delay(us). The minimum value can be the same as deep retention, because deep has a current pulse when it wakes up, so the value is set higher.
+#define DEEP_R_DELAY_US       688
 
-#define SUSPEND_XTAL_DELAY_US       200 //waits for XTAL to stabilize after suspend waking up.
-#define BOOT_ROM_US                 390 //BOOT ROM
+#define SUSPEND_XTAL_DELAY_US 200 //waits for XTAL to stabilize after suspend waking up.
+#define BOOT_ROM_US           390 //BOOT ROM
 
-#define HARDWARE_DELAY_US           109 //3.5*(1/32k), suspend/deep/deep retention hardware delay.
+#define HARDWARE_DELAY_US     109 //3.5*(1/32k), suspend/deep/deep retention hardware delay.
 
 /********************************************************************************************************
  *                                 The usual fixed time.
  *******************************************************************************************************/
-#define SLEEP_MIN_MARGIN_US         400 //400 means more margin, >32 is enough.
+#define SLEEP_MIN_MARGIN_US 400 //400 means more margin, >32 is enough.
 
-#if(PM_DEBUG)
-volatile unsigned char debug_pm_info;
-volatile unsigned int debug_ana_32k_tick;
-volatile unsigned int debug_sleep_32k_cur;
-volatile unsigned int debug_ana_tick_reset;
-volatile unsigned int debug_tick_32k_cur;
-volatile unsigned char debug_min_wakeup_src=0;
-volatile unsigned char debug_sleep_start_wakeup_src0=0;
-volatile unsigned char debug_sleep_start_wakeup_src1=0;
-volatile unsigned char debug_sleep_start_wakeup_src2=0;
-volatile unsigned int debug_min_stimer_tick=0;
-volatile unsigned int debug_sleep_start_cur_tick=0;
-volatile unsigned int debug_sleep_start_set_tick=0;
-volatile unsigned int debug_sleep_wakeup_return=0;
+#if (PM_DEBUG)
+volatile unsigned char      debug_pm_info;
+volatile unsigned int       debug_ana_32k_tick;
+volatile unsigned int       debug_sleep_32k_cur;
+volatile unsigned int       debug_ana_tick_reset;
+volatile unsigned int       debug_tick_32k_cur;
+volatile unsigned char      debug_min_wakeup_src          = 0;
+volatile unsigned char      debug_sleep_start_wakeup_src0 = 0;
+volatile unsigned char      debug_sleep_start_wakeup_src1 = 0;
+volatile unsigned char      debug_sleep_start_wakeup_src2 = 0;
+volatile unsigned int       debug_min_stimer_tick         = 0;
+volatile unsigned int       debug_sleep_start_cur_tick    = 0;
+volatile unsigned int       debug_sleep_start_set_tick    = 0;
+volatile unsigned int       debug_sleep_wakeup_return     = 0;
 volatile unsigned long long debug_while_7d_tick_1;
 volatile unsigned long long debug_while_7d_tick_2;
 volatile unsigned long long debug_while_7d_tick_3;
 volatile unsigned long long debug_min_code_tick_1;
 volatile unsigned long long debug_min_code_tick_2;
 volatile unsigned long long debug_min_code_tick_3;
-volatile unsigned char debug_ana_reg[128];
+volatile unsigned char      debug_ana_reg[128];
 #endif
 
 extern _attribute_data_retention_sec_ unsigned int g_pm_xtal_stable_loopnum;
 
 _attribute_aligned_(4) pm_status_info_s g_pm_status_info;
 volatile unsigned char g_pm_system_reboot_event = 0;
-unsigned char g_areg_aon_7f = 0;
+unsigned char          g_areg_aon_7f            = 0;
 
-_attribute_data_retention_sec_  unsigned int            g_pm_tick_32k_calib;
-_attribute_data_retention_sec_  unsigned int            g_pm_tick_cur;
-_attribute_data_retention_sec_  unsigned int            g_pm_tick_32k_cur;
-_attribute_data_retention_sec_  unsigned char           g_pm_long_suspend;
-_attribute_data_retention_sec_  unsigned char           g_areg_aon_0a=0;
+_attribute_data_retention_sec_ unsigned int                       g_pm_tick_32k_calib;
+_attribute_data_retention_sec_ unsigned int                       g_pm_tick_cur;
+_attribute_data_retention_sec_ unsigned int                       g_pm_tick_32k_cur;
+_attribute_data_retention_sec_ unsigned char                      g_pm_long_suspend;
+_attribute_data_retention_sec_ unsigned char                      g_areg_aon_0a              = 0;
 /**< BLE USED *****/
-_attribute_data_retention_sec_  unsigned char           g_pm_suspend_power_cfg=(FLD_PD_ZB_EN | FLD_PD_USB_EN | FLD_PD_AUDIO_EN);
-_attribute_data_retention_sec_  unsigned char           g_pm_pad_filter_en=0x00;
+_attribute_data_retention_sec_ unsigned char                      g_pm_suspend_power_cfg=(FLD_PD_ZB_EN | FLD_PD_USB_EN | FLD_PD_AUDIO_EN);
+_attribute_data_retention_sec_ unsigned char                      g_pm_pad_filter_en=0x00;
 /**< BLE USED END */
-_attribute_data_retention_sec_  unsigned int            g_pm_multi_addr=0;
-_attribute_data_retention_sec_  unsigned int            g_pm_suspend_code_us = SUSPEND_CODE_US;
-_attribute_data_retention_sec_  unsigned int            g_pm_min_code_us = SLEEP_MIN_CODE_US;
-_attribute_data_retention_sec_  unsigned int            g_pm_suspend_xtal_delay_us = SUSPEND_XTAL_DELAY_US;
-_attribute_data_retention_sec_
-volatile pm_early_wakeup_time_us_s g_pm_early_wakeup_time_us = {
-    .suspend_early_wakeup_time_us = SUSPEND_RET_R_DELAY_US + HARDWARE_DELAY_US + SUSPEND_XTAL_DELAY_US + SUSPEND_CODE_US,
-    .deep_ret_early_wakeup_time_us = SUSPEND_RET_R_DELAY_US + HARDWARE_DELAY_US,
-    .deep_early_wakeup_time_us = DEEP_R_DELAY_US + HARDWARE_DELAY_US + BOOT_ROM_US,
-    .sleep_min_time_us = DEEP_R_DELAY_US + HARDWARE_DELAY_US + BOOT_ROM_US + SLEEP_START_CODE_US + SLEEP_MIN_CODE_US + SLEEP_MIN_MARGIN_US, //(the maximum value of suspend and deep) + margin.
+_attribute_data_retention_sec_ unsigned int                       g_pm_multi_addr            = 0;
+_attribute_data_retention_sec_ unsigned int                       g_pm_suspend_code_us       = SUSPEND_CODE_US;
+_attribute_data_retention_sec_ unsigned int                       g_pm_min_code_us           = SLEEP_MIN_CODE_US;
+_attribute_data_retention_sec_ unsigned int                       g_pm_suspend_xtal_delay_us = SUSPEND_XTAL_DELAY_US;
+_attribute_data_retention_sec_ volatile pm_early_wakeup_time_us_s g_pm_early_wakeup_time_us  = {
+     .suspend_early_wakeup_time_us  = SUSPEND_RET_R_DELAY_US + HARDWARE_DELAY_US + SUSPEND_XTAL_DELAY_US + SUSPEND_CODE_US,
+     .deep_ret_early_wakeup_time_us = SUSPEND_RET_R_DELAY_US + HARDWARE_DELAY_US,
+     .deep_early_wakeup_time_us     = DEEP_R_DELAY_US + HARDWARE_DELAY_US + BOOT_ROM_US,
+     .sleep_min_time_us             = DEEP_R_DELAY_US + HARDWARE_DELAY_US + BOOT_ROM_US + SLEEP_START_CODE_US + SLEEP_MIN_CODE_US + SLEEP_MIN_MARGIN_US, //(the maximum value of suspend and deep) + margin.
 };
-_attribute_data_retention_sec_
-volatile pm_r_delay_cycle_s g_pm_r_delay_cycle = {  // 16K clock, 62.5us
-    .deep_r_delay_cycle = DEEP_R_DELAY_US / 62,
-    .suspend_ret_r_delay_cycle = SUSPEND_RET_R_DELAY_US / 62,
-    .deep_xtal_delay_cycle = DEEP_R_DELAY_US / 62,
+_attribute_data_retention_sec_ volatile pm_r_delay_cycle_s g_pm_r_delay_cycle = {
+    // 16K clock, 62.5us
+    .deep_r_delay_cycle           = DEEP_R_DELAY_US / 62,
+    .suspend_ret_r_delay_cycle    = SUSPEND_RET_R_DELAY_US / 62,
+    .deep_xtal_delay_cycle        = DEEP_R_DELAY_US / 62,
     .suspend_ret_xtal_delay_cycle = SUSPEND_RET_R_DELAY_US / 62,
 };
 
@@ -143,18 +141,15 @@ extern _attribute_ram_code_sec_noinline_ void flash_send_cmd(unsigned int cmd);
  */
 void pm_update_early_wakeup_time(void)
 {
-    int deep_r_delay_us = g_pm_r_delay_cycle.deep_r_delay_cycle * 1000 / 16;
+    int deep_r_delay_us        = g_pm_r_delay_cycle.deep_r_delay_cycle * 1000 / 16;
     int suspend_ret_r_delay_us = g_pm_r_delay_cycle.suspend_ret_r_delay_cycle * 1000 / 16;
 
-    g_pm_early_wakeup_time_us.suspend_early_wakeup_time_us = suspend_ret_r_delay_us + HARDWARE_DELAY_US + g_pm_suspend_xtal_delay_us + g_pm_suspend_code_us;
+    g_pm_early_wakeup_time_us.suspend_early_wakeup_time_us  = suspend_ret_r_delay_us + HARDWARE_DELAY_US + g_pm_suspend_xtal_delay_us + g_pm_suspend_code_us;
     g_pm_early_wakeup_time_us.deep_ret_early_wakeup_time_us = suspend_ret_r_delay_us + HARDWARE_DELAY_US;
-    g_pm_early_wakeup_time_us.deep_early_wakeup_time_us = deep_r_delay_us + HARDWARE_DELAY_US + BOOT_ROM_US;
-    if((g_pm_early_wakeup_time_us.deep_early_wakeup_time_us + g_pm_min_code_us) < g_pm_early_wakeup_time_us.suspend_early_wakeup_time_us)
-    {
+    g_pm_early_wakeup_time_us.deep_early_wakeup_time_us     = deep_r_delay_us + HARDWARE_DELAY_US + BOOT_ROM_US;
+    if ((g_pm_early_wakeup_time_us.deep_early_wakeup_time_us + g_pm_min_code_us) < g_pm_early_wakeup_time_us.suspend_early_wakeup_time_us) {
         g_pm_early_wakeup_time_us.sleep_min_time_us = g_pm_early_wakeup_time_us.suspend_early_wakeup_time_us + SLEEP_START_CODE_US + SLEEP_MIN_MARGIN_US;
-    }
-    else
-    {
+    } else {
         g_pm_early_wakeup_time_us.sleep_min_time_us = g_pm_early_wakeup_time_us.deep_early_wakeup_time_us + SLEEP_START_CODE_US + g_pm_min_code_us + SLEEP_MIN_MARGIN_US;
     }
 }
@@ -167,9 +162,9 @@ void pm_update_early_wakeup_time(void)
  */
 void pm_set_wakeup_time_param(pm_r_delay_cycle_s param)
 {
-    g_pm_r_delay_cycle.deep_r_delay_cycle = param.deep_r_delay_cycle;
-    g_pm_r_delay_cycle.suspend_ret_r_delay_cycle = param.suspend_ret_r_delay_cycle;
-    g_pm_r_delay_cycle.deep_xtal_delay_cycle = param.deep_xtal_delay_cycle;
+    g_pm_r_delay_cycle.deep_r_delay_cycle           = param.deep_r_delay_cycle;
+    g_pm_r_delay_cycle.suspend_ret_r_delay_cycle    = param.suspend_ret_r_delay_cycle;
+    g_pm_r_delay_cycle.deep_xtal_delay_cycle        = param.deep_xtal_delay_cycle;
     g_pm_r_delay_cycle.suspend_ret_xtal_delay_cycle = param.suspend_ret_xtal_delay_cycle;
 
     pm_update_early_wakeup_time();
@@ -187,7 +182,7 @@ void pm_set_wakeup_time_param(pm_r_delay_cycle_s param)
  */
 void pm_set_xtal_stable_timer_param(unsigned int delay_us, unsigned int loopnum)
 {
-    g_pm_xtal_stable_loopnum = loopnum;
+    g_pm_xtal_stable_loopnum   = loopnum;
     g_pm_suspend_xtal_delay_us = delay_us;
 
     pm_update_early_wakeup_time();
@@ -209,15 +204,44 @@ pm_sw_reboot_reason_e pm_get_sw_reboot_event(void)
  * @return      none.
  */
 /**< BLE USED *****/
-_attribute_ram_code_sec_noinline_ void pm_sleep_start(pm_sleep_mode_e sleep_mode)
+_attribute_ram_code_sec_optimize_o2_noinline_ void pm_sleep_start(pm_sleep_mode_e sleep_mode)
 /**< BLE USED END */
 {
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     /******************************************debug_pm_info**********************************************/
     debug_pm_info = 0x20;
 #endif
 
-    pm_set_dig_module_power_switch(g_pm_suspend_power_cfg, PM_POWER_DOWN);
+    /**
+        Before powering up the zb, you need to make sure that the input function of PA2 is disable, otherwise it may cause the RF module to not have clock.
+        In response to this question,The principle of suspend handling is:
+        If the PA2 input function is enabled, it will not actively turn off the ZB (causing the pm_set_suspend_power_cfg function not to take effect).
+        Because if you take the initiative to turn off the ZB, you need to recover after wakeup, and the scenario of Power on zb when PA2 input is enabled will occur,
+        so in order not to trigger the situation, choose not to take the initiative to turn off the ZB, in this case,
+        the pm_set_suspend_power_cfg function will not take effect, and the suspend power consumption will be higher, but it won't affect the function.
+        The processing during suspend sleep is as follows:
+        +--------------+-----------------------+--------- -------------------------------------+-----------------------------------------+
+        | PA2 input    | User ZB configuration |    Handling of ZB during sleep                |   pm_set_suspend_power_cfg function     |
+        +--------------+-----------------------+-----------------------------------------------+-----------------------------------------+
+        |   enable     |       power on        |   Maintain user ZB configuration(power on)    |            Not effective                |
+        |   enable     |       power down      |   Maintain user ZB configuration(power down)  |            Not effective                |
+        |   disable    |       xx              |   determined by the pm_set_suspend_power_cfg  |            effective                    |
+        +--------------+-----------------------+-----------------------------------------------+-----------------------------------------+
+        Handling after suspend wakeup: restoring user ZB configuration
+        See jira for details:BUT-53.(add by weihua.zhang, confirmed by peng.hao 20250101)
+     */
+    unsigned char areg_7d = 0;
+    if(sleep_mode == SUSPEND_MODE)
+    {
+        areg_7d = analog_read_reg8(areg_aon_0x7d);
+        if(reg_gpio_pa_ie&0x04)
+        {
+            g_pm_suspend_power_cfg &= ~FLD_PD_ZB_EN;
+        }
+        pm_set_dig_module_power_switch(g_pm_suspend_power_cfg, PM_POWER_DOWN);
+    }else{
+        pm_set_dig_module_power_switch((FLD_PD_ZB_EN | FLD_PD_USB_EN | FLD_PD_AUDIO_EN), PM_POWER_DOWN);
+    }
 
     flash_send_cmd(FLASH_WRITE_DEEP_CMD);
     gpio_set_mspi_pin_ie_dis();
@@ -226,7 +250,7 @@ _attribute_ram_code_sec_noinline_ void pm_sleep_start(pm_sleep_mode_e sleep_mode
     //there will be two power supplies at the same time, which may cause abnormalities.add by weihua.zhang, confirmed by haitao 20210107
     pm_enable_native_ldo();
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     /******************************************debug_pm_info**********************************************/
     debug_pm_info = 0x21;
 #endif
@@ -241,37 +265,33 @@ _attribute_ram_code_sec_noinline_ void pm_sleep_start(pm_sleep_mode_e sleep_mode
     //the mcu cannot wake up from the stall because it is edge wake-up.The LDO is level awake and the LDO is powered on.
     //At this time, the mcu and ldo are out of sync.(add by weihua.zhang, confirmed by jianzhi.chen 20230907)
     plic_interrupt_enable(IRQ_PM_LVL);
-    unsigned int clr_plic_request_result = 0;
-    unsigned char clr_pm_irq_result = pm_clr_all_irq_status();
-    if(clr_pm_irq_result == 1){
+    unsigned int  clr_plic_request_result = 0;
+    unsigned char clr_pm_irq_result       = pm_clr_all_irq_status();
+    if (clr_pm_irq_result == 1) {
         clr_plic_request_result = plic_clr_all_request();
     }
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     /******************************************debug_pm_info**********************************************/
     debug_pm_info = 0x22;
 #endif
 
     //If the clearing fails, it indicates that the wake source is active. In this case, the deep mode will reboot,
     //and the other modes continue to run downward.(add by weihua.zhang, 20230907)
-    if((clr_pm_irq_result == 0) || (clr_plic_request_result == 0))
-    {
-#if(PM_DEBUG)
-        while(1);
+    if ((clr_pm_irq_result == 0) || (clr_plic_request_result == 0)) {
+#if (PM_DEBUG)
+        while (1);
 #endif
-        if(sleep_mode == DEEPSLEEP_MODE)
-        {
+        if (sleep_mode == DEEPSLEEP_MODE) {
             pm_sys_reboot_with_reason(PM_CLR_PLIC_REQUEST_FAIL, 0x01);
-            while(1);
+            while (1);
         }
-    }
-    else
-    {
-#if(PM_DEBUG)
+    } else {
+#if (PM_DEBUG)
         debug_min_code_tick_3 = rdmcycle();
-        debug_sleep_32k_cur = analog_read_reg32(0x60);
-        if((debug_ana_tick_reset - debug_sleep_32k_cur) > BIT(30)){
-            while(1);
+        debug_sleep_32k_cur = clock_get_32k_tick();
+        if ((debug_ana_tick_reset - debug_sleep_32k_cur) > BIT(30)) {
+            while (1);
         }
 #endif
 
@@ -295,19 +315,23 @@ _attribute_ram_code_sec_noinline_ void pm_sleep_start(pm_sleep_mode_e sleep_mode
     gpio_set_low_level(GPIO_PB5);
 #endif
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     /******************************************debug_pm_info**********************************************/
     debug_pm_info = 0x23;
 #endif
 
     g_pm_status_info.wakeup_src = pm_get_wakeup_src();
+    g_pm_status_info.wakeup_src = pm_get_wakeup_src();
+    g_pm_status_info.wakeup_src = pm_get_wakeup_src();
+    g_pm_status_info.wakeup_src = pm_get_wakeup_src();
+    g_pm_status_info.wakeup_src = pm_get_wakeup_src();
 
-#if(PM_DEBUG)
-    if(g_pm_status_info.wakeup_src&0x70){
-        for(unsigned int i=0; i<128; i++){
+#if (PM_DEBUG)
+    if (g_pm_status_info.wakeup_src & 0x70) {
+        for (unsigned int i = 0; i < 128; i++) {
             debug_ana_reg[i] = analog_read_reg8(i);
         }
-        while(1);
+        while (1);
     }
 #endif
 
@@ -315,16 +339,22 @@ _attribute_ram_code_sec_noinline_ void pm_sleep_start(pm_sleep_mode_e sleep_mode
     //the plic cannot be cleared. When exiting the sleep function, if the total interrupt is turned on, the interrupt handler function is entered.
     //If the interrupt handler is not defined, the program will run away.(changed by weihua.zhang, confirmed by jianzhi 20231101)
     plic_interrupt_disable(IRQ_PM_LVL);
-    pm_clr_all_irq_status();  //clear all flag
+    pm_clr_all_irq_status(); //clear all flag
     plic_clr_all_request();
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     /******************************************debug_pm_info**********************************************/
     debug_pm_info = 0x24;
 #endif
 
     pm_disable_native_ldo();
     pm_disable_spd_ldo_enable_ret_ldo();
+    if((areg_7d&FLD_PD_ZB_EN) == 0x00)
+    {
+        pm_set_dig_module_power_switch(FLD_PD_ZB_EN, PM_POWER_UP);
+    }else{
+        pm_set_dig_module_power_switch(FLD_PD_ZB_EN, PM_POWER_DOWN);
+    }
 
     //must to set xo_quick_settle with manual and wait it stable(added by jilong.liu, confirmed by wenfeng 20240320)
     crystal_manual_settle();
@@ -337,9 +367,9 @@ _attribute_ram_code_sec_noinline_ void pm_sleep_start(pm_sleep_mode_e sleep_mode
     //by flash will be disabled. After suspend wakes up, the six lines will be set to input function.
     //(changed by weihua.zhang, confirmed by jianzhi 20201201)
     gpio_set_mspi_pin_ie_en();
-    flash_send_cmd(FLASH_WRITE_RELEASE_CMD);     //flash wakeup
+    flash_send_cmd(FLASH_WRITE_RELEASE_CMD); //flash wakeup
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     /******************************************debug_pm_info**********************************************/
     debug_pm_info = 0x25;
 #endif
@@ -351,13 +381,12 @@ _attribute_ram_code_sec_noinline_ void pm_sleep_start(pm_sleep_mode_e sleep_mode
     //(add by bingyu.li, confirmed by wenfeng.lou 20230531)
     pm_wait_xtal_ready(0x01);
 
-    if(sys_clk_config.bbpll_is_used == 1)
-    {
+    if (sys_clk_config.bbpll_is_used == 1) {
         pm_bbpll_power_up();
         g_bbpll_is_used = 1;
     }
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     /******************************************debug_pm_info**********************************************/
     debug_pm_info = 0x26;
 #endif
@@ -379,16 +408,22 @@ _attribute_ram_code_sec_noinline_ void pm_sleep_start(pm_sleep_mode_e sleep_mode
                                       The range of tick that can be set is approximately: 64~0xffffffff,
                                       and the corresponding sleep time is approximately: 2ms~37hours.
                                       When it exceeds this range, it cannot sleep properly.
- * @note        There are two things to note when using LPC wake up:
- *              1.After the LPC is configured, you need to wait 100 seconds before you can go to sleep.
- *                After the LPC is opened, 1-2 32k tick is needed to calculate the result.
- *                Before this, the data in the result register is random. If you enter the sleep function at this time,
- *                you may not be able to sleep normally because the data in the result register is abnormal.
- *              2.When entering sleep, keep the input voltage and reference voltage difference must be greater than 30mV,
- *                otherwise can not enter sleep normally, crash occurs.
+ * @note        -# There are two things to note when using LPC wake up:
+ *                 1.After the LPC is configured, you need to wait 100 seconds before you can go to sleep.
+ *                   After the LPC is opened, 1-2 32k tick is needed to calculate the result.
+ *                   Before this, the data in the result register is random. If you enter the sleep function at this time,
+ *                   you may not be able to sleep normally because the data in the result register is abnormal.
+ *                 2.When entering sleep, keep the input voltage and reference voltage difference must be greater than 30mV,
+ *                   otherwise can not enter sleep normally, crash occurs.
+ *              -# Before calling this function, the input function of PA2 must be enabled.
+ *                 If there is a scenario where the input function of PA2 must be enabled before calling this function, the processing in this function is as follows:
+ *                 The FLD_PD_ZB_EN configuration of the function pm_set_suspend_power_cfg will not take effect and it will be handled in accordance with keeping the user FLD_PD_ZB_EN configuration.
+ *                 If the user is power on FLD_PD_ZB_EN, the power consumption of suspend will be about 6uA larger in this usage scenario.
+ *                 After suspend wakes up, it restores the user's FLD_PD_ZB_EN configuration((BUT-53))
  * @return      indicate whether the cpu is wake up successful.
+ * @attention   Must ensure that all GPIOs cannot be floating status before going to sleep to prevent power leakage.
  */
-_attribute_ram_code_sec_noinline_ int pm_sleep_wakeup_ram(pm_sleep_mode_e sleep_mode, pm_sleep_wakeup_src_e wakeup_src, pm_wakeup_tick_type_e wakeup_tick_type, unsigned int wakeup_tick)
+_attribute_ram_code_sec_optimize_o2_noinline_ int pm_sleep_wakeup_ram(pm_sleep_mode_e sleep_mode, pm_sleep_wakeup_src_e wakeup_src, pm_wakeup_tick_type_e wakeup_tick_type, unsigned int wakeup_tick)
 {
     /**
      * At present, the compensation value in the function is tested on the basis of the optimization level O2. If there are other optimization levels,
@@ -407,55 +442,46 @@ _attribute_ram_code_sec_noinline_ int pm_sleep_wakeup_ram(pm_sleep_mode_e sleep_
 
     ///////////////////       /////////////////////////////////
     int timer_wakeup_enable = (wakeup_src & PM_WAKEUP_TIMER);
-    if(timer_wakeup_enable)
-    {
-        if(wakeup_tick_type == PM_TICK_STIMER)
-        {
+    if (timer_wakeup_enable) {
+        if (wakeup_tick_type == PM_TICK_STIMER) {
             unsigned int span = (unsigned int)(wakeup_tick - stimer_get_tick());
             if (span > 0xE0000000) //BIT(31)+BIT(30)+BIT(29)   7/8 cycle of 32bit, 178*7/8 = 156 S
             {
                 core_restore_interrupt(r);
-                return  pm_get_wakeup_src() | STATUS_EXCEED_MAX;
-            }
-            else if (span < g_pm_early_wakeup_time_us.sleep_min_time_us * SYSTEM_TIMER_TICK_1US)
-            {
+                return pm_get_wakeup_src() | STATUS_EXCEED_MAX;
+            } else if (span < g_pm_early_wakeup_time_us.sleep_min_time_us * SYSTEM_TIMER_TICK_1US) {
                 unsigned int t = stimer_get_tick();
                 pm_clr_irq_status(FLD_WAKEUP_STATUS_ALL);
                 unsigned char st;
-                do
-                {
+                do {
                     st = pm_get_wakeup_src();
-                }while ( ((unsigned int)stimer_get_tick () - t < span) && !(st & WAKEUP_STATUS_INUSE_ALL));
+                } while (((unsigned int)stimer_get_tick() - t < span) && !(st & WAKEUP_STATUS_INUSE_ALL));
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
                 /******************************************debug_pm_info 1 **********************************************/
-                debug_pm_info = 1;
-                debug_min_wakeup_src = st;
+                debug_pm_info         = 1;
+                debug_min_wakeup_src  = st;
                 debug_min_stimer_tick = t;
 #endif
 
                 core_restore_interrupt(r);
                 return st | STATUS_EXCEED_MIN;
             }
-        }
-        else
-        {
+        } else {
             //What is the minimum time us, converted to how many 32k ticks.
             //When the minimum time is 2ms, the difference between /31.25 and /31 is 0.5 ticks, so 31 can also be used.
-            if (wakeup_tick < g_pm_early_wakeup_time_us.sleep_min_time_us / 31)
-            {
-                unsigned int t = clock_get_32k_tick () - 1;
+            if (wakeup_tick < g_pm_early_wakeup_time_us.sleep_min_time_us / 31) {
+                unsigned int t = clock_get_32k_tick() - 1;
                 pm_clr_irq_status(FLD_WAKEUP_STATUS_ALL);
                 unsigned char st;
-                do
-                {
+                do {
                     st = pm_get_wakeup_src();
-                }while ( ((unsigned int)clock_get_32k_tick () - t < wakeup_tick) && !(st & WAKEUP_STATUS_INUSE_ALL));
+                } while (((unsigned int)clock_get_32k_tick() - t < wakeup_tick) && !(st & WAKEUP_STATUS_INUSE_ALL));
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
                 /******************************************debug_pm_info 1 **********************************************/
-                debug_pm_info = 1;
-                debug_min_wakeup_src = st;
+                debug_pm_info         = 1;
+                debug_min_wakeup_src  = st;
                 debug_min_stimer_tick = t;
 #endif
 
@@ -470,7 +496,7 @@ _attribute_ram_code_sec_noinline_ int pm_sleep_wakeup_ram(pm_sleep_mode_e sleep_
     //modify by bingyu.li, confirmed by jianzhi.chen at 20230810.
     plic_irqs_preprocess_for_wfi(0, FLD_MIE_MEIE);
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     /******************************************debug_pm_info 2 **********************************************/
     debug_pm_info = 2;
 #endif
@@ -485,49 +511,46 @@ _attribute_ram_code_sec_noinline_ int pm_sleep_wakeup_ram(pm_sleep_mode_e sleep_
     clock_save_clock_config();
     clock_set_all_clock_to_default();
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     /******************************************debug_pm_info 3 **********************************************/
     debug_pm_info = 3;
 #endif
 
     ///////////////////     get 32k calib      /////////////////////////////////
-    if(CLK_32K_RC == g_clk_32k_src)
-    {
-        while(!stimer_get_tracking_32k_value());   //Wait for the 32k clock calibration to complete.
+    if (CLK_32K_RC == g_clk_32k_src) {
+        while (!stimer_get_tracking_32k_value()); //Wait for the 32k clock calibration to complete.
 
         g_pm_tick_32k_calib = stimer_get_tracking_32k_value();
-    }
-    else
-    {
-#if(STIMER_CLOCK == STIMER_CLOCK_16M)
+    } else {
+#if (STIMER_CLOCK == STIMER_CLOCK_16M)
         g_pm_tick_32k_calib = CRYSTAL32768_TICK_PER_32CYCLE;
-#elif(STIMER_CLOCK == STIMER_CLOCK_24M)
+#elif (STIMER_CLOCK == STIMER_CLOCK_24M)
         g_pm_tick_32k_calib = CRYSTAL32768_TICK_PER_64CYCLE;
 #endif
     }
-    unsigned int  tick_32k_halfCalib = g_pm_tick_32k_calib>>1;
+    unsigned int tick_32k_halfCalib = g_pm_tick_32k_calib >> 1;
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     analog_write_reg16(PM_ANA_REG_POWER_ON_CLR_BUF1, g_pm_tick_32k_calib);
     /******************************************debug_pm_info 4 **********************************************/
-    debug_pm_info = 4;
+    debug_pm_info      = 4;
     debug_tick_32k_cur = analog_read_reg32(0x60);
 #endif
 
     /////////////////// stop system timer /////////////////////////////////
 #if SYS_TIMER_AUTO_MODE
-    stimer_32k_tracking_disable();  //disable 32k track
-    stimer_set_update_upon_nxt_32k_enable();        //system tick only update upon 32k posedge, must set before enable 32k read update!!!
+    stimer_32k_tracking_disable();           //disable 32k track
+    stimer_set_update_upon_nxt_32k_enable(); //system tick only update upon 32k posedge, must set before enable 32k read update!!!
     g_pm_tick_32k_cur = clock_get_32k_tick();
-    g_pm_tick_cur = stimer_get_tick();
+    g_pm_tick_cur     = stimer_get_tick();
     stimer_set_update_upon_nxt_32k_disable();
-    stimer_disable();   //disable system timer
+    stimer_disable(); //disable system timer
 #else
-    #error -- Manual mode is only for internal testing, and 37 in the code may not be accurate
-    stimer_32k_tracking_disable();  //disable 32k track
-    g_pm_tick_cur = stimer_get_tick() + 37 * SYSTEM_TIMER_TICK_1US;  //cpu_get_32k_tick will cost 30~40 us
-    stimer_disable();       //disable system timer
-    g_pm_tick_32k_cur = clock_get_32k_tick ();
+    #error-- Manual mode is only for internal testing, and 37 in the code may not be accurate
+    stimer_32k_tracking_disable();                                  //disable 32k track
+    g_pm_tick_cur = stimer_get_tick() + 37 * SYSTEM_TIMER_TICK_1US; //cpu_get_32k_tick will cost 30~40 us
+    stimer_disable();                                               //disable system timer
+    g_pm_tick_32k_cur = clock_get_32k_tick();
 #endif
 
 #if PM_START_CODE_DEBUG
@@ -538,162 +561,150 @@ _attribute_ram_code_sec_noinline_ int pm_sleep_wakeup_ram(pm_sleep_mode_e sleep_
     gpio_set_low_level(GPIO_PB5);
 #endif
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     /******************************************debug_pm_info 5 **********************************************/
-    debug_pm_info = 5;
+    debug_pm_info         = 5;
     debug_min_code_tick_1 = rdmcycle();
 #endif
 
     unsigned int earlyWakeup_us;
-    if(sleep_mode & DEEPSLEEP_RETENTION_FLAG)  //deep sleep with retention
+    if (sleep_mode & DEEPSLEEP_RETENTION_FLAG) //deep sleep with retention
     {
         earlyWakeup_us = g_pm_early_wakeup_time_us.deep_ret_early_wakeup_time_us;
-    }
-    else if(sleep_mode == DEEPSLEEP_MODE)  //deepsleep no retention
+    } else if (sleep_mode == DEEPSLEEP_MODE)   //deepsleep no retention
     {
         earlyWakeup_us = g_pm_early_wakeup_time_us.deep_early_wakeup_time_us;
-    }
-    else  //suspend
+    } else                                     //suspend
     {
         earlyWakeup_us = g_pm_early_wakeup_time_us.suspend_early_wakeup_time_us;
     }
 
     //The variable pmcd.ref_tick is added, replacing the original variable g_pm_tick_cur. Because pmcd.ref_tick directly affects the value of
     //g_pm_long_suspend, g_pm_long_suspend can be assigned after pmcd.ref_tick is updated.changed by weihua,confirmed by biao.li.20201204.
-    if(timer_wakeup_enable)
-    {
+    if (timer_wakeup_enable) {
         unsigned int tick_reset;
         unsigned int tick_wakeup_reset;
 
-        if(wakeup_tick_type == PM_TICK_STIMER)
-        {
+        if (wakeup_tick_type == PM_TICK_STIMER) {
             tick_wakeup_reset = (unsigned int)(wakeup_tick - (earlyWakeup_us * SYSTEM_TIMER_TICK_1US) - g_pm_tick_cur);
-            if(CLK_32K_RC == g_clk_32k_src)
-            {
+            if (CLK_32K_RC == g_clk_32k_src) {
                 //0x0fff0000 is selected for tick_wakeup_reset * g_track_32kcnt do not exceed 32bit,
                 //if more than, first divide and then multiply, if not more than, first multiply and then divide.
-                if(tick_wakeup_reset > 0x0fff0000)      // 24M: 11.18S, 16M: 16.77S
+                if (tick_wakeup_reset > 0x0fff0000) // 24M: 11.18S, 16M: 16.77S
                 {
-                    tick_reset = g_pm_tick_32k_cur + tick_wakeup_reset / g_pm_tick_32k_calib * g_track_32kcnt;
+                    tick_reset        = g_pm_tick_32k_cur + tick_wakeup_reset / g_pm_tick_32k_calib * g_track_32kcnt;
                     g_pm_long_suspend = 1;
-                }
-                else
-                {
-                    tick_reset = g_pm_tick_32k_cur + (tick_wakeup_reset * g_track_32kcnt + tick_32k_halfCalib) / g_pm_tick_32k_calib;
+                } else {
+                    tick_reset        = g_pm_tick_32k_cur + (tick_wakeup_reset * g_track_32kcnt + tick_32k_halfCalib) / g_pm_tick_32k_calib;
                     g_pm_long_suspend = 0;
                 }
-            }
-            else
-            {
-#if(STIMER_CLOCK == STIMER_CLOCK_16M)
-                if(tick_wakeup_reset > 0x07ff0000)      // 16M: 8.38S
+            } else {
+#if (STIMER_CLOCK == STIMER_CLOCK_16M)
+                if (tick_wakeup_reset > 0x07ff0000) // 16M: 8.38S
                 {
-                    tick_reset = g_pm_tick_32k_cur + tick_wakeup_reset / g_pm_tick_32k_calib * 32;
+                    tick_reset        = g_pm_tick_32k_cur + tick_wakeup_reset / g_pm_tick_32k_calib * 32;
                     g_pm_long_suspend = 1;
-                }
-                else
-                {
-                    tick_reset = g_pm_tick_32k_cur + (tick_wakeup_reset * 32 + tick_32k_halfCalib) / g_pm_tick_32k_calib;
+                } else {
+                    tick_reset        = g_pm_tick_32k_cur + (tick_wakeup_reset * 32 + tick_32k_halfCalib) / g_pm_tick_32k_calib;
                     g_pm_long_suspend = 0;
                 }
-#elif(STIMER_CLOCK == STIMER_CLOCK_24M)
-                if(tick_wakeup_reset > 0x03ff0000)      // 24M: 2.79S
+#elif (STIMER_CLOCK == STIMER_CLOCK_24M)
+                if (tick_wakeup_reset > 0x03ff0000) // 24M: 2.79S
                 {
-                    tick_reset = g_pm_tick_32k_cur + tick_wakeup_reset / g_pm_tick_32k_calib * 64;
+                    tick_reset        = g_pm_tick_32k_cur + tick_wakeup_reset / g_pm_tick_32k_calib * 64;
                     g_pm_long_suspend = 1;
-                }
-                else
-                {
-                    tick_reset = g_pm_tick_32k_cur + (tick_wakeup_reset * 64 + tick_32k_halfCalib) / g_pm_tick_32k_calib;
+                } else {
+                    tick_reset        = g_pm_tick_32k_cur + (tick_wakeup_reset * 64 + tick_32k_halfCalib) / g_pm_tick_32k_calib;
                     g_pm_long_suspend = 0;
                 }
 #endif
             }
-        }
-        else
-        {
-            tick_reset = g_pm_tick_32k_cur + wakeup_tick - (earlyWakeup_us * 4 / 125);  // 32k clk: /31.25
+        } else {
+            tick_reset = g_pm_tick_32k_cur + wakeup_tick - (earlyWakeup_us * 4 / 125); // 32k clk: /31.25
         }
         //The clock_ct_32k_tick interface needs to avoid encountering rising edges of 32k as much as possible.
         //Otherwise, if the intermediate data generated during the clock_set_32k_tick process has the same value as 32k tick, it will cause the wake-up source to be set.
-        //The interval time between the clock_get_32k_tick() and clock_set_32k_tick() interfaces should be as short as possible 
+        //The interval time between the clock_get_32k_tick() and clock_set_32k_tick() interfaces should be as short as possible
         //to avoid the clock_set_32k_tick() interface encountering a rising edge of 32k.
         //add by weihua.zhang at 20240827
         clock_set_32k_tick(tick_reset);
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
         analog_write_reg32(PM_ANA_REG_WD_CLR_BUF1, g_pm_tick_32k_cur);
-        debug_ana_32k_tick = analog_read_reg32(areg_aon_0x65);
+        debug_ana_32k_tick   = analog_read_reg32(areg_aon_0x65);
         debug_ana_tick_reset = tick_reset;
-        if(tick_reset != debug_ana_32k_tick)
-        {
+        if (tick_reset != debug_ana_32k_tick) {
             stimer_enable_in_manual_mode();
-            stimer_32k_tracking_enable();   //enable 32k cal
+            stimer_32k_tracking_enable(); //enable 32k cal
             gpio_set_high_level(GPIO_PE7);
-            while(1);
+            while (1);
         }
         /******************************************debug_pm_info 6 **********************************************/
-        debug_pm_info = 6;
+        debug_pm_info         = 6;
         debug_min_code_tick_2 = rdmcycle();
 #endif
-
     }
 
     /////////////////// set wakeup source /////////////////////////////////
     pm_set_wakeup_src(wakeup_src);
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     /******************************************debug_pm_info 7 **********************************************/
     debug_pm_info = 7;
 #endif
 
     /////////////////// auto power down /////////////////////////////////
-    unsigned short auto_power_down = FLD_PD_32K_RC|FLD_PD_32K_XTAL|FLD_PD_24M_XTAL|FLD_PD_DCDC|FLD_PD_VBUS_LDO|FLD_PD_ANA_BBPLL_TEMP_LDO\
-                                    |FLD_PD_VBUS_SW|FLD_PD_SEQUENCE_EN;
-    unsigned char sleep_ldo_en = 0;
+    unsigned short auto_power_down = FLD_PD_32K_RC | FLD_PD_32K_XTAL | FLD_PD_24M_XTAL | FLD_PD_DCDC | FLD_PD_VBUS_LDO | FLD_PD_ANA_BBPLL_TEMP_LDO | FLD_PD_VBUS_SW | FLD_PD_SEQUENCE_EN;
+    unsigned char  sleep_ldo_en    = 0;
 
-    if(sleep_mode & DEEPSLEEP_RETENTION_FLAG)  //deep sleep with retention
+
+    /*
+     * afe_0x7e<2:0> sram_ret default(000)
+     * afe_0x7e<6:4> sram_slp default(000)
+     * Analog 0x7e will remain value after sleep, the sram_slp is use to control the sram voltage not only in deep retention sleep mode but also take effect in suspend sleep mode.
+     * If enter suspend sleep mode after enter deep retention sleep mode(setup not retention all sram), then the SRAM will also not retention all sram during suspend sleep mode.
+     * So for tl321x it needs to be rewritten when enter suspend sleep mode.
+     * (added by jilong.liu, confirmed by jianzhi.chen at 20241225)
+     */
+    analog_write_reg8(areg_aon_0x7e, sleep_mode);
+
+    if (sleep_mode & DEEPSLEEP_RETENTION_FLAG)                                       //deep sleep with retention
     {
-        g_pm_multi_addr = reg_mspi_xip_core_size | (reg_mspi_xip_core_offset << 16);//after retention, multiple address offset is lost, save it
-
-        analog_write_reg8(areg_aon_0x7e, sleep_mode);
+        g_pm_multi_addr = reg_mspi_xip_core_size | (reg_mspi_xip_core_offset << 16); //after retention, multiple address offset is lost, save it
 
         auto_power_down |= FLD_PD_ISOLATION;
         sleep_ldo_en = FLD_PD_DIG_RET_LDO;
-    }
-    else if(sleep_mode == DEEPSLEEP_MODE)  //deepsleep no retention
+    } else if (sleep_mode == DEEPSLEEP_MODE) //deepsleep no retention
     {
         auto_power_down |= FLD_PD_ISOLATION;
         sleep_ldo_en = 0;
-    }
-    else  //suspend
+    } else //suspend
     {
         sleep_ldo_en = FLD_PD_SPD_LDO;
     }
 
-    if(!(wakeup_src & PM_WAKEUP_COMPARATOR)){
+    if (!(wakeup_src & PM_WAKEUP_COMPARATOR)) {
         auto_power_down |= FLD_PD_LPC;
     }
 
-    if(((wakeup_src & PM_WAKEUP_PAD) && g_pm_pad_filter_en) || (wakeup_src & PM_WAKEUP_TIMER) || (wakeup_src & PM_WAKEUP_COMPARATOR))
-    {
-        if(CLK_32K_RC == g_clk_32k_src){
-            auto_power_down &= ~FLD_PD_32K_RC;  //disable auto power down 32KRC
-        }else{
+    if (((wakeup_src & PM_WAKEUP_PAD) && g_pm_pad_filter_en) || (wakeup_src & PM_WAKEUP_TIMER) || (wakeup_src & PM_WAKEUP_COMPARATOR)) {
+        if (CLK_32K_RC == g_clk_32k_src) {
+            auto_power_down &= ~FLD_PD_32K_RC; //disable auto power down 32KRC
+        } else {
             //suspend mode or deep retention mode or timer wake up source.
             //(we don't power down external 32k pad clock, even though three's no timer wake up source in suspend or deep retention mode)
-            auto_power_down &= ~FLD_PD_32K_XTAL;  //if use timer wake up, auto pad 32k power down should be disabled
+            auto_power_down &= ~FLD_PD_32K_XTAL; //if use timer wake up, auto pad 32k power down should be disabled
         }
-    }else{
-        if(CLK_32K_XTAL == g_clk_32k_src){
-            if(sleep_mode == DEEPSLEEP_MODE){
+    } else {
+        if (CLK_32K_XTAL == g_clk_32k_src) {
+            if (sleep_mode == DEEPSLEEP_MODE) {
                 //deep + no tmr wakeup(we need  32k clk to count dcdc dly and xtal dly, but this case, ext 32k clk need close, here we use 32k rc instead.
                 //switch 32k clk src: select internal 32k rc, if not do this, when deep+pad wakeup: there's no stable 32k clk(therefore, the pad wake-up time
                 //is a bit long, the need for external 32k crystal vibration time) to count DCDC dly and XTAL dly. High temperatures even make it impossible
                 //to vibrate, as the code for PWM excitation crystals has not yet been effectively executed. SO, we can switch 32k clk to the internal 32k rc.
                 clock_32k_init(CLK_32K_RC);
-            }else{
-                auto_power_down &= ~FLD_PD_32K_XTAL;  //if use timer wake up, auto pad 32k power down should be disabled
+            } else {
+                auto_power_down &= ~FLD_PD_32K_XTAL; //if use timer wake up, auto pad 32k power down should be disabled
             }
         }
     }
@@ -702,25 +713,22 @@ _attribute_ram_code_sec_noinline_ int pm_sleep_wakeup_ram(pm_sleep_mode_e sleep_
     //areg_aon_0x06 need to restore after wake up
     analog_write_reg8(areg_aon_0x06, (analog_read_reg8(areg_aon_0x06) | FLD_PD_BBPLL_LDO | FLD_PD_SPD_LDO | FLD_PD_DIG_RET_LDO) & (~sleep_ldo_en));
     sys_clk_config.bbpll_is_used = g_bbpll_is_used;
-    g_bbpll_is_used = 0;
+    g_bbpll_is_used              = 0;
     analog_write_reg16(areg_aon_0x4c, auto_power_down);
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     /******************************************debug_pm_info 8 **********************************************/
     debug_pm_info = 8;
 #endif
 
     /////////////////// R DELAY AND XTAL DELAY /////////////////////////////////
-    if(sleep_mode == DEEPSLEEP_MODE)
-    {
+    if (sleep_mode == DEEPSLEEP_MODE) {
         pm_set_delay_cycle(g_pm_r_delay_cycle.deep_xtal_delay_cycle, g_pm_r_delay_cycle.deep_r_delay_cycle);
-    }
-    else
-    {
+    } else {
         pm_set_delay_cycle(g_pm_r_delay_cycle.suspend_ret_xtal_delay_cycle, g_pm_r_delay_cycle.suspend_ret_r_delay_cycle);
     }
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     /******************************************debug_pm_info 9 **********************************************/
     debug_pm_info = 9;
 #endif
@@ -729,27 +737,25 @@ _attribute_ram_code_sec_noinline_ int pm_sleep_wakeup_ram(pm_sleep_mode_e sleep_
     //This process will generate an intermediate value, which may be the same as the current 32k tick value.
     //If the value is the same, the state of the timer wake source will be set.
     //changed by weihua, confirmed by jianzhi. 20240711.
-    pm_clr_irq_status(FLD_WAKEUP_STATUS_ALL);               //clear all flag
+    pm_clr_irq_status(FLD_WAKEUP_STATUS_ALL); //clear all flag
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     debug_sleep_start_wakeup_src1 = pm_get_wakeup_src();
     /******************************************debug_pm_info 11 **********************************************/
     debug_pm_info = 11;
 #endif
 
-    if(pm_get_wakeup_src() & WAKEUP_STATUS_INUSE_ALL){
-
-#if(PM_DEBUG)
+    if (pm_get_wakeup_src() & WAKEUP_STATUS_INUSE_ALL) {
+#if (PM_DEBUG)
         debug_sleep_start_wakeup_src2 = pm_get_wakeup_src();
-        debug_sleep_start_cur_tick = analog_read_reg32(0x60);
-        debug_sleep_start_set_tick = analog_read_reg32(0x65);
+        debug_sleep_start_cur_tick    = analog_read_reg32(0x60);
+        debug_sleep_start_set_tick    = analog_read_reg32(0x65);
 #endif
 
-    }else{
-
-        if(sleep_mode & DEEPSLEEP_RETENTION_FLAG){
+    } else {
+        if (sleep_mode & DEEPSLEEP_RETENTION_FLAG) {
             g_areg_aon_7f = (g_areg_aon_7f & (~FLD_BOOTFROMBROM)) | g_pm_pad_filter_en;
-        }else{
+        } else {
             g_areg_aon_7f = (g_areg_aon_7f | FLD_BOOTFROMBROM | g_pm_pad_filter_en);
         }
         analog_write_reg8(areg_aon_0x7f, g_areg_aon_7f);
@@ -757,23 +763,23 @@ _attribute_ram_code_sec_noinline_ int pm_sleep_wakeup_ram(pm_sleep_mode_e sleep_
         pm_sleep_start(sleep_mode);
     }
 
-#if(PM_DEBUG)
-        /******************************************debug_pm_info 12 **********************************************/
+#if (PM_DEBUG)
+    /******************************************debug_pm_info 12 **********************************************/
     debug_pm_info = 12;
 #endif
 
-    if(sleep_mode == DEEPSLEEP_MODE){
-        sys_reset_all();  //reboot
+    if (sleep_mode == DEEPSLEEP_MODE) {
+        sys_reset_all(); //reboot
     }
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     /******************************************debug_pm_info 13 **********************************************/
     debug_pm_info = 13;
 #endif
 
     pm_stimer_recover();
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     /******************************************debug_pm_info 14 **********************************************/
     debug_pm_info = 14;
 #endif
@@ -782,7 +788,7 @@ _attribute_ram_code_sec_noinline_ int pm_sleep_wakeup_ram(pm_sleep_mode_e sleep_
 
     mspi_set_xip_en();
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     /******************************************debug_pm_info 15 **********************************************/
     debug_pm_info = 15;
 #endif
@@ -794,12 +800,12 @@ _attribute_ram_code_sec_noinline_ int pm_sleep_wakeup_ram(pm_sleep_mode_e sleep_
 #if PM_SUSPEND_WHILE_DEBUG
     gpio_set_low_level(GPIO_PB5);
 #endif
-    if((g_pm_status_info.wakeup_src & WAKEUP_STATUS_TIMER) && timer_wakeup_enable)  //wakeup from timer only
+    if ((g_pm_status_info.wakeup_src & WAKEUP_STATUS_TIMER) && timer_wakeup_enable) //wakeup from timer only
     {
-        if(wakeup_tick_type == PM_TICK_STIMER){
-            while((unsigned int)(stimer_get_tick() - wakeup_tick) > BIT(30));
-        }else{
-            while((unsigned int)(clock_get_32k_tick() - wakeup_tick - g_pm_tick_32k_cur + 1) > BIT(30));
+        if (wakeup_tick_type == PM_TICK_STIMER) {
+            while ((unsigned int)(stimer_get_tick() - wakeup_tick) > BIT(30));
+        } else {
+            while ((unsigned int)(clock_get_32k_tick() - wakeup_tick - g_pm_tick_32k_cur + 1) > BIT(30));
         }
     }
 
@@ -807,7 +813,7 @@ _attribute_ram_code_sec_noinline_ int pm_sleep_wakeup_ram(pm_sleep_mode_e sleep_
     gpio_set_high_level(GPIO_PB5);
 #endif
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     /******************************************debug_pm_info 16 **********************************************/
     debug_pm_info = 16;
 #endif
@@ -818,7 +824,7 @@ _attribute_ram_code_sec_noinline_ int pm_sleep_wakeup_ram(pm_sleep_mode_e sleep_
     plic_irqs_postprocess_for_wfi();
     core_restore_interrupt(r);
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     /******************************************debug_pm_info 17 **********************************************/
     debug_pm_info = 17;
 #endif
@@ -851,10 +857,9 @@ _attribute_text_sec_ int pm_sleep_wakeup(pm_sleep_mode_e sleep_mode, pm_sleep_wa
  */
 void pm_set_suspend_power_cfg(pm_pd_module_e value, unsigned char on_off)
 {
-    if(0 == on_off){
+    if (0 == on_off) {
         g_pm_suspend_power_cfg |= (value);
-    }
-    else{
+    } else {
         g_pm_suspend_power_cfg &= ~(value);
     }
 }
@@ -878,22 +883,20 @@ void pm_set_gpio_wakeup(gpio_pin_e pin, pm_gpio_wakeup_level_e pol, int en)
 
     ////////////////////////// polarity ////////////////////////
     analog_reg = ((pin >> 8) + 0x3f);
-    val = analog_read_reg8(analog_reg);
+    val        = analog_read_reg8(analog_reg);
     if (pol) {
         val &= ~mask;
-    }
-    else {
+    } else {
         val |= mask;
     }
     analog_write_reg8(analog_reg, val);
 
     /////////////////////////// enable /////////////////////
     analog_reg = ((pin >> 8) + 0x45);
-    val = analog_read_reg8(analog_reg);
+    val        = analog_read_reg8(analog_reg);
     if (en) {
         val |= mask;
-    }
-    else {
+    } else {
         val &= ~mask;
     }
     analog_write_reg8(analog_reg, val);
@@ -904,9 +907,15 @@ void pm_set_gpio_wakeup(gpio_pin_e pin, pm_gpio_wakeup_level_e pol, int en)
  * @param[in]   module - digital module.
  * @param[in]   power_sel - power up or power down.
  * @return      none.
+ * @note        Before calling this interface to open base band, you need to make sure that the input function of PA2 is turned off.(BUT-53)
  */
-_attribute_ram_code_sec_noinline_ void pm_set_dig_module_power_switch(pm_pd_module_e module, pm_power_sel_e power_sel)
+_attribute_ram_code_sec_optimize_o2_noinline_ void pm_set_dig_module_power_switch(pm_pd_module_e module, pm_power_sel_e power_sel)
 {
+    /*
+    * This function will be called in PM, need to pay attention to the conditional judgment statement
+    * where the code execution time is consistent.
+    */
+
     /*
     * when doing digital module power switch should make sure the 24m rc is working or power switch won't take effect.
     * (add by jilong.liu, confirmed by jianzhi at 20240807)
@@ -927,13 +936,13 @@ _attribute_ram_code_sec_noinline_ void pm_set_dig_module_power_switch(pm_pd_modu
     }
 
     /*
-     * Buteo don't have the pd_sm_busy bit(Onca and Tercel has 0x69<5> which can indicate power switch status).
+     * tl321x don't have the pd_sm_busy bit(tl7518 and tl721x has 0x69<5> which can indicate power switch status).
      * And the 0x69<0:3> can only indicate the power up process, it's invalid when power down.
-     * Wait for power stable, for this chip(Buteo), is a fixed value 5us.
+     * Wait for power stable, for this chip(tl321x), is a fixed value 5us.
      * (added by jilong.liu, confirmed by jianzhi.chen at 20240514)
      * The time required for different chips may vary so it is necessary to confirm with the chip colleagues when porting other chips.
      */
-    core_cclk_delay_tick((unsigned long long)(sys_clk.cclk * 5));//delay 5us
+    core_cclk_delay_tick((unsigned long long)(sys_clk.cclk * 5)); //delay 5us
 
     pm_24mrc_power_down_if_unused();
 }
@@ -951,7 +960,7 @@ void pm_set_probe_vol_to_pc3(pm_vol_mux_sel_e mux_sel)
      * added by jilong.liu, confirmed by yangya at 20240530.
      */
     analog_write_reg8(0x11, (analog_read_reg8(0x11) & 0xf0) | mux_sel);
-   /**
+    /**
     * afe3V-reg17<4:0>      value           note
     * ---------------------------------------------------------------------------
     *                       4'b0010         vdd_bb
@@ -978,35 +987,35 @@ void pm_set_probe_vol_to_pc3(pm_vol_mux_sel_e mux_sel)
  */
 _attribute_ram_code_sec_noinline_ void pm_update_status_info(unsigned char clr_en)
 {
-    if(g_pm_status_info.mcu_status == MCU_DEEPRET_BACK){
+    if (g_pm_status_info.mcu_status == MCU_DEEPRET_BACK) {
         return;
     }
 
-    unsigned char wd_clr0 = analog_read_reg8(PM_ANA_REG_WD_CLR_BUF0);
+    unsigned char wd_clr0      = analog_read_reg8(PM_ANA_REG_WD_CLR_BUF0);
     unsigned char poweron_clr0 = analog_read_reg8(PM_ANA_REG_POWER_ON_CLR_BUF0);
 
-    if(wd_clr0 & POWERON_FLAG){
-        if(poweron_clr0 & REBOOT_FLAG){
+    if (wd_clr0 & POWERON_FLAG) {
+        if (poweron_clr0 & REBOOT_FLAG) {
             g_pm_status_info.mcu_status = MCU_SW_REBOOT_BACK;
-            if(wd_get_status()){
+            if (wd_get_status()) {
                 g_pm_status_info.mcu_status = MCU_HW_REBOOT_TIMER_WATCHDOG;
-            }else{
-                g_pm_system_reboot_event = (poweron_clr0>>1);
+            } else {
+                g_pm_system_reboot_event = (poweron_clr0 >> 1);
             }
-            if(clr_en == 1){
+            if (clr_en == 1) {
                 analog_write_reg8(PM_ANA_REG_WD_CLR_BUF0, wd_clr0 & (~POWERON_FLAG));
             }
-        }else{
+        } else {
             g_pm_status_info.mcu_status = MCU_POWER_ON;
-            if(wd_32k_get_status()){
+            if (wd_32k_get_status()) {
                 g_pm_status_info.mcu_status = MCU_HW_REBOOT_32K_WATCHDOG;
             }
-            if(clr_en == 1){
+            if (clr_en == 1) {
                 analog_write_reg8(PM_ANA_REG_WD_CLR_BUF0, wd_clr0 & (~POWERON_FLAG));
                 analog_write_reg8(PM_ANA_REG_POWER_ON_CLR_BUF0, REBOOT_FLAG);
             }
         }
-    }else{
+    } else {
         g_pm_status_info.mcu_status = MCU_DEEP_BACK;
     }
 }
@@ -1024,24 +1033,32 @@ _attribute_ram_code_sec_noinline_ void pm_update_status_info(unsigned char clr_e
  */
 _attribute_ram_code_sec_noinline_ void pm_set_power_mode(power_mode_e power_mode)
 {
-    if(g_pm_status_info.mcu_status != MCU_STATUS_DEEPRET_BACK)
-    {
+    if (g_pm_status_info.mcu_status != MCU_STATUS_DEEPRET_BACK) {
         g_areg_aon_0a = analog_read_reg8(areg_aon_0x0a);
     }
 
-    if((g_areg_aon_0a & 0x03) != power_mode)
-    {
+    if ((g_areg_aon_0a & 0x03) != power_mode) {
         //The power-on process of a DCDC requires a 24M rc clock.(add by weihua.zhang, confirmed by wenfeng.lou 20240903)
-        if(LDO_1P25_LDO_1P8 != power_mode){
-            analog_write_reg8(areg_aon_0x0c, (analog_read_reg8(areg_aon_0x0c) & 0x0f) | 0x60);// trim dcdc output to 1.2v
+        if (LDO_1P25_LDO_1P8 != power_mode) {
+            analog_write_reg8(areg_aon_0x0c, (analog_read_reg8(areg_aon_0x0c) & 0x0f) | 0x60); // trim dcdc output to 1.2v
+            /*
+             * In A1 version, undering DCDC mode, some chips with low vdd_core voltage (around 0.95V, still within the theoretical voltage range for digital operation) 
+             * will cause a crash when open RF module frequently by write analog 0x7d.
+             * The specific reason is not yet clear, but raising the digital ldo voltage can temporarily avoid this problem.(ISSUE:BUT-41)
+             * TODO: In A2 version, this need to be re-evaluate.(add by jilong.liu, confirmed by wenfeng.lou 20241111)
+             */
+            if (g_chip_version == CHIP_VERSION_A1) {
+                analog_write_reg8(0x10, (analog_read_reg8(0x10) & 0x8f) | 0x70);                   // itrim_dig close all branch
+                analog_write_reg8(areg_aon_0x0f, (analog_read_reg8(areg_aon_0x0f) & 0x0f) | 0xc0); // trim dig ldo to 1.05v
+            }
             pm_24mrc_power_up();
         }
 
         g_areg_aon_0a = (g_areg_aon_0a & 0xfc) | power_mode;
         analog_write_reg8(areg_aon_0x0a, g_areg_aon_0a);
 
-        if(LDO_1P25_LDO_1P8 != power_mode){
-            if(!g_24m_rc_is_used){
+        if (LDO_1P25_LDO_1P8 != power_mode) {
+            if (!g_24m_rc_is_used) {
                 core_cclk_delay_tick((unsigned long long)(25 * sys_clk.cclk));
             }
             pm_24mrc_power_down_if_unused();
@@ -1055,19 +1072,20 @@ _attribute_ram_code_sec_noinline_ void pm_set_power_mode(power_mode_e power_mode
  * @param[in]   all_ramcode_en  - Whether all processing in this function is required to be ram code.
  * @return      none.
  */
-_attribute_ram_code_sec_noinline_ void pm_sys_reboot_with_reason(pm_sw_reboot_reason_e reboot_reason, unsigned char all_ramcode_en)
+_attribute_ram_code_sec_optimize_o2_noinline_ void pm_sys_reboot_with_reason(pm_sw_reboot_reason_e reboot_reason, unsigned char all_ramcode_en)
 {
     pm_set_reboot_reason(reboot_reason);
-#if(PM_DEBUG)
-    while(1);
+
+#if (PM_DEBUG)
+    while (1);
 #endif
-    if(all_ramcode_en == 0x00)
-    {
-        protected_sys_reboot();
-    }
-    else
-    {
+
+    if (all_ramcode_en == 0x00) {
+        DISABLE_BTB;
+        sys_reboot_ram();
+        ENABLE_BTB;
+    } else {
         sys_reset_all();
-        while(1);
+        while (1);
     }
 }

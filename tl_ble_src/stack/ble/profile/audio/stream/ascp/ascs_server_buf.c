@@ -27,31 +27,31 @@
 
 
 const u8 gAscssSinkAseCnt = APP_AUDIO_ASCSS_SINK_ASE_CNT;
-const u8 gAscssSrcAseCnt = APP_AUDIO_ASCSS_SRC_ASE_CNT;
+const u8 gAscssSrcAseCnt  = APP_AUDIO_ASCSS_SRC_ASE_CNT;
 
 
 _attribute_ble_data_retention_
-blt_ascss_ase_state_t gAseState[APP_AUDIO_ASCSS_ASE_CNT * ACL_PERIPHR_MAX_NUM];
+    blt_ascss_ase_state_t gAseState[APP_AUDIO_ASCSS_ASE_CNT * ACL_PERIPHR_MAX_NUM];
 
 _attribute_ble_data_retention_
-blc_ascs_server_t gAscss[ACL_PERIPHR_MAX_NUM];
+    blc_ascs_server_t gAscss[ACL_PERIPHR_MAX_NUM];
 
-blt_ascss_ase_state_t* blc_ascss_getAseStateInfo(u8 index)
+blt_ascss_ase_state_t *blc_ascss_getAseStateInfo(u8 index)
 {
-    return index>(APP_AUDIO_ASCSS_ASE_CNT * ACL_PERIPHR_MAX_NUM) ? NULL : &gAseState[index];
+    return index > (APP_AUDIO_ASCSS_ASE_CNT * ACL_PERIPHR_MAX_NUM) ? NULL : &gAseState[index];
 }
 
-blc_ascs_server_t* blc_ascss_getAscssInfo(u8 index)
+blc_ascs_server_t *blc_ascss_getAscssInfo(u8 index)
 {
-    return index>ACL_PERIPHR_MAX_NUM ? NULL : &gAscss[index];
+    return index > ACL_PERIPHR_MAX_NUM ? NULL : &gAscss[index];
 }
 
-void blc_ascss_initAseParam(blt_ascss_ase_state_t* aseState)
+void blc_ascss_initAseParam(blt_ascss_ase_state_t *aseState)
 {
-    u8* codecCfg = &aseState->codecState.framing;
-    U8_TO_STREAM(codecCfg,  AUDIO_UNICAST_SERVER_SUPPORT_FRAMING);
-    U8_TO_STREAM(codecCfg,  AUDIO_UNICAST_SERVER_PREFERRED_PHY);
-    U8_TO_STREAM(codecCfg,  AUDIO_UNICAST_SERVER_PREFERRED_RTN);
+    u8 *codecCfg = &aseState->codecState.framing;
+    U8_TO_STREAM(codecCfg, AUDIO_UNICAST_SERVER_SUPPORT_FRAMING);
+    U8_TO_STREAM(codecCfg, AUDIO_UNICAST_SERVER_PREFERRED_PHY);
+    U8_TO_STREAM(codecCfg, AUDIO_UNICAST_SERVER_PREFERRED_RTN);
     U16_TO_STREAM(codecCfg, AUDIO_UNICAST_SERVER_MAX_TRANSPORT_LATENCY);
     U24_TO_STREAM(codecCfg, AUDIO_UNICAST_SERVER_PRESENTATION_DELAY_MIN);
     U24_TO_STREAM(codecCfg, AUDIO_UNICAST_SERVER_PRESENTATION_DELAY_MAX);
@@ -60,30 +60,41 @@ void blc_ascss_initAseParam(blt_ascss_ase_state_t* aseState)
 }
 
 const blc_bapAnnouncement_t bapTargetDefAnnouncement = {
-        .ltv.len = 17,
-        .ltv.type = DT_SERVICE_DATA_16BIT_UUID,
-        .ascsUuid = SERVICE_UUID_AUDIO_STREAM_CONTROL,
-        .type = BLC_AUDIO_TARGETED_ANNOUNCEMENT,
-        .availableContext = AUDIO_UNICAST_SERVER_DEFAULT_CONTEXT|AUDIO_UNICAST_SERVER_DEFAULT_CONTEXT<<16,
-        .metadataLen = 8,
-        .metadata = {// length  --  type  --  value
-                0x03, BLC_AUDIO_METATYPE_PREFERRED_CONTEXTS,(AUDIO_UNICAST_SERVER_DEFAULT_CONTEXT & 0xFF), (AUDIO_UNICAST_SERVER_DEFAULT_CONTEXT & 0xFF00) >> 8,
-                0x03, BLC_AUDIO_METATYPE_STREAMING_CONTEXTS,(AUDIO_UNICAST_SERVER_DEFAULT_CONTEXT & 0xFF), (AUDIO_UNICAST_SERVER_DEFAULT_CONTEXT & 0xFF00) >> 8,
-        },
+    .ltv.len          = 17,
+    .ltv.type         = DT_SERVICE_DATA_16BIT_UUID,
+    .ascsUuid         = SERVICE_UUID_AUDIO_STREAM_CONTROL,
+    .type             = BLC_AUDIO_TARGETED_ANNOUNCEMENT,
+    .availableContext = AUDIO_UNICAST_SERVER_DEFAULT_CONTEXT | AUDIO_UNICAST_SERVER_DEFAULT_CONTEXT << 16,
+    .metadataLen      = 8,
+    .metadata         = {
+                         // length  --  type  --  value
+        0x03,
+                         BLC_AUDIO_METATYPE_PREFERRED_CONTEXTS,
+                         (AUDIO_UNICAST_SERVER_DEFAULT_CONTEXT & 0xFF),
+                         (AUDIO_UNICAST_SERVER_DEFAULT_CONTEXT & 0xFF00) >> 8,
+                         0x03,
+                         BLC_AUDIO_METATYPE_STREAMING_CONTEXTS,
+                         (AUDIO_UNICAST_SERVER_DEFAULT_CONTEXT & 0xFF),
+                         (AUDIO_UNICAST_SERVER_DEFAULT_CONTEXT & 0xFF00) >> 8,
+                         },
 };
 
 const blc_bapAnnouncement_t bapGeneralDefAnnouncement = {
-        .ltv.len = 17,
-        .ltv.type = DT_SERVICE_DATA_16BIT_UUID,
-        .ascsUuid = SERVICE_UUID_AUDIO_STREAM_CONTROL,
-        .type = BLC_AUDIO_GENERAL_ANNOUNCEMENT,
-        .availableContext = AUDIO_UNICAST_SERVER_DEFAULT_CONTEXT,
-        .metadataLen = 8,
-        .metadata = {// length  --  type  --  value
-                0x03, BLC_AUDIO_METATYPE_PREFERRED_CONTEXTS,(AUDIO_UNICAST_SERVER_DEFAULT_CONTEXT & 0xFF), (AUDIO_UNICAST_SERVER_DEFAULT_CONTEXT & 0xFF00) >> 8,
-                0x03, BLC_AUDIO_METATYPE_STREAMING_CONTEXTS,(AUDIO_UNICAST_SERVER_DEFAULT_CONTEXT & 0xFF), (AUDIO_UNICAST_SERVER_DEFAULT_CONTEXT & 0xFF00) >> 8,
-        },
+    .ltv.len          = 17,
+    .ltv.type         = DT_SERVICE_DATA_16BIT_UUID,
+    .ascsUuid         = SERVICE_UUID_AUDIO_STREAM_CONTROL,
+    .type             = BLC_AUDIO_GENERAL_ANNOUNCEMENT,
+    .availableContext = AUDIO_UNICAST_SERVER_DEFAULT_CONTEXT,
+    .metadataLen      = 8,
+    .metadata         = {
+                         // length  --  type  --  value
+        0x03,
+                         BLC_AUDIO_METATYPE_PREFERRED_CONTEXTS,
+                         (AUDIO_UNICAST_SERVER_DEFAULT_CONTEXT & 0xFF),
+                         (AUDIO_UNICAST_SERVER_DEFAULT_CONTEXT & 0xFF00) >> 8,
+                         0x03,
+                         BLC_AUDIO_METATYPE_STREAMING_CONTEXTS,
+                         (AUDIO_UNICAST_SERVER_DEFAULT_CONTEXT & 0xFF),
+                         (AUDIO_UNICAST_SERVER_DEFAULT_CONTEXT & 0xFF00) >> 8,
+                         },
 };
-
-
-

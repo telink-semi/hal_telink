@@ -190,11 +190,7 @@ __INLINE int tick1_out_range_of_tick2(unsigned int tick1, unsigned int tick2, un
  */
 #define DEEP_ANA_REG0                       PM_ANA_REG_POWER_ON_CLR_BUF0 //initial value =0x00  [Bit0][Bit1] is already occupied. The customer cannot change!
 #define DEEP_ANA_REG1                       PM_ANA_REG_POWER_ON_CLR_BUF1 //initial value =0x00
-#define DEEP_ANA_REG2                       PM_ANA_REG_POWER_ON_CLR_BUF2 //initial value =0x00
-#define DEEP_ANA_REG3                       PM_ANA_REG_POWER_ON_CLR_BUF3 //initial value =0x00
-#define DEEP_ANA_REG4                       PM_ANA_REG_POWER_ON_CLR_BUF4 //initial value =0x00
-#define DEEP_ANA_REG5                       PM_ANA_REG_POWER_ON_CLR_BUF5 //initial value =0x00
-#define DEEP_ANA_REG6                       PM_ANA_REG_POWER_ON_CLR_BUF6 //initial value =0x0f
+#define DEEP_ANA_REG2                       PM_ANA_REG_POWER_ON_CLR_BUF2 //initial value =0xff
 
 /**
  * @brief these analog register can store data in deepsleep mode or deepsleep with SRAM retention mode.

@@ -25,9 +25,10 @@
 
 //BAS: Battery Level Service
 
-typedef enum{
-    DEVICE_IN_CHARGING  =   0xBB,
-    DEVICE_NO_CHARGING  =   0xAE,
+typedef enum
+{
+    DEVICE_IN_CHARGING = 0xBB,
+    DEVICE_NO_CHARGING = 0xAE,
 } blc_bas_battery_power_state_enum;
 
 /**

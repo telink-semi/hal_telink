@@ -26,45 +26,43 @@
 static unsigned char i2c_dma_tx_chn;
 static unsigned char i2c_dma_rx_chn;
 
-dma_config_t i2c_tx_dma_config={
-    .dst_req_sel= DMA_REQ_I2C_TX,//tx req
-    .src_req_sel=0,
-    .dst_addr_ctrl=DMA_ADDR_FIX,
-    .src_addr_ctrl=DMA_ADDR_INCREMENT,//increment
-    .dstmode=DMA_HANDSHAKE_MODE,//handshake
-    .srcmode=DMA_NORMAL_MODE,
-    .dstwidth=DMA_CTR_WORD_WIDTH,//must word
-    .srcwidth=DMA_CTR_WORD_WIDTH,//must word
-    .src_burst_size=0,//must 0
-    .read_num_en=0,
-    .priority=0,
-    .write_num_en=0,
-    .auto_en=0,//must 0
-    };
-dma_config_t i2c_rx_dma_config={
-    .dst_req_sel= DMA_REQ_AUDIO0_TX,
-    .src_req_sel=DMA_REQ_I2C_RX,
-    .dst_addr_ctrl=DMA_ADDR_INCREMENT,
-    .src_addr_ctrl=DMA_ADDR_FIX,
-    .dstmode=DMA_NORMAL_MODE,
-    .srcmode=DMA_HANDSHAKE_MODE,
-    .dstwidth=DMA_CTR_WORD_WIDTH,//must word
-    .srcwidth=DMA_CTR_WORD_WIDTH,////must word
-    .src_burst_size=0,
-    .read_num_en=0,
-    .priority=0,
-    .write_num_en=0,
-    .auto_en=0,//must 0
+dma_config_t i2c_tx_dma_config = {
+    .dst_req_sel    = DMA_REQ_I2C_TX,     //tx req
+    .src_req_sel    = 0,
+    .dst_addr_ctrl  = DMA_ADDR_FIX,
+    .src_addr_ctrl  = DMA_ADDR_INCREMENT, //increment
+    .dstmode        = DMA_HANDSHAKE_MODE, //handshake
+    .srcmode        = DMA_NORMAL_MODE,
+    .dstwidth       = DMA_CTR_WORD_WIDTH, //must word
+    .srcwidth       = DMA_CTR_WORD_WIDTH, //must word
+    .src_burst_size = 0,                  //must 0
+    .read_num_en    = 0,
+    .priority       = 0,
+    .write_num_en   = 0,
+    .auto_en        = 0, //must 0
 };
-
+dma_config_t i2c_rx_dma_config = {
+    .dst_req_sel    = DMA_REQ_AUDIO0_TX,
+    .src_req_sel    = DMA_REQ_I2C_RX,
+    .dst_addr_ctrl  = DMA_ADDR_INCREMENT,
+    .src_addr_ctrl  = DMA_ADDR_FIX,
+    .dstmode        = DMA_NORMAL_MODE,
+    .srcmode        = DMA_HANDSHAKE_MODE,
+    .dstwidth       = DMA_CTR_WORD_WIDTH, //must word
+    .srcwidth       = DMA_CTR_WORD_WIDTH, ////must word
+    .src_burst_size = 0,
+    .read_num_en    = 0,
+    .priority       = 0,
+    .write_num_en   = 0,
+    .auto_en        = 0, //must 0
+};
 
 
 /*
  * This parameter is 0x20 by default, that is, each write or read API opens the stop command.
  * if g_i2c_stop_en=0x00,it means every write or read API will disable stop command.
  */
-unsigned char g_i2c_stop_en=0x20;
-
+unsigned char g_i2c_stop_en = 0x20;
 
 /**
  * @brief      The function of this interface is equivalent to that after the user finishes calling the write or read interface, the stop signal is not sent,
@@ -74,15 +72,12 @@ unsigned char g_i2c_stop_en=0x20;
  */
 void i2c_master_send_stop(unsigned char en)
 {
-    if(en==1)
-    {
-        g_i2c_stop_en=0x20;
-    }else{
-        g_i2c_stop_en=0x00;
+    if (en == 1) {
+        g_i2c_stop_en = 0x20;
+    } else {
+        g_i2c_stop_en = 0x00;
     }
-
 }
-
 
 /**
  * @brief      This function selects a pin port for I2C interface.
@@ -90,63 +85,48 @@ void i2c_master_send_stop(unsigned char en)
  * @param[in]  scl_pin - the pin port selected as I2C scl pin port.
  * @return     none
  */
-void i2c_set_pin(i2c_sda_pin_e sda_pin,i2c_scl_pin_e scl_pin)
+void i2c_set_pin(i2c_sda_pin_e sda_pin, i2c_scl_pin_e scl_pin)
 {
-
     //When the pad is configured with mux input and a pull-up resistor is required, gpio_input_en needs to be placed before gpio_function_dis,
     //otherwise first set gpio_input_disable and then call the mux function interface,the mux pad will misread the short low-level timing.confirmed by minghai.20210709.
-    gpio_input_en(sda_pin);//enable sda input
-    gpio_input_en(scl_pin);//enable scl input
+    gpio_input_en(sda_pin); //enable sda input
+    gpio_input_en(scl_pin); //enable scl input
     gpio_set_up_down_res(sda_pin, GPIO_PIN_PULLUP_10K);
     gpio_set_up_down_res(scl_pin, GPIO_PIN_PULLUP_10K);
 
-    unsigned char val = 0;
+    unsigned char val  = 0;
     unsigned char mask = 0xff;
 
     //enable gpio as i2c sda function.
-    if(sda_pin == I2C_GPIO_SDA_B3)
-    {
-        mask= (unsigned char)~(BIT(7)|BIT(6));
-        val = BIT(6);
+    if (sda_pin == I2C_GPIO_SDA_B3) {
+        mask = (unsigned char)~(BIT(7) | BIT(6));
+        val  = BIT(6);
+    } else if (sda_pin == I2C_GPIO_SDA_C2) {
+        mask = (unsigned char)~(BIT(5) | BIT(4));
+        val  = 0;
+    } else if (sda_pin == I2C_GPIO_SDA_E2) {
+        mask = (unsigned char)~(BIT(5) | BIT(4));
+        val  = 0;
+    } else if (sda_pin == I2C_GPIO_SDA_E3) {
+        mask = (unsigned char)~(BIT(7) | BIT(6));
+        val  = 0;
     }
-    else if(sda_pin == I2C_GPIO_SDA_C2)
-    {
-        mask = (unsigned char)~(BIT(5)|BIT(4));
-        val = 0;
-    }
-    else if(sda_pin == I2C_GPIO_SDA_E2)
-    {
-        mask = (unsigned char)~(BIT(5)|BIT(4));
-        val = 0;
-    }
-    else if(sda_pin == I2C_GPIO_SDA_E3)
-    {
-        mask = (unsigned char)~(BIT(7)|BIT(6));
-        val = 0;
-    }
-    reg_gpio_func_mux(sda_pin)=(reg_gpio_func_mux(sda_pin)& mask)|val;
+    reg_gpio_func_mux(sda_pin) = (reg_gpio_func_mux(sda_pin) & mask) | val;
     //enable gpio as i2c scl function.
-    if(scl_pin == I2C_GPIO_SCL_B2)
-    {
-        mask= (unsigned char)~(BIT(5)|BIT(4));
-        val = BIT(4);
+    if (scl_pin == I2C_GPIO_SCL_B2) {
+        mask = (unsigned char)~(BIT(5) | BIT(4));
+        val  = BIT(4);
+    } else if (scl_pin == I2C_GPIO_SCL_C1) {
+        mask = (unsigned char)~(BIT(3) | BIT(2));
+        val  = 0;
+    } else if (scl_pin == I2C_GPIO_SCL_E0) {
+        mask = (unsigned char)~(BIT(1) | BIT(0));
+        val  = 0;
+    } else if (scl_pin == I2C_GPIO_SCL_E1) {
+        mask = (unsigned char)~(BIT(3) | BIT(2));
+        val  = 0;
     }
-    else if(scl_pin == I2C_GPIO_SCL_C1)
-    {
-        mask = (unsigned char)~(BIT(3)|BIT(2));
-        val = 0;
-    }
-    else if(scl_pin == I2C_GPIO_SCL_E0)
-    {
-        mask = (unsigned char)~(BIT(1)|BIT(0));
-        val = 0;
-    }
-    else if(scl_pin == I2C_GPIO_SCL_E1)
-    {
-        mask = (unsigned char)~(BIT(3)|BIT(2));
-        val = 0;
-    }
-    reg_gpio_func_mux(scl_pin)=(reg_gpio_func_mux(scl_pin)& mask)|val;
+    reg_gpio_func_mux(scl_pin) = (reg_gpio_func_mux(scl_pin) & mask) | val;
 
     //disable sda_pin and scl_pin gpio function.
     gpio_function_dis(scl_pin);
@@ -159,11 +139,9 @@ void i2c_set_pin(i2c_sda_pin_e sda_pin,i2c_scl_pin_e scl_pin)
  */
 void i2c_master_init(void)
 {
-    reg_i2c_sct0  |=  FLD_I2C_MASTER;       //i2c master enable.
+    reg_i2c_sct0 |= FLD_I2C_MASTER; //i2c master enable.
     i2c_master_stretch_en();
 }
-
-
 
 /**
  * @brief      This function serves to set the i2c clock frequency.The i2c clock is consistent with the pclk.
@@ -173,14 +151,12 @@ void i2c_master_init(void)
  */
 void i2c_set_master_clk(unsigned char clock)
 {
-
     //i2c frequency = system_clock/(4*clock)
     reg_i2c_sp = clock;
 
     //set enable flag.
     reg_clk_en0 |= FLD_CLK0_I2C_EN;
 }
-
 
 /**
  * @brief      This function serves to enable slave mode.
@@ -192,9 +168,8 @@ void i2c_slave_init(unsigned char id)
 {
     reg_i2c_sct0 &= (~FLD_I2C_MASTER); //enable slave mode.
 
-    reg_i2c_id    = id;                   //default eagle slave ID is 0x5a
+    reg_i2c_id = id;                   //default eagle slave ID is 0x5a
 }
-
 
 /**
  *  @brief      The function of this API is to ensure that the data can be successfully sent out.
@@ -205,39 +180,37 @@ void i2c_slave_init(unsigned char id)
  *  @param[in]  len - This length is the total length, including both the length of the slave RAM address and the length of the data to be sent.
  *  @return     0 : the master receive NACK after sending out the id and then send stop.  1: the master sent the data successfully,(master does not detect NACK in data phase)
  */
-unsigned char  i2c_master_write(unsigned char id, unsigned char *data, unsigned char len)
+unsigned char i2c_master_write(unsigned char id, unsigned char *data, unsigned char len)
 {
-    BM_SET(reg_i2c_status,FLD_I2C_TX_CLR);//clear index
+    BM_SET(reg_i2c_status, FLD_I2C_TX_CLR); //clear index
     //set i2c master write.
-    reg_i2c_data_buf(0)=id & (~FLD_I2C_WRITE_READ_BIT); //BIT(0):R:High  W:Low;
-    reg_i2c_sct1 = (FLD_I2C_LS_ADDR | FLD_I2C_LS_START);
-    while(i2c_master_busy());
-    if(reg_i2c_mst&FLD_I2C_ACK_IN)
-    {
+    reg_i2c_data_buf(0) = id & (~FLD_I2C_WRITE_READ_BIT); //BIT(0):R:High  W:Low;
+    reg_i2c_sct1        = (FLD_I2C_LS_ADDR | FLD_I2C_LS_START);
+    while (i2c_master_busy())
+        ;
+    if (reg_i2c_mst & FLD_I2C_ACK_IN) {
         reg_i2c_sct1 = (FLD_I2C_LS_STOP);
-        while(i2c_master_busy());
+        while (i2c_master_busy())
+            ;
         return 0;
     }
-    reg_i2c_len   =  len;
+    reg_i2c_len = len;
     //write data
     unsigned int cnt = 0;
-    while(cnt<len)
-    {
-        if(i2c_get_tx_buf_cnt()<8)
-        {
-            reg_i2c_data_buf(cnt % 4) = data[cnt];  //write data
+    while (cnt < len) {
+        if (i2c_get_tx_buf_cnt() < 8) {
+            reg_i2c_data_buf(cnt % 4) = data[cnt];                 //write data
             cnt++;
-            if(cnt==1)
-            {
-                reg_i2c_sct1 = ( FLD_I2C_LS_DATAW|g_i2c_stop_en ); //launch stop cycle
+            if (cnt == 1) {
+                reg_i2c_sct1 = (FLD_I2C_LS_DATAW | g_i2c_stop_en); //launch stop cycle
             }
         }
     }
 
-    while(i2c_master_busy());
+    while (i2c_master_busy())
+        ;
     return 1;
 }
-
 
 /**
  * @brief      This function serves to read a packet of data from the specified address of slave device.
@@ -248,35 +221,34 @@ unsigned char  i2c_master_write(unsigned char id, unsigned char *data, unsigned 
  * @param[in]  len - The total length of the data read back.
  * @return     0 : the master receive NACK after sending out the id and then send stop.  1: the master receive the data successfully.
  */
-unsigned char  i2c_master_read(unsigned char id, unsigned char *data, unsigned char len)
+unsigned char i2c_master_read(unsigned char id, unsigned char *data, unsigned char len)
 {
     //set i2c master read.
-    BM_SET(reg_i2c_status,FLD_I2C_RX_CLR);//clear index
-    reg_i2c_sct0  |=  FLD_I2C_RNCK_EN;       //i2c rnck enable.
-    reg_i2c_data_buf(0)=(id | FLD_I2C_WRITE_READ_BIT); //BIT(0):R:High  W:Low;
-    reg_i2c_sct1 = (FLD_I2C_LS_ADDR | FLD_I2C_LS_START);
-    while(i2c_master_busy());
-    if(reg_i2c_mst&FLD_I2C_ACK_IN)
-    {
+    BM_SET(reg_i2c_status, FLD_I2C_RX_CLR);              //clear index
+    reg_i2c_sct0 |= FLD_I2C_RNCK_EN;                     //i2c rnck enable.
+    reg_i2c_data_buf(0) = (id | FLD_I2C_WRITE_READ_BIT); //BIT(0):R:High  W:Low;
+    reg_i2c_sct1        = (FLD_I2C_LS_ADDR | FLD_I2C_LS_START);
+    while (i2c_master_busy())
+        ;
+    if (reg_i2c_mst & FLD_I2C_ACK_IN) {
         reg_i2c_sct1 = (FLD_I2C_LS_STOP);
-        while(i2c_master_busy());
+        while (i2c_master_busy())
+            ;
         return 0;
     }
-    reg_i2c_sct1 = ( FLD_I2C_LS_DATAR | FLD_I2C_LS_ID_R | g_i2c_stop_en);
-    reg_i2c_len   =  len;
+    reg_i2c_sct1     = (FLD_I2C_LS_DATAR | FLD_I2C_LS_ID_R | g_i2c_stop_en);
+    reg_i2c_len      = len;
     unsigned int cnt = 0;
-    while(cnt<len)
-    {
-        if(i2c_get_rx_buf_cnt()>0)
-        {
+    while (cnt < len) {
+        if (i2c_get_rx_buf_cnt() > 0) {
             data[cnt] = reg_i2c_data_buf(cnt % 4);
             cnt++;
         }
     }
-    while(i2c_master_busy());
+    while (i2c_master_busy())
+        ;
     return 1;
 }
-
 
 /**
  * @brief      This function serves to write data and restart read data.
@@ -292,30 +264,29 @@ unsigned char  i2c_master_read(unsigned char id, unsigned char *data, unsigned c
 unsigned char i2c_master_write_read(unsigned char id, unsigned char *wr_data, unsigned char wr_len, unsigned char *rd_data, unsigned char rd_len)
 {
     //set i2c master write.
-    if(!i2c_master_write(id,wr_data,wr_len)){
+    if (!i2c_master_write(id, wr_data, wr_len)) {
         return 0;
     }
     //i2c_master_write_read: the master between writing and reading,it will be a restart signal,and after reading and writing, a stop signal is sent,
     //in order to after write and read, a stop signal is sent,so need to enable stop during read.
     unsigned char i2c_stop_en = g_i2c_stop_en;
-    if(0x00 == i2c_stop_en){
+    if (0x00 == i2c_stop_en) {
         i2c_master_send_stop(1);
     }
     //set i2c master read.
-    if(!i2c_master_read(id,rd_data,rd_len)){
-        if(0x00 == i2c_stop_en){
+    if (!i2c_master_read(id, rd_data, rd_len)) {
+        if (0x00 == i2c_stop_en) {
             i2c_master_send_stop(0);
         }
         return 0;
     }
     //since the configuration state of stop is changed in this interface,
     //the previous configuration needs to be restored either after the function reads or when an exception occurs during the read process.
-    if(0x00 == i2c_stop_en){
+    if (0x00 == i2c_stop_en) {
         i2c_master_send_stop(0);
     }
     return 1;
 }
-
 
 /**
  * @brief      The function of this API is just to write data to the i2c tx_fifo by DMA.
@@ -330,17 +301,15 @@ unsigned char i2c_master_write_read(unsigned char id, unsigned char *wr_data, un
  */
 void i2c_master_write_dma(unsigned char id, unsigned char *data, unsigned char len)
 {
-
     //set id.
     reg_i2c_id = (id & (~FLD_I2C_WRITE_READ_BIT)); //BIT(0):R:High  W:Low
 
-    dma_set_size(i2c_dma_tx_chn,len,DMA_WORD_WIDTH);
-    dma_set_address(i2c_dma_tx_chn,(unsigned int)data,reg_i2c_data_buf0_addr);
+    dma_set_size(i2c_dma_tx_chn, len, DMA_WORD_WIDTH);
+    dma_set_address(i2c_dma_tx_chn, (unsigned int)data, reg_i2c_data_buf0_addr);
     dma_chn_en(i2c_dma_tx_chn);
 
-    reg_i2c_len   =  len;
-    reg_i2c_sct1 = (FLD_I2C_LS_ID|FLD_I2C_LS_START|FLD_I2C_LS_DATAW |g_i2c_stop_en);
-
+    reg_i2c_len  = len;
+    reg_i2c_sct1 = (FLD_I2C_LS_ID | FLD_I2C_LS_START | FLD_I2C_LS_DATAW | g_i2c_stop_en);
 }
 
 /**
@@ -353,19 +322,17 @@ void i2c_master_write_dma(unsigned char id, unsigned char *data, unsigned char l
  */
 void i2c_master_read_dma(unsigned char id, unsigned char *rx_data, unsigned char len)
 {
-
-    reg_i2c_sct0  |=  FLD_I2C_RNCK_EN;       //i2c rnck enable
+    reg_i2c_sct0 |= FLD_I2C_RNCK_EN; //i2c rnck enable
 
     //set i2c master read.
     reg_i2c_id = (id | FLD_I2C_WRITE_READ_BIT); //BIT(0):R:High  W:Low
 
-    dma_set_size(i2c_dma_rx_chn,len,DMA_WORD_WIDTH);
-    dma_set_address(i2c_dma_rx_chn,reg_i2c_data_buf0_addr,(unsigned int)rx_data);
+    dma_set_size(i2c_dma_rx_chn, len, DMA_WORD_WIDTH);
+    dma_set_address(i2c_dma_rx_chn, reg_i2c_data_buf0_addr, (unsigned int)rx_data);
     dma_chn_en(i2c_dma_rx_chn);
 
-    reg_i2c_len   =  len;
-    reg_i2c_sct1 = ( FLD_I2C_LS_ID | FLD_I2C_LS_DATAR | FLD_I2C_LS_START | FLD_I2C_LS_ID_R | g_i2c_stop_en);
-
+    reg_i2c_len  = len;
+    reg_i2c_sct1 = (FLD_I2C_LS_ID | FLD_I2C_LS_DATAR | FLD_I2C_LS_START | FLD_I2C_LS_ID_R | g_i2c_stop_en);
 }
 
 /**
@@ -375,13 +342,12 @@ void i2c_master_read_dma(unsigned char id, unsigned char *rx_data, unsigned char
  * @return     none.
  * @note       data: must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
-void i2c_slave_set_tx_dma( unsigned char *data, unsigned char len)
+void i2c_slave_set_tx_dma(unsigned char *data, unsigned char len)
 {
-    dma_set_address(i2c_dma_tx_chn,(unsigned int)data,reg_i2c_data_buf0_addr);
-    dma_set_size(i2c_dma_tx_chn,len,DMA_WORD_WIDTH);
+    dma_set_address(i2c_dma_tx_chn, (unsigned int)data, reg_i2c_data_buf0_addr);
+    dma_set_size(i2c_dma_tx_chn, len, DMA_WORD_WIDTH);
     dma_chn_en(i2c_dma_tx_chn);
 }
-
 
 /**
  * @brief      This function serves to receive a packet of data from master device,It will trigger after the master sends the write sequence.
@@ -392,29 +358,29 @@ void i2c_slave_set_tx_dma( unsigned char *data, unsigned char len)
  */
 void i2c_slave_set_rx_dma(unsigned char *data, unsigned char len)
 {
-    dma_set_address(i2c_dma_rx_chn,reg_i2c_data_buf0_addr,(unsigned int)data);
-    dma_set_size(i2c_dma_rx_chn,len,DMA_WORD_WIDTH);
+    dma_set_address(i2c_dma_rx_chn, reg_i2c_data_buf0_addr, (unsigned int)data);
+    dma_set_size(i2c_dma_rx_chn, len, DMA_WORD_WIDTH);
     dma_chn_en(i2c_dma_rx_chn);
 }
+
 //logs the current read position in the fifo.
 unsigned char i2c_slave_rx_index = 0;
+
 /**
  * @brief     This function serves to receive data .
  * @param[in]  data - the data need read.
  * @param[in]  len - The total length of the data
  * @return    none
  */
-void i2c_slave_read(unsigned char* data , unsigned char len )
+void i2c_slave_read(unsigned char *data, unsigned char len)
 {
     unsigned int cnt = 0;
-    while(cnt<len)
-    {
-        if(i2c_get_rx_buf_cnt()>0)
-        {
-        data[cnt] = reg_i2c_data_buf(i2c_slave_rx_index);
-        i2c_slave_rx_index++;
-        i2c_slave_rx_index &= 0x03 ;
-        cnt++;
+    while (cnt < len) {
+        if (i2c_get_rx_buf_cnt() > 0) {
+            data[cnt] = reg_i2c_data_buf(i2c_slave_rx_index);
+            i2c_slave_rx_index++;
+            i2c_slave_rx_index &= 0x03;
+            cnt++;
         }
     }
 }
@@ -425,20 +391,17 @@ void i2c_slave_read(unsigned char* data , unsigned char len )
  * @param[in]  len - The total length of the data.
  * @return    none
  */
-void i2c_slave_write(unsigned char* data , unsigned char len)
+void i2c_slave_write(unsigned char *data, unsigned char len)
 {
     i2c_clr_fifo(I2C_TX_BUFF_CLR);
     unsigned int cnt = 0;
-    while(cnt<len)
-    {
-        if(i2c_get_tx_buf_cnt()<8)
-        {
+    while (cnt < len) {
+        if (i2c_get_tx_buf_cnt() < 8) {
             reg_i2c_data_buf(cnt % 4) = data[cnt];
             cnt++;
         }
     }
 }
-
 
 /**
  * @brief     This function serves to set i2c tx_dma channel and config dma tx default.
@@ -467,11 +430,3 @@ void i2c_set_rx_dma_config(dma_chn_e chn)
     i2c_dma_rx_chn = chn;
     dma_config(chn, &i2c_rx_dma_config);
 }
-
-
-
-
-
-
-
-

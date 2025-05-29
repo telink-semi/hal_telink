@@ -29,14 +29,13 @@
 
 #include "tlk_malloc_stack.h"
 
-static void* _sbrk(struct mem_arena_header* memHead, int incr)
+static void *_sbrk(struct mem_arena_header *memHead, int incr)
 {
     unsigned char *prev_brk;
-    unsigned char *sbrkBase = memHead->sbrkBase;
+    unsigned char *sbrkBase  = memHead->sbrkBase;
     unsigned char *sbrkLimit = memHead->sbrkLimit;
 
     if (incr < 0) {
-
         /* Returning memory to the heap. */
         incr = -incr;
         if (memHead->brk - incr < sbrkBase) {
@@ -73,8 +72,8 @@ static inline void remove_from_main_chain(struct free_arena_header *ah)
 
     mark_block_dead(ah);
 
-    ap = ah->a.prev;
-    an = ah->a.next;
+    ap         = ah->a.prev;
+    an         = ah->a.next;
     ap->a.next = an;
     an->a.prev = ap;
 }
@@ -83,8 +82,8 @@ static inline void remove_from_free_chain(struct free_arena_header *ah)
 {
     struct free_arena_header *ap, *an;
 
-    ap = ah->prev_free;
-    an = ah->next_free;
+    ap            = ah->prev_free;
+    an            = ah->next_free;
     ap->next_free = an;
     an->prev_free = ap;
 }
@@ -97,7 +96,7 @@ static inline void remove_from_chains(struct free_arena_header *ah)
 
 static void *__malloc_from_block(struct free_arena_header *fp, size_t size)
 {
-    size_t fsize;
+    size_t                    fsize;
     struct free_arena_header *nfp, *na, *fpn, *fpp;
 
     fsize = fp->a.size;
@@ -107,24 +106,24 @@ static void *__malloc_from_block(struct free_arena_header *fp, size_t size)
     if (fsize >= size + 2 * sizeof(struct arena_header)) {
         /* Bigger block than required -- split block */
         nfp = (struct free_arena_header *)((char *)fp + size);
-        na = fp->a.next;
+        na  = fp->a.next;
 
         nfp->a.type = ARENA_TYPE_FREE;
         nfp->a.size = fsize - size;
-        fp->a.type = ARENA_TYPE_USED;
-        fp->a.size = size;
+        fp->a.type  = ARENA_TYPE_USED;
+        fp->a.size  = size;
 
         /* Insert into all-block chain */
         nfp->a.prev = fp;
         nfp->a.next = na;
-        na->a.prev = nfp;
-        fp->a.next = nfp;
+        na->a.prev  = nfp;
+        fp->a.next  = nfp;
 
         /* Replace current block on free chain */
         nfp->next_free = fpn = fp->next_free;
         nfp->prev_free = fpp = fp->prev_free;
-        fpn->prev_free = nfp;
-        fpp->next_free = nfp;
+        fpn->prev_free       = nfp;
+        fpp->next_free       = nfp;
     } else {
         fp->a.type = ARENA_TYPE_USED; /* Allocate the whole block */
         remove_from_free_chain(fp);
@@ -133,7 +132,7 @@ static void *__malloc_from_block(struct free_arena_header *fp, size_t size)
     return (void *)(&fp->a + 1);
 }
 
-static struct free_arena_header *__free_block(struct free_arena_header* head, struct free_arena_header *ah)
+static struct free_arena_header *__free_block(struct free_arena_header *head, struct free_arena_header *ah)
 {
     struct free_arena_header *pah, *nah;
 
@@ -147,14 +146,14 @@ static struct free_arena_header *__free_block(struct free_arena_header* head, st
         nah->a.prev = pah;
         mark_block_dead(ah);
 
-        ah = pah;
+        ah  = pah;
         pah = ah->a.prev;
     } else {
         /* Need to add this block to the free chain */
-        ah->a.type = ARENA_TYPE_FREE;
-        ah->next_free = head->next_free;
-        ah->prev_free = head;
-        head->next_free = ah;
+        ah->a.type               = ARENA_TYPE_FREE;
+        ah->next_free            = head->next_free;
+        ah->prev_free            = head;
+        head->next_free          = ah;
         ah->next_free->prev_free = ah;
     }
 
@@ -172,15 +171,15 @@ static struct free_arena_header *__free_block(struct free_arena_header* head, st
     return ah;
 }
 
-
 /* Call this to give malloc some memory to allocate from */
-static void add_malloc_block(struct free_arena_header* head, void *buf, size_t size)
+static void add_malloc_block(struct free_arena_header *head, void *buf, size_t size)
 {
     struct free_arena_header *fp = buf;
     struct free_arena_header *pah;
 
-    if (size < sizeof(struct free_arena_header))
+    if (size < sizeof(struct free_arena_header)) {
         return; // Too small.
+    }
 
     /* Insert the block into the management chains.  We need to set
        up the size and the main block list pointer, the rest of
@@ -194,38 +193,38 @@ static void add_malloc_block(struct free_arena_header* head, void *buf, size_t s
        the proper place. */
     for (pah = head->a.prev; pah->a.type != ARENA_TYPE_HEAD;
          pah = pah->a.prev) {
-        if (pah < fp)
+        if (pah < fp) {
             break;
+        }
     }
 
     /* Now pah points to the node that should be the predecessor of
        the new node */
-    fp->a.next = pah->a.next;
-    fp->a.prev = pah;
-    pah->a.next = fp;
+    fp->a.next         = pah->a.next;
+    fp->a.prev         = pah;
+    pah->a.next        = fp;
     fp->a.next->a.prev = fp;
 
     /* Insert into the free chain and coalesce with adjacent blocks */
     fp = __free_block(head, fp);
-
 }
 
-static void* tlk_malloc(struct mem_arena_header* memHead, size_t size)
+static void *tlk_malloc(struct mem_arena_header *memHead, size_t size)
 {
     struct free_arena_header *fp;
-    void *more_mem;
-    
+    void                     *more_mem;
+
     if (size == 0 || size > (SIZE_MAX - sizeof(struct arena_header))) {
         //printf("malloc failed 0:%d\n", size);
         return NULL;
     }
 
-    struct free_arena_header* head = &memHead->a;
+    struct free_arena_header *head = &memHead->a;
 
     /* Add the obligatory arena header, and round up */
-//    size = (size + 2 * sizeof(struct arena_header) - 1) & ARENA_SIZE_MASK;
-    size = (size + sizeof(struct arena_header) + 3)&(~3);
-    size = size > sizeof(struct free_arena_header)? size: sizeof(struct free_arena_header); //must need
+    //    size = (size + 2 * sizeof(struct arena_header) - 1) & ARENA_SIZE_MASK;
+    size = (size + sizeof(struct arena_header) + 3) & (~3);
+    size = size > sizeof(struct free_arena_header) ? size : sizeof(struct free_arena_header); //must need
 
     void *result = NULL;
 retry_alloc:
@@ -248,13 +247,13 @@ retry_alloc:
             //printf("malloc failed 2:%d\n", size);
         }
     } else {
-       //printf("malloc[0x%p]:%d\n", result, (int)size);
+        //printf("malloc[0x%p]:%d\n", result, (int)size);
     }
 
     return result;
 }
 
-static void tlk_free(struct mem_arena_header* memHead, void *ptr)
+static void tlk_free(struct mem_arena_header *memHead, void *ptr)
 {
     struct free_arena_header *ah;
 
@@ -263,14 +262,13 @@ static void tlk_free(struct mem_arena_header* memHead, void *ptr)
         return;
     }
 
-    ah = (struct free_arena_header *)
-        ((struct arena_header *)ptr - 1);
+    ah = (struct free_arena_header *)((struct arena_header *)ptr - 1);
 
 #ifdef DEBUG_MALLOC
     assert(ah->a.type == ARENA_TYPE_USED);
 #endif
 
-    struct free_arena_header* head = &memHead->a;
+    struct free_arena_header *head = &memHead->a;
 
     //printf("free[0x%p]\n", ptr);
 
@@ -278,11 +276,11 @@ static void tlk_free(struct mem_arena_header* memHead, void *ptr)
     ah = __free_block(head, ah);
 }
 
-static void *tlk_realloc(struct mem_arena_header* memHead, void *ptr, size_t size)
+static void *tlk_realloc(struct mem_arena_header *memHead, void *ptr, size_t size)
 {
     struct free_arena_header *ah;
-    void *newptr;
-    size_t oldsize;
+    void                     *newptr;
+    size_t                    oldsize;
 
     if (!ptr) {
         return tlk_malloc(memHead, size);
@@ -294,15 +292,14 @@ static void *tlk_realloc(struct mem_arena_header* memHead, void *ptr, size_t siz
     }
 
     /* Add the obligatory arena header, and round up */
-//  size = (size + 2 * sizeof(struct arena_header) - 1) & ARENA_SIZE_MASK;
-    size = (size + sizeof(struct arena_header) + 3)&(~3);
-    size = size > sizeof(struct free_arena_header)? size: sizeof(struct free_arena_header); //must need
+    //  size = (size + 2 * sizeof(struct arena_header) - 1) & ARENA_SIZE_MASK;
+    size = (size + sizeof(struct arena_header) + 3) & (~3);
+    size = size > sizeof(struct free_arena_header) ? size : sizeof(struct free_arena_header); //must need
 
-    ah = (struct free_arena_header *)
-        ((struct arena_header *)ptr - 1);
+    ah = (struct free_arena_header *)((struct arena_header *)ptr - 1);
 
     if (ah->a.size >= size && size >= (ah->a.size >> 2)) {
-    /* This field is a good size already. */
+        /* This field is a good size already. */
         return ptr;
     } else {
         /* Make me a new block.  This is kind of bogus; we should
@@ -324,74 +321,103 @@ static void *tlk_realloc(struct mem_arena_header* memHead, void *ptr, size_t siz
 }
 
 
-__attribute__((section(".retention_data")))
-static struct mem_arena_header __retentionHeader= {
+__attribute__((section(".retention_data"))) static struct mem_arena_header __retentionHeader = {
     .a = {
-        {
+          {
             ARENA_TYPE_HEAD,
             0,
             &__retentionHeader.a,
             &__retentionHeader.a,
         },
-        &__retentionHeader.a,
-        &__retentionHeader.a,
-    },
+          &__retentionHeader.a,
+          &__retentionHeader.a,
+          },
 };
 
-__attribute__((section(".retention_data")))
-static struct mem_arena_header __nonRetentionHeader= {
+__attribute__((section(".retention_data"))) static struct mem_arena_header __nonRetentionHeader = {
     .a = {
-        {
+          {
             ARENA_TYPE_HEAD,
             0,
             &__nonRetentionHeader.a,
             &__nonRetentionHeader.a,
         },
-        &__nonRetentionHeader.a,
-        &__nonRetentionHeader.a,
-    },
+          &__nonRetentionHeader.a,
+          &__nonRetentionHeader.a,
+          },
 };
 
-void tlk_initialRetentionBuffer(void* base, size_t size)
+#ifdef MCU_CORE_D25F_ENABLE
+void tlk_malloc_init(void *base, size_t size)
 {
-    __retentionHeader.sbrkBase = (unsigned char*)base;
-    __retentionHeader.sbrkLimit = (unsigned char*)base + size - 1;
-    __retentionHeader.brk = (unsigned char*)base;
+    struct mem_arena_header *memHead = base;
+    memHead->a.a.type                = ARENA_TYPE_HEAD;
+    memHead->a.a.size                = 0;
+    memHead->a.a.prev = memHead->a.a.next = (struct free_arena_header *)&memHead->a.a;
+    memHead->a.next_free                  = &memHead->a;
+    memHead->a.prev_free                  = &memHead->a;
+    memHead->sbrkBase                     = (unsigned char *)base + sizeof(struct mem_arena_header);
+    memHead->sbrkLimit                    = (unsigned char *)base + size - 1;
+    memHead->brk                          = (unsigned char *)memHead->sbrkBase;
 }
 
-void tlk_initialNonRetentionBuffer(void* base, size_t size)
+void tlk_malloc_deinit(void *base)
 {
-    __nonRetentionHeader.sbrkBase = (unsigned char*)base;
-    __nonRetentionHeader.sbrkLimit = (unsigned char*)base + size - 1;
-    __nonRetentionHeader.brk = (unsigned char*)base;
+    (void)base;
 }
 
-void* malloc_reten(size_t size)
+void *tlk_malloc_buffer(void *base, size_t size, unsigned short usedType)
+{
+    (void)usedType;
+    return tlk_malloc(base, size); //todo: xh
+}
+
+void tlk_free_buffer(void *base, void *ptr)
+{
+    return tlk_free(base, ptr);
+}
+#endif
+
+void tlk_initialRetentionBuffer(void *base, size_t size)
+{
+    __retentionHeader.sbrkBase  = (unsigned char *)base;
+    __retentionHeader.sbrkLimit = (unsigned char *)base + size - 1;
+    __retentionHeader.brk       = (unsigned char *)base;
+}
+
+void tlk_initialNonRetentionBuffer(void *base, size_t size)
+{
+    __nonRetentionHeader.sbrkBase  = (unsigned char *)base;
+    __nonRetentionHeader.sbrkLimit = (unsigned char *)base + size - 1;
+    __nonRetentionHeader.brk       = (unsigned char *)base;
+}
+
+void *malloc_reten(size_t size)
 {
     return tlk_malloc(&__retentionHeader, size);
 }
 
-void free_reten(void* ptr)
+void free_reten(void *ptr)
 {
     return tlk_free(&__retentionHeader, ptr);
 }
 
-void* realloc_reten(void* ptr, size_t size)
+void *realloc_reten(void *ptr, size_t size)
 {
     return tlk_realloc(&__retentionHeader, ptr, size);
 }
 
-void* malloc_nonreten(size_t size)
+void *malloc_nonreten(size_t size)
 {
     return tlk_malloc(&__nonRetentionHeader, size);
 }
 
-void free_nonreten(void* ptr)
+void free_nonreten(void *ptr)
 {
     return tlk_free(&__nonRetentionHeader, ptr);
 }
 
-void* realloc_nonreten(void* ptr, size_t size)
+void *realloc_nonreten(void *ptr, size_t size)
 {
     return tlk_realloc(&__nonRetentionHeader, ptr, size);
 }

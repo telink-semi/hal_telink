@@ -32,7 +32,7 @@
  * @param      none
  * @return     none
  */
-void        blc_ll_init2MPhyCodedPhy_feature(void);
+void blc_ll_init2MPhyCodedPhy_feature(void);
 
 
 #endif /* PHY_H_ */

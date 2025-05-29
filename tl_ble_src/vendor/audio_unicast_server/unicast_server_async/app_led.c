@@ -32,7 +32,7 @@
 
 #if (UNICAST_SERVER_SELECT == UNICAST_SERVER_ASYNC)
 
-app_led_state_t appLedState;
+app_led_state_t         appLedState;
 extern app_audio_ctrl_t appCtrl;
 
 /**
@@ -44,8 +44,7 @@ extern app_audio_ctrl_t appCtrl;
  */
 u8 app_led_get_id(u8 index_flag)
 {
-    if (index_flag >= TLK_LED_NUM_MAX)
-    {
+    if (index_flag >= TLK_LED_NUM_MAX) {
         return 0;
     }
     return appLedState.led_id[index_flag];
@@ -60,24 +59,18 @@ u8 app_led_get_id(u8 index_flag)
  */
 void app_led_set_state(sys_led_state_e state)
 {
-    if(state == SYS_STATE_IDLE)
-    {
+    if (state == SYS_STATE_IDLE) {
         app_led_set_all_ctrl_pattern(LED_PATTERN_LED_FLASH_SLOW, DEFAULT_PATTERN);
         appLedState.conn_state        = SYS_STATE_IDLE;
         appLedState.led_power_on_flag = TRUE;
-    }
-    else if(state == SYS_STATE_PAIR)
-    {
+    } else if (state == SYS_STATE_PAIR) {
         app_led_set_all_ctrl_pattern(LED_PATTERN_LED_FLASH_FAST, DEFAULT_PATTERN);
-        appLedState.conn_state        = SYS_STATE_PAIR;
-    }
-    else if(state == SYS_STATE_CONNECTED)
-    {
+        appLedState.conn_state = SYS_STATE_PAIR;
+    } else if (state == SYS_STATE_CONNECTED) {
         app_led_set_all_ctrl_pattern(LED_PATTERN_LED_BREATH, DEFAULT_PATTERN);
-        appLedState.conn_state        = SYS_STATE_CONNECTED;
+        appLedState.conn_state = SYS_STATE_CONNECTED;
     }
 }
-
 
 /**
  * @brief  set connected state led.
@@ -89,24 +82,22 @@ void app_led_set_state(sys_led_state_e state)
 void app_led_state_sync(sys_led_state_e state)
 {
     extern u8 appAsyncState;
-    if(appAsyncState != APP_ASYNC_STATE_CONNECT)
-    {
-        if(state != SYS_STATE_SYNC)
-        {
+    if (appAsyncState != APP_ASYNC_STATE_CONNECT) {
+        if (state != SYS_STATE_SYNC) {
             app_led_set_state(state);
         }
         return;
     }
-//  if(appCtrl.leaRole != ACL_ROLE_CENTRAL)
-//  {
-//      return;
-//  }
+    //  if(appCtrl.leaRole != ACL_ROLE_CENTRAL)
+    //  {
+    //      return;
+    //  }
     blc_async_message_t message;
-    message.type = TYPE_SYNC;
-    message.opcode = OPCODE_LED;//OPCODE_LED;
+    message.type   = TYPE_SYNC;
+    message.opcode = OPCODE_LED; //OPCODE_LED;
 
     message.data[0] = state;
-    blc_async_push_message(500*1000,&message);
+    blc_async_push_message(500 * 1000, &message);
 }
 
 /**
@@ -121,12 +112,10 @@ _attribute_ram_code_sec_noinline_ void app_led_set_all_ctrl_pattern(int patt, tl
 {
     u8 i_for  = 0;
     u8 led_id = 0;
-    for (i_for = 0; i_for < TLK_LED_NUM_MAX; i_for++)
-    {
+    for (i_for = 0; i_for < TLK_LED_NUM_MAX; i_for++) {
         led_id = app_led_get_id(i_for);
 
-        if (led_id == 0 || led_id > TLK_LED_NUM_MAX)
-        {
+        if (led_id == 0 || led_id > TLK_LED_NUM_MAX) {
             continue;
         }
 
@@ -134,7 +123,7 @@ _attribute_ram_code_sec_noinline_ void app_led_set_all_ctrl_pattern(int patt, tl
     }
 
     appLedState.log_flag_led_set_patt = 1;
-    appLedState.log_flag_patt = (u16)patt;
+    appLedState.log_flag_patt         = (u16)patt;
 }
 
 /**
@@ -149,37 +138,31 @@ _attribute_ram_code_sec_noinline_ void app_led_insert_all_ctrl_pattern(int patt,
 {
     u8 i_for  = 0;
     u8 led_id = 0;
-    for (i_for = 0; i_for < TLK_LED_NUM_MAX; i_for++)
-    {
+    for (i_for = 0; i_for < TLK_LED_NUM_MAX; i_for++) {
         led_id = app_led_get_id(i_for);
 
-        if (led_id == 0 || led_id > TLK_LED_NUM_MAX)
-        {
+        if (led_id == 0 || led_id > TLK_LED_NUM_MAX) {
             continue;
         }
 
         tlk_led_pattern_insert(led_id, patt, is_user_patt);
     }
     appLedState.log_flag_led_insert_patt = 1;
-    appLedState.log_flag_patt = (u16)patt;
+    appLedState.log_flag_patt            = (u16)patt;
 }
 
-
-void app_led_async(u8* data)
+void app_led_async(u8 *data)
 {
     tlkapi_printf(APP_LOG_EN, "[APP][LED][ASYNC]\n");
-    tlkapi_send_string_data(1,"data",data,10);
+    tlkapi_send_string_data(1, "data", data, 10);
 }
 
-void app_led_sync(u8* data)
+void app_led_sync(u8 *data)
 {
     tlkapi_printf(APP_LOG_EN, "[APP][LED][SYNC]\n");
-    if(data[0] == SYS_STATE_SYNC)
-    {
+    if (data[0] == SYS_STATE_SYNC) {
         app_led_set_state(appLedState.conn_state);
-    }
-    else
-    {
+    } else {
         app_led_set_state(data[0]);
     }
 }
@@ -194,78 +177,66 @@ void app_led_sync(u8* data)
 void app_led_init(void)
 {
     tlk_led_config_t led_config;
-    int ret = 0;
-#ifdef LED1_ID
+    int              ret = 0;
+    #ifdef LED1_ID
     /** add led1 */
-    led_config.led_pin = LED1_PIN;
+    led_config.led_pin      = LED1_PIN;
     led_config.led_on_level = TLK_LED_VALID_LEVEL;
-    led_config.pwmid = PWM0_ID;
-    ret = tlk_led_add(&led_config);
-    if(ret != TLK_LED_SUCCESS)
-    {
-        tlkapi_printf(APP_LOG_EN, "led_1 init fail,ret - %d\n",ret);
-    }
-    else
-    {
+    led_config.pwmid        = PWM0_ID;
+    ret                     = tlk_led_add(&led_config);
+    if (ret != TLK_LED_SUCCESS) {
+        tlkapi_printf(APP_LOG_EN, "led_1 init fail,ret - %d\n", ret);
+    } else {
         tlkapi_printf(APP_LOG_EN, "led_1 init success\n");
         appLedState.led_id[APP_LED_INDEX_BLUE] = tlk_get_led_id_by_gpio(led_config.led_pin);
     }
-#endif
+    #endif
 
-#ifdef LED2_ID
+    #ifdef LED2_ID
     /** add led2 */
-    led_config.led_pin = LED2_PIN;
+    led_config.led_pin      = LED2_PIN;
     led_config.led_on_level = TLK_LED_VALID_LEVEL;
-    led_config.pwmid = PWM1_ID;
-    ret = tlk_led_add(&led_config);
-    if(ret != TLK_LED_SUCCESS)
-    {
-        tlkapi_printf(APP_LOG_EN, "led_2 init fail,ret - %d\n",ret);
-    }
-    else
-    {
+    led_config.pwmid        = PWM1_ID;
+    ret                     = tlk_led_add(&led_config);
+    if (ret != TLK_LED_SUCCESS) {
+        tlkapi_printf(APP_LOG_EN, "led_2 init fail,ret - %d\n", ret);
+    } else {
         tlkapi_printf(APP_LOG_EN, "led_2 init success\n");
         appLedState.led_id[APP_LED_INDEX_GREEN] = tlk_get_led_id_by_gpio(led_config.led_pin);
     }
-#endif
+    #endif
 
-#ifdef LED3_ID
+    #ifdef LED3_ID
     /** add led3 */
-    led_config.led_pin = LED3_PIN;
+    led_config.led_pin      = LED3_PIN;
     led_config.led_on_level = TLK_LED_VALID_LEVEL;
-    led_config.pwmid = PWM2_ID;
-    ret = tlk_led_add(&led_config);
-    if(ret != TLK_LED_SUCCESS)
-    {
-        tlkapi_printf(APP_LOG_EN, "led_3 init fail,ret - %d\n",ret);
-    }
-    else
-    {
+    led_config.pwmid        = PWM2_ID;
+    ret                     = tlk_led_add(&led_config);
+    if (ret != TLK_LED_SUCCESS) {
+        tlkapi_printf(APP_LOG_EN, "led_3 init fail,ret - %d\n", ret);
+    } else {
         tlkapi_printf(APP_LOG_EN, "led_3 init success\n");
         appLedState.led_id[APP_LED_INDEX_WHITE] = tlk_get_led_id_by_gpio(led_config.led_pin);
     }
-#endif
+    #endif
 
-#ifdef LED4_ID
+    #ifdef LED4_ID
     /** add led4 */
-    led_config.led_pin = LED4_PIN;
+    led_config.led_pin      = LED4_PIN;
     led_config.led_on_level = TLK_LED_VALID_LEVEL;
-#if(MCU_CORE_TYPE == MCU_CORE_B91 && HARDWARE_TYPE == TLSR9517CDK56D)
+        #if (MCU_CORE_TYPE == MCU_CORE_B91 && HARDWARE_TYPE == TLSR9517CDK56D)
     led_config.pwmid = PWM3_ID;
-#elif(MCU_CORE_TYPE == MCU_CORE_B91 && HARDWARE_TYPE == TLSR9518ADK80D)
+        #elif (MCU_CORE_TYPE == MCU_CORE_B91 && HARDWARE_TYPE == TLSR9518ADK80D)
     led_config.pwmid = PWM2_ID;
-#endif
+        #endif
     ret = tlk_led_add(&led_config);
-    if(ret != TLK_LED_SUCCESS)
-    {
-        tlkapi_printf(APP_LOG_EN, "led_4 init fail,ret - %d\n",ret);
-    }
-    else
-    {
+    if (ret != TLK_LED_SUCCESS) {
+        tlkapi_printf(APP_LOG_EN, "led_4 init fail,ret - %d\n", ret);
+    } else {
         tlkapi_printf(APP_LOG_EN, "led_4 init success\n");
         appLedState.led_id[APP_LED_INDEX_RED] = tlk_get_led_id_by_gpio(led_config.led_pin);
     }
-#endif
+    #endif
 
     appLedState.conn_state = SYS_STATE_IDLE;
     app_led_set_state(SYS_STATE_IDLE);
@@ -278,17 +249,15 @@ void app_led_init(void)
  *
  * @returns None.
  */
-_attribute_ram_code_
-void app_led_task(void)
+_attribute_ram_code_ void app_led_task(void)
 {
-    static u32 tlkLedSyncTick = 0;
+    static u32 tlkLedSyncTick  = 0;
     static u32 tlkLedSyncCount = 0;
-    if(clock_time_exceed(tlkLedSyncTick,1000*1000))
-    {
-        tlkLedSyncCount++;//plus every second
+    if (clock_time_exceed(tlkLedSyncTick, 1000 * 1000)) {
+        tlkLedSyncCount++;      //plus every second
         tlkLedSyncTick = clock_time();
     }
-    if(tlkLedSyncCount>=300)//5min
+    if (tlkLedSyncCount >= 300) //5min
     {
         app_led_state_sync(SYS_STATE_SYNC);
         tlkLedSyncCount = 0;

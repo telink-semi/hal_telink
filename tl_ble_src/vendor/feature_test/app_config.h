@@ -27,13 +27,9 @@
 #include "feature_config.h"
 
 
-
-
-
-
-#if(FEATURE_TEST_MODE == TEST_LL_MD)
+#if (FEATURE_TEST_MODE == TEST_LL_MD)
     #include "feature_ll_more_data/app_config.h"
-#elif(FEATURE_TEST_MODE == TEST_2M_CODED_PHY_CONNECTION)
+#elif (FEATURE_TEST_MODE == TEST_2M_CODED_PHY_CONNECTION)
     #include "feature_2M_coded_phy/app_config.h"
 #elif (FEATURE_TEST_MODE == TEST_LL_DLE)
     #include "feature_dle/app_config.h"
@@ -74,7 +70,7 @@
 #elif (FEATURE_TEST_MODE == ISO_TEST_MODE)
     #include "feature_iso_test/app_config.h"
 #elif (FEATURE_TEST_MODE == TEST_SMP)
-   #include "feature_smp/app_config.h"
+    #include "feature_smp/app_config.h"
 #elif (FEATURE_TEST_MODE == TEST_MULTIPLE_LOCAL_DEVICE)
     #include "feature_multi_local_dev/app_config.h"
 #elif (FEATURE_TEST_MODE == TEST_SUBRATE_CENTRAL)
@@ -93,6 +89,11 @@
     #include "feature_debug_log/app_config.h"
 #elif (FEATURE_TEST_MODE == TEST_L2CAP_COC)
     #include "feature_l2cap_coc/app_config.h"
+#elif (FEATURE_TEST_MODE == TEST_CURRENT)
+    #include "feature_current/app_config.h"
+#elif (FEATURE_TEST_MODE == TEST_AUTO)
+    #include "feature_auto_test/app_config.h"
+#elif (FEATURE_TEST_MODE == TEST_LONG_RANGE)
+    #include "feature_long_range/app_config.h"
 #else
 #endif
-

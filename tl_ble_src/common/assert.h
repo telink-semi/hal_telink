@@ -23,33 +23,39 @@
  *******************************************************************************************************/
 #pragma once
 
-#include "config/user_config.h"         //   for  __DEBUG__
+#include "config/user_config.h" //   for  __DEBUG__
 
 #ifndef __DEBUG__
-#define __DEBUG__                   0
+    #define __DEBUG__ 0
 #endif
 
 #ifndef __GNUC__
-#define __GNUC__                    0
+    #define __GNUC__ 0
 #endif
 
 #ifndef __SHOW_TODO__
-#define __SHOW_TODO__               0
+    #define __SHOW_TODO__ 0
 #endif
 
 #ifndef __SHOW_WARN__
-#define __SHOW_WARN__               0
+    #define __SHOW_WARN__ 0
 #endif
 
 #if (__DEBUG__)
 
-#define assert(expression)  \
-  do{if(!(expression)) __assert (expression, __FILE__, __LINE__)}while(0)
+    #define assert(expression)                           \
+        do {                                             \
+            if (!(expression))                           \
+                __assert(expression, __FILE__, __LINE__) \
+        } while (0)
 
-#define __assert(expression, file, lineno)  {printf ("%s:%u: assertion failed!\n", file, lineno);}
+    #define __assert(expression, file, lineno)                  \
+        {                                                       \
+            printf("%s:%u: assertion failed!\n", file, lineno); \
+        }
 
 #else
-#define assert(ignore) ((void) 0)
+    #define assert(ignore) ((void)0)
 #endif
 
 ////////////////////  To do compiler warning  //////////////////
@@ -57,45 +63,43 @@
 // http://gcc.gnu.org/ml/gcc-help/2010-10/msg00196.html
 // http://stackoverflow.com/questions/3030099/c-c-pragma-in-define-macro
 #ifndef _STRINGIFY
-#define _STRINGIFY(x) #x
+    #define _STRINGIFY(x) #x
 #endif
 
 #ifndef STRINGIFY
-#define STRINGIFY(x) _STRINGIFY(x)
+    #define STRINGIFY(x) _STRINGIFY(x)
 #endif
 
 #ifdef __GNUC__
-#define COMPILE_MESSAGE(x) _Pragma (#x)
+    #define COMPILE_MESSAGE(x) _Pragma(#x)
 #endif
 
 #if (__SHOW_TODO__)
-#ifdef __GNUC__
-#define TODO(x) COMPILE_MESSAGE(message ("--TODO-- " #x))
+    #ifdef __GNUC__
+        #define TODO(x) COMPILE_MESSAGE(message("--TODO-- " #x))
+    #else
+        #define TODO(x) __pragma(message("--TODO-- "_STRINGIFY(x) " ::function: " __FUNCTION__ "@" STRINGIFY(__LINE__)))
+    #endif
 #else
-#define TODO(x) __pragma(message("--TODO-- "_STRINGIFY(x) " ::function: " __FUNCTION__ "@"STRINGIFY(__LINE__)))
-#endif
-#else
-#define TODO(x)
-#endif
-
-#if (__SHOW_WARN__)
-#ifdef __GNUC__
-#define WARN(x) COMPILE_MESSAGE(message ("--WARN-- " #x))
-#else
-#define WARN(x) __pragma(message("--WARN-- "_STRINGIFY(x) " ::function: " __FUNCTION__ "@"STRINGIFY(__LINE__)))
-#endif
-#else
-#define WARN(x)
+    #define TODO(x)
 #endif
 
 #if (__SHOW_WARN__)
-#ifdef __GNUC__
-#define NOTE(x) COMPILE_MESSAGE(message ("--NOTE-- " #x))
+    #ifdef __GNUC__
+        #define WARN(x) COMPILE_MESSAGE(message("--WARN-- " #x))
+    #else
+        #define WARN(x) __pragma(message("--WARN-- "_STRINGIFY(x) " ::function: " __FUNCTION__ "@" STRINGIFY(__LINE__)))
+    #endif
 #else
-#define NOTE(x) __pragma(message("--NOTE-- "_STRINGIFY(x) " ::function: " __FUNCTION__ "@"STRINGIFY(__LINE__)))
-#endif
-#else
-#define NOTE(x)
+    #define WARN(x)
 #endif
 
-
+#if (__SHOW_WARN__)
+    #ifdef __GNUC__
+        #define NOTE(x) COMPILE_MESSAGE(message("--NOTE-- " #x))
+    #else
+        #define NOTE(x) __pragma(message("--NOTE-- "_STRINGIFY(x) " ::function: " __FUNCTION__ "@" STRINGIFY(__LINE__)))
+    #endif
+#else
+    #define NOTE(x)
+#endif

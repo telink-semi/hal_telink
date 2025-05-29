@@ -26,15 +26,17 @@
 
 #if (UNICAST_SERVER_SELECT == UNICAST_SERVER_ASYNC)
 
-typedef struct{
+typedef struct
+{
     blc_adv_ltv_t ltv;
-    u8 rsi[6];
-}app_csis_Rsi_t;
+    u8            rsi[6];
+} app_csis_Rsi_t;
 
-typedef struct{
+typedef struct
+{
     blc_adv_ltv_t ltv;
-    u8 list[20];
-}app_incompleteList_t;
+    u8            list[20];
+} app_incompleteList_t;
 
 /**
  * @brief       This function serves to initialize the acceptor module.
@@ -117,14 +119,14 @@ void app_audio_media_next_track(u16 connHandle);
  * @param[in]   connHandle - ACL connect handle.
  * @return      none
  */
-void app_audio_call_accept(u16 connHandle,u8 callIndex);
+void app_audio_call_accept(u16 connHandle, u8 callIndex);
 
 /**
  * @brief       This function serves to terminate the call.
  * @param[in]   connHandle - ACL connect handle.
  * @return      none
  */
-void app_audio_call_termiante(u16 connHandle,u8 callIndex);
+void app_audio_call_termiante(u16 connHandle, u8 callIndex);
 
 #endif
 

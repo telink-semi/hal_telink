@@ -33,7 +33,7 @@
 extern "C" {
 #endif
 
-#define big_integer_compare     uint32_BigNumCmp
+
 
 #define GET_MAX_LEN(a,b)         (((a)>(b))?(a):(b))
 #define GET_MIN_LEN(a,b)         (((a)>(b))?(b):(a))

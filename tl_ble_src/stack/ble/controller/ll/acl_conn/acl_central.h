@@ -25,13 +25,12 @@
 #define ACL_CENTRAL_H_
 
 
-
 /**
  * @brief      for user to initialize ACL connection central role.
  * @param      none
  * @return     none
  */
-void        blc_ll_initAclCentralRole_module(void);
+void blc_ll_initAclCentralRole_module(void);
 
 
 /**
@@ -43,7 +42,7 @@ void        blc_ll_initAclCentralRole_module(void);
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_initAclCentralTxFifo(u8 *pTxbuf, int fifo_size, int fifo_number, int conn_number);
+ble_sts_t blc_ll_initAclCentralTxFifo(u8 *pTxbuf, int fifo_size, int fifo_number, int conn_number);
 
 
 /**
@@ -53,7 +52,7 @@ ble_sts_t   blc_ll_initAclCentralTxFifo(u8 *pTxbuf, int fifo_size, int fifo_numb
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_setAclCentralBaseConnectionInterval(conn_inter_t conn_interval);
+ble_sts_t blc_ll_setAclCentralBaseConnectionInterval(conn_inter_t conn_interval);
 
 
 /**
@@ -68,8 +67,7 @@ ble_sts_t   blc_ll_setAclCentralBaseConnectionInterval(conn_inter_t conn_interva
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_updateConnection(u16 connHandle, conn_inter_t conn_min, conn_inter_t conn_max, u16 conn_latency, conn_tm_t timeout, u16 ce_min, u16 ce_max);
-
+ble_sts_t blc_ll_updateConnection(u16 connHandle, conn_inter_t conn_min, conn_inter_t conn_max, u16 conn_latency, conn_tm_t timeout, u16 ce_min, u16 ce_max);
 
 
 /**
@@ -77,8 +75,7 @@ ble_sts_t   blc_ll_updateConnection(u16 connHandle, conn_inter_t conn_min, conn_
  * @param[in]  enable - 1: enable;  0: disable
  * @return     none
  */
-void        blc_ll_customizeConnectionEstablishEvent(int enable);
-
+void blc_ll_customizeConnectionEstablishEvent(int enable);
 
 
 #endif /* ACL_CENTRAL_H_ */

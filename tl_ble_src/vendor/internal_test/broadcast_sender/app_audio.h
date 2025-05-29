@@ -32,38 +32,34 @@
 #if (INTER_TEST_MODE == TEST_BIS_AUDIO_SENDER)
 
 
-//broadcast source extend advertising parameter
-#define DEFAULT_LOCAL_NAME                      "Telink-SOURCE"
-#define DEFALUT_NUM_SUBGROUP                    1
-#define SUBGROUP_NUM_BIS                        2
+    //broadcast source extend advertising parameter
+    #define DEFAULT_LOCAL_NAME                 "Telink-SOURCE"
+    #define DEFALUT_NUM_SUBGROUP               1
+    #define SUBGROUP_NUM_BIS                   2
 
-#define BIS_STREAM_CONFIG_LOW_LATENCY           0
-#define BIS_STREAM_CONFIG_HIGH_RELIABILITY      1
-#define BIS_STREAM_CONFIG                       BIS_STREAM_CONFIG_HIGH_RELIABILITY
-
-
-#if (SUBGROUP_NUM_BIS > APP_BIS_NUM_IN_PER_BIG_BCST)
-    #error "bis num large"
-#endif
+    #define BIS_STREAM_CONFIG_LOW_LATENCY      0
+    #define BIS_STREAM_CONFIG_HIGH_RELIABILITY 1
+    #define BIS_STREAM_CONFIG                  BIS_STREAM_CONFIG_HIGH_RELIABILITY
 
 
+    #if (SUBGROUP_NUM_BIS > APP_BIS_NUM_IN_PER_BIG_BCST)
+        #error "bis num large"
+    #endif
 
 
-#define DEFAULT_METADATA_LENGTH                 0
+    #define DEFAULT_METADATA_LENGTH 0
 
-#define BIS_CONTEXTS_TYPE                       BLC_AUDIO_CONTEXT_TYPE_MEDIA
-#define BIS_LANGUAGE                            0x0003A8        //
+    #define BIS_CONTEXTS_TYPE       BLC_AUDIO_CONTEXT_TYPE_MEDIA
+    #define BIS_LANGUAGE            0x0003A8 //
 
-#define BIS_1_AUDIO_LOCATION                    BLC_AUDIO_LOCATION_FLAG_FL
-#define BIS_2_AUDIO_LOCATION                    BLC_AUDIO_LOCATION_FLAG_FR
+    #define BIS_1_AUDIO_LOCATION    BLC_AUDIO_LOCATION_FLAG_FL
+    #define BIS_2_AUDIO_LOCATION    BLC_AUDIO_LOCATION_FLAG_FR
 
-/* Audio configuration */
-#define APP_AUDIO_FRAME_SAMPLE                  (480)// 48K => 10ms * 48sample
-#define APP_AUDIO_FRAME_BYTES                   (APP_AUDIO_FRAME_SAMPLE << 1) // 1 sample 16bits
+    /* Audio configuration */
+    #define APP_AUDIO_FRAME_SAMPLE (480)                         // 48K => 10ms * 48sample
+    #define APP_AUDIO_FRAME_BYTES  (APP_AUDIO_FRAME_SAMPLE << 1) // 1 sample 16bits
 
-#define APP_USB_1MS_BUFF_LEN                    (APP_AUDIO_FRAME_BYTES / 10) //AUDIO_SAMPLE_RATE //bytes per ms
-
-
+    #define APP_USB_1MS_BUFF_LEN   (APP_AUDIO_FRAME_BYTES / 10)  //AUDIO_SAMPLE_RATE //bytes per ms
 
 /*
  * Broadcast source PDA Advertise parameter
@@ -71,7 +67,8 @@
  * BAP: broadcast ID
  * PBP: Broadcast Name/Public Broadcast Announcement
  */
-typedef struct{
+typedef struct
+{
     u8 samplingFreqLen;
     u8 samplingFreqType;
     u8 samplingFreq;
@@ -80,54 +77,54 @@ typedef struct{
     u8 frameDurationType;
     u8 frameDuration;
 
-    u8 octetsPerFrameLen;
-    u8 octetsPerFrameType;
+    u8  octetsPerFrameLen;
+    u8  octetsPerFrameType;
     u16 octetsPerFrame;
-}bisPdaCodecSpecificConfig_t;
+} bisPdaCodecSpecificConfig_t;
 
-
-typedef struct{
-    u8 streamingAudioContextsLen;
-    u8 streamingAudioContextsType;
+typedef struct
+{
+    u8  streamingAudioContextsLen;
+    u8  streamingAudioContextsType;
     u16 streamingAudioContexts;
-    u8 languageLen;
-    u8 languageType;
-    u8 language[3];
-}bisPdaMetadata_t;
+    u8  languageLen;
+    u8  languageType;
+    u8  language[3];
+} bisPdaMetadata_t;
 
-
-typedef struct{
-    u8 bisIndex;
-    u8 size;
-    u8 audioChannelAllocationLen;
-    u8 audioChannelAllocationType;
+typedef struct
+{
+    u8  bisIndex;
+    u8  size;
+    u8  audioChannelAllocationLen;
+    u8  audioChannelAllocationType;
     u32 audioChannelAllocation;
-}bisPdaEachAddiInfo_t;
+} bisPdaEachAddiInfo_t;
 
-
-typedef struct{
+typedef struct
+{
     u8 numBis;
     // codec id
-    u8 codecFormat;
+    u8  codecFormat;
     u16 companyID;
     u16 vendorSpecificCodecID;
     //codec specific configuration
-    u8 CodecSpecificConfigLen;
+    u8                          CodecSpecificConfigLen;
     bisPdaCodecSpecificConfig_t CodecSpecificConfig;
-    u8 metadataLen;
-    bisPdaMetadata_t metadata;
-    bisPdaEachAddiInfo_t addiInfo[SUBGROUP_NUM_BIS];
-}bisGroupInfo_t;
+    u8                          metadataLen;
+    bisPdaMetadata_t            metadata;
+    bisPdaEachAddiInfo_t        addiInfo[SUBGROUP_NUM_BIS];
+} bisGroupInfo_t;
 
-
-typedef struct{
-    u8 length;
-    u8 type;
-    u16 BASS_UUID;
-    u8 presentationDelay[3];
-    u8 numSubgroups;
+typedef struct
+{
+    u8             length;
+    u8             type;
+    u16            BASS_UUID;
+    u8             presentationDelay[3];
+    u8             numSubgroups;
     bisGroupInfo_t groupInfo[DEFALUT_NUM_SUBGROUP];
-}bisSourcPdaeAdvData_t;
+} bisSourcPdaeAdvData_t;
 
 /*
  * Broadcast source extend Advertise parameter
@@ -135,41 +132,40 @@ typedef struct{
  * BAP: broadcast ID
  * PBP: Broadcast Name/Public Broadcast Announcement
  */
-typedef struct{
+typedef struct
+{
     //adv local name
     u8 localNameLen;
     u8 localNameType;
-    u8 localName[sizeof(DEFAULT_LOCAL_NAME)-1];
+    u8 localName[sizeof(DEFAULT_LOCAL_NAME) - 1];
     //adv flags
     u8 flagsLen;
     u8 flagsType;
     u8 flags;
     //adv BAAS UUID (BAP)
-    u8 broadcastIDLen;
-    u8 broadcastIDType;
+    u8  broadcastIDLen;
+    u8  broadcastIDType;
     u16 BAAS_UUID;
-    u8 broadcastID[3];
+    u8  broadcastID[3];
     //adv PBAS UUID (PBP)
-    u8 PBAFeatureLen;
-    u8 PBAFeatureType;
+    u8  PBAFeatureLen;
+    u8  PBAFeatureType;
     u16 PBAS_UUID;
-    u8 PBAFeature;
-    u8 metadataLen;
-    u8 metadata[DEFAULT_METADATA_LENGTH];
+    u8  PBAFeature;
+    u8  metadataLen;
+    u8  metadata[DEFAULT_METADATA_LENGTH];
     //adv Broadcast Name (PBP)
     u8 broadcastNameLen;
     u8 broadcastNameType;
-    u8 broadcastName[sizeof(DEFAULT_BROADCAST_NAME)-1];
+    u8 broadcastName[sizeof(DEFAULT_BROADCAST_NAME) - 1];
 
-}bisSourceAdvData_t;
+} bisSourceAdvData_t;
 
-
-
-extern unsigned short gAppAudioBuffer[APP_AUDIO_FRAME_BYTES *2];
-extern u8  gbisSamplingFreq;
-extern u8  gbisFrameDuration;
-extern u16 gbisOctetPer;
-extern bool gAppAudioIsSend;
+extern unsigned short gAppAudioBuffer[APP_AUDIO_FRAME_BYTES * 2];
+extern u8             gbisSamplingFreq;
+extern u8             gbisFrameDuration;
+extern u16            gbisOctetPer;
+extern bool           gAppAudioIsSend;
 
 int  app_audio_init(void);
 void app_audio_handler(void);

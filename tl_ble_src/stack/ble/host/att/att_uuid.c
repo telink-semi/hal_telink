@@ -38,8 +38,8 @@
  *  big endian    0x2800 : [28 00] -> swapping required
  */
 static const uuid_t uuid128_base = {
-    .uuidLen = ATT_128_UUID_LEN,
-    .uuidVal.u128 = { 0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
+    .uuidLen      = ATT_128_UUID_LEN,
+    .uuidVal.u128 = {0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
 };
 
 static void uuid_to_uuid128(const uuid_t *src, uuid_t *dst)
@@ -47,13 +47,13 @@ static void uuid_to_uuid128(const uuid_t *src, uuid_t *dst)
     dst->uuidLen = ATT_128_UUID_LEN;
 
     switch (src->uuidLen) {
-        case ATT_16_UUID_LEN:
-            *dst = uuid128_base;
-            memcpy((u8*)&dst->uuidVal.u128[UUID_16_BASE_OFFSET], (u8*)(u32)&src->uuidVal.u16, src->uuidLen);
-            return;
-        case ATT_128_UUID_LEN:
-            memcpy(dst->uuidVal.u128, src->uuidVal.u128, ATT_128_UUID_LEN);
-            return;
+    case ATT_16_UUID_LEN:
+        *dst = uuid128_base;
+        memcpy((u8 *)&dst->uuidVal.u128[UUID_16_BASE_OFFSET], (u8 *)(u32)&src->uuidVal.u16, src->uuidLen);
+        return;
+    case ATT_128_UUID_LEN:
+        memcpy(dst->uuidVal.u128, src->uuidVal.u128, ATT_128_UUID_LEN);
+        return;
     }
 }
 
@@ -70,14 +70,14 @@ static int uuid128_cmp(const uuid_t *u1, const uuid_t *u2)
 int blc_uuid_cmp(const uuid_t *u1, const uuid_t *u2)
 {
     /* UUID1 length check */
-    if (u1 == NULL || \
-       (u1->uuidLen != ATT_16_UUID_LEN && u1->uuidLen != ATT_128_UUID_LEN)) {
+    if (u1 == NULL ||
+        (u1->uuidLen != ATT_16_UUID_LEN && u1->uuidLen != ATT_128_UUID_LEN)) {
         return -1;
     }
 
     /* UUID2 length check */
-    if (u2 == NULL || \
-       (u2->uuidLen != ATT_16_UUID_LEN && u2->uuidLen != ATT_128_UUID_LEN)) {
+    if (u2 == NULL ||
+        (u2->uuidLen != ATT_16_UUID_LEN && u2->uuidLen != ATT_128_UUID_LEN)) {
         return -1;
     }
 
@@ -92,8 +92,8 @@ int blc_uuid_cmp(const uuid_t *u1, const uuid_t *u2)
 bool blc_uuid_create(uuid_t *uuid, const u8 *data, u8 data_len)
 {
     /* UUID2 length check */
-    if (uuid == NULL || data == NULL || \
-       (data_len != ATT_16_UUID_LEN && data_len != ATT_128_UUID_LEN)) {
+    if (uuid == NULL || data == NULL ||
+        (data_len != ATT_16_UUID_LEN && data_len != ATT_128_UUID_LEN)) {
         return false;
     }
 
@@ -103,11 +103,9 @@ bool blc_uuid_create(uuid_t *uuid, const u8 *data, u8 data_len)
     return true;
 }
 
-
 bool blt_uuid_cmp16to128(const u8 *pUuid16, const u8 *pUuid128)
 {
-    u8 attBaseUuid[16] = {0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80,
-            0x00, 0x10, 0x00, 0x00, pUuid16[0], pUuid16[1], 0x00, 0x00};
+    u8 attBaseUuid[16] = {0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, pUuid16[0], pUuid16[1], 0x00, 0x00};
     return (memcmp(attBaseUuid, pUuid128, ATT_128_UUID_LEN) == 0);
 }
 
@@ -119,6 +117,3 @@ bool blt_uuid_cmp16or128(const u8 *pUuid16, u8 uuidLen, const u8 *pUuid)
         return blt_uuid_cmp16to128(pUuid16, pUuid);
     }
 }
-
-
-

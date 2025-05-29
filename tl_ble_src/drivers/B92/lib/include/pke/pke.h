@@ -26,7 +26,8 @@
 #define PKE_H
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 
@@ -36,125 +37,123 @@ extern "C" {
 #include "pke_utility.h"
 
 
-#define pke_clr_irq_status          pke_clear_interrupt
-#define pke_get_irq_status          pke_wait_till_done
-#define pke_opr_start               pke_start
-#define pke_mod_add                 pke_modadd
-#define pke_mod_sub                 pke_modsub
-#define pke_mod_mul                 pke_modmul
-#define pke_mod_inv                 pke_modinv
-#define div2n_u32                   Big_Div2n
-#define sub_u32                     pke_sub
-#define pke_eccp_point_mul          eccp_pointMul
-#define pke_eccp_point_add          eccp_pointAdd
-#define pke_eccp_point_verify       eccp_pointVerify
-#define pke_x25519_point_mul        x25519_pointMul
-#define pke_ed25519_point_mul       ed25519_pointMul
-#define pke_ed25519_point_add       ed25519_pointAdd
+#define pke_clr_irq_status    pke_clear_interrupt
+#define pke_get_irq_status    pke_wait_till_done
+#define pke_opr_start         pke_start
+#define pke_mod_add           pke_modadd
+#define pke_mod_sub           pke_modsub
+#define pke_mod_mul           pke_modmul
+#define pke_mod_inv           pke_modinv
+#define div2n_u32             Big_Div2n
+#define sub_u32               pke_sub
+#define pke_eccp_point_mul    eccp_pointMul
+#define pke_eccp_point_add    eccp_pointAdd
+#define pke_eccp_point_verify eccp_pointVerify
+#define pke_x25519_point_mul  x25519_pointMul
+#define pke_ed25519_point_mul ed25519_pointMul
+#define pke_ed25519_point_add ed25519_pointAdd
 
 
 //#define SUPPORT_SM2
 #define SUPPORT_C25519
 
-#ifndef   NULL
-#define   NULL              0
+#ifndef NULL
+    #define NULL 0
 #endif
 
-//TRNG return code
-enum TRNG_RET_CODE
-{
-    TRNG_SUCCESS = 0,
-    TRNG_BUFFER_NULL,
-    TRNG_INVALID_INPUT,
-    TRNG_INVALID_CONFIG,
-    TRNG_HT_ERROR,
-    TRNG_ERROR
-};
+    //TRNG return code
+    enum TRNG_RET_CODE
+    {
+        TRNG_SUCCESS = 0,
+        TRNG_BUFFER_NULL,
+        TRNG_INVALID_INPUT,
+        TRNG_INVALID_CONFIG,
+        TRNG_HT_ERROR,
+        TRNG_ERROR
+    };
 
 /*********** PKE register action offset ************/
-#define PKE_INT_ENABLE_OFFSET                 (8)
-#define PKE_START_CALC                        (1)
+#define PKE_INT_ENABLE_OFFSET       (8)
+#define PKE_START_CALC              (1)
 
-#define PKE_EXE_OUTPUT_AFFINE                 (0x10)
-#define PKE_EXE_R1_MONT_R0_AFFINE             (0x09)
-#define PKE_EXE_R1_MONT_R0_MONT               (0x0A)
-#define PKE_EXE_R1_AFFINE_R0_AFFINE           (0x05)
-#define PKE_EXE_R1_AFFINE_R0_MONT             (0x06)
-#define PKE_EXE_ECCP_POINT_MUL                (PKE_EXE_OUTPUT_AFFINE + PKE_EXE_R1_AFFINE_R0_MONT)
-#define PKE_EXE_ECCP_POINT_ADD                (PKE_EXE_OUTPUT_AFFINE + PKE_EXE_R1_AFFINE_R0_AFFINE)
-#define PKE_EXE_ECCP_POINT_DBL                (PKE_EXE_OUTPUT_AFFINE + PKE_EXE_R1_MONT_R0_AFFINE)
-#define PKE_EXE_ECCP_POINT_VER                (PKE_EXE_OUTPUT_AFFINE + PKE_EXE_R1_AFFINE_R0_MONT)
+#define PKE_EXE_OUTPUT_AFFINE       (0x10)
+#define PKE_EXE_R1_MONT_R0_AFFINE   (0x09)
+#define PKE_EXE_R1_MONT_R0_MONT     (0x0A)
+#define PKE_EXE_R1_AFFINE_R0_AFFINE (0x05)
+#define PKE_EXE_R1_AFFINE_R0_MONT   (0x06)
+#define PKE_EXE_ECCP_POINT_MUL      (PKE_EXE_OUTPUT_AFFINE + PKE_EXE_R1_AFFINE_R0_MONT)
+#define PKE_EXE_ECCP_POINT_ADD      (PKE_EXE_OUTPUT_AFFINE + PKE_EXE_R1_AFFINE_R0_AFFINE)
+#define PKE_EXE_ECCP_POINT_DBL      (PKE_EXE_OUTPUT_AFFINE + PKE_EXE_R1_MONT_R0_AFFINE)
+#define PKE_EXE_ECCP_POINT_VER      (PKE_EXE_OUTPUT_AFFINE + PKE_EXE_R1_AFFINE_R0_MONT)
 
-#define PKE_EXE_CFG_ALL_MONT                  (0x002A)
-#define PKE_EXE_CFG_ALL_NON_MONT              (0x0000)
-#define PKE_EXE_CFG_MOD_EXP                   (0x0316)
+#define PKE_EXE_CFG_ALL_MONT        (0x002A)
+#define PKE_EXE_CFG_ALL_NON_MONT    (0x0000)
+#define PKE_EXE_CFG_MOD_EXP         (0x0316)
 
 
 /***************** PKE microcode ******************/
-#define MICROCODE_PDBL                        (0x04)
-#define MICROCODE_PADD                        (0x08)
-#define MICROCODE_PVER                        (0x0C)
-#define MICROCODE_PMUL                        (0x10)
-#define MICROCODE_MODEXP                      (0x14)
-#define MICROCODE_MODMUL                      (0x18)
-#define MICROCODE_MODINV                      (0x1C)
-#define MICROCODE_MODADD                      (0x20)
-#define MICROCODE_MODSUB                      (0x24)
-#define MICROCODE_MGMR_PRE                    (0x28)
-#define MICROCODE_INTMUL                      (0x2C)
-#define MICROCODE_Ed25519_PMUL                (0x30)
-#define MICROCODE_Ed25519_PADD                (0x34)
-#define MICROCODE_C25519_PMUL                 (0x38)
+#define MICROCODE_PDBL         (0x04)
+#define MICROCODE_PADD         (0x08)
+#define MICROCODE_PVER         (0x0C)
+#define MICROCODE_PMUL         (0x10)
+#define MICROCODE_MODEXP       (0x14)
+#define MICROCODE_MODMUL       (0x18)
+#define MICROCODE_MODINV       (0x1C)
+#define MICROCODE_MODADD       (0x20)
+#define MICROCODE_MODSUB       (0x24)
+#define MICROCODE_MGMR_PRE     (0x28)
+#define MICROCODE_INTMUL       (0x2C)
+#define MICROCODE_Ed25519_PMUL (0x30)
+#define MICROCODE_Ed25519_PADD (0x34)
+#define MICROCODE_C25519_PMUL  (0x38)
 
 
 /*********** some PKE algorithm operand length ************/
-#define OPERAND_MAX_BIT_LEN                   (2048)
-#define OPERAND_MAX_WORD_LEN                  (GET_WORD_LEN(OPERAND_MAX_BIT_LEN))
+#define OPERAND_MAX_BIT_LEN  (2048)
+#define OPERAND_MAX_WORD_LEN (GET_WORD_LEN(OPERAND_MAX_BIT_LEN))
 
-#define ECCP_MAX_BIT_LEN                      (256)  //ECC256
-#define ECCP_MAX_BYTE_LEN                     (GET_BYTE_LEN(ECCP_MAX_BIT_LEN))
-#define ECCP_MAX_WORD_LEN                     (GET_WORD_LEN(ECCP_MAX_BIT_LEN))
+#define ECCP_MAX_BIT_LEN     (256) //ECC256
+#define ECCP_MAX_BYTE_LEN    (GET_BYTE_LEN(ECCP_MAX_BIT_LEN))
+#define ECCP_MAX_WORD_LEN    (GET_WORD_LEN(ECCP_MAX_BIT_LEN))
 
-#define C25519_BYTE_LEN                       (256/8)
-#define C25519_WORD_LEN                       (256/32)
+#define C25519_BYTE_LEN      (256 / 8)
+#define C25519_WORD_LEN      (256 / 32)
 
-#define Ed25519_BYTE_LEN                      C25519_BYTE_LEN
-#define Ed25519_WORD_LEN                      C25519_WORD_LEN
+#define Ed25519_BYTE_LEN     C25519_BYTE_LEN
+#define Ed25519_WORD_LEN     C25519_WORD_LEN
 
-#define MAX_RSA_WORD_LEN                      OPERAND_MAX_WORD_LEN
-#define MAX_RSA_BIT_LEN                       (MAX_RSA_WORD_LEN<<5)
-#define MIN_RSA_BIT_LEN                       (512)
+#define MAX_RSA_WORD_LEN     OPERAND_MAX_WORD_LEN
+#define MAX_RSA_BIT_LEN      (MAX_RSA_WORD_LEN << 5)
+#define MIN_RSA_BIT_LEN      (512)
 
+    /******************* PKE return code ********************/
+    enum PKE_RET_CODE
+    {
+        PKE_SUCCESS = 0,
+        PKE_STOP,
+        PKE_NO_MODINV,
+        PKE_NOT_ON_CURVE,
+        PKE_INVALID_MC,
+        PKE_ZERO_ALL,        //for ECCP input check
+        PKE_INTEGER_TOO_BIG, //for ECCP input check
+        PKE_INVALID_INPUT,
+    };
 
-/******************* PKE return code ********************/
-enum PKE_RET_CODE
-{
-    PKE_SUCCESS = 0,
-    PKE_STOP,
-    PKE_NO_MODINV,
-    PKE_NOT_ON_CURVE,
-    PKE_INVALID_MC,
-    PKE_ZERO_ALL,                   //for ECCP input check
-    PKE_INTEGER_TOO_BIG,            //for ECCP input check
-    PKE_INVALID_INPUT,
-};
-
-
-//define KDF
-typedef void *(*KDF_FUNC)(const void *input, unsigned int byteLen, unsigned char *key, unsigned int keyByteLen);
+    //define KDF
+    typedef void *(*KDF_FUNC)(const void *input, unsigned int byteLen, unsigned char *key, unsigned int keyByteLen);
 
 
-//APIs
+    //APIs
 
-/**
+    /**
  * @brief       get random data.
  * @param[in]   rand_pke  - random data array.
  * @param[in]   bytes     - length of the random data.
  * @return      TRNG_SUCCESS(success), other(error).
  */
-unsigned char rand_get(unsigned char *rand, unsigned int byteLen);
+    unsigned char rand_get(unsigned char *rand, unsigned int byteLen);
 
-/**
+    /**
  * @brief       ainv = a^(-1) mod modulus.
  * @param[in]   modulus    - modulus.
  * @param[in]   a          - integer a.
@@ -164,10 +163,9 @@ unsigned char rand_get(unsigned char *rand, unsigned int byteLen);
  * @return      PKE_SUCCESS(success), other(inverse not exists or error).
  * @caution     please make sure aWordLen <= modWordLen <= OPERAND_MAX_WORD_LEN and a < modulus.
  */
-unsigned int pke_modinv(const unsigned int *modulus, volatile const unsigned int *a, unsigned int *ainv, unsigned int modWordLen,
-        unsigned int aWordLen);
+    unsigned int pke_modinv(const unsigned int *modulus, volatile const unsigned int *a, unsigned int *ainv, unsigned int modWordLen, unsigned int aWordLen);
 
-/**
+    /**
  * @brief       out = (a+b) mod modulus.
  * @param[in]   modulus  - modulus.
  * @param[in]   a        - integer a.
@@ -178,10 +176,9 @@ unsigned int pke_modinv(const unsigned int *modulus, volatile const unsigned int
  * @caution     1. a,b must be less than modulus.
  *              2. wordLen must not be bigger than OPERAND_MAX_WORD_LEN.
  */
-unsigned int pke_modadd(const unsigned int *modulus, volatile const unsigned int *a, volatile const unsigned int *b,
-        unsigned int *out, unsigned int wordLen);
+    unsigned int pke_modadd(const unsigned int *modulus, volatile const unsigned int *a, volatile const unsigned int *b, unsigned int *out, unsigned int wordLen);
 
-/**
+    /**
  * @brief       out = (a-b) mod modulus.
  * @param[in]   modulus - modulus.
  * @param[in]   a       - integer a.
@@ -192,10 +189,9 @@ unsigned int pke_modadd(const unsigned int *modulus, volatile const unsigned int
  * @caution     1. a,b must be less than modulus.
  *              2. wordLen must not be bigger than OPERAND_MAX_WORD_LEN.
  */
-unsigned int pke_modsub(const unsigned int *modulus, const unsigned int *a, const unsigned int *b,
-        unsigned int *out, unsigned int wordLen);
+    unsigned int pke_modsub(const unsigned int *modulus, const unsigned int *a, const unsigned int *b, unsigned int *out, unsigned int wordLen);
 
-/**
+    /**
  * @brief       out = a+b.
  * @param[in]   a         - integer a.
  * @param[in]   b         - integer b.
@@ -205,9 +201,9 @@ unsigned int pke_modsub(const unsigned int *modulus, const unsigned int *a, cons
  * @caution     1. a+b may overflow.
  *              2. wordLen must not be bigger than OPERAND_MAX_WORD_LEN.
  */
-unsigned int pke_add(volatile const unsigned int *a, volatile const unsigned int *b, unsigned int *out, unsigned int wordLen);
+    unsigned int pke_add(volatile const unsigned int *a, volatile const unsigned int *b, unsigned int *out, unsigned int wordLen);
 
-/**
+    /**
  * @brief       out = a-b.
  * @param[in]   a         - integer a.
  * @param[in]   b         - integer b.
@@ -217,9 +213,9 @@ unsigned int pke_add(volatile const unsigned int *a, volatile const unsigned int
  * @caution     1. please make sure a > b.
  *              2. wordLen must not be bigger than OPERAND_MAX_WORD_LEN.
  */
-unsigned int pke_sub(volatile const unsigned int *a, const unsigned int *b, volatile unsigned int *out, unsigned int wordLen);
+    unsigned int pke_sub(volatile const unsigned int *a, const unsigned int *b, volatile unsigned int *out, unsigned int wordLen);
 
-/**
+    /**
  * @brief       out = a*b.
  * @param[in]   a       - integer a.
  * @param[in]   b       - integer b.
@@ -229,9 +225,9 @@ unsigned int pke_sub(volatile const unsigned int *a, const unsigned int *b, vola
  * @caution     1. please make sure out buffer word length is bigger than (2*max_bit_len(a,b)+0x1F)>>5.
  *              2. please make sure ab_wordLen is not bigger than OPERAND_MAX_WORD_LEN/2.
  */
-unsigned int pke_mul(const unsigned int *a, const unsigned int *b, volatile unsigned int *out, unsigned int ab_wordLen);
+    unsigned int pke_mul(const unsigned int *a, const unsigned int *b, volatile unsigned int *out, unsigned int ab_wordLen);
 
-/**
+    /**
  * @brief       load the pre-calculated mont parameters H(R^2 mod modulus).
  * @param[in]   H       - R^2 mod modulus.
  * @param[in]   n1      - -modulus ^(-1) mod 2^w, here w is 32 actually.
@@ -240,9 +236,9 @@ unsigned int pke_mul(const unsigned int *a, const unsigned int *b, volatile unsi
  * @caution     1. please make sure the 2 input parameters are both valid.
  *              2. wordLen must not be bigger than OPERAND_MAX_WORD_LEN.
  */
-void pke_load_pre_calc_mont(volatile const unsigned int *H, volatile const unsigned int *n1, unsigned int wordLen);
+    void pke_load_pre_calc_mont(volatile const unsigned int *H, volatile const unsigned int *n1, unsigned int wordLen);
 
-/**
+    /**
  * @brief       out = a*b mod modulus.
  * @param[in]   modulus  - modulus.
  * @param[in]   a        - integer a.
@@ -255,10 +251,9 @@ void pke_load_pre_calc_mont(volatile const unsigned int *H, volatile const unsig
  *              3. wordLen must not be bigger than OPERAND_MAX_WORD_LEN.
  *              4. before calling this function, please make sure the pre-calculated mont arguments of modulus are located in the right address.
  */
-unsigned int pke_modmul_internal(volatile const unsigned int *modulus, volatile const unsigned int *a, volatile const unsigned int *b, volatile unsigned int *out,
-        unsigned int wordLen);
+    unsigned int pke_modmul_internal(volatile const unsigned int *modulus, volatile const unsigned int *a, volatile const unsigned int *b, volatile unsigned int *out, unsigned int wordLen);
 
-/**
+    /**
  * @brief       out = a*b mod modulus.
  * @param[in]   modulus  - modulus.
  * @param[in]   a        - integer a.
@@ -270,9 +265,9 @@ unsigned int pke_modmul_internal(volatile const unsigned int *modulus, volatile 
  *              2. a, b must less than modulus.
  *              3. wordLen must not be bigger than OPERAND_MAX_WORD_LEN.
  */
-unsigned int pke_modmul(const unsigned int *modulus, const unsigned int *a, const unsigned int *b, unsigned int *out, unsigned int wordLen);
+    unsigned int pke_modmul(const unsigned int *modulus, const unsigned int *a, const unsigned int *b, unsigned int *out, unsigned int wordLen);
 
-/**
+    /**
  * @brief       mod exponent, this could be used for rsa encrypting,decrypting,signing,verifying.
  * @param[in]   modulus     - modulus.
  * @param[in]   exponent    - exponent.
@@ -286,10 +281,9 @@ unsigned int pke_modmul(const unsigned int *modulus, const unsigned int *a, cons
  *              2. modulus must be odd.
  *              3. please make sure exp_wordLen <= mod_wordLen <= OPERAND_MAX_WORD_LEN.
  */
-unsigned int pke_modexp(volatile const unsigned int *modulus, volatile const unsigned int *exponent, volatile const unsigned int *base,
-        volatile unsigned int *out, unsigned int mod_wordLen, unsigned int exp_wordLen);
+    unsigned int pke_modexp(volatile const unsigned int *modulus, volatile const unsigned int *exponent, volatile const unsigned int *base, volatile unsigned int *out, unsigned int mod_wordLen, unsigned int exp_wordLen);
 
-/**
+    /**
  * @brief       c = a mod b.
  * @param[in]   a          - real bit length of e.
  * @param[in]   aWordLen   - real bit length of n.
@@ -303,10 +297,9 @@ unsigned int pke_modexp(volatile const unsigned int *modulus, volatile const uns
  *              2. please make sure aWordLen <= 2*OPERAND_MAX_WORD_LEN, bWordLen <= OPERAND_MAX_WORD_LEN.
  *              3. real bit length of a can not be bigger than 2*(real bit length of b).
  */
-unsigned int pke_mod(unsigned int *a, unsigned int aWordLen, const unsigned int *b, volatile const unsigned int *b_h, volatile const unsigned int *b_n1, unsigned int bWordLen,
-        unsigned int *c);
+    unsigned int pke_mod(unsigned int *a, unsigned int aWordLen, const unsigned int *b, volatile const unsigned int *b_h, volatile const unsigned int *b_n1, unsigned int bWordLen, unsigned int *c);
 
-/**
+    /**
  * @brief       ECCP curve point mul(random point), Q=[k]P.
  * @param[in]   curve - eccp_curve_t curve struct pointer.
  * @param[in]   k     - scalar.
@@ -319,10 +312,9 @@ unsigned int pke_mod(unsigned int *a, unsigned int aWordLen, const unsigned int 
  *              2. please make sure input point P is on the curve.
  *              3. please make sure bit length of the curve is not bigger than ECCP_MAX_BIT_LEN.
  */
-unsigned int eccp_pointMul(eccp_curve_t *curve, unsigned int *k, const unsigned int *Px, const unsigned int *Py,
-                      volatile unsigned int *Qx, volatile unsigned int *Qy);
+    unsigned int eccp_pointMul(eccp_curve_t *curve, unsigned int *k, const unsigned int *Px, const unsigned int *Py, volatile unsigned int *Qx, volatile unsigned int *Qy);
 
-/**
+    /**
  * @brief       ECCP curve point add, Q=P1+P2.
  * @param[in]   curve - eccp_curve_t curve struct pointer.
  * @param[in]   P1x   - x coordinate of point P1.
@@ -335,12 +327,11 @@ unsigned int eccp_pointMul(eccp_curve_t *curve, unsigned int *k, const unsigned 
  * @caution     1. please make sure input point P1 and P2 are both on the curve.
  *              2. please make sure bit length of the curve is not bigger than ECCP_MAX_BIT_LEN.
  */
-unsigned int eccp_pointAdd(eccp_curve_t *curve, unsigned int *P1x, unsigned int *P1y, unsigned int *P2x, unsigned int *P2y,
-                      unsigned int *Qx, unsigned int *Qy);
+    unsigned int eccp_pointAdd(eccp_curve_t *curve, unsigned int *P1x, unsigned int *P1y, unsigned int *P2x, unsigned int *P2y, unsigned int *Qx, unsigned int *Qy);
 
 //#define ECCP_POINT_DOUBLE   //recommended not to define
 #ifdef ECCP_POINT_DOUBLE
-/**
+    /**
  * @brief       ECCP curve point double, Q=[2]P.
  * @param[in]   curve - eccp_curve_t curve struct pointer.
  * @param[in]   Px    - x coordinate of point P.
@@ -351,10 +342,10 @@ unsigned int eccp_pointAdd(eccp_curve_t *curve, unsigned int *P1x, unsigned int 
  * @caution     1. please make sure input point P is on the curve.
  *              2. please make sure bit length of the curve is not bigger than ECCP_MAX_BIT_LEN.
  */
-unsigned int eccp_pointDouble(eccp_curve_t *curve, unsigned int *Px, unsigned int *Py, unsigned int *Qx, unsigned int *Qy);
+    unsigned int eccp_pointDouble(eccp_curve_t *curve, unsigned int *Px, unsigned int *Py, unsigned int *Qx, unsigned int *Qy);
 #endif
 
-/**
+    /**
  * @brief       check whether the input point P is on ECCP curve or not.
  * @param[in]   curve - eccp_curve_t curve struct pointer.
  * @param[in]   Px    - x coordinate of point P.
@@ -363,9 +354,9 @@ unsigned int eccp_pointDouble(eccp_curve_t *curve, unsigned int *Px, unsigned in
  * @caution     1. please make sure bit length of the curve is not bigger than ECCP_MAX_BIT_LEN.
  *              2. after calculation, A1 and A2 will be changed!
  */
-unsigned int eccp_pointVerify(eccp_curve_t *curve, unsigned int *Px, unsigned int *Py);
+    unsigned int eccp_pointVerify(eccp_curve_t *curve, unsigned int *Px, unsigned int *Py);
 
-/**
+    /**
  * @brief       get ECCP public key from private key(the key pair could be used in SM2/ECDSA/ECDH).
  * @param[in]   curve   - eccp_curve_t curve struct pointer.
  * @param[in]   priKey  - private key, big-endian.
@@ -373,9 +364,9 @@ unsigned int eccp_pointVerify(eccp_curve_t *curve, unsigned int *Px, unsigned in
  * @return      PKE_SUCCESS(success), other(error).
  * @caution     please make sure bit length of the curve is not bigger than ECCP_MAX_BIT_LEN.
  */
-unsigned int eccp_get_pubkey_from_prikey(eccp_curve_t *curve, unsigned char *priKey, unsigned char *pubKey);
+    unsigned int eccp_get_pubkey_from_prikey(eccp_curve_t *curve, unsigned char *priKey, unsigned char *pubKey);
 
-/**
+    /**
  * @brief       get ECCP key pair(the key pair could be used in SM2/ECDSA/ECDH).
  * @param[in]   curve  - eccp_curve_t curve struct pointer.
  * @param[out]  priKey - private key, big-endian.
@@ -383,11 +374,11 @@ unsigned int eccp_get_pubkey_from_prikey(eccp_curve_t *curve, unsigned char *pri
  * @return      PKE_SUCCESS(success), other(error).
  * @caution     please make sure bit length of the curve is not bigger than ECCP_MAX_BIT_LEN.
  */
-unsigned int eccp_getkey(eccp_curve_t *curve, unsigned char *priKey, unsigned char *pubKey);
+    unsigned int eccp_getkey(eccp_curve_t *curve, unsigned char *priKey, unsigned char *pubKey);
 
 
 #ifdef SUPPORT_C25519
-/**
+    /**
  * @brief       c25519 point mul(random point), Q=[k]P.
  * @param[in]   curve   - c25519 curve struct pointer.
  * @param[in]   k       - scalar.
@@ -398,9 +389,9 @@ unsigned int eccp_getkey(eccp_curve_t *curve, unsigned char *priKey, unsigned ch
  *              2. even if the input point P is valid, the output may be infinite point, in this case return error.
  *              3. please make sure the curve is c25519.
  */
-unsigned int x25519_pointMul(mont_curve_t *curve, unsigned int *k, const unsigned int *Pu, unsigned int *Qu);
+    unsigned int x25519_pointMul(mont_curve_t *curve, unsigned int *k, const unsigned int *Pu, unsigned int *Qu);
 
-/**
+    /**
  * @brief       edwards25519 curve point mul(random point), Q=[k]P.
  * @param[in]   curve   - edwards25519 curve struct pointer.
  * @param[in]   k       - scalar.
@@ -414,10 +405,9 @@ unsigned int x25519_pointMul(mont_curve_t *curve, unsigned int *k, const unsigne
  *              3. please make sure the curve is edwards25519.
  *              4. k could not be zero now.
  */
-unsigned int ed25519_pointMul(edward_curve_t *curve, unsigned int *k, unsigned int *Px, unsigned int *Py,
-        unsigned int *Qx, unsigned int *Qy);
+    unsigned int ed25519_pointMul(edward_curve_t *curve, unsigned int *k, unsigned int *Px, unsigned int *Py, unsigned int *Qx, unsigned int *Qy);
 
-/**
+    /**
  * @brief       edwards25519 point add, Q=P1+P2.
  * @param[in]   curve   - edwards25519 curve struct pointer.
  * @param[in]   P1x     - x coordinate of point P1.
@@ -431,8 +421,7 @@ unsigned int ed25519_pointMul(edward_curve_t *curve, unsigned int *k, unsigned i
  *              2. the output point may be neutral point (0, 1), it is valid.
  *              3. please make sure the curve is edwards25519.
  */
-unsigned int ed25519_pointAdd(edward_curve_t *curve, unsigned int *P1x, unsigned int *P1y, unsigned int *P2x, unsigned int *P2y,
-        unsigned int *Qx, unsigned int *Qy);
+    unsigned int ed25519_pointAdd(edward_curve_t *curve, unsigned int *P1x, unsigned int *P1y, unsigned int *P2x, unsigned int *P2y, unsigned int *Qx, unsigned int *Qy);
 
 #endif
 

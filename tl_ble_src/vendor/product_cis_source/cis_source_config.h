@@ -23,12 +23,12 @@
  *******************************************************************************************************/
 #pragma once
 
-#define PRODUCT_MCU_DEMO                                    0
+#define PRODUCT_MCU_DEMO              0
 
-#define PRODUCT_KMLEA_DONGLE                                1
+#define PRODUCT_KMLEA_DONGLE          1
 
-#define PRODUCT_CIS_SOURCE_SELECT                           PRODUCT_KMLEA_DONGLE
+#define PRODUCT_CIS_SOURCE_SELECT     PRODUCT_KMLEA_DONGLE
 
 
-#define BLC_PM_EN                           0
-#define BLC_PM_DEEP_RETENTION_MODE_EN       0
+#define BLC_PM_EN                     0
+#define BLC_PM_DEEP_RETENTION_MODE_EN 0

@@ -26,30 +26,27 @@
 #define _ECDSA_H_
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
-
 
 
 #include "pke.h"
 
+    //ECDSA return code
+    enum ECDSA_RET_CODE
+    {
+        ECDSA_SUCCESS      = PKE_SUCCESS,
+        ECDSA_POINTOR_NULL = PKE_SUCCESS + 0x50,
+        ECDSA_INVALID_INPUT,
+        ECDSA_ZERO_ALL,
+        ECDSA_INTEGER_TOO_BIG,
+        ECDSA_VERIFY_FAILED,
+    };
 
+    //APIs
 
-//ECDSA return code
-enum ECDSA_RET_CODE
-{
-    ECDSA_SUCCESS = PKE_SUCCESS,
-    ECDSA_POINTOR_NULL = PKE_SUCCESS+0x50,
-    ECDSA_INVALID_INPUT,
-    ECDSA_ZERO_ALL,
-    ECDSA_INTEGER_TOO_BIG,
-    ECDSA_VERIFY_FAILED,
-};
-
-
-//APIs
-
-/**
+    /**
  * @brief       Generate ECDSA Signature in octet string style.
  * @param[in]   curve       - ecc curve struct pointer, please make sure it is valid.
  * @param[in]   E           - hash value, big-endian.
@@ -58,10 +55,9 @@ enum ECDSA_RET_CODE
  * @param[out]  signature   - signature r and s, big-endian.
  * @return      ECDSA_SUCCESS(success), other(error).
  */
-unsigned char ecdsa_sign(eccp_curve_t *curve, unsigned char *E, unsigned int EByteLen, unsigned char *rand_k, unsigned char *priKey,
-                   unsigned char *signature);
+    unsigned char ecdsa_sign(eccp_curve_t *curve, unsigned char *E, unsigned int EByteLen, unsigned char *rand_k, unsigned char *priKey, unsigned char *signature);
 
-/**
+    /**
  * @brief       Verify ECDSA Signature in octet string style.
  * @param[in]   curve       - ecc curve struct pointer, please make sure it is valid.
  * @param[in]   E           - hash value, big-endian.
@@ -70,8 +66,7 @@ unsigned char ecdsa_sign(eccp_curve_t *curve, unsigned char *E, unsigned int EBy
  * @param[in]   signature   - signature r and s, big-endian.
  * @return      ECDSA_SUCCESS(success), other(error).
  */
-unsigned char ecdsa_verify(eccp_curve_t *curve, unsigned char *E, unsigned int EByteLen, unsigned char *pubKey, unsigned char *signature);
-
+    unsigned char ecdsa_verify(eccp_curve_t *curve, unsigned char *E, unsigned int EByteLen, unsigned char *pubKey, unsigned char *signature);
 
 
 #ifdef __cplusplus

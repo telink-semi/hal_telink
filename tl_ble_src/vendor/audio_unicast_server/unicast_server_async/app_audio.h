@@ -30,54 +30,58 @@
 /**
  *  @brief  app audio codec parameter
  */
-typedef struct{
-    bool  paramReady;
-    u8    frequency;
-    u8    duration;
-    u8    blocks;
-    u32   frameOcts;
-    u32   location;
-    blc_audio_codec_id_t  codecId;
-    u8    rsvd[3];
-}app_codec_param_t;
+typedef struct
+{
+    bool                 paramReady;
+    u8                   frequency;
+    u8                   duration;
+    u8                   blocks;
+    u32                  frameOcts;
+    u32                  location;
+    blc_audio_codec_id_t codecId;
+    u8                   rsvd[3];
+} app_codec_param_t;
 
 /**
  *  @brief  app audio parameter
  */
-typedef struct{
-    u8    epId;            //endpoint ID
-    bool  sS;              //stream start
-    u16   rsvd;
-    u32   sT;              //stream tick
-    u32   pD;              //presentation delay
-    app_codec_param_t cP;  //codec Param
-}app_audio_param_t;
+typedef struct
+{
+    u8                epId; //endpoint ID
+    bool              sS;   //stream start
+    u16               rsvd;
+    u32               sT;   //stream tick
+    u32               pD;   //presentation delay
+    app_codec_param_t cP;   //codec Param
+} app_audio_param_t;
 
 /**
  *  @brief  app audio control parameter
  */
-typedef struct{
-    u16    aclHandle;
-    bool   configCodecIdx;
-    u8     leaRole;//ACL_ROLE_PERIPHERAL or ACL_ROLE_CENTRAL
-    u16    asyncHandle;
-    u16    rsvd;
-    u8     mic_reset;
-    u8     spk_reset;
-    app_audio_param_t   source[APP_AUDIO_MAX_SOURCE_EP];
-    app_audio_param_t   sink[APP_AUDIO_MAX_SINK_EP];
-    u8     sirkCfg[16];
-#if (TLK_TONE_ENABLE)
-    u32 is_tone_codec_cfg;  // currently configuration is tone codec
+typedef struct
+{
+    u16               aclHandle;
+    bool              configCodecIdx;
+    u8                leaRole; //ACL_ROLE_PERIPHERAL or ACL_ROLE_CENTRAL
+    u16               asyncHandle;
+    u16               rsvd;
+    u8                mic_reset;
+    u8                spk_reset;
+    app_audio_param_t source[APP_AUDIO_MAX_SOURCE_EP];
+    app_audio_param_t sink[APP_AUDIO_MAX_SINK_EP];
+    u8                sirkCfg[16];
+    #if (TLK_TONE_ENABLE)
+    u32 is_tone_codec_cfg; // currently configuration is tone codec
     u32 tone_len;
     s16 tone_buff[480];
-#endif
-}app_audio_ctrl_t;
+    #endif
+} app_audio_ctrl_t;
 
 /**
  *  @brief  app audio event callback parameter
  */
-typedef struct{
+typedef struct
+{
     audio_event_enum id;
     int (*evtCb)(u16 connHandle, void *pAudEvt);
 } app_audio_evtCb_t;
@@ -97,9 +101,9 @@ void app_audio_init(void);
  */
 void app_audio_handler(void);
 
-#if (TLK_TONE_ENABLE)
+    #if (TLK_TONE_ENABLE)
 _attribute_ram_code_ void app_audio_tone_handle_task(void);
-#endif
+    #endif
 
 #endif
 #endif

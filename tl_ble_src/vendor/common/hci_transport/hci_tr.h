@@ -32,60 +32,59 @@
 #include "user_config.h"
 
 #ifndef HCI_TR_EN
-#define HCI_TR_EN            0
+    #define HCI_TR_EN 0
 #endif
 
-#if(__PROJECT_BQB_CONTROLLER__)
-#include "vendor/BQB_controller/app_buffer.h"
+#if (__PROJECT_BQB_CONTROLLER__)
+    #include "vendor/BQB_controller/app_buffer.h"
 #elif (__PROJECT_BLE_CONTROLLER__)
-#include "vendor/ble_controller/app_buffer.h"
+    #include "vendor/ble_controller/app_buffer.h"
 #endif
 
 #if HCI_TR_EN
 
-/*! HCI transport layer protocol selection. */
-#define HCI_TR_H4            0
-#define HCI_TR_H5            1
-#define HCI_TR_USB           2
-#define HCI_TR_MODE          HCI_TR_H4
+    /*! HCI transport layer protocol selection. */
+    #define HCI_TR_H4   0
+    #define HCI_TR_H5   1
+    #define HCI_TR_USB  2
+    #define HCI_TR_MODE HCI_TR_H4
 
 
-
-/*! HCI ACL data packet max size define. */
-#ifndef HCI_TR_RX_BUF_SIZE
-#define HCI_TR_RX_BUF_SIZE   (760)  // must be larger than IAL length
-#endif
-#ifndef HCI_TR_TX_BUF_SIZE
-#define HCI_TR_TX_BUF_SIZE   (760)
-#endif
-
-
-#ifndef HCI_TR_RX_PIN
-#error "please define UART RX Pin for HCI."
-#endif
-
-#ifndef HCI_TR_TX_PIN
-#error "please define UART TX Pin for HCI."
-#endif
-
-#ifndef HCI_TR_BAUDRATE
-#define HCI_TR_BAUDRATE    1000000
-#endif
+    /*! HCI ACL data packet max size define. */
+    #ifndef HCI_TR_RX_BUF_SIZE
+        #define HCI_TR_RX_BUF_SIZE (760) // must be larger than IAL length
+    #endif
+    #ifndef HCI_TR_TX_BUF_SIZE
+        #define HCI_TR_TX_BUF_SIZE (760)
+    #endif
 
 
-#ifndef HCI_UART_SoftwareRxDone_EN   //If the HCI_TR_BAUDRATE is greater than 1m(1000000), you are advised to enable it
-#define HCI_UART_SoftwareRxDone_EN   0
-#endif
+    #ifndef HCI_TR_RX_PIN
+        #error "please define UART RX Pin for HCI."
+    #endif
 
-#if  (HCI_UART_SoftwareRxDone_EN)
-#ifndef HCI_TR_RTS_PIN
-#error "please define UART RTS Pin for HCI."
-#endif
+    #ifndef HCI_TR_TX_PIN
+        #error "please define UART TX Pin for HCI."
+    #endif
 
-#ifndef HCI_TR_CTS_PIN
-#error "please define UART CTS Pin for HCI."
-#endif
-#endif
+    #ifndef HCI_TR_BAUDRATE
+        #define HCI_TR_BAUDRATE 1000000
+    #endif
+
+
+    #ifndef HCI_UART_SoftwareRxDone_EN //If the HCI_TR_BAUDRATE is greater than 1m(1000000), you are advised to enable it
+        #define HCI_UART_SoftwareRxDone_EN 0
+    #endif
+
+    #if (HCI_UART_SoftwareRxDone_EN)
+        #ifndef HCI_TR_RTS_PIN
+            #error "please define UART RTS Pin for HCI."
+        #endif
+
+        #ifndef HCI_TR_CTS_PIN
+            #error "please define UART CTS Pin for HCI."
+        #endif
+    #endif
 
 typedef void (*HciH5PacketHandler_t)(u8 *pPacket, u32 len);
 

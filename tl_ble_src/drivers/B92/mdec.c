@@ -21,10 +21,10 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-#include"mdec.h"
+#include "mdec.h"
 #include "compiler.h"
 #include "reg_include/mdec_reg.h"
-#include "analog.h"
+#include "lib/include/analog.h"
 #include "clock.h"
 
 /**
@@ -35,7 +35,7 @@
  */
 void mdec_init(mdec_pin_e pin)
 {
-    analog_write_reg8(mdec_rst_addr,(analog_read_reg8(mdec_rst_addr) & (~FLD_CLS_MDEC)) | pin);//A0/B7/C4/D0/E0
+    analog_write_reg8(mdec_rst_addr, (analog_read_reg8(mdec_rst_addr) & (~FLD_CLS_MDEC)) | pin); //A0/B7/C4/D0/E0
 }
 
 /**
@@ -45,23 +45,21 @@ void mdec_init(mdec_pin_e pin)
  */
 unsigned char mdec_read_dat(unsigned char *dat)
 {
-    unsigned char m0,m1,m2,data_crc;
+    unsigned char m0, m1, m2, data_crc;
 
-    dat[0]=analog_read_reg8(0x6a);
-    dat[1]=analog_read_reg8(0x6b);
-    dat[2]=analog_read_reg8(0x6c);
-    dat[3]=analog_read_reg8(0x6d);
-    dat[4]=analog_read_reg8(0x6e);
+    dat[0] = analog_read_reg8(0x6a);
+    dat[1] = analog_read_reg8(0x6b);
+    dat[2] = analog_read_reg8(0x6c);
+    dat[3] = analog_read_reg8(0x6d);
+    dat[4] = analog_read_reg8(0x6e);
 
-    m0= ((dat[0]>>5)<<4);
-    m1= dat[0]&0x07;
-    m2= m0+m1;
-    data_crc=(((m2+dat[1])^dat[2])+dat[3])^0xa5;
+    m0       = ((dat[0] >> 5) << 4);
+    m1       = dat[0] & 0x07;
+    m2       = m0 + m1;
+    data_crc = (((m2 + dat[1]) ^ dat[2]) + dat[3]) ^ 0xa5;
 
-    if(data_crc==dat[4]){
+    if (data_crc == dat[4]) {
         return 1;
     }
     return 0;
 }
-
-

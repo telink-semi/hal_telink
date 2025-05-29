@@ -26,7 +26,7 @@
 
 #include "types.h"
 #include "../compatibility_pack/cmpt.h"
-#include "../analog.h"
+#include "../lib/include/analog.h"
 #include "../adc.h"
 #include "../gpio.h"
 #include "../stimer.h"
@@ -66,6 +66,9 @@
 #define irq_enable                  core_interrupt_enable
 #define irq_restore(en)             core_restore_interrupt(en)
 
+#define GLOBAL_INT_DISABLE()         u32 rie = core_interrupt_disable()
+#define GLOBAL_INT_RESTORE()         core_restore_interrupt(rie)
+
 /******************************* core_end ********************************************************************/
 
 
@@ -77,11 +80,16 @@
 /******************************* mtime register end************************************************************/
 
 
-/******************************* efuse start *****************************************************************/
+/******************************* mac start ************************************************************/
+
+/**
+* @brief     This function servers to get MAC address from EFUSE(byte [119:112]).
+* @return    The protection code value.
+*/
 bool efuse_get_mac_address(u8* mac_read, int length);
-/******************************* efuse end *******************************************************************/
 
-
+#define get_device_mac_address            efuse_get_mac_address
+/******************************* mac end **************************************************************/
 
 
 /******************************* gpio start ******************************************************************/
@@ -159,14 +167,13 @@ void rf_set_channel_power_calibration(unsigned char *channel_power);
 */
 void rf_set_channel_power_enable(unsigned char enable);
 #endif
-
 /******************************* rf end  **********************************************************************/
 
 
 
 
 /******************************* trng_start ******************************************************************/
-#define rand                        trng_rand
+
 #define random_generator_init       trng_init
 
 
@@ -248,6 +255,32 @@ void generateRandomNum(int len, unsigned char *data);
 //12 = 4(struct bis_rx_pdu_tag  *next) + 4(u32 payloadNum) + 4(u32 idealPldAnchorTick) in bis_rx_pdu_t
 #define     BIS_LL_RX_PDU_FIFO_SIZE(n)              (CAL_LL_ISO_RX_FIFO_SIZE(n) + 12)
 
+/*
+*  DMA_len(4us)
+*
+*  ExtraInfo(sizeof(cs_rx_para_t) = 50us)
+*
+*  Mode2_len: rx_early_us(5us) + (T_PM + T_SW)*(AntPath +1) - T_SW
+*  Mode1_len: rx_early_us(5us) + AA_Only(44us) + Sequence(maximum 128us) + extend (15us) = 192us
+*  Mode0_len: T_FM(80us)
+*
+*  Max_mode_len = max3(Mode2_len,Mode1_len,Mode0_len)
+*
+*  IQ sample_1us :  4[sample rate is 4Mhz] * 5[IQ_20_BIT] = 20 bytes
+*
+*  buffer_len = DMA_len(4us) + ExtraInfo(sizeof(cs_rx_para_t) = 50us) + Max_mode_len * IQ sample_1us
+*
+*  RX buffer size must be be 16*n, due to MCU design
+*
+*  RX buffer size : ((buffer_len + 15)/16) *16
+*
+*/
+#define     CS_ALIGN_16(len)                                                 (((len + 15)>>4) <<4)
+#define     CS_RX_MODE0_FIFO_SIZE_MAX                                        CS_ALIGN_16(80*20 + 50 + 4)
+#define     CS_RX_MODE1_FIFO_SIZE_MAX                                        CS_ALIGN_16((5 + 44 + 128 + 15)*20 + 50 + 4)
+#define     CS_RX_MODE2_FIFO_SIZE_MAX(AP,PM, SW)                             CS_ALIGN_16((5 + (AP+1)*(PM+SW) - SW)*20 + 54 + 4)
+#define     CHANNEL_SOUNDING_RX_FIFO_SIZE_ALIGN16(N_AP, T_PM_US, T_SW_US)    max3(CS_RX_MODE0_FIFO_SIZE_MAX,CS_RX_MODE1_FIFO_SIZE_MAX, CS_RX_MODE2_FIFO_SIZE_MAX(N_AP, T_PM_US, T_SW_US))
+
 /******************************* dma_end ********************************************************************/
 
 
@@ -258,5 +291,23 @@ enum{//todo: SunWei &YeYang
 };
 /******************************* plic_end ********************************************************************/
 
+/******************************* cs_ant_switch_start *********************************************************/
+typedef struct{
+    gpio_pin_e  pin;
+    gpio_func_e  pin_fun;
+}rf_cs_ant_switch_ctrl;
+
+/**
+ * @brief        * This function initializes the GPIO pins used for antenna switching according to the specified configuration.
+ *                 It disables the input and output functions of the GPIO pins, sets the pull-down resistance, and configures
+ *                 the multiplexing function of the pins.
+ *
+ * @param[in]   switch_ctrl    - Pointer to the antenna switch control structure array.
+ * @param[in]   num            - Number of antenna switch pins
+ * @return      none.
+ */
+void rf_cs_ant_switch_pin_init(rf_cs_ant_switch_ctrl *switch_ctrl, u8 num);
+
+/******************************* cs_ant_switch_end **********************************************************/
 
 #endif /* DRIVERS_B92_EXT_MISC_H_ */

@@ -53,8 +53,7 @@ static unsigned char s_ir_learn_rx_fifo_hword_index = 0;
  */
 static void ir_learn_tx_mode(ir_learn_tx_e tx_mode)
 {
-    switch (tx_mode)
-    {
+    switch (tx_mode) {
     case DIGITAL_TX_MODE:
         ir_learn_ana_tx_dis();
         pwm_set_pwm0_output_to_ana_ir_dis();
@@ -88,8 +87,7 @@ void ir_learn_tx_init(ir_learn_tx_t *ir_learn_tx)
  */
 static void ir_learn_rx_mode(ir_learn_rx_e rx_mode)
 {
-    switch (rx_mode)
-    {
+    switch (rx_mode) {
     case DIGITAL_RX_MODE:
         ir_learn_ana_rx_dis();
         break;
@@ -128,11 +126,8 @@ void ir_learn_rx_init(ir_learn_rx_t *ir_learn_rx)
     BM_SET(reg_rst5, FLD_RST5_IR_LEARN);
     BM_SET(reg_clk_en5, FLD_CLK5_IR_LEARN_EN);
     ir_learn_rx_mode(ir_learn_rx->rx_mode); /* TODO: A2 chip version need software trig timing to fix the first edge loss issue. */
-    reg_ir_learn_ctrl1 = MASK_VAL(FLD_IR_LEARN_MODE, ir_learn_rx->cnt_mode, FLD_IR_LEARN_INV, ir_learn_rx->rx_invert_en, FLD_IR_LEARN_HIGH_WR_EN,
-                                  ir_learn_rx->high_data_en, FLD_IR_LEARN_CYCLE_WR_EN, ir_learn_rx->cycle_data_en, FLD_IR_LEARN_MODE_2BYTE,
-                                  ir_learn_rx->data_format, FLD_IR_LEARN_NO_TIMEOUT, !ir_learn_rx->timeout_en, FLD_IR_LEARN_INPUT_SEL,
-                                  ir_learn_rx->rx_mode);
-    ir_learn_dma_auto_clr_rx_fifo_en(); /* dma mode automatically clears the FIFO pointer, otherwise software clearing is required. */
+    reg_ir_learn_ctrl1 = MASK_VAL(FLD_IR_LEARN_MODE, ir_learn_rx->cnt_mode, FLD_IR_LEARN_INV, ir_learn_rx->rx_invert_en, FLD_IR_LEARN_HIGH_WR_EN, ir_learn_rx->high_data_en, FLD_IR_LEARN_CYCLE_WR_EN, ir_learn_rx->cycle_data_en, FLD_IR_LEARN_MODE_2BYTE, ir_learn_rx->data_format, FLD_IR_LEARN_NO_TIMEOUT, !ir_learn_rx->timeout_en, FLD_IR_LEARN_INPUT_SEL, ir_learn_rx->rx_mode);
+    ir_learn_dma_auto_clr_rx_fifo_en();     /* dma mode automatically clears the FIFO pointer, otherwise software clearing is required. */
 }
 
 /**********************************************************************************************************************
@@ -191,8 +186,7 @@ void ir_learn_receive_dma(dma_chn_e chn, unsigned int *dst_addr, unsigned int le
  * @param[in]  data_len    - length of DMA in byte.
  * @return     none
  */
-void ir_learn_rx_dma_add_list_element(dma_chn_e chn, dma_chain_config_t *config_addr, dma_chain_config_t *llpointer, unsigned char *dst_addr,
-                                      unsigned int data_len)
+void ir_learn_rx_dma_add_list_element(dma_chn_e chn, dma_chain_config_t *config_addr, dma_chain_config_t *llpointer, unsigned char *dst_addr, unsigned int data_len)
 {
     config_addr->dma_chain_ctl      = reg_dma_ctrl(chn) | BIT(0);
     config_addr->dma_chain_src_addr = reg_ir_learn_fifo_addr;

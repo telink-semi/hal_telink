@@ -29,7 +29,7 @@
  * @param[in]  chn_b - input types of b channel.
  * @return     none.
  */
-void qdec_set_pin(qdec_chn_e chn_a,qdec_chn_e chn_b)
+void qdec_set_pin(qdec_chn_e chn_a, qdec_chn_e chn_b)
 {
     reg_qdec_channel_a = chn_a;
     reg_qdec_channel_b = chn_b;
@@ -45,10 +45,9 @@ void qdec_set_pin(qdec_chn_e chn_a,qdec_chn_e chn_b)
  */
 void qdec_set_mode(qdec_mode_e mode)
 {
-    if(mode == COMMON_MODE){
+    if (mode == COMMON_MODE) {
         reg_qdec_mode &= (~FLD_QDEC_DOUBLE0);
-    }
-    else if(mode == DOUBLE_ACCURACY_MODE){
+    } else if (mode == DOUBLE_ACCURACY_MODE) {
         reg_qdec_mode |= FLD_QDEC_DOUBLE0;
     }
 }
@@ -62,7 +61,7 @@ void qdec_clk_en(void)
 {
     clock_32k_init(CLK_32K_RC);
     clock_cal_32k_rc();
-    reg_clk_en3|=FLD_CLK3_QDEC_EN;
+    reg_clk_en3 |= FLD_CLK3_QDEC_EN;
     qdec_reset();
 }
 
@@ -78,7 +77,8 @@ signed char qdec_get_count_value(void)
     //before reading the hardware counting value,write 1 to reg_qdec_load.
     reg_qdec_load |= FLD_QDEC_COUNT0_RELOAD;
     // Wait for the count0_reload register to change from 1 to 0 before reading the value, otherwise it will read the old value
-    while(FLD_QDEC_COUNT0_RELOAD == (reg_qdec_load & FLD_QDEC_COUNT0_RELOAD)){}
+    while (FLD_QDEC_COUNT0_RELOAD == (reg_qdec_load & FLD_QDEC_COUNT0_RELOAD)) {
+    }
     return reg_qdec_count0;
 }
 
@@ -90,7 +90,7 @@ signed char qdec_get_count_value(void)
 void qdec_reset(void)
 {
     reg_rst3 &= ~(FLD_RST3_QDEC);
-    reg_rst3 |=  FLD_RST3_QDEC;
+    reg_rst3 |= FLD_RST3_QDEC;
 }
 
 /**
@@ -103,9 +103,5 @@ void qdec_set_debouncing(qdec_thrsh_e thrsh)
 {
     //the threshold: 2^(n+1) *clk_32kHz *3 (n=0xd1[2:0]))
     reg_qdec_dbntime &= (~FLD_QDEC_DBNTIME);
-    reg_qdec_dbntime |= thrsh ;
+    reg_qdec_dbntime |= thrsh;
 }
-
-
-
-

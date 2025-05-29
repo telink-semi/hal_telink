@@ -23,17 +23,18 @@
  *******************************************************************************************************/
 #pragma once
 
-typedef struct{
-    u16 tmasRoleHdl;    /* TMAP Role Handle */
-    u16 tmasRole;       /* TMAP Role */
+typedef struct
+{
+    u16 tmasRoleHdl; /* TMAP Role Handle */
+    u16 tmasRole;    /* TMAP Role */
 } blc_tmas_client_t;
 
-typedef struct blc_tmas_client_ctrl{
-    blc_prf_proc_t process;
+typedef struct blc_tmas_client_ctrl
+{
+    blc_prf_proc_t     process;
     blc_tmas_client_t *pTmasClient[STACK_PRF_ACL_CONN_MAX_NUM];
 } blc_tmas_client_ctrl_t;
 
-
-typedef struct{
-
+typedef struct
+{
 } blc_tmasc_regParam_t;

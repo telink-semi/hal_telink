@@ -35,46 +35,60 @@
 
 /******************************* phy start *************************************************************************/
 
-#define         RFLEN_255_1MPHY_US                              2120
-#define         RFLEN_255_2MPHY_US                              1064
-#define         RFLEN_255_CODEDPHY_S2_US                        4542
-#define         RFLEN_255_CODEDPHY_S8_US                        17040
+#define RFLEN_255_1MPHY_US       2120
+#define RFLEN_255_2MPHY_US       1064
+#define RFLEN_255_CODEDPHY_S2_US 4542
+#define RFLEN_255_CODEDPHY_S8_US 17040
 
+typedef struct __attribute__((packed))
+{
+    u8 llid;
+    u8 rf_len;
+    u8 opcode;
+    u8 tx_phys;
+    u8 rx_phys;
+} rf_pkt_ll_phy_req_rsp_t; //phy_req, phy_rsp
 
-typedef struct __attribute__((packed)) {
-    u8  llid;
-    u8  rf_len;
-    u8  opcode;
-    u8  tx_phys;
-    u8  rx_phys;
-}rf_pkt_ll_phy_req_rsp_t;   //phy_req, phy_rsp
+typedef struct __attribute__((packed))
+{
+    u8 llid;
+    u8 rf_len;
+    u8 opcode;
+    u8 m_to_s_phy;
+    u8 s_to_m_phy;
+    u8 instant0;
+    u8 instant1;
+} rf_pkt_ll_phy_update_ind_t; //phy_req, phy_rsp
 
-typedef struct __attribute__((packed)) {
-    u8  llid;
-    u8  rf_len;
-    u8  opcode;
-    u8  m_to_s_phy;
-    u8  s_to_m_phy;
-    u8  instant0;
-    u8  instant1;
-}rf_pkt_ll_phy_update_ind_t;   //phy_req, phy_rsp
+typedef struct __attribute__((packed))
+{
+    u8 llid;
+    u8 rf_len;
+    u8 opcode;
+    u8 m_to_s_phy;
+    u8 s_to_m_phy;
+    u8 instant0;
+    u8 instant1;
+    u8 pca[5];
+} rf_pkt_ll_phy_update_ind_v2_t; //phy_req, phy_rsp
 
-typedef struct {
-    u8  dft_tx_prefer_phys;
-    u8  dft_rx_prefer_phys;
-    u8  dft_prefer_phy;
-    u8  dft_CI;
+typedef struct
+{
+    u8 dft_tx_prefer_phys;
+    u8 dft_rx_prefer_phys;
+    u8 dft_prefer_phy;
+    u8 dft_CI;
 
     //for Extended ADV
-    u8  cur_llPhy;  //"le_phy_type_t"    1:1M    2:2M   3:Coded
-    u8  cur_own_CI;  //TX cur_coding_ind
-    u8  cur_peer_CI; //IRQ variable, current Peer CI
-    u8  tx_stl_adv;
+    u8 cur_llPhy;   //"le_phy_type_t"    1:1M    2:2M   3:Coded
+    u8 cur_own_CI;  //TX cur_coding_ind
+    u8 cur_peer_CI; //IRQ variable, current Peer CI
+    u8 tx_stl_adv;
 
-    u8  tx_stl_tifs;
-    u8  peer_oneByte_us; //1M: 8uS;  2M: 4uS; Coded S2: 16uS; Coded S8: 64uS
-    u8  own_oneByte_us; //1M: 8uS;  2M: 4uS; Coded S2: 16uS; Coded S8: 64uS
-    u8  extra_preamble; //extra preamble numbers
+    u8 tx_stl_tifs;
+    u8 peer_oneByte_us; //1M: 8uS;  2M: 4uS; Coded S2: 16uS; Coded S8: 64uS
+    u8 own_oneByte_us;  //1M: 8uS;  2M: 4uS; Coded S2: 16uS; Coded S8: 64uS
+    u8 extra_preamble;  //extra preamble numbers
     /* T1 definition
      * timing after "access_code" to packet tail
      * 1M:       (rf_len+5)*8          = rf_len*8 + 40          5 = 2(header)+3(CRC)
@@ -125,36 +139,41 @@ typedef struct {
      *        Coded: 336 + 14 = 350 uS
      * */
     u16 prmb_ac_us; //
-}ll_phy_t;
+} ll_phy_t;
 
-typedef enum {
-    BLE_PHY_NONE        = 0x00, //different from BLE_PHY_1M/BLE_PHY_2M/BLE_PHY_CODED
+typedef enum
+{
+    BLE_PHY_NONE = 0x00, //different from BLE_PHY_1M/BLE_PHY_2M/BLE_PHY_CODED
 } le_phy_ext_type_t;
 
-typedef enum{
-    LE_CI_NONE = 0,  //when setting 1M/2M PHY, use this to distinguish, for code readability
+typedef enum
+{
+    LE_CI_NONE  = 0, //when setting 1M/2M PHY, use this to distinguish, for code readability
     LE_CODED_S2 = 2,
     LE_CODED_S8 = 8,
-}le_coding_ind_t;
+} le_coding_ind_t;
 
 //do not support Asymmetric PHYs, conn_phys = tx_phys & rx_phys
-typedef struct {
-    u8  conn_prefer_phys;  // conn_prefer_phys = tx_prefer_phys & rx_prefer_phys
-    u8  conn_cur_phy;      //
-    u8  conn_next_phy;     //
-    u8  conn_cur_CI;       // CI: coding_ind
+typedef struct
+{
+    u8 conn_prefer_phys; // conn_prefer_phys = tx_prefer_phys & rx_prefer_phys
+    u8 conn_cur_phy;     //
+    u8 conn_next_phy;    //
+    u8 conn_cur_CI;      // CI: coding_ind
 
-    u8  conn_next_CI;
-    u8  phy_req_trigger;  // 1: means current device triggers phy_req, due to API "blc_ll_setPhy" called by Host or Application
-    u8  phy_req_pending;
-    u8  phy_update_pending;
+    u8 conn_next_CI;
+    u8 phy_req_trigger;  // 1: means current device triggers phy_req, due to API "blc_ll_setPhy" called by Host or Application
+    u8 phy_req_pending;
+    u8 phy_update_pending;
 
     u32 conn_updatePhy;
 
     u8 conn_last_phy;
-    u8 align[3];
+    u8 conn_cur_hdt_rate;
+    u8 conn_next_hdt_rate;
+    u8 align;
 
-    #if 0
+#if 0
         u8  tx_prefer_phys;     //phy set
         u8  rx_prefer_phys;
         u8  tx_next_phys;
@@ -163,9 +182,9 @@ typedef struct {
         u8  cur_tx_phy;     //phy using
         u8  cur_rx_phy;
         u16 rsvd;
-    #endif
+#endif
 
-}ll_conn_phy_t;
+} ll_conn_phy_t;
 
 typedef int (*llms_conn_phy_update_callback_t)(u16 connHandle);
 typedef int (*llms_conn_phy_switch_callback_t)(u16 connHandle);
@@ -174,33 +193,40 @@ typedef void (*ll_phy_switch_callback_t)(le_phy_type_t, le_coding_ind_t);
 typedef void (*ll_coded_phy_ind_detect_callback_t)(u8);
 extern ll_coded_phy_ind_detect_callback_t ll_coded_phy_ind_detect_cb;
 
-extern  llms_conn_phy_update_callback_t llms_conn_phy_update_cb; ///blt_ll_updateConnPhy
-extern  llms_conn_phy_switch_callback_t llms_conn_phy_switch_cb; ///blt_ll_switchConnPhy
-extern  ll_phy_switch_callback_t        ll_phy_switch_cb;
+extern llms_conn_phy_update_callback_t llms_conn_phy_update_cb; ///blt_ll_updateConnPhy
+extern llms_conn_phy_switch_callback_t llms_conn_phy_switch_cb; ///blt_ll_switchConnPhy
+extern ll_phy_switch_callback_t        ll_phy_switch_cb;
 
 #if STACK_IRQ_CODE_IN_SRAM_DUE_TO_FLASH_OPERATION_V2
-extern u8 tx_stl_auto_mode[4];
-extern u8 tx_stl_btx_1st_pkt[4];
+    #if (BLE_S2_S8_NEW_PATH)
+    extern u8 tx_stl_auto_mode[5];
+    extern u8 tx_rxPathDly_extraPreamble[5];
+    #else
+    extern u8 tx_stl_auto_mode[4];
+    extern u8 tx_rxPathDly_extraPreamble[4];
+    #endif
+    extern u8 tx_stl_btx_1st_pkt[4];
 #else
-extern const u8 tx_stl_auto_mode[4];
-extern const u8 tx_stl_btx_1st_pkt[4];
-#endif
+    #if (BLE_S2_S8_NEW_PATH)
+    extern const u8 tx_stl_auto_mode[5];
+    #else
+    extern const u8 tx_stl_auto_mode[4];
+    #endif
+    extern const u8 tx_stl_btx_1st_pkt[4];
+#endif /*!< STACK_IRQ_CODE_IN_SRAM_DUE_TO_FLASH_OPERATION_V2 */
 
-extern _attribute_aligned_(4) ll_phy_t      bltPHYs;
+extern _attribute_aligned_(4) ll_phy_t bltPHYs;
 
 int  blt_phy_getRfPacketTime_us(int rf_len, le_phy_type_t phy, le_coding_ind_t ci);
 void rf_ble_switch_phy(le_phy_type_t phy, le_coding_ind_t own_coding_ind);
 void blt_ll_set_peer_codePhy_CI(le_coding_ind_t coding_ind);
-void blt_ll_phy_param_reset(void);;
+void blt_ll_phy_param_reset(void);
+;
 /******************************* phy end ***************************************************************************/
 
 
-
-
-
-
 /******************************* phy_test start *************************************************************************/
-    int       blt_phyTest_main_loop(void);
+int blt_phyTest_main_loop(void);
 
 
 /**
@@ -224,24 +250,23 @@ ble_sts_t blt_phyTest_hci_setReceiverTest_V1(hci_le_receiverTestV1_cmdParam_t *p
 */
 ble_sts_t blt_phyTest_hci_setTransmitterTest_V2(hci_le_transmitterTestV2_cmdParam_t *param);
 
+ble_sts_t blt_phyTest_hci_setTransmitterTest_V5(hci_le_transmitterTestV5_cmdParam_t *param);
 /**
 * @brief   This function is used to receive and parse HCI instructions for receive tests in V2 format.
 * @param   hci_le_transmitterTestV1_cmdParam_t:V2 HCI parameter resolution struct of the receive test command;
 * @return  ble_sts_t:Returns the instruction completion status.
 */
 ble_sts_t blt_phyTest_hci_setReceiverTest_V2(hci_le_receiverTestV2_cmdParam_t *param);
+ble_sts_t blt_phyTest_hci_setReceiverTest_V3(hci_le_receiverTestV3_cmdParam_t *param);
 
 ble_sts_t blt_phyTest_setTestEnd(u8 *pkt_num);
 
 
-    //void blc_phy_preamble_length_set(unsigned char len);
-    void blt_InitPhyTestDriver(rf_mode_e rf_mode);
+//void blc_phy_preamble_length_set(unsigned char len);
+void blt_InitPhyTestDriver(rf_mode_e rf_mode);
 
 
 /******************************* phy_test end ***************************************************************************/
 
 
-
 #endif /* PHY_STACK_H_ */
-
-

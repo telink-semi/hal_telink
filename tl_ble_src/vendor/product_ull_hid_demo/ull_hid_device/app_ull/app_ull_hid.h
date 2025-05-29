@@ -27,9 +27,10 @@
 #include "../../ull_hid_config.h"
 #if (ULL_HID_DEMO_SLECT == ULL_HID_DEVICE)
 
-#define ULL_HID_LOG(fmt, ...)            tlkapi_printf(APP_ULL_HID_LOG_EN, "[ULL-HID]"fmt"\n", ##__VA_ARGS__)
+    #define ULL_HID_LOG(fmt, ...) tlkapi_printf(APP_ULL_HID_LOG_EN, "[ULL-HID]" fmt "\n", ##__VA_ARGS__)
 
-enum{
+enum
+{
     HID_MODE_NONE,
     HID_MODE_MOUSE_HYBRID,
     HID_MODE_MOUSE_GATT,
@@ -38,7 +39,8 @@ enum{
     HID_MODE_TEST_ISO,
 };
 
-typedef struct __attribute__((packed)){
+typedef struct __attribute__((packed))
+{
     u8 length;
     u8 sequenceNumber;
     u8 reportId;
@@ -60,10 +62,9 @@ void app_ull_hid_acl_connect(u16 connHandle, u16 connInterval);
 void app_ull_hid_acl_disconnect(u16 connHandle);
 void app_ull_hid_cis_connect(u16 connHandle, u16 isoIntvl, u8 NSE, u16 pdu_s2m);
 void app_ull_hid_cis_disconnect(u16 connHandle);
-u16 app_ull_hid_get_acl_handle(void);
-u16 app_ull_hid_get_cis_handle(void);
+u16  app_ull_hid_get_acl_handle(void);
+u16  app_ull_hid_get_cis_handle(void);
 
 void blc_app_ull_ui_init(void);
 void app_ull_hid_device_main_loop(void);
-#endif    //INTER_TEST_MODE == TEST_ULL_HID_DEVICE
-
+#endif //INTER_TEST_MODE == TEST_ULL_HID_DEVICE

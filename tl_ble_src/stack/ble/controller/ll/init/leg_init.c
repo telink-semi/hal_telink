@@ -32,16 +32,13 @@
 
 #if (LL_ACL_CEN_EN)
 
-#if OS_SUP_EN
-#include "stack/ble/os_sup/os_sup.h"
-#include "stack/ble/os_sup/os_sup_stack.h"
-#endif
+    #if OS_SUP_EN
+        #include "stack/ble/os_sup/os_sup.h"
+        #include "stack/ble/os_sup/os_sup_stack.h"
+    #endif
 
 
-
-_attribute_ble_data_retention_  _attribute_aligned_(4) ll_init_t  bltInit;
-
-
+_attribute_ble_data_retention_ _attribute_aligned_(4) ll_init_t bltInit;
 
 /**
  * @brief      for user to initialize legacy initiating module
@@ -52,57 +49,47 @@ _attribute_ble_data_retention_  _attribute_aligned_(4) ll_init_t  bltInit;
 void blc_ll_initLegacyInitiating_module(void)
 {
     blt_ll_initInitiatingCommon();
-
-
 }
 
-
-
-
-_attribute_ram_code_ int  blt_legacy_initiate_process(u8 *raw_pkt)
+_attribute_ram_code_ int blt_legacy_initiate_process(u8 *raw_pkt)
 {
-
-    rf_packet_adv_t * pAdv = (rf_packet_adv_t *) (raw_pkt + DMA_RFRX_LEN_HW_INFO);
-    int initiate_success = 0;
+    rf_packet_adv_t *pAdv             = (rf_packet_adv_t *)(raw_pkt + DMA_RFRX_LEN_HW_INFO);
+    int              initiate_success = 0;
 
     /* attention: pkt_init.rxAddr &  pkt_init.txAddr &  pkt_init.advA &  pkt_init.initA
      * are set in "blt_ll_init_filter" !!! */
-    if(blt_ll_init_filter(bltScn.direct_adv, pAdv->txAddr, pAdv->rxAddr, pAdv->advA, pAdv->data)){
-
-
+    if (blt_ll_init_filter(bltScn.direct_adv, pAdv->txAddr, pAdv->rxAddr, pAdv->advA, pAdv->data)) {
         bltInit.sec_chn_init = 0;
-        if(blms_m_connect( (rf_packet_connect_t *)&pkt_init, raw_pkt)){
-
-            initiate_success = 1;
+        if (blms_m_connect((rf_packet_connect_t *)&pkt_init, raw_pkt)) {
+            initiate_success                       = 1;
             blmsParam.scanInitEn_union.leg_init_en = 0;
-            blmsParam.scanInitEn_union.ext_init_en = 0;  //important: ext Init may also send conn_req on primary channel !!!
+            blmsParam.scanInitEn_union.ext_init_en = 0; //important: ext Init may also send conn_req on primary channel !!!
 
-            #if (SCAN_EN_MORE_STRATEGY)
-                int remove_prichn_scan = 0;
-                //both extended scan and legacy scan can run here.so here need to judge both.
-                if(!blmsParam.scanInitEn_union.ext_scan_init_en && !blmsParam.scanInitEn_union.leg_scan_en){
+    #if (SCAN_EN_MORE_STRATEGY)
+            int remove_prichn_scan = 0;
+            //both extended scan and legacy scan can run here.so here need to judge both.
+            if (!blmsParam.scanInitEn_union.ext_scan_init_en && !blmsParam.scanInitEn_union.leg_scan_en) {
+                remove_prichn_scan = 1;
+            } else if (blmsParam.cur_master_num == blmsParam.max_master_num) {
+                if (!bltScn.scan_en_strategy && (blmsParam.scanInitEn_union.leg_scan_en || blmsParam.scanInitEn_union.ext_scan_en)) {
                     remove_prichn_scan = 1;
                 }
-                else if(blmsParam.cur_master_num == blmsParam.max_master_num){
-                    if(!bltScn.scan_en_strategy && (blmsParam.scanInitEn_union.leg_scan_en || blmsParam.scanInitEn_union.ext_scan_en) ){
-                        remove_prichn_scan = 1;
-                    }
-                }
+            }
 
-                if(remove_prichn_scan){
-                    blt_sche_removeTaskMask(TSKMSK_PRICHN_SCAN);
-                }
-            #else
-                /* If current scanning is triggered by initialization, Scan mask should also removed */
-                #if (LL_FEATURE_ENABLE_LE_EXTENDED_SCAN || LL_FEATURE_ENABLE_LE_EXTENDED_INITIATE)
-                    if(!blmsParam.scanInitEn_union.ext_scan_init_en && (!blmsParam.scanInitEn_union.leg_scan_en || blmsParam.cur_master_num == blmsParam.max_master_num))
-                #else
-                    if(!blmsParam.scanInitEn_union.leg_scan_en || blmsParam.cur_master_num == blmsParam.max_master_num)
-                #endif
-                    {
-                        blt_sche_removeTaskMask(TSKMSK_PRICHN_SCAN);  // master connection triggers "update", no need triggers "update" for scan remove
-                    }
-            #endif
+            if (remove_prichn_scan) {
+                blt_sche_removeTaskMask(TSKMSK_PRICHN_SCAN);
+            }
+    #else
+        /* If current scanning is triggered by initialization, Scan mask should also removed */
+        #if (LL_FEATURE_ENABLE_LE_EXTENDED_SCAN || LL_FEATURE_ENABLE_LE_EXTENDED_INITIATE)
+            if (!blmsParam.scanInitEn_union.ext_scan_init_en && (!blmsParam.scanInitEn_union.leg_scan_en || blmsParam.cur_master_num == blmsParam.max_master_num))
+        #else
+            if (!blmsParam.scanInitEn_union.leg_scan_en || blmsParam.cur_master_num == blmsParam.max_master_num)
+        #endif
+            {
+                blt_sche_removeTaskMask(TSKMSK_PRICHN_SCAN); // master connection triggers "update", no need triggers "update" for scan remove
+            }
+    #endif
 
 
             my_dump_str_data(DBG_PRVC_INIT_EN, "[PRV][INI] legacy initiate success", 0, 0);
@@ -112,8 +99,10 @@ _attribute_ram_code_ int  blt_legacy_initiate_process(u8 *raw_pkt)
             //DBG_C HN7_HIGH;
             //RF 1M mode: (rf_len + 10)*8: 10 = PREAMBLE 1B + AA 4B + HDR 2B + CRC 3B:
             //conn_req_rf_len = 34: u32 connReq_timeout_us = 532;  //(34+10)*8=352; 352 + 150 + 30(margin)
-            while( !HAL_GET_RF_TX_IRQ && (u32)(clock_time() - bltRxPkt.rx_irq_tick) < (532 * SYSTEM_TIMER_TICK_1US)){
-                if(usr_irq_handler_cb){usr_irq_handler_cb();}
+            while (!HAL_GET_RF_TX_IRQ && (u32)(clock_time() - bltRxPkt.rx_irq_tick) < (532 * SYSTEM_TIMER_TICK_1US)) {
+                if (usr_irq_handler_cb) {
+                    usr_irq_handler_cb();
+                }
             }
             //DBG_C HN7_LOW;
             HAL_CLEAR_RF_TX_IRQ;
@@ -131,15 +120,14 @@ _attribute_ram_code_ int  blt_legacy_initiate_process(u8 *raw_pkt)
      */
     HAL_CSEM_IP_RESET_BASEBAND; //RF rx dma config keep, tx dma config lost after reset baseband for TL751X chip
 
-    STOP_RF_STATE_MACHINE;  /* if initiate fail, stop FSM */
-    HAL_CLEAR_RF_TX_IRQ;  //clear TX
+    STOP_RF_STATE_MACHINE;      /* if initiate fail, stop FSM */
+    HAL_CLEAR_RF_TX_IRQ;        //clear TX
 
-    if(initiate_success){
+    if (initiate_success) {
         blmsParam.rf_fsm_busy = 0;
         rf_set_tx_rx_off();
-    }
-    else{ //back to scan
-        rf_ble_tx_done ();
+    } else { //back to scan
+        rf_ble_tx_done();
         /**
          * For CSEM IP, We use special process to disable RX continue mode:
          *  rf_ble_csem_close_rx_continue_mode();
@@ -157,37 +145,31 @@ _attribute_ram_code_ int  blt_legacy_initiate_process(u8 *raw_pkt)
          *  TODO: we need to test and verify;
          **/
         blmsParam.rf_fsm_busy = 1;
-        rf_set_rxmode ();  //go on Scanning
-        if(blc_rf_pa_cb){   blc_rf_pa_cb(PA_TYPE_RX_ON);  }
+        rf_set_rxmode(); //go on Scanning
+        if (blc_rf_pa_cb) {
+            blc_rf_pa_cb(PA_TYPE_RX_ON);
+        }
     }
 
 
     return initiate_success;
 }
 
-
-
-
-
-ble_sts_t   blt_ll_createConnection( scan_inter_t scanInter, scan_wind_t scanWindow, init_fp_t fp, u8 peerAdrType, u8 *peerAddr, own_addr_type_t ownAdrType,
-                                     conn_inter_t conn_min,  conn_inter_t conn_max, u16 conn_latency, conn_tm_t timeout, u16 ce_min,   u16 ce_max )
+ble_sts_t blt_ll_createConnection(scan_inter_t scanInter, scan_wind_t scanWindow, init_fp_t fp, u8 peerAdrType, u8 *peerAddr, own_addr_type_t ownAdrType, conn_inter_t conn_min, conn_inter_t conn_max, u16 conn_latency, conn_tm_t timeout, u16 ce_min, u16 ce_max)
 {
-    (void)scanInter; //unused, remove warning
-    (void)scanWindow; //unused, remove warning
+    (void)scanInter;    //unused, remove warning
+    (void)scanWindow;   //unused, remove warning
     (void)conn_latency; //unused, remove warning
-    (void)ce_min; //unused, remove warning
-    (void)ce_max; //unused, remove warning
+    (void)ce_min;       //unused, remove warning
+    (void)ce_max;       //unused, remove warning
 
     /* some code use "hci_cmd_mask" even without HCI, so handle it here */
     /* HCI/GEV/BV-03-C [Disallow Mixing Legacy and Extended Scanning Commands] */
-    if(IS_EXTENDED_SCAN_VALID){
+    if (IS_EXTENDED_SCAN_VALID) {
         return HCI_ERR_CMD_DISALLOWED;
-    }
-    else{
+    } else {
         SET_LEGACY_SCAN_VALID;
     }
-
-
 
 
     /*
@@ -201,89 +183,77 @@ ble_sts_t   blt_ll_createConnection( scan_inter_t scanInter, scan_wind_t scanWin
     */
 
     u8 ret_status = (u8)blt_ll_createConnCommon(fp, ownAdrType, peerAdrType, peerAddr);
-    if(ret_status != BLE_SUCCESS){
+    if (ret_status != BLE_SUCCESS) {
         return ret_status;
     }
 
     /* When code running here, initiation will start */
 
 
-
-
     /**************************** master conn_interval process begin *********************************************************************************/
 
     #if (ACL_CENTRAL_BASE_INTERVAL_FOLLOW_UPPER_LAYER)
-        if(blmsParam.cur_master_num == 0){  //first ACL master
-            blc_ll_setAclCentralBaseConnectionInterval(conn_min);
-            u32 oct_conn_min_us = blt_debug_hex_2_dec_display(conn_min*1250);
-            my_dump_str_data(DBG_SET_CIG_PARAMS, "[LEGINIT] ACL base interval", &oct_conn_min_us, 4)
-        }
+    if (blmsParam.cur_master_num == 0) { //first ACL master
+        blc_ll_setAclCentralBaseConnectionInterval(conn_min);
+        u32 oct_conn_min_us = blt_debug_hex_2_dec_display(conn_min * 1250);
+        my_dump_str_data(DBG_SET_CIG_PARAMS, "[LEGINIT] ACL base interval", &oct_conn_min_us, 4)
+    }
     #endif
 
 
-
-
     bltInit.mas_intv_mul = blt_init_calculateMasterIntervalMultiplier(aclMas_param.master_connInter, conn_min, conn_max);
-    if(bltInit.mas_intv_mul == 24){
+    if (bltInit.mas_intv_mul == 24) {
         bltInit.mas_intv_msk = INTV_MSK_24_TIME;
-    }
-    else{
+    } else {
         bltInit.mas_intv_msk = interMask_tbl[bltInit.mas_intv_mul];
     }
 
 
     #if (IMPROVE_MASTER_INTERVAL)
-        u16 conn_inter_use = aclMas_param.master_connInter*bltInit.mas_intv_mul;
-        if(conn_min <= conn_inter_use && conn_max >= conn_inter_use){ //totally meet host's requirement
-            //do nothing
-        }
-        else{ //not exactly host's requirement
-            if(conn_min > aclMas_param.master_connInter){
-                int mod = conn_max % aclMas_param.master_connInter;
-                u16 conn_inter = conn_max - mod;
-                if(conn_inter >= conn_min){
-                    bltInit.mas_intv_mul = conn_inter/aclMas_param.master_connInter;
-                    bltInit.mas_intv_msk = 0xFFFFFF;
-                }
+    u16 conn_inter_use = aclMas_param.master_connInter * bltInit.mas_intv_mul;
+    if (conn_min <= conn_inter_use && conn_max >= conn_inter_use) { //totally meet host's requirement
+        //do nothing
+    } else { //not exactly host's requirement
+        if (conn_min > aclMas_param.master_connInter) {
+            int mod        = conn_max % aclMas_param.master_connInter;
+            u16 conn_inter = conn_max - mod;
+            if (conn_inter >= conn_min) {
+                bltInit.mas_intv_mul = conn_inter / aclMas_param.master_connInter;
+                bltInit.mas_intv_msk = 0xFFFFFF;
             }
         }
+    }
     #endif
 
-    my_dump_str_data(ACL_MASTER_INITIATE,"master intv mul",&bltInit.mas_intv_mul, 1);
+    my_dump_str_data(ACL_MASTER_INITIATE, "master intv mul", &bltInit.mas_intv_mul, 1);
     /**************************** master conn_interval process end *********************************************************************************/
 
-    pkt_init.interval = aclMas_param.master_connInter*bltInit.mas_intv_mul;
-    pkt_init.timeout = timeout;
+    pkt_init.interval = aclMas_param.master_connInter * bltInit.mas_intv_mul;
+    pkt_init.timeout  = timeout;
 
 
+    u32 r_sts = irq_disable(); //very important to disable IRQ
 
-    u32 r_sts = irq_disable();  //very important to disable IRQ
-
-    if(blmsParam.scanInitEn_union.leg_scan_en){
+    if (blmsParam.scanInitEn_union.leg_scan_en) {
         blmsParam.create_connection = CONNECT_REQ_LEG_PENDING;
-    }
-    else{
+    } else {
         /* if scan not enabled, */
         blmsParam.state_chng |= STATE_CHANGE_INIT;
         blmsParam.create_connection = CONNECT_REQ_GOING;
-        bltScn.initiate_going = LEG_INITIATE_GOING;
+        bltScn.initiate_going       = LEG_INITIATE_GOING;
     }
 
     irq_restore(r_sts);
-#if OS_SUP_EN
-    if(blt_os_giveSem_cb)
-    {
+    #if OS_SUP_EN
+    if (blt_os_giveSem_cb) {
         blt_os_giveSem_cb();
     }
-#endif
+    #endif
 
     return BLE_SUCCESS;
 }
 
-
-
-ble_sts_t   blc_ll_createConnection( scan_inter_t scanInter, scan_wind_t scanWindow, init_fp_t fp, u8 peerAdrType, u8 *peerAddr, own_addr_type_t ownAdrType,
-                                     conn_inter_t conn_min,  conn_inter_t conn_max, u16 conn_latency, conn_tm_t timeout, u16 ce_min,   u16 ce_max )
+ble_sts_t blc_ll_createConnection(scan_inter_t scanInter, scan_wind_t scanWindow, init_fp_t fp, u8 peerAdrType, u8 *peerAddr, own_addr_type_t ownAdrType, conn_inter_t conn_min, conn_inter_t conn_max, u16 conn_latency, conn_tm_t timeout, u16 ce_min, u16 ce_max)
 {
     (void)ce_min; //unused, remove warning
     (void)ce_max; //unused, remove warning
@@ -291,64 +261,49 @@ ble_sts_t   blc_ll_createConnection( scan_inter_t scanInter, scan_wind_t scanWin
     tlkapi_send_string_data(BLC_LL_LOG_EN || (stkLog_mask & STK_LOG_LL_CMD), "[LL][CMD] Create Connection", peerAddr, 6);
 
     #if (CUSTOM_CONNECTION_ESTABLISH_EVT_ENABLE)
-        if(aclConn_etbsh.crtConn_retry_num){
-            if(aclConn_etbsh.crtConn_cur_cnt){
-                return HCI_ERR_CMD_DISALLOWED;  //previous create command is pending in the Controller
-            }
-
-            aclConn_etbsh.crtConn_cur_cnt = 1;
-
-            aclConn_etbsh.crtConn_buf.scan_inter = scanInter;
-            aclConn_etbsh.crtConn_buf.scan_wind = scanWindow;
-            aclConn_etbsh.crtConn_buf.fp = fp;
-            aclConn_etbsh.crtConn_buf.peerAddr_type = peerAdrType;
-            smemcpy(aclConn_etbsh.crtConn_buf.peer_addr, peerAddr, 6);
-            aclConn_etbsh.crtConn_buf.ownAddr_type = ownAdrType;
-            aclConn_etbsh.crtConn_buf.conn_min = conn_min;
-            aclConn_etbsh.crtConn_buf.conn_max = conn_max;
-            aclConn_etbsh.crtConn_buf.connLatency = conn_latency;
-            aclConn_etbsh.crtConn_buf.timeout = timeout;
+    if (aclConn_etbsh.crtConn_retry_num) {
+        if (aclConn_etbsh.crtConn_cur_cnt) {
+            return HCI_ERR_CMD_DISALLOWED; //previous create command is pending in the Controller
         }
+
+        aclConn_etbsh.crtConn_cur_cnt = 1;
+
+        aclConn_etbsh.crtConn_buf.scan_inter    = scanInter;
+        aclConn_etbsh.crtConn_buf.scan_wind     = scanWindow;
+        aclConn_etbsh.crtConn_buf.fp            = fp;
+        aclConn_etbsh.crtConn_buf.peerAddr_type = peerAdrType;
+        smemcpy(aclConn_etbsh.crtConn_buf.peer_addr, peerAddr, 6);
+        aclConn_etbsh.crtConn_buf.ownAddr_type = ownAdrType;
+        aclConn_etbsh.crtConn_buf.conn_min     = conn_min;
+        aclConn_etbsh.crtConn_buf.conn_max     = conn_max;
+        aclConn_etbsh.crtConn_buf.connLatency  = conn_latency;
+        aclConn_etbsh.crtConn_buf.timeout      = timeout;
+    }
     #endif
 
-    return  blt_ll_createConnection(scanInter, scanWindow, fp, peerAdrType, peerAddr, ownAdrType, conn_min, conn_max, conn_latency, timeout, 0, 0);
+    return blt_ll_createConnection(scanInter, scanWindow, fp, peerAdrType, peerAddr, ownAdrType, conn_min, conn_max, conn_latency, timeout, 0, 0);
 }
 
-
-ble_sts_t   blc_hci_le_createConnection( hci_le_createConn_cmdParam_t * pCmdParam)
+ble_sts_t blc_hci_le_createConnection(hci_le_createConn_cmdParam_t *pCmdParam)
 {
     //my_dump_str_data(IUT_HCI_LOG_EN, "[HCI][CMD] Create_Connection", &pCmdParam->fp, 8);
-    my_dump_str_data(IUT_HCI_LOG_EN, "[HCI][CMD] Create_Connection", pCmdParam, sizeof(hci_le_createConn_cmdParam_t));
+    my_dump_str_data(IUT_HCI_LOG_EN, "[HCI][CMD] LE_Create_Connection", pCmdParam, sizeof(hci_le_createConn_cmdParam_t));
 
-    my_dump_str_u32s(DBG_CIS_CENTRAL_PARAM, "ACL interval", blt_debug_hex_2_dec_display(pCmdParam->conn_min * 1250), \
-                                                           blt_debug_hex_2_dec_display(pCmdParam->conn_max * 1250), 0, 0);
+    my_dump_str_u32s(DBG_CIS_CENTRAL_PARAM, "ACL interval", blt_debug_hex_2_dec_display(pCmdParam->conn_min * 1250), blt_debug_hex_2_dec_display(pCmdParam->conn_max * 1250), 0, 0);
 
 
-    return blc_ll_createConnection ( pCmdParam->scan_inter, pCmdParam->scan_wind, pCmdParam->fp,
-                                     pCmdParam->peerAddr_type, pCmdParam->peer_addr, pCmdParam->ownAddr_type,
-                                     pCmdParam->conn_min, pCmdParam->conn_max, 0, pCmdParam->timeout, 0, 0);  //latency & ce_min & ce_max not process
-
+    return blc_ll_createConnection(pCmdParam->scan_inter, pCmdParam->scan_wind, pCmdParam->fp, pCmdParam->peerAddr_type, pCmdParam->peer_addr, pCmdParam->ownAddr_type, pCmdParam->conn_min, pCmdParam->conn_max, 0, pCmdParam->timeout, 0, 0); //latency & ce_min & ce_max not process
 }
 
 
+#else  //else of LL_ACL_CEN_EN
 
 
-
-#else    //else of LL_ACL_CEN_EN
-
-
-
-
-
-
-
-void        blc_ll_initLegacyInitiating_module(void)
+void blc_ll_initLegacyInitiating_module(void)
 {
-
 }
 
-ble_sts_t   blc_ll_createConnection( scan_inter_t scan_interval, scan_wind_t scan_window, init_fp_t filter_policy, u8 adr_type, u8  *mac, own_addr_type_t own_adr_type,
-                                     conn_inter_t conn_min, conn_inter_t conn_max, u16 conn_latency, conn_tm_t timeout, u16 ce_min, u16 ce_max )
+ble_sts_t blc_ll_createConnection(scan_inter_t scan_interval, scan_wind_t scan_window, init_fp_t filter_policy, u8 adr_type, u8 *mac, own_addr_type_t own_adr_type, conn_inter_t conn_min, conn_inter_t conn_max, u16 conn_latency, conn_tm_t timeout, u16 ce_min, u16 ce_max)
 {
     (void)scan_interval;
     (void)scan_window;
@@ -366,4 +321,4 @@ ble_sts_t   blc_ll_createConnection( scan_inter_t scan_interval, scan_wind_t sca
 }
 
 
-#endif   //end of LL_ACL_CEN_EN
+#endif //end of LL_ACL_CEN_EN

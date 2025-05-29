@@ -32,13 +32,12 @@
 #include "driver.h"
 
 
-
 #if 0
 //hash register pointer
 volatile static HASH_REG * const g_hash_reg = (HASH_REG *)HASH_BASE_ADDR;
 #endif
 
- /**
+/**
   * @brief          get HFE IP version.
   * @return         HFE IP version
   */
@@ -47,18 +46,16 @@ unsigned int hash_get_version(void)
     return rHASH_VERSION;
 }
 
-
 /**
  * @brief       set hash to be CPU mode.
  * @return      none
  */
 void hash_set_cpu_mode(void)
 {
-    volatile unsigned int mask = ~(((unsigned int)1)<<HASH_DMA_OFFSET);
+    volatile unsigned int mask = ~(((unsigned int)1) << HASH_DMA_OFFSET);
 
     rHASH_CFG &= mask;
 }
-
 
 /**
  * @brief       set hash to be DMA mode.
@@ -66,11 +63,10 @@ void hash_set_cpu_mode(void)
  */
 void hash_set_dma_mode(void)
 {
-    volatile unsigned int flag = (((unsigned int)1)<<HASH_DMA_OFFSET);
+    volatile unsigned int flag = (((unsigned int)1) << HASH_DMA_OFFSET);
 
     rHASH_CFG |= flag;
 }
-
 
 /**
  * @brief       set the specific hash algorithm.
@@ -89,18 +85,16 @@ void hash_set_alg(HASH_ALG hash_alg)
     rHASH_CFG |= hash_alg;
 }
 
-
 /**
  * @brief       enable hash interruption in CPU mode or DMA mode.
  * @return      none
  */
 void hash_enable_interruption(void)
 {
-    volatile unsigned int flag = (((unsigned int)1)<<HASH_INTERRUPTION_OFFSET);
+    volatile unsigned int flag = (((unsigned int)1) << HASH_INTERRUPTION_OFFSET);
 
     rHASH_CFG |= flag;
 }
-
 
 /**
  * @brief       disable hash interruption in CPU mode or DMA mode.
@@ -108,11 +102,10 @@ void hash_enable_interruption(void)
  */
 void hash_disable_interruption(void)
 {
-    volatile unsigned int mask = ~(((unsigned int)1)<<HASH_INTERRUPTION_OFFSET);
+    volatile unsigned int mask = ~(((unsigned int)1) << HASH_INTERRUPTION_OFFSET);
 
     rHASH_CFG &= mask;
 }
-
 
 /**
  * @brief       set the tag whether current block is the last message block or not.
@@ -129,16 +122,14 @@ void hash_set_last_block(unsigned int tag)
     volatile unsigned int flag = (((unsigned int)1) << HASH_LAST_OFFSET);
     volatile unsigned int mask = (~(((unsigned int)1) << HASH_LAST_OFFSET));
 
-    if(tag)     //current block is the last one of the message
+    if (tag) //current block is the last one of the message
     {
         rHASH_CFG |= flag;
-    }
-    else        //current block is not the last one of the message
+    } else   //current block is not the last one of the message
     {
         rHASH_CFG &= mask;
     }
 }
-
 
 /**
  * @brief       get current HASH iterator value.
@@ -151,23 +142,18 @@ void hash_get_iterator(unsigned char *iterator, unsigned int hash_iterator_words
     unsigned int temp;
     unsigned int i;
 
-    if(((unsigned int)iterator) & 3) //for the case that iterator is not aligned by word
+    if (((unsigned int)iterator) & 3) //for the case that iterator is not aligned by word
     {
-        for (i = 0; i < hash_iterator_words; i++)
-        {
+        for (i = 0; i < hash_iterator_words; i++) {
             temp = rHASH_OUT(i);
-            memcpy_((unsigned char *)(iterator+(i<<2)), (unsigned char *)(&temp), 4);
+            memcpy_((unsigned char *)(iterator + (i << 2)), (unsigned char *)(&temp), 4);
         }
-    }
-    else
-    {
-        for (i = 0; i < hash_iterator_words; i++)
-        {
+    } else {
+        for (i = 0; i < hash_iterator_words; i++) {
             ((unsigned int *)iterator)[i] = rHASH_OUT(i);
         }
     }
 }
-
 
 /**
  * @brief       input current iterator value.
@@ -183,12 +169,10 @@ void hash_set_iterator(const unsigned int *iterator, unsigned int hash_iterator_
 {
     unsigned int i;
 
-    for (i = 0; i < hash_iterator_words; i++)
-    {
+    for (i = 0; i < hash_iterator_words; i++) {
         rHASH_IN(i) = iterator[i];
     }
 }
-
 
 /**
  * @brief       clear rHASH_PCR_LEN.
@@ -204,8 +188,6 @@ void hash_clear_msg_len(void)
     rHASH_PCR_LEN(3) = flag;
 }
 
-
-
 /**
  * @brief       set the total byte length of the whole message.
  * @param[in]   msg_total_bytes             - total byte length of the whole message.
@@ -214,12 +196,10 @@ void hash_clear_msg_len(void)
  */
 void hash_set_msg_total_byte_len(unsigned int *msg_total_bytes, unsigned int words)
 {
-    while(words--)
-    {
+    while (words--) {
         rHASH_PCR_LEN(words) = msg_total_bytes[words];
     }
 }
-
 
 /**
  * @brief       set dma output bytes length.
@@ -230,7 +210,6 @@ void hash_set_dma_output_len(unsigned int bytes)
 {
     rHASH_DMA_WLEN = bytes;
 }
-
 
 /**
  * @brief       start HASH iteration calc.
@@ -245,9 +224,7 @@ void hash_start(void)
 
     rHASH_SR2 |= flag;
     rHASH_CTRL |= flag;
-
 }
-
 
 /**
  * @brief       wait till done.
@@ -257,12 +234,12 @@ void hash_wait_till_done(void)
 {
     volatile unsigned int flag = 1;
 
-    while((rHASH_SR2 & flag) == 0)
-    {;}
+    while ((rHASH_SR2 & flag) == 0) {
+        ;
+    }
 
     rHASH_SR2 = flag;
 }
-
 
 /**
  * @brief       DMA wait till done.
@@ -273,19 +250,16 @@ void hash_dma_wait_till_done(HASH_CALLBACK callback)
 {
     volatile unsigned int flag = 1;
 
-    while((rHASH_SR2 & flag) == 0)
-    {
-        if(callback)
-        {
+    while ((rHASH_SR2 & flag) == 0) {
+        if (callback) {
             callback();
+        } else {
+            ;
         }
-        else
-        {;}
     }
 
     rHASH_SR2 = flag;
 }
-
 
 /**
  * @brief       input message.
@@ -303,19 +277,14 @@ void hash_input_msg(const unsigned char *msg, unsigned int msg_words)
     unsigned int tmp;
     unsigned int i;
 
-    if(((unsigned int)msg) & 3)
-    {
-        for(i = 0; i < msg_words; i++)
-        {
+    if (((unsigned int)msg) & 3) {
+        for (i = 0; i < msg_words; i++) {
             memcpy_((unsigned char *)(&tmp), msg, 4);
             rHASH_M_DIN(i) = tmp;
             msg += 4;
         }
-    }
-    else
-    {
-        for(i = 0; i < msg_words; i++)
-        {
+    } else {
+        for (i = 0; i < msg_words; i++) {
             rHASH_M_DIN(i) = *((const unsigned int *)msg);
             msg += 4;
         }
@@ -342,17 +311,16 @@ void hash_input_msg(const unsigned char *msg, unsigned int msg_words)
 void hash_dma_operate(unsigned int *in, unsigned int *out, unsigned int inByteLen, HASH_CALLBACK callback)
 {
     //src addr
-    rHASH_DMA_SA = ((unsigned int)in)&0xFFFFFFFF;
+    rHASH_DMA_SA = ((unsigned int)in) & 0xFFFFFFFF;
     hash_tx_dma(hash_get_tx_dma_channel(), (unsigned int)in, inByteLen);
 
     //dst addr
-    if(out)
-    {
-        rHASH_DMA_DA = ((unsigned int)out)&0xFFFFFFFF;
+    if (out) {
+        rHASH_DMA_DA = ((unsigned int)out) & 0xFFFFFFFF;
         hash_rx_dma(hash_get_rx_dma_channel(), (unsigned int)out, rHASH_DMA_WLEN);
+    } else {
+        ;
     }
-    else
-    {;}
 
     //data byte length
     rHASH_DMA_RLEN = inByteLen;
@@ -363,4 +331,3 @@ void hash_dma_operate(unsigned int *in, unsigned int *out, unsigned int inByteLe
 }
 
 #endif
-

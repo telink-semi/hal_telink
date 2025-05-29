@@ -27,31 +27,32 @@
 #include "tl_common.h"
 
 
-
 #ifndef BLT_APP_LED_ENABLE
-#define BLT_APP_LED_ENABLE              0
+    #define BLT_APP_LED_ENABLE 0
 #endif
 
 
 /**
  * @brief   Configure the parameters for led event
  */
-typedef struct{
+typedef struct
+{
     unsigned short onTime_ms;
     unsigned short offTime_ms;
 
-    unsigned char  repeatCount;  //0xff special for long on(offTime_ms=0)/long off(onTime_ms=0)
-    unsigned char  priority;     //0x00 < 0x01 < 0x02 < 0x04 < 0x08 < 0x10 < 0x20 < 0x40 < 0x80
+    unsigned char repeatCount; //0xff special for long on(offTime_ms=0)/long off(onTime_ms=0)
+    unsigned char priority;    //0x00 < 0x01 < 0x02 < 0x04 < 0x08 < 0x10 < 0x20 < 0x40 < 0x80
 } led_cfg_t;
 
 /**
  * @brief   the status of led event
  */
-typedef struct {
-    unsigned char  isOn;
-    unsigned char  polar;
-    unsigned char  repeatCount;
-    unsigned char  priority;
+typedef struct
+{
+    unsigned char isOn;
+    unsigned char polar;
+    unsigned char repeatCount;
+    unsigned char priority;
 
 
     unsigned short onTime_ms;
@@ -59,11 +60,11 @@ typedef struct {
 
     unsigned int gpio_led;
     unsigned int startTick;
-}device_led_t;
+} device_led_t;
 
 extern device_led_t device_led;
 
-#define  DEVICE_LED_BUSY    (device_led.repeatCount)
+#define DEVICE_LED_BUSY (device_led.repeatCount)
 
 /**
  * @brief       This function is used to manage led tasks
@@ -78,7 +79,7 @@ extern void led_proc(void);
  * @param[in]   polarity - 1 for high led on, 0 for low led on
  * @return      none
  */
-extern void device_led_init(u32 gpio,u8 polarity);
+extern void device_led_init(u32 gpio, u8 polarity);
 
 /**
  * @brief       This function is used to create new led task
@@ -96,13 +97,11 @@ int device_led_setup(led_cfg_t led_cfg);
 static inline void device_led_process(void)
 {
 #if (BLT_APP_LED_ENABLE)
-    if(DEVICE_LED_BUSY){
+    if (DEVICE_LED_BUSY) {
         led_proc();
     }
 #endif
 }
-
-
 
 
 #endif /* BLT_LED_H_ */

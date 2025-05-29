@@ -25,12 +25,11 @@
 
 #if (ASSISTANT_VERSION == UNIVERSAL_VERSION)
 
-#include "app.h"
-#include "app_config.h"
-#include "tl_common.h"
-#include "drivers.h"
-#include "stack/ble/ble.h"
-
+    #include "app.h"
+    #include "app_config.h"
+    #include "tl_common.h"
+    #include "drivers.h"
+    #include "stack/ble/ble.h"
 
 /**
  * @brief       BLE RF interrupt handler.
@@ -41,11 +40,12 @@ _attribute_ram_code_ void rf_irq_handler(void)
 {
     DBG_CHN14_HIGH;
 
-    blc_sdk_irq_handler ();
+    blc_sdk_irq_handler();
 
     DBG_CHN14_LOW;
 }
 PLIC_ISR_REGISTER(rf_irq_handler, IRQ_ZB_RT)
+
 /**
  * @brief       System timer interrupt handler.
  * @param[in]   none
@@ -55,11 +55,12 @@ _attribute_ram_code_ void stimer_irq_handler(void)
 {
     DBG_CHN15_HIGH;
 
-    blc_sdk_irq_handler ();
+    blc_sdk_irq_handler();
 
     DBG_CHN15_LOW;
 }
 PLIC_ISR_REGISTER(stimer_irq_handler, IRQ_SYSTIMER)
+
 /**
  * @brief       BLE USB endpoint interrupt handler.
  * @param[in]   none
@@ -69,6 +70,7 @@ _attribute_ram_code_ void usb_endpoint_irq_handler(void)
 {
 }
 PLIC_ISR_REGISTER(usb_endpoint_irq_handler, IRQ_USB_ENDPOINT)
+
 /**
  * @brief       timer0 interrupt handler.
  * @param[in]   none
@@ -78,6 +80,7 @@ _attribute_ram_code_ void timer0_irq_handler(void)
 {
 }
 PLIC_ISR_REGISTER(timer0_irq_handler, IRQ_TIMER0)
+
 /**
  * @brief       This is main function
  * @param[in]   none
@@ -91,14 +94,14 @@ _attribute_ram_code_ int main(void)
     blc_pm_select_internal_32k_crystal();
 
     #if (MCU_CORE_TYPE == MCU_CORE_B91)
-        sys_init(DCDC_1P4_LDO_1P8, VBAT_MAX_VALUE_GREATER_THAN_3V6,INTERNAL_CAP_XTAL24M);
+    sys_init(DCDC_1P4_LDO_1P8, VBAT_MAX_VALUE_GREATER_THAN_3V6, INTERNAL_CAP_XTAL24M);
     #elif (MCU_CORE_TYPE == MCU_CORE_B92)
-        sys_init(DCDC_1P4_LDO_2P0, VBAT_MAX_VALUE_GREATER_THAN_3V6, GPIO_VOLTAGE_3V3, INTERNAL_CAP_XTAL24M);
-        wd_32k_stop();          //todo: Deep wakeup shall not call wd stop after A1. Jaguar A0 have problem on PM now, so call 32k watchdog stop here now. See <Skype-B91m driver: 2022-10-25>
+    sys_init(DCDC_1P4_LDO_2P0, VBAT_MAX_VALUE_GREATER_THAN_3V6, GPIO_VOLTAGE_3V3, INTERNAL_CAP_XTAL24M);
+    wd_32k_stop(); //todo: Deep wakeup shall not call wd stop after A1. Jaguar A0 have problem on PM now, so call 32k watchdog stop here now. See <Skype-B91m driver: 2022-10-25>
     #endif
 
     /* detect if MCU is wake_up from deep retention mode */
-    int deepRetWakeUp = pm_is_MCU_deepRetentionWakeup();  //MCU deep retention wakeUp
+    int deepRetWakeUp = pm_is_MCU_deepRetentionWakeup(); //MCU deep retention wakeUp
 
     CCLK_32M_HCLK_32M_PCLK_16M;
 
@@ -106,21 +109,19 @@ _attribute_ram_code_ int main(void)
 
     gpio_init(!deepRetWakeUp);
 
-    if( deepRetWakeUp ){ //MCU wake_up from deepSleep retention mode
-        user_init_deepRetn ();
-    }
-    else{ //MCU power_on or wake_up from deepSleep mode
+    if (deepRetWakeUp) { //MCU wake_up from deepSleep retention mode
+        user_init_deepRetn();
+    } else {             //MCU power_on or wake_up from deepSleep mode
         user_init_normal();
     }
 
 
     irq_enable();
 
-    while(1)
-    {
-        main_loop ();
+    while (1) {
+        main_loop();
     }
     return 0;
 }
 
-#endif  //ASSISTANT_VERSION == UNIVERSAL_VERSION
+#endif //ASSISTANT_VERSION == UNIVERSAL_VERSION

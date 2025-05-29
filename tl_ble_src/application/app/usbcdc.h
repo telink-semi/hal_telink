@@ -25,27 +25,27 @@
 
 #include "tl_common.h"
 #if USB_CDC_ENABLE
-#include "driver.h"
-#include "../usbstd/HIDClassCommon.h"
-#include "../usbstd/HIDReportData.h"
-#include "../usbstd/CDCClassDevice.h"
-#include "../usbstd/usbdesc.h"
+    #include "driver.h"
+    #include "../usbstd/HIDClassCommon.h"
+    #include "../usbstd/HIDReportData.h"
+    #include "../usbstd/CDCClassDevice.h"
+    #include "../usbstd/usbdesc.h"
 
 
+    /* Enable C linkage for C++ Compilers: */
+    #if defined(__cplusplus)
+extern "C"
+{
+    #endif
 
-/* Enable C linkage for C++ Compilers: */
-#if defined(__cplusplus)
-    extern "C" {
-#endif
+    typedef void (*usb_cdc_read_cb_t)(unsigned char *data, unsigned short length);
 
-typedef void (*usb_cdc_read_cb_t)(unsigned char * data, unsigned short length);
+    void usb_cdc_read(usb_cdc_read_cb_t cb);
 
-void usb_cdc_read(usb_cdc_read_cb_t cb);
+    unsigned short usb_cdc_write(unsigned char *data, unsigned short length);
 
-unsigned short usb_cdc_write(unsigned char * data, unsigned short length);
-
-/* Disable C linkage for C++ Compilers: */
-#if defined(__cplusplus)
-    }
-#endif
+    /* Disable C linkage for C++ Compilers: */
+    #if defined(__cplusplus)
+}
+    #endif
 #endif

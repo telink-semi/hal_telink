@@ -28,7 +28,6 @@
 #if (FEATURE_TEST_MODE == TEST_GATTC_SDP)
 
 
-
 void gatt_init_service(void);
 
 

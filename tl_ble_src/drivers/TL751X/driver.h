@@ -41,7 +41,7 @@
 #include "lib/include/hash/hash_algorithm.h"
 #include "lib/include/ske/ske_algorithm.h"
 
-#include "emi.h"
+#include "lib/include/emi.h"
 #include "audio.h"
 #include "analog.h"
 #include "dma.h"
@@ -55,7 +55,7 @@
 #include "usb1hw.h"
 #include "watchdog.h"
 #include "s7816.h"
-#include "nds_intrinsic.h"
+#include "core.h"
 #include "mdec.h"
 
 #include "uart.h"

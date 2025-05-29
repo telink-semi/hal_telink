@@ -24,10 +24,14 @@
 
 #pragma once
 
+// #include <sys/queue.h>
+
+#define BLC_PRF_DBG(en, fmt, ...) tlkapi_printf(en, "[PRF]" fmt "\n", ##__VA_ARGS__)
+
 /* Stack max settings */
-#define STACK_PRF_ACL_CONN_MAX_NUM                              8//LL_MAX_ACL_CONN_NUM
-#define STACK_PRF_ACL_CENTRAL_MAX_NUM                           4//LL_MAX_ACL_CEN_NUM
-#define STACK_PRF_ACL_PERIPHERAL_MAX_NUM                        4//LL_MAX_ACL_PER_NUM
+#define STACK_PRF_ACL_CONN_MAX_NUM       LL_MAX_ACL_CONN_NUM //LL_MAX_ACL_CONN_NUM
+#define STACK_PRF_ACL_CENTRAL_MAX_NUM    LL_MAX_ACL_CEN_NUM  //LL_MAX_ACL_CEN_NUM
+#define STACK_PRF_ACL_PERIPHERAL_MAX_NUM LL_MAX_ACL_PER_NUM  //LL_MAX_ACL_PER_NUM
 
 /**
  * profile bound ACL role enumeration.
@@ -35,13 +39,15 @@
  * PRF_GAP_ACL_PERIPHERAL: ACL peripheral.
  * PRF_GAP_ACL_UNSPECIF: ACL central and ACL peripheral.
  */
-typedef enum {
-    PRF_GAP_ACL_CENTRAL = BIT(0),
+typedef enum
+{
+    PRF_GAP_ACL_CENTRAL    = BIT(0),
     PRF_GAP_ACL_PERIPHERAL = BIT(1),
-    PRF_GAP_ACL_UNSPECIF = BITS(0, 1),
+    PRF_GAP_ACL_UNSPECIF   = BITS(0, 1),
 } prf_bound_acl_role_enum;
 
-typedef enum {
+typedef enum
+{
     PRF_COMMON_SUCC = 0x00, /* Success */
     PRF_COMMON_ERR,
     PRF_COMMON_ERR_INPUT_NULL,
@@ -50,10 +56,9 @@ typedef enum {
     PRF_COMMON_ERR_ATTR_HANDLE_NOT_FOUND,
     PRF_ATT_ERROR_FLAG = 0x100,
     PRF_HCI_ERROR_FLAG = 0x200,
-    PRF_OTHER_ERROR = 0x300,
-    PRF_MODULE_ERROR = 0x400,
+    PRF_OTHER_ERROR    = 0x300,
+    PRF_MODULE_ERROR   = 0x400,
 } prf_error_enum;
-
 
 /**
  * profile ACL state enumeration.
@@ -61,7 +66,8 @@ typedef enum {
  * PRF_ACL_STATE_DISCONN: ACL disconnect.
  * PRF_ACL_STATE_RECONNECT: RFU.
  */
-typedef enum {
+typedef enum
+{
     PRF_ACL_STATE_CONNECT,
     PRF_ACL_STATE_DISCONN,
     PRF_ACL_STATE_RECONNECT,
@@ -72,38 +78,51 @@ typedef enum {
  * PRF_NV_STATE_STORE: profile store NV data.
  * PRF_NV_STATE_LOAD: profile load NV data.
  */
-typedef enum{
+typedef enum
+{
     PRF_NV_STATE_STORE,
     PRF_NV_STATE_LOAD,
 } prf_nv_state_enum;
 
-typedef enum {
+typedef enum
+{
     PRF_CLIENT_MIN = 0x00,
-    PRF_BASIC_CLIENT_START,     //for GATT, GAP, BAS, DIS.
-    PRF_BASIC_CLIENT_END = PRF_BASIC_CLIENT_START + 0x0E,   //used:4, other reserved
+    PRF_BASIC_CLIENT_START,                                                                 //for GATT, GAP, BAS, DIS.
+    PRF_BASIC_CLIENT_END = PRF_BASIC_CLIENT_START + 0x0E,                                   //used:4, other reserved
     PRF_LE_AUDIO_CLIENT_START,
-    PRF_LE_AUDIO_CLIENT_END = PRF_LE_AUDIO_CLIENT_START + 0x1F, //used:10, other reserved.
+    PRF_LE_AUDIO_CLIENT_END = PRF_LE_AUDIO_CLIENT_START + 0x1F,                             //used:10, other reserved.
     PRF_CHANNEL_SOUNDING_CLIENT_START,
-    PRF_CHANNEL_SOUNDING_CLIENT_END = PRF_CHANNEL_SOUNDING_CLIENT_START + 0x03, //used:1 other reserved.
+    PRF_CHANNEL_SOUNDING_CLIENT_END = PRF_CHANNEL_SOUNDING_CLIENT_START + 0x03,             //used:1 other reserved.
     PRF_HUMAN_INTERFACE_DEVICE_CLIENT_START,
     PRF_HUMAN_INTERFACE_DEVICE_CLIENT_ENC = PRF_HUMAN_INTERFACE_DEVICE_CLIENT_START + 0x03, //used:2 other reserved
-    PRF_TEST_PROFILE_CLIENT_START = 0x70,   //only user 1
-    PRF_USE_DEFINE_CLIENT_START = 0x71,
-    PRF_SERVER_OFFSET = 0x80,
+    PRF_ELECTRONIC_SHELF_LABEL_CLIENT_START,
+    PRF_ELECTRONIC_SHELF_LABEL_CLIENT_END = PRF_ELECTRONIC_SHELF_LABEL_CLIENT_START + 0x08, //used:4 other reserved
+    PRF_OTA_CLIENT_START,
+    PRF_OTA_CLIENT_END = PRF_OTA_CLIENT_START + 0x01,                                       //used:2
+    PRF_SPP_CLIENT_START,
+    PRF_SPP_CLIENT_END = PRF_SPP_CLIENT_START + 0x01,
+    PRF_TEST_PROFILE_CLIENT_START         = 0x70,                                           //only user 1
+    PRF_USE_DEFINE_CLIENT_START           = 0x71,
+    PRF_SERVER_OFFSET                     = 0x80,
 } profile_service_role_enum;
 
-#define PRF_EVENT_ID_SIZE               0x0100
+#define PRF_EVENT_ID_SIZE 0x0100
 
-typedef enum {
+typedef enum
+{
     PRF_EVTID_NULL,
     PRF_EVTID_COMMON_START,
-    PRF_EVTID_BASIC_START = PRF_BASIC_CLIENT_START * PRF_EVENT_ID_SIZE,
-    PRF_EVTID_LE_AUDIO_START = PRF_LE_AUDIO_CLIENT_START * PRF_EVENT_ID_SIZE,
-    PRF_EVTID_CHANNEL_SOUNDING_START = PRF_CHANNEL_SOUNDING_CLIENT_START * PRF_EVENT_ID_SIZE,
+    PRF_EVTID_BASIC_START                  = PRF_BASIC_CLIENT_START * PRF_EVENT_ID_SIZE,
+    PRF_EVTID_LE_AUDIO_START               = PRF_LE_AUDIO_CLIENT_START * PRF_EVENT_ID_SIZE,
+    PRF_EVTID_CHANNEL_SOUNDING_START       = PRF_CHANNEL_SOUNDING_CLIENT_START * PRF_EVENT_ID_SIZE,
     PRF_EVTID_HUMAN_INTERFACE_DEVICE_START = PRF_HUMAN_INTERFACE_DEVICE_CLIENT_START * PRF_EVENT_ID_SIZE,
+    PRF_EVTID_ELECTRONIC_SHELF_LABEL_START = PRF_ELECTRONIC_SHELF_LABEL_CLIENT_START * PRF_EVENT_ID_SIZE,
+    PRF_EVTID_OTA_START                    = PRF_OTA_CLIENT_START * PRF_EVENT_ID_SIZE,
+    PRF_EVTID_SPP_START                    = PRF_SPP_CLIENT_START * PRF_EVENT_ID_SIZE,
 } prf_event_id_enum;
 
-typedef enum {
+typedef enum
+{
     PRF_EVTID_TYPE_COMMON = PRF_EVTID_COMMON_START,
     PRF_EVTID_CLIENT_SDP_FAIL,
     PRF_EVTID_CLIENT_SDP_FOUND,
@@ -113,86 +132,175 @@ typedef enum {
     PRF_EVTID_ACL_CONNECT,
     PRF_EVTID_ACL_DISCONNECT,
     PRF_EVTID_SMP_SECURITY_DONE,
+    PRF_EVTID_ACL_CONNECT_UPDATE,
+    PRF_EVTID_LE_ADVERTISING_REPORT,
+
+    PRF_EVTID_LE_CS_READ_REMOTE_SUPPORTED_CAPABILITIES_COMPLETE,
+    PRF_EVTID_LE_CS_READ_REMOTE_FAE_TABLE_COMPLETE,
+    PRF_EVTID_LE_CS_CONFIG_COMPLETE,
+    PRF_EVTID_LE_CS_SECURITY_ENABLE_COMPLETE,
+    PRF_EVTID_LE_CS_PROCEDURE_ENABLE_COMPLETE,
+    PRF_EVTID_LE_CS_SUBEVENT_RESULT,
+    PRF_EVTID_LE_CS_SUBEVENT_RESULT_CONTINUE,
 } prf_common_event_id_enum;
 
-typedef enum{
-    PRF_PROC_CONN = 0x0000,     /* process when le_connected */
-    PRF_PROC_DISCONN,           /* process when le_disconnected */
-    PRF_PROC_DISCOVERY,         /* process discovery (better after smp_pairing_done OR re_connection encryption done) */
-    PRF_PROC_LOOP,              /* process audio loop */
-    PRF_PROC_INIT,              /* process when register SVC node */
-    PRF_PROC_DEINIT,            /* process when unregister SVC node */
+typedef enum
+{
+#if ((!defined(HOST_V2_ENABLE)))
+    PRF_PROC_CONN = 0x0000, /* process when le_connected */
+    PRF_PROC_DISCONN,       /* process when le_disconnected */
+    PRF_PROC_DISCOVERY,     /* process discovery (better after smp_pairing_done OR re_connection encryption done) */
+    PRF_PROC_LOOP,          /* process audio loop */
+    PRF_PROC_INIT,          /* process when register SVC node */
+    PRF_PROC_DEINIT,        /* process when unregister SVC node */
+#else
+    PRF_PROC_INIT,   /* process when register SVC node */
+    PRF_PROC_DEINIT, /* process when unregister SVC node */
+#endif
 } prf_proc_type_enum;
 
-
-typedef struct {
+#if (defined(HOST_V2_ENABLE))
+typedef struct __attribute__((packed)) 
+#else
+typedef struct
+#endif
+{
     //if load nv data, ptr is NV block start address.
     //if store nv data, ptr is current write NV data address.
-    u8* dataPtr;
-    union {
-        u16 currentTotalLen;    //only user in store mode.
-        u16 nvItemLen;          //only used in load mode.
+    u8 *dataPtr;
+
+    union
+    {
+        u16 currentTotalLen; //only user in store mode.
+        u16 nvItemLen;       //only used in load mode.
     };
 } prf_nv_param_t;
 
-typedef int(*prf_evt_cb_t)(u16 connHandle, int evtID, u8 *pData, u16 dataLen);
+typedef int (*prf_evt_cb_t)(u16 connHandle, int evtID, u8 *pData, u16 dataLen);
 
-typedef void(*prf_read_cb_t)(u16 connHandle, att_err_t err);
+#if (defined(HOST_V2_ENABLE))
+#define att_err_t  enum attribute_error_code
+#endif
 
-typedef void(*prf_write_cb_t)(u16 connHandle, att_err_t err);
+typedef void (*prf_read_cb_t)(u16 connHandle, att_err_t err);
 
-typedef void(*prf_ind_cb_t)(u16 connHandle, u16 scid);
+typedef void (*prf_write_cb_t)(u16 connHandle, att_err_t err);
 
-typedef struct blc_prf_proc{
+typedef void (*prf_ind_cb_t)(u16 connHandle, u16 scid);
+
+#if ((!defined(HOST_V2_ENABLE)))
+typedef struct blc_prf_proc
+{
     struct blc_prf_proc *pNext;
-    u8 id;//profile_service_role_enum;
-    u8 usedAclRole; //prf_bound_acl_role_enum;
-    u8 reserved1[2];
-    int (* init)(u8 initType, const void *initParam);
-    int (* connect)(u16 connHandle, prf_acl_state_enum connState);
-    int (* discov)(u16 connHandle);
-    int (* loop)(u16 connHandle);
-    int (* store)(u16 connHandle, prf_nv_state_enum nvState, prf_nv_param_t* param);
+    u8                   id;          //profile_service_role_enum;
+    u8                   usedAclRole; //prf_bound_acl_role_enum;
+    u8                   reserved1[2];
+    int (*init)(u8 initType, const void *initParam);
+    int (*connect)(u16 connHandle, prf_acl_state_enum connState);
+    int (*discov)(u16 connHandle);
+    int (*loop)(u16 connHandle);
+    int (*store)(u16 connHandle, prf_nv_state_enum nvState, prf_nv_param_t *param);
 } blc_prf_proc_t;
 
-typedef struct {
+
+typedef struct
+{
     int evtId;
     int (*evtCb)(u16 connHandle, u8 *pData, u16 dataLen);
-}app_prf_evtCb_t;
+} app_prf_evtCb_t;
+#else
+struct blc_prf_process_params
+{
+    uint8_t  id;          //profile_service_role_enum;
+    uint8_t  usedAclRole; //prf_bound_acl_role_enum;
+    uint16_t reserved;
+    int (*init)(u8 initType, const void *initParam);
+    int (*connect)(u16 connHandle, prf_acl_state_enum connState);
+    int (*discovery)(u16 connHandle);
+    int (*store)(u16 connHandle, prf_nv_state_enum nvState, prf_nv_param_t *param);
+};
+#endif
+
+#if (defined(HOST_V2_ENABLE))
+struct blc_prf_process
+{
+    SLIST_ENTRY(blc_prf_process)
+    next;
+    int (*prf_event_callback)(uint16_t connHandle, uint8_t event_id, void *event_msg);
+    const struct blc_prf_process_params *prf_params;
+};
+
+typedef struct __attribute__((packed)) 
+{
+    int evtId;
+    int (*evtCb)(u16 connHandle, u8 *pData, u16 dataLen);
+} app_prf_evtCb_t;
+#endif
 
 /**
  *  @brief  Event Parameters for "PRF_EVTID_ACL_CONNECT"
  * The LE protocol stack event is taken over by the Audio Profile, and
  * the event is wrapped and used as a callback for the profile event.
  */
-typedef struct{
-    u16  aclHandle;
-    u16  connInterval;
-    u8   PeerAddrType;
-    u8   PeerAddr[6];
+#if (defined(HOST_V2_ENABLE))
+typedef struct __attribute__((packed)) 
+#else
+typedef struct
+#endif
+{
+    u16 aclHandle;
+    u16 connInterval;
+    u8  PeerAddrType;
+    u8  PeerAddr[6];
 } blc_prf_aclConnEvt_t;
 
 /**
  *  @brief  Event Parameters for "PRF_EVTID_ACL_DISCONNECT"
  */
-typedef struct{
-    u16  aclHandle;
-    u8   reason;
+#if (defined(HOST_V2_ENABLE))
+typedef struct __attribute__((packed)) 
+#else
+typedef struct
+#endif
+{
+    u16 aclHandle;
+    u8  reason;
 } blc_prf_aclDisconnEvt_t;
+
+#if (defined(HOST_V2_ENABLE))
+/**
+ *  @brief  Event Parameters for "PRF_EVTID_ACL_CONNECT_UPDATE"
+ */
+typedef struct __attribute__((packed)) 
+{
+    u16 aclHandle;
+    u16 connectInterval;
+} blc_prf_aclConnectUpdateEvt_t;
+#endif
 
 /**
  *  @brief  Event Parameters for "PRF_EVTID_SERVICE_ACL_ROLE_FAIL"
  */
-typedef struct{
-    u16 connHandle;
-    int svcId;
+#if (defined(HOST_V2_ENABLE))
+typedef struct __attribute__((packed)) 
+#else
+typedef struct
+#endif
+{
+    u16                   connHandle;
+    int                   svcId;
     acl_connection_role_t currAclRole;
 } blc_prf_svrGapRoleErrorEvt_t;
 
 /**
  *  @brief  Event Parameters for "PRF_EVTID_CLIENT_SDP_FAIL"
  */
-typedef struct{
+#if (defined(HOST_V2_ENABLE))
+typedef struct __attribute__((packed)) 
+#else
+typedef struct
+#endif
+{
     u16 aclHandle;
     int svcId;
 } blc_prf_sdpFailEvt_t, blc_prf_sdpEndEvt_t;
@@ -200,7 +308,12 @@ typedef struct{
 /**
  *  @brief  Event Parameters for "PRF_EVTID_CLIENT_SDP_FOUND"
  */
-typedef struct{
+#if (defined(HOST_V2_ENABLE))
+typedef struct __attribute__((packed)) 
+#else
+typedef struct
+#endif
+{
     u16 aclHandle;
     int svcId;
     u16 startHdl;
@@ -210,30 +323,49 @@ typedef struct{
 /**
  *  @brief  Event Parameters for "PRF_EVTID_CLIENT_ALL_SDP_OVER"
  */
-typedef struct{
+#if (defined(HOST_V2_ENABLE))
+typedef struct __attribute__((packed)) 
+#else
+typedef struct
+#endif
+{
     u16 aclHandle;
 } blc_prf_sdpOverEvt_t;
 
 /**
  *  @brief  Event Parameters for "PRF_EVTID_SMP_SECURITY_DONE"
  */
-typedef struct{
-    u16  aclHandle;
+#if (defined(HOST_V2_ENABLE))
+typedef struct __attribute__((packed)) 
+#else
+typedef struct
+#endif
+{
+    u16 aclHandle;
 } blc_prf_securityDoneEvt_t;
 
-#define PRF_EVT_CB(EVT_CALLBACK)            \
-static int app_prf_eventCb(u16 connHandle, int evtID, u8 *pData, u16 dataLen)   \
-{   \
-    for(unsigned int i=0; i<ARRAY_SIZE(EVT_CALLBACK); i++) { \
-        if(EVT_CALLBACK[i].evtId == evtID) { \
-            return EVT_CALLBACK[i].evtCb(connHandle, pData, dataLen);   \
-        }\
-    }\
-    return 0;   \
-}
+#define PRF_EVT_CB(EVT_CALLBACK)                                                  \
+    static int app_prf_eventCb(u16 connHandle, int evtID, u8 *pData, u16 dataLen) \
+    {                                                                             \
+        for (unsigned int i = 0; i < ARRAY_SIZE(EVT_CALLBACK); i++) {             \
+            if (EVT_CALLBACK[i].evtId == evtID) {                                 \
+                return EVT_CALLBACK[i].evtCb(connHandle, pData, dataLen);         \
+            }                                                                     \
+        }                                                                         \
+        return 0;                                                                 \
+    }
 
-void blc_prf_initialModule(prf_evt_cb_t evtCb);
-
+#if ((!defined(HOST_V2_ENABLE)))
+void blc_prf_initialModule(prf_evt_cb_t evtCb,void *base, u32 size);
+#else
+//void blc_prf_initialModule(prf_evt_cb_t evtCb);
+void blc_prf_initialModule(prf_evt_cb_t evtCb,void *base, u32 size);
+#endif
+/**
+ * @brief       This function retrieves the ACL connection index.
+ * @param[in]   connHandle - The connection handle.
+ * @return      int - The ACL connection index associated with the given connection handle.
+ */
 int blc_prf_getAclConnectIndex(u16 connHandle);
 
 /**
@@ -250,8 +382,11 @@ void blc_prf_main_loop(void);
  * @param[in]   param       - setting parameters.
  * @return      none.
  */
+#if ((!defined(HOST_V2_ENABLE)))
 void blc_prf_registerServiceModule(prf_bound_acl_role_enum usedAclRole, blc_prf_proc_t *pSvc, const void *param);
-
+#else
+void blc_prf_registerServiceModule(struct blc_prf_process *pSvc, const void *param);
+#endif
 /**
  * @brief       This function use read Attribute Value finish callback to high layer.
  * @param[in]   connHandle - ACL Connect.
@@ -296,7 +431,7 @@ int blc_prf_writeAttributeValue(u16 connHandle, gapc_write_cfg_t *pGapWrCfg, prf
  * @brief       This function use write Attribute Value default callback.
  * @return      none.
  */
-void blc_prf_writeAttributeValueDefaultCallback(u16 connHandle, u8 err, void* data);
+void blc_prf_writeAttributeValueDefaultCallback(u16 connHandle, u8 err, void *data);
 
 
 /**
@@ -353,3 +488,10 @@ void blc_prf_sendServiceDiscoveryFoundEvent(u16 connHandle, int svcId, u16 start
  * @return      none.
  */
 void blc_prf_sendSingleServiceDiscoveryFinishEvent(u16 connHandle, int svcId);
+
+/**
+ * @brief       This function is used for updating storage of parameters in nv. Overwrites an existing entry.
+ * @param[in]   connHandle  - ACL Connect Handle..
+ * @return      none.
+ */
+void blt_prf_updatePairingInfoByAclHandle(u16 connHandle);

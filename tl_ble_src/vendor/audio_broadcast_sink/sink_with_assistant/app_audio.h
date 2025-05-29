@@ -24,12 +24,13 @@
 #include "../sink_config.h"
 #if (SINK_VERSION == SINK_WITH_ASSISTANT_VERSION)
 
-#pragma once
+    #pragma once
 
 /**
  *  @brief  app audio event callback parameter.
  */
-typedef struct{
+typedef struct
+{
     int evtCode;
     void (*evtCb)(u8 *p, int n);
 } app_audio_controllerEvtCb_t;
@@ -61,5 +62,4 @@ int app_audio_controllerEventCallBack(u32 h, u8 *p, int n);
 void app_audio_selectBroadcastSource(bool up);
 
 
-
-#endif      //SINK_VERSION == SINK_WITH_ASSISTANT_VERSION
+#endif //SINK_VERSION == SINK_WITH_ASSISTANT_VERSION

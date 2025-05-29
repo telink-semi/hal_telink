@@ -30,76 +30,75 @@
 #include "stack/ble/ble.h"
 
 //Broadcast Source
-typedef struct{
-    u8 BIS_index;
+typedef struct
+{
+    u8                            BIS_index;
     blc_audio_codecSpecCfgParam_t codecCfg;
-}blt_BASE_BIS_param_t;
+} blt_BASE_BIS_param_t;
 
-typedef struct{
-    u8 BIS_num;
-    blc_audio_codec_id_t  codecId; //Codec ID, 06 0000 0000 mean LC3 codec
+typedef struct
+{
+    u8                            BIS_num;
+    blc_audio_codec_id_t          codecId; //Codec ID, 06 0000 0000 mean LC3 codec
     blc_audio_codecSpecCfgParam_t codecCfg;
-    blc_audio_metadataParam_t metadata;
-    blt_BASE_BIS_param_t BIS_param[0];
+    blc_audio_metadataParam_t     metadata;
+    blt_BASE_BIS_param_t          BIS_param[0];
 } blt_BASE_BIG_param_t;
 
-typedef struct{
+typedef struct
+{
     u32 presentation_delay; //Range:0x000000-0xFFFFFF  Units: us
 
-    u8 subGroupNum;
+    u8                   subGroupNum;
     blt_BASE_BIG_param_t BIG_param[0];
 } blt_bcstAudioAnnouncements_param_t;
 
-
-int blc_bap_calculateBASELength(void* base)
+int blc_bap_calculateBASELength(void *base)
 {
-    blt_bcstAudioAnnouncements_param_t* ptr = (blt_bcstAudioAnnouncements_param_t*) base;
-    int length = 8; //length:1Byte, Type:1Byte, BAAS:2Byte, Presentation Delay:3Byte, Num Subgroups:1Byte
+    blt_bcstAudioAnnouncements_param_t *ptr    = (blt_bcstAudioAnnouncements_param_t *)base;
+    int                                 length = 8; //length:1Byte, Type:1Byte, BAAS:2Byte, Presentation Delay:3Byte, Num Subgroups:1Byte
 
-    blt_BASE_BIG_param_t* bigPtr = NULL;
-    base = ptr->BIG_param;
+    blt_BASE_BIG_param_t *bigPtr = NULL;
+    base                         = ptr->BIG_param;
 
-    for(int i=0; i<ptr->subGroupNum; i++)
-    {
-        bigPtr = (blt_BASE_BIG_param_t*)base;
-        length ++;          //Num_BIS
+    for (int i = 0; i < ptr->subGroupNum; i++) {
+        bigPtr = (blt_BASE_BIG_param_t *)base;
+        length++;                               //Num_BIS
         length += sizeof(blc_audio_codec_id_t); //Codec_ID[i]
 
-        length++;   //Codec_Specific_Configuration_Length[i]
+        length++;                               //Codec_Specific_Configuration_Length[i]
         length += blc_bap_calculateCodecSpecificConfigurationLength(&bigPtr->codecCfg);
 
-        length++;   //Metadata Length[i]
+        length++;                               //Metadata Length[i]
         length += blc_bap_calculateMetadataLength(&bigPtr->metadata);
 
-        for(int j=0; j<bigPtr->BIS_num; j++)
-        {
-            blt_BASE_BIS_param_t* bisPtr = &bigPtr->BIS_param[j];
-            length ++;  //Bis index[i[j]];
-            length ++;  //Codec_Specific_Configuration_Length[i[j]];
+        for (int j = 0; j < bigPtr->BIS_num; j++) {
+            blt_BASE_BIS_param_t *bisPtr = &bigPtr->BIS_param[j];
+            length++; //Bis index[i[j]];
+            length++; //Codec_Specific_Configuration_Length[i[j]];
             length += blc_bap_calculateCodecSpecificConfigurationLength(&bisPtr->codecCfg);
         }
-        base = (u8*)base + sizeof(blt_BASE_BIG_param_t) + bigPtr->BIS_num*sizeof(blt_BASE_BIS_param_t);
+        base = (u8 *)base + sizeof(blt_BASE_BIG_param_t) + bigPtr->BIS_num * sizeof(blt_BASE_BIS_param_t);
     }
     return length;
 }
 
-u8* blc_bap_setBASEToAddress(void* base, u8* dst)
+u8 *blc_bap_setBASEToAddress(void *base, u8 *dst)
 {
-    blt_bcstAudioAnnouncements_param_t* ptr = (blt_bcstAudioAnnouncements_param_t*) base;
+    blt_bcstAudioAnnouncements_param_t *ptr = (blt_bcstAudioAnnouncements_param_t *)base;
 
-    U8_TO_STREAM(dst, blc_bap_calculateBASELength(base)-1);
+    U8_TO_STREAM(dst, blc_bap_calculateBASELength(base) - 1);
 
     U8_TO_STREAM(dst, DT_SERVICE_DATA);
     U16_TO_STREAM(dst, SERVICE_UUID_BASIC_AUDIO_ANNOUNCEMENT);
     U24_TO_STREAM(dst, ptr->presentation_delay);
 
-    blt_BASE_BIG_param_t* bigPtr = NULL;
-    base = ptr->BIG_param;
+    blt_BASE_BIG_param_t *bigPtr = NULL;
+    base                         = ptr->BIG_param;
     U8_TO_STREAM(dst, ptr->subGroupNum);
 
-    for(int i=0; i<ptr->subGroupNum; i++)
-    {
-        bigPtr = (blt_BASE_BIG_param_t*)base;
+    for (int i = 0; i < ptr->subGroupNum; i++) {
+        bigPtr = (blt_BASE_BIG_param_t *)base;
         //Num_BIS
         U8_TO_STREAM(dst, bigPtr->BIS_num);
 
@@ -114,18 +113,16 @@ u8* blc_bap_setBASEToAddress(void* base, u8* dst)
         U8_TO_STREAM(dst, blc_bap_calculateMetadataLength(&bigPtr->metadata));
         dst = blc_bap_setMetadataToAddress(&bigPtr->metadata, dst);
 
-        for(int j=0; j<bigPtr->BIS_num; j++)
-        {
-            blt_BASE_BIS_param_t* bisPtr = &bigPtr->BIS_param[j];
+        for (int j = 0; j < bigPtr->BIS_num; j++) {
+            blt_BASE_BIS_param_t *bisPtr = &bigPtr->BIS_param[j];
             //Bis index[i[j]];
             U8_TO_STREAM(dst, bisPtr->BIS_index);
             //Codec_Specific_Configuration_Length[i[j]];
             U8_TO_STREAM(dst, blc_bap_calculateCodecSpecificConfigurationLength(&bisPtr->codecCfg));
             dst = blc_bap_setCodecSpecificConfigurationToAddress(&bisPtr->codecCfg, dst);
         }
-        base = (u8*)base + sizeof(blt_BASE_BIG_param_t) + bigPtr->BIS_num*sizeof(blt_BASE_BIS_param_t);
+        base = (u8 *)base + sizeof(blt_BASE_BIG_param_t) + bigPtr->BIS_num * sizeof(blt_BASE_BIS_param_t);
     }
 
     return dst;
 }
-

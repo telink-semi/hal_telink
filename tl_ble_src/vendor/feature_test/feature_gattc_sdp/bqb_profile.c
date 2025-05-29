@@ -23,21 +23,21 @@
  *******************************************************************************************************/
 #include "app_config.h"
 #if (FEATURE_TEST_MODE == TEST_GATTC_SDP)
-#include "tl_common.h"
-#include "drivers.h"
-#include "stack/ble/ble.h"
-#include "bqb_profile.h"
+    #include "tl_common.h"
+    #include "drivers.h"
+    #include "stack/ble/ble.h"
+    #include "bqb_profile.h"
 
 
-#if (1 || BQB_PROFILE_ENABLE)
+    #if (1 || BQB_PROFILE_ENABLE)
 
-#include "app_att.h"
+        #include "app_att.h"
 
 u16 gAppBqbConnHandle = 0;
 
 volatile u16 gAppBqbUpdateFlags = 0;
-extern u8 cis_id[];
-int app_bqb_debug(unsigned char *p, int len);
+extern u8    cis_id[];
+int          app_bqb_debug(unsigned char *p, int len);
 
 void app_bqb_init(void)
 {
@@ -55,16 +55,15 @@ void app_bqb_connect(u16 aclHandle)
 
     BLT_APP_LOG("app_bqb_connect:0x%x", gAppBqbConnHandle);
 }
+
 void app_bqb_disconn(u16 aclHandle)
 {
     gAppBqbConnHandle = 0;
     BLT_APP_LOG("app_bqb_disconnect:0x%x", aclHandle);
 }
 
-
 void app_bqb_handler(void)
 {
-    
 }
 
 u16 gTempReadError = 0x00;
@@ -73,139 +72,141 @@ int app_bqb_debug(unsigned char *p, int len)
 {
     BLT_APP_STR_LOG("[APP]app_bqb_debug receive", p, len);
 
-    if(p[0] != 0x11) return 1;
+    if (p[0] != 0x11) {
+        return 1;
+    }
 
-    u16 test_case = ((p[1]<<8) | p[2]);
+    u16 test_case = ((p[1] << 8) | p[2]);
 
-    switch(test_case){
-    /******************** ASCP ********************/
+    switch (test_case) {
+        /******************** ASCP ********************/
 
-    /******************** CCP ********************/
+        /******************** CCP ********************/
 
-    /******************** CSIP ********************/
+        /******************** CSIP ********************/
 
-    /******************** CSIP ********************/
+        /******************** CSIP ********************/
 
-    /******************** VCP ********************/
-        case BQB_VCP_VC_READ:
-
-        break;
-        case BQB_VCP_VC_WRITE:
-
-        break;
-        case BQB_VCP_VC_CGGIT_SER_BV_01_C:
+        /******************** VCP ********************/
+    case BQB_VCP_VC_READ:
 
         break;
-        case BQB_VCP_VC_CGGIT_SER_BV_02_C:
+    case BQB_VCP_VC_WRITE:
 
         break;
-        case BQB_VCP_VC_CGGIT_SER_BV_03_C:
+    case BQB_VCP_VC_CGGIT_SER_BV_01_C:
 
         break;
-        case BQB_VCP_VC_CGGIT_CHA_BV_01_C:
+    case BQB_VCP_VC_CGGIT_SER_BV_02_C:
 
         break;
-        case BQB_VCP_VC_CGGIT_CHA_BV_02_C:
+    case BQB_VCP_VC_CGGIT_SER_BV_03_C:
 
         break;
-        case BQB_VCP_VC_CGGIT_CHA_BV_03_C:
+    case BQB_VCP_VC_CGGIT_CHA_BV_01_C:
 
         break;
-        case BQB_VCP_VC_CGGIT_CHA_BV_04_C:
+    case BQB_VCP_VC_CGGIT_CHA_BV_02_C:
 
         break;
-        case BQB_VCP_VC_CGGIT_CHA_BV_05_C:
+    case BQB_VCP_VC_CGGIT_CHA_BV_03_C:
 
         break;
-        case BQB_VCP_VC_CGGIT_CHA_BV_06_C:
+    case BQB_VCP_VC_CGGIT_CHA_BV_04_C:
 
         break;
-        case BQB_VCP_VC_CGGIT_CHA_BV_07_C:
+    case BQB_VCP_VC_CGGIT_CHA_BV_05_C:
 
         break;
-        case BQB_VCP_VC_CGGIT_CHA_BV_08_C:
+    case BQB_VCP_VC_CGGIT_CHA_BV_06_C:
 
         break;
-        case BQB_VCP_VC_CGGIT_CHA_BV_09_C:
+    case BQB_VCP_VC_CGGIT_CHA_BV_07_C:
 
         break;
-        case BQB_VCP_VC_CGGIT_CHA_BV_10_C:
+    case BQB_VCP_VC_CGGIT_CHA_BV_08_C:
 
         break;
-        case BQB_VCP_VC_CGGIT_CHA_BV_11_C:
+    case BQB_VCP_VC_CGGIT_CHA_BV_09_C:
 
         break;
-        case BQB_VCP_VC_CGGIT_CHA_BV_12_C:
+    case BQB_VCP_VC_CGGIT_CHA_BV_10_C:
 
         break;
-        case BQB_VCP_VC_CGGIT_CHA_BV_13_C:
+    case BQB_VCP_VC_CGGIT_CHA_BV_11_C:
 
         break;
-        //SPE
-        case BQB_VCP_VC_SPE_BI_01_C:
+    case BQB_VCP_VC_CGGIT_CHA_BV_12_C:
 
         break;
-        case BQB_VCP_VC_SPE_BI_02_C:
+    case BQB_VCP_VC_CGGIT_CHA_BV_13_C:
 
         break;
-        case BQB_VCP_VC_SPE_BI_03_C:
+    //SPE
+    case BQB_VCP_VC_SPE_BI_01_C:
 
         break;
-        case BQB_VCP_VC_SPE_BI_04_C:
+    case BQB_VCP_VC_SPE_BI_02_C:
 
         break;
-        case BQB_VCP_VC_SPE_BI_05_C:
+    case BQB_VCP_VC_SPE_BI_03_C:
 
         break;
-        case BQB_VCP_VC_SPE_BI_06_C:
+    case BQB_VCP_VC_SPE_BI_04_C:
 
         break;
-        case BQB_VCP_VC_SPE_BI_07_C:
+    case BQB_VCP_VC_SPE_BI_05_C:
 
         break;
-        case BQB_VCP_VC_SPE_BI_08_C:
+    case BQB_VCP_VC_SPE_BI_06_C:
 
         break;
-        case BQB_VCP_VC_SPE_BI_09_C:
+    case BQB_VCP_VC_SPE_BI_07_C:
 
         break;
-        case BQB_VCP_VC_SPE_BI_10_C:
+    case BQB_VCP_VC_SPE_BI_08_C:
 
         break;
-        case BQB_VCP_VC_SPE_BI_11_C:
+    case BQB_VCP_VC_SPE_BI_09_C:
 
         break;
-        case BQB_VCP_VC_SPE_BI_12_C:
+    case BQB_VCP_VC_SPE_BI_10_C:
 
         break;
-        case BQB_VCP_VC_SPE_BI_13_C:
+    case BQB_VCP_VC_SPE_BI_11_C:
 
         break;
-        case BQB_VCP_VC_SPE_BI_14_C:
+    case BQB_VCP_VC_SPE_BI_12_C:
 
         break;
-        case BQB_VCP_VC_SPE_BI_15_C:
+    case BQB_VCP_VC_SPE_BI_13_C:
 
         break;
-        case BQB_VCP_VC_SPE_BI_16_C:
+    case BQB_VCP_VC_SPE_BI_14_C:
 
         break;
-        case BQB_VCP_VC_SPE_BI_17_C:
+    case BQB_VCP_VC_SPE_BI_15_C:
 
         break;
-        case BQB_VCP_VC_SPE_BI_18_C:
+    case BQB_VCP_VC_SPE_BI_16_C:
 
         break;
-        case BQB_VCP_VC_SPE_BI_19_C:
+    case BQB_VCP_VC_SPE_BI_17_C:
 
         break;
-        case BQB_VCP_VC_SPE_BI_20_C:
+    case BQB_VCP_VC_SPE_BI_18_C:
+
+        break;
+    case BQB_VCP_VC_SPE_BI_19_C:
+
+        break;
+    case BQB_VCP_VC_SPE_BI_20_C:
 
         break;
 
-        default:
-            blc_ll_disconnect(gAppBqbConnHandle, HCI_ERR_REMOTE_USER_TERM_CONN);
-            break;
+    default:
+        blc_ll_disconnect(gAppBqbConnHandle, HCI_ERR_REMOTE_USER_TERM_CONN);
+        break;
     }
 
 
@@ -213,6 +214,5 @@ int app_bqb_debug(unsigned char *p, int len)
 }
 
 
-#endif //BQB_PROFILE_ENABLE
-#endif //#if (FEATURE_TEST_MODE == TEST_GATTC_SDP)
-
+    #endif //BQB_PROFILE_ENABLE
+#endif     //#if (FEATURE_TEST_MODE == TEST_GATTC_SDP)

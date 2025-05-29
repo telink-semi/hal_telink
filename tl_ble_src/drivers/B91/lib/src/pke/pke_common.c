@@ -28,7 +28,6 @@
 /********* pke version:1.0 *********/
 #include "lib/include/pke/pke_common.h"
 
-
 /**
  * @brief       copy uint32 buffer.
  * @param[out]  dst     - output word buffer.
@@ -40,10 +39,8 @@ void uint32_copy(unsigned int *dst, unsigned int *src, unsigned int wordLen)
 {
     unsigned int i;
 
-    if(dst != src)
-    {
-        for(i=0; i<wordLen; i++)
-        {
+    if (dst != src) {
+        for (i = 0; i < wordLen; i++) {
             dst[i] = src[i];
         }
     }
@@ -57,8 +54,7 @@ void uint32_copy(unsigned int *dst, unsigned int *src, unsigned int wordLen)
  */
 void uint32_clear(unsigned int *a, unsigned int wordLen)
 {
-    while(wordLen)
-    {
+    while (wordLen) {
         a[--wordLen] = 0;
     }
 }
@@ -73,36 +69,27 @@ void uint32_clear(unsigned int *a, unsigned int wordLen)
  */
 void reverse_word(unsigned char *in, unsigned char *out, unsigned int bytelen)
 {
-    unsigned int i, len;
-    unsigned char tmp;
+    unsigned int   i, len;
+    unsigned char  tmp;
     unsigned char *p = in;
 
-    if(in == out)
-    {
-        while(bytelen>0)
-        {
-            tmp=*p;
-            *p=*(p+3);
-            *(p+3)=tmp;
-            p+=1;
-            tmp=*p;
-            *p=*(p+1);
-            *(p+1)=tmp;
-            bytelen-=4;
-            p+=3;
+    if (in == out) {
+        while (bytelen > 0) {
+            tmp      = *p;
+            *p       = *(p + 3);
+            *(p + 3) = tmp;
+            p += 1;
+            tmp      = *p;
+            *p       = *(p + 1);
+            *(p + 1) = tmp;
+            bytelen -= 4;
+            p += 3;
         }
-    }
-    else
-    {
-        for (i = 0; i < bytelen; i++)
-        {
-            len = i >> 2;
-            len = len << 3;
+    } else {
+        for (i = 0; i < bytelen; i++) {
+            len    = i >> 2;
+            len    = len << 3;
             out[i] = p[len + 3 - i];
         }
     }
 }
-
-
-
-

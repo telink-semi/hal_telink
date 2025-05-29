@@ -23,18 +23,19 @@
  *******************************************************************************************************/
 #pragma once
 
-#define BLT_CAP_LOG(fmt, ...)           BLC_AUDIO_PRF_DBG(DBG_PRF_MASK_CAP_LOG, "[CAP]"fmt, ##__VA_ARGS__)
+#define BLT_CAP_LOG(fmt, ...) BLC_AUDIO_PRF_DBG(DBG_PRF_MASK_CAP_LOG, "[CAP]" fmt, ##__VA_ARGS__)
 
 
 extern const u8 gAppAudioAclMaxNum;
 extern const u8 gAppAudioAclCentralNum;
 extern const u8 gAppAudioAclPeripheralNum;
 
-typedef struct{
+typedef struct
+{
     blc_adv_ltv_t ltv;
-    u16 casUuid;
-    u8  announcementType;
-}blc_capAnnouncement_t;
+    u16           casUuid;
+    u8            announcementType;
+} blc_capAnnouncement_t;
 
 extern const blc_capAnnouncement_t capTargetAnnouncement;
 
@@ -123,6 +124,3 @@ void blc_cap_initBcstAcceptor(void);
  * @return      none.
  */
 void blc_cap_initAudioAcceptor(void);
-
-
-

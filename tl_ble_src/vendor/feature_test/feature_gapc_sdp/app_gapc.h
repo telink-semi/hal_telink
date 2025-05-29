@@ -25,4 +25,3 @@
 
 
 void app_gap_init(u16 connHandle);
-

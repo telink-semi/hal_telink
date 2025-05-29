@@ -39,6 +39,7 @@
 #include "../../lib/include/stimer.h"
 #include "../../lib/include/clock.h"
 #include "../../compatibility_pack/cmpt.h"
+#include "../../lib/include/rf/rf_common.h"
 #include "../ext_misc.h"
 #include "../ext_pm.h"
 #include "ext_lib.h"
@@ -63,8 +64,7 @@ _attribute_data_retention_sec_  unsigned int        ota_firmware_max_size = (MUL
 _attribute_data_retention_sec_  unsigned int        ota_program_offset = 0;//
 
 extern drv_api_status_e efuse_read(unsigned char addr, unsigned char* buff, unsigned short len);
-
-extern void rf_turn_off_internal_cap(void);
+extern void efuse_check_protection_code(unsigned char sdk_version);
 /**
  * @brief     This function servers to get protection code from EFUSE(byte 104).
  * @return    The protection code value.
@@ -242,32 +242,32 @@ static _attribute_no_inline_ void cpu_wakeup_no_deepretn_back_init(void)
  */
 _attribute_ram_code_sec_noinline_ void sys_init(power_mode_e power_mode, vbat_type_e vbat_v, cap_typedef_e cap)
 {
-    #if 0
-        /**
-         * reset function will be cleared by set "1",which is different from the previous configuration.
-         * This setting turns off the TRNG and NPE modules in order to test power consumption.The current
-         * decrease about 3mA when those two modules be turn off.changed by zhiwei,confirmed by kaixin.20200828.
-         */
-        reg_rst = 0xffffffff;
-        reg_clk_en = 0xffffffff;
+#if 0
+    /*
+     * Reset function will be cleared by set "1",which is different from the previous configuration.
+     * This setting turns off the TRNG and NPE modules in order to test power consumption.The current
+     * decrease about 3mA when those two modules be turn off.changed by zhiwei,confirmed by kaixin.20200828.
+     */
+    reg_rst = 0xffffffff;
+    reg_clk_en = 0xffffffff;
 
-        reg_rst_1 = 0xffffffff;
-        reg_clk_en_1 = 0xffffffff;
-    #else
-        /*
-         * Reset function will be cleared by set "1".
-         * Turn off the following modules compared to the default values: sspi, brom.
-         * Turn on the following modules compared to the default values: uart0, uart1, uart2, stimer, dma, algm.
-         * Overall, the enabled modules here includes: dbgen, swires, stimer, dma, algm, machinetime, mcu, lm, trace, mspi, cclk.
-         * uart0, uart1, uart2, efuse, pwm, timer.
-         * among them, the uart, pwm, and timer modules do not have appropriate positions to enable them in the module interface, so they are also enabled here.
-         */
-        reg_rst      =  0x92390ed4;             //reset_0_dft:  0x96388080 -> 0x92380ed4
-        reg_clk_en   =  0x1a312ef4;             //clken_0_dft:  0x1e30a0a0 -> 0x1a312ef4
+    reg_rst_1 = 0xffffffff;
+    reg_clk_en_1 = 0xffffffff;
+#else
+    /*
+     * Reset function will be cleared by set "1".
+     * Turn off the following modules compared to the default values: sspi, brom.
+     * Turn on the following modules compared to the default values: uart0, uart1, uart2, stimer, dma, algm.
+     * Overall, the enabled modules here includes: dbgen, swires, stimer, dma, algm, machinetime, mcu, lm, trace, mspi, cclk.
+     * uart0, uart1, uart2, efuse, pwm, timer.
+     * among them, the uart, pwm, and timer modules do not have appropriate positions to enable them in the module interface, so they are also enabled here.
+     */
+    reg_rst    = 0x92390ed4;   //reset_0_dft:  0x96388080 -> 0x92380ed4
+    reg_clk_en = 0x1a312ef4;   //clken_0_dft:  0x1e30a0a0 -> 0x1a312ef4
 
-        reg_rst_1    =  0x00000204;             //reset_1_dft:  0x00000004 -> 0x00000204
-        reg_clk_en_1 =  0x00000244;             //clken_1_dft:  0x00000044 -> 0x00000244
-    #endif
+    reg_rst_1    = 0x00000204; //reset_1_dft:  0x00000004 -> 0x00000204
+    reg_clk_en_1 = 0x00000244; //clken_1_dft:  0x00000044 -> 0x00000244
+#endif
     /*
      * 1. Before calling the function pm_wait_xtal_ready, you need to ensure that the cclk is set to 24M,
      * otherwise a reboot may occur (for example, the following use case: when the flash is running a cclk>24M program,
@@ -276,7 +276,7 @@ _attribute_ram_code_sec_noinline_ void sys_init(power_mode_e power_mode, vbat_ty
      * 2. Before calling the function crystal_manual_settle, you need to ensure that the cclk is set to 24M,
      * cause the crystal_manual_settle will power down xtal first then power it up.(add by jilong.liu at 20240513)
      */
-    analog_write_reg8(areg_aon_0x05, analog_read_reg8(areg_aon_0x05) & ~(FLD_24M_RC_PD));//power on 24M RC
+    analog_write_reg8(areg_aon_0x05, analog_read_reg8(areg_aon_0x05) & ~(FLD_24M_RC_PD)); //power on 24M RC
     clock_set_all_clock_to_default();
 
     //A0: 0x00, A1: 0x01
@@ -284,10 +284,10 @@ _attribute_ram_code_sec_noinline_ void sys_init(power_mode_e power_mode, vbat_ty
 
     //If the crystal oscillator uses an external capacitor, the internal capacitor must be turned off at the very beginning,
     //otherwise it will affect the start-up.(add by bingyu.li, confirmed by wenfeng.lou 20240621)
-    if(cap != INTERNAL_CAP_XTAL24M)
-    {
+    if (cap != INTERNAL_CAP_XTAL24M) {
         rf_turn_off_internal_cap();
     }
+
     if (g_chip_version == CHIP_VERSION_A0) {
         /*
          * For version A0, the RC 24M is high to 32M, register ana0x16<1:0> needs to be configured as 2b'01, the frequency is about 25MHz.
@@ -295,16 +295,16 @@ _attribute_ram_code_sec_noinline_ void sys_init(power_mode_e power_mode, vbat_ty
          */
         analog_write_reg8(0x16, (analog_read_reg8(0x16) & 0xfc) | 0x01);
     }
+
     //must to set xo_quick_settle with manual and wait it stable(added by jilong.liu, confirmed by wenfeng 20240320)
     crystal_manual_settle();
 
     g_areg_aon_7f = analog_read_reg8(areg_aon_0x7f);
-    if(!(g_areg_aon_7f & FLD_BOOTFROMBROM)){
+    if (!(g_areg_aon_7f & FLD_BOOTFROMBROM)) {
         g_pm_status_info.mcu_status = MCU_DEEPRET_BACK;
     }
 
     pm_set_power_mode(power_mode);
-
 
     /*
      *                      poweron_dft:    0x7f -> 0x3f.
@@ -330,26 +330,21 @@ _attribute_ram_code_sec_noinline_ void sys_init(power_mode_e power_mode, vbat_ty
      * <7>:dig_ret_pd  default:1,->0 Power up of retention LDO.
      */
     /*
-     * For Buteo, the retention ldo should turn on before use cause it need more time to be stable.
+     * For tl321x, the retention ldo should turn on before use cause it need more time to be stable.
      * The follow chip version will not change this situation.
      * (modified by jilong.liu, confirmed by wenfeng 20240620)
      */
     analog_write_reg8(areg_aon_0x06, (analog_read_reg8(areg_aon_0x06) | FLD_PD_SPD_LDO | FLD_PD_VBAT_SW) & ~(FLD_PD_DIG_RET_LDO | vbat_v));
 
-    g_pm_status_info.wakeup_src = pm_get_wakeup_src();
+    g_pm_status_info.wakeup_src    = pm_get_wakeup_src();
     g_pm_status_info.is_pad_wakeup = (g_pm_status_info.wakeup_src & BIT(0));
 
     g_pm_vbat_v = vbat_v >> 3;
 
     if (g_chip_version == CHIP_VERSION_A0) {
         //For version A0, the theoretical value is low, and the current enumeration value is set after actual testing.
-        pm_set_dig_ldo_voltage(DIG_LDO_TRIM_1P010V);//trim VDDDEC to 1V
-        pm_set_1p25v(TRIM_1P25V_TO_1P25V);//trim VDD1P25 to 1.25V
-    }
-
-    if(g_pm_status_info.mcu_status != MCU_STATUS_DEEPRET_BACK)
-    {
-
+        pm_set_dig_ldo_voltage(DIG_LDO_TRIM_1P010V); //trim VDDDEC to 1V
+        pm_set_1p25v(TRIM_1P25V_TO_1P25V);           //trim VDD1P25 to 1.25V
     }
 
     /*
@@ -359,43 +354,48 @@ _attribute_ram_code_sec_noinline_ void sys_init(power_mode_e power_mode, vbat_ty
     */
     analog_write_reg8(areg_0x8c, 0x02);
 
+    //Before powering up the zb, you need to make sure that the input function of PA2 is disable, otherwise it may cause the RF module to not have clock.
+    //See jira for details:BUT-53.(add by weihua.zhang, confirmed by peng.hao 20250101)
+    reg_gpio_pa_ie &= (~0x04);
+    pm_set_dig_module_power_switch(FLD_PD_ZB_EN, PM_POWER_UP);
+
     //The xo_ready_ana signal fails, and the tick value of the clock is used to determine whether the crystal oscillator is stable.
     pm_wait_xtal_ready(0x00);
 
     if(g_pm_status_info.mcu_status == MCU_STATUS_DEEPRET_BACK)
     {
-        //pm_stimer_recover();
-        if(g_clk_32k_src == CLK_32K_XTAL) {
-            pm_stimer_recover();
-        } else {
-            stimer_set_run_upon_nxt_32k_enable();   //system tick set upon next 32k posedge.
-            stimer_set_auto_enable_mode();
+#if (_2P4G_DEMO_ || USE_DRIVER_PM)
+        pm_stimer_recover();
+#else
+        stimer_set_run_upon_nxt_32k_enable();   //system tick set upon next 32k posedge.
+        stimer_set_auto_enable_mode();
 
-            unsigned int deepRet_32k_tick = clock_get_32k_tick();
-            unsigned int deepRet_tick = pm_tim_recover(deepRet_32k_tick + 1); // pm_tim_recover_32k_rc
+        unsigned int deepRet_32k_tick = clock_get_32k_tick();
+        unsigned int deepRet_tick = pm_tim_recover(deepRet_32k_tick + 1); // pm_tim_recover_32k_rc
 
 
-            stimer_set_tick(deepRet_tick+1);
-            //wait command set delay done upon next 32k posedge.
-            //if not using status bit, wait at least 1 32k cycle to set register r_run_upon_next_32k back to 0, or before next normal set
-            stimer_wait_write_done();               //system timer set done status upon next 32k posedge
-            stimer_set_run_upon_nxt_32k_disable();  //normal system tick update
+        stimer_set_tick(deepRet_tick+1);
+        //wait command set delay done upon next 32k posedge.
+        //if not using status bit, wait at least 1 32k cycle to set register r_run_upon_next_32k back to 0, or before next normal set
+        stimer_wait_write_done();               //system timer set done status upon next 32k posedge
+        stimer_set_run_upon_nxt_32k_disable();  //normal system tick update
 
-            stimer_32k_tracking_enable();
-        }
-    }else{
-        #if SYS_TIMER_AUTO_MODE
-            stimer_enable(STIMER_AUTO_MODE_W_TRIG, 0x01);
-            stimer_32k_tracking_enable();   //enable 32k cal
-        #else
-            stimer_enable(STIMER_MANUAL_MODE, 0x01);
-            stimer_32k_tracking_enable();   //enable 32k cal
-        #endif
+        stimer_32k_tracking_enable();
+#endif
+    } else {
+#if SYS_TIMER_AUTO_MODE
+        stimer_enable(STIMER_AUTO_MODE_W_TRIG, 0x01);
+        stimer_32k_tracking_enable(); //enable 32k cal
+#else
+        stimer_enable(STIMER_MANUAL_MODE, 0x01);
+        stimer_32k_tracking_enable(); //enable 32k cal
+#endif
 
         cpu_wakeup_no_deepretn_back_init(); // to save ramcode
 
         //check protection code
-        //efuse_check_protection_code();//BLE move by SunWei. //todo
+        u8 ble_sdk_version = 7; //Buteo BLE SDK version use 7.refer to the relate email
+        efuse_check_protection_code(ble_sdk_version); //0:driver sdk  0xff:sdk_version_ignore
 
         clock_cal_24m_rc();
     }
@@ -456,17 +456,8 @@ void pm_32k_rc_offset_init(void)
 _attribute_ram_code_ void pm_ble_update_32k_rc_sleep_tick (unsigned int tick_32k, unsigned int tick)
 {
     pmbcd.rc32_rt = tick_32k - pmbcd.rc32_wakeup; //rc32_rt not used
-
-    // Why PM_OPTIMIZATION_EN_0, because there might be a better solution. For example: PM_OPTIMIZATION_EN_1
-#ifdef PM_OPTIMIZATION_EN_0
-    /*PM function optimization solves the timeout problem in the case of long mainloop times*/
-    extern unsigned int now_tick_stimer;
-    if (pmbcd.calib || pmbcd.ref_no > 20 || !pmbcd.ref_tick || ((tick_32k - pmbcd.ref_tick_32k) & 0xfffffff) > 32 * 300 || \
-    (unsigned int)(tick - now_tick_stimer - 10*SYSTEM_TIMER_TICK_1MS) < BIT(30))//3 mS
-#else
-    if (pmbcd.calib || pmbcd.ref_no > 20 || !pmbcd.ref_tick || ((tick_32k - pmbcd.ref_tick_32k) & 0xfffffff) > 32 * 3000)//3S#endif
-#endif
-   {
+    if (pmbcd.calib || pmbcd.ref_no > 20 || !pmbcd.ref_tick || ((tick_32k - pmbcd.ref_tick_32k) & 0xfffffff) > 32 * 3000)//3S
+    {
         pmbcd.calib = 0;
         pmbcd.ref_tick_32k = tick_32k;
         pmbcd.ref_tick = tick | 1;
@@ -619,14 +610,6 @@ void blc_pm_select_internal_32k_crystal(void)
     pm_tim_recover          = pm_tim_recover_32k_rc;
 
     blt_miscParam.pm_enter_en   = 1; // allow enter pm, 32k rc does not need to wait for 32k clk to be stable
-}
-
-void blc_pm_select_external_32k_crystal(void)
-{
-    cpu_sleep_wakeup        = cpu_sleep_wakeup_32k_xtal;
-    //pm_tim_recover          = pm_tim_recover_32k_rc;
-    g_clk_32k_src = CLK_32K_XTAL;
-    blt_miscParam.pad32k_en   = 1; // allow enter pm, 32k rc does not need to wait for 32k clk to be stable
 }
 
 

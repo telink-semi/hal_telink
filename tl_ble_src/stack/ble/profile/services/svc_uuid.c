@@ -27,31 +27,33 @@
 #include "stack/ble/host/att/att_uuid.h"
 #include "stack/ble/host/gatt/gatt.h"
 
-const unsigned short attr16UuidLen = 2;
-const unsigned short attr128UuidLen = 16;
-const unsigned short gattIncludeValueLen    =   6;
+const unsigned short attr16UuidLen       = 2;
+const unsigned short attr128UuidLen      = 16;
+const unsigned short gattIncludeValueLen = 6;
 
 const unsigned short characteristicPropertiesLen = CHARACTERISTIC_PROPERTIES_LENGTH;
 
-const unsigned char charPropRead = CHAR_PROP_READ;
-const unsigned char charPropReadWrite = CHAR_PROP_READ | CHAR_PROP_WRITE;
-const unsigned char charPropReadWriteWithout = CHAR_PROP_READ | CHAR_PROP_WRITE_WITHOUT_RSP;
-const unsigned char charPropReadWriteWriteWithout = CHAR_PROP_READ | CHAR_PROP_WRITE | CHAR_PROP_WRITE_WITHOUT_RSP;
+const unsigned char charPropRead                        = CHAR_PROP_READ;
+const unsigned char charPropReadWrite                   = CHAR_PROP_READ | CHAR_PROP_WRITE;
+const unsigned char charPropReadWriteWithout            = CHAR_PROP_READ | CHAR_PROP_WRITE_WITHOUT_RSP;
+const unsigned char charPropReadWriteWriteWithout       = CHAR_PROP_READ | CHAR_PROP_WRITE | CHAR_PROP_WRITE_WITHOUT_RSP;
 const unsigned char charPropReadWriteWriteWithoutNotify = CHAR_PROP_READ | CHAR_PROP_WRITE | CHAR_PROP_WRITE_WITHOUT_RSP | CHAR_PROP_NOTIFY;
-const unsigned char charPropReadWriteNotify = CHAR_PROP_READ | CHAR_PROP_WRITE | CHAR_PROP_NOTIFY;
-const unsigned char charPropReadWriteWithoutNotify = CHAR_PROP_READ | CHAR_PROP_WRITE_WITHOUT_RSP | CHAR_PROP_NOTIFY;
-const unsigned char charPropReadNotfiy = CHAR_PROP_READ | CHAR_PROP_NOTIFY;
+const unsigned char charPropReadWriteNotify             = CHAR_PROP_READ | CHAR_PROP_WRITE | CHAR_PROP_NOTIFY;
+const unsigned char charPropReadWriteWithoutNotify      = CHAR_PROP_READ | CHAR_PROP_WRITE_WITHOUT_RSP | CHAR_PROP_NOTIFY;
+const unsigned char charPropReadNotfiy                  = CHAR_PROP_READ | CHAR_PROP_NOTIFY;
 
 
-const unsigned char charPropWrite = CHAR_PROP_WRITE;
-const unsigned char charPropWriteWithout = CHAR_PROP_WRITE_WITHOUT_RSP;
-const unsigned char charPropWriteWriteWithout = CHAR_PROP_WRITE | CHAR_PROP_WRITE_WITHOUT_RSP;
-const unsigned char charPropWriteIndicate = CHAR_PROP_WRITE | CHAR_PROP_INDICATE;
-const unsigned char charPropWriteNotifyIndicate = CHAR_PROP_WRITE | CHAR_PROP_NOTIFY | CHAR_PROP_INDICATE;
+const unsigned char charPropWrite                   = CHAR_PROP_WRITE;
+const unsigned char charPropWriteWithout            = CHAR_PROP_WRITE_WITHOUT_RSP;
+const unsigned char charPropWriteWriteWithout       = CHAR_PROP_WRITE | CHAR_PROP_WRITE_WITHOUT_RSP;
+const unsigned char charPropWriteIndicate           = CHAR_PROP_WRITE | CHAR_PROP_INDICATE;
+const unsigned char charPropWriteNotifyIndicate     = CHAR_PROP_WRITE | CHAR_PROP_NOTIFY | CHAR_PROP_INDICATE;
 const unsigned char charPropWriteWriteWithoutNotify = CHAR_PROP_WRITE | CHAR_PROP_WRITE_WITHOUT_RSP | CHAR_PROP_NOTIFY;
+const unsigned char charPropWriteWithoutIndicate = CHAR_PROP_WRITE_WITHOUT_RSP | CHAR_PROP_INDICATE;
 
-const unsigned char charPropNotify = CHAR_PROP_NOTIFY;
-const unsigned char charPropIndicate = CHAR_PROP_INDICATE;
+const unsigned char charPropNotify         = CHAR_PROP_NOTIFY;
+const unsigned char charPropIndicate       = CHAR_PROP_INDICATE;
+const unsigned char charPropNotifyIndicate = CHAR_PROP_NOTIFY | CHAR_PROP_INDICATE;
 
-const unsigned char clientCharacteristicConfiguration[2] = {0x00, 0x00};
+const unsigned char  clientCharacteristicConfiguration[2] = {0x00, 0x00};
 const unsigned short clientCharacteristicConfigurationLen = sizeof(clientCharacteristicConfiguration);

@@ -449,6 +449,8 @@ typedef enum{
 
 #define uart_rtx_pin_tx_trig(uart_num)  uart_clr_irq_status(uart_num,UART_TXDONE_IRQ_STATUS)
 
+//for compatibility
+#define uart_reset   uart_hw_fsm_reset
 /**********************************************************************************************************************
  *                                     global variable declaration                                                    *
  *********************************************************************************************************************/
@@ -477,13 +479,15 @@ static inline unsigned char uart_get_txfifo_num(uart_num_e uart_num)
 }
 
 /**
- * @brief     This function resets the UART module.
+ * @brief     uart finite state machine reset(the configuration register is still there and does not need to be reconfigured),
+ *            For compatibility define uart_reset uart_hw_fms_reset, uart_hw_fms_reset is used when the driver is invoked (no matter at the driver layer or demo layer),
+ *            before using UART, it is needed to call uart_hw_fsm_reset() to avoid affecting the use of UART.
  * @param[in] uart_num  - UART0/UART1/UART2/UART3.
  * @return    none
  * @note
  *            this function will clear rx and tx status and fifo.
  */
-static inline void uart_reset(uart_num_e uart_num)
+static inline void uart_hw_fsm_reset(uart_num_e uart_num)
 {
     switch (uart_num)
     {
@@ -618,11 +622,11 @@ static inline void uart_clr_irq_mask(uart_num_e uart_num,uart_irq_mask_e mask)
  * @param[in] uart_num  - UART0/UART1/UART2/UART3.
  * @return    none.
  * @note      Note the following:
- *            -# After calling the uart_reset interface, uart_clr_tx_index and uart_clr_rx_index must be called to clear the read/write pointer, \n
- *               after the uart_reset interface is invoked, the hardware read and write Pointers are cleared to zero. \n
+ *            -# After calling the uart_hw_fsm_reset interface, uart_clr_tx_index and uart_clr_rx_index must be called to clear the read/write pointer, \n
+ *               after the uart_hw_fsm_reset interface is invoked, the hardware read and write Pointers are cleared to zero. \n
  *               Therefore, the software read and write Pointers are cleared to ensure logical correctness.
  *            -# After waking up from suspend, you must call uart_clr_tx_index and uart_clr_rx_index to clear read and write pointers, \n
- *               because after suspend wakes up, the chip is equivalent to performing a uart_reset, \n
+ *               because after suspend wakes up, the chip is equivalent to performing a uart_hw_fsm_reset, \n
  *               so the software read and write pointer also needs to be cleared to zero.
  */
 static inline void uart_clr_rx_index(uart_num_e uart_num)
@@ -637,11 +641,11 @@ static inline void uart_clr_rx_index(uart_num_e uart_num)
  * @param[in] uart_num  - UART0/UART1/UART2/UART3.
  * @return    none.
  * @note      Note the following:
- *            -# After calling the uart_reset interface, uart_clr_tx_index and uart_clr_rx_index must be called to clear the read/write pointer, \n
- *               after the uart_reset interface is invoked, the hardware read and write Pointers are cleared to zero. \n
+ *            -# After calling the uart_hw_fsm_reset interface, uart_clr_tx_index and uart_clr_rx_index must be called to clear the read/write pointer, \n
+ *               after the uart_hw_fsm_reset interface is invoked, the hardware read and write Pointers are cleared to zero. \n
  *               Therefore, the software read and write Pointers are cleared to ensure logical correctness.
  *            -# After waking up from suspend, you must call uart_clr_tx_index and uart_clr_rx_index to clear read and write pointers, \n
- *               because after suspend wakes up, the chip is equivalent to performing a uart_reset, \n
+ *               because after suspend wakes up, the chip is equivalent to performing a uart_hw_fsm_reset, \n
  *               so the software read and write pointer also needs to be cleared to zero.
  */
 static inline void uart_clr_tx_index(uart_num_e uart_num)

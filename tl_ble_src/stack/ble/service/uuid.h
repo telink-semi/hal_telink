@@ -21,116 +21,114 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-#pragma  once
+#pragma once
 
 #include "stack/ble/host/att/att_uuid.h"
-
 /**
  *  @brief Definition for GATT Services UUID
  */
-#define SERVICE_UUID_GENERIC_ACCESS                             0x1800 //Generic Access Service
-#define SERVICE_UUID_GENERIC_ATTRIBUTE                          0x1801 //Generic Attribute Service
-#define SERVICE_UUID_IMMEDIATE_ALERT                            0x1802 //Immediate Alert Service
-#define SERVICE_UUID_LINK_LOSS                                  0x1803 //Link Loss Service
-#define SERVICE_UUID_TX_POWER                                   0x1804 //Tx Power Service
-#define SERVICE_UUID_CURRENT_TIME                               0x1805 //Current Time Service
-#define SERVICE_UUID_REFERENCE_TIME_UPDATE                      0x1806 //Reference Time Update Service
-#define SERVICE_UUID_NEXT_DST_CHANGE                            0x1807 //Next DST Change Service
-#define SERVICE_UUID_GLUCOSE                                    0x1808 //Glucose Service
-#define SERVICE_UUID_HEALTH_THERMOMETER                         0x1809 //Health Thermometer Service
-#define SERVICE_UUID_DEVICE_INFORMATION                         0x180A //Device Information Service
-#define SERVICE_UUID_HEART_RATE                                 0x180D //Heart Rate Service
-#define SERVICE_UUID_PHONE_ALERT_STATUS                         0x180E //Phone Alert Status Service
-#define SERVICE_UUID_BATTERY                                    0x180F //Battery Service
-#define SERVICE_UUID_BLOOD_PRESSURE                             0x1810 //Blood Pressure Service
-#define SERVICE_UUID_ALERT_NOTIFICATION                         0x1811 //Alert Notification Service
-#define SERVICE_UUID_HUMAN_INTERFACE_DEVICE                     0x1812 //Human Interface Device Service
-#define SERVICE_UUID_SCAN_PARAMETERS                            0x1813 //Scan Parameters Service
-#define SERVICE_UUID_RUNNING_SPEED_AND_CADENCE                  0x1814 //Running Speed and Cadence Service
-#define SERVICE_UUID_AUTOMATION_IO                              0x1815 //Automation IO Service
-#define SERVICE_UUID_CYCLING_SPEED_AND_CADENCE                  0x1816 //Cycling Speed and Cadence Service
-#define SERVICE_UUID_CYCLING_POWER                              0x1818 //Cycling Power Service
-#define SERVICE_UUID_LOCATION_AND_NAVIGATION                    0x1819 //Location and Navigation Service
-#define SERVICE_UUID_ENVIRONMENTAL_SENSING                      0x181A //Environmental Sensing Service
-#define SERVICE_UUID_BODY_COMPOSITION                           0x181B //Body Composition Service
-#define SERVICE_UUID_USER_DATA                                  0x181C //User Data Service
-#define SERVICE_UUID_WEIGHT_SCALE                               0x181D //Weight Scale Service
-#define SERVICE_UUID_BOND_MANAGEMENT                            0x181E //Bond Management Service
-#define SERVICE_UUID_CONTINUOUS_GLUCOSE_MONITORING              0x181F //Continuous Glucose Monitoring Service
-#define SERVICE_UUID_INTERNET_PROTOCOL_SUPPORT                  0x1820 //Internet Protocol Support Service
-#define SERVICE_UUID_INDOOR_POSITIONING                         0x1821 //Indoor Positioning Service
-#define SERVICE_UUID_PULSE_OXIMETER                             0x1822 //Pulse Oximeter Service
-#define SERVICE_UUID_HTTP_PROXY                                 0x1823 //HTTP Proxy Service
-#define SERVICE_UUID_TRANSPORT_DISCOVERY                        0x1824 //Transport Discovery Service
-#define SERVICE_UUID_OBJECT_TRANSFER                            0x1825 //Object Transfer Service
-#define SERVICE_UUID_FITNESS_MACHINE                            0x1826 //Fitness Machine Service
-#define SERVICE_UUID_MESH_PROVISIONING                          0x1827 //Mesh Provisioning Service
-#define SERVICE_UUID_MESH_PROXY                                 0x1828 //Mesh Proxy Service
-#define SERVICE_UUID_RECONNECTION_CONFIGURATION                 0x1829 //Reconnection Configuration Service
-#define SERVICE_UUID_INSULIN_DELIVERY                           0x183A //Insulin Delivery Service
-#define SERVICE_UUID_BINARY_SENSOR                              0x183B //Binary Sensor Service
-#define SERVICE_UUID_EMERGENCY_CONFIGURATION                    0x183C //Emergency Configuration Service
-#define SERVICE_UUID_AUTHORIZATION_CONTROL                      0x183D //Authorization Control Service
-#define SERVICE_UUID_PHYSICAL_ACTIVITY_MONITOR                  0x183E //Physical Activity Monitor Service
-#define SERVICE_UUID_ELAPSED_TIME                               0x183F //Elapsed Time Service
-#define SERVICE_UUID_GENERIC_HEALTH_SENSOR                      0x1840 //Generic Health Sensor Service
-#define SERVICE_UUID_AUDIO_INPUT_CONTROL                        0x1843 //Audio Input Control Service
-#define SERVICE_UUID_VOLUME_CONTROL                             0x1844 //Volume Control Service
-#define SERVICE_UUID_VOLUME_OFFSET_CONTROL                      0x1845 //Volume Offset Control Service
-#define SERVICE_UUID_COORDINATED_SET_IDENTIFICATION             0x1846 //Coordinated Set Identification Service
-#define SERVICE_UUID_DEVICE_TIME                                0x1847 //Device Time Service
-#define SERVICE_UUID_MEDIA_CONTROL                              0x1848 //Media Control Service
-#define SERVICE_UUID_GENERIC_MEDIA_CONTROL                      0x1849 //Generic Media Control Service
-#define SERVICE_UUID_CONSTANT_TONE_EXTENSION                    0x184A //Constant Tone Extension Service
-#define SERVICE_UUID_TELEPHONE_BEARER                           0x184B //Telephone Bearer Service
-#define SERVICE_UUID_GENERIC_TELEPHONE_BEARER                   0x184C //Generic Telephone Bearer Service
-#define SERVICE_UUID_MICROPHONE_CONTROL                         0x184D //Microphone Control Service
-#define SERVICE_UUID_AUDIO_STREAM_CONTROL                       0x184E //Audio Stream Control Service
-#define SERVICE_UUID_BROADCAST_AUDIO_SCAN                       0x184F //Broadcast Audio Scan Service
-#define SERVICE_UUID_PUBLISHED_AUDIO_CAPABILITIES               0x1850 //Published Audio Capabilities Service
-#define SERVICE_UUID_BASIC_AUDIO_ANNOUNCEMENT                   0x1851 //Basic Audio Announcement Service
-#define SERVICE_UUID_BROADCAST_AUDIO_ANNOUNCEMENT               0x1852 //Broadcast Audio Announcement Service
-#define SERVICE_UUID_COMMON_AUDIO                               0x1853 //Common Audio Service
-#define SERVICE_UUID_HEARING_ACCESS                             0x1854 //Hearing Access Service
-#define SERVICE_UUID_TELEPHONY_AND_MEDIA_AUDIO                  0x1855 //Telephony and Media Audio Service
-#define SERVICE_UUID_PUBLIC_BROADCAST_ANNOUNCEMENT              0x1856 //Public Broadcast Announcement Service
-#define SERVICE_UUID_ELECTRONIC_SHELF_LABEL                     0x1857 //Electronic Shelf Label Service
-#define SERVICE_UUID_GAMING_AUDIO                               0x1858 //Gaming Audio Service
-#define SERVICE_UUID_MESH_PROXY_SOLICITATION                    0x1859 //Mesh Proxy Solicitation Service
-//TODO: Ranging profile has not been confirmed yet. by junhui.hu
-#define SERVICE_UUID_RANGING                                    0x185A //Ranging Service
+#define SERVICE_UUID_GENERIC_ACCESS                 0x1800 //Generic Access Service
+#define SERVICE_UUID_GENERIC_ATTRIBUTE              0x1801 //Generic Attribute Service
+#define SERVICE_UUID_IMMEDIATE_ALERT                0x1802 //Immediate Alert Service
+#define SERVICE_UUID_LINK_LOSS                      0x1803 //Link Loss Service
+#define SERVICE_UUID_TX_POWER                       0x1804 //Tx Power Service
+#define SERVICE_UUID_CURRENT_TIME                   0x1805 //Current Time Service
+#define SERVICE_UUID_REFERENCE_TIME_UPDATE          0x1806 //Reference Time Update Service
+#define SERVICE_UUID_NEXT_DST_CHANGE                0x1807 //Next DST Change Service
+#define SERVICE_UUID_GLUCOSE                        0x1808 //Glucose Service
+#define SERVICE_UUID_HEALTH_THERMOMETER             0x1809 //Health Thermometer Service
+#define SERVICE_UUID_DEVICE_INFORMATION             0x180A //Device Information Service
+#define SERVICE_UUID_HEART_RATE                     0x180D //Heart Rate Service
+#define SERVICE_UUID_PHONE_ALERT_STATUS             0x180E //Phone Alert Status Service
+#define SERVICE_UUID_BATTERY                        0x180F //Battery Service
+#define SERVICE_UUID_BLOOD_PRESSURE                 0x1810 //Blood Pressure Service
+#define SERVICE_UUID_ALERT_NOTIFICATION             0x1811 //Alert Notification Service
+#define SERVICE_UUID_HUMAN_INTERFACE_DEVICE         0x1812 //Human Interface Device Service
+#define SERVICE_UUID_SCAN_PARAMETERS                0x1813 //Scan Parameters Service
+#define SERVICE_UUID_RUNNING_SPEED_AND_CADENCE      0x1814 //Running Speed and Cadence Service
+#define SERVICE_UUID_AUTOMATION_IO                  0x1815 //Automation IO Service
+#define SERVICE_UUID_CYCLING_SPEED_AND_CADENCE      0x1816 //Cycling Speed and Cadence Service
+#define SERVICE_UUID_CYCLING_POWER                  0x1818 //Cycling Power Service
+#define SERVICE_UUID_LOCATION_AND_NAVIGATION        0x1819 //Location and Navigation Service
+#define SERVICE_UUID_ENVIRONMENTAL_SENSING          0x181A //Environmental Sensing Service
+#define SERVICE_UUID_BODY_COMPOSITION               0x181B //Body Composition Service
+#define SERVICE_UUID_USER_DATA                      0x181C //User Data Service
+#define SERVICE_UUID_WEIGHT_SCALE                   0x181D //Weight Scale Service
+#define SERVICE_UUID_BOND_MANAGEMENT                0x181E //Bond Management Service
+#define SERVICE_UUID_CONTINUOUS_GLUCOSE_MONITORING  0x181F //Continuous Glucose Monitoring Service
+#define SERVICE_UUID_INTERNET_PROTOCOL_SUPPORT      0x1820 //Internet Protocol Support Service
+#define SERVICE_UUID_INDOOR_POSITIONING             0x1821 //Indoor Positioning Service
+#define SERVICE_UUID_PULSE_OXIMETER                 0x1822 //Pulse Oximeter Service
+#define SERVICE_UUID_HTTP_PROXY                     0x1823 //HTTP Proxy Service
+#define SERVICE_UUID_TRANSPORT_DISCOVERY            0x1824 //Transport Discovery Service
+#define SERVICE_UUID_OBJECT_TRANSFER                0x1825 //Object Transfer Service
+#define SERVICE_UUID_FITNESS_MACHINE                0x1826 //Fitness Machine Service
+#define SERVICE_UUID_MESH_PROVISIONING              0x1827 //Mesh Provisioning Service
+#define SERVICE_UUID_MESH_PROXY                     0x1828 //Mesh Proxy Service
+#define SERVICE_UUID_RECONNECTION_CONFIGURATION     0x1829 //Reconnection Configuration Service
+#define SERVICE_UUID_INSULIN_DELIVERY               0x183A //Insulin Delivery Service
+#define SERVICE_UUID_BINARY_SENSOR                  0x183B //Binary Sensor Service
+#define SERVICE_UUID_EMERGENCY_CONFIGURATION        0x183C //Emergency Configuration Service
+#define SERVICE_UUID_AUTHORIZATION_CONTROL          0x183D //Authorization Control Service
+#define SERVICE_UUID_PHYSICAL_ACTIVITY_MONITOR      0x183E //Physical Activity Monitor Service
+#define SERVICE_UUID_ELAPSED_TIME                   0x183F //Elapsed Time Service
+#define SERVICE_UUID_GENERIC_HEALTH_SENSOR          0x1840 //Generic Health Sensor Service
+#define SERVICE_UUID_AUDIO_INPUT_CONTROL            0x1843 //Audio Input Control Service
+#define SERVICE_UUID_VOLUME_CONTROL                 0x1844 //Volume Control Service
+#define SERVICE_UUID_VOLUME_OFFSET_CONTROL          0x1845 //Volume Offset Control Service
+#define SERVICE_UUID_COORDINATED_SET_IDENTIFICATION 0x1846 //Coordinated Set Identification Service
+#define SERVICE_UUID_DEVICE_TIME                    0x1847 //Device Time Service
+#define SERVICE_UUID_MEDIA_CONTROL                  0x1848 //Media Control Service
+#define SERVICE_UUID_GENERIC_MEDIA_CONTROL          0x1849 //Generic Media Control Service
+#define SERVICE_UUID_CONSTANT_TONE_EXTENSION        0x184A //Constant Tone Extension Service
+#define SERVICE_UUID_TELEPHONE_BEARER               0x184B //Telephone Bearer Service
+#define SERVICE_UUID_GENERIC_TELEPHONE_BEARER       0x184C //Generic Telephone Bearer Service
+#define SERVICE_UUID_MICROPHONE_CONTROL             0x184D //Microphone Control Service
+#define SERVICE_UUID_AUDIO_STREAM_CONTROL           0x184E //Audio Stream Control Service
+#define SERVICE_UUID_BROADCAST_AUDIO_SCAN           0x184F //Broadcast Audio Scan Service
+#define SERVICE_UUID_PUBLISHED_AUDIO_CAPABILITIES   0x1850 //Published Audio Capabilities Service
+#define SERVICE_UUID_BASIC_AUDIO_ANNOUNCEMENT       0x1851 //Basic Audio Announcement Service
+#define SERVICE_UUID_BROADCAST_AUDIO_ANNOUNCEMENT   0x1852 //Broadcast Audio Announcement Service
+#define SERVICE_UUID_COMMON_AUDIO                   0x1853 //Common Audio Service
+#define SERVICE_UUID_HEARING_ACCESS                 0x1854 //Hearing Access Service
+#define SERVICE_UUID_TELEPHONY_AND_MEDIA_AUDIO      0x1855 //Telephony and Media Audio Service
+#define SERVICE_UUID_PUBLIC_BROADCAST_ANNOUNCEMENT  0x1856 //Public Broadcast Announcement Service
+#define SERVICE_UUID_ELECTRONIC_SHELF_LABEL         0x1857 //Electronic Shelf Label Service
+#define SERVICE_UUID_GAMING_AUDIO                   0x1858 //Gaming Audio Service
+#define SERVICE_UUID_MESH_PROXY_SOLICITATION        0x1859 //Mesh Proxy Solicitation Service
+#define SERVICE_UUID_RANGING                        0x185B //Ranging Service
 //TODO: Ultra Low Latency HID service has not been confirmed yet. by qihang.mou
-#define SERVICE_UUID_ULL_HID                                    0x7F8D //Ultra Low Latency HID Service
+#define SERVICE_UUID_ULL_HID 0x7F8D //Ultra Low Latency HID Service
 
 /**
  *  @brief Definition for Declaration UUID
  */
-#define DECLARATIONS_UUID_PRIMARY_SERVICE                       0x2800 //Primary Service
-#define DECLARATIONS_UUID_SECONDARY_SERVICE                     0x2801 //Secondary Service
-#define DECLARATIONS_UUID_INCLUDE                               0x2802 //Include
-#define DECLARATIONS_UUID_CHARACTERISTIC                        0x2803 //Characteristic
+#define DECLARATIONS_UUID_PRIMARY_SERVICE   0x2800 //Primary Service
+#define DECLARATIONS_UUID_SECONDARY_SERVICE 0x2801 //Secondary Service
+#define DECLARATIONS_UUID_INCLUDE           0x2802 //Include
+#define DECLARATIONS_UUID_CHARACTERISTIC    0x2803 //Characteristic
 
 /**
  * @brief Definition for Descriptor UUID
  */
-#define DESCRIPTOR_UUID_CHARACTERISTIC_EXTENDED_PROPERTIES      0x2900 //Characteristic Extended Properties
-#define DESCRIPTOR_UUID_CHARACTERISTIC_USER_DESCRIPTION         0x2901 //Characteristic User Description
-#define DESCRIPTOR_UUID_CLIENT_CHARACTERISTIC_CONFIGURATION     0x2902 //Client Characteristic Configuration
-#define DESCRIPTOR_UUID_SERVER_CHARACTERISTIC_CONFIGURATION     0x2903 //Server Characteristic Configuration
-#define DESCRIPTOR_UUID_CHARACTERISTIC_PRESENTATION_FORMAT      0x2904 //Characteristic Presentation Format
-#define DESCRIPTOR_UUID_CHARACTERISTIC_AGGREGATE_FORMAT         0x2905 //Characteristic Aggregate Format
-#define DESCRIPTOR_UUID_VALID_RANGE                             0x2906 //Valid Range
-#define DESCRIPTOR_UUID_EXTERNAL_REPORT_REFERENCE               0x2907 //External Report Reference
-#define DESCRIPTOR_UUID_REPORT_REFERENCE                        0x2908 //Report Reference
-#define DESCRIPTOR_UUID_NUMBER_OF_DIGITALS                      0x2909 //Number of Digitals
-#define DESCRIPTOR_UUID_VALUE_TRIGGER_SETTING                   0x290A //Value Trigger Setting
-#define DESCRIPTOR_UUID_ENVIRONMENTAL_SENSING_CONFIGURATION     0x290B //Environmental Sensing Configuration
-#define DESCRIPTOR_UUID_ENVIRONMENTAL_SENSING_MEASUREMENT       0x290C //Environmental Sensing Measurement
-#define DESCRIPTOR_UUID_ENVIRONMENTAL_SENSING_TRIGGER_SETTING   0x290D //Environmental Sensing Trigger Setting
-#define DESCRIPTOR_UUID_TIME_TRIGGER_SETTING                    0x290E //Time Trigger Setting
-#define DESCRIPTOR_UUID_COMPLETE_BR_EDR_TRANSPORT_BLOCK_DATA    0x290F //Complete BR-EDR Transport Block Data
-#define DESCRIPTOR_UUID_OBSERVATION_SCHEDULE                    0x2910 //Observation Schedule
-#define DESCRIPTOR_UUID_VALID_RANGE_AND_ACCURACY                0x2911 //Valid Range and Accuracy
+#define DESCRIPTOR_UUID_CHARACTERISTIC_EXTENDED_PROPERTIES    0x2900 //Characteristic Extended Properties
+#define DESCRIPTOR_UUID_CHARACTERISTIC_USER_DESCRIPTION       0x2901 //Characteristic User Description
+#define DESCRIPTOR_UUID_CLIENT_CHARACTERISTIC_CONFIGURATION   0x2902 //Client Characteristic Configuration
+#define DESCRIPTOR_UUID_SERVER_CHARACTERISTIC_CONFIGURATION   0x2903 //Server Characteristic Configuration
+#define DESCRIPTOR_UUID_CHARACTERISTIC_PRESENTATION_FORMAT    0x2904 //Characteristic Presentation Format
+#define DESCRIPTOR_UUID_CHARACTERISTIC_AGGREGATE_FORMAT       0x2905 //Characteristic Aggregate Format
+#define DESCRIPTOR_UUID_VALID_RANGE                           0x2906 //Valid Range
+#define DESCRIPTOR_UUID_EXTERNAL_REPORT_REFERENCE             0x2907 //External Report Reference
+#define DESCRIPTOR_UUID_REPORT_REFERENCE                      0x2908 //Report Reference
+#define DESCRIPTOR_UUID_NUMBER_OF_DIGITALS                    0x2909 //Number of Digitals
+#define DESCRIPTOR_UUID_VALUE_TRIGGER_SETTING                 0x290A //Value Trigger Setting
+#define DESCRIPTOR_UUID_ENVIRONMENTAL_SENSING_CONFIGURATION   0x290B //Environmental Sensing Configuration
+#define DESCRIPTOR_UUID_ENVIRONMENTAL_SENSING_MEASUREMENT     0x290C //Environmental Sensing Measurement
+#define DESCRIPTOR_UUID_ENVIRONMENTAL_SENSING_TRIGGER_SETTING 0x290D //Environmental Sensing Trigger Setting
+#define DESCRIPTOR_UUID_TIME_TRIGGER_SETTING                  0x290E //Time Trigger Setting
+#define DESCRIPTOR_UUID_COMPLETE_BR_EDR_TRANSPORT_BLOCK_DATA  0x290F //Complete BR-EDR Transport Block Data
+#define DESCRIPTOR_UUID_OBSERVATION_SCHEDULE                  0x2910 //Observation Schedule
+#define DESCRIPTOR_UUID_VALID_RANGE_AND_ACCURACY              0x2911 //Valid Range and Accuracy
 
 
 /**
@@ -159,7 +157,7 @@
 #define CHARACTERISTIC_UUID_TIME_UPDATE_STATE                   0x2A17 //Time Update State
 #define CHARACTERISTIC_UUID_GLUCOSE_MEASUREMENT                 0x2A18 //Glucose Measurement
 #define CHARACTERISTIC_UUID_BATTERY_LEVEL                       0x2A19 //Battery Level
-#define CHARACTERISTIC_UUID_BATTERY_POWER_STATE                 0x2A1A  //Battery Power state
+#define CHARACTERISTIC_UUID_BATTERY_POWER_STATE                 0x2A1A //Battery Power state
 #define CHARACTERISTIC_UUID_TEMPERATURE_MEASUREMENT             0x2A1C //Temperature Measurement
 #define CHARACTERISTIC_UUID_TEMPERATURE_TYPE                    0x2A1D //Temperature Type
 #define CHARACTERISTIC_UUID_INTERMEDIATE_TEMPERATURE            0x2A1E //Intermediate Temperature
@@ -341,6 +339,7 @@
 #define CHARACTERISTIC_UUID_CHROMATIC_DIST_FROM_PLANCKIAN       0x2AE3 //Chromatic Distance from Planckian
 #define CHARACTERISTIC_UUID_CHROMATICITY_COORDINATES            0x2AE4 //Chromaticity Coordinates
 #define CHARACTERISTIC_UUID_CHROMATICITYIN_CCT_DUV_VALUES       0x2AE5 //Chromaticityin CCT and Duv Values
+#define CHARACTERISTIC_UUID_CHROMATICITY_IN_CCT_DUV_VALUES      0x2AE5 //Chromaticityin CCT and Duv Values
 #define CHARACTERISTIC_UUID_CHROMATICITY_TOLERANCE              0x2AE6 //Chromaticity Tolerance
 #define CHARACTERISTIC_UUID_CIE13_3_1995_COLOR_INDEX            0x2AE7 //CIE13.3-1995 Color Rendering Index
 #define CHARACTERISTIC_UUID_COEFFICIENT                         0x2AE8 //Coefficient
@@ -421,6 +420,7 @@
 #define CHARACTERISTIC_UUID_ACS_CONTROL_POINT                   0x2B33 //ACS Control Point
 #define CHARACTERISTIC_UUID_ENHANCED_BP_MEASUREMENT             0x2B34 //Enhanced Blood Pressure Measurement
 #define CHARACTERISTIC_UUID_ENHANCED_INTERMEDIATE_CUFF_PRESSURE 0x2B35 //Enhanced Intermediate Cuff Pressure
+#define CHARACTERISTIC_UUID_ENHANCED_INTERM_CUFF_PRESSURE       0x2B35 //Enhanced Intermediate Cuff Pressure
 #define CHARACTERISTIC_UUID_BLOOD_PRESSURE_RECORD               0x2B36 //Blood Pressure Record
 #define CHARACTERISTIC_UUID_REGISTERED_USER                     0x2B37 //Registered User
 #define CHARACTERISTIC_UUID_BR_EDR_HANDOVER_DATA                0x2B38 //BR-EDR Handover Data
@@ -513,6 +513,7 @@
 #define CHARACTERISTIC_UUID_BEARER_UCI                          0x2BB4 //Bearer UCI
 #define CHARACTERISTIC_UUID_BEARER_TECHNOLOGY                   0x2BB5 //Bearer Technology
 #define CHARACTERISTIC_UUID_BEARER_URI_SCHEMES_SUPPRTED_LIST    0x2BB6 //Bearer URI Schemes Supported List
+#define CHARACTERISTIC_UUID_BEARER_URI_SCHEMES_SUPPORTED_LIST   0x2BB6 //Bearer URI Schemes Supported List
 #define CHARACTERISTIC_UUID_BEARER_SS                           0x2BB7 //Bearer Signal Strength
 #define CHARACTERISTIC_UUID_BEARER_SS_REPORTING_INTERVAL        0x2BB8 //Bearer Signal Strength Reporting Interval
 #define CHARACTERISTIC_UUID_BEARER_LIST_CURRENT_CALLS           0x2BB9 //Bearer List Current Calls
@@ -591,16 +592,17 @@
 #define CHARACTERISTIC_UUID_UGT_FEATURES                        0x2C02 //UGT Features
 #define CHARACTERISTIC_UUID_BGS_FEATURES                        0x2C03 //BGS Features
 #define CHARACTERISTIC_UUID_BGR_FEATURES                        0x2C04 //BGR Features
-//TODO: Ranging profile has not been confirmed yet. by junhui.hu
-#define CHARACTERISTIC_UUID_RAS_FEATURE                         0x2C05 //RAS feature
-#define CHARACTERISTIC_UUID_REAL_TIME_PROCEDURE_DATA            0x2C06 //Live Ranging Data
-#define CHARACTERISTIC_UUID_ON_DEMAND_PROCEDURE_DATA            0x2C07 //Stored Ranging Data
-#define CHARACTERISTIC_UUID_CONTROL_POINT                       0x2C08 //Control Point
-#define CHARACTERISTIC_UUID_RANGING_DATA_READY                  0x2C09 //Ranging Data Ready
-#define CHARACTERISTIC_UUID_RANGING_DATA_OVERWRITTEN            0x2C0A //Ranging Data Overwritten
+#define CHARACTERISTIC_UUID_RAS_FEATURE                         0x2C14 //RAS feature
+#define CHARACTERISTIC_UUID_REAL_TIME_PROCEDURE_DATA            0x2C15 //Real Time Procedure Data
+#define CHARACTERISTIC_UUID_ON_DEMAND_PROCEDURE_DATA            0x2C16 //On Demand Procedure Data
+#define CHARACTERISTIC_UUID_CONTROL_POINT                       0x2C17 //Control Point
+#define CHARACTERISTIC_UUID_RANGING_DATA_READY                  0x2C18 //Ranging Data Ready
+#define CHARACTERISTIC_UUID_RANGING_DATA_OVERWRITTEN            0x2C19 //Ranging Data Overwritten
 //TODO: Ultra Low Latency HID service has not been confirmed yet. by qihang.mou
-#define CHARACTERISTIC_UUID_ULL_HID_PROPERTIES                  0x7F8C  //Ultra Low Latency HID Properties
-#define CHARACTERISTIC_UUID_LE_HID_OPERATION_MODE               0x7F8B  //LE HID Operation mode
+#define CHARACTERISTIC_UUID_ULL_HID_PROPERTIES    0x7F8C //Ultra Low Latency HID Properties
+#define CHARACTERISTIC_UUID_LE_HID_OPERATION_MODE 0x7F8B //LE HID Operation mode
+//TODO: Coordinated Set Name Characteristic has not been confirmed yet.
+#define CHARACTERISTIC_UUID_COORDINATED_SET_NAME 0x7FE6 //Coordinated Set Name
 
 ///////////////////////
 //old UUID define
@@ -608,70 +610,71 @@
 /**
  *  @brief  GATT 16 bit UUID definition
  */
-#define GATT_UUID_PRIMARY_SERVICE        0x2800     //!< Primary Service
-#define GATT_UUID_SECONDARY_SERVICE      0x2801     //!< Secondary Service
-#define GATT_UUID_INCLUDE                0x2802     //!< Include
-#define GATT_UUID_CHARACTER              0x2803     //!< Characteristic
-#define GATT_UUID_CHAR_EXT_PROPS         0x2900     //!< Characteristic Extended Properties
-#define GATT_UUID_CHAR_USER_DESC         0x2901     //!< Characteristic User Description
-#define GATT_UUID_CLIENT_CHAR_CFG        0x2902     //!< Client Characteristic Configuration
-#define GATT_UUID_SERVER_CHAR_CFG        0x2903     //!< Server Characteristic Configuration
-#define GATT_UUID_CHAR_PRESENT_FORMAT    0x2904     //!< Characteristic Present Format
-#define GATT_UUID_CHAR_AGG_FORMAT        0x2905     //!< Characteristic Aggregate Format
-#define GATT_UUID_VALID_RANGE            0x2906     //!< Valid Range
-#define GATT_UUID_EXT_REPORT_REF         0x2907     //!< External Report Reference
-#define GATT_UUID_REPORT_REF             0x2908     //!< Report Reference
+#define GATT_UUID_PRIMARY_SERVICE     0x2800 //!< Primary Service
+#define GATT_UUID_SECONDARY_SERVICE   0x2801 //!< Secondary Service
+#define GATT_UUID_INCLUDE             0x2802 //!< Include
+#define GATT_UUID_CHARACTER           0x2803 //!< Characteristic
+#define GATT_UUID_CHAR_EXT_PROPS      0x2900 //!< Characteristic Extended Properties
+#define GATT_UUID_CHAR_USER_DESC      0x2901 //!< Characteristic User Description
+#define GATT_UUID_CLIENT_CHAR_CFG     0x2902 //!< Client Characteristic Configuration
+#define GATT_UUID_SERVER_CHAR_CFG     0x2903 //!< Server Characteristic Configuration
+#define GATT_UUID_CHAR_PRESENT_FORMAT 0x2904 //!< Characteristic Present Format
+#define GATT_UUID_CHAR_AGG_FORMAT     0x2905 //!< Characteristic Aggregate Format
+#define GATT_UUID_VALID_RANGE         0x2906 //!< Valid Range
+#define GATT_UUID_EXT_REPORT_REF      0x2907 //!< External Report Reference
+#define GATT_UUID_REPORT_REF          0x2908 //!< Report Reference
 
-#define GATT_UUID_DEVICE_NAME            0x2a00     //!< Report Reference
-#define GATT_UUID_APPEARANCE             0x2a01
-#define GATT_UUID_PERI_CONN_PARAM        0x2a04
-#define GATT_UUID_SERVICE_CHANGE         0x2a05
-#define GATT_UUID_BATTERY_LEVEL          0x2A19
-#define GATT_UUID_FIRMWARE_VER           0x2a26     //!<Firmware Version
-#define GATT_UUID_CENTRAL_ADDR_RES       0x2AA6
-#define GATT_UUID_RAP_ONLY               0x2AC9
+#define GATT_UUID_DEVICE_NAME         0x2a00 //!< Report Reference
+#define GATT_UUID_APPEARANCE          0x2a01
+#define GATT_UUID_PERI_CONN_PARAM     0x2a04
+#define GATT_UUID_SERVICE_CHANGE      0x2a05
+#define GATT_UUID_BATTERY_LEVEL       0x2A19
+#define GATT_UUID_FIRMWARE_VER        0x2a26 //!<Firmware Version
+#define GATT_UUID_CENTRAL_ADDR_RES    0x2AA6
+#define GATT_UUID_RAP_ONLY            0x2AC9
 
 /**
  * @brief   hids_uuid Hids Characteristic UUID
  */
-#define CHARACTERISTIC_UUID_HID_BOOT_KEY_INPUT          0x2A22    //!< HID Boot Keyboard Input Report
-#define CHARACTERISTIC_UUID_HID_BOOT_KEY_OUTPUT         0x2A32    //!< HID Boot Keyboard Output Report
-#define CHARACTERISTIC_UUID_HID_BOOT_MOUSE_INPUT        0x2A33    //!< HID Boot Mouse Input Report
-#define CHARACTERISTIC_UUID_HID_INFORMATION             0x2A4A    //!< HID Information
-#define CHARACTERISTIC_UUID_HID_REPORT_MAP              0x2A4B    //!< HID Report Map
-#define CHARACTERISTIC_UUID_HID_CONTROL_POINT           0x2A4C    //!< HID Control Point
-#define CHARACTERISTIC_UUID_HID_REPORT                  0x2A4D    //!< HID Report
-#define CHARACTERISTIC_UUID_HID_PROTOCOL_MODE           0x2A4E    //!< HID Protocol Mode
-
+#define CHARACTERISTIC_UUID_HID_BOOT_KEY_INPUT   0x2A22 //!< HID Boot Keyboard Input Report
+#define CHARACTERISTIC_UUID_HID_BOOT_KEY_OUTPUT  0x2A32 //!< HID Boot Keyboard Output Report
+#define CHARACTERISTIC_UUID_HID_BOOT_MOUSE_INPUT 0x2A33 //!< HID Boot Mouse Input Report
+#define CHARACTERISTIC_UUID_HID_INFORMATION      0x2A4A //!< HID Information
+#define CHARACTERISTIC_UUID_HID_REPORT_MAP       0x2A4B //!< HID Report Map
+#define CHARACTERISTIC_UUID_HID_CONTROL_POINT    0x2A4C //!< HID Control Point
+#define CHARACTERISTIC_UUID_HID_REPORT           0x2A4D //!< HID Report
+#define CHARACTERISTIC_UUID_HID_PROTOCOL_MODE    0x2A4E //!< HID Protocol Mode
 
 
 ////////////////////////////////////
 // Telink Service
 ////////////////////////////////////
-#define WRAPPING_BRACES(__DATA__)           { __DATA__ }
-#define TELINK_SPP_UUID_SERVICE             0x10,0x19,0x0d,0x0c,0x0b,0x0a,0x09,0x08,0x07,0x06,0x05,0x04,0x03,0x02,0x01,0x00     //!< TELINK_SPP service
-#define TELINK_AUDIO_UUID_SERVICE           0x11,0x19,0x0d,0x0c,0x0b,0x0a,0x09,0x08,0x07,0x06,0x05,0x04,0x03,0x02,0x01,0x00     //!< TELINK_SPP service
-#define TELINK_OTA_UUID_SERVICE             0x12,0x19,0x0d,0x0c,0x0b,0x0a,0x09,0x08,0x07,0x06,0x05,0x04,0x03,0x02,0x01,0x00     //!< TELINK_OTA service
-#define TELINK_MESH_UUID_SERVICE            0x20,0x19,0x0d,0x0c,0x0b,0x0a,0x09,0x08,0x07,0x06,0x05,0x04,0x03,0x02,0x01,0x00     //!< TELINK_SPP service
-#define TELINK_MESH_LT_UUID_SERVICE         0x21,0x19,0x0d,0x0c,0x0b,0x0a,0x09,0x08,0x07,0x06,0x05,0x04,0x03,0x02,0x01,0x00     //!< TELINK_SPP service
+#define WRAPPING_BRACES(__DATA__)     {__DATA__}
+#define TELINK_SPP_UUID_SERVICE       0x10, 0x19, 0x0d, 0x0c, 0x0b, 0x0a, 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00 //!< TELINK_SPP service
+#define TELINK_AUDIO_UUID_SERVICE     0x11, 0x19, 0x0d, 0x0c, 0x0b, 0x0a, 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00 //!< TELINK_SPP service
+#define TELINK_OTA_UUID_SERVICE       0x12, 0x19, 0x0d, 0x0c, 0x0b, 0x0a, 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00 //!< TELINK_OTA service
+#define TELINK_MESH_UUID_SERVICE      0x20, 0x19, 0x0d, 0x0c, 0x0b, 0x0a, 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00 //!< TELINK_SPP service
+#define TELINK_MESH_LT_UUID_SERVICE   0x21, 0x19, 0x0d, 0x0c, 0x0b, 0x0a, 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00 //!< TELINK_SPP service
 
-#define TELINK_SPP_DATA_SERVER2CLIENT       0x10,0x2B,0x0d,0x0c,0x0b,0x0a,0x09,0x08,0x07,0x06,0x05,0x04,0x03,0x02,0x01,0x00     //!< TELINK_SPP data from server to client
-#define TELINK_SPP_DATA_CLIENT2SERVER       0x11,0x2B,0x0d,0x0c,0x0b,0x0a,0x09,0x08,0x07,0x06,0x05,0x04,0x03,0x02,0x01,0x00     //!< TELINK_SPP data from client to server
-#define TELINK_SPP_DATA_OTA                 0x12,0x2B,0x0d,0x0c,0x0b,0x0a,0x09,0x08,0x07,0x06,0x05,0x04,0x03,0x02,0x01,0x00     //!< TELINK_SPP data for ota
-#define TELINK_SPP_DATA_PAIR                0x13,0x2B,0x0d,0x0c,0x0b,0x0a,0x09,0x08,0x07,0x06,0x05,0x04,0x03,0x02,0x01,0x00     //!< TELINK_SPP data for ota
-#define TELINK_SPP_DATA_DEFINE              0x14,0x2B,0x0d,0x0c,0x0b,0x0a,0x09,0x08,0x07,0x06,0x05,0x04,0x03,0x02,0x01,0x00     //!< TELINK_SPP data for userdefine data
-
-
-#define TELINK_MIC_DATA                     0x18,0x2B,0x0d,0x0c,0x0b,0x0a,0x09,0x08,0x07,0x06,0x05,0x04,0x03,0x02,0x01,0x00     //!< TELINK_SPP data from server to client
-#define TELINK_SPEAKER_DATA                 0x19,0x2B,0x0d,0x0c,0x0b,0x0a,0x09,0x08,0x07,0x06,0x05,0x04,0x03,0x02,0x01,0x00     //!< TELINK_SPP data from client to server
+#define TELINK_SPP_DATA_SERVER2CLIENT 0x10, 0x2B, 0x0d, 0x0c, 0x0b, 0x0a, 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00 //!< TELINK_SPP data from server to client
+#define TELINK_SPP_DATA_CLIENT2SERVER 0x11, 0x2B, 0x0d, 0x0c, 0x0b, 0x0a, 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00 //!< TELINK_SPP data from client to server
+#define TELINK_SPP_DATA_OTA           0x12, 0x2B, 0x0d, 0x0c, 0x0b, 0x0a, 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00 //!< TELINK_SPP data for ota
+#define TELINK_SPP_DATA_PAIR          0x13, 0x2B, 0x0d, 0x0c, 0x0b, 0x0a, 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00 //!< TELINK_SPP data for ota
+#define TELINK_SPP_DATA_DEFINE        0x14, 0x2B, 0x0d, 0x0c, 0x0b, 0x0a, 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00 //!< TELINK_SPP data for userdefine data
 
 
-#define AUDIO_GOOGLE_SERVICE_UUID           0x64,0xB6,0x17,0xF6,0x01,0xAF,0x7D,0xBC,0x05,0x4F,0x21,0x5A,0x01,0x00,0x5E,0xAB
-#define AUDIO_GOOGL_TX_CHAR_UUID            0x64,0xB6,0x17,0xF6,0x01,0xAF,0x7D,0xBC,0x05,0x4F,0x21,0x5A,0x02,0x00,0x5E,0xAB
-#define AUDIO_GOOGL_RX_CHAR_UUID            0x64,0xB6,0x17,0xF6,0x01,0xAF,0x7D,0xBC,0x05,0x4F,0x21,0x5A,0x03,0x00,0x5E,0xAB
-#define AUDIO_GOOGL_CTL_CHAR_UUID           0x64,0xB6,0x17,0xF6,0x01,0xAF,0x7D,0xBC,0x05,0x4F,0x21,0x5A,0x04,0x00,0x5E,0xAB
+#define TELINK_MIC_DATA               0x18, 0x2B, 0x0d, 0x0c, 0x0b, 0x0a, 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00 //!< TELINK_SPP data from server to client
+#define TELINK_SPEAKER_DATA           0x19, 0x2B, 0x0d, 0x0c, 0x0b, 0x0a, 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00 //!< TELINK_SPP data from client to server
 
 
+#define AUDIO_GOOGLE_SERVICE_UUID     0x64, 0xB6, 0x17, 0xF6, 0x01, 0xAF, 0x7D, 0xBC, 0x05, 0x4F, 0x21, 0x5A, 0x01, 0x00, 0x5E, 0xAB
+#define AUDIO_GOOGL_TX_CHAR_UUID      0x64, 0xB6, 0x17, 0xF6, 0x01, 0xAF, 0x7D, 0xBC, 0x05, 0x4F, 0x21, 0x5A, 0x02, 0x00, 0x5E, 0xAB
+#define AUDIO_GOOGL_RX_CHAR_UUID      0x64, 0xB6, 0x17, 0xF6, 0x01, 0xAF, 0x7D, 0xBC, 0x05, 0x4F, 0x21, 0x5A, 0x03, 0x00, 0x5E, 0xAB
+#define AUDIO_GOOGL_CTL_CHAR_UUID     0x64, 0xB6, 0x17, 0xF6, 0x01, 0xAF, 0x7D, 0xBC, 0x05, 0x4F, 0x21, 0x5A, 0x04, 0x00, 0x5E, 0xAB
+
+// google defined 128bit uuid for special ranging seeting
+#define CHARACTERISTIC_UUID_SRS_READ_CAP   0xF1, 0x35, 0x9C, 0x5F, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10,0x00, 0x00, 0x01, 0x8F, 0x00, 0x00
+#define CHARACTERISTIC_UUID_SRS_SEND_CMD   0xF1, 0x35, 0x9C, 0x5F, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10,0x00, 0x00, 0x02, 0x8F, 0x00, 0x00
 
 extern const unsigned char serviceGenericAccessUuid[ATT_16_UUID_LEN];
 extern const unsigned char serviceGenericAttributeUuid[ATT_16_UUID_LEN];
@@ -1224,14 +1227,14 @@ extern const unsigned char characteristicUggFeaturesUuid[ATT_16_UUID_LEN];
 extern const unsigned char characteristicUgtFeaturesUuid[ATT_16_UUID_LEN];
 extern const unsigned char characteristicBgsFeaturesUuid[ATT_16_UUID_LEN];
 extern const unsigned char characteristicBgrFeaturesUuid[ATT_16_UUID_LEN];
-//TODO: Ranging profile has not been confirmed yet. by junhui.hu
 extern const unsigned char characteristicRasFeatureUuid[ATT_16_UUID_LEN];
-extern const unsigned char characteristicLiveRangingDataUuid[ATT_16_UUID_LEN];
-extern const unsigned char characteristicStoredRangingDataUuid[ATT_16_UUID_LEN];
+extern const unsigned char characteristicRealTimeProcedureDataUuid[ATT_16_UUID_LEN];
+extern const unsigned char characteristicOnDemandProcedureDataUuid[ATT_16_UUID_LEN];
 extern const unsigned char characteristicControlPointUuid[ATT_16_UUID_LEN];
 extern const unsigned char characteristicRangingDataReadyUuid[ATT_16_UUID_LEN];
 extern const unsigned char characteristicRangingDataOverwrittenUuid[ATT_16_UUID_LEN];
+extern const unsigned char characteristicGoogleSrsReadCapUuid[ATT_128_UUID_LEN];
+extern const unsigned char characteristicGoogleSrsSendCmdUuid[ATT_128_UUID_LEN];
 //TODO: Ultra Low Latency HID service has not been confirmed yet. by qihang.mou
 extern const unsigned char characteristicUllHidPropertiesUuid[ATT_16_UUID_LEN];
 extern const unsigned char characteristicLeHidOperationModeUuid[ATT_16_UUID_LEN];
-

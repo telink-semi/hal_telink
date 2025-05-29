@@ -24,18 +24,19 @@
 #include "../sink_config.h"
 #if (SINK_VERSION == SINK_ONLY_VERSION)
 
-#pragma once
+    #pragma once
 
-#define VOLUME_INITIAL_VALUE                20
-#define MUTE_INITIAL_VALUE                  false
-#define VLOUME_STEP_INITIAL_VALUE           20
-#define LEFT_VOL_OFFSET_INITIAL_VALUE       0
-#define RIGHT_VOL_OFFSET_INITIAL_VALUE      0
+    #define VOLUME_INITIAL_VALUE           20
+    #define MUTE_INITIAL_VALUE             false
+    #define VLOUME_STEP_INITIAL_VALUE      20
+    #define LEFT_VOL_OFFSET_INITIAL_VALUE  0
+    #define RIGHT_VOL_OFFSET_INITIAL_VALUE 0
 
 /**
  *  @brief  app audio event callback parameter.
  */
-typedef struct{
+typedef struct
+{
     audio_event_enum id;
     int (*evtCb)(u16 connHandle, u8 *pData, u16 dataLen);
 } app_audio_evtCb_t;
@@ -43,10 +44,11 @@ typedef struct{
 /**
  *  @brief  app sink VCP state parameter.
  */
-typedef struct{
-    u8 volume;
+typedef struct
+{
+    u8   volume;
     bool mute;
-    s16 volOffset[APP_AUDIO_VCS_INCLUDE_VOCS_INSTANCE_NUM];
+    s16  volOffset[APP_AUDIO_VCS_INCLUDE_VOCS_INSTANCE_NUM];
 } appSinkVcpState_t;
 
 /**
@@ -106,4 +108,4 @@ void app_send_unmute(void);
  */
 void app_send_changeMuteState(void);
 
-#endif      //SINK_VERSION == SINK_ONLY_VERSION
+#endif //SINK_VERSION == SINK_ONLY_VERSION

@@ -28,7 +28,8 @@
 /**
  * define input IO.
  */
-typedef enum{
+typedef enum
+{
     LPC_INPUT_PB1 = 1,
     LPC_INPUT_PB2 = 2,
     LPC_INPUT_PB3 = 3,
@@ -36,37 +37,40 @@ typedef enum{
     LPC_INPUT_PB5 = 5,
     LPC_INPUT_PB6 = 6,
     LPC_INPUT_PB7 = 7,
-}lpc_input_channel_e;
+} lpc_input_channel_e;
 
 /**
  * define work mode.
  */
-typedef enum{
+typedef enum
+{
     LPC_NORMAL = 0,
     LPC_LOWPOWER,
-}lpc_mode_e;
+} lpc_mode_e;
 
 /**
  * define Reference voltage.
  */
-typedef enum{
-    LPC_REF_974MV  = 1,
-    LPC_REF_923MV  = 2,
-    LPC_REF_872MV  = 3,
-    LPC_REF_820MV  = 4,
-    LPC_REF_PB0    = 5,
-    LPC_REF_PB3    = 6,
-}lpc_reference_e;
+typedef enum
+{
+    LPC_REF_974MV = 1,
+    LPC_REF_923MV = 2,
+    LPC_REF_872MV = 3,
+    LPC_REF_820MV = 4,
+    LPC_REF_PB0   = 5,
+    LPC_REF_PB3   = 6,
+} lpc_reference_e;
 
 /**
  * define scale.
  */
-typedef enum{
+typedef enum
+{
     LPC_SCALING_PER25  = 0,
     LPC_SCALING_PER50  = 1,
     LPC_SCALING_PER75  = 2,
     LPC_SCALING_PER100 = 3,
-}lpc_scaling_e;
+} lpc_scaling_e;
 
 /**
  * @brief       This function servers to powers down low power comparator.
@@ -74,7 +78,7 @@ typedef enum{
  */
 static inline void lpc_power_down(void)
 {
-    analog_write_reg8(0x06,(analog_read_reg8(0x06))|0x02);
+    analog_write_reg8(0x06, (analog_read_reg8(0x06)) | 0x02);
 }
 
 /**
@@ -83,7 +87,7 @@ static inline void lpc_power_down(void)
  */
 static inline void lpc_power_on(void)
 {
-    analog_write_reg8(0x06,analog_read_reg8(0x06) & 0xfd);
+    analog_write_reg8(0x06, analog_read_reg8(0x06) & 0xfd);
 }
 
 /**
@@ -93,7 +97,7 @@ static inline void lpc_power_on(void)
  */
 static inline void lpc_set_input_chn(lpc_input_channel_e pin)
 {
-    analog_write_reg8(0x0d,(analog_read_reg8(0x0d) & 0xf8) | pin);
+    analog_write_reg8(0x0d, (analog_read_reg8(0x0d) & 0xf8) | pin);
 }
 
 /**
@@ -103,7 +107,7 @@ static inline void lpc_set_input_chn(lpc_input_channel_e pin)
  */
 static inline void lpc_set_scaling_coeff(lpc_scaling_e divider)
 {
-    analog_write_reg8(0x0b,(analog_read_reg8(0x0b)&0xcf)|(divider<<4));
+    analog_write_reg8(0x0b, (analog_read_reg8(0x0b) & 0xcf) | (divider << 4));
 }
 
 /**
@@ -112,7 +116,7 @@ static inline void lpc_set_scaling_coeff(lpc_scaling_e divider)
  */
 static inline unsigned char lpc_get_result(void)
 {
-    return ((analog_read_reg8(0x88)&0x40)>>6);
+    return ((analog_read_reg8(0x88) & 0x40) >> 6);
 }
 
 /**
@@ -122,5 +126,3 @@ static inline unsigned char lpc_get_result(void)
  * @return      none.
  */
 void lpc_set_input_ref(lpc_mode_e mode, lpc_reference_e ref);
-
-

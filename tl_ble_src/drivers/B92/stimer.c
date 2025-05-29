@@ -23,17 +23,17 @@
  *******************************************************************************************************/
 #include "stimer.h"
 
-unsigned int g_track_32kcnt=16;
+unsigned int g_track_32kcnt = 16;
 
 /**
  * @brief     This function performs to set delay time by us.
  * @param[in] microsec - need to delay.
  * @return    none
 */
- void delay_us(unsigned int microsec)
+void delay_us(unsigned int microsec)
 {
     unsigned long t = stimer_get_tick();
-    while(!clock_time_exceed(t, microsec)){
+    while (!clock_time_exceed(t, microsec)) {
     }
 }
 
@@ -42,9 +42,9 @@ unsigned int g_track_32kcnt=16;
  * @param[in] millisec - need to delay.
  * @return    none
 */
- void delay_ms(unsigned int millisec)
+void delay_ms(unsigned int millisec)
 {
     unsigned long t = stimer_get_tick();
-    while(!clock_time_exceed(t, millisec*1000)){
+    while (!clock_time_exceed(t, millisec * 1000)) {
     }
 }

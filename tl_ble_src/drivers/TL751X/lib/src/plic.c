@@ -33,6 +33,31 @@
 _attribute_data_retention_sec_ volatile unsigned char g_plic_preempt_en = 0;
 
 /**
+ * @brief The global variable is used to save irq_src0 register value.
+ */
+unsigned int g_irq_src0_value = 0;
+
+/**
+ * @brief The global variable is used to save irq_src1 register value.
+ */
+unsigned int g_irq_src1_value = 0;
+
+/**
+ * @brief The global variable is used to save MIE register value.
+ */
+unsigned int g_mie_value = 0;
+
+/**
+ * @brief The global variable is used to save MSTATUS register value.
+ */
+unsigned int g_mstatus_value = 0;
+
+/**
+ * @brief This variable is used to indicate whether to disable global interrupts when entering WFI, 1: disable, 0: not disable.
+ */
+unsigned int g_wfi_disable_int = 0;
+
+/**
  * @brief       This function serves to secure code by reconfiguring interrupt threshold or mstatus.MIE to enter the critical section, such as calling some flash interface to enter some function process.
  * @param[in]   preempt_en
  *                - 1 means interrupt priority larger than the given threshold which can disturb function process.
@@ -164,4 +189,83 @@ _attribute_ram_code_sec_ int plic_clr_all_request(void)
     }
 
     return 1;
+}
+
+/**
+ * @brief      This function serves to save and disable all PLIC interrupt sources.
+ * @return     none
+ * @note       plic_all_interrupt_save_and_disable and plic_all_interrupt_restore must be used in pairs.
+ */
+void plic_all_interrupt_save_and_disable(void)
+{
+    /* save PLIC irq and disable. */
+    g_irq_src1_value = reg_irq_src1;
+    g_irq_src0_value = reg_irq_src0;
+    reg_irq_src1 = 0;
+    reg_irq_src0 = 0;
+}
+
+/**
+ * @brief      This function serves to restore and all PLIC interrupt sources.
+ * @return     none
+ * @note       plic_all_interrupt_save_and_disable and plic_all_interrupt_restore must be used in pairs.
+ */
+void plic_all_interrupt_restore(void)
+{
+    /* restore PLIC irq. */
+    reg_irq_src0 = g_irq_src0_value;
+    reg_irq_src1 = g_irq_src1_value;
+}
+
+/**
+ * @brief      This function serves to save and disable interrupts, including the MIE bit of the MSTATUS register(depends on the first parameter,regardless of whether the global interrupt is enabled or not.), \n
+ *             MSIE, MTIE, and MEIE bits of the MIE register, and all PLIC interrupt sources.
+ * @param[in]  flag - Global interrupt disable flag, 1: disable, 0: not disable.
+ * @param[in]  mie - MSIE, MTIE, and MEIE Which one wakes up WFI.
+ * @note
+ *  - When the core is awoken by the taken interrupt and global interrupts enable, it will resume and start to execute from the corresponding interrupt service routine.
+ *  - When the core is awoken by the pending interrupt and global interrupts disable, it will resume and start to execute from the instruction after the WFI instruction.
+ *  - plic_irqs_preprocess_for_wfi and plic_irqs_postprocess_for_wfi must be used in pairs.
+ */
+void plic_irqs_preprocess_for_wfi(unsigned char flag, mie_e mie)
+{
+    if (flag)
+    {
+        g_wfi_disable_int = 1;
+        g_mstatus_value = core_interrupt_disable();
+    }
+    else
+    {
+        g_wfi_disable_int = 0;
+    }
+
+    plic_all_interrupt_save_and_disable();
+    g_mie_value = core_mie_disable(FLD_MIE_MSIE | FLD_MIE_MTIE | FLD_MIE_MEIE);
+    core_mie_enable(mie);
+}
+
+/**
+ * @brief      This function serves to restore interrupts, including the MIE bit of the MSTATUS register, \n
+ *             MSIE, MTIE, and MEIE bits of the MIE register, and all PLIC interrupt sources.
+ * @return     none
+ * @note
+ *  - Make sure that the status flag of the corresponding interrupt is cleared before calling this interface.
+ *  - This function will enable PLIC interrupt so this interface cannot be called from the interrupt service routine.
+ *  - plic_irqs_preprocess_for_wfi and plic_irqs_postprocess_for_wfi must be used in pairs.
+ */
+void plic_irqs_postprocess_for_wfi(void)
+{
+    if (g_wfi_disable_int)
+    {
+        /* When global interrupt is disabled, the application needs to call this interface to ensure that the corresponding PLIC interrupt requests have been processed. */
+        plic_clr_all_request();
+    }
+
+    plic_all_interrupt_restore();
+    core_mie_restore(g_mie_value);
+
+    if (g_wfi_disable_int)
+    {
+        core_restore_interrupt(g_mstatus_value);
+    }
 }

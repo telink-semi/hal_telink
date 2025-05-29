@@ -25,8 +25,7 @@
 #define CIS_CENTRAL_H_
 
 
-#define         CIG_PARAM_LEN                                   660 //user can't modify this value !!!
-
+#define CIG_PARAM_LEN 532 //user can't modify this value !!!
 
 
 /**
@@ -36,12 +35,7 @@
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_initCisCentralModule_initCigParametersBuffer(u8 *pCigParamBuf, int cig_num);
-
-
-
-
-
+ble_sts_t blc_ll_initCisCentralModule_initCigParametersBuffer(u8 *pCigParamBuf, int cig_num);
 
 
 /**
@@ -52,10 +46,7 @@ ble_sts_t   blc_ll_initCisCentralModule_initCigParametersBuffer(u8 *pCigParamBuf
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_setCigTimingOffsetOfAclCentral(u8 acl_cen_index, u16 offset_custom_us);
-
-
-
+ble_sts_t blc_ll_setCigTimingOffsetOfAclCentral(u8 acl_cen_index, u16 offset_custom_us);
 
 
 #endif /* CIS_CENTRAL_H_ */

@@ -32,32 +32,24 @@
 #include "app_ota_client.h"
 
 
-
 #if (FEATURE_TEST_MODE == TEST_OTA)
 
 int central_pairing_enable = 0;
-u16 central_unpair_enable = 0;
+u16 central_unpair_enable  = 0;
 
-u16 central_disconnect_connhandle;   //mark the central connection which is in un_pair disconnection flow
-
-
+u16 central_disconnect_connhandle; //mark the central connection which is in un_pair disconnection flow
 
 
+    #if (UI_KEYBOARD_ENABLE)
+
+_attribute_ble_data_retention_ int key_not_released;
 
 
+        #define CONSUMER_KEY    1
+        #define KEYBOARD_KEY    2
+        #define PAIR_UNPAIR_KEY 3
 
-
-
-#if (UI_KEYBOARD_ENABLE)
-
-_attribute_ble_data_retention_  int     key_not_released;
-
-
-#define CONSUMER_KEY                1
-#define KEYBOARD_KEY                2
-#define PAIR_UNPAIR_KEY             3
-
-_attribute_ble_data_retention_  u8      key_type;
+_attribute_ble_data_retention_ u8 key_type;
 
 /**
  * @brief   Check changed key value.
@@ -66,71 +58,61 @@ _attribute_ble_data_retention_  u8      key_type;
  */
 void key_change_proc(void)
 {
-
     u8 key0 = kb_event.keycode[0];
-//  u8 key1 = kb_event.keycode[1];
-//  u8 key_buf[8] = {0,0,0,0,0,0,0,0};
+    //  u8 key1 = kb_event.keycode[1];
+    //  u8 key_buf[8] = {0,0,0,0,0,0,0,0};
 
     key_not_released = 1;
-    if (kb_event.cnt == 2)   //two key press
+    if (kb_event.cnt == 2) //two key press
     {
-
-    }
-    else if(kb_event.cnt == 1)
-    {
+    } else if (kb_event.cnt == 1) {
         static u32 last_singleKey_press_tick;
 
 
-        if(key0 == CR_VOL_UP || key0 == CR_VOL_DN)
-        {
-            #if (BLE_OTA_CLIENT_ENABLE)
+        if (key0 == CR_VOL_UP || key0 == CR_VOL_DN) {
+        #if (BLE_OTA_CLIENT_ENABLE)
 
-                if(blotaClt.ota_test_mode == 0){
-                    static u32 button_history = 0;
-                    if(!clock_time_exceed(last_singleKey_press_tick, 2000000)){
-                        button_history = button_history<<1 | (key0 == CR_VOL_UP || key0 == CR_VOL_DN);
-                        if( (button_history & 0x0f) == 0x0f){ //fast key press 4 time
-                            blotaClt.ota_test_mode = 1;  //enter OTA test mode, LED shine
-                            ota_trigger_tick = clock_time() | 1;
-                            tlkapi_send_string_data(APP_OTA_CLIENT_LOG_EN, "[APP][OTA] enter test mode", 0, 0);
-                        }
+            if (blotaClt.ota_test_mode == 0) {
+                static u32 button_history = 0;
+                if (!clock_time_exceed(last_singleKey_press_tick, 2000000)) {
+                    button_history = button_history << 1 | (key0 == CR_VOL_UP || key0 == CR_VOL_DN);
+                    if ((button_history & 0x0f) == 0x0f) { //fast key press 4 time
+                        blotaClt.ota_test_mode = 1;        //enter OTA test mode, LED shine
+                        ota_trigger_tick       = clock_time() | 1;
+                        tlkapi_send_string_data(APP_OTA_CLIENT_LOG_EN, "[APP][OTA] enter test mode", 0, 0);
                     }
-                    else{
-                        button_history = 0;
+                } else {
+                    button_history = 0;
+                }
+            } else if (blotaClt.ota_test_mode == 1) {
+                if (acl_conn_central_num) { //at least one connection exist
+                    if (key0 == CR_VOL_UP) {
+                        app_key_trigger_ota_start(NEW_FW_ADDR0, conn_dev_list[0].conn_handle);
+                    } else if (key0 == CR_VOL_DN) {
+                        app_key_trigger_ota_start(NEW_FW_ADDR1, conn_dev_list[0].conn_handle);
                     }
                 }
-                else if(blotaClt.ota_test_mode == 1){
-                    if(acl_conn_central_num){ //at least one connection exist
-                        if(key0 == CR_VOL_UP){
-                            app_key_trigger_ota_start(NEW_FW_ADDR0, conn_dev_list[0].conn_handle);
-                        }
-                        else if(key0 == CR_VOL_DN){
-                            app_key_trigger_ota_start(NEW_FW_ADDR1, conn_dev_list[0].conn_handle);
-                        }
-                    }
-                }
+            }
 
 
-
-            #endif
+        #endif
         }
-        if(key0 == BTN_PAIR)   //Manual pair triggered by Key Press
+        if (key0 == BTN_PAIR) //Manual pair triggered by Key Press
         {
             central_pairing_enable = 1;
             tlkapi_send_string_data(APP_PAIR_LOG_EN, "[UI][PAIR] Pair begin", 0, 0);
-        }
-        else if(key0 == BTN_UNPAIR) //Manual un_pair triggered by Key Press
+        } else if (key0 == BTN_UNPAIR) //Manual un_pair triggered by Key Press
         {
             /*Here is just Telink Demonstration effect. Cause the demo board has limited key to use, only one "un_pair" key is
              available. When "un_pair" key pressed, we will choose and un_pair one device in connection state */
-            if(acl_conn_central_num){ //at least 1 ACL Central exist
+            if (acl_conn_central_num) {               //at least 1 ACL Central exist
 
-                if(!central_disconnect_connhandle){  //if one central un_pair disconnection flow not finish, here new un_pair not accepted
+                if (!central_disconnect_connhandle) { //if one central un_pair disconnection flow not finish, here new un_pair not accepted
 
                     /* choose one central connection to disconnect */
-                    for(int i=0; i < ACL_CENTRAL_MAX_NUM; i++){ //ACL Peripheral index is from 0 to "ACL_CENTRAL_MAX_NUM - 1"
-                        if(conn_dev_list[i].conn_state){
-                            central_unpair_enable = conn_dev_list[i].conn_handle;  //mark connHandle on central_unpair_enable
+                    for (int i = 0; i < ACL_CENTRAL_MAX_NUM; i++) {               //ACL Peripheral index is from 0 to "ACL_CENTRAL_MAX_NUM - 1"
+                        if (conn_dev_list[i].conn_state) {
+                            central_unpair_enable = conn_dev_list[i].conn_handle; //mark connHandle on central_unpair_enable
                             tlkapi_send_string_data(APP_PAIR_LOG_EN, "[UI][PAIR] Unpair", &central_unpair_enable, 2);
                             break;
                         }
@@ -139,23 +121,20 @@ void key_change_proc(void)
             }
         }
 
-        last_singleKey_press_tick = clock_time();  //update single key press tick
-    }
-    else   //kb_event.cnt == 0,  key release
+        last_singleKey_press_tick = clock_time(); //update single key press tick
+    } else                                        //kb_event.cnt == 0,  key release
     {
-        if(central_pairing_enable){
+        if (central_pairing_enable) {
             central_pairing_enable = 0;
         }
 
-        if(central_unpair_enable){
+        if (central_unpair_enable) {
             central_unpair_enable = 0;
         }
     }
 }
 
-
-
-_attribute_ble_data_retention_      static u32 keyScanTick = 0;
+_attribute_ble_data_retention_ static u32 keyScanTick = 0;
 
 /**
  * @brief      keyboard task handler
@@ -164,36 +143,27 @@ _attribute_ble_data_retention_      static u32 keyScanTick = 0;
  * @param[in]  n    - the length of event parameter.
  * @return     none.
  */
-void proc_keyboard (u8 e, u8 *p, int n)
+void proc_keyboard(u8 e, u8 *p, int n)
 {
-    if(clock_time_exceed(keyScanTick, 10 * 1000)){  //keyScan interval: 10mS
+    if (clock_time_exceed(keyScanTick, 10 * 1000)) { //keyScan interval: 10mS
         keyScanTick = clock_time();
-    }
-    else{
+    } else {
         return;
     }
 
     kb_event.keycode[0] = 0;
-    int det_key = kb_scan_key (0, 1);
+    int det_key         = kb_scan_key(0, 1);
 
-    if (det_key){
+    if (det_key) {
         key_change_proc();
     }
 }
 
 
+    #endif //end of UI_KEYBOARD_ENABLE
 
 
-#endif   //end of UI_KEYBOARD_ENABLE
-
-
-
-
-
-
-
-_attribute_ble_data_retention_  u8      ota_is_working = 0;
-
+_attribute_ble_data_retention_ u8 ota_is_working = 0;
 
 /**
  * @brief      this function is used to register the function for OTA start.
@@ -204,15 +174,10 @@ void app_enter_ota_mode(void)
 {
     ota_is_working = 1;
 
-    #if(UI_LED_ENABLE)  //this is only for debug
-        gpio_write(GPIO_LED_BLUE, 1);
+    #if (UI_LED_ENABLE) //this is only for debug
+    gpio_write(GPIO_LED_BLUE, 1);
     #endif
 }
-
-
-
-
-
 
 /**
  * @brief       no matter whether the OTA result is successful or fail.
@@ -222,41 +187,38 @@ void app_enter_ota_mode(void)
  */
 void app_ota_result(int result)
 {
-    #if (1)  //this is only for debug
-        if(result == OTA_SUCCESS){  //led for debug: OTA success
-            gpio_write(GPIO_LED_GREEN, 1);
-        }
-        else{  //OTA fail
+    #if (1)                      //this is only for debug
+    if (result == OTA_SUCCESS) { //led for debug: OTA success
+        gpio_write(GPIO_LED_GREEN, 1);
+    } else {                     //OTA fail
 
-            gpio_write(GPIO_LED_GREEN, 0);
+        gpio_write(GPIO_LED_GREEN, 0);
 
-            #if 0 //this is only for debug,  can not use this in application code
+        #if 0 //this is only for debug,  can not use this in application code
                 irq_disable();
                 WATCHDOG_DISABLE;
 
                 while(1){
                 }
-            #endif
-        }
+        #endif
+    }
     #endif
 
     gpio_write(GPIO_LED_BLUE, 0);
     gpio_write(GPIO_LED_WHITE, 1);
 
-//  sleep_us(2000000);  //debug
+    //  sleep_us(2000000);  //debug
 }
-
-
 
 void app_ota_server_init(void)
 {
     #if (APP_HW_FIRMWARE_ENCRYPTION_ENABLE)
-        blc_ota_enableFirmwareEncryption();
+    blc_ota_enableFirmwareEncryption();
     #endif
 
     #if (APP_HW_SECURE_BOOT_ENABLE)
-        /* attention that "blc_ota enableSecureBoot" must be called before "blc_ota initOtaServer_module" !!! */
-        blc_ota_enableSecureBoot();
+    /* attention that "blc_ota enableSecureBoot" must be called before "blc_ota initOtaServer_module" !!! */
+    blc_ota_enableSecureBoot();
     #endif
 
     #if (TLKAPI_DEBUG_ENABLE)
@@ -272,9 +234,6 @@ void app_ota_server_init(void)
     blc_ota_setOtaDataPacketTimeout(3); //OTA data packet interval timeout 3 seconds
 }
 
-
-
-
 /**
  * @brief   BLE Unpair handle for central
  * @param   none.
@@ -282,41 +241,30 @@ void app_ota_server_init(void)
  */
 void proc_central_role_unpair(void)
 {
-
     //terminate and un_pair process, Telink demonstration effect: triggered by "un_pair" key press
-    if(central_unpair_enable){
+    if (central_unpair_enable) {
+        dev_char_info_t *dev_char_info = dev_char_info_search_by_connhandle(central_unpair_enable); //connHandle has marked on on central_unpair_enable
 
-        dev_char_info_t* dev_char_info = dev_char_info_search_by_connhandle(central_unpair_enable); //connHandle has marked on on central_unpair_enable
+        if (dev_char_info) {                                                                        //un_pair device in still in connection state
 
-        if( dev_char_info ){ //un_pair device in still in connection state
+            if (blc_ll_disconnect(central_unpair_enable, HCI_ERR_REMOTE_USER_TERM_CONN) == BLE_SUCCESS) {
+                central_disconnect_connhandle = central_unpair_enable;                              //mark conn_handle
 
-            if(blc_ll_disconnect(central_unpair_enable, HCI_ERR_REMOTE_USER_TERM_CONN) == BLE_SUCCESS){
-
-                central_disconnect_connhandle = central_unpair_enable; //mark conn_handle
-
-                central_unpair_enable = 0;  //every "un_pair" key can only triggers one connection disconnect
+                central_unpair_enable = 0;                                                          //every "un_pair" key can only triggers one connection disconnect
 
 
-                // delete this device information(mac_address and distributed keys...) on FLash
-                #if (ACL_CENTRAL_SMP_ENABLE)
-                    blc_smp_deleteBondingPeripheralInfo_by_PeerMacAddress(dev_char_info->peer_adrType, dev_char_info->peer_addr);
-                #endif
+    // delete this device information(mac_address and distributed keys...) on FLash
+    #if (ACL_CENTRAL_SMP_ENABLE)
+                blc_smp_deleteBondingPeripheralInfo_by_PeerMacAddress(dev_char_info->peer_adrType, dev_char_info->peer_addr);
+    #endif
             }
 
-        }
-        else{ //un_pair device can not find in device list, it's not connected now
+        } else {                       //un_pair device can not find in device list, it's not connected now
 
-            central_unpair_enable = 0;  //every "un_pair" key can only triggers one connection disconnect
+            central_unpair_enable = 0; //every "un_pair" key can only triggers one connection disconnect
         }
-
     }
 }
-
-
-
-
-
-
 
 
 #endif

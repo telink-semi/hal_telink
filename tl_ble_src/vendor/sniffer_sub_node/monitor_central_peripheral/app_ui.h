@@ -26,11 +26,11 @@
 
 
 #if (MONITOR_ROLE_SELECT == MONITOR_CENTRAL_PERIPHERAL)
-extern  int central_pairing_enable;
-extern  u16 central_unpair_enable;
+extern int central_pairing_enable;
+extern u16 central_unpair_enable;
 
-extern  u16 central_disconnect_connhandle;
-extern  int key_not_released;
+extern u16 central_disconnect_connhandle;
+extern int key_not_released;
 
 /**
  * @brief      keyboard task handler
@@ -39,7 +39,16 @@ extern  int key_not_released;
  * @param[in]  n    - the length of event parameter.
  * @return     none.
  */
-void proc_keyboard (u8 e, u8 *p, int n);
+void proc_keyboard(u8 e, u8 *p, int n);
+
+/**
+ * @brief      user set keyboard wakeup
+ * @param[in]  e - LinkLayer Event type
+ * @param[in]  p - data pointer of event
+ * @param[in]  n - data length of event
+ * @return     none
+ */
+void app_set_kb_wakeup(u8 e, u8 *p, int n);
 
 /**
  * @brief      keyboard initialization
@@ -49,4 +58,5 @@ void proc_keyboard (u8 e, u8 *p, int n);
 void keyboard_init(void);
 
 #endif
+
 #endif /* APP_UI_H_ */

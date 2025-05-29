@@ -35,7 +35,10 @@
 #include "flash.h"
 #include "stimer.h"
 #include "watchdog.h"
-
+#include "string.h"
+#include "analog.h"
+#include "error_handler/error_handler.h"
+#include "lib/include/swire.h"
 #if (!defined(MCU_CORE_TL751X_N22))
 
 #if(PM_DEBUG)
@@ -1077,4 +1080,284 @@ void pm_set_dig_module_power_switch(pm_pd_module_e module, pm_power_sel_e power_
     */
 }
 
+#define D25F_EMA_DMA_COMMON_CFG(i) \
+    .dma_chain_ctl =  M2M_DMA_CFG|FLD_DMA_CHANNEL_ENABLE|FLD_DMA_CHANNEL_TC_MASK,\
+    .dma_chain_dst_addr = D25F_SRAM_EMA_ADDR,\
+    .dma_chain_data_len = D25F_SRAM_EMA_DATA_LEN,   \
+    .dma_chain_src_addr = (unsigned int) dvdd_config[i].d25f_pke_sdio_npe_sram_ema
+
+
+#define N22_EMA_DMA_COMMON_CFG(i) \
+    .dma_chain_ctl =  M2M_DMA_CFG|FLD_DMA_CHANNEL_ENABLE|FLD_DMA_CHANNEL_TC_MASK,\
+    .dma_chain_dst_addr = N22_SRAM_EMA_REG_ADDR,\
+    .dma_chain_data_len = N22_SRAM_EMA_DATA_LEN,     \
+    .dma_chain_src_addr = (unsigned int) dvdd_config[i].n22_sram_ema
+
+#define DSP_EMA_DMA_COMMON_CFG(i) \
+    .dma_chain_ctl = M2M_DMA_CFG|FLD_DMA_CHANNEL_ENABLE|FLD_DMA_CHANNEL_TC_MASK, \
+    .dma_chain_dst_addr = DSP_SRAM_EMA_REG_ADDR, \
+    .dma_chain_data_len = DSP_SRAM_EMA_DATA_LEN, \
+    .dma_chain_src_addr = (unsigned int) dvdd_config[i].dsp_sram_ema
+
+#define DELAY_DMA_COMMON_CFG \
+    .dma_chain_ctl =  ANALOG_FIXED_ADDR_TX_DMA_CFG|FLD_DMA_CHANNEL_ENABLE|FLD_DMA_CHANNEL_TC_MASK,\
+    .dma_chain_src_addr = (unsigned int)&useless_data,  \
+    .dma_chain_dst_addr = ANALOG_DATA_REG_ADDR,\
+    .dma_chain_data_len = sizeof(useless_data)*4
+
+#define VOL_DMA_COMMON_CFG(i) \
+    .dma_chain_ctl =  ANALOG_INC_ADDR_TX_DMA_CFG|FLD_DMA_CHANNEL_ENABLE|FLD_DMA_CHANNEL_TC_MASK,       \
+    .dma_chain_dst_addr = ANALOG_DATA_REG_ADDR,\
+    .dma_chain_data_len = VOL_DATA_LEN/4,        \
+    .dma_chain_src_addr = (unsigned int)dvdd_config[i].vol
+
+
+#define DVDD1_DVDD2_MAX_CONFIG_NUM               2
+#define CHANIN_NODE_CNT                          6
+#define VOL_DATA_LEN                             4                        //Must be a multiple of four
+
+typedef struct {
+      unsigned char vol[VOL_DATA_LEN] __attribute__((aligned(4)));
+      unsigned char d25f_pke_sdio_npe_sram_ema[D25F_SRAM_EMA_DATA_LEN];
+      unsigned char n22_sram_ema[N22_SRAM_EMA_DATA_LEN];
+      unsigned char dsp_sram_ema[DSP_SRAM_EMA_DATA_LEN];
+}dvdd_config_t ;
+
+typedef enum{
+    DVDD_0P8V=0,
+    DVDD_0P9V
+}dvdd_vol_e;
+const dvdd_config_t dvdd_config[DVDD1_DVDD2_MAX_CONFIG_NUM] __attribute__((section(".flash_data")))=
+{
+    //PM_DVDD1_DVDD2_0P8_CINFIG
+    {
+       .vol = {0x21, (ALG0X21_DEFAULT_CONFIG& 0xf8) | (DVDD1_DVDD2_VOL_0P8_CONFG&0xff),0x22,((ALG0X22_DEFAULT_CONFIG & 0x88) | ((DVDD1_DVDD2_VOL_0P8_CONFG & 0xffff)>>8)<<4 | PM_AVDD2_VOLTAGE_2V500)},
+       .d25f_pke_sdio_npe_sram_ema = {0x54,0xd4,0x2c,0x03,0x03,0x1d,0x04,0x18},
+       .n22_sram_ema = {0x03,0x1d},
+       .dsp_sram_ema = {0x03,0x1d,0x04,0x18},
+    },
+
+    //PM_DVDD1_DVDD2_0P9_CONFIG
+    {
+       .vol = {0x21, (ALG0X21_DEFAULT_CONFIG& 0xf8) | (DVDD1_DVDD2_VOL_0P9_CONFG&0xff),0x22,((ALG0X22_DEFAULT_CONFIG & 0x88) | ((DVDD1_DVDD2_VOL_0P9_CONFG & 0xffff)>>8)<<4 | PM_AVDD2_VOLTAGE_2V500)},
+       .d25f_pke_sdio_npe_sram_ema = {0x53,0x13,0x2b,0x01,0x02,0x0b,0x0b,0x08},
+       .n22_sram_ema = {0x02,0x0b},
+       .dsp_sram_ema = {0x02,0x0b,0x0b,0x08},
+    },
+};
+
+const unsigned char useless_data[4]__attribute__((section(".flash_data"))) __attribute__((aligned(4)))={0xff,0xff,0xff,0xff};
+
+const dma_chain_config_t dvdd_down_to_0p8_dma_chain[CHANIN_NODE_CNT] __attribute__((section(".flash_data")))= \
+{
+    {
+        DELAY_DMA_COMMON_CFG,
+        .dma_chain_llp_ptr  = ((unsigned int)(dvdd_down_to_0p8_dma_chain+1)),
+    },
+    {
+        D25F_EMA_DMA_COMMON_CFG(DVDD_0P8V),
+        .dma_chain_llp_ptr  = (unsigned int) (dvdd_down_to_0p8_dma_chain+2),
+    },
+    {
+        N22_EMA_DMA_COMMON_CFG(DVDD_0P8V),
+        .dma_chain_llp_ptr  = (unsigned int)(dvdd_down_to_0p8_dma_chain+3),
+    },
+    {
+        DSP_EMA_DMA_COMMON_CFG(DVDD_0P8V),
+        .dma_chain_llp_ptr  = (unsigned int)(dvdd_down_to_0p8_dma_chain+4),
+    },
+    {
+        VOL_DMA_COMMON_CFG(DVDD_0P8V),
+       .dma_chain_llp_ptr  =(unsigned int)(dvdd_down_to_0p8_dma_chain+5),
+    },
+    {
+        DELAY_DMA_COMMON_CFG,
+        .dma_chain_llp_ptr  =0,
+    },
+};
+
+const dma_chain_config_t dvdd_up_to_0p9_dma_chain[CHANIN_NODE_CNT]__attribute__((section(".flash_data")))= \
+{
+    {
+        DELAY_DMA_COMMON_CFG,
+        .dma_chain_llp_ptr  = ((unsigned int)(dvdd_up_to_0p9_dma_chain+1)),
+    },
+    {
+        VOL_DMA_COMMON_CFG(DVDD_0P9V),
+       .dma_chain_llp_ptr  =(unsigned int)(dvdd_up_to_0p9_dma_chain+2),
+    },
+    {
+        D25F_EMA_DMA_COMMON_CFG(DVDD_0P9V),
+        .dma_chain_llp_ptr  = (unsigned int)(dvdd_up_to_0p9_dma_chain+3),
+    },
+    {
+         N22_EMA_DMA_COMMON_CFG(DVDD_0P9V),
+        .dma_chain_llp_ptr  = (unsigned int)(dvdd_up_to_0p9_dma_chain+4),
+    },
+    {
+        DSP_EMA_DMA_COMMON_CFG(DVDD_0P9V),
+        .dma_chain_llp_ptr  = (unsigned int)(dvdd_up_to_0p9_dma_chain+5),
+    },
+    {
+        DELAY_DMA_COMMON_CFG,
+        .dma_chain_llp_ptr  =0,
+    },
+
+};
+
+static void pm_set_dvdd_restore_cfg(dma_chn_e chn,unsigned char swire,unsigned char dma_mask){
+    if(swire){
+        swire_slave_en();
+    }
+    if(!dma_mask){
+        dma_clr_irq_mask(chn, TC_MASK);
+    }
+}
+
+static unsigned char pm_set_dvdd_is_correct(const dma_chain_config_t * dma_chain_p,unsigned char node_cnt,sys_core_e core){
+    unsigned char i=0;
+    unsigned char j=0;
+    unsigned char ref;
+    unsigned char rcv;
+    //1.in preparation to enter wfi, there may be access ram, the first node waits to enter wfi by configuring useless data.
+    //2.when the dvdd voltage is set up, it takes time to stabilize, by the last node sending useless data as a delay.
+    for(i=1;i<node_cnt-1;i++){
+         if(dma_chain_p[i].dma_chain_dst_addr == (ANALOG_DATA_REG_ADDR)){
+            for(j=0;j<(dma_chain_p[i].dma_chain_data_len)*2;j++)
+            {
+                unsigned int ana_addr=0;
+                ana_addr =*((unsigned char*)dma_chain_p[i].dma_chain_src_addr + (2*j + 0));
+                rcv = analog_read_reg8(ana_addr);
+                ref = *((unsigned char*)dma_chain_p[i].dma_chain_src_addr + (2*j + 1));
+                if(rcv != ref ) {
+                   return 1;
+                }
+            }
+        }else{
+
+            for(j=0;j<dma_chain_p[i].dma_chain_data_len;j++){
+                rcv = read_reg8(dma_chain_p[i].dma_chain_dst_addr + j);
+                ref = *((unsigned char*)dma_chain_p[i].dma_chain_src_addr + j);
+                if(rcv != ref) {
+                    if(dma_chain_p[i].dma_chain_dst_addr == (D25F_SRAM_EMA_ADDR)){
+                        return 1;
+                    }
+                    if((core & N22)&&(dma_chain_p[i].dma_chain_dst_addr == (N22_SRAM_EMA_REG_ADDR)) ){
+                        return 1;
+                    }
+                    if((core & DSP)&&(dma_chain_p[i].dma_chain_dst_addr == (DSP_SRAM_EMA_REG_ADDR))){
+                        return 1;
+                    }
+                }
+            }
+        }
+    }
+    return 0;
+
+}
+static unsigned int g_dvdd_vol = DVDD1_DVDD2_DEFAULT_VOL;
+/**
+ * @brief       This function serves to set dvdd
+ * @param[in]   vol      - DVDD1_DVDD2_VOL_0P8_CONFG/DVDD1_DVDD2_VOL_0P9_CONFG.
+ *                       - the 0.8v/0.9v confirms which of the pm_dvdd1_dvdd2_voltage_e enumeration is configured, and then assigns the value to the macro DVDD1_DVDD2_VOL_0P8_CONFG/DVDD1_DVDD2_VOL_0P9_CONFG.
+ * @param[in]   chn      - dma channel.
+ * @param[in]   core     - sys_core_e,which cores are used in the application choose the corresponding enumeration (or just).
+ * @param[in]   dma_timeout_us - wait dma all chn complete timeout.
+ * @return      DRV_API_SUCCESS - successful;
+ *              DRV_API_INVALID_PARAM - equal to the current voltage configuration or dvdd1_dvdd2_vol error;
+ *              DRV_API_FAILURE - core error(need contains all the cores used);
+ *              DRV_API_TIMEOUT - wait for dma all chn idle timeout to exit;
+ *              DRV_API_OTHER_ERROR - clear all interrupt requests failed;
+ * @note        1.If the voltage goes up, after calling the interface first, then adjust the frequency;
+ *                If the voltage goes down,adjust the frequency first,then  calling the interface;
+ *              2.When adjusting this voltage, no access ram operation is allowed, so it will wait for dma idle in this interface,
+ *                modifying dma_timeout_us won't work if there are dma chains working all the time, and needs to be turned off by the upper layers themselves depending on the situation.
+ *              3.When adjusting this voltage, the mcu will be stalled because the ram cannot be operated, use the dma method to modify the dvdd configuration and wake up the d25f with this dma interrupt,
+ *                so will turns off the general interrupt and clears all interrupt requests.
+ *              4.When adjusting this voltage, no access ram operation is allowed,disable swire.
+ *              5.if the check configuration fails, reboot.
+ */
+drv_api_status_e pm_set_dvdd(pm_dvdd_voltage_e vol,dma_chn_e chn,sys_core_e core,unsigned int dma_timeout_us){
+
+    if((g_dvdd_vol == vol)||((vol!=DVDD1_DVDD2_VOL_0P8_CONFG)&&(vol!=DVDD1_DVDD2_VOL_0P9_CONFG))){
+        return DRV_API_INVALID_PARAM;
+    }
+    //turn off the interrupt source and save,the reason why it is placed at the front of the interface:
+    //To prevent the interrupt status flag bit from going up before the interrupt source is turned off, which will cause the plic_clr_all_request()
+    //interface to clear the interrupt and cause an exception to be returned.
+    plic_irqs_preprocess_for_wfi(1,FLD_MIE_MEIE);
+    //Check the parameter core:
+    //1. if power is on and this register is turned on, then the n22/dsp clk register is the configured value;
+    //2. If power is present and the register is not turned on, the n22/dsp clk is garbled;
+    //3. If the power is not on, even if the register is on, the n22/dsp clk register reads 00;
+    //That is to say, if the value is there, it is meaningful to judge whether the state of n22/dsp clk is correct or not, so whether the core is open or not is controlled by this register.
+    if((((core&N22) == N22)&&(sys_core_is_initialized(N22)==0))        \
+        ||(((core&N22)!=N22)&&(sys_core_is_initialized(N22)==1))       \
+        ||(((core&DSP)==DSP)&&(sys_core_is_initialized(DSP)==0))       \
+        ||(((core&DSP)!=DSP)&&(sys_core_is_initialized(DSP)==1))       \
+      ){
+      }else{
+          plic_irqs_postprocess_for_wfi();
+          return DRV_API_FAILURE;
+      }
+    //waiting for dma to finish.
+     if(dma_wait_for_all_chn_to_complete(dma_timeout_us)){
+         plic_irqs_postprocess_for_wfi();
+         return  DRV_API_TIMEOUT;
+    }
+    //n22/dsp core stall and save
+    sys_n22_clk_reg_save();
+    sys_dsp_clk_reg_save();
+    sys_n22_clk_dis();
+    sys_dsp_clk_dis();
+    //Open dma interrupt source and clear interrupt.
+    plic_interrupt_enable(IRQ_DMA);
+    plic_interrupt_enable(IRQ_DMA1);
+    unsigned int clr_plic_request_result = 0;
+    unsigned char clr_dma_irq_result = dma_clr_all_irq_status();
+    clr_plic_request_result = plic_clr_all_request();
+    if((clr_plic_request_result == 0 )&&(clr_dma_irq_result==DRV_API_FAILURE))
+    {
+       plic_irqs_postprocess_for_wfi();
+       sys_dsp_clk_reg_restore();
+       sys_n22_clk_reg_restore();
+       return DRV_API_OTHER_ERROR;
+    }
+    //Turn off swire and save
+    unsigned char swire =0;
+    if(swire_slave_is_init()){
+        swire=1;
+        swire_slave_dis();
+    }
+    //Initialize dma configuration, dma enable, dma mask save.
+    //Even if the n22/dsp is not turned on and the dma configuration does not go in, it does not affect the dma chaining table working
+    const dma_chain_config_t *dvdd_dma_chain=NULL;
+    if(vol > g_dvdd_vol){
+       if(vol==DVDD1_DVDD2_VOL_0P9_CONFG){
+            dvdd_dma_chain= dvdd_up_to_0p9_dma_chain;
+        }
+    }else{
+        if(vol==DVDD1_DVDD2_VOL_0P8_CONFG){
+            dvdd_dma_chain= dvdd_down_to_0p8_dma_chain;
+        }
+    }
+    g_dvdd_vol = vol;
+    unsigned char dma_mask=  dma_is_irq_mask(chn,TC_MASK);
+    dma_write_reg(chn,(const dma_chain_config_t *)dvdd_dma_chain,CHANIN_NODE_CNT);
+    //wfi
+    core_entry_wfi_mode();
+    dma_write_reg_is_complete();
+    //check
+    if(pm_set_dvdd_is_correct(( const dma_chain_config_t *)dvdd_dma_chain,CHANIN_NODE_CNT,core)){
+        sys_reboot();
+    }
+    //swire recovery, dma tc mask recovery
+    pm_set_dvdd_restore_cfg(chn,swire,dma_mask);
+    //clear flag bit, interrupt source recovery, Total interrupt recovery, core clk recovery
+    dma_clr_tc_irq_status(BIT(chn));
+    plic_irqs_postprocess_for_wfi();
+    sys_dsp_clk_reg_restore();
+    sys_n22_clk_reg_restore();
+    return DRV_API_SUCCESS;
+}
 #endif

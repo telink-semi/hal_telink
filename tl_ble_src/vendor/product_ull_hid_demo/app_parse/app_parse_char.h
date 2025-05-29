@@ -23,12 +23,12 @@
  *******************************************************************************************************/
 #pragma once
 
-typedef struct __attribute__((packed)) {
+typedef struct __attribute__((packed))
+{
     char *fun_name;
     void (*fun)(char *argv[], int argc, void *user_data);
     void *user_data;
 } parse_fun_list_t;
-
 
 /**
  * @brief        parse initial function.
@@ -50,7 +50,7 @@ void app_parse_loop(void);
  * @param[in]    ps: value string, '\0' ending, supported -1, -0xAB, 1.
  * @return        immediate value.
  */
-int app_parse_str2n (char * ps);
+int app_parse_str2n(char *ps);
 
 /**
  * @brief        parse print log function.
@@ -58,4 +58,3 @@ int app_parse_str2n (char * ps);
  * @return        none.
  */
 void app_parse_printf(const char *format, ...);
-

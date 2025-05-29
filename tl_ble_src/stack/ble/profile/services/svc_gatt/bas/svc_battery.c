@@ -24,54 +24,51 @@
 #include "stack/ble/ble.h"
 
 #ifndef BAS_BATTERY_POWER_STATE
-#define BAS_BATTERY_POWER_STATE             1
+    #define BAS_BATTERY_POWER_STATE 1
 #endif
 
-#define BAS_START_HDL                       SERVICE_BATTERY_HDL
+#define BAS_START_HDL SERVICE_BATTERY_HDL
 
-_attribute_ble_data_retention_
-static u8 basBatteryLevelValue = 0x64;
-static const u16 basBatteryLevelValueLen = sizeof(basBatteryLevelValue);
+_attribute_ble_data_retention_ static u8 basBatteryLevelValue    = 0x64;
+static const u16                         basBatteryLevelValueLen = sizeof(basBatteryLevelValue);
 
 #if BAS_BATTERY_POWER_STATE
-_attribute_ble_data_retention_
-static u8 basBatteryPowerStateValue = DEVICE_IN_CHARGING;
-static const u16 basBatteryPowerStateValueLen = sizeof(basBatteryPowerStateValue);
+_attribute_ble_data_retention_ static u8 basBatteryPowerStateValue    = DEVICE_IN_CHARGING;
+static const u16                         basBatteryPowerStateValueLen = sizeof(basBatteryPowerStateValue);
 #endif
 
 /*
  * @brief the structure for default BAS service List.
  */
 static const atts_attribute_t basList[] =
-{
-    ATTS_PRIMARY_SERVICE(serviceBatteryUuid),
+    {
+        ATTS_PRIMARY_SERVICE(serviceBatteryUuid),
 
-    //Battery level
-    ATTS_CHAR_UUID_READ_ENTITY_NOCB(charPropReadNotfiy, characteristicBatteryLevelUuid, basBatteryLevelValue),
-    ATTS_COMMON_CCC_DEFINE,
+        //Battery level
+        ATTS_CHAR_UUID_READ_ENTITY_NOCB(charPropReadNotfiy, characteristicBatteryLevelUuid, basBatteryLevelValue),
+        ATTS_COMMON_CCC_DEFINE,
 
 #if BAS_BATTERY_POWER_STATE
-    //Battery Power State
-    ATTS_CHAR_UUID_READ_ENTITY_NOCB(charPropReadNotfiy, characteristicBatteryPowerStateUuid, basBatteryPowerStateValue),
-    ATTS_COMMON_CCC_DEFINE,
+        //Battery Power State
+        ATTS_CHAR_UUID_READ_ENTITY_NOCB(charPropReadNotfiy, characteristicBatteryPowerStateUuid, basBatteryPowerStateValue),
+        ATTS_COMMON_CCC_DEFINE,
 #endif
 };
 
 /*
  * @brief the structure for default BAS service group.
  */
-_attribute_ble_data_retention_
-static atts_group_t svcBasGroup =
-{
-    NULL,
-    basList,
-    NULL,
-    NULL,
-    BAS_START_HDL,
-    0,
+_attribute_ble_data_retention_ static atts_group_t svcBasGroup =
+    {
+        NULL,
+        basList,
+        NULL,
+        NULL,
+        BAS_START_HDL,
+        0,
 };
 
-const u16 basIncludeVal[3] = {SERVICE_BATTERY_HDL, SERVICE_BATTERY_HDL+ARRAY_SIZE(basList)-1, SERVICE_UUID_BATTERY};
+const u16 basIncludeVal[3] = {SERVICE_BATTERY_HDL, SERVICE_BATTERY_HDL + ARRAY_SIZE(basList) - 1, SERVICE_UUID_BATTERY};
 
 /**
  * @brief      for user add default BAS service in all GAP server.
@@ -80,7 +77,7 @@ const u16 basIncludeVal[3] = {SERVICE_BATTERY_HDL, SERVICE_BATTERY_HDL+ARRAY_SIZ
  */
 void blc_svc_addBasGroup(void)
 {
-    svcBasGroup.endHandle = svcBasGroup.startHandle+ARRAY_SIZE(basList)-1;
+    svcBasGroup.endHandle = svcBasGroup.startHandle + ARRAY_SIZE(basList) - 1;
     blc_gatts_addAttributeServiceGroup(&svcBasGroup);
 }
 
@@ -104,7 +101,6 @@ void blc_svc_basSetBatteryLevel(u8 batteryLevel)
     basBatteryLevelValue = batteryLevel;
 }
 
-
 /**
  * @brief      for use set battery power state value.
  * @param[in]  powerState - the value that battery power state.
@@ -118,4 +114,3 @@ void blc_svc_basSetPowerState(blc_bas_battery_power_state_enum powerState)
     (void)powerState;
 #endif
 }
-

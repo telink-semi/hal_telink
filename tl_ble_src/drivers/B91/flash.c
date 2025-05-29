@@ -31,13 +31,13 @@
 #include "string.h"
 #include "watchdog.h"               //BLE SDK use
 
-_attribute_data_retention_sec_ flash_handler_t flash_read_page = flash_dread;
+_attribute_data_retention_sec_ flash_handler_t flash_read_page  = flash_dread;
 _attribute_data_retention_sec_ flash_handler_t flash_write_page = flash_page_program;
 
 _attribute_data_retention_sec_ static preempt_config_t s_flash_preempt_config =
-{
-    .preempt_en =0,
-    .threshold  =1,
+    {
+        .preempt_en = 0,
+        .threshold  = 1,
 };
 
 /*******************************************************************************************************************
@@ -61,7 +61,7 @@ _attribute_data_retention_sec_ static preempt_config_t s_flash_preempt_config =
 void flash_plic_preempt_config(unsigned char preempt_en, unsigned char threshold)
 {
     s_flash_preempt_config.preempt_en = preempt_en;
-    s_flash_preempt_config.threshold = threshold;
+    s_flash_preempt_config.threshold  = threshold;
 }
 
 /*******************************************************************************************************************
@@ -72,8 +72,9 @@ void flash_plic_preempt_config(unsigned char preempt_en, unsigned char threshold
  * @brief       This function to determine whether the flash is busy..
  * @return      1:Indicates that the flash is busy. 0:Indicates that the flash is free
  */
-_attribute_ram_code_sec_ static inline int flash_is_busy(void){
-    return mspi_read() & 0x01;      //the busy bit, pls check flash spec
+_attribute_ram_code_sec_ static inline int flash_is_busy(void)
+{
+    return mspi_read() & 0x01; //the busy bit, pls check flash spec
 }
 
 /**
@@ -97,10 +98,11 @@ _attribute_ram_code_sec_noinline_ void flash_send_cmd(flash_command_e cmd)
  * @param[in]   addr    - the flash address.
  * @return      none.
  */
-_attribute_ram_code_sec_noinline_ static void flash_send_addr(unsigned int addr){
-    mspi_write((unsigned char)(addr>>16));
+_attribute_ram_code_sec_noinline_ static void flash_send_addr(unsigned int addr)
+{
+    mspi_write((unsigned char)(addr >> 16));
     mspi_wait();
-    mspi_write((unsigned char)(addr>>8));
+    mspi_write((unsigned char)(addr >> 8));
     mspi_wait();
     mspi_write((unsigned char)(addr));
     mspi_wait();
@@ -115,8 +117,8 @@ _attribute_ram_code_sec_noinline_ static void flash_wait_done(void)
     flash_send_cmd(FLASH_READ_STATUS_CMD_LOWBYTE);
 
     int i;
-    for(i = 0; i < 10000000; ++i){
-        if(!flash_is_busy()){
+    for (i = 0; i < 10000000; ++i) {
+        if (!flash_is_busy()) {
             break;
         }
     }
@@ -139,48 +141,42 @@ _attribute_ram_code_sec_noinline_ static void flash_wait_done(void)
  */
 _attribute_ram_code_sec_noinline_ void flash_mspi_read_ram(flash_command_e cmd, unsigned long addr, unsigned char addr_en, unsigned char dummy_cnt, unsigned char *data, unsigned long data_len)
 {
-    unsigned int r=plic_enter_critical_sec(s_flash_preempt_config.preempt_en,s_flash_preempt_config.threshold);
+    unsigned int r = plic_enter_critical_sec(s_flash_preempt_config.preempt_en, s_flash_preempt_config.threshold);
     mspi_stop_xip();
     /*Flash single line mode does not distinguish between mspi read and mspi write.This is just to be compatible with single line, dual line and quad line.*/
-    mspi_fm_write_en();         /* write mode */
+    mspi_fm_write_en(); /* write mode */
     mspi_fm_data_line(MSPI_SINGLE_LINE);
     flash_send_cmd(cmd);
-    if(cmd == FLASH_X4READ_CMD)
-    {
+    if (cmd == FLASH_X4READ_CMD) {
         mspi_fm_data_line(MSPI_QUAD_LINE);
     }
-    if(addr_en)
-    {
+    if (addr_en) {
         flash_send_addr(addr);
     }
-    for(unsigned int i = 0; i < dummy_cnt; ++i)
-    {
-        mspi_write(0x00);       /* dummy */
+    for (unsigned int i = 0; i < dummy_cnt; ++i) {
+        mspi_write(0x00); /* dummy */
         mspi_wait();
     }
-    if(cmd == FLASH_DREAD_CMD)
-    {
+    if (cmd == FLASH_DREAD_CMD) {
         mspi_fm_data_line(MSPI_DUAL_LINE);
     }
-    mspi_fm_read_en();          /* read mode */
-    mspi_write(0x00);           /* to issue clock */
+    mspi_fm_read_en();    /* read mode */
+    mspi_write(0x00);     /* to issue clock */
     mspi_wait();
-    mspi_fm_rd_trig_en();       /* auto mode, mspi_get() automatically triggers mspi_write(0x00) once. */
+    mspi_fm_rd_trig_en(); /* auto mode, mspi_get() automatically triggers mspi_write(0x00) once. */
     mspi_wait();
-    for(unsigned int i = 0; i < data_len; ++i)
-    {
+    for (unsigned int i = 0; i < data_len; ++i) {
         *data++ = mspi_get();
         mspi_wait();
     }
-    mspi_fm_rd_trig_dis();      /* off read auto mode */
-    if((cmd == FLASH_X4READ_CMD)||(cmd == FLASH_DREAD_CMD))
-    {
+    mspi_fm_rd_trig_dis(); /* off read auto mode */
+    if ((cmd == FLASH_X4READ_CMD) || (cmd == FLASH_DREAD_CMD)) {
         mspi_fm_data_line(MSPI_SINGLE_LINE);
     }
     mspi_high();
 
     CLOCK_DLY_5_CYC;
-    plic_exit_critical_sec(s_flash_preempt_config.preempt_en,r);
+    plic_exit_critical_sec(s_flash_preempt_config.preempt_en, r);
 }
 
 /**
@@ -195,35 +191,31 @@ _attribute_ram_code_sec_noinline_ void flash_mspi_read_ram(flash_command_e cmd, 
  */
 _attribute_ram_code_sec_noinline_ void flash_mspi_write_ram(flash_command_e cmd, unsigned long addr, unsigned char addr_en, unsigned char *data, unsigned long data_len)
 {
-    unsigned int r=plic_enter_critical_sec(s_flash_preempt_config.preempt_en,s_flash_preempt_config.threshold);
+    unsigned int r = plic_enter_critical_sec(s_flash_preempt_config.preempt_en, s_flash_preempt_config.threshold);
     mspi_stop_xip();
     /*Flash single line mode does not distinguish between mspi read and mspi write.This is just to be compatible with single line, dual line and quad line.*/
-    mspi_fm_write_en();         /* write mode */
+    mspi_fm_write_en(); /* write mode */
     mspi_fm_data_line(MSPI_SINGLE_LINE);
     flash_send_cmd(FLASH_WRITE_ENABLE_CMD);
     flash_send_cmd(cmd);
-    if(addr_en)
-    {
+    if (addr_en) {
         flash_send_addr(addr);
     }
-    if(cmd == FLASH_QUAD_PAGE_PROGRAM_CMD)
-    {
+    if (cmd == FLASH_QUAD_PAGE_PROGRAM_CMD) {
         mspi_fm_data_line(MSPI_QUAD_LINE);
     }
-    for(unsigned int i = 0; i < data_len; ++i)
-    {
+    for (unsigned int i = 0; i < data_len; ++i) {
         mspi_write(data[i]);
         mspi_wait();
     }
     mspi_high();
-    if(cmd == FLASH_QUAD_PAGE_PROGRAM_CMD)
-    {
+    if (cmd == FLASH_QUAD_PAGE_PROGRAM_CMD) {
         mspi_fm_data_line(MSPI_SINGLE_LINE);
     }
     flash_wait_done();
 
     CLOCK_DLY_5_CYC;
-    plic_exit_critical_sec(s_flash_preempt_config.preempt_en,r);
+    plic_exit_critical_sec(s_flash_preempt_config.preempt_en, r);
 }
 
 /**
@@ -310,9 +302,9 @@ _attribute_text_sec_ void flash_4read(unsigned long addr, unsigned long len, uns
 _attribute_text_sec_ static void flash_write(unsigned long addr, unsigned long len, unsigned char *buf, flash_command_e cmd)
 {
     unsigned int ns = PAGE_SIZE - (addr & (PAGE_SIZE - 1));
-    int nw = 0;
+    int          nw = 0;
 
-    while(len > 0){
+    while (len > 0) {
         nw = len > ns ? ns : len;
         DISABLE_BTB;
         flash_mspi_write_ram(cmd, addr, 1, buf, nw);
@@ -421,13 +413,13 @@ _attribute_text_sec_ void flash_write_status(flash_status_typedef_e type, unsign
     unsigned char buf[2];
 
     buf[0] = data;
-    buf[1] = data>>8;
+    buf[1] = data >> 8;
     DISABLE_BTB;
-    if(type == FLASH_TYPE_8BIT_STATUS){
+    if (type == FLASH_TYPE_8BIT_STATUS) {
         flash_mspi_write_ram(FLASH_WRITE_STATUS_CMD_LOWBYTE, 0, 0, buf, 1);
-    }else if(type == FLASH_TYPE_16BIT_STATUS_ONE_CMD){
+    } else if (type == FLASH_TYPE_16BIT_STATUS_ONE_CMD) {
         flash_mspi_write_ram(FLASH_WRITE_STATUS_CMD_LOWBYTE, 0, 0, buf, 2);
-    }else if(type == FLASH_TYPE_16BIT_STATUS_TWO_CMD){
+    } else if (type == FLASH_TYPE_16BIT_STATUS_TWO_CMD) {
         flash_mspi_write_ram(FLASH_WRITE_STATUS_CMD_LOWBYTE, 0, 0, (unsigned char *)&buf[0], 1);
         flash_mspi_write_ram(FLASH_WRITE_STATUS_CMD_HIGHBYTE, 0, 0, (unsigned char *)&buf[1], 1);
     }
@@ -450,7 +442,7 @@ _attribute_text_sec_ void flash_write_status(flash_status_typedef_e type, unsign
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-_attribute_text_sec_ void flash_read_otp(unsigned long addr, unsigned long len, unsigned char* buf)
+_attribute_text_sec_ void flash_read_otp(unsigned long addr, unsigned long len, unsigned char *buf)
 {
     DISABLE_BTB;
     flash_mspi_read_ram(FLASH_READ_SECURITY_REGISTERS_CMD, addr, 1, 1, buf, len);
@@ -476,9 +468,9 @@ _attribute_text_sec_ void flash_read_otp(unsigned long addr, unsigned long len, 
 _attribute_text_sec_ void flash_write_otp(unsigned long addr, unsigned long len, unsigned char *buf)
 {
     unsigned int ns = PAGE_SIZE_OTP - (addr & (PAGE_SIZE_OTP - 1));
-    int nw = 0;
+    int          nw = 0;
 
-    while(len > 0){
+    while (len > 0) {
         nw = len > ns ? ns : len;
         DISABLE_BTB;
         flash_mspi_write_ram(FLASH_WRITE_SECURITY_REGISTERS_CMD, addr, 1, buf, nw);
@@ -531,7 +523,7 @@ _attribute_text_sec_ unsigned int flash_read_mid(void)
 {
     unsigned int flash_mid = 0;
     DISABLE_BTB;
-    flash_mspi_read_ram(FLASH_GET_JEDEC_ID, 0, 0, 0, (unsigned char*)(&flash_mid), 3);
+    flash_mspi_read_ram(FLASH_GET_JEDEC_ID, 0, 0, 0, (unsigned char *)(&flash_mid), 3);
     ENABLE_BTB;
     return flash_mid;
 }
@@ -555,7 +547,7 @@ _attribute_text_sec_ unsigned int flash_read_mid(void)
 _attribute_text_sec_ void flash_read_uid(unsigned char idcmd, unsigned char *buf)
 {
     DISABLE_BTB;
-    if(idcmd == FLASH_READ_UID_CMD_GD_PUYA_ZB_TH)   //< GD/PUYA/ZB/TH
+    if (idcmd == FLASH_READ_UID_CMD_GD_PUYA_ZB_TH) //< GD/PUYA/ZB/TH
     {
         flash_mspi_read_ram(idcmd, 0, 0, 4, buf, 16);
     }
@@ -571,14 +563,15 @@ _attribute_text_sec_ void flash_read_uid(unsigned char idcmd, unsigned char *buf
  */
 _attribute_ram_code_sec_noinline_ void flash_set_xip_config_sram(flash_xip_config_e config)
 {
-    unsigned int r=plic_enter_critical_sec(s_flash_preempt_config.preempt_en,s_flash_preempt_config.threshold);
+    unsigned int r = plic_enter_critical_sec(s_flash_preempt_config.preempt_en, s_flash_preempt_config.threshold);
 
     mspi_stop_xip();
     reg_mspi_xip_config = config;
     CLOCK_DLY_5_CYC;
 
-    plic_exit_critical_sec(s_flash_preempt_config.preempt_en,r);
+    plic_exit_critical_sec(s_flash_preempt_config.preempt_en, r);
 }
+
 _attribute_text_sec_ void flash_set_xip_config(flash_xip_config_e config)
 {
     DISABLE_BTB;
@@ -602,7 +595,7 @@ _attribute_text_sec_ void flash_set_xip_config(flash_xip_config_e config)
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-_attribute_text_sec_ void flash_write_config(flash_command_e cmd,unsigned char data)
+_attribute_text_sec_ void flash_write_config(flash_command_e cmd, unsigned char data)
 {
     DISABLE_BTB;
     flash_mspi_write_ram(cmd, 0, 0, &data, 1);
@@ -622,9 +615,9 @@ _attribute_text_sec_ void flash_write_config(flash_command_e cmd,unsigned char d
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-_attribute_text_sec_ unsigned char  flash_read_config(void)
+_attribute_text_sec_ unsigned char flash_read_config(void)
 {
-    unsigned char config=0;
+    unsigned char config = 0;
     DISABLE_BTB;
     flash_mspi_read_ram(FLASH_READ_CONFIGURE_CMD, 0, 0, 0, &config, 1);
     ENABLE_BTB;
@@ -643,8 +636,7 @@ _attribute_text_sec_ unsigned char  flash_read_config(void)
  */
 unsigned int flash_get_vendor(unsigned int flash_mid)
 {
-    switch(flash_mid&0x0000ffff)
-    {
+    switch (flash_mid & 0x0000ffff) {
     case 0x0000325E:
         return FLASH_ETOX_ZB;
     case 0x000060C8:
@@ -669,7 +661,7 @@ unsigned int flash_get_vendor(unsigned int flash_mid)
  * @param[in]   flash_mid - MID of the flash(4 bytes).
  * @return      flash capacity.
  */
-flash_capacity_e  flash_get_capacity(unsigned int flash_mid)
+flash_capacity_e flash_get_capacity(unsigned int flash_mid)
 {
-    return (flash_mid&0x00ff0000)>>16;
+    return (flash_mid & 0x00ff0000) >> 16;
 }

@@ -130,8 +130,8 @@ ext_hci_StatusTypeDef_e ext_hci_uartInit(ext_hci_InitTypeDef * uart)
 /**
  * @brief  Transmit interrupt function
  */
-_attribute_ram_code_com_
-_attribute_ram_code_com_sec_ void ext_hci_irq_handler(void){
+_attribute_ram_code_
+_attribute_ram_code_sec_ void ext_hci_irq_handler(void){
      if(uart_get_irq_status(EXT_HCI_UART_CHANNEL,UART_TXDONE_IRQ_STATUS))
      {
          uart_clr_irq_status(EXT_HCI_UART_CHANNEL,UART_TXDONE_IRQ_STATUS);
@@ -147,7 +147,7 @@ PLIC_ISR_REGISTER(ext_hci_irq_handler, EXT_HCI_UART_IRQ )
 /**
  * @brief  Receive interrupt function
  */
-_attribute_ram_code_com_
+_attribute_ram_code_
 void ext_hci_dma_irq_handler(void)
 {
     if(dma_get_tc_irq_status( BIT(EXT_HCI_UART_DMA_CHN_RX))){
@@ -185,7 +185,7 @@ unsigned char ext_hci_getTxCompleteDone(void)
  *              0  the length is error.
  * @note        addr: must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
-_attribute_ram_code_com_sec_
+_attribute_ram_code_sec_
 unsigned char ext_hci_uartSendData(unsigned char *addr, unsigned int len)
 {
     unsigned char ret_val;
@@ -196,7 +196,7 @@ unsigned char ext_hci_uartSendData(unsigned char *addr, unsigned int len)
     return ret_val;
 }
 
-_attribute_ram_code_com_sec_  //BLE SDK use:
+_attribute_ram_code_sec_  //BLE SDK use:
 void ext_hci_uartReceData(unsigned char *addr, unsigned int len)
 {
     core_interrupt_disable();

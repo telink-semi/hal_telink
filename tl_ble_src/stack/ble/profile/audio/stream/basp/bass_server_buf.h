@@ -26,41 +26,45 @@
 #include "stack/ble/profile/services/svc_adv.h"
 
 #ifndef DEFAULT_BROADCAST_ID
-#define DEFAULT_BROADCAST_ID            0x123456
+    #define DEFAULT_BROADCAST_ID 0x123456
 #endif
 
-typedef struct{
+typedef struct
+{
     /* Service handle range */
     u16 bassCtrlHandle;
     u16 pastConnHandle;
-    u8 sourceId;
-    u8 bcstRcvStateCnt;
+    u8  sourceId;
+    u8  bcstRcvStateCnt;
     u16 pastTimer;
     u16 recvStateHandle[STACK_AUDIO_BASS_RECV_STATE_NUM];
     u32 pastStartTimer;
 
 } blc_bass_server_t;
 
-typedef struct blc_bass_server_ctrl{
-    blc_prf_proc_t process;
+typedef struct blc_bass_server_ctrl
+{
+    blc_prf_proc_t    process;
     blc_bass_server_t bassServer;
 } blc_bass_server_ctrl_t;
 
-typedef struct{
-    u16 pastTimer;  //unit ms
+typedef struct
+{
+    u16 pastTimer; //unit ms
 } blc_basss_regParam_t;
 
-typedef struct{
+typedef struct
+{
     blc_adv_ltv_t ltv;
-    u16 baasUuid;
-    u8 broadcastId[3];
+    u16           baasUuid;
+    u8            broadcastId[3];
 } blc_adv_broadcastId_t;
 
-typedef struct{
+typedef struct
+{
     blc_adv_ltv_t ltv;
-    u16 bassUuid;
+    u16           bassUuid;
 } blc_adv_broadcastSink_t;
 
-extern const blc_adv_broadcastId_t advDefBroadcastId;
+extern const blc_adv_broadcastId_t   advDefBroadcastId;
 extern const blc_adv_broadcastSink_t advDefBroadcastSink;
-

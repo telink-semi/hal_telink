@@ -30,8 +30,7 @@ const int gAppVcsSvrInstNum = APP_AUDIO_AICS_SERVER_MAX_INSTANCE_NUM;
 
 
 _attribute_ble_data_retention_
-blc_aics_server_t aics_server[APP_AUDIO_AICS_SERVER_MAX_INSTANCE_NUM];
-
+    blc_aics_server_t aics_server[APP_AUDIO_AICS_SERVER_MAX_INSTANCE_NUM];
 
 /**
  * @brief       aics get server control buffer.
@@ -44,7 +43,3 @@ blc_aics_server_t *blt_aicss_getServerControlBuffer(u8 instIdx)
 
     return &aics_server[instIdx];
 }
-
-
-
-

@@ -26,17 +26,15 @@
 
 unsigned int g_slave_base_addr[4] = {0x00000000, 0x00000000, 0x00000000, 0x00000000};
 
-
 /**
  * @brief       This function servers to write mspi fifo.
  * @param[in]   data    - the pointer to the data for write.
  * @param[in]   len     - write length.
  * @return      none
  */
-_attribute_ram_code_com_sec_noinline_  void mspi_write(unsigned char *data, unsigned int len)
+_attribute_ram_code_sec_noinline_ void mspi_write(unsigned char *data, unsigned int len)
 {
-    for (unsigned int i = 0; i < len; i++)
-    {
+    for (unsigned int i = 0; i < len; i++) {
         //while (reg_mspi_txfifo_status & FLD_MSPI_TXFIFO_FULL);    //do not need software to block,use hardware block mcu.
         reg_mspi_wr_rd_data(i % 4) = data[i];
     }
@@ -49,11 +47,10 @@ _attribute_ram_code_com_sec_noinline_  void mspi_write(unsigned char *data, unsi
  * @param[in]   len     - write length.
  * @return      none
  */
-_attribute_ram_code_com_sec_noinline_  void mspi_read(unsigned char *data, unsigned int len)
+_attribute_ram_code_sec_noinline_ void mspi_read(unsigned char *data, unsigned int len)
 {
-    for (unsigned int i = 0; i < len; i++)
-    {
-//      while (reg_mspi_rxfifo_status & FLD_MSPI_RXFIFO_EMPTY);   //do not need software to block,use hardware block mcu.
+    for (unsigned int i = 0; i < len; i++) {
+        //      while (reg_mspi_rxfifo_status & FLD_MSPI_RXFIFO_EMPTY);   //do not need software to block,use hardware block mcu.
         data[i] = reg_mspi_wr_rd_data(i % 4);
     }
     mspi_wait();
@@ -72,8 +69,7 @@ _attribute_ram_code_com_sec_noinline_  void mspi_read(unsigned char *data, unsig
  */
 unsigned char mspi_slave_device_addr_space_config(mspi_slave_size_e slave0_size, mspi_slave_size_e slave1_size, mspi_slave_size_e slave2_size, mspi_slave_size_e slave3_size)
 {
-    if((slave0_size + slave1_size + slave2_size + slave3_size) > 4)
-    {
+    if ((slave0_size + slave1_size + slave2_size + slave3_size) > 4) {
         return 0;
     }
     //The middle device can also not allocate the address space, because when the chip actually accesses the address,
@@ -88,26 +84,23 @@ unsigned char mspi_slave_device_addr_space_config(mspi_slave_size_e slave0_size,
     //  slave2 space = {xip1_end_addr+1) * 16m, (xip2_end_addr+1) * 16m}.
     //  slave3 space = {xip2_end_addr+1) * 16m, (xip3_end_addr+1) * 16m}.
 
-    reg_mspi_xip_size_set = (((slave0_size + slave1_size + slave2_size + slave3_size - 1) << 6) & FLD_MSPI_XIP3_END_ADDR)\
-            | (((slave0_size + slave1_size + slave2_size - 1) << 4) & FLD_MSPI_XIP2_END_ADDR)\
-            | (((slave0_size + slave1_size - 1) << 2) & FLD_MSPI_XIP1_END_ADDR) | ((slave0_size - 1) & FLD_MSPI_XIP0_END_ADDR);
+    reg_mspi_xip_size_set = (((slave0_size + slave1_size + slave2_size + slave3_size - 1) << 6) & FLD_MSPI_XIP3_END_ADDR) | (((slave0_size + slave1_size + slave2_size - 1) << 4) & FLD_MSPI_XIP2_END_ADDR) | (((slave0_size + slave1_size - 1) << 2) & FLD_MSPI_XIP1_END_ADDR) | ((slave0_size - 1) & FLD_MSPI_XIP0_END_ADDR);
 
-    if(slave1_size == SLAVE_SIZE_NONE){
+    if (slave1_size == SLAVE_SIZE_NONE) {
         g_slave_base_addr[1] = 0x00000000;
-    }else{
+    } else {
         g_slave_base_addr[1] = slave0_size << 24;
     }
-    if(slave2_size == SLAVE_SIZE_NONE){
+    if (slave2_size == SLAVE_SIZE_NONE) {
         g_slave_base_addr[2] = 0x00000000;
-    }else{
+    } else {
         g_slave_base_addr[2] = (slave0_size + slave1_size) << 24;
     }
-    if(slave3_size == SLAVE_SIZE_NONE){
+    if (slave3_size == SLAVE_SIZE_NONE) {
         g_slave_base_addr[3] = 0x00000000;
-    }else{
+    } else {
         g_slave_base_addr[3] = (slave0_size + slave1_size + slave2_size) << 24;
     }
 
     return 1;
 }
-

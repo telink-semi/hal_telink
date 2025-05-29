@@ -78,26 +78,6 @@ enum{
     FLD_BB_DMA_TX_SIZE_IDX      =   BIT_RNG(22,23),
 };
 
-
-#define reg_bb_dma_rx_wptr              REG_ADDR8(BB_DMA_BASE_ADDR+0xf4)
-#define reg_bb_dma_tx_wptr              REG_ADDR8(BB_DMA_BASE_ADDR+0x100)
-
-enum{
-    FLD_BB_DMA_WPTR_MASK =          BIT_RNG(0,4),
-};
-
-
-#define reg_bb_dma_rx_rptr              REG_ADDR8(BB_DMA_BASE_ADDR+0xf5)
-#define reg_bb_dma_tx_rptr              REG_ADDR8(BB_DMA_BASE_ADDR+0x101)
-enum{
-    FLD_BB_DMA_RPTR_MASK =          BIT_RNG(0,4),
-    FLD_BB_DMA_RPTR_SET =           BIT(5),
-    FLD_BB_DMA_RPTR_NEXT =          BIT(6),
-    FLD_BB_DMA_RPTR_CLR =           BIT(7),
-};
-
-
-
 #define reg_rf_bb_auto_ctrl             REG_ADDR8(BB_DMA_BASE_ADDR+0x10c)
 enum{
     FLD_RF_TX_MULTI_EN                  =   BIT(0),
@@ -116,7 +96,17 @@ enum{
 #define reg_rf_dma_rx_rptr              REG_ADDR8(BB_DMA_BASE_ADDR+0xf5)
 
 #define reg_rf_dma_tx_rptr(i)           REG_ADDR8(BB_DMA_BASE_ADDR+0x101 + (i << 1))
+enum{
+    FLD_BB_DMA_RPTR_MASK =          BIT_RNG(0,4),
+    FLD_BB_DMA_RPTR_SET =           BIT(5),
+    FLD_BB_DMA_RPTR_NEXT =          BIT(6),
+    FLD_BB_DMA_RPTR_CLR =           BIT(7),
+};
+
 #define reg_rf_dma_tx_wptr(i)           REG_ADDR8(BB_DMA_BASE_ADDR+0x100 + (i << 1))
+enum{
+    FLD_BB_DMA_WPTR_MASK =         BIT_RNG(0,4),
+};
 
 #define reg_rf_bb_rx_size                   REG_ADDR8(BB_DMA_BASE_ADDR+0xf6)
 #define reg_rf_bb_rx_size_h                 REG_ADDR8(BB_DMA_BASE_ADDR+0xf7)
@@ -833,6 +823,7 @@ enum{
 #define    reg_rf_ll_2d_sclk       REG_ADDR8(REG_BB_LL_BASE_ADDR+0x24)
 typedef enum {
     FLD_RF_STATE_MACHINE_IDLE = 0,          /**< idle */
+    FLD_RF_STATE_MACHINE_ACTIVE,            /**< active */
     FLD_RF_STATE_MACHINE_TX_SETTLE,         /**< tx settle*/
     FLD_RF_STATE_MACHINE_TX,                /**< tx */
     FLD_RF_STATE_MACHINE_RX_WAIT,           /**< rx wait */
@@ -882,7 +873,7 @@ enum{
 };
 #define   CLEAR_ALL_RFIRQ_STATUS        do{reg_rf_irq_status = 0xffff; \
                                             reg_rf_ll_irq_list_h = 0xff; \
-                                            reg_rf_mdm_irq_status_clr = reg_rf_mdm_irq_status_clr;}while(0) //Read operation cleanup
+                                            reg_rf_mdm_irq_status_clr = read_reg8(0xd4171374);}while(0)//Read operation cleanup
 
 #define    reg_rf_ll_tx_en_ctrl4      REG_ADDR8(REG_BB_LL_BASE_ADDR+0x4f)
 enum{

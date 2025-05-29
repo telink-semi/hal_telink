@@ -23,96 +23,96 @@
  *******************************************************************************************************/
 #pragma once
 
+/**
+ * @brief maximum expected number of lost segment entries - consecutive lost segments get stored as a single entry
+ */
+#define RAS_LOST_SEGMENT_RECORDS_COUNT 8
 
 /**
- * @brief the cmd of get lost procedure segment.
+ * @brief RAS characteristics read
  */
-typedef struct __attribute__((packed))  {
-    u16 recordNumber;
-    u16 segmentStart;
-    u16 segmentEnd;
-} ras_getLostProcSegment_t;
-
-#define RECORD_LOST_SEGMENT_BUFF_LEN    8
+typedef enum {
+    BLT_RASC_READ_RAS_FEATURE,
+    BLT_RASC_READ_RAS_DATA_READY,
+    BLT_RASC_READ_RAS_DATA_OVERWRITTEN,
+    BLT_RASC_READ_MAX,
+} blt_rasc_read_t;
 
 /**
- * @brief the buffer of record lost segment.
+ * @brief the get lost segment command
  */
-typedef struct {
-    u16 index;
-    ras_getLostProcSegment_t segment[RECORD_LOST_SEGMENT_BUFF_LEN];
-} ras_recordLostSegment_t;
+typedef struct __attribute__((packed))
+{
+    u16 rangingCounter;
+    u8  segmentStartAsIndex;
+    u8  segmentEndAsIndex;
+} blt_rasc_get_lost_proc_segment_t;
+
+/**
+ * @brief buffer for storing lost segment records
+ */
+typedef struct __attribute__((packed))
+{
+    u16                              lostSegmentEntriesCount;
+    blt_rasc_get_lost_proc_segment_t segment[RAS_LOST_SEGMENT_RECORDS_COUNT];
+} blt_rasc_record_lost_segment_t;
+
+/**
+ * @brief a node type for storing segments incoming from RAS server on the RAS client side, before they get combined to full received procedure
+ */
+typedef struct __attribute__((packed)) ras_segment_node
+{
+    struct __attribute__((packed)) ras_segment_node *next;
+    u8                                              *pData;
+    u8                                               index;
+    u8                                               dataLen;
+} blt_rasc_segment_node_t;
 
 /**
  * @brief the data structure of ranging procedure data.
  */
-typedef struct __attribute__((packed))  {
-    u16 procedureCounter;
-    u16 expectSegmentCounter;
-    u16 rangingDataLen;
-    u8 rangingData[4096];
-    ras_recordLostSegment_t ras_segment;
-} ras_rangingProcData_t;
-
-#define RECORD_ONDEMAND_BUFF_LEN    1
-
-/**
- * @brief the data structure of get lost procedure segment.
- */
-typedef struct __attribute__((packed))  {
-    u8  rcvSegmentLostStart;
-    u16 bffIndex;
-    u16 expectSegmentCounter;
-    u16 recordNumber;
-    u16 segmentStart;
-    u16 segmentEnd;
-} ras_getLostData_t;
+typedef struct __attribute__((packed))
+{
+    u16                            rangingCounter;
+    u8                             finalSegmentReceived;
+    u8                             segmentCount;
+    u8                             realtimeDataLost;
+    u16                            expectedSegmentAsIndex;
+    u16                            rangingDataLen;
+    u8                            *rangingData;
+    blt_rasc_segment_node_t       *head;
+    blt_rasc_record_lost_segment_t ras_segment;
+} blt_rasc_ranging_proc_data_t;
 
 /**
- * @brief the data structure of ranging data to application .
+ * @brief lost segments control structure
  */
-typedef struct __attribute__((packed))  {
-    u8 onDemandDataFlag;
-    u16 rangingDataIndex;
-    ras_getLostData_t   lost_data_ctl;
-    ras_rangingProcData_t  proc_data[RECORD_ONDEMAND_BUFF_LEN];
-} ras_rangingData_t;
+typedef struct __attribute__((packed))
+{
+    u8  lostSegmentsFlag;
+    u16 expectedSegmentAsIndex;
+    u16 rangingCounter;
+    u16 segmentStartAsIndex;
+    u16 segmentEndAsIndex;
+} blt_rasc_get_lost_data_t;
 
 /**
- * @brief the data structure of RAS Client basic info.
+ * @brief the data structure for storing received ranging data and related lost segments metadata
  */
-typedef struct __attribute__((packed))  {
-    gattc_sub_ccc_msg_t ntfInput;
-    /* Characteristic value handle */
-    u8 rasFeatureProperties;
-    u16 rasFeatureHandle;
+typedef struct __attribute__((packed))
+{
+    blt_rasc_get_lost_data_t     lost_data_ctl;
+    blt_rasc_ranging_proc_data_t proc_data;
+} blt_ras_ranging_data_t;
 
-    u8 liveRangingDataProperties;       //live ranging data attribute properties
-    u16 liveRangingDataHandle;          //live ranging data attribute handle
-
-    u8 storedRangingDataProperties;     //stored ranging data attribute properties
-    u16 storedRangingDataHandle;        //stored ranging data attribute handle
-
-    u8 rasControlPointProperties;       //ras control point attribute properties
-    u16 rasControlPointHandle;          //ras control point attribute handle
-
-    u8 rangingDataReadyProperties;      //ranging data ready attribute properties
-    u16 rangingDataReadyHandle;         //ranging data ready attribute handle
-
-    u8 rangingDataOverwrittenProperties;//stored ranging Overwritten data attribute properties
-    u16 rangingDataOverwrittenHandle;   //stored ranging Overwritten data attribute handle
-
-    u8 recvState;
-
-    svc_ras_feature_t ras_feature;
-    ras_rangingData_t rang_data;
-
-} blc_ras_client_t;
+/**
+ * @brief timeout event callback prototype
+ */
+typedef ble_sts_t (*blt_ras_timer_cb_t)(u16, u16, u8); //(u16, u16, blc_ras_timer_type_enum)
 
 /**
  * @brief the data structure of register RAS Client parameter.
  */
-typedef struct __attribute__((packed)) {
-
+typedef struct __attribute__((packed))
+{
 } blc_rasc_regParam_t;
-

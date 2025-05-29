@@ -28,56 +28,76 @@
 #include "bas_internal.h"
 #include "bas_server_buf.h"
 
-static int blt_bass_init(u8 initType, const void* param);
-static void blt_bass_serviceInit(const struct blc_bass_regParam* param);
+static int  blt_bass_init(u8 initType, const void *param);
+static void blt_bass_serviceInit(const struct blc_bass_regParam *param);
 static void blt_bass_setBatteryLevel(u8 batteryLevel);
 static void blt_bass_setBatteryPowerState(u8 batteryPowerState);
 
-_attribute_ble_data_retention_
-struct blc_bas_server_ctrl bas_server_ctrl = {
+#if ((!defined(HOST_V2_ENABLE)))
+_attribute_ble_data_retention_ struct blc_bas_server_ctrl bas_server_ctrl = {
     .process = {
-        .pNext = NULL,
-        .id = BAS_SERVER,
-        .usedAclRole = 0,
-        .init = blt_bass_init,
-        .connect = NULL,
-        .discov = NULL,
-        .loop = NULL,
-    },
+                .pNext       = NULL,
+                .id          = BAS_SERVER,
+                .usedAclRole = 0,
+                .init        = blt_bass_init,
+                .connect     = NULL,
+                .discov      = NULL,
+                .loop        = NULL,
+                },
 };
+#else
+static const struct blc_prf_process_params s_bas_server_process_params = {
+    .id          = BAS_SERVER,
+    .usedAclRole = PRF_GAP_ACL_UNSPECIF,
+    .init        = blt_bass_init,
+    .connect     = NULL,
+    .discovery   = NULL,
+};
+
+_attribute_ble_data_retention_ struct blc_bas_server_ctrl bas_server_ctrl = {
+    .process = {
+                .next       = SLIST_HEAD_INITIALIZER(),
+                .prf_params = &s_bas_server_process_params,
+                },
+};
+#endif
 
 void blc_basic_registerBASControlServer(const struct blc_bass_regParam *param)
 {
-    blc_prf_registerServiceModule(PRF_GAP_ACL_UNSPECIF, (blc_prf_proc_t*)&bas_server_ctrl, param);
+#if ((!defined(HOST_V2_ENABLE)))
+    blc_prf_registerServiceModule(PRF_GAP_ACL_UNSPECIF, (blc_prf_proc_t *)&bas_server_ctrl, param);
+#else
+    blc_prf_registerServiceModule((struct blc_prf_process *)&bas_server_ctrl, param);
+#endif
 }
 
-static int blt_bass_init(u8 initType, const void* param)
+static int blt_bass_init(u8 initType, const void *param)
 {
-#if(BLT_STRUCT_4B_ALIGN_CHECK_EN)
+#if (BLT_STRUCT_4B_ALIGN_CHECK_EN)
     STATIC_ASSERT_FILE(IS_4BYTE_ALIGN(sizeof(struct blc_bas_server_ctrl)), blc_bas_server_ctrl);
     STATIC_ASSERT_FILE(IS_4BYTE_ALIGN(sizeof(struct blc_bas_server)), blc_bas_server);
 #endif
 
-    if(initType == PRF_PROC_INIT) {
+    if (initType == PRF_PROC_INIT) {
         BLT_BAS_LOG("Server init");
         blc_svc_addBasGroup();
         blt_bass_serviceInit(param);
     }
-//  else if (initType == PRF_PROC_DEINIT) {
-//      blc_svc_removeBasGroup();
-//      BLT_BAS_LOG("Server deinit");
-//  }
+    //  else if (initType == PRF_PROC_DEINIT) {
+    //      blc_svc_removeBasGroup();
+    //      BLT_BAS_LOG("Server deinit");
+    //  }
     return 0;
 }
 
-static struct blc_bas_server* blt_bass_getCtrl(u16 connHandle)
+static struct blc_bas_server *blt_bass_getCtrl(u16 connHandle)
 {
     (void)connHandle;
     return &bas_server_ctrl.basServer;
 }
 
-#define BASS_BATTERY_LEVEL_HANDLE(connHandle)               (blt_bass_getCtrl(connHandle)->batteryLevelHdl)
-#define BASS_BATTERY_POWER_STATE_HANDLE(connHandle)         (blt_bass_getCtrl(connHandle)->batteryPowerStateHdl)
+#define BASS_BATTERY_LEVEL_HANDLE(connHandle)       (blt_bass_getCtrl(connHandle)->batteryLevelHdl)
+#define BASS_BATTERY_POWER_STATE_HANDLE(connHandle) (blt_bass_getCtrl(connHandle)->batteryPowerStateHdl)
 
 /******************BAS server init all characteristic handle*************************/
 BLT_BAS_SERVER_INIT_HANDLE(batteryLevel)
@@ -90,33 +110,37 @@ static const atts_findCharList_t bassChar[] = {
 
 const struct blc_bass_regParam defaultBasParam = {
     .batteryLevel = 100,
-    .powerState = DEVICE_NO_CHARGING,
+    .powerState   = DEVICE_NO_CHARGING,
 };
 
-static void blt_bass_serviceInit(const struct blc_bass_regParam* param)
+static void blt_bass_serviceInit(const struct blc_bass_regParam *param)
 {
     struct blc_bas_server *server = blt_bass_getCtrl(PRF_RFU_CONN_HANDLE);
     blc_atts_findCharacteristicByServiceUuid(serviceBatteryUuid, ATT_16_UUID_LEN, bassChar, ARRAY_SIZE(bassChar), server);
     BLT_BAS_LOG("Handle information, Battery Level:0x%x, Battery Power State:0x%x", server->batteryLevelHdl, server->batteryPowerStateHdl);
 
-    const struct blc_bass_regParam* basParam = param? param: &defaultBasParam;
+    const struct blc_bass_regParam *basParam = param ? param : &defaultBasParam;
     blt_bass_setBatteryLevel(basParam->batteryLevel);
     blt_bass_setBatteryPowerState(basParam->powerState);
 }
 
 /****************BAS server init all characteristic handle end***********************/
 
-static u8* blt_bass_getBatteryLevel(u16 connHandle)
+static u8 *blt_bass_getBatteryLevel(u16 connHandle)
 {
     return blc_gatts_getAttributeValueByHandle(connHandle, BASS_BATTERY_LEVEL_HANDLE(connHandle));
 }
 
 static void blt_bass_setBatteryLevel(u8 batteryLevel)
 {
-    if(!CHECK_BATTERY_LEVEL(batteryLevel))  return ;
+    if (!CHECK_BATTERY_LEVEL(batteryLevel)) {
+        return;
+    }
 
     u8 *pBatteryLevel = blt_bass_getBatteryLevel(PRF_RFU_CONN_HANDLE);
-    if(!pBatteryLevel)      return ;
+    if (!pBatteryLevel) {
+        return;
+    }
 
     *pBatteryLevel = batteryLevel;
 }
@@ -132,7 +156,7 @@ u8 blc_bass_getBatteryLevel(void)
     return *blt_bass_getBatteryLevel(PRF_RFU_CONN_HANDLE);
 }
 
-static u8* blt_bass_getBatteryPowerState(u16 connHandle)
+static u8 *blt_bass_getBatteryPowerState(u16 connHandle)
 {
     return blc_gatts_getAttributeValueByHandle(connHandle, BASS_BATTERY_POWER_STATE_HANDLE(connHandle));
 }
@@ -140,7 +164,9 @@ static u8* blt_bass_getBatteryPowerState(u16 connHandle)
 static void blt_bass_setBatteryPowerState(u8 batteryPowerState)
 {
     u8 *pBatteryPowerState = blt_bass_getBatteryPowerState(PRF_RFU_CONN_HANDLE);
-    if(!pBatteryPowerState)     return ;
+    if (!pBatteryPowerState) {
+        return;
+    }
 
     *pBatteryPowerState = batteryPowerState;
 }

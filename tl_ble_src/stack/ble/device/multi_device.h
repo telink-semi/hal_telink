@@ -28,22 +28,23 @@
  *  @brief  local device index
  *  if multiple device function not needed, please use DEFAULT_DEVICE_INDEX in any relative APIs
  */
-typedef enum {
-    LOCAL_DEVICE_INDEX_0    = 0x00,     DEFAULT_DEVICE_INDEX = 0x00,
-    LOCAL_DEVICE_INDEX_1    = 0x01,
-    LOCAL_DEVICE_INDEX_2    = 0x02,
-    LOCAL_DEVICE_INDEX_3    = 0x03,
+typedef enum
+{
+    LOCAL_DEVICE_INDEX_0 = 0x00,
+    DEFAULT_DEVICE_INDEX = 0x00,
+    LOCAL_DEVICE_INDEX_1 = 0x01,
+    LOCAL_DEVICE_INDEX_2 = 0x02,
+    LOCAL_DEVICE_INDEX_3 = 0x03,
 } loc_dev_idx_t;
-
 
 /**
  *  @brief  multiple local device enable
  */
-typedef enum {
+typedef enum
+{
     MULTI_DEV_DISABLE = 0x00,
     MULTI_DEV_ENABLE  = 0x01,
 } multi_dev_en_t;
-
 
 /**
  * @brief      for user to enable multiple local device feature. If not set, this feature is disabled by default.
@@ -51,7 +52,7 @@ typedef enum {
  * @param[in]  enable - enable or disable.
  * @return     none
  */
-void        blc_ll_setMultipleLocalDeviceEnable (multi_dev_en_t enable);
+void blc_ll_setMultipleLocalDeviceEnable(multi_dev_en_t enable);
 
 
 /**
@@ -62,9 +63,7 @@ void        blc_ll_setMultipleLocalDeviceEnable (multi_dev_en_t enable);
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_setLocalDeviceIndexAndIdentityAddress(loc_dev_idx_t local_dev_idx,  u8 id_adrType, u8 *id_addr);
-
-
+ble_sts_t blc_ll_setLocalDeviceIndexAndIdentityAddress(loc_dev_idx_t local_dev_idx, u8 id_adrType, u8 *id_addr);
 
 
 /**
@@ -74,7 +73,7 @@ ble_sts_t   blc_ll_setLocalDeviceIndexAndIdentityAddress(loc_dev_idx_t local_dev
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_setCurrentLocalDevice_by_index(loc_dev_idx_t local_dev_idx);
+ble_sts_t blc_ll_setCurrentLocalDevice_by_index(loc_dev_idx_t local_dev_idx);
 
 
 #endif /* STACK_BLE_DEVICE_MULTI_DEVICE_H_ */

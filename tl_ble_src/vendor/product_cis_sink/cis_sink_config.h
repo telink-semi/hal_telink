@@ -23,10 +23,10 @@
  *******************************************************************************************************/
 #pragma once
 
-#define PRODUCT_MCU_DEMO                                0
+#define PRODUCT_MCU_DEMO              0
 
 
-#define PRODUCT_CIS_SINK_SELECT                         PRODUCT_MCU_DEMO
+#define PRODUCT_CIS_SINK_SELECT       PRODUCT_MCU_DEMO
 
-#define BLC_PM_EN                           0
-#define BLC_PM_DEEP_RETENTION_MODE_EN       0
+#define BLC_PM_EN                     0
+#define BLC_PM_DEEP_RETENTION_MODE_EN 0

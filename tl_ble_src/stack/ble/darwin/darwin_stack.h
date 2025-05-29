@@ -28,12 +28,14 @@
 #include "darwin_fmn.h"
 
 #if (CUSTOM_DARWIN_FMN_ENABLE)
-    typedef struct{
-        u8 darwin_fmn_enable;
-        blc_smp_paringreq_cb_t pair_req_cb;
-        blc_smp_sec_info_cb_t sec_info_req_cb;
-    }custom_darwin_fmn_t;
-    extern custom_darwin_fmn_t custom_darwin_fmn;
+typedef struct
+{
+    u8                     darwin_fmn_enable;
+    blc_smp_paringreq_cb_t pair_req_cb;
+    blc_smp_sec_info_cb_t  sec_info_req_cb;
+} custom_darwin_fmn_t;
+
+extern custom_darwin_fmn_t custom_darwin_fmn;
 #endif
 
 #endif /* STACK_BLE_DARWIN_DARWIN_STACK_H_ */

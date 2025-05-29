@@ -26,8 +26,8 @@
 
 #include "sink_config.h"
 
-#define TLKAPI_DEBUG_FIFO_SIZE                      144
-#define TLKAPI_DEBUG_FIFO_NUM                       32
+#define TLKAPI_DEBUG_FIFO_SIZE 144
+#define TLKAPI_DEBUG_FIFO_NUM  32
 
 #if (SINK_VERSION == SINK_ONLY_VERSION)
     #include "sink_only/app_config.h"

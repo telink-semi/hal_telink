@@ -5,11 +5,9 @@
  *      Author: ADmin
  */
 
-#include"stack/ble/hal/hal_internal.h"
+#include "stack/ble/hal/hal_internal.h"
 
-
-_attribute_ram_code_
-void blt_hal_reset_baseband(void)
+_attribute_ram_code_ void blt_hal_reset_baseband(void)
 {
     /*
      * At the end of each task, reset baseband is used to ensure that RF status is the default when the next task starts.

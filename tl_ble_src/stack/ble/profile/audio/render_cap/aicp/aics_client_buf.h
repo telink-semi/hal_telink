@@ -25,31 +25,30 @@
 
 #include "common/utility.h"
 
-#define AICS_READ_INPUT_DESC_MAX_SIZE               DATA_LENGTH_ALIGN4(50)
+#define AICS_READ_INPUT_DESC_MAX_SIZE DATA_LENGTH_ALIGN4(50)
 
-typedef struct{
-
+typedef struct
+{
     gattc_sub_ccc_msg_t ntfInput;
 
     /* Characteristic value handle */
-    u16 audioInStateHdl;            /* Audio Input State */
-    u16 gainSettingPropertiesHdl;   /* Gain Setting Properties */
-    u16 audioInTypeHdl;             /* Audio Input Type */
-    u16 audioInStatusHdl;           /* Audio Input Status */
-    u16 audioInCtrlHdl;             /* Audio Input Control Point */
-    u16 audioInDescHdl;             /* Audio Input Description */
+    u16 audioInStateHdl;          /* Audio Input State */
+    u16 gainSettingPropertiesHdl; /* Gain Setting Properties */
+    u16 audioInTypeHdl;           /* Audio Input Type */
+    u16 audioInStatusHdl;         /* Audio Input Status */
+    u16 audioInCtrlHdl;           /* Audio Input Control Point */
+    u16 audioInDescHdl;           /* Audio Input Description */
 
-    u16 connHandle;
+    u16  connHandle;
     bool vcpInclFlag;
     bool micpInclFlag;
 
     /* ATT Characteristic values */
-    blc_aics_audio_input_state_t audioInState;
+    blc_aics_audio_input_state_t       audioInState;
     blc_aics_gain_setting_properties_t gainSettingProperties;
-    bool useFlag;
-    u8 audioInType;
-    u8 audioInStatus;
-    u16 audioInDescLen;
-    u8 audioInDesc[AICS_READ_INPUT_DESC_MAX_SIZE];
-}blc_aics_client_t;
-
+    bool                               useFlag;
+    u8                                 audioInType;
+    u8                                 audioInStatus;
+    u16                                audioInDescLen;
+    u8                                 audioInDesc[AICS_READ_INPUT_DESC_MAX_SIZE];
+} blc_aics_client_t;

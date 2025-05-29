@@ -29,10 +29,10 @@
 
 #if HCI_TR_EN
 
-/* Tmax = (MTU * 10 * 1000)/baudrate, unit:ms. */
-#define H5_ACK_MAX_TIME      ((4096 * 10 * 1000)/(HCI_TR_BAUDRATE))
-#define H5_PURE_ACK_TO       10//(2 * H5_ACK_MAX_TIME) // 80ms
-#define H5_RESEND_TO         50//(3 * H5_ACK_MAX_TIME) // 120ms
+    /* Tmax = (MTU * 10 * 1000)/baudrate, unit:ms. */
+    #define H5_ACK_MAX_TIME ((4096 * 10 * 1000) / (HCI_TR_BAUDRATE))
+    #define H5_PURE_ACK_TO  10 //(2 * H5_ACK_MAX_TIME) // 80ms
+    #define H5_RESEND_TO    50 //(3 * H5_ACK_MAX_TIME) // 120ms
 
 /*! H5 protocol define configuration. */
 static HciH5Config_t hciH5Config = {
@@ -47,26 +47,27 @@ static HciH5Config_t hciH5Config = {
 u8 h5TxBuf[HCI_H5_TX_BUF_SIZE] = {0};
 
 /*! HCI H5 Main Control Block. */
-typedef struct{
-    hci_fifo_t    *pHciRxFifo;
-    hci_fifo_t    *pHciTxFifo;
-    u8            *pTxBuf;
-    hci_fifo_t    *pTxQ;
+typedef struct
+{
+    hci_fifo_t *pHciRxFifo;
+    hci_fifo_t *pHciTxFifo;
+    u8         *pTxBuf;
+    hci_fifo_t *pTxQ;
 
-    HciH5Config_t  config;
-    u32            tick;          /*!< link state control timer. */
-    u8             linkState;
-    u8             rxSlidWinSize; /*!< range 1~7 */
-    u8             txSlidWinSize; /*!< range 1~7 */
-    u8             txSeq;         /*!< peer expect packet SN.  */
-    u8             txAck;         /*!< local expect packet SN. */
-    u8             rxAck;         /*!< peer expect packet SN.  */
-    u8             isReliable;    /*!< reliable packet flag.   */
-    u8             recvd;
-    u32            txTick;        /*!< use for re-send monitor. */
-    u32            rxTick;        /*!< rx packet tick. */
-    u32            resendTick;
-}HciH5Cb_t;
+    HciH5Config_t config;
+    u32           tick;          /*!< link state control timer. */
+    u8            linkState;
+    u8            rxSlidWinSize; /*!< range 1~7 */
+    u8            txSlidWinSize; /*!< range 1~7 */
+    u8            txSeq;         /*!< peer expect packet SN.  */
+    u8            txAck;         /*!< local expect packet SN. */
+    u8            rxAck;         /*!< peer expect packet SN.  */
+    u8            isReliable;    /*!< reliable packet flag.   */
+    u8            recvd;
+    u32           txTick;        /*!< use for re-send monitor. */
+    u32           rxTick;        /*!< rx packet tick. */
+    u32           resendTick;
+} HciH5Cb_t;
 
 static HciH5Cb_t hciH5Cb;
 
@@ -90,14 +91,14 @@ void HCI_H5_Init(hci_fifo_t *pHciRxFifo, hci_fifo_t *pHciTxFifo)
     hciH5Cb.linkState     = HCI_H5_LINK_STATE_IDLE;
     hciH5Cb.rxSlidWinSize = 0;
     hciH5Cb.txSlidWinSize = 0;
-    hciH5Cb.txSeq = 0;
-    hciH5Cb.txAck = 0;
-    hciH5Cb.rxAck = 0;
-    hciH5Cb.tick = clock_time()|1;
-    hciH5Cb.isReliable = true;
-    hciH5Cb.txTick = 0;
-    hciH5Cb.rxTick = 0;
-    hciH5Cb.resendTick = 0;
+    hciH5Cb.txSeq         = 0;
+    hciH5Cb.txAck         = 0;
+    hciH5Cb.rxAck         = 0;
+    hciH5Cb.tick          = clock_time() | 1;
+    hciH5Cb.isReliable    = true;
+    hciH5Cb.txTick        = 0;
+    hciH5Cb.rxTick        = 0;
+    hciH5Cb.resendTick    = 0;
 
     /* Register Slip handler. */
     HCI_Slip_RegisterPktHandler(HCI_H5_PacketHandler);
@@ -114,13 +115,13 @@ void HCI_H5_Reset(void)
 {
     hciH5Cb.rxSlidWinSize = 0;
     hciH5Cb.txSlidWinSize = 0;
-    hciH5Cb.txSeq = 0;
-    hciH5Cb.txAck = 0;
-    hciH5Cb.rxAck = 0;
-    hciH5Cb.tick = clock_time()|1;
+    hciH5Cb.txSeq         = 0;
+    hciH5Cb.txAck         = 0;
+    hciH5Cb.rxAck         = 0;
+    hciH5Cb.tick          = clock_time() | 1;
 
-    hciH5Cb.txTick = 0;
-    hciH5Cb.rxTick = 0;
+    hciH5Cb.txTick     = 0;
+    hciH5Cb.rxTick     = 0;
     hciH5Cb.resendTick = 0;
 
     hciH5Cb.pHciRxFifo->wptr = hciH5Cb.pHciRxFifo->rptr = 0;
@@ -138,18 +139,16 @@ void HCI_H5_Reset(void)
  */
 u16 HCI_H5_CcittCrc16Calc(u16 crcInit, u8 *pPacket, u32 len)
 {
-    u16 crc = crcInit;
+    u16 crc     = crcInit;
     u16 crcPoly = 0x8408;
 
-    while(len--)
-    {
+    while (len--) {
         crc ^= *pPacket++;
-        for(int i=0; i<8; i++)
-        {
-            if(crc & 1){
-                crc = (crc>>1) ^ crcPoly;
-            }else{
-                crc = (crc>>1);
+        for (int i = 0; i < 8; i++) {
+            if (crc & 1) {
+                crc = (crc >> 1) ^ crcPoly;
+            } else {
+                crc = (crc >> 1);
             }
         }
     }
@@ -166,7 +165,7 @@ u8 HCI_H5_CheckSumCalc(u8 *p, u32 len)
 {
     ASSERT(len == 3, HCI_TR_ERR_H5_HEAD_LEN);
 
-#if 0
+    #if 0
     u32 sum = 0;
     while(len--){
         sum += *p++;
@@ -177,9 +176,9 @@ u8 HCI_H5_CheckSumCalc(u8 *p, u32 len)
     if(x == 0) x = 1;
 
     return ((x<<8) + 255 - sum);
-#else
+    #else
     return ~((p[0] + p[1] + p[2]) & 0xff);
-#endif
+    #endif
 }
 
 /**
@@ -193,10 +192,10 @@ bool HCI_H5_IsCheckSumValid(u8 *p, u32 len)
     ASSERT(len == 4, HCI_TR_ERR_H5_HEAD_LEN);
 
     u32 sum = 0;
-    while(len--){
+    while (len--) {
         sum += *p++;
     }
-    return (sum % 256) == 0xFF ? true:false;
+    return (sum % 256) == 0xFF ? true : false;
 }
 
 /**
@@ -216,10 +215,10 @@ u16 HCI_H5_PackHeader(u8 *pBuf, HciH5Head_t *pHead)
     u8  pktType    = pHead->pktType;
     u16 payloadLen = pHead->payloadLen;
 
-    u16 tmp = (seqNum<<0) | (ackNum<<3) | (crc<<6) | (reliable<<7);
+    u16 tmp = (seqNum << 0) | (ackNum << 3) | (crc << 6) | (reliable << 7);
     UINT8_TO_BSTREAM(p, tmp);
 
-    tmp = pktType | ((payloadLen<<4) & 0x0fff);
+    tmp = pktType | ((payloadLen << 4) & 0x0fff);
     UINT16_TO_BSTREAM(p, tmp);
 
     u8 checkSum = HCI_H5_CheckSumCalc(pBuf, 3);
@@ -239,13 +238,13 @@ void HCI_H5_UnpackHeader(HciH5Head_t *hciH5Head, u8 *pPacket)
     u32 head = 0;
     BSTREAM_TO_UINT32(head, pPacket);
 
-    hciH5Head->seqNum        = H5_HDR_SEQ(head);
-    hciH5Head->ackNum        = H5_HDR_ACK(head);
-    hciH5Head->crc           = H5_HDR_CRC(head);
-    hciH5Head->reliable      = H5_HDR_RELIABLE(head);
-    hciH5Head->pktType       = H5_HDR_PKT_TYPE(head);
-    hciH5Head->payloadLen    = H5_HDR_LEN(head);
-    hciH5Head->headCheckSum  = H5_HDR_CHECKSUM(head);
+    hciH5Head->seqNum       = H5_HDR_SEQ(head);
+    hciH5Head->ackNum       = H5_HDR_ACK(head);
+    hciH5Head->crc          = H5_HDR_CRC(head);
+    hciH5Head->reliable     = H5_HDR_RELIABLE(head);
+    hciH5Head->pktType      = H5_HDR_PKT_TYPE(head);
+    hciH5Head->payloadLen   = H5_HDR_LEN(head);
+    hciH5Head->headCheckSum = H5_HDR_CHECKSUM(head);
 }
 
 /**
@@ -255,8 +254,7 @@ void HCI_H5_UnpackHeader(HciH5Head_t *hciH5Head, u8 *pPacket)
  */
 static bool HCI_H5_IsReliablePacket(u8 type)
 {
-    switch(type)
-    {
+    switch (type) {
     case HCI_H5_PKT_TYPE_CMD:
     case HCI_H5_PKT_TYPE_ACL:
     case HCI_H5_PKT_TYPE_EVT:
@@ -275,30 +273,27 @@ static bool HCI_H5_IsReliablePacket(u8 type)
  */
 bool HCI_H5_Send(u8 h5Type, u8 *pPacket, u32 len)
 {
-    HciH5Head_t hciH5Head = {0,0,0,0,0,0,0};
-    hciH5Head.ackNum        = hciH5Cb.txAck;
-    hciH5Head.pktType       = h5Type;
-    hciH5Head.payloadLen    = len;
+    HciH5Head_t hciH5Head = {0, 0, 0, 0, 0, 0, 0};
+    hciH5Head.ackNum      = hciH5Cb.txAck;
+    hciH5Head.pktType     = h5Type;
+    hciH5Head.payloadLen  = len;
 
-    if(HCI_H5_IsReliablePacket(h5Type)){
+    if (HCI_H5_IsReliablePacket(h5Type)) {
         hciH5Head.reliable = 1;
         hciH5Head.seqNum   = hciH5Cb.txSeq;
-        hciH5Cb.txSeq = (hciH5Cb.txSeq + 1) % 8;
+        hciH5Cb.txSeq      = (hciH5Cb.txSeq + 1) % 8;
     }
 
-    if(h5Type != HCI_H5_PKT_TYPE_ACK && h5Type != HCI_H5_PKT_TYPE_LINK_CTRL){
+    if (h5Type != HCI_H5_PKT_TYPE_ACK && h5Type != HCI_H5_PKT_TYPE_LINK_CTRL) {
         hciH5Head.crc = hciH5Cb.config.dataIntgrtChkType;
     }
 
     u8 *pBuf = hciH5Cb.pTxBuf;
     pBuf += HCI_H5_PackHeader(pBuf, &hciH5Head);
 
-    if(pPacket == NULL || len == 0){
-
-    }
-    else
-    {
-        if(len > HCI_H5_TX_BUF_SIZE-HCI_H5_HEAD_LEN){
+    if (pPacket == NULL || len == 0) {
+    } else {
+        if (len > HCI_H5_TX_BUF_SIZE - HCI_H5_HEAD_LEN) {
             H5_TRACK_ERR("H5 Tx buffer overflow...\n");
             ASSERT(false, HCI_TR_ERR_H5_TX_BUF_OVFL);
         }
@@ -306,16 +301,16 @@ bool HCI_H5_Send(u8 h5Type, u8 *pPacket, u32 len)
         pBuf += len;
     }
 
-    if(hciH5Head.crc){
+    if (hciH5Head.crc) {
         u16 crc = HCI_H5_CcittCrc16Calc(0xFFFF, hciH5Cb.pTxBuf, HCI_H5_HEAD_LEN + len);
-        *pBuf++ = (crc>>8) & 0xFF;
-        *pBuf++ =  crc & 0xFF;
+        *pBuf++ = (crc >> 8) & 0xFF;
+        *pBuf++ = crc & 0xFF;
     }
 
-    u16 pktLen = HCI_H5_HEAD_LEN + len + (hciH5Head.crc ? HCI_H5_CRC_LEN:0);
-    u8 res = HCI_Slip_Send(hciH5Cb.pTxBuf, pktLen);
-    if(res){
-        H5_TRACK_INFO("TX > SEQ:%d, ACK:%d, Rel:%d\n",hciH5Head.seqNum, hciH5Head.ackNum, hciH5Head.reliable);
+    u16 pktLen = HCI_H5_HEAD_LEN + len + (hciH5Head.crc ? HCI_H5_CRC_LEN : 0);
+    u8  res    = HCI_Slip_Send(hciH5Cb.pTxBuf, pktLen);
+    if (res) {
+        H5_TRACK_INFO("TX > SEQ:%d, ACK:%d, Rel:%d\n", hciH5Head.seqNum, hciH5Head.ackNum, hciH5Head.reliable);
     }
     return res;
 }
@@ -327,20 +322,20 @@ bool HCI_H5_Send(u8 h5Type, u8 *pPacket, u32 len)
  */
 void HCI_H5_SendData(void)
 {
-    if(hciH5Cb.txSlidWinSize >= hciH5Cb.config.slidWinSize){
+    if (hciH5Cb.txSlidWinSize >= hciH5Cb.config.slidWinSize) {
         return;
     }
 
     hci_fifo_t *pHciTxFifo = hciH5Cb.pHciTxFifo;
-    if(pHciTxFifo->wptr == pHciTxFifo->rptr+hciH5Cb.txSlidWinSize){
-        return;//have no data to send.
+    if (pHciTxFifo->wptr == pHciTxFifo->rptr + hciH5Cb.txSlidWinSize) {
+        return; //have no data to send.
     }
 
     u8  r = pHciTxFifo->rptr + hciH5Cb.txSlidWinSize;
     u8 *p = pHciTxFifo->p + (r & pHciTxFifo->mask) * pHciTxFifo->size;
     hciH5Cb.txSlidWinSize++;
 
-    u16 len = 0;
+    u16 len     = 0;
     u8  hciType = 0;
     BSTREAM_TO_UINT16(len, p);
     BSTREAM_TO_UINT8(hciType, p);
@@ -350,19 +345,18 @@ void HCI_H5_SendData(void)
     //H5_TRACK_INFO("Hci Type: 0x%02X\n H5 Tx data: ", hciType);
     //HCI_TRACK_DATA((p-1), len);
 
-    if(res == false){
+    if (res == false) {
         hciH5Cb.txSeq = (hciH5Cb.txSeq - 1) & 0x07;
         hciH5Cb.txSlidWinSize--;
         hciH5Cb.txTick = 0;
-    }
-    else{
+    } else {
         hciH5Cb.rxSlidWinSize = 0;
 
-        hciH5Cb.txTick = clock_time()|1;
+        hciH5Cb.txTick = clock_time() | 1;
         hciH5Cb.rxTick = 0;
 
         H5_TRACK_INFO("Tx > HCI_Evt: ");
-        HCI_TRACK_DATA((p-1), len);
+        HCI_TRACK_DATA((p - 1), len);
     }
 }
 
@@ -384,7 +378,7 @@ bool HCI_H5_SendPureAck(void)
 void HCI_H5_SendSync(void)
 {
     u16 payload = HCI_H5_MSG_SYNC;
-    HCI_H5_Send(HCI_H5_PKT_TYPE_LINK_CTRL, (u8*)&payload, 2);
+    HCI_H5_Send(HCI_H5_PKT_TYPE_LINK_CTRL, (u8 *)&payload, 2);
 }
 
 /**
@@ -395,7 +389,7 @@ void HCI_H5_SendSync(void)
 void HCI_H5_SendSyncRsp(void)
 {
     u16 payload = HCI_H5_MSG_SYNC_RSP;
-    HCI_H5_Send(HCI_H5_PKT_TYPE_LINK_CTRL, (u8*)&payload, 2);
+    HCI_H5_Send(HCI_H5_PKT_TYPE_LINK_CTRL, (u8 *)&payload, 2);
 }
 
 /**
@@ -405,13 +399,13 @@ void HCI_H5_SendSyncRsp(void)
  */
 void HCI_H5_SendConfig(void)
 {
-    u8 payload[3]={0};
-    u8 *pBuf = payload;
+    u8  payload[3] = {0};
+    u8 *pBuf       = payload;
 
     UINT16_TO_BSTREAM(pBuf, HCI_H5_MSG_CONFIG);
 
-    u8 config = (hciH5Config.slidWinSize) | (hciH5Config.oofFlowCtrl<<3) |
-                (hciH5Config.dataIntgrtChkType<<4) | (hciH5Config.version<<5);
+    u8 config = (hciH5Config.slidWinSize) | (hciH5Config.oofFlowCtrl << 3) |
+                (hciH5Config.dataIntgrtChkType << 4) | (hciH5Config.version << 5);
     UINT8_TO_BSTREAM(pBuf, config);
 
     HCI_H5_Send(HCI_H5_PKT_TYPE_LINK_CTRL, payload, sizeof(payload));
@@ -424,13 +418,13 @@ void HCI_H5_SendConfig(void)
  */
 void HCI_H5_SendConfigRsp(void)
 {
-    u8 payload[3] = {0};
-    u8 *pBuf = payload;
+    u8  payload[3] = {0};
+    u8 *pBuf       = payload;
 
     UINT16_TO_BSTREAM(pBuf, HCI_H5_MSG_CONFIG_RSP);
 
-    u8 config = (hciH5Config.slidWinSize) | (hciH5Config.oofFlowCtrl<<3) |
-                (hciH5Config.dataIntgrtChkType<<4) | (hciH5Config.version<<5);
+    u8 config = (hciH5Config.slidWinSize) | (hciH5Config.oofFlowCtrl << 3) |
+                (hciH5Config.dataIntgrtChkType << 4) | (hciH5Config.version << 5);
     UINT8_TO_BSTREAM(pBuf, config);
 
     HCI_H5_Send(HCI_H5_PKT_TYPE_LINK_CTRL, payload, sizeof(payload));
@@ -446,30 +440,27 @@ void HCI_H5_SendConfigRsp(void)
 void HCI_H5_DecodeLinkPdu(HciH5Head_t *pHciH5Head, u8 *pPacket, u32 len)
 {
     HciH5Config_t *pH5Config = &hciH5Cb.config;
-    u8 *p = pPacket + HCI_H5_HEAD_LEN;
+    u8            *p         = pPacket + HCI_H5_HEAD_LEN;
 
     u16 msg = 0;
-    u8 cfg = 0;
+    u8  cfg = 0;
     BSTREAM_TO_UINT16(msg, p);
     BSTREAM_TO_UINT8(cfg, p);
 
-    switch(hciH5Cb.linkState)
-    {
+    switch (hciH5Cb.linkState) {
     case HCI_H5_LINK_STATE_IDLE:
-        if(msg == HCI_H5_MSG_SYNC)//SYNC message.
+        if (msg == HCI_H5_MSG_SYNC) //SYNC message.
         {
             HCI_H5_SendSyncRsp();
             H5_TRACK_INFO("[IDLE]Rx SYNC >>> Send SYNC_RSP Message...\n");
-        }
-        else if(msg == HCI_H5_MSG_SYNC_RSP)//SYNC Rsp message.
+        } else if (msg == HCI_H5_MSG_SYNC_RSP) //SYNC Rsp message.
         {
             hciH5Cb.linkState = HCI_H5_LINK_STATE_INIT;
             H5_TRACK_INFO("[IDLE]Rx SYNC_RSP >>> Switch to state: INIT...\n");
 
             HCI_H5_SendConfig();
             H5_TRACK_INFO("[IDLE]Send CONFIG Message...\n");
-        }
-        else //invalid packet.
+        } else //invalid packet.
         {
             HCI_H5_SendSync();
             H5_TRACK_INFO("[IDLE]Rx invalid packet >>> Send SYNC Message...\n");
@@ -477,26 +468,22 @@ void HCI_H5_DecodeLinkPdu(HciH5Head_t *pHciH5Head, u8 *pPacket, u32 len)
         break;
 
     case HCI_H5_LINK_STATE_INIT:
-        if(msg == HCI_H5_MSG_SYNC)//SYNC message.
+        if (msg == HCI_H5_MSG_SYNC) //SYNC message.
         {
             HCI_H5_SendSyncRsp();
             H5_TRACK_INFO("[INIT]Rx SYNC >>> Send SYNC_RSP Message...\n");
-        }
-        else if(msg == HCI_H5_MSG_CONFIG)
-        {
+        } else if (msg == HCI_H5_MSG_CONFIG) {
             HCI_H5_SendConfigRsp();
             H5_TRACK_INFO("[INIT]Rx CONFIG >>> Send CONFIG_RSP Message...\n");
-        }
-        else if(msg == HCI_H5_MSG_CONFIG_RSP)
-        {
+        } else if (msg == HCI_H5_MSG_CONFIG_RSP) {
             hciH5Cb.linkState = HCI_H5_LINK_STATE_ACTIVE;
             HCI_H5_Reset();
 
             /* Set config info. */
-            u8 slidSize  = min(hciH5Config.slidWinSize, (cfg&0x07));
-            u8 oofFlow   = hciH5Config.oofFlowCtrl & ((cfg>>3)&0x01);
-            u8 dataCheck = hciH5Config.dataIntgrtChkType & ((cfg>>4)&0x01);
-            u8 version   = min(hciH5Config.version,((cfg>>5)&0x07));
+            u8 slidSize  = min(hciH5Config.slidWinSize, (cfg & 0x07));
+            u8 oofFlow   = hciH5Config.oofFlowCtrl & ((cfg >> 3) & 0x01);
+            u8 dataCheck = hciH5Config.dataIntgrtChkType & ((cfg >> 4) & 0x01);
+            u8 version   = min(hciH5Config.version, ((cfg >> 5) & 0x07));
 
             pH5Config->slidWinSize       = slidSize;
             pH5Config->oofFlowCtrl       = oofFlow;
@@ -504,22 +491,17 @@ void HCI_H5_DecodeLinkPdu(HciH5Head_t *pHciH5Head, u8 *pPacket, u32 len)
             pH5Config->version           = version;
 
             H5_TRACK_INFO("[INIT]Rx CONFIG_RSP >>> Switch to state: ACTIVE...\n");
-        }
-        else
-        {
+        } else {
             //spec: All other messages that are received must be ignored.
         }
         break;
 
     case HCI_H5_LINK_STATE_ACTIVE:
-        if(msg == HCI_H5_MSG_CONFIG)
-        {
+        if (msg == HCI_H5_MSG_CONFIG) {
             HCI_H5_SendConfigRsp();
             H5_TRACK_INFO("[ACTIVE]Rx CONFIG >>> Send CONFIG_RSP Message...\n");
-        }
-        else if(msg == HCI_H5_MSG_SYNC)
-        {
-            hciH5Cb.linkState  = HCI_H5_LINK_STATE_IDLE;
+        } else if (msg == HCI_H5_MSG_SYNC) {
+            hciH5Cb.linkState = HCI_H5_LINK_STATE_IDLE;
             HCI_H5_Reset();
             extern ble_sts_t blc_hci_reset(void);
             blc_hci_reset();
@@ -527,9 +509,7 @@ void HCI_H5_DecodeLinkPdu(HciH5Head_t *pHciH5Head, u8 *pPacket, u32 len)
 
             HCI_H5_SendSyncRsp();
             H5_TRACK_INFO("[ACTIVE]Send SYNC_RSP Message...\n");
-        }
-        else
-        {
+        } else {
         }
         break;
 
@@ -550,9 +530,9 @@ void HCI_H5_PackHciPdu(u8 hciType, u8 *pPayload, u32 len)
 {
     hci_fifo_t *pHciRxFifo = hciH5Cb.pHciRxFifo;
 
-    u8 *p = pHciRxFifo->p + (pHciRxFifo->wptr & pHciRxFifo->mask)*pHciRxFifo->size;
+    u8 *p = pHciRxFifo->p + (pHciRxFifo->wptr & pHciRxFifo->mask) * pHciRxFifo->size;
 
-    if(len+1 > pHciRxFifo->size){
+    if (len + 1 > pHciRxFifo->size) {
         H5_TRACK_ERR("HCI Rx buffer overflow...\n");
         ASSERT(FALSE, HCI_TR_ERR_H5_HCI_RX_BUF_OVFL);
     }
@@ -562,7 +542,7 @@ void HCI_H5_PackHciPdu(u8 hciType, u8 *pPayload, u32 len)
     pHciRxFifo->wptr++;
 
     H5_TRACK_INFO("data to hci buffer:");
-    HCI_TRACK_DATA(p-1, len + 1);
+    HCI_TRACK_DATA(p - 1, len + 1);
 }
 
 /**
@@ -572,7 +552,7 @@ void HCI_H5_PackHciPdu(u8 hciType, u8 *pPayload, u32 len)
  */
 void HCI_H5_ResendStart(void)
 {
-    hciH5Cb.txSeq = hciH5Cb.rxAck;
+    hciH5Cb.txSeq         = hciH5Cb.rxAck;
     hciH5Cb.txSlidWinSize = 0;
 
     HCI_H5_SendData();
@@ -587,22 +567,19 @@ void HCI_H5_ReSendCheck(void)
 {
     hci_fifo_t *pHciTxFifo = hciH5Cb.pHciTxFifo;
 
-    if(hciH5Cb.rxAck == hciH5Cb.txSeq)
-    {
+    if (hciH5Cb.rxAck == hciH5Cb.txSeq) {
         H5_TRACK_INFO("local packet is received by peer correctly...\n");
         pHciTxFifo->rptr += hciH5Cb.txSlidWinSize;
         hciH5Cb.txSlidWinSize = 0;
 
-        hciH5Cb.txTick = 0;
+        hciH5Cb.txTick     = 0;
         hciH5Cb.resendTick = 0;
-    }
-    else
-    {
+    } else {
         H5_TRACK_INFO("local device need resend packet...\n");
         hciH5Cb.txTick = 0;
 
-        if(hciH5Cb.resendTick == 0){
-            hciH5Cb.resendTick = clock_time()|1;
+        if (hciH5Cb.resendTick == 0) {
+            hciH5Cb.resendTick = clock_time() | 1;
         }
     }
 }
@@ -619,57 +596,50 @@ void HCI_H5_DecodeDataPdu(HciH5Head_t *pHciH5Head, u8 *pPacket, u32 len)
     H5_TRACK_INFO("=== H5 data parse start ===\n");
 
     HciH5Config_t *pH5Config = &hciH5Cb.config;
-    if(!pH5Config->dataIntgrtChkType && pHciH5Head->crc){
-        return;//discard
+    if (!pH5Config->dataIntgrtChkType && pHciH5Head->crc) {
+        return; //discard
     }
 
     /* Check CRC */
-    if(pHciH5Head->crc)
-    {
+    if (pHciH5Head->crc) {
         u16 pLen = len - HCI_H5_CRC_LEN;
-        u16 crc = HCI_H5_CcittCrc16Calc(0x0000, pPacket, pLen);
-        if((crc & 0xff) != *(pPacket + pLen+1) || ((crc>>8) & 0xff) != *(pPacket + pLen)){
+        u16 crc  = HCI_H5_CcittCrc16Calc(0x0000, pPacket, pLen);
+        if ((crc & 0xff) != *(pPacket + pLen + 1) || ((crc >> 8) & 0xff) != *(pPacket + pLen)) {
             H5_TRACK_WRN("CRC error...\n");
-            return;//discard
+            return; //discard
         }
     }
 
     /* Reliable transport */
-    if(pHciH5Head->reliable)
-    {
+    if (pHciH5Head->reliable) {
         H5_TRACK_INFO("This is H5 reliable packet...\n");
 
-        if(pHciH5Head->seqNum == hciH5Cb.txAck)
-        {
+        if (pHciH5Head->seqNum == hciH5Cb.txAck) {
             hciH5Cb.txAck = (hciH5Cb.txAck + 1) % 8;
             hciH5Cb.rxSlidWinSize++;
-        #if 0
+    #if 0
             if(hciH5Cb.rxSlidWinSize >= pH5Config->slidWinSize){
                 HCI_H5_SendPureAck();
                 hciH5Cb.rxSlidWinSize = 0;
             }
-        #else
-            hciH5Cb.rxTick = clock_time()|1;
-            if(pH5Config->slidWinSize == 1){
-
-            }
-            else{
-                if(hciH5Cb.rxSlidWinSize >= pH5Config->slidWinSize){
+    #else
+            hciH5Cb.rxTick = clock_time() | 1;
+            if (pH5Config->slidWinSize == 1) {
+            } else {
+                if (hciH5Cb.rxSlidWinSize >= pH5Config->slidWinSize) {
                     HCI_H5_SendPureAck();
                     hciH5Cb.rxSlidWinSize = 0;
 
                     //hciH5Cb.txTick = clock_time()|1;
                 }
             }
-        #endif
+    #endif
 
             /* H5 to HCI */
-            HCI_H5_PackHciPdu(pHciH5Head->pktType, pPacket+HCI_H5_HEAD_LEN, pHciH5Head->payloadLen);
+            HCI_H5_PackHciPdu(pHciH5Head->pktType, pPacket + HCI_H5_HEAD_LEN, pHciH5Head->payloadLen);
 
             H5_TRACK_INFO("H5 RxSeq Ok...\n");
-        }
-        else
-        {
+        } else {
             H5_TRACK_WRN("H5 RxSeq error, Need peer resend...\n");
         }
 
@@ -680,8 +650,7 @@ void HCI_H5_DecodeDataPdu(HciH5Head_t *pHciH5Head, u8 *pPacket, u32 len)
     #else
         hci_fifo_t *pHciTxFifo = hciH5Cb.pHciTxFifo;
 
-        if(pHciH5Head->ackNum == hciH5Cb.txSeq)
-        {
+        if (pHciH5Head->ackNum == hciH5Cb.txSeq) {
             H5_TRACK_INFO("local packet is received by peer correctly...\n");
             hciH5Cb.rxAck = pHciH5Head->ackNum;
 
@@ -689,28 +658,25 @@ void HCI_H5_DecodeDataPdu(HciH5Head_t *pHciH5Head, u8 *pPacket, u32 len)
             hciH5Cb.txSlidWinSize = 0;
 
             hciH5Cb.resendTick = 0;
-            hciH5Cb.txTick = 0;
-        }
-        else
-        {
+            hciH5Cb.txTick     = 0;
+        } else {
             //H5_TRACK_INFO("local device need resend packet...\n");
 
-            if(hciH5Cb.resendTick == 0){
-                hciH5Cb.resendTick = clock_time()|1;
-            }else{
+            if (hciH5Cb.resendTick == 0) {
+                hciH5Cb.resendTick = clock_time() | 1;
+            } else {
                 //hciH5Cb.txSeq = hciH5Cb.rxAck;
                 //hciH5Cb.txSlidWinSize = 0;
             }
         }
     #endif
-    }
-    else/* Unreliable transport. */
+    } else /* Unreliable transport. */
     {
         H5_TRACK_INFO("This is H5 unreliable packet...\n");
 
         hciH5Cb.txAck = (hciH5Cb.txAck + 1) % 8;
         /* H5 to HCI */
-        HCI_H5_PackHciPdu(pHciH5Head->pktType, pPacket+HCI_H5_HEAD_LEN, pHciH5Head->payloadLen);
+        HCI_H5_PackHciPdu(pHciH5Head->pktType, pPacket + HCI_H5_HEAD_LEN, pHciH5Head->payloadLen);
     }
 
     H5_TRACK_INFO("=== H5 data parse end ===\n");
@@ -727,7 +693,7 @@ void HCI_H5_PacketHandler(u8 *pPacket, u32 len)
     H5_TRACK_INFO("==== H5 Rx Handler Start ====\n");
 
     /* Check Head Checksum. */
-    if(!HCI_H5_IsCheckSumValid(pPacket, HCI_H5_HEAD_LEN)){
+    if (!HCI_H5_IsCheckSumValid(pPacket, HCI_H5_HEAD_LEN)) {
         H5_TRACK_WRN("Header checksum error...\n");
         return; //discard
     }
@@ -736,28 +702,26 @@ void HCI_H5_PacketHandler(u8 *pPacket, u32 len)
     HCI_H5_UnpackHeader(&hciH5Head, pPacket);
 
     /* Check Payload length. */
-    if(!hciH5Head.crc){
-        if(HCI_H5_HEAD_LEN + hciH5Head.payloadLen != len){
+    if (!hciH5Head.crc) {
+        if (HCI_H5_HEAD_LEN + hciH5Head.payloadLen != len) {
             H5_TRACK_WRN("Payload length error(NO CRC)...\n");
-            return;//discard.
+            return; //discard.
         }
-    }
-    else{
-        if(HCI_H5_HEAD_LEN + hciH5Head.payloadLen + HCI_H5_CRC_LEN != len){
+    } else {
+        if (HCI_H5_HEAD_LEN + hciH5Head.payloadLen + HCI_H5_CRC_LEN != len) {
             H5_TRACK_WRN("Payload length error(CRC)...\n");
-            return;//discard.
+            return; //discard.
         }
     }
 
-    H5_TRACK_INFO("RX > SEQ:%d, ACK:%d, Rel:%d\n", hciH5Head.seqNum, hciH5Head.ackNum,hciH5Head.reliable);
+    H5_TRACK_INFO("RX > SEQ:%d, ACK:%d, Rel:%d\n", hciH5Head.seqNum, hciH5Head.ackNum, hciH5Head.reliable);
 
-    switch(hciH5Head.pktType)
-    {
+    switch (hciH5Head.pktType) {
     case HCI_H5_PKT_TYPE_ACK:
         H5_TRACK_INFO("Pure ACK Packet:");
         HCI_TRACK_DATA(pPacket, len);
 
-        if(hciH5Cb.linkState != HCI_H5_LINK_STATE_ACTIVE){
+        if (hciH5Cb.linkState != HCI_H5_LINK_STATE_ACTIVE) {
             return;
         }
 
@@ -776,7 +740,7 @@ void HCI_H5_PacketHandler(u8 *pPacket, u32 len)
     case HCI_H5_PKT_TYPE_ACL:
     case HCI_H5_PKT_TYPE_SCO:
     case HCI_H5_PKT_TYPE_EVT:
-        if(hciH5Cb.linkState != HCI_H5_LINK_STATE_ACTIVE){
+        if (hciH5Cb.linkState != HCI_H5_LINK_STATE_ACTIVE) {
             return;
         }
         H5_TRACK_INFO("Data Packet:");
@@ -801,29 +765,20 @@ void HCI_H5_PacketHandler(u8 *pPacket, u32 len)
  */
 void HCI_H5_Poll(void)
 {
-    if(hciH5Cb.linkState == HCI_H5_LINK_STATE_IDLE)
-    {
-        if(clock_time_exceed(hciH5Cb.tick, 250*1000))
-        {
+    if (hciH5Cb.linkState == HCI_H5_LINK_STATE_IDLE) {
+        if (clock_time_exceed(hciH5Cb.tick, 250 * 1000)) {
             HCI_H5_SendSync();
             hciH5Cb.tick = clock_time();
         }
-    }
-    else if(hciH5Cb.linkState == HCI_H5_LINK_STATE_INIT)
-    {
-        if(clock_time_exceed(hciH5Cb.tick, 250*1000))
-        {
+    } else if (hciH5Cb.linkState == HCI_H5_LINK_STATE_INIT) {
+        if (clock_time_exceed(hciH5Cb.tick, 250 * 1000)) {
             HCI_H5_SendConfig();
             hciH5Cb.tick = clock_time();
         }
-    }
-    else if(hciH5Cb.linkState == HCI_H5_LINK_STATE_ACTIVE)
-    {
+    } else if (hciH5Cb.linkState == HCI_H5_LINK_STATE_ACTIVE) {
         /* When sending a packet locally, the peer happened to also send the packet, which caused an ACK exception.*/
-        if(hciH5Cb.resendTick)
-        {
-            if(clock_time_exceed(hciH5Cb.resendTick, H5_RESEND_TO*1000))
-            {
+        if (hciH5Cb.resendTick) {
+            if (clock_time_exceed(hciH5Cb.resendTick, H5_RESEND_TO * 1000)) {
                 hciH5Cb.resendTick = 0;
                 HCI_H5_ResendStart();
 
@@ -831,22 +786,19 @@ void HCI_H5_Poll(void)
             }
         }
         /* If peer is not response after local send data, local must re-send until peer response*/
-        else if(hciH5Cb.txSlidWinSize >= hciH5Cb.config.slidWinSize)
-        {
-            if( hciH5Cb.txTick && clock_time_exceed(hciH5Cb.txTick, H5_RESEND_TO*1000)){
+        else if (hciH5Cb.txSlidWinSize >= hciH5Cb.config.slidWinSize) {
+            if (hciH5Cb.txTick && clock_time_exceed(hciH5Cb.txTick, H5_RESEND_TO * 1000)) {
                 hciH5Cb.txTick = 0;
                 HCI_H5_ResendStart();
                 H5_TRACK_INFO("Can not receive peer packet >>> H5 Re-send ...\n");
             }
-        }
-        else{
+        } else {
             HCI_H5_SendData();
         }
 
     #if 1
         /* Pure Ack Handler. */
-        if(hciH5Cb.config.slidWinSize == 1 && hciH5Cb.rxTick && clock_time_exceed(hciH5Cb.rxTick, H5_PURE_ACK_TO*1000))
-        {
+        if (hciH5Cb.config.slidWinSize == 1 && hciH5Cb.rxTick && clock_time_exceed(hciH5Cb.rxTick, H5_PURE_ACK_TO * 1000)) {
             hciH5Cb.rxTick = 0;
             HCI_H5_SendPureAck();
             hciH5Cb.rxSlidWinSize = 0;
@@ -856,5 +808,3 @@ void HCI_H5_Poll(void)
 }
 
 #endif /* End of HCI_TR_EN */
-
-

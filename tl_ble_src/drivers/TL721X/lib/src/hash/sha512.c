@@ -28,9 +28,6 @@
 #include "lib/include/hash/sha512.h"
 
 
-
-
-
 #ifdef SUPPORT_HASH_SHA512
 
 
@@ -59,7 +56,6 @@ unsigned int sha512_update(SHA512_CTX *ctx, const unsigned char *msg, unsigned i
 {
     return hash_update(ctx, msg, msg_bytes);
 }
-
 
 /**
  * @brief       message update done, get the sha512 digest
@@ -93,7 +89,7 @@ unsigned int sha512(unsigned char *msg, unsigned int msg_bytes, unsigned char *d
 }
 
 
-#ifdef HASH_DMA_FUNCTION
+    #ifdef HASH_DMA_FUNCTION
 /**
  * @brief       init dma sha512
  * @param[in]   ctx           - SHA512_DMA_CTX context pointer.
@@ -156,6 +152,6 @@ unsigned int sha512_dma(unsigned int *msg, unsigned int msg_bytes, unsigned int 
 {
     return hash_dma(HASH_SHA512, msg, msg_bytes, digest, callback);
 }
-#endif
+    #endif
 
 #endif

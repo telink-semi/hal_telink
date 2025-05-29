@@ -29,41 +29,43 @@
 
 #if HCI_TR_EN
 
-#define HCI_Tr_H4TimerEnable()    hciH4TrCB.flushTimer = clock_time()|1
-#define HCI_Tr_H4TimerDisable()   hciH4TrCB.flushTimer = 0
-#define HCI_Tr_H4FlushHandler()   \
-do{\
-    if(hciH4TrCB.flushTimer && clock_time_exceed(hciH4TrCB.flushTimer, HCI_H4_FLUSH_TO*1000))\
-    {\
-        hciH4TrCB.flushTimer = 0;\
-        hciH4TrCB.backupCnt = 0;\
-    }\
-}while(0)
+    #define HCI_Tr_H4TimerEnable()  hciH4TrCB.flushTimer = clock_time() | 1
+    #define HCI_Tr_H4TimerDisable() hciH4TrCB.flushTimer = 0
+    #define HCI_Tr_H4FlushHandler()                                                                        \
+        do {                                                                                               \
+            if (hciH4TrCB.flushTimer && clock_time_exceed(hciH4TrCB.flushTimer, HCI_H4_FLUSH_TO * 1000)) { \
+                hciH4TrCB.flushTimer = 0;                                                                  \
+                hciH4TrCB.backupCnt  = 0;                                                                  \
+            }                                                                                              \
+        } while (0)
 
-_attribute_iram_noinit_data_  u8 h4TrBackupBuf[HCI_H4_TR_RX_BUF_SIZE];
-_attribute_iram_noinit_data_  u8 h4TrRxBuf[HCI_H4_TR_RX_BUF_SIZE * HCI_H4_TR_RX_BUF_NUM];
+_attribute_iram_noinit_data_ u8 h4TrBackupBuf[HCI_H4_TR_RX_BUF_SIZE]__attribute__((aligned(4))) ;
+_attribute_iram_noinit_data_ u8 h4TrRxBuf[HCI_H4_TR_RX_BUF_SIZE * HCI_H4_TR_RX_BUF_NUM] __attribute__((aligned(4))) ;
 
 static hci_fifo_t h4TrRxFifo = {
     HCI_H4_TR_RX_BUF_SIZE,
     HCI_H4_TR_RX_BUF_NUM,
     HCI_H4_TR_RX_BUF_NUM - 1,
-    0,0,
+    0,
+    0,
     &h4TrRxBuf[0],
 };
 
 /*!  HCI Transmit main control block */
-typedef struct{
-    hci_fifo_t   *pHciRxFifo;  /*!< Point to HCI rx fifo. */
-    hci_fifo_t   *pRxFifo;     /*!< Point to H4 rx fifo.  */
-    u8           *pBackUpBuf;
-    u32           flushTimer;
-    u8            backupCnt;
-    u8            align[3];
-}HciH4TrCb_t;
+typedef struct
+{
+    hci_fifo_t *pHciRxFifo; /*!< Point to HCI rx fifo. */
+    hci_fifo_t *pRxFifo;    /*!< Point to H4 rx fifo.  */
+    u8         *pBackUpBuf;
+    u32         flushTimer;
+    u8          backupCnt;
+    u8          align[3];
+} HciH4TrCb_t;
 
-static HciH4TrCb_t hciH4TrCB;
-void HCI_Tr_H4UartRxIRQHandler(unsigned int * param);
-ext_hci_InitTypeDef  hci_h4_uart;
+static HciH4TrCb_t  hciH4TrCB;
+void                HCI_Tr_H4UartRxIRQHandler(unsigned int *param);
+ext_hci_InitTypeDef hci_h4_uart;
+
 /**
  * @brief  : HCI Transport initialization.
  * @param  : pFifo    Pointer point to hci rx FIFO.
@@ -71,6 +73,9 @@ ext_hci_InitTypeDef  hci_h4_uart;
  */
 void HCI_Tr_H4Init(hci_fifo_t *pHciRxFifo)
 {
+    memset(h4TrBackupBuf, 0, sizeof(h4TrBackupBuf));
+    memset(h4TrRxBuf, 0, sizeof(h4TrRxBuf));
+
     hciH4TrCB.pHciRxFifo = pHciRxFifo;
     hciH4TrCB.pRxFifo    = &h4TrRxFifo;
     hciH4TrCB.pBackUpBuf = h4TrBackupBuf;
@@ -80,12 +85,12 @@ void HCI_Tr_H4Init(hci_fifo_t *pHciRxFifo)
     //UART HARDWARE INIT
 
     memset(&hci_h4_uart, 0, sizeof(ext_hci_InitTypeDef));
-    hci_h4_uart.baudrate  = HCI_TR_BAUDRATE;
-    hci_h4_uart.tx_Pin = HCI_TR_TX_PIN;      //
-    hci_h4_uart.rx_Pin = HCI_TR_RX_PIN;      //
-    hci_h4_uart.HwFlowCtl = 0;
-    hci_h4_uart.cts_Pin = 0;
-    hci_h4_uart.rts_Pin = 0;
+    hci_h4_uart.baudrate       = HCI_TR_BAUDRATE;
+    hci_h4_uart.tx_Pin         = HCI_TR_TX_PIN; //
+    hci_h4_uart.rx_Pin         = HCI_TR_RX_PIN; //
+    hci_h4_uart.HwFlowCtl      = 0;
+    hci_h4_uart.cts_Pin        = 0;
+    hci_h4_uart.rts_Pin        = 0;
     hci_h4_uart.RxCpltCallback = HCI_Tr_H4UartRxIRQHandler;
     hci_h4_uart.TxCpltCallback = NULL;
     ext_hci_uartInit(&hci_h4_uart);
@@ -93,7 +98,7 @@ void HCI_Tr_H4Init(hci_fifo_t *pHciRxFifo)
     ext_hci_uartReceData((hciH4TrCB.pRxFifo->p + 4), hciH4TrCB.pRxFifo->size - 4);
 }
 
-/**
+    /**
  * @brief  : HCI Transmit backup handler
  * @param  : pPacket    Pointer point to data buffer.
  * @param  : len        The length of data.
@@ -102,13 +107,13 @@ void HCI_Tr_H4Init(hci_fifo_t *pHciRxFifo)
 #if (TIFS_VARIATION_WORKAROUND_MLP_CODE_IN_RAM)
 _attribute_ram_code_
 #endif
-int HCI_Tr_H4BackUpHandler(u8 *pPacket, u32 len)
+    int
+    HCI_Tr_H4BackUpHandler(u8 *pPacket, u32 len)
 {
-    u8 *pBuf = hciH4TrCB.pBackUpBuf;
-    u8 backupLen = hciH4TrCB.backupCnt;
+    u8 *pBuf      = hciH4TrCB.pBackUpBuf;
+    u8  backupLen = hciH4TrCB.backupCnt;
 
-    if(backupLen == 0)
-    {
+    if (backupLen == 0) {
     #if (TIFS_VARIATION_WORKAROUND_MLP_CODE_IN_RAM)
         smemcpy(pBuf, pPacket, len);
     #else
@@ -123,15 +128,13 @@ int HCI_Tr_H4BackUpHandler(u8 *pPacket, u32 len)
     u8 hciType = 0;
     BSTREAM_TO_UINT8(hciType, pBuf);
 
-    u16 paramLen = 0;
+    u16         paramLen   = 0;
     hci_fifo_t *pHciRxFifo = hciH4TrCB.pHciRxFifo;
 
-    switch(hciType)
-    {
+    switch (hciType) {
     case HCI_TR_TYPE_CMD:
-        if(backupLen >= 1 + HCI_CMD_HEAD_LEN)
-        {
-            pBuf += 2;//skip opcode
+        if (backupLen >= 1 + HCI_CMD_HEAD_LEN) {
+            pBuf += 2; //skip opcode
             BSTREAM_TO_UINT8(paramLen, pBuf);
 
             u16 cpyLen = 1 + HCI_CMD_HEAD_LEN + paramLen - hciH4TrCB.backupCnt;
@@ -142,9 +145,8 @@ int HCI_Tr_H4BackUpHandler(u8 *pPacket, u32 len)
         #endif
             hciH4TrCB.backupCnt += min(cpyLen, len);
 
-            if(hciH4TrCB.backupCnt == 1 + HCI_CMD_HEAD_LEN + paramLen)
-            {
-                u8 *p = pHciRxFifo->p + (pHciRxFifo->wptr & (pHciRxFifo->num-1)) * pHciRxFifo->size;
+            if (hciH4TrCB.backupCnt == 1 + HCI_CMD_HEAD_LEN + paramLen) {
+                u8 *p = pHciRxFifo->p + (pHciRxFifo->wptr & (pHciRxFifo->num - 1)) * pHciRxFifo->size;
             #if (TIFS_VARIATION_WORKAROUND_MLP_CODE_IN_RAM)
                 smemcpy(p, hciH4TrCB.pBackUpBuf, hciH4TrCB.backupCnt);
             #else
@@ -154,18 +156,13 @@ int HCI_Tr_H4BackUpHandler(u8 *pPacket, u32 len)
 
                 hciH4TrCB.backupCnt = 0;
                 HCI_Tr_H4TimerDisable();
-            }
-            else
-            {
+            } else {
                 HCI_Tr_H4TimerEnable();
             }
             return min(cpyLen, len);
-        }
-        else
-        {
-            if(backupLen + len >= 1 + HCI_CMD_HEAD_LEN)
-            {
-                u16 cnt = 0;
+        } else {
+            if (backupLen + len >= 1 + HCI_CMD_HEAD_LEN) {
+                u16 cnt    = 0;
                 u16 cpyLen = 1 + HCI_CMD_HEAD_LEN - backupLen;
             #if (TIFS_VARIATION_WORKAROUND_MLP_CODE_IN_RAM)
                 smemcpy(hciH4TrCB.pBackUpBuf + hciH4TrCB.backupCnt, pPacket, cpyLen);
@@ -177,7 +174,7 @@ int HCI_Tr_H4BackUpHandler(u8 *pPacket, u32 len)
                 len -= cpyLen;
                 cnt += cpyLen;
 
-                pBuf += 2;//skip opcode
+                pBuf += 2; //skip opcode
                 BSTREAM_TO_UINT8(paramLen, pBuf);
                 cpyLen = 1 + HCI_CMD_HEAD_LEN + paramLen - hciH4TrCB.backupCnt;
             #if (TIFS_VARIATION_WORKAROUND_MLP_CODE_IN_RAM)
@@ -188,8 +185,8 @@ int HCI_Tr_H4BackUpHandler(u8 *pPacket, u32 len)
                 hciH4TrCB.backupCnt += min(cpyLen, len);
                 cnt += min(cpyLen, len);
 
-                if(hciH4TrCB.backupCnt == 1 + HCI_CMD_HEAD_LEN + paramLen){
-                    u8 *p = pHciRxFifo->p + (pHciRxFifo->wptr & (pHciRxFifo->num-1)) * pHciRxFifo->size;
+                if (hciH4TrCB.backupCnt == 1 + HCI_CMD_HEAD_LEN + paramLen) {
+                    u8 *p = pHciRxFifo->p + (pHciRxFifo->wptr & (pHciRxFifo->num - 1)) * pHciRxFifo->size;
                 #if (TIFS_VARIATION_WORKAROUND_MLP_CODE_IN_RAM)
                     smemcpy(p, hciH4TrCB.pBackUpBuf, hciH4TrCB.backupCnt);
                 #else
@@ -199,14 +196,11 @@ int HCI_Tr_H4BackUpHandler(u8 *pPacket, u32 len)
 
                     hciH4TrCB.backupCnt = 0;
                     HCI_Tr_H4TimerDisable();
-                }
-                else{
+                } else {
                     HCI_Tr_H4TimerEnable();
                 }
                 return cnt;
-            }
-            else
-            {
+            } else {
             #if (TIFS_VARIATION_WORKAROUND_MLP_CODE_IN_RAM)
                 smemcpy(hciH4TrCB.pBackUpBuf + hciH4TrCB.backupCnt, pPacket, len);
             #else
@@ -221,9 +215,8 @@ int HCI_Tr_H4BackUpHandler(u8 *pPacket, u32 len)
 
     case HCI_TR_TYPE_ACL:
     case HCI_TR_TYPE_ISO:
-        if(backupLen >= 1 + HCI_ACL_HEAD_LEN)
-        {
-            pBuf += 2;//skip connHandle
+        if (backupLen >= 1 + HCI_ACL_HEAD_LEN) {
+            pBuf += 2; //skip connHandle
             BSTREAM_TO_UINT16(paramLen, pBuf);
             u16 cpyLen = 1 + HCI_ACL_HEAD_LEN + paramLen - backupLen;
         #if (TIFS_VARIATION_WORKAROUND_MLP_CODE_IN_RAM)
@@ -233,11 +226,10 @@ int HCI_Tr_H4BackUpHandler(u8 *pPacket, u32 len)
         #endif
             hciH4TrCB.backupCnt += min(cpyLen, len);
 
-            if(hciH4TrCB.backupCnt == 1 + HCI_ACL_HEAD_LEN + paramLen)
-            {
+            if (hciH4TrCB.backupCnt == 1 + HCI_ACL_HEAD_LEN + paramLen) {
                 HCI_Tr_H4TimerDisable();
 
-                u8 *p = pHciRxFifo->p + (pHciRxFifo->wptr & (pHciRxFifo->num-1)) * pHciRxFifo->size;
+                u8 *p = pHciRxFifo->p + (pHciRxFifo->wptr & (pHciRxFifo->num - 1)) * pHciRxFifo->size;
             #if (TIFS_VARIATION_WORKAROUND_MLP_CODE_IN_RAM)
                 smemcpy(p, hciH4TrCB.pBackUpBuf, hciH4TrCB.backupCnt);
             #else
@@ -246,18 +238,13 @@ int HCI_Tr_H4BackUpHandler(u8 *pPacket, u32 len)
                 pHciRxFifo->wptr++;
 
                 hciH4TrCB.backupCnt = 0;
-            }
-            else
-            {
+            } else {
                 HCI_Tr_H4TimerEnable();
             }
             return min(cpyLen, len);
-        }
-        else
-        {
-            if(backupLen + len >= 1 + HCI_ACL_HEAD_LEN)
-            {
-                u16 cnt = 0;
+        } else {
+            if (backupLen + len >= 1 + HCI_ACL_HEAD_LEN) {
+                u16 cnt    = 0;
                 u16 cpyLen = 1 + HCI_ACL_HEAD_LEN - backupLen;
             #if (TIFS_VARIATION_WORKAROUND_MLP_CODE_IN_RAM)
                 smemcpy(hciH4TrCB.pBackUpBuf + hciH4TrCB.backupCnt, pPacket, cpyLen);
@@ -269,7 +256,7 @@ int HCI_Tr_H4BackUpHandler(u8 *pPacket, u32 len)
                 len -= cpyLen;
                 cnt += cpyLen;
 
-                pBuf += 2;//skip connHandle
+                pBuf += 2; //skip connHandle
                 BSTREAM_TO_UINT16(paramLen, pBuf);
                 cpyLen = 1 + HCI_ACL_HEAD_LEN + paramLen - hciH4TrCB.backupCnt;
             #if (TIFS_VARIATION_WORKAROUND_MLP_CODE_IN_RAM)
@@ -280,25 +267,22 @@ int HCI_Tr_H4BackUpHandler(u8 *pPacket, u32 len)
                 hciH4TrCB.backupCnt += min(cpyLen, len);
                 cnt += min(cpyLen, len);
 
-                if(hciH4TrCB.backupCnt == 1 + HCI_ACL_HEAD_LEN + paramLen){
-                    u8 *p = pHciRxFifo->p + (pHciRxFifo->wptr & (pHciRxFifo->num-1)) * pHciRxFifo->size;
-                #if (TIFS_VARIATION_WORKAROUND_MLP_CODE_IN_RAM)
+                if (hciH4TrCB.backupCnt == 1 + HCI_ACL_HEAD_LEN + paramLen) {
+                    u8 *p = pHciRxFifo->p + (pHciRxFifo->wptr & (pHciRxFifo->num - 1)) * pHciRxFifo->size;
+            #if (TIFS_VARIATION_WORKAROUND_MLP_CODE_IN_RAM)
                     smemcpy(p, hciH4TrCB.pBackUpBuf, hciH4TrCB.backupCnt);
-                #else
+            #else
                     memcpy(p, hciH4TrCB.pBackUpBuf, hciH4TrCB.backupCnt);
-                #endif
+            #endif
                     pHciRxFifo->wptr++;
 
                     hciH4TrCB.backupCnt = 0;
                     HCI_Tr_H4TimerDisable();
-                }
-                else{
+                } else {
                     HCI_Tr_H4TimerEnable();
                 }
                 return cnt;
-            }
-            else
-            {
+            } else {
             #if (TIFS_VARIATION_WORKAROUND_MLP_CODE_IN_RAM)
                 smemcpy(hciH4TrCB.pBackUpBuf + hciH4TrCB.backupCnt, pPacket, len);
             #else
@@ -322,7 +306,7 @@ int HCI_Tr_H4BackUpHandler(u8 *pPacket, u32 len)
     return 0;
 }
 
-/**
+    /**
  * @brief  : HCI Transmit RX handler
  * @param  : none.
  * @return : none.
@@ -330,44 +314,42 @@ int HCI_Tr_H4BackUpHandler(u8 *pPacket, u32 len)
 #if (TIFS_VARIATION_WORKAROUND_MLP_CODE_IN_RAM)
 _attribute_ram_code_
 #endif
-void HCI_Tr_H4RxHandler(void)
+    void
+    HCI_Tr_H4RxHandler(void)
 {
     HCI_Tr_H4FlushHandler();
 
     hci_fifo_t *pRxFifo = hciH4TrCB.pRxFifo;
-    if(pRxFifo->wptr == pRxFifo->rptr){
-        return;//have no data
+    if (pRxFifo->wptr == pRxFifo->rptr) {
+        return; //have no data
     }
 
     u8 *pPacket = pRxFifo->p + (pRxFifo->rptr & pRxFifo->mask) * pRxFifo->size;
-    u32 len = 0;
-    BSTREAM_TO_UINT32(len, pPacket);//DMA mode length
+    u32 len     = 0;
+    BSTREAM_TO_UINT32(len, pPacket); //DMA mode length
 
     hci_fifo_t *pHciRxFifo = hciH4TrCB.pHciRxFifo;
 
-    while(len)
-    {
-        if(hciH4TrCB.backupCnt){
+    while (len) {
+        if (hciH4TrCB.backupCnt) {
             u8 res = HCI_Tr_H4BackUpHandler(pPacket, len);
             pPacket += res;
             len -= res;
 
-            if(len == 0){
+            if (len == 0) {
                 continue;
             }
         }
 
-        u8 *pBuf = pPacket;
-        u8 hciType = 0;
+        u8 *pBuf    = pPacket;
+        u8  hciType = 0;
         BSTREAM_TO_UINT8(hciType, pBuf);
         u16 paramLen = 0;
-        u16 pktLen = 0;
+        u16 pktLen   = 0;
 
-        switch(hciType)
-        {
+        switch (hciType) {
         case HCI_TR_TYPE_CMD:
-            if(len < 1 + HCI_CMD_HEAD_LEN)
-            {
+            if (len < 1 + HCI_CMD_HEAD_LEN) {
                 HCI_Tr_H4BackUpHandler(pPacket, len);
 
                 len = 0;
@@ -381,8 +363,7 @@ void HCI_Tr_H4RxHandler(void)
 
         case HCI_TR_TYPE_ACL:
         case HCI_TR_TYPE_ISO:
-            if(len < 1 + HCI_ACL_HEAD_LEN)
-            {
+            if (len < 1 + HCI_ACL_HEAD_LEN) {
                 HCI_Tr_H4BackUpHandler(pPacket, len);
 
                 len = 0;
@@ -391,15 +372,14 @@ void HCI_Tr_H4RxHandler(void)
             pBuf += 2; //skip connHandle
             BSTREAM_TO_UINT16(paramLen, pBuf);
 
-            if(hciType==HCI_TR_TYPE_ISO){
-                paramLen &=0x03ff;
+            if (hciType == HCI_TR_TYPE_ISO) {
+                paramLen &= 0x03ff;
             }
             pktLen = 1 + HCI_ACL_HEAD_LEN + paramLen;
             break;
 
         case HCI_TR_TYPE_EVENT:
-            if(len < 1 + HCI_EVT_HEAD_LEN)
-            {
+            if (len < 1 + HCI_EVT_HEAD_LEN) {
                 len = 0;
                 continue;
             }
@@ -411,8 +391,7 @@ void HCI_Tr_H4RxHandler(void)
             continue;
 
         case HCI_TR_TYPE_SCO:
-            if(len < 1 + HCI_SCO_HEAD_LEN)
-            {
+            if (len < 1 + HCI_SCO_HEAD_LEN) {
                 len = 0;
                 continue;
             }
@@ -428,63 +407,57 @@ void HCI_Tr_H4RxHandler(void)
             continue;
         }
 
-        if(pktLen && len >= pktLen)
-        {
-            if((u8)(pHciRxFifo->wptr - pHciRxFifo->rptr) >= pHciRxFifo->num){
-                tlkapi_send_string_data(DBG_HCI_TR, "[I] HCI RX FIFO overflow", 0,0);
+        if (pktLen && len >= pktLen) {
+            if ((u8)(pHciRxFifo->wptr - pHciRxFifo->rptr) >= pHciRxFifo->num) {
+                tlkapi_send_string_data(DBG_HCI_TR, "[I] HCI RX FIFO overflow", 0, 0);
                 return; //have no memory.
             }
-             /* Copy packet to HCI Rx buffer */
-             u8 *p = pHciRxFifo->p + (pHciRxFifo->wptr & (pHciRxFifo->num-1)) * pHciRxFifo->size;
-            #if (TIFS_VARIATION_WORKAROUND_MLP_CODE_IN_RAM)
-             smemcpy(p, pPacket, pktLen);
-            #else
-             memcpy(p, pPacket, pktLen);
-            #endif
-             pHciRxFifo->wptr++;
-             tlkapi_send_string_data(1, "[I] ACL to HCI RX FIFO", p, pktLen);
+            /* Copy packet to HCI Rx buffer */
+            u8 *p = pHciRxFifo->p + (pHciRxFifo->wptr & (pHciRxFifo->num - 1)) * pHciRxFifo->size;
+        #if (TIFS_VARIATION_WORKAROUND_MLP_CODE_IN_RAM)
+            smemcpy(p, pPacket, pktLen);
+        #else
+            memcpy(p, pPacket, pktLen);
+        #endif
+            pHciRxFifo->wptr++;
+            tlkapi_send_string_data(DBG_HCI_TR, "[I] ACL to HCI RX FIFO", p, pktLen);
 
-             len -= pktLen;
-             pPacket += pktLen;
-        }
-        else if(pktLen && len < pktLen)
-        {
+            len -= pktLen;
+            pPacket += pktLen;
+        } else if (pktLen && len < pktLen) {
             HCI_Tr_H4BackUpHandler(pPacket, len);
 
             len = 0;
             continue;
         }
-    }/* while(len) */
+    } /* while(len) */
 
 
-    if(len == 0){
+    if (len == 0) {
         pRxFifo->rptr++;
     }
 }
 
-_attribute_ram_code_
-void HCI_Tr_H4UartRxIRQHandler(unsigned int * param)
+_attribute_ram_code_ void HCI_Tr_H4UartRxIRQHandler(unsigned int *param)
 {
-    (void)* param;
+    (void)*param;
     /* Get the length of Rx data */
-    u32 rxLen = 0;
+    u32         rxLen   = 0;
     hci_fifo_t *pRxFifo = hciH4TrCB.pRxFifo;
-    u8 *p = pRxFifo->p + (pRxFifo->wptr & pRxFifo->mask) * pRxFifo->size;
+    u8         *p       = pRxFifo->p + (pRxFifo->wptr & pRxFifo->mask) * pRxFifo->size;
 
-    if((u8)(pRxFifo->wptr - pRxFifo->rptr) >= pRxFifo->num){
-        ext_hci_uartReceData((p+4), pRxFifo->size - 4);//[!!important]
+    if ((u8)(pRxFifo->wptr - pRxFifo->rptr) >= pRxFifo->num) {
+        ext_hci_uartReceData((p + 4), pRxFifo->size - 4); //[!!important]
         tlkapi_send_string_data(DBG_HCI_TR, "[I] UART Rx overflow", 0, 0);
 
-        return; //have no memory.
+        return;                                           //have no memory.
     }
-    BSTREAM_TO_UINT32(rxLen,p);
-    if(rxLen)
-    {
+    BSTREAM_TO_UINT32(rxLen, p);
+    if (rxLen) {
         pRxFifo->wptr++;
         p = pRxFifo->p + (pRxFifo->wptr & pRxFifo->mask) * pRxFifo->size;
-
     }
-    ext_hci_uartReceData( (p+4), pRxFifo->size - 4);//[!!important]
+    ext_hci_uartReceData((p + 4), pRxFifo->size - 4); //[!!important]
 }
 
 

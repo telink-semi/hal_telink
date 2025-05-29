@@ -28,9 +28,6 @@
 #include "lib/include/hash/sha224.h"
 
 
-
-
-
 #ifdef SUPPORT_HASH_SHA224
 /**
  * @brief       init sha224
@@ -73,7 +70,6 @@ unsigned int sha224_final(SHA224_CTX *ctx, unsigned char *digest)
     return hash_final(ctx, digest);
 }
 
-
 /**
  * @brief       input whole message and get its sha224 digest
  * @param[in]   msg            - message.
@@ -91,7 +87,7 @@ unsigned int sha224(unsigned char *msg, unsigned int msg_bytes, unsigned char *d
 }
 
 
-#ifdef HASH_DMA_FUNCTION
+    #ifdef HASH_DMA_FUNCTION
 /**
  * @brief       init dma sha224
  * @param[in]   ctx           - SHA224_DMA_CTX context pointer.
@@ -154,6 +150,6 @@ unsigned int sha224_dma(unsigned int *msg, unsigned int msg_bytes, unsigned int 
 {
     return hash_dma(HASH_SHA224, msg, msg_bytes, digest, callback);
 }
-#endif
+    #endif
 
 #endif

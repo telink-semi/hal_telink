@@ -31,13 +31,10 @@
 
 #ifdef SUPPORT_RSA
 
-#include "lib/include/pke/rsa.h"
-#include "lib/include/pke/pke_prime.h"
-#include "lib/include/trng/trng.h"
-#include "lib/include/crypto_common/utility.h"
-
-
-
+    #include "lib/include/pke/rsa.h"
+    #include "lib/include/pke/pke_prime.h"
+    #include "lib/include/trng/trng.h"
+    #include "lib/include/crypto_common/utility.h"
 
 /**
  * @brief       out = a^e mod n.
@@ -59,45 +56,34 @@ unsigned int RSA_ModExp(unsigned int *a, unsigned int *e, unsigned int *n, unsig
     unsigned int nWordLen = GET_WORD_LEN(nBitLen);
     unsigned int ret;
 
-    if((NULL == a) || (NULL == e) || (NULL == n) || (NULL == out))
-    {
+    if ((NULL == a) || (NULL == e) || (NULL == n) || (NULL == out)) {
         return RSA_BUFFER_NULL;
-    }
-    else if((nBitLen > RSA_MAX_BIT_LEN) || (eBitLen > nBitLen))
-    {
+    } else if ((nBitLen > RSA_MAX_BIT_LEN) || (eBitLen > nBitLen)) {
         return RSA_INPUT_TOO_LONG;
-    }
-    else if((0u == nBitLen) || (0u == (n[0] & 1u)))
-    {
+    } else if ((0u == nBitLen) || (0u == (n[0] & 1u))) {
         return RSA_INPUT_INVALID;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    ret = pke_modexp_check_input(( unsigned int *)n, ( unsigned int *)e, ( unsigned int *)a,
-            out, nWordLen, eWordLen);
-    if(PKE_FINISHED == ret)
-    {
+    ret = pke_modexp_check_input((unsigned int *)n, (unsigned int *)e, (unsigned int *)a, out, nWordLen, eWordLen);
+    if (PKE_FINISHED == ret) {
         return RSA_SUCCESS;
-    }
-    else if(PKE_SUCCESS != ret)
-    {
+    } else if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ret = pke_pre_calc_mont_for_modexp(n, nBitLen, NULL, NULL);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     return pke_modexp(n, e, a, out, nWordLen, eWordLen);
 }
-
 
 /**
  * @brief        out = a^d mod n, here d represents RSA CRT private key (p,q,dp,dq,u).
@@ -116,190 +102,167 @@ unsigned int RSA_ModExp(unsigned int *a, unsigned int *e, unsigned int *n, unsig
          have the same word length:((nBitLen/2+31)>>5).
   @endverbatim
  */
-unsigned int RSA_CRTModExp(unsigned int *a, unsigned int *p, unsigned int *q, unsigned int *dp, unsigned int*dq, unsigned int *u,
-        unsigned int *out, unsigned int nBitLen)
+unsigned int RSA_CRTModExp(unsigned int *a, unsigned int *p, unsigned int *q, unsigned int *dp, unsigned int *dq, unsigned int *u, unsigned int *out, unsigned int nBitLen)
 {
-    unsigned int buf[RSA_MAX_WORD_LEN];
+    unsigned int  buf[RSA_MAX_WORD_LEN];
     unsigned int *m1 = buf;
-    unsigned int *m2 = buf+(RSA_MAX_WORD_LEN>>1);
+    unsigned int *m2 = buf + (RSA_MAX_WORD_LEN >> 1);
     unsigned int *tmp_out;
-    unsigned int tmp_step;
-    unsigned int nWordLen = GET_WORD_LEN(nBitLen);
-    unsigned int pBitLen = nBitLen>>1;
-    unsigned int pWordLen = GET_WORD_LEN(pBitLen);
-    int32_t flag;
-    unsigned int ret;
+    unsigned int  tmp_step;
+    unsigned int  nWordLen = GET_WORD_LEN(nBitLen);
+    unsigned int  pBitLen  = nBitLen >> 1;
+    unsigned int  pWordLen = GET_WORD_LEN(pBitLen);
+    int32_t       flag;
+    unsigned int  ret;
 
-    if((NULL == a) || (NULL == p) || (NULL == q) || (NULL == dp) || (NULL == dq) || (NULL == u) || (NULL == out))
-    {
+    if ((NULL == a) || (NULL == p) || (NULL == q) || (NULL == dp) || (NULL == dq) || (NULL == u) || (NULL == out)) {
         return RSA_BUFFER_NULL;
-    }
-    else if(nBitLen > RSA_MAX_BIT_LEN)
-    {
+    } else if (nBitLen > RSA_MAX_BIT_LEN) {
         return RSA_INPUT_TOO_LONG;
-    }
-    else if((0u == nBitLen) || (0u != (nBitLen & 1u)))
-    {
+    } else if ((0u == nBitLen) || (0u != (nBitLen & 1u))) {
         return RSA_INPUT_INVALID;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //get n = p*q
     ret = pke_mul(p, q, buf, pWordLen);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //a should be in [0,n]
     flag = uint32_BigNumCmp(a, nWordLen, buf, nWordLen);
-    if(flag > 0)
-    {
+    if (flag > 0) {
         return RSA_INPUT_INVALID;
-    }
-    else if((0 == flag) || (1u == uint32_BigNum_Check_Zero(a, nWordLen)))  //if a is 0 or n, the output is 0
+    } else if ((0 == flag) || (1u == uint32_BigNum_Check_Zero(a, nWordLen))) //if a is 0 or n, the output is 0
     {
         uint32_clear(out, nWordLen);
         return RSA_SUCCESS;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //do pke_pre_calc_mont() first, because a may be less than p or q, then pke_mod() will not
     //call pke_pre_calc_mont() inside, but pke_modexp() needs the output of pke_pre_calc_mont().
 
     //m2 = (a) mod q
     ret = pke_pre_calc_mont_for_modexp(q, pBitLen, NULL, NULL);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //get the pBitLen step
     tmp_step = pke_get_operand_bytes();
 
-#if (defined(PKE_LP) || defined(PKE_SECURE))
-    ret = pke_mod(a, nWordLen, q, (unsigned int *)(rPKE_A(3u,tmp_step)), (unsigned int *)(rPKE_B(4u,tmp_step)), pWordLen, m2);
-#else
-    ret = pke_mod(a, nWordLen, q, (unsigned int *)(rPKE_B(0u,tmp_step)), pWordLen, m2);
-#endif
-    if(PKE_SUCCESS != ret)
-    {
+    #if (defined(PKE_LP) || defined(PKE_SECURE))
+    ret = pke_mod(a, nWordLen, q, (unsigned int *)(rPKE_A(3u, tmp_step)), (unsigned int *)(rPKE_B(4u, tmp_step)), pWordLen, m2);
+    #else
+    ret = pke_mod(a, nWordLen, q, (unsigned int *)(rPKE_B(0u, tmp_step)), pWordLen, m2);
+    #endif
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //m2 = (a)^dq mod q
     ret = pke_modexp(q, dq, m2, m2, pWordLen, pWordLen);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //m1 = (a) mod p
     ret = pke_pre_calc_mont_for_modexp(p, pBitLen, NULL, NULL);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
-#if (defined(PKE_LP) || defined(PKE_SECURE))
-    ret = pke_mod(a, nWordLen, p, (unsigned int *)(rPKE_A(3u,tmp_step)), (unsigned int *)(rPKE_B(4u,tmp_step)), pWordLen, m1);
-#else
-    ret = pke_mod(a, nWordLen, p, (unsigned int *)(rPKE_B(0u,tmp_step)), pWordLen, m1);
-#endif
-    if(PKE_SUCCESS != ret)
-    {
+    #if (defined(PKE_LP) || defined(PKE_SECURE))
+    ret = pke_mod(a, nWordLen, p, (unsigned int *)(rPKE_A(3u, tmp_step)), (unsigned int *)(rPKE_B(4u, tmp_step)), pWordLen, m1);
+    #else
+    ret = pke_mod(a, nWordLen, p, (unsigned int *)(rPKE_B(0u, tmp_step)), pWordLen, m1);
+    #endif
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //m1 = (a)^dp mod p
     ret = pke_modexp(p, dp, m1, m1, pWordLen, pWordLen);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
-#if (defined(PKE_LP) || defined(PKE_SECURE))
-     tmp_out = (unsigned int *)(rPKE_B(0u,tmp_step));
-#else
-     tmp_out = (unsigned int *)(rPKE_B(1u,tmp_step));
-#endif
+    #if (defined(PKE_LP) || defined(PKE_SECURE))
+    tmp_out = (unsigned int *)(rPKE_B(0u, tmp_step));
+    #else
+    tmp_out = (unsigned int *)(rPKE_B(1u, tmp_step));
+    #endif
 
     //m1 = (m1-m2) mod p
-    if(uint32_BigNumCmp(m2, pWordLen, p, pWordLen) >= 0)
-    {
+    if (uint32_BigNumCmp(m2, pWordLen, p, pWordLen) >= 0) {
         //if m2 >= p, get tmp_out = m2 mod p
         ret = pke_sub(m2, p, tmp_out, pWordLen);
-        if(PKE_SUCCESS != ret)
-        {
+        if (PKE_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
 
         ret = pke_modsub(p, m1, tmp_out, m1, pWordLen);
-    }
-    else
-    {
+    } else {
         ret = pke_modsub(p, m1, m2, m1, pWordLen);
     }
 
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //m1 = h = u*(m1-m2) mod p
-#if 1
-#if (defined(PKE_LP) || defined(PKE_SECURE))
+    #if 1
+        #if (defined(PKE_LP) || defined(PKE_SECURE))
     pke_set_exe_cfg(PKE_EXE_CFG_ALL_NON_MONT);
-#endif
+        #endif
     ret = pke_modmul_internal(m1, u, m1, pWordLen);
-#else
+    #else
     ret = pke_modmul(p, m1, u, m1, pWordLen);
-#endif
-    if(PKE_SUCCESS != ret)
-    {
+    #endif
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //store the nBitLen step
     tmp_step = pke_set_operand_width(nBitLen);
 
     //A1 = hq
-    ret = pke_mul(m1, q, (unsigned int *)(rPKE_A(1u,tmp_step)), pWordLen);
-    if(PKE_SUCCESS != ret)
-    {
+    ret = pke_mul(m1, q, (unsigned int *)(rPKE_A(1u, tmp_step)), pWordLen);
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //out = m2+hq
-    uint32_copy((unsigned int *)(rPKE_B(1u,tmp_step)), m2, pWordLen);
-    uint32_clear((unsigned int *)(rPKE_B(1u,tmp_step))+pWordLen, nWordLen-pWordLen);
-    return pke_add((unsigned int *)(rPKE_A(1u,tmp_step)), (unsigned int *)(rPKE_B(1u,tmp_step)), out, nWordLen);
+    uint32_copy((unsigned int *)(rPKE_B(1u, tmp_step)), m2, pWordLen);
+    uint32_clear((unsigned int *)(rPKE_B(1u, tmp_step)) + pWordLen, nWordLen - pWordLen);
+    return pke_add((unsigned int *)(rPKE_A(1u, tmp_step)), (unsigned int *)(rPKE_B(1u, tmp_step)), out, nWordLen);
 }
-
 
 /**
  * @brief       get big odd integer e of eBitLen
@@ -313,47 +276,41 @@ unsigned int RSA_CRTModExp(unsigned int *a, unsigned int *p, unsigned int *q, un
  */
 unsigned int RSA_Get_E1(unsigned int e[], unsigned int eBitLen)
 {
-    unsigned int eWordLen = (eBitLen+0x1Fu)>>5;
+    unsigned int eWordLen = (eBitLen + 0x1Fu) >> 5;
     unsigned int ret;
 
-    if(eBitLen < 2u)
-    {
+    if (eBitLen < 2u) {
         return RSA_INPUT_INVALID;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    ret = get_rand((unsigned char *)e, eWordLen<<2);
-    if(TRNG_SUCCESS != ret)
-    {
+    ret = get_rand((unsigned char *)e, eWordLen << 2);
+    if (TRNG_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     eBitLen &= 31u;
 
-    if(0u != eBitLen)
-    {
-#if 0
+    if (0u != eBitLen) {
+    #if 0
         e[eWordLen - 1u] <<= (32u - eBitLen);
         e[eWordLen - 1u] |= 0x80000000u;
         e[eWordLen - 1u] >>= (32u - eBitLen);
-#else
-        e[eWordLen - 1u] &= (1u<<(eBitLen))-1u;
-        e[eWordLen - 1u] |= 1u<<(eBitLen - 1u);
-#endif
-    }
-    else
-    {
+    #else
+        e[eWordLen - 1u] &= (1u << (eBitLen)) - 1u;
+        e[eWordLen - 1u] |= 1u << (eBitLen - 1u);
+    #endif
+    } else {
         e[eWordLen - 1u] |= 0x80000000u;
     }
 
-    e[0] |= 0x01u;          //make e odd
+    e[0] |= 0x01u; //make e odd
 
     return 0u;
 }
-
 
 /**
  * @brief       get big odd integer e of eBitLen, satisfies e < fai_n of bitLen.
@@ -369,50 +326,46 @@ unsigned int RSA_Get_E1(unsigned int e[], unsigned int eBitLen)
  */
 unsigned int RSA_Get_E2(unsigned int e[], unsigned int fai_n[], unsigned int bitLen)
 {
-    int32_t i;
+    int32_t       i;
     unsigned char j;
 
-    if(bitLen < 66u)
-    {
+    if (bitLen < 66u) {
         return 1u;
+    } else {
+        ;
     }
-    else
-    {;}
 
     RSA_Get_E1(e, bitLen);
     bitLen--;
-    i = ((bitLen+0x1Fu)>>5) - 1;  //i is the word index of the word where the second highest bit is located
-    j = bitLen&31u;               //j is the bit length up to the second highest bit in the targeted word
-    if(j == (unsigned char)0)
-    {
+    i = ((bitLen + 0x1Fu) >> 5) - 1; //i is the word index of the word where the second highest bit is located
+    j = bitLen & 31u;                //j is the bit length up to the second highest bit in the targeted word
+    if (j == (unsigned char)0) {
         j = 32;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    while(i>=0)
-    {
-        e[i] &= (unsigned int)(~(1u<<(j-((unsigned char)1))));
-        if(uint32_BigNumCmp(e, i+1, fai_n, i+1) < 0)       //if e < n
+    while (i >= 0) {
+        e[i] &= (unsigned int)(~(1u << (j - ((unsigned char)1))));
+        if (uint32_BigNumCmp(e, i + 1, fai_n, i + 1) < 0) //if e < n
         {
             return 0u;
+        } else {
+            ;
         }
-        else
-        {;}
 
         j--;
-        if(((unsigned char)0) == j)       //j is 0, switch to the next word
+        if (((unsigned char)0) == j) //j is 0, switch to the next word
         {
             i--;
-            j=32;
+            j = 32;
+        } else {
+            ;
         }
-        else
-        {;}
     }
 
-    return 2u;          //fail, because fai_n is 1000000000...000000
+    return 2u; //fail, because fai_n is 1000000000...000000
 }
-
 
 /**
  * @brief       judge whether big integer a is equal to 0x5a5a5a5a5a...5a or not.
@@ -427,33 +380,28 @@ unsigned int RSA_Get_E2(unsigned int e[], unsigned int fai_n[], unsigned int bit
  */
 unsigned int CheckValue_0x5a5a5a5a(unsigned int a[], unsigned int aBitLen)
 {
-    unsigned int i, wordLen = aBitLen>>5;
+    unsigned int i, wordLen = aBitLen >> 5;
 
-    if(0u != (aBitLen & 0x1Fu))
-    {
-        if(a[wordLen] != 0u)
-        {
+    if (0u != (aBitLen & 0x1Fu)) {
+        if (a[wordLen] != 0u) {
             return 1;
+        } else {
+            ;
         }
-        else
-        {;}
+    } else {
+        ;
     }
-    else
-    {;}
 
-    for(i=0; i<wordLen; i++)
-    {
-        if(a[i] != 0x5a5a5a5au)
-        {
+    for (i = 0; i < wordLen; i++) {
+        if (a[i] != 0x5a5a5a5au) {
             return 1;
+        } else {
+            ;
         }
-        else
-        {;}
     }
 
     return 0;
 }
-
 
 /**
  * @brief       generate RSA key (e,d,n).
@@ -471,189 +419,173 @@ unsigned int CheckValue_0x5a5a5a5a(unsigned int a[], unsigned int aBitLen)
  */
 unsigned int RSA_GetKey(unsigned int *e, unsigned int *d, unsigned int *n, unsigned int eBitLen, unsigned int nBitLen)
 {
-    unsigned int buf[RSA_MAX_WORD_LEN];
+    unsigned int  buf[RSA_MAX_WORD_LEN];
     unsigned int *p, *q, *in, *out;
-    unsigned int pBitLen, pWordLen, eWordLen, nWordLen, tmp_step;
-    unsigned int count, ret;
+    unsigned int  pBitLen, pWordLen, eWordLen, nWordLen, tmp_step;
+    unsigned int  count, ret;
 
-    if((NULL == e) || (NULL == d) || (NULL == n))
-    {
+    if ((NULL == e) || (NULL == d) || (NULL == n)) {
         return RSA_BUFFER_NULL;
-    }
-    else if((0u != (nBitLen&1u)) || (nBitLen < RSA_MIN_BIT_LEN) || (nBitLen > RSA_MAX_BIT_LEN))  //nBitLen can not be odd
+    } else if ((0u != (nBitLen & 1u)) || (nBitLen < RSA_MIN_BIT_LEN) || (nBitLen > RSA_MAX_BIT_LEN)) //nBitLen can not be odd
     {
         return RSA_INPUT_INVALID;
-    }
-    else if((eBitLen<2u) || (eBitLen>nBitLen))
-    {
+    } else if ((eBitLen < 2u) || (eBitLen > nBitLen)) {
         return RSA_INPUT_INVALID;
+    } else {
+        ;
     }
-    else
-    {;}
 
     p = buf;
-    q = buf+RSA_MAX_WORD_LEN/2;
+    q = buf + RSA_MAX_WORD_LEN / 2;
 
     tmp_step = pke_set_operand_width(nBitLen);
 
-    in = (unsigned int *)(rPKE_B(1u,tmp_step));
-#if (defined(PKE_LP) || defined(PKE_SECURE))
-    out = (unsigned int *)(rPKE_A(2u,tmp_step));
-#else
-    out = (unsigned int *)(rPKE_A(1u,tmp_step));
-#endif
+    in = (unsigned int *)(rPKE_B(1u, tmp_step));
+    #if (defined(PKE_LP) || defined(PKE_SECURE))
+    out = (unsigned int *)(rPKE_A(2u, tmp_step));
+    #else
+    out = (unsigned int *)(rPKE_A(1u, tmp_step));
+    #endif
 
     eWordLen = GET_WORD_LEN(eBitLen);
     nWordLen = GET_WORD_LEN(nBitLen);
-    pBitLen = nBitLen>>1;
+    pBitLen  = nBitLen >> 1;
     pWordLen = GET_WORD_LEN(pBitLen);
 
 GET_PQ:
 
     ret = get_prime(p, pBitLen);
-    if(0u != ret)
-    {
+    if (0u != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ret = get_prime(q, pBitLen);
-    if(0u != ret)
-    {
+    if (0u != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    p[0]--;                                            // p=p-1
-    q[0]--;                                            // q=q-1
-    ret = pke_mul(p, q, n, pWordLen);                  // get fai(n)=(p-1)(q-1)
-    if(PKE_SUCCESS != ret)
-    {
+    p[0]--;                           // p=p-1
+    q[0]--;                           // q=q-1
+    ret = pke_mul(p, q, n, pWordLen); // get fai(n)=(p-1)(q-1)
+    if (PKE_SUCCESS != ret) {
         return ret;
-    }
-    else
-    {
+    } else {
         ;
     }
 
     count = 0u;
 GET_E:
     count++;
-    if(count == 7u)
-    {
+    if (count == 7u) {
         goto GET_PQ;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    switch(eBitLen)
+    switch (eBitLen) {
+    case 2u:
     {
-        case 2u :  {e[0] = 3u; break;}
-        case 5u :  {e[0] = 17u; break;}
-        case 17u:  {e[0] = 65537u; break;}
-        default:
-        {
-            if(eBitLen == nBitLen)
-            {
-                ret = RSA_Get_E2(e, n, eBitLen);
-                if(0u != ret)
-                {
-                    return ret;
-                }
-                else
-                {;}
+        e[0] = 3u;
+        break;
+    }
+    case 5u:
+    {
+        e[0] = 17u;
+        break;
+    }
+    case 17u:
+    {
+        e[0] = 65537u;
+        break;
+    }
+    default:
+    {
+        if (eBitLen == nBitLen) {
+            ret = RSA_Get_E2(e, n, eBitLen);
+            if (0u != ret) {
+                return ret;
+            } else {
+                ;
             }
-            else
-            {
-                ret = RSA_Get_E1(e, eBitLen);
-                if(0u != ret)
-                {
-                    return ret;
-                }
-                else
-                {;}
+        } else {
+            ret = RSA_Get_E1(e, eBitLen);
+            if (0u != ret) {
+                return ret;
+            } else {
+                ;
             }
-            break;
         }
+        break;
+    }
     }
 
     //get d = e^(-1) mod n
     ret = pke_modinv(n, e, d, nWordLen, eWordLen);
-    if(PKE_NO_MODINV == ret)                           //if d doesn't exist
+    if (PKE_NO_MODINV == ret)                                       //if d doesn't exist
     {
-        if((eBitLen==2u) || (eBitLen==5u) || (eBitLen==17u))    //if e is prime, and e divide fai(n)
+        if ((eBitLen == 2u) || (eBitLen == 5u) || (eBitLen == 17u)) //if e is prime, and e divide fai(n)
         {
             goto GET_PQ;
-        }
-        else                                           //1. e is prime, and e divide fai(n) 2.e is not prime, and
-        {                                              //e, fai(n) have common divisor.
+        } else                                                      //1. e is prime, and e divide fai(n) 2.e is not prime, and
+        {                                                           //e, fai(n) have common divisor.
             goto GET_E;
         }
-    }
-    else if(PKE_SUCCESS != ret)
-    {
+    } else if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //get n = pq
     p[0]++;
     q[0]++;
     ret = pke_mul(p, q, n, pWordLen);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ret = pke_pre_calc_mont_for_modexp(n, nBitLen, NULL, NULL);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //Encryption test
-    if(0u != (nBitLen & 0x1Fu))
-    {
-        in[nWordLen-1u]=0u;
+    if (0u != (nBitLen & 0x1Fu)) {
+        in[nWordLen - 1u] = 0u;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    uint32_set(in, 0x5a5a5a5au, nBitLen>>5);
+    uint32_set(in, 0x5a5a5a5au, nBitLen >> 5);
 
     ret = pke_modexp(n, e, in, out, nWordLen, eWordLen);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ret = pke_modexp(n, d, out, out, nWordLen, nWordLen);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    if(0u != CheckValue_0x5a5a5a5a(out, nBitLen))
-    {
+    if (0u != CheckValue_0x5a5a5a5a(out, nBitLen)) {
         goto GET_PQ;
-    }
-    else
-    {
+    } else {
         return RSA_SUCCESS;
     }
 }
-
 
 /**
  * @brief       generate RSA-CRT key (e,p,q,dp,dq,u,n).
@@ -673,285 +605,248 @@ GET_E:
       -# 2.eBitLen must be larger than 1, and less than or equal to nBitLen.
   @endverbatim
  */
-unsigned int RSA_GetCRTKey(unsigned int *e, unsigned int *p, unsigned int *q, unsigned int *dp, unsigned int *dq, unsigned int *u,
-        unsigned int *n, unsigned int eBitLen, unsigned int nBitLen)
+unsigned int RSA_GetCRTKey(unsigned int *e, unsigned int *p, unsigned int *q, unsigned int *dp, unsigned int *dq, unsigned int *u, unsigned int *n, unsigned int eBitLen, unsigned int nBitLen)
 {
     unsigned int buf[RSA_MAX_WORD_LEN];
     unsigned int pBitLen, pWordLen, eWordLen, nWordLen, i, wordLen;
-    int32_t count;
+    int32_t      count;
     unsigned int ret;
 
-    if((NULL == e) || (NULL == p) || (NULL == q) || (NULL == dp) || (NULL == dq) || (NULL == u) || (NULL == n))
-    {
+    if ((NULL == e) || (NULL == p) || (NULL == q) || (NULL == dp) || (NULL == dq) || (NULL == u) || (NULL == n)) {
         return RSA_BUFFER_NULL;
-    }
-    else if((0u != (nBitLen&1u)) || (nBitLen < RSA_MIN_BIT_LEN) || (nBitLen > RSA_MAX_BIT_LEN))  //nBitLen can not be odd
+    } else if ((0u != (nBitLen & 1u)) || (nBitLen < RSA_MIN_BIT_LEN) || (nBitLen > RSA_MAX_BIT_LEN)) //nBitLen can not be odd
     {
         return RSA_INPUT_INVALID;
-    }
-    else if((eBitLen<2u) || (eBitLen>nBitLen))
-    {
+    } else if ((eBitLen < 2u) || (eBitLen > nBitLen)) {
         return RSA_INPUT_INVALID;
+    } else {
+        ;
     }
-    else
-    {;}
 
     eWordLen = GET_WORD_LEN(eBitLen);
     nWordLen = GET_WORD_LEN(nBitLen);
-    pBitLen = nBitLen>>1;
+    pBitLen  = nBitLen >> 1;
     pWordLen = GET_WORD_LEN(pBitLen);
 
 GET_PQ:
 
     ret = get_prime(p, pBitLen);
-    if(0u != ret)
-    {
+    if (0u != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ret = get_prime(q, pBitLen);
-    if(0u != ret)
-    {
+    if (0u != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    count = uint32_BigNumCmp(p, pWordLen, q, pWordLen);         // make p > q, for get u = q^(-1) mod p convenient
-    if(count == -1)
-    {
-        for(i=0; i<pWordLen; i++)
-        {
+    count = uint32_BigNumCmp(p, pWordLen, q, pWordLen); // make p > q, for get u = q^(-1) mod p convenient
+    if (count == -1) {
+        for (i = 0; i < pWordLen; i++) {
             wordLen = p[i];
-            p[i] = q[i];
-            q[i] = wordLen;
+            p[i]    = q[i];
+            q[i]    = wordLen;
         }
-    }
-    else if(count == 0)
-    {
+    } else if (count == 0) {
         goto GET_PQ;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    p[0]--;                                                // p=p-1
-    q[0]--;                                                // q=q-1
-    if(eBitLen == nBitLen)
-    {
+    p[0]--;                               // p=p-1
+    q[0]--;                               // q=q-1
+    if (eBitLen == nBitLen) {
         ret = pke_mul(p, q, n, pWordLen); // get fai(n)=(p-1)(q-1)
-        if(PKE_SUCCESS != ret)
-        {
+        if (PKE_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
+    } else {
+        ;
     }
-    else
-    {;}
 
     count = 0;
 GET_E:
     count++;
-    if(count == 7)
-    {
+    if (count == 7) {
         goto GET_PQ;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    switch(eBitLen)
+    switch (eBitLen) {
+    case 2u:
     {
-        case 2u :  {e[0] = 3u; break;}
-        case 5u :  {e[0] = 17u; break;}
-        case 17u:  {e[0] = 65537u; break;}
-        default:
-        {
-            if(eBitLen == nBitLen)
-            {
-                ret = RSA_Get_E2(e, n, eBitLen);
-                if(0u != ret)
-                {
-                    return ret;
-                }
-                else
-                {;}
+        e[0] = 3u;
+        break;
+    }
+    case 5u:
+    {
+        e[0] = 17u;
+        break;
+    }
+    case 17u:
+    {
+        e[0] = 65537u;
+        break;
+    }
+    default:
+    {
+        if (eBitLen == nBitLen) {
+            ret = RSA_Get_E2(e, n, eBitLen);
+            if (0u != ret) {
+                return ret;
+            } else {
+                ;
             }
-            else
-            {
-                ret = RSA_Get_E1(e, eBitLen);
-                if(0u != ret)
-                {
-                    return ret;
-                }
-                else
-                {;}
+        } else {
+            ret = RSA_Get_E1(e, eBitLen);
+            if (0u != ret) {
+                return ret;
+            } else {
+                ;
             }
-            break;
         }
+        break;
+    }
     }
 
     // dp = e^(-1) mod (p-1)
-    if(uint32_BigNumCmp(e, eWordLen, p, pWordLen) > 0)
-    {
-#if (defined(PKE_LP) || defined(PKE_SECURE))
+    if (uint32_BigNumCmp(e, eWordLen, p, pWordLen) > 0) {
+    #if (defined(PKE_LP) || defined(PKE_SECURE))
         ret = pke_mod(e, eWordLen, p, NULL, NULL, pWordLen, u);
-#else
+    #else
         ret = pke_mod(e, eWordLen, p, NULL, pWordLen, u);
-#endif
-        if(PKE_SUCCESS != ret)
-        {
+    #endif
+        if (PKE_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
 
         wordLen = pWordLen;
-    }
-    else
-    {
+    } else {
         uint32_copy(u, e, eWordLen);
         wordLen = eWordLen;
     }
 
     ret = pke_modinv(p, u, dp, pWordLen, wordLen);
-    if(PKE_NO_MODINV == ret)
-    {
-        if((eBitLen==2u) || (eBitLen==5u) || (eBitLen==17u))    //if e is prime, and e divide fai(n)
+    if (PKE_NO_MODINV == ret) {
+        if ((eBitLen == 2u) || (eBitLen == 5u) || (eBitLen == 17u)) //if e is prime, and e divide fai(n)
         {
             goto GET_PQ;
-        }
-        else                                           //1. e is prime, and e divide fai(n) 2.e is not prime, and
-        {                                              //e, fai(n) have common divisor.
+        } else                                                      //1. e is prime, and e divide fai(n) 2.e is not prime, and
+        {                                                           //e, fai(n) have common divisor.
             goto GET_E;
         }
-    }
-    else if(PKE_SUCCESS != ret)
-    {
+    } else if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     // dq = e^(-1) mod (q-1)
-    if(uint32_BigNumCmp(e, eWordLen, q, pWordLen) > 0)
-    {
-#if (defined(PKE_LP) || defined(PKE_SECURE))
+    if (uint32_BigNumCmp(e, eWordLen, q, pWordLen) > 0) {
+    #if (defined(PKE_LP) || defined(PKE_SECURE))
         ret = pke_mod(e, eWordLen, q, NULL, NULL, pWordLen, u);
-#else
+    #else
         ret = pke_mod(e, eWordLen, q, NULL, pWordLen, u);
-#endif
-        if(PKE_SUCCESS != ret)
-        {
+    #endif
+        if (PKE_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
 
         wordLen = pWordLen;
-    }
-    else
-    {
+    } else {
         uint32_copy(u, e, eWordLen);
         wordLen = eWordLen;
     }
 
     ret = pke_modinv(q, u, dq, pWordLen, wordLen);
-    if(PKE_NO_MODINV == ret)
-    {
-        if((eBitLen==2u) || (eBitLen==5u) || (eBitLen==17u))    //if e is prime, and e divide fai(n)
+    if (PKE_NO_MODINV == ret) {
+        if ((eBitLen == 2u) || (eBitLen == 5u) || (eBitLen == 17u)) //if e is prime, and e divide fai(n)
         {
             goto GET_PQ;
-        }
-        else                                           //1. e is prime, and e divide fai(n) 2.e is not prime, and
-        {                                              //e, fai(n) have common divisor.
+        } else                                                      //1. e is prime, and e divide fai(n) 2.e is not prime, and
+        {                                                           //e, fai(n) have common divisor.
             goto GET_E;
         }
-    }
-    else if(PKE_SUCCESS != ret)
-    {
+    } else if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     p[0]++;
     q[0]++;
 
     // u = q^(-1) mod p
     ret = pke_modinv(p, q, u, pWordLen, pWordLen);
-    if(PKE_NO_MODINV == ret)
-    {
+    if (PKE_NO_MODINV == ret) {
         goto GET_PQ;
-    }
-    else if(PKE_SUCCESS != ret)
-    {
+    } else if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     // get n
     ret = pke_mul(p, q, n, pWordLen);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //Encryption test
-    if(0u != (nBitLen & 0x1Fu))
-    {
-        buf[nWordLen-1u]=0u;
+    if (0u != (nBitLen & 0x1Fu)) {
+        buf[nWordLen - 1u] = 0u;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    wordLen = nBitLen>>5;
+    wordLen = nBitLen >> 5;
     uint32_set(buf, 0x5a5a5a5au, wordLen);
 
     ret = pke_pre_calc_mont_for_modexp(n, nBitLen, NULL, NULL);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ret = pke_modexp(n, e, buf, buf, nWordLen, eWordLen);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    if(0u == CheckValue_0x5a5a5a5a(buf, nBitLen))
-    {
+    if (0u == CheckValue_0x5a5a5a5a(buf, nBitLen)) {
         goto GET_PQ;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ret = RSA_CRTModExp(buf, p, q, dp, dq, u, buf, nBitLen);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    if(0u != CheckValue_0x5a5a5a5a(buf, nBitLen))
-    {
+    if (0u != CheckValue_0x5a5a5a5a(buf, nBitLen)) {
         goto GET_PQ;
-    }
-    else
-    {
+    } else {
         return RSA_SUCCESS;
     }
 }
 
 #endif
-

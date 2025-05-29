@@ -29,7 +29,8 @@ volatile unsigned int  s7816_rst_pin;
 volatile unsigned int  s7816_vcc_pin;
 volatile unsigned int  s7816_rtx_pin;
 volatile unsigned char s7816_clock;
-volatile int s7816_rst_time;//us
+volatile int           s7816_rst_time; //us
+
 /**
  * @brief       This function is used to set the s7816 clock.
  * @param[in]   div - set the divider of clock of 7816 module.
@@ -40,7 +41,7 @@ volatile int s7816_rst_time;//us
  */
 void s7816_set_clk(unsigned char div)
 {
-    reg_7816_clk_div = ((reg_7816_clk_div & (~FLD_7816_CLK_DIV)) | (div << 4 ));
+    reg_7816_clk_div = ((reg_7816_clk_div & (~FLD_7816_CLK_DIV)) | (div << 4));
 }
 
 /**
@@ -50,8 +51,9 @@ void s7816_set_clk(unsigned char div)
  */
 void s7816_set_time(int rst_time_us)
 {
-    s7816_rst_time=rst_time_us;
+    s7816_rst_time = rst_time_us;
 }
+
 /**
  * @brief       This function is used to set the RST pin of s7816.
  * @param[in]   pin_7816_rst - the RST pin of s7816.
@@ -59,7 +61,7 @@ void s7816_set_time(int rst_time_us)
  */
 void s7816_set_rst_pin(gpio_pin_e pin_7816_rst)
 {
-    s7816_rst_pin=pin_7816_rst;
+    s7816_rst_pin = pin_7816_rst;
     gpio_set_low_level(pin_7816_rst);
     gpio_output_en(pin_7816_rst);
     gpio_input_dis(pin_7816_rst);
@@ -73,12 +75,11 @@ void s7816_set_rst_pin(gpio_pin_e pin_7816_rst)
  */
 void s7816_set_vcc_pin(gpio_pin_e pin_7816_vcc)
 {
-    s7816_vcc_pin=pin_7816_vcc;
+    s7816_vcc_pin = pin_7816_vcc;
     gpio_set_low_level(pin_7816_vcc);
     gpio_output_en(pin_7816_vcc);
     gpio_input_dis(pin_7816_vcc);
     gpio_function_en(pin_7816_vcc);
-
 }
 
 /**
@@ -89,29 +90,24 @@ void s7816_set_vcc_pin(gpio_pin_e pin_7816_vcc)
  * @param[in]   d            - the bitrate regulator of s7816,1 by default.
  * @return      none.
  */
-void s7816_init(uart_num_e uart_num,s7816_clock_e clock,int f,int d)
+void s7816_init(uart_num_e uart_num, s7816_clock_e clock, int f, int d)
 {
     unsigned short div;
-    unsigned char bwpc;
-    s7816_clock=clock;
-    s7816_rst_time=40000/clock;//us
+    unsigned char  bwpc;
+    s7816_clock    = clock;
+    s7816_rst_time = 40000 / clock; //us
 
-    int baud=clock*1000000*d/f;
-    if(clock==S7816_4MHZ)
-    {
+    int baud = clock * 1000000 * d / f;
+    if (clock == S7816_4MHZ) {
         s7816_set_clk(0x06);
-    }
-    else if(clock==S7816_6MHZ)
-    {
+    } else if (clock == S7816_6MHZ) {
         s7816_set_clk(0x04);
-    }
-    else if(clock==S7816_12MHZ)
-    {
+    } else if (clock == S7816_12MHZ) {
         s7816_set_clk(0x02);
     }
     uart_hw_fsm_reset(uart_num);
-    uart_cal_div_and_bwpc(baud, 24*1000*1000, &div, &bwpc);
-    uart_init(uart_num, div, bwpc, UART_PARITY_EVEN, UART_STOP_BIT_ONE);//7816 protocol stipulate the parity bit should be even.
+    uart_cal_div_and_bwpc(baud, 24 * 1000 * 1000, &div, &bwpc);
+    uart_init(uart_num, div, bwpc, UART_PARITY_EVEN, UART_STOP_BIT_ONE); //7816 protocol stipulate the parity bit should be even.
 }
 
 /**
@@ -122,18 +118,18 @@ void s7816_init(uart_num_e uart_num,s7816_clock_e clock,int f,int d)
  * @param[in]   trx_pin     - the trx pin of s7816.
  * @return      none.
  */
-void s7816_set_pin(gpio_pin_e rst_pin,gpio_pin_e vcc_pin,s7816_clk_pin_e clk_pin,s7816_rtx_pin_e rtx_pin)
+void s7816_set_pin(gpio_pin_e rst_pin, gpio_pin_e vcc_pin, s7816_clk_pin_e clk_pin, s7816_rtx_pin_e rtx_pin)
 {
     s7816_set_rst_pin(rst_pin);
-    s7816_rst_pin=rst_pin;
+    s7816_rst_pin = rst_pin;
 
     s7816_set_vcc_pin(vcc_pin);
-    s7816_vcc_pin=vcc_pin;
+    s7816_vcc_pin = vcc_pin;
 
-    reg_gpio_func_mux(clk_pin)=(reg_gpio_func_mux(clk_pin)&(~BIT_RNG(0,1)))|BIT(0);
+    reg_gpio_func_mux(clk_pin) = (reg_gpio_func_mux(clk_pin) & (~BIT_RNG(0, 1))) | BIT(0);
     gpio_function_dis(clk_pin);
 
-    s7816_rtx_pin=rtx_pin;//if the trx function set to early,it may trigger interrupt by accident.so we set the function in coldreset.
+    s7816_rtx_pin = rtx_pin; //if the trx function set to early,it may trigger interrupt by accident.so we set the function in coldreset.
 }
 
 /**
@@ -145,11 +141,11 @@ void s7816_set_pin(gpio_pin_e rst_pin,gpio_pin_e vcc_pin,s7816_clk_pin_e clk_pin
 void s7816_coldreset()
 {
     gpio_set_high_level(s7816_vcc_pin);
-    delay_us(20);//wait for the vcc  stable.
-    reg_7816_clk_div|=BIT(7); //enable the 7816 clk,the pin is A0.
+    delay_us(20);                       //wait for the vcc  stable.
+    reg_7816_clk_div |= BIT(7);         //enable the 7816 clk,the pin is A0.
     delay_us(s7816_rst_time);
-    s7816_set_rtx_pin(s7816_rtx_pin);// uart tx/rx pin set,if the trx pin set before this place,it may
-    gpio_set_high_level(s7816_rst_pin);//the IC card will return the initial ATR.
+    s7816_set_rtx_pin(s7816_rtx_pin);   // uart tx/rx pin set,if the trx pin set before this place,it may
+    gpio_set_high_level(s7816_rst_pin); //the IC card will return the initial ATR.
 }
 
 /**
@@ -160,7 +156,7 @@ void s7816_coldreset()
 void s7816_release_trig()
 {
     gpio_set_low_level(s7816_rst_pin);
-    reg_7816_clk_div&=(BIT(7)-1);
+    reg_7816_clk_div &= (BIT(7) - 1);
     gpio_set_low_level(s7816_vcc_pin);
 }
 
@@ -174,7 +170,7 @@ void s7816_warmreset()
 {
     gpio_set_low_level(s7816_rst_pin);
     delay_us(s7816_rst_time);
-    gpio_set_high_level(s7816_rst_pin);//The IC card will return the initial ATR.
+    gpio_set_high_level(s7816_rst_pin); //The IC card will return the initial ATR.
 }
 
 /**
@@ -185,6 +181,6 @@ void s7816_warmreset()
  */
 void s7816_send_byte(uart_num_e uart_num, unsigned char tx_data)
 {
-    uart_send_byte(uart_num,tx_data);
+    uart_send_byte(uart_num, tx_data);
     uart_rtx_pin_tx_trig(uart_num);
 }

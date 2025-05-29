@@ -73,7 +73,38 @@
  *               }
  *               PLIC_ISR_REGISTER(stimer_irq_handler, IRQ_SYSTIMER)
  *              @endcode
- *
+ *    - Saving and disabling global interrupts and restoring global interrupts example.
+ *        -# Saving and disabling global interrupts example:
+ *            @code
+ *            void global_interrupts_save_and_disable(void)
+ *            {
+ *                g_mstatus_value = core_interrupt_disable();
+ *                g_mie_value     = core_mie_disable(FLD_MIE_MSIE | FLD_MIE_MTIE | FLD_MIE_MEIE);
+ *                plic_all_interrupt_save_and_disable();
+ *            }
+ *            @endcode
+ *        -# Restoring global interrupts example:
+ *            @code
+ *            void global_interrupts_restore(void)
+ *            {
+ *                plic_all_interrupt_restore();
+ *                core_mie_restore(g_mie_value);
+ *                core_restore_interrupt(g_mstatus_value);
+ *            }
+ *            @endcode
+ *    - WFI Example.
+ *      # Before entering WFI, set the wakeup source and turn off unneeded interrupts:
+ *          @code
+ *          plic_irqs_preprocess_for_wfi(1, FLD_MIE_MEIE); // disable all interrupts except MEIE.
+ *          plic_interrupt_enable(IRQ_SYSTIMER); // stimer wakeup.
+ *          core_entry_wfi_mode(); // enter wfi.
+ *          @endcode
+ *      # After WFI wakeup, clear the corresponding interrupt flag bit and restore other interrupts:
+ *          @code
+ *          core_entry_wfi_mode();
+ *          stimer_clr_irq_status(FLD_SYSTEM_IRQ); // clear stimer irq status.
+ *          plic_irqs_postprocess_for_wfi(); // restore interrupts.
+ *          @endcode
  */
 #ifndef INTERRUPT_H
 #define INTERRUPT_H
@@ -170,68 +201,6 @@ extern _attribute_data_retention_sec_ volatile unsigned char g_plic_preempt_en;
 #define IRQ_USB1_CTRL_EP_STATUS     61 /* USB1_STATUS_IRQ: USB1 status interrupt, - usb1_ctrl_ep_status_irq_handler */
 #define IRQ_USB1_CTRL_EP_SETINF     62 /* USB1_SETINF_IRQ: USB1 set interface interrupt, - usb1_ctrl_ep_setinf_irq_handler */
 #define IRQ_USB1_ENDPOINT           63 /* USB1_EDP_IRQ: USB1 edp (1-8) interrupt, - usb1_endpoint_irq_handler */
-/**
- * @brief The following macros are for compatibility with previous definitions and will be deprecated in the future.
- */
-#define IRQ1_SYSTIMER               IRQ_SYSTIMER             /* STIMER_IRQ: system timer interrupt, - stimer_irq_handler */
-#define IRQ2_ALG                    IRQ_ALG                  /* ALGM_IRQ: analog register master interface interrupt, - analog_irq_handler */
-#define IRQ3_TIMER1                 IRQ_TIMER1               /* TIMER1_IRQ, - timer1_irq_handler */
-#define IRQ4_TIMER0                 IRQ_TIMER0               /* TIMER0_IRQ, - timer0_irq_handler */
-#define IRQ5_DMA                    IRQ_DMA                  /* DMA_IRQ_IRQ, - dma_irq_handler */
-#define IRQ6_BMC                    IRQ_BMC                  /* BMC_IRQ: ahb bus matrix controller interrupt, - bmc_irq_handler */
-#define IRQ7_USB_CTRL_EP_SETUP      IRQ_USB_CTRL_EP_SETUP    /* USB_SETUP_IRQ: USB setup interrupt, - usb_ctrl_ep_setup_irq_handler */
-#define IRQ8_USB_CTRL_EP_DATA       IRQ_USB_CTRL_EP_DATA     /* USB_DATA_IRQ: USB data interrupt, - usb_ctrl_ep_data_irq_handler */
-#define IRQ9_USB_CTRL_EP_STATUS     IRQ_USB_CTRL_EP_STATUS   /* USB_STATUS_IRQ: USB status interrupt, - usb_ctrl_ep_status_irq_handler */
-#define IRQ10_USB_CTRL_EP_SETINF    IRQ_USB_CTRL_EP_SETINF   /* USB_SETINF_IRQ: USB set interface interrupt, - usb_ctrl_ep_setinf_irq_handler */
-#define IRQ11_USB_ENDPOINT          IRQ_USB_ENDPOINT         /* USB_EDP_IRQ: USB edp (1-8) interrupt, - usb_endpoint_irq_handler */
-#define IRQ12_ZB_DM                 IRQ_ZB_DM                /* ZB_DM_IRQ, - rf_dm_irq_handler */
-#define IRQ13_ZB_BLE                IRQ_ZB_BLE               /* ZB_BLE_IRQ, - rf_ble_irq_handler */
-#define IRQ14_ZB_BT                 IRQ_ZB_BT                /* ZB_BT_IRQ: BR/EDR sub-system interrupt, - rf_bt_irq_handler */
-#define IRQ15_ZB_RT                 IRQ_ZB_RT                /* ZB_BLE_TL_IRQ: BLE (TL) sub-system interrupt, - rf_irq_handler */
-#define IRQ16_PWM                   IRQ_PWM                  /* PWM_IRQ, - pwm_irq_handler */
-#define IRQ17_PKE                   IRQ_PKE                  /* PKE_IRQ, - pke_irq_handler */
-#define IRQ18_UART1                 IRQ_UART1                /* UART1_IRQ, - uart1_irq_handler */
-#define IRQ19_UART0                 IRQ_UART0                /* UART0_IRQ, - uart0_irq_handler */
-#define IRQ20_DFIFO                 IRQ_DFIFO                /* DFIFO_IRQ: audio dma fifo interrupt, - audio_irq_handler */
-#define IRQ21_I2C                   IRQ_I2C                  /* I2C_IRQ, - i2c_irq_handler */
-#define IRQ22_SPI_AHB               IRQ_SPI_AHB              /* HSPI_IRQ, - hspi_irq_handler */
-#define IRQ23_SPI_APB               IRQ_SPI_APB              /* PSPI_IRQ, - pspi_irq_handler */
-#define IRQ24_USB_PWDN              IRQ_USB_PWDN             /* USB_PWDN_IRQ: USB suspend interrupt, - usb_pwdn_irq_handler */
-#define IRQ25_GPIO                  IRQ_GPIO                 /* GPIO_IRQ, - gpio_irq_handler */
-#define IRQ26_GPIO2RISC0            IRQ_GPIO2RISC0           /* GPIO2RISC[0]_IRQ, - gpio_risc0_irq_handler */
-#define IRQ27_GPIO2RISC1            IRQ_GPIO2RISC1           /* GPIO2RISC[1]_IRQ, - gpio_risc1_irq_handler */
-#define IRQ28_SOFT                  IRQ_SOFT                 /* SOFT_IRQ: software interrupt, - soft_irq_handler */
-#define IRQ29_NPE_BUS0              IRQ_NPE_BUS0             /* NPE_BUS0_IRQ, - npe_bus0_irq_handler */
-#define IRQ30_NPE_BUS1              IRQ_NPE_BUS1             /* NPE_BUS1_IRQ, - npe_bus1_irq_handler */
-#define IRQ31_NPE_BUS2              IRQ_NPE_BUS2             /* NPE_BUS2_IRQ, - npe_bus2_irq_handler */
-#define IRQ32_NPE_BUS3              IRQ_NPE_BUS3             /* NPE_BUS3_IRQ, - npe_bus3_irq_handler */
-#define IRQ33_NPE_BUS4              IRQ_NPE_BUS4             /* NPE_BUS4_IRQ, - npe_bus4_irq_handler */
-#define IRQ34_USB_250US             IRQ_USB_250US            /* USB_250US_SOF_IRQ: USB 250us or SOF interrupt, - usb_250us_irq_handler */
-#define IRQ35_USB_RESET             IRQ_USB_RESET            /* USB_RESET_IRQ: USB reset interrupt, - usb_reset_irq_handler */
-#define IRQ36_NPE_BUS7              IRQ_NPE_BUS7             /* NPE_BUS7_IRQ, - npe_bus7_irq_handler */
-#define IRQ37_NPE_BUS8              IRQ_NPE_BUS8             /* NPE_BUS8_IRQ, - npe_bus8_irq_handler */
-
-#define IRQ42_NPE_BUS13             IRQ_NPE_BUS13            /* NPE_BUS13_IRQ, - npe_bus13_irq_handler */
-#define IRQ43_NPE_BUS14             IRQ_NPE_BUS14            /* NPE_BUS14_IRQ, - npe_bus14_irq_handler */
-#define IRQ44_NPE_BUS15             IRQ_NPE_BUS15            /* NPE_BUS15_IRQ, - npe_bus15_irq_handler */
-
-#define IRQ46_NPE_BUS17             IRQ_NPE_BUS17            /* NPE_BUS17_IRQ, - npe_bus17_irq_handler */
-
-#define IRQ50_NPE_BUS21             IRQ_NPE_BUS21            /* NPE_BUS21_IRQ, - npe_bus21_irq_handler */
-#define IRQ51_NPE_BUS22             IRQ_NPE_BUS22            /* NPE_BUS22_IRQ, - npe_bus22_irq_handler */
-#define IRQ52_NPE_BUS23             IRQ_NPE_BUS23            /* NPE_BUS23_IRQ, - npe_bus23_irq_handler */
-#define IRQ53_NPE_BUS24             IRQ_NPE_BUS24            /* NPE_BUS24_IRQ, - npe_bus24_irq_handler */
-#define IRQ54_NPE_BUS25             IRQ_NPE_BUS25            /* NPE_BUS25_IRQ, - npe_bus25_irq_handler */
-#define IRQ55_NPE_BUS26             IRQ_NPE_BUS26            /* NPE_BUS26_IRQ, - npe_bus26_irq_handler */
-#define IRQ56_NPE_BUS27             IRQ_NPE_BUS27            /* NPE_BUS27_IRQ, - npe_bus27_irq_handler */
-#define IRQ57_NPE_BUS28             IRQ_NPE_BUS28            /* NPE_BUS28_IRQ, - npe_bus28_irq_handler */
-#define IRQ58_NPE_BUS29             IRQ_NPE_BUS29            /* NPE_BUS29_IRQ, - npe_bus29_irq_handler */
-#define IRQ59_NPE_BUS30             IRQ_NPE_BUS30            /* NPE_BUS30_IRQ, - npe_bus30_irq_handler */
-#define IRQ60_NPE_BUS31             IRQ_NPE_BUS31            /* NPE_BUS31_IRQ, - npe_bus31_irq_handler */
-#define IRQ61_NPE_COMB              IRQ_NPE_COMB             /* NPE_COMB_IRQ, - npe_comb_irq_handler */
-#define IRQ62_PM_TM                 IRQ_PM_TM                /* PM_IRQ, - pm_irq_handler */
-#define IRQ63_EOC                   IRQ_EOC                  /* EOC_IRQ, - eoc_irq_handler */
-
 /**
  * @}
  */
@@ -406,6 +375,7 @@ static inline void plic_interrupt_complete(unsigned int src)
  * @note
  *          - For vector interrupt, the hardware will automatically claim an interrupt, in general, the software does not need to claim.
  *          - plic_interrupt_claim() and plic_interrupt_complete() must be used in pairs.
+ *          - If the corresponding interrupt has never been enabled, claim does not get the corresponding interrupt ID, and the interface returns 0.
  */
 static inline unsigned int plic_interrupt_claim(void)
 {
@@ -461,5 +431,42 @@ _attribute_ram_code_sec_ void plic_isr(func_isr_t func, unsigned int src);
  *          - When global interrupt is enabled, the application does not need to call this interface, the hardware and interrupt service routine handle interrupt requests.
  */
 _attribute_ram_code_sec_ int plic_clr_all_request(void);
+
+/**
+ * @brief      This function serves to save and disable all PLIC interrupt sources.
+ * @return     none
+ * @note       plic_all_interrupt_save_and_disable and plic_all_interrupt_restore must be used in pairs.
+ */
+void plic_all_interrupt_save_and_disable(void);
+
+/**
+ * @brief      This function serves to restore and all PLIC interrupt sources.
+ * @return     none
+ * @note       plic_all_interrupt_save_and_disable and plic_all_interrupt_restore must be used in pairs.
+ */
+void plic_all_interrupt_restore(void);
+
+/**
+ * @brief      This function serves to save and disable interrupts, including the MIE bit of the MSTATUS register(depends on the first parameter,regardless of whether the global interrupt is enabled or not.), \n
+ *             MSIE, MTIE, and MEIE bits of the MIE register, and all PLIC interrupt sources.
+ * @param[in]  flag - Global interrupt disable flag, 1: disable, 0: not disable.
+ * @param[in]  mie - MSIE, MTIE, and MEIE Which one wakes up WFI.
+ * @note
+ *  - When the core is awoken by the taken interrupt and global interrupts enable, it will resume and start to execute from the corresponding interrupt service routine.
+ *  - When the core is awoken by the pending interrupt and global interrupts disable, it will resume and start to execute from the instruction after the WFI instruction.
+ *  - plic_irqs_preprocess_for_wfi and plic_irqs_postprocess_for_wfi must be used in pairs.
+ */
+void plic_irqs_preprocess_for_wfi(unsigned char flag, mie_e mie);
+
+/**
+ * @brief      This function serves to restore interrupts, including the MIE bit of the MSTATUS register, \n
+ *             MSIE, MTIE, and MEIE bits of the MIE register, and all PLIC interrupt sources.
+ * @return     none
+ * @note
+ *  - Make sure that the status flag of the corresponding interrupt is cleared before calling this interface.
+ *  - This function will enable PLIC interrupt so this interface cannot be called from the interrupt service routine.
+ *  - plic_irqs_preprocess_for_wfi and plic_irqs_postprocess_for_wfi must be used in pairs.
+ */
+void plic_irqs_postprocess_for_wfi(void);
 
 #endif

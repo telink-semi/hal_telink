@@ -29,16 +29,13 @@
 #include "hal.h"
 
 
-
-
-
 /*  This code in RF irq and system irq put in RAM by force
  * Because of the flash resource contention problem, when the
  * flash access is interrupted by a higher priority interrupt,
  * the interrupt processing function cannot operate the flash(For Eagle)
 */
 #ifndef STACK_IRQ_CODE_IN_SRAM_DUE_TO_FLASH_OPERATION
-#define STACK_IRQ_CODE_IN_SRAM_DUE_TO_FLASH_OPERATION               1
+    #define STACK_IRQ_CODE_IN_SRAM_DUE_TO_FLASH_OPERATION 1
 #endif
 
 /*  Limit some code from sram to flash
@@ -49,33 +46,48 @@
 
 /* MCU hardware TX auto FIFO 4096 bytes limitation, only B91 issue */
 #ifndef MCU_HARDWARE_TX_FIFO_4K_BYTES_LIMITATION
-#define MCU_HARDWARE_TX_FIFO_4K_BYTES_LIMITATION                    0
+    #define MCU_HARDWARE_TX_FIFO_4K_BYTES_LIMITATION 0
 #endif
-
-
 
 /* Modem IP Information, current only TL751X used. */
 #ifndef HAL_CHIP_USE_CSEM_MODEM_IP
 
-    #define STOP_RF_STATE_MACHINE                                   do{reg_rf_ll_cmd = 0x80; }while(0)
-    #define HAL_GET_RF_TX_IRQ                                       (reg_rf_irq_status & FLD_RF_IRQ_TX)
-    #define HAL_GET_RF_RX_IRQ                                       (reg_rf_irq_status & FLD_RF_IRQ_RX)
-    #define HAL_CLEAR_RF_TX_IRQ                                     do {reg_rf_irq_status = FLD_RF_IRQ_TX;} while(0)
-    #define HAL_CLEAR_RF_RX_IRQ                                     do {reg_rf_irq_status = FLD_RF_IRQ_RX;} while(0)
-    #define HAL_CLEAR_RF_TX_RX_IRQ                                  do {reg_rf_irq_status = FLD_RF_IRQ_TX | FLD_RF_IRQ_RX;} while(0)
-    #define HAL_NONE_CSEM_IP_SET_DEFAULT_TX_DMA                     do{ble_rf_set_tx_dma(0, 17);}while(0)
-    #define HAL_NONE_CSEM_IP_SET_DEFAULT_RX_DMA                     do{ble_rf_set_rx_dma((u8*)glb_temp_rx_buff, 4);}while(0)
+    #define STOP_RF_STATE_MACHINE \
+        do {                      \
+            reg_rf_ll_cmd = 0x80; \
+        } while (0)
+    #define HAL_GET_RF_TX_IRQ (reg_rf_irq_status & FLD_RF_IRQ_TX)
+    #define HAL_GET_RF_RX_IRQ (reg_rf_irq_status & FLD_RF_IRQ_RX)
+    #define HAL_CLEAR_RF_TX_IRQ                \
+        do {                                   \
+            reg_rf_irq_status = FLD_RF_IRQ_TX; \
+        } while (0)
+    #define HAL_CLEAR_RF_RX_IRQ                \
+        do {                                   \
+            reg_rf_irq_status = FLD_RF_IRQ_RX; \
+        } while (0)
+    #define HAL_CLEAR_RF_TX_RX_IRQ                             \
+        do {                                                   \
+            reg_rf_irq_status = FLD_RF_IRQ_TX | FLD_RF_IRQ_RX; \
+        } while (0)
+    #define HAL_NONE_CSEM_IP_SET_DEFAULT_TX_DMA \
+        do {                                    \
+            ble_rf_set_tx_dma(0, 17);           \
+        } while (0)
+    #define HAL_NONE_CSEM_IP_SET_DEFAULT_RX_DMA           \
+        do {                                              \
+            ble_rf_set_rx_dma((u8 *)glb_temp_rx_buff, 4); \
+        } while (0)
     #define HAL_WAIT_MODEM_SEQ_TIME
     #define HAL_CSEM_IP_WAIT_TX_DONE
     #define HAL_CSEM_IP_RESET_BASEBAND
     #define HAL_CSEM_IP_SET_DEFAULT_TX_DMA
     #define HAL_CSEM_IP_SET_DEFAULT_RX_DMA
 
-    #define rf_ble_csem_set_tx_rx_settle(x,y,z)
+    #define rf_ble_csem_set_tx_rx_settle(x, y, z)
     #define rf_ble_csem_close_rx_continue_mode()
 
 #endif
-
 
 
 #if 0
@@ -118,7 +130,6 @@ blt_hal_prevent_rf_irq_status_to_plic_module();
  * so we disable RF mask to prevent RF IRQ status sending to PLIC */
 blt_hal_restore_rf_irq_status_to_plic_module();
 #endif
-
 
 
 #endif /* STACK_HAL_HAL_INTERNAL_H_ */

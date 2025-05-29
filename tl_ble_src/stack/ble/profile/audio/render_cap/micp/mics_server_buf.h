@@ -23,20 +23,20 @@
  *******************************************************************************************************/
 #pragma once
 
-typedef struct {
+typedef struct
+{
     /* Characteristic value handle */
     u16 muteHdl;
     u16 reserved;
 } blc_mics_server_t;
 
-
-typedef struct blc_mics_server_ctrl{
-    blc_prf_proc_t process;
+typedef struct blc_mics_server_ctrl
+{
+    blc_prf_proc_t    process;
     blc_mics_server_t micsServer;
 } blc_mics_server_ctrl_t;
 
-
-typedef struct{
+typedef struct
+{
     blc_mics_mute_value_enum mute;
 } blc_micss_regParam_t;
-

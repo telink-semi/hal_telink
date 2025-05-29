@@ -134,7 +134,7 @@ int cpu_long_sleep_wakeup_32k_rc(pm_sleep_mode_e sleep_mode,  pm_sleep_wakeup_sr
  */
 static inline int pm_is_MCU_deepRetentionWakeup(void)
 {
-    return (g_pm_status_info.mcu_status & MCU_STATUS_DEEPRET_BACK);
+    return (g_pm_status_info.mcu_status & MCU_DEEPRET_BACK);
 }
 
 /**

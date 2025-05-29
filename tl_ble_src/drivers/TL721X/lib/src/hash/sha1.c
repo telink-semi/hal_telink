@@ -28,8 +28,6 @@
 #include "lib/include/hash/sha1.h"
 
 
-
-
 #ifdef SUPPORT_HASH_SHA1
 /**
  * @brief       init sha1
@@ -89,7 +87,7 @@ unsigned int sha1(unsigned char *msg, unsigned int msg_bytes, unsigned char *dig
 }
 
 
-#ifdef HASH_DMA_FUNCTION
+    #ifdef HASH_DMA_FUNCTION
 /**
  * @brief       init dma sha1
  * @param[in]   ctx            - SHA1_DMA_CTX context pointer.
@@ -156,6 +154,6 @@ unsigned int sha1_dma(unsigned int *msg, unsigned int msg_bytes, unsigned int *d
 {
     return hash_dma(HASH_SHA1, msg, msg_bytes, digest, callback);
 }
-#endif
+    #endif
 
 #endif

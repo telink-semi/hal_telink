@@ -37,11 +37,9 @@ void print_buf_U8(const unsigned char *buf, unsigned int byteLen, char *name)
 {
     unsigned int i;
 
-    if(NULL != buf)
-    {
-        (void)printf("\r\n %s: %08x\r\n  ",name, (unsigned int)buf); //fflush(stdout);
-        for(i=0U; i<byteLen; i++)
-        {
+    if (NULL != buf) {
+        (void)printf("\r\n %s: %08x\r\n  ", name, (unsigned int)buf); //fflush(stdout);
+        for (i = 0U; i < byteLen; i++) {
             //if(i%16 ==0 && i>0)
             //    (void)printf("\r\n");
             //(void)printf("%02x", buf[byteLen-1-i]);
@@ -56,18 +54,16 @@ void print_buf_U32(const unsigned int *buf, unsigned int wordLen, char *name)
 {
     unsigned int i;
 
-    if(NULL != buf)
-    {
-        (void)printf("\r\n %s: %08x\r\n",name, (unsigned int)buf);//fflush(stdout);
-        for(i=0U; i<wordLen; i++)
-        {
+    if (NULL != buf) {
+        (void)printf("\r\n %s: %08x\r\n", name, (unsigned int)buf); //fflush(stdout);
+        for (i = 0U; i < wordLen; i++) {
             //if(i%16 ==0 && i>0)
             //    (void)printf("\r\n");
             //(void)printf("%08x", buf[wordLen-1-i]);
-            (void)printf("%08x", buf[i]);//fflush(stdout);
+            (void)printf("%08x", buf[i]); //fflush(stdout);
         }
 
-        (void)printf("\r\n");//fflush(stdout);
+        (void)printf("\r\n");             //fflush(stdout);
     }
 }
 
@@ -75,17 +71,14 @@ void print_BN_buf_U32(const unsigned int *buf, unsigned int wordLen, char *name)
 {
     unsigned int i;
 
-    if(NULL != buf)
-    {
-        (void)printf("\r\n %08x %s: ", (unsigned int)buf, name);//fflush(stdout);
-        for(i=0U; i<wordLen; i++)
-        {
+    if (NULL != buf) {
+        (void)printf("\r\n %08x %s: ", (unsigned int)buf, name); //fflush(stdout);
+        for (i = 0U; i < wordLen; i++) {
             //if(i%16 ==0 && i>0)
             //    (void)printf("\r\n");
-            (void)printf("%08x", buf[wordLen-1U-i]);
+            (void)printf("%08x", buf[wordLen - 1U - i]);
         }
-        (void)printf("\r\n");//fflush(stdout);
+        (void)printf("\r\n"); //fflush(stdout);
     }
 }
 #endif
-

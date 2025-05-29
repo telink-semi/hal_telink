@@ -120,3 +120,43 @@ void usbhw_ep_map_en(usb_ep_map_sel_e map_en)
         reg_usb_min1 &= ~(FLD_USB_EDP_MAP_AUTO_EN | FLD_USB_EDP_MAP_MANUAL_EN);
     }
 }
+
+/**
+ * @brief      This function serves to set dp_through_swire function.
+ * @param[in]  dp_through_swire - 1: swire_usb_en 0: swire_usb_dis
+ * @return     none.
+ */
+void dp_through_swire_en(bool dp_through_swire)
+{
+    if (dp_through_swire)
+    {
+        write_reg8(0x100c01, (read_reg8(0x100c01) | BIT(7))); // BIT(7) = 1 : swire_usb_en
+    }
+    else
+    {
+        write_reg8(0x100c01, (read_reg8(0x100c01) & ~BIT(7))); // BIT(7) = 0 : swire_usb_dis
+    }
+}
+
+/**
+ * @brief      This function serves to set GPIO MUX function as DP and DM pin of USB.
+ * @param[in]  dp_through_swire - 1: swire_usb_en 0: swire_usb_dis
+ * @return     none.
+ * @note       1. Configure usb_set_pin(0) , there are some risks, please refer to the startup.S file about DP_THROUGH_SWIRE_DIS
+ *                for detailed description (by default dp_through_swire is disabled). Configure usb_set_pin(1) to enable dp_through_swire again.
+ *             2. When dp_through_swire is enabled, Swire and USB applications do not affect each other.
+ */
+void usb_set_pin(bool dp_through_swire)
+{
+    reg_gpio_func_mux(GPIO_PH2) = reg_gpio_func_mux(GPIO_PH2) & (~BIT_RNG(0, 4));
+    reg_gpio_func_mux(GPIO_PH3) = reg_gpio_func_mux(GPIO_PH3) & (~BIT_RNG(0, 4));
+    gpio_function_dis(GPIO_PH2 | GPIO_PH3);
+    gpio_input_en(GPIO_PH2 | GPIO_PH3); // DP/DM must set input enable
+    usb_dp_pullup_en(1);
+    /*                                      Note
+     * If you want to enable the dp_through_swire function, there are the following considerations:
+     * 1.configure dp_through_swire_en(1).
+     * 2.keep DM high (external hardware burning EVK has pull-up function, no software configuration is needed).
+     */
+    dp_through_swire_en(dp_through_swire);
+}

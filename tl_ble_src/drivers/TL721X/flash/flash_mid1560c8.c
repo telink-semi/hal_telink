@@ -23,7 +23,6 @@
  *******************************************************************************************************/
 #include "flash_type.h"
 
-
 /**
  * @brief       This function reads the status of flash.
  * @param[in]   device_num  - the number of slave device.
@@ -40,7 +39,7 @@
  */
 unsigned short flash_read_status_mid1560c8_with_device_num(mspi_slave_device_num_e device_num)
 {
-    unsigned char status_low = flash_read_status(device_num, FLASH_READ_STATUS_CMD_LOWBYTE);
+    unsigned char status_low  = flash_read_status(device_num, FLASH_READ_STATUS_CMD_LOWBYTE);
     unsigned char status_high = flash_read_status(device_num, FLASH_READ_STATUS_CMD_HIGHBYTE);
     return (status_low | (status_high << 8));
 }
@@ -63,20 +62,18 @@ unsigned short flash_read_status_mid1560c8_with_device_num(mspi_slave_device_num
  */
 unsigned char flash_write_status_mid1560c8_with_device_num(mspi_slave_device_num_e device_num, unsigned short data, unsigned int mask)
 {
-    if (0 != (data & ~mask))
-    {
+    if (0 != (data & ~mask)) {
         return 2;
     }
-    
+
     unsigned short status = flash_read_status_mid1560c8_with_device_num(device_num);
-    if(data != (status & mask)) //To reduce the operation of the status register.
+    if (data != (status & mask)) //To reduce the operation of the status register.
     {
         status = data | (status & ~(mask));
         flash_write_status(device_num, FLASH_TYPE_16BIT_STATUS_ONE_CMD, status);
         status = flash_read_status_mid1560c8_with_device_num(device_num);
     }
-    if(data == (status & mask))
-    {
+    if (data == (status & mask)) {
         return 1;
     }
     return 0;
@@ -118,7 +115,7 @@ unsigned char flash_lock_mid1560c8_with_device_num(mspi_slave_device_num_e devic
  */
 unsigned char flash_unlock_mid1560c8_with_device_num(mspi_slave_device_num_e device_num)
 {
-    return flash_write_status_mid1560c8_with_device_num(device_num,FLASH_LOCK_NONE_MID1560C8, FLASH_WRITE_STATUS_BP_MID1560C8);
+    return flash_write_status_mid1560c8_with_device_num(device_num, FLASH_LOCK_NONE_MID1560C8, FLASH_WRITE_STATUS_BP_MID1560C8);
 }
 
 /**
@@ -160,7 +157,7 @@ unsigned int flash_get_lock_block_mid1560c8_with_device_num(mspi_slave_device_nu
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-void flash_read_otp_mid1560c8_with_device_num(mspi_slave_device_num_e device_num, unsigned long addr, unsigned long len, unsigned char* buf)
+void flash_read_otp_mid1560c8_with_device_num(mspi_slave_device_num_e device_num, unsigned long addr, unsigned long len, unsigned char *buf)
 {
     flash_read_otp(device_num, addr, len, buf);
 }
@@ -238,5 +235,3 @@ void flash_lock_otp_mid1560c8_with_device_num(mspi_slave_device_num_e device_num
 {
     flash_write_status_mid1560c8_with_device_num(device_num, data, FLASH_WRITE_STATUS_OTP_MID1560C8);
 }
-
-

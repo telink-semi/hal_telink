@@ -4,9 +4,9 @@
  * @brief   This is the source file for TL751X
  *
  * @author  Driver Group
- * @date    2023
+ * @date    2024
  *
- * @par     Copyright (c) 2023, Telink Semiconductor (Shanghai) Co., Ltd.
+ * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd.
  *          All rights reserved.
  *
  *          The information contained herein is confidential property of Telink
@@ -40,44 +40,57 @@ volatile unsigned int xxxx=0,xxxx2=0,count=0;
 #endif
 
 /**
- * @brief       clear finished and interrupt tag
+ * @brief       load input operand to baseaddr
+ * @param[out]   baseaddr            - destination data.
+ * @param[in]   data                 - source data.
+ * @param[in]   wordLen              - word length of data.
  * @return      none
  */
-extern void pke_load_operand(unsigned int *baseaddr, const unsigned int *data, unsigned int wordLen);
+extern void pke_load_operand(volatile unsigned int *baseaddr, const unsigned int *data, unsigned int wordLen);
 
 /**
- * @brief       clear finished and interrupt tag
- * @return      none
+ * @brief      set operand width
+ * @param[in]  bitLen            - bit length of operand.
+ * @return     none
+ * @note
+  @verbatim
+      -# 1. please make sure 0 < bitLen <= OPERAND_MAX_BIT_LEN
+  @endverbatim
  */
 extern void pke_set_operand_width(unsigned int bitLen);
 
 /**
- * @brief       set operation micro code
- * @return      current operand byte length
+ * @brief     get current operand byte length
+ * @return     none
+ * @note
+  @verbatim
+      -# 1. current operand byte length
+  @endverbatim
  */
 extern unsigned int pke_get_operand_bytes(void);
 
 /**
- * @brief       start pke calc
- * @return      none
+ * @brief     clear finished and interrupt tag
+ * @return     none
  */
 extern void pke_clear_interrupt(void);
 
 /**
- * @brief       return calc return code
- * @return      0:success     other:error
+ * @brief      set operation micro code
+ * @param[in]  addr            - specific micro code.
+ * @return     none
  */
 extern void pke_set_microcode(unsigned int addr);
 
 /**
- * @brief       start pke calc
- * @return      none
+ * @brief      start pke calc
+ * @return     none
  */
 extern void pke_start(void);
 
 /**
- * @brief       return calc return code
- * @return      0:success     other:error
+ * @brief      return calc return code
+ * @return     0(success), other(error)
  */
 extern unsigned int pke_check_rt_code(void);
 
@@ -2463,8 +2476,9 @@ unsigned int bigint_div_table_low(unsigned int *a, const unsigned short *r, cons
 unsigned int primality_test_Fermat(unsigned int *p, unsigned int pBitLen, unsigned int round)
 {
     unsigned int pWordLen = GET_WORD_LEN(pBitLen);
-    unsigned int tmp_step, i, tag;
-    unsigned int ret;
+    unsigned int tmp_step, i ;
+    unsigned int tag;
+    volatile unsigned int ret;
 
     pke_set_operand_width(pBitLen);
     tmp_step = pke_get_operand_bytes();
@@ -2472,11 +2486,11 @@ unsigned int primality_test_Fermat(unsigned int *p, unsigned int pBitLen, unsign
     for(i=0; i<round; i++)
     {
         //A1, exponent, make it to be (p-1)
-        uint32_copy((unsigned int *)(PKE_A(1,tmp_step)), p, pWordLen);
-        *((unsigned int *)(PKE_A(1,tmp_step))) -= 1;
+        uint32_copy((volatile unsigned int *)(PKE_A(1,tmp_step)), p, pWordLen);
+        *((volatile unsigned int *)(PKE_A(1,tmp_step))) -= 1;
 
         //B0, base, make it to be in [2, p-2]
-        uint32_clear((unsigned int *)(PKE_B(0,tmp_step)), pWordLen);
+        uint32_clear((volatile unsigned int *)(PKE_B(0,tmp_step)), pWordLen);
 
 GET_RAND_BASE:
 
@@ -2491,8 +2505,8 @@ GET_RAND_BASE:
             goto GET_RAND_BASE;
         }
 
-        *((unsigned int *)(PKE_B(0,tmp_step))) = tag;
-        uint32_clear((unsigned int *)(PKE_B(0,tmp_step))+pWordLen-1, (tmp_step/4)-pWordLen+1);
+        *((volatile unsigned int *)(PKE_B(0,tmp_step))) = tag;
+        uint32_clear((volatile unsigned int *)(PKE_B(0,tmp_step))+pWordLen-1, (tmp_step/4)-pWordLen+1);
 
         //get pre-calculated mont paras
         ret = pke_pre_calc_mont(p, pBitLen, NULL, NULL);
@@ -2502,15 +2516,15 @@ GET_RAND_BASE:
         }
 
         //A0, base^d mod p
-        ret = pke_modexp((unsigned int *)(PKE_B(3,tmp_step)), (unsigned int *)(PKE_A(1,tmp_step)), (unsigned int *)(PKE_B(0,tmp_step)),
-                (unsigned int *)(PKE_A(0,tmp_step)), pWordLen, pWordLen);
+        ret = pke_modexp((volatile unsigned int *)(PKE_B(3,tmp_step)), (volatile unsigned int *)(PKE_A(1,tmp_step)), (volatile unsigned int *)(PKE_B(0,tmp_step)),
+                (volatile unsigned int *)(PKE_A(0,tmp_step)), pWordLen, pWordLen);
         if(PKE_SUCCESS != ret)
         {
             return ret;
         }
 
         //if the result is 1 mod p, then p is probably prime
-        if(Bigint_Check_1((unsigned int *)(PKE_A(0,tmp_step)), pWordLen))
+        if(Bigint_Check_1((volatile unsigned int *)(PKE_A(0,tmp_step)), pWordLen))
         {
             continue;
         }

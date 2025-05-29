@@ -4,9 +4,9 @@
  * @brief   This is the header file for TL751X
  *
  * @author  Driver Group
- * @date    2023
+ * @date    2024
  *
- * @par     Copyright (c) 2023, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
+ * @par     Copyright (c) 2024, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -75,16 +75,16 @@ typedef struct
 {
     unsigned int        eccp_p_bitLen;        //bit length of prime p
     unsigned int        eccp_n_bitLen;        //bit length of order n
-    const unsigned int *eccp_p;              //prime p
-    const unsigned int *eccp_p_h;
-    const unsigned int *eccp_p_n1;
-    const unsigned int *eccp_a;
-    const unsigned int *eccp_b;
-    const unsigned int *eccp_Gx;
-    const unsigned int *eccp_Gy;
-    const unsigned int *eccp_n;              //order of curve or point(Gx,Gy)
-    const unsigned int *eccp_n_h;
-    const unsigned int *eccp_n_n1;
+     unsigned int *eccp_p;              //prime p
+     unsigned int *eccp_p_h;
+     unsigned int *eccp_p_n1;
+     unsigned int *eccp_a;
+     unsigned int *eccp_b;
+     unsigned int *eccp_Gx;
+     unsigned int *eccp_Gy;
+     unsigned int *eccp_n;              //order of curve or point(Gx,Gy)
+     unsigned int *eccp_n_h;
+     unsigned int *eccp_n_n1;
 } eccp_curve_t;
 #endif
 
@@ -143,13 +143,17 @@ typedef struct
     unsigned int p_bitLen;        //bit length of prime p
     unsigned int *p;
     unsigned int *p_h;
-    unsigned int *p_n1;
+#ifndef PKE_HP
+    unsigned int *p_n0;
+#endif
     unsigned int *d;
     unsigned int *Gx;
     unsigned int *Gy;
     unsigned int *n;              //order of curve or point(Gx,Gy)
     unsigned int *n_h;
-    unsigned int *n_n1;
+#ifndef PKE_HP
+    unsigned int *n_n0;
+#endif
     unsigned int *h;
 } edward_curve_t;
 

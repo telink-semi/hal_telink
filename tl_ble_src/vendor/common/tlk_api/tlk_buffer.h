@@ -31,27 +31,28 @@
 //buffer error code
 typedef enum
 {
-    TLK_BUFFER_SUCCESS                = 0,
-    TLK_BUFFER_PARAMETER_ERROR        = 1,
-    TLK_BUFFER_NO_INIT                = 2,
-    TLK_BUFFER_DATA_INSUFFICIENT      = 3,
-}tlk_buffer_sts_e;
+    TLK_BUFFER_SUCCESS           = 0,
+    TLK_BUFFER_PARAMETER_ERROR   = 1,
+    TLK_BUFFER_NO_INIT           = 2,
+    TLK_BUFFER_DATA_INSUFFICIENT = 3,
+} tlk_buffer_sts_e;
 
 //buffer index,default 2,user can extend more
 typedef enum
 {
-    TLK_BUFFER_1                      = 0,
-    TLK_BUFFER_2                      = 1,
-    TLK_BUFFER_MAX                    = 2,
-}tlk_buffer_e;
+    TLK_BUFFER_1   = 0,
+    TLK_BUFFER_2   = 1,
+    TLK_BUFFER_MAX = 2,
+} tlk_buffer_e;
 
 //buffer control struct
-typedef struct {
-    u8*  buffer;
-    u32  bufferLen;
-    u32  bufferROffset ;
-    u32  bufferWOffset ;
-}tlk_buffer_t;
+typedef struct
+{
+    u8 *buffer;
+    u32 bufferLen;
+    u32 bufferROffset;
+    u32 bufferWOffset;
+} tlk_buffer_t;
 
 /**
  * @brief      This function serves to init the buffer.
@@ -60,7 +61,7 @@ typedef struct {
  * @param[in]  index   - buffer index.
  * @return     Succeed or failed,search 'tlk_buffer_sts_e' for detail.
  */
-tlk_buffer_sts_e tlk_buffer_init(u8 *pBuffer, u16 buffLen,tlk_buffer_e index);
+tlk_buffer_sts_e tlk_buffer_init(u8 *pBuffer, u16 buffLen, tlk_buffer_e index);
 
 /**
  * @brief      This function serves to clear the buffer,which means all of the buffer will be set to '0'.
@@ -76,7 +77,7 @@ tlk_buffer_sts_e tlk_buffer_clear(tlk_buffer_e index);
  * @param[in]  index   - buffer index.
  * @return     Succeed or failed,search 'tlk_buffer_sts_e' for detail.
  */
-tlk_buffer_sts_e tlk_buffer_write(u8 *pData, u16 dataLen,tlk_buffer_e index);
+tlk_buffer_sts_e tlk_buffer_write(u8 *pData, u16 dataLen, tlk_buffer_e index);
 
 /**
  * @brief      This function serves to read data from the buffer,user needn't consider buffer edge.
@@ -85,5 +86,5 @@ tlk_buffer_sts_e tlk_buffer_write(u8 *pData, u16 dataLen,tlk_buffer_e index);
  * @param[in]  index   - buffer index.
  * @return     Succeed or failed,search 'tlk_buffer_sts_e' for detail.
  */
-tlk_buffer_sts_e tlk_buffer_read(u8 *pData, u16 dataLen,tlk_buffer_e index);
+tlk_buffer_sts_e tlk_buffer_read(u8 *pData, u16 dataLen, tlk_buffer_e index);
 #endif /* VENDOR_COMMON_TLK_BUFFER_H_ */

@@ -28,8 +28,6 @@
 #include "lib/include/hash/hmac_sha1.h"
 
 
-
-
 #ifdef SUPPORT_HASH_SHA1
 
 /**
@@ -56,15 +54,15 @@ unsigned int hmac_sha1_init(HMAC_SHA1_CTX *ctx, unsigned char *key, unsigned sho
       -# 1. please make sure the three parameters are valid, and ctx is initialized.
   @endverbatim
  */
-unsigned int hmac_sha1_update(HMAC_SHA1_CTX *ctx, const unsigned char *msg, unsigned int msg_bytes)
+unsigned int hmac_sha1_update(HMAC_SHA1_CTX *ctx, unsigned char *msg, unsigned int msg_bytes)
 {
     return hmac_update(ctx, msg, msg_bytes);
 }
 
 /**
- * @brief       hmac-sha1 update message.
+ * @brief       message update done, get the hmac.
  * @param[in]   ctx               - HMAC_CTX context pointer.
- * @param[out]  mac               - hmac.
+ * @param[out]   mac               - hmac.
  * @return      0:success     other:error
  * @note
   @verbatim
@@ -84,7 +82,7 @@ unsigned int hmac_sha1_final(HMAC_SHA1_CTX *ctx, unsigned char *mac)
  * @param[in]   key_bytes         - byte length of the key.
  * @param[in]   msg               - message.
  * @param[in]   msg_bytes         - byte length of the input message.
- * @param[out]  mac               - hmac.
+ * @param[out]   mac               - hmac.
  * @return      0:success     other:error
  * @note
   @verbatim
@@ -97,9 +95,33 @@ unsigned int hmac_sha1(unsigned char *key, unsigned short sp_key_idx, unsigned i
 }
 
 
-#ifdef HASH_DMA_FUNCTION
+    #ifdef SUPPORT_HASH_NODE
 /**
- * @brief       input key and whole message, get the hmac.
+ * @brief       input key and whole message, get the hmac(node style).
+ * @param[in]   key               - key.
+ * @param[in]   sp_key_idx        - index of secure port key.
+ * @param[in]   key_bytes         - key byte length.
+ * @param[in]   node              - message node pointer
+ * @param[in]   node_num          - number of hash nodes, i.e. number of message segments.
+ * @param[out]   mac               - hmac.
+ * @return      0:success     other:error
+ * @note
+  @verbatim
+      -# 1. please make sure the mac buffer is sufficient.
+      -# 2. if the whole message consists of some segments, every segment is a node, a node includes
+            address and byte length.
+  @endverbatim
+ */
+unsigned int hmac_sha1_node_steps(unsigned char *key, unsigned short sp_key_idx, unsigned int key_bytes, HASH_NODE *node, unsigned int node_num, unsigned char *mac)
+{
+    return hmac_node_steps(HASH_SHA1, key, sp_key_idx, key_bytes, node, node_num, mac);
+}
+    #endif
+
+
+    #ifdef HASH_DMA_FUNCTION
+/**
+ * @brief       init dma hmac-sha1
  * @param[in]   ctx               - HMAC_SHA1_DMA_CTX context pointer.
  * @param[in]   key               - key.
  * @param[in]   sp_key_idx        - index of secure port key.
@@ -107,8 +129,7 @@ unsigned int hmac_sha1(unsigned char *key, unsigned short sp_key_idx, unsigned i
  * @param[in]   callback          - callback function pointer.
  * @return      0:success     other:error
  */
-unsigned int hmac_sha1_dma_init(HMAC_SHA1_DMA_CTX *ctx, const unsigned char *key, unsigned short sp_key_idx, unsigned int key_bytes,
-        HASH_CALLBACK callback)
+unsigned int hmac_sha1_dma_init(HMAC_SHA1_DMA_CTX *ctx, unsigned char *key, unsigned short sp_key_idx, unsigned int key_bytes, HASH_CALLBACK callback)
 {
     return hmac_dma_init(ctx, HASH_SHA1, key, sp_key_idx, key_bytes, callback);
 }
@@ -125,9 +146,9 @@ unsigned int hmac_sha1_dma_init(HMAC_SHA1_DMA_CTX *ctx, const unsigned char *key
       -# 1. please make sure the four parameters are valid, and ctx is initialized.
   @endverbatim
  */
-unsigned int hmac_sha1_dma_update_blocks(HMAC_SHA1_DMA_CTX *ctx, unsigned int *msg, unsigned int msg_words)
+unsigned int hmac_sha1_dma_update_blocks(HMAC_SHA1_DMA_CTX *ctx, unsigned int *msg, unsigned int msg_bytes)
 {
-    return hmac_dma_update_blocks(ctx, msg, msg_words);
+    return hmac_dma_update_blocks(ctx, msg, msg_bytes);
 }
 
 /**
@@ -136,7 +157,7 @@ unsigned int hmac_sha1_dma_update_blocks(HMAC_SHA1_DMA_CTX *ctx, unsigned int *m
  * @param[in]   remainder_msg           - HMAC_SHA1_DMA_CTX context pointer.
  * @param[in]   remainder_bytes         - byte length of the last message, must be in [0, BLOCK_BYTE_LEN-1],
  *                                  here BLOCK_BYTE_LEN is block byte length of SHA1(64).
- * @param[out]  mac                     - hmac
+ * @param[out]   mac                     - hmac
  * @return      0:success     other:error
 * @note
   @verbatim
@@ -155,17 +176,42 @@ unsigned int hmac_sha1_dma_final(HMAC_SHA1_DMA_CTX *ctx, unsigned int *remainder
  * @param[in]   key_bytes            - key byte length,
  * @param[in]   msg                  - message
  * @param[in]   msg_bytes            - byte length of the input message
- * @param[out]  mac                  - hmac
+ * @param[out]   mac                  - hmac
  * @param[in]   callback             - callback function pointer
  * @return      0:success     other:error
  */
-unsigned int hmac_sha1_dma(unsigned char *key, unsigned short sp_key_idx, unsigned int key_bytes, unsigned int *msg, unsigned int msg_bytes, unsigned int *mac,
-        HASH_CALLBACK callback)
+unsigned int hmac_sha1_dma(unsigned char *key, unsigned short sp_key_idx, unsigned int key_bytes, unsigned int *msg, unsigned int msg_bytes, unsigned int *mac, HASH_CALLBACK callback)
 {
     return hmac_dma(HASH_SHA1, key, sp_key_idx, key_bytes, msg, msg_bytes, mac, callback);
 }
 
-#endif
 
+        #ifdef SUPPORT_HASH_DMA_NODE
+/**
+ * @brief       dma hmac input key and message, get the hmac(node style).
+ * @param[in]   key               - key.
+ * @param[in]   sp_key_idx        - index of secure port key.
+ * @param[in]   key_bytes         - key byte length.
+ * @param[in]   node              - message node pointer
+ * @param[in]   node_num          - number of hash nodes, i.e. number of message segments.
+ * @param[out]  mac               - hmac.
+ * @param[in]   callback          - callback function pointer
+ * @return      0:success     other:error
+ * @note
+  @verbatim
+      -# 1. please make sure the mac buffer is sufficient.
+      -# 2. if the whole message consists of some segments, every segment is a node, a node includes
+            address and byte length.
+      -# 3. for every node or segment except the last, its message length must be a multiple of block length.
+  @endverbatim
+ */
+unsigned int hmac_sha1_dma_node_steps(unsigned char *key, unsigned short sp_key_idx, unsigned int key_bytes, HASH_DMA_NODE *node, unsigned int node_num, unsigned int *mac, HASH_CALLBACK callback)
+{
+    return hmac_dma_node_steps(HASH_SHA1, key, sp_key_idx, key_bytes, node, node_num, mac, callback);
+}
+        #endif
+
+
+    #endif
 
 #endif

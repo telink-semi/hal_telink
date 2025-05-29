@@ -33,10 +33,15 @@
  */
 typedef void (*blt_event_callback_t)(u8 e, u8 *p, int n);
 typedef void (*user_irq_handler_cb_t)(void);
-extern  user_irq_handler_cb_t  usr_irq_handler_cb;
+extern user_irq_handler_cb_t usr_irq_handler_cb;
 
 
-typedef enum{
+typedef int (*ll_task_callback_0_t)(void);
+extern ll_task_callback_0_t ll_cs_rawData_process_cb;
+extern ll_task_callback_0_t ll_cs_hci_subevent_report_cb;
+
+typedef enum
+{
     BLT_EV_FLAG_RX_DATA_ABANDON,
     BLT_EV_FLAG_GPIO_EARLY_WAKEUP,
     BLT_EV_FLAG_SLEEP_ENTER,
@@ -44,25 +49,18 @@ typedef enum{
     BLT_EV_FLAG_KEY_MISSING,
 
     BLT_EV_MAX_NUM,
-}blt_ev_flag_t;
+} blt_ev_flag_t;
 
-
-typedef enum {
-    BLE_STATUS_IDLE              = 0x0000, // Idle state
-    BLE_STATUS_ADVERTISING       = 0x0001, // Scanning state
-    BLE_STATUS_SCANNING          = 0x0002, // Advertising state (non-extended)
-    BLE_STATUS_INITIATING        = 0x0004, // initiating state
-    BLE_STATUS_CONNECTED         = 0x0008, // Connected state
-    BLE_STATUS_EXT_ADVERTISING   = 0x0010, // Extended Advertising state
-    BLE_STATUS_UNKNOWN           = 0x8000, // Unknown state (to indicate undefined)
+typedef enum
+{
+    BLE_STATUS_IDLE            = 0x0000, // Idle state
+    BLE_STATUS_ADVERTISING     = 0x0001, // Advertising state (non-extended)
+    BLE_STATUS_SCANNING        = 0x0002, // Scanning state
+    BLE_STATUS_INITIATING      = 0x0004, // initiating state
+    BLE_STATUS_CONNECTED       = 0x0008, // Connected state
+    BLE_STATUS_EXT_ADVERTISING = 0x0010, // Extended Advertising state
+    BLE_STATUS_UNKNOWN         = 0x8000, // Unknown state (to indicate undefined)
 } ble_status_t;
-
-
-
-
-
-
-
 
 /**
  * @brief   Telink defined LinkLayer Event callBack
@@ -70,22 +68,21 @@ typedef enum {
  * @param[in]   p - callBack function
  * @return  none
  */
-void        blc_ll_registerTelinkControllerEventCallback (u8 e, blt_event_callback_t p);
+void blc_ll_registerTelinkControllerEventCallback(u8 e, blt_event_callback_t p);
 
 /**
  * @brief   irq_handler for BLE stack, process system tick interrupt and RF interrupt
  * @param   none
  * @return  none
  */
-void        blc_sdk_irq_handler(void);
+void blc_sdk_irq_handler(void);
 
 /**
  * @brief   main_loop for BLE stack, process data and event
  * @param   none
  * @return  none
  */
-void        blc_sdk_main_loop (void);
-
+void blc_sdk_main_loop(void);
 
 
 /**
@@ -93,7 +90,7 @@ void        blc_sdk_main_loop (void);
  * @param      none
  * @return     none
  */
-void        blc_ll_initBasicMCU (void);
+void blc_ll_initBasicMCU(void);
 
 
 /**
@@ -101,7 +98,7 @@ void        blc_ll_initBasicMCU (void);
  * @param      none
  * @return     none
  */
-void        blc_ll_initStandby_module (u8 *public_adr);
+void blc_ll_initStandby_module(u8 *public_adr);
 
 
 /**
@@ -110,7 +107,7 @@ void        blc_ll_initStandby_module (u8 *public_adr);
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_readBDAddr(u8 *addr);
+ble_sts_t blc_ll_readBDAddr(u8 *addr);
 
 
 /**
@@ -119,7 +116,7 @@ ble_sts_t   blc_ll_readBDAddr(u8 *addr);
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_setRandomAddr(u8 *randomAddr);
+ble_sts_t blc_ll_setRandomAddr(u8 *randomAddr);
 
 
 /**
@@ -129,9 +126,9 @@ ble_sts_t   blc_ll_setRandomAddr(u8 *randomAddr);
  * @return     status, 0x00:  succeed, no buffer error
  *                     other: buffer error code
  */
-init_err_t  blc_contr_checkControllerInitialization(void);
+init_err_t blc_contr_checkControllerInitialization(void);
 
-#define blc_controller_check_appBufferInitialization        blc_contr_checkControllerInitialization
+#define blc_controller_check_appBufferInitialization blc_contr_checkControllerInitialization
 
 /**
  * @brief      this function is used by the Host to specify a channel classification based on its local information,
@@ -140,7 +137,7 @@ init_err_t  blc_contr_checkControllerInitialization(void);
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_setHostChannel(u8 * chnMap);
+ble_sts_t blc_ll_setHostChannel(u8 *chnMap);
 
 
 /**
@@ -149,7 +146,7 @@ ble_sts_t   blc_ll_setHostChannel(u8 * chnMap);
  * @return     status, 0x00:  succeed, no buffer error
  *                     other: buffer error code
  */
-ble_sts_t   blc_hci_reset(void);
+ble_sts_t blc_hci_reset(void);
 
 
 /**
@@ -158,7 +155,7 @@ ble_sts_t   blc_hci_reset(void);
  * @return     status, 0:  idle
  *                     1:  task
  */
-u32         blc_ll_checkBleTaskIsIdle(void);
+u32 blc_ll_checkBleTaskIsIdle(void);
 
 
 /**
@@ -167,7 +164,7 @@ u32         blc_ll_checkBleTaskIsIdle(void);
  * @return     bool, 0:  ble task running
  *                   1:  idle
  */
-bool        blc_ll_isBleTaskIdle(void);
+bool blc_ll_isBleTaskIdle(void);
 
 
 /**
@@ -177,7 +174,15 @@ bool        blc_ll_isBleTaskIdle(void);
  * @param[in]  chn2 - channel to replace channel 39
  * @return     none
  */
-void        blc_ll_setCustomizedAdvertisingScanningChannel (u8 chn0, u8 chn1, u8 chn2);
+void blc_ll_setCustomizedAdvertisingScanningChannel(u8 chn0, u8 chn1, u8 chn2);
+
+
+/**
+ * @brief   Check if the RF is currently busy.
+ * This function checks if the RF module is currently in a busy state.
+ * @return  true if the RF is busy, false otherwise.
+ */
+bool blc_ll_isRfBusy(void);
 
 
 /**
@@ -186,13 +191,6 @@ void        blc_ll_setCustomizedAdvertisingScanningChannel (u8 chn0, u8 chn1, u8
  * @return  A bitmask representing the active BLE states.
  */
 ble_status_t blc_ll_getBleCurrentState(void);
-
-
-/* @brief   Check if the RF is currently busy.
- * This function checks if the RF module is currently in a busy state.
- * @return  true if the RF is busy, false otherwise.
- */
-bool blc_ll_isRfBusy(void);
 
 
 #endif /* LL_H_ */

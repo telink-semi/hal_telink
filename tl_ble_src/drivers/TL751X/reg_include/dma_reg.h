@@ -78,6 +78,22 @@ enum{
     FLD_DMA_CHANNEL_SRC_WIDTH       = BIT_RNG(22,23),
 };
 
+#define  DMA_CHACTRL_DST_REQ_SEL_OFFSET             (2)
+#define  DMA_CHACTRL_SRC_REQ_SEL_OFFSET             (8)
+#define  DMA_CHACTRL_DST_ADDR_CTRL_OFFSET           (14)
+#define  DMA_CHACTRL_SRC_ADDR_CTRL_OFFST            (16)
+#define  DMA_CHACTRL_DSTMODE_OFFSET                 (18)
+#define  DMA_CHACTRL_SRCMODE_OFFSET                 (19)
+#define  DMA_CHACTRL_DSTWIDTH_SIZE_OFFSET           (20)
+#define  DMA_CHACTRL_SRCWIDTH_SIZE_OFFSET           (22)
+#define  DMA_CHACTRL_SRC_BURST_SIZE_OFFSET          (24)
+#define  DMA_CHACTRL_READ_NUM_EN_OFFSET             (28)
+#define  DMA_CHACTRL_PRIORITY_OFFSET                (29)
+#define  DMA_CHACTRL_WRITE_NUM_EN_OFFSET            (30)
+#define  DMA_CHACTRL_AUTO_EN_OFFSET                 (31)
+
+
+
 #define reg_dma_ctr0(i)             REG_ADDR8(DMA_BASE_ADDR+0x44 +((i)>>3)*0x1000 +((i)%8)*0x14)
 #define reg_dma_ch_cr3(i)           REG_ADDR8(DMA_BASE_ADDR+0x47 +((i)>>3)*0x1000 +((i)%8)*0x14)
 
@@ -135,21 +151,5 @@ enum{
 
 
 #define reg_dma_llp_int_mode(i)     REG_ADDR8(DMA_BASE_ADDR+0x113+((((i)%8)>3) ? 1 : 0)+((i)>>3)*0x1000)
-#define reg_dma_rx_wptr             REG_ADDR8(DMA_BASE_ADDR+0xf4+((i)>>3)*0x1000)
-#define reg_dma_tx_wptr             REG_ADDR8(DMA_BASE_ADDR+0x100+((i)>>3)*0x1000)
-
-enum{
-    FLD_DMA_WPTR_MASK =             BIT_RNG(0,4),
-};
-
-
-#define reg_dma_rx_rptr             REG_ADDR8(DMA_BASE_ADDR+0xf5+((i)>>3)*0x1000)
-#define reg_dma_tx_rptr             REG_ADDR8(DMA_BASE_ADDR+0x101+((i)>>3)*0x1000)
-enum{
-    FLD_DMA_RPTR_MASK               = BIT_RNG(0,4),
-    FLD_DMA_RPTR_SET                = BIT(5),
-    FLD_DMA_RPTR_NEXT               = BIT(6),
-    FLD_DMA_RPTR_CLR                = BIT(7),
-};
 
 #endif

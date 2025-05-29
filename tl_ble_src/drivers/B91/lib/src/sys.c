@@ -37,10 +37,10 @@
 #include "dma.h"
 #include "usbhw.h"
 //Protection Code checking related macro
-#define SDK_VERSION_S2          2
-#define SDK_VERSION_IGNORE      5
+#define SDK_VERSION_S2     2
+#define SDK_VERSION_IGNORE 5
 
-#define SDK_VERSION_SELECT      SDK_VERSION_IGNORE
+#define SDK_VERSION_SELECT SDK_VERSION_IGNORE
 
 /**
  * There have been several customer complaints about DCDC_1P4_DCDC_1P8.
@@ -59,18 +59,18 @@
  * After all the tests have passed, open the feature.
  * changed by weihua.zhang, confirmed by yu.ling, at 20240319.
  */
-#define DCDC_1P4_DCDC_1P8_EN            0
+#define DCDC_1P4_DCDC_1P8_EN 0
 
-typedef enum{
-    SDK_VERSION_PROTECTION_CODE_S2      = 0x02, // The value of protection code is less than or equal to 9 but not equal to 3.
-    SDK_VERSION_PROTECTION_CODE_IGNORE  = 0x05, // Ignore the value of protection code.
-}sdk_version_protection_code_e;
+typedef enum
+{
+    SDK_VERSION_PROTECTION_CODE_S2     = 0x02, // The value of protection code is less than or equal to 9 but not equal to 3.
+    SDK_VERSION_PROTECTION_CODE_IGNORE = 0x05, // Ignore the value of protection code.
+} sdk_version_protection_code_e;
 
+unsigned int g_chip_version = 0;
 
-unsigned int g_chip_version=0;
-
-extern void pm_update_status_info(void);
-unsigned int  efuse_get_low_word(void);
+extern void  pm_update_status_info(void);
+unsigned int efuse_get_low_word(void);
 
 /**
  * @brief       This function serves to check protection code according SDK version.
@@ -81,13 +81,11 @@ static __attribute__((always_inline)) inline void efuse_check_protection_code(sd
 {
     unsigned char pCode;
     pCode = efuse_get_low_word() & 0xf;
-    switch(version)
-    {
+    switch (version) {
     case SDK_VERSION_PROTECTION_CODE_S2:
-        if((3 == pCode) || (9 < pCode))
-        {
-            reg_pwdn_en = 0x20;/*reboot*/
-            while(1);
+        if ((3 == pCode) || (9 < pCode)) {
+            reg_pwdn_en = 0x20; /*reboot*/
+            while (1);
         }
         break;
     default:
@@ -101,10 +99,10 @@ static __attribute__((always_inline)) inline void efuse_check_protection_code(sd
  */
 _attribute_ram_code_sec_noinline_ void sys_reboot_ram(void)
 {
-    core_interrupt_disable();   //It must be inlined to ensure that the text segment cannot be entered.
+    core_interrupt_disable(); //It must be inlined to ensure that the text segment cannot be entered.
     mspi_stop_xip();
     reg_pwdn_en = 0x20;
-    while(1);
+    while (1);
 }
 
 /**
@@ -129,13 +127,13 @@ _attribute_ram_code_sec_optimize_o2_ void crystal_manual_settle(void)
     //Due to differences in chip design, the analog registers operated here are different.
     //For B91, here need to write 1 to reset then write 0 to it default value which is no need for other chips.
     //(modified by jilong.liu, confirmed by wenfeng.lou 20240328)
-    unsigned char ana_50 = analog_read_reg8(0x50);//0x50<7>: write 1 to reset xtal quick start cnt
+    unsigned char ana_50 = analog_read_reg8(0x50); //0x50<7>: write 1 to reset xtal quick start cnt
     analog_write_reg8(0x50, ana_50 | 0x80);
     analog_write_reg8(0x50, ana_50 & 0x7f);
 
-    unsigned char ana_05 = analog_read_reg8(0x05);//0x05<3>: 24M_xtl_pd
-    analog_write_reg8(0x05, ana_05 | 0x08);     //<3>1b'1: Power down 24MHz XTL oscillator
-    analog_write_reg8(0x05, ana_05 & 0xf7);     //<3>1b'0: Power up 24MHz XTL oscillator        
+    unsigned char ana_05 = analog_read_reg8(0x05); //0x05<3>: 24M_xtl_pd
+    analog_write_reg8(0x05, ana_05 | 0x08);        //<3>1b'1: Power down 24MHz XTL oscillator
+    analog_write_reg8(0x05, ana_05 & 0xf7);        //<3>1b'0: Power up 24MHz XTL oscillator
 }
 
 #if 0       //BLE SDK use:  in ext_driver
@@ -158,21 +156,20 @@ void sys_init(power_mode_e power_mode, vbat_type_e vbat_v, cap_typedef_e cap)
      * This setting turns off the TRNG and NPE modules in order to test power consumption.The current
      * decrease about 3mA when those two modules be turn off.changed by zhiwei,confirmed by kaixin.20200828.
      */
-    reg_rst     = 0xffbbffff;
-    reg_clk_en  = 0xffbbffff;
-    
-    //Before calling the function pm_wait_xtal_ready, you need to ensure that the cclk is set to 24M, 
+    reg_rst    = 0xffbbffff;
+    reg_clk_en = 0xffbbffff;
+
+    //Before calling the function pm_wait_xtal_ready, you need to ensure that the cclk is set to 24M,
     //otherwise a reboot may occur (for example, the following use case: when the flash is running a cclk>24M program,
     //without powering down the chip to load a ram program, at this time the nop timing judgment in the pm_wait_xtal_ready function is incorrect,
     //which may lead to a reboot)(add by weihua.zhang, confirmed by kaixin 20230609)
     //When load code twice without power down DUT, DUT will use crystal clock in here, xo_quick_settle manual mode need to use in RC clock.
-    write_reg8(0x1401e8, read_reg8(0x1401e8) & 0x0f);               //mspiclk & cclk to 24M rc clock
-    write_reg8(0x1401d8, read_reg8(0x1401d8) & 0xf8);               //clock division to 1:1:1
+    write_reg8(0x1401e8, read_reg8(0x1401e8) & 0x0f); //mspiclk & cclk to 24M rc clock
+    write_reg8(0x1401d8, read_reg8(0x1401d8) & 0xf8); //clock division to 1:1:1
 
     //If the crystal oscillator uses an external capacitor, the internal capacitor must be turned off at the very beginning,
     //otherwise it will affect the start-up.(add by bingyu.li, confirmed by wenfeng.lou 20240531)
-    if(cap == EXTERNAL_CAP_XTAL24M)
-    {
+    if (cap == EXTERNAL_CAP_XTAL24M) {
         rf_turn_off_internal_cap();
     }
 
@@ -184,53 +181,51 @@ void sys_init(power_mode_e power_mode, vbat_type_e vbat_v, cap_typedef_e cap)
     * Because the stimer is necessary for the pm_wait_xtal_ready.
     * (add by jilong.liu, confirmed by wenfeng.lou 20240513)
     */
-    analog_write_reg8(0x8c,0x02);
+    analog_write_reg8(0x8c, 0x02);
 
 #if DCDC_1P4_DCDC_1P8_EN
     //when VBAT power supply > 4.1V and LDO switch to DCDC,DCDC_1V8 voltage will ascend to the supply power in a period time,
     //cause the program can not run. Need to trim down dcdc_flash_out before switch power mode.
     //confirmed by haitao,modify by yi.bao(20210119)
-    if(DCDC_1P4_DCDC_1P8 == power_mode)
-    {
-        analog_write_reg8(0x0c, 0x40);  //poweron_dft: 0x44 --> 0x40.
-                                        //<2:0> dcdc_trim_flash_out,flash/codec 1.8V/2.8V trim down 0.2V in DCDC mode.
+    if (DCDC_1P4_DCDC_1P8 == power_mode) {
+        analog_write_reg8(0x0c, 0x40); //poweron_dft: 0x44 --> 0x40.
+                                       //<2:0> dcdc_trim_flash_out,flash/codec 1.8V/2.8V trim down 0.2V in DCDC mode.
     }
 #endif
 
-    analog_write_reg8(0x0a, power_mode);//poweron_dft:  0x90.
-                                        //<0-1>:pd_dcdc_ldo_sw, default:00, dcdc & bypass ldo status bits.
-                                        //      dcdc_1p4    dcdc_1p8    ldo_1p4     ldo_1p8
-                                        //00:       N           N           Y           Y
-                                        //01:       Y           N           N           Y
-                                        //10:       Y           N           N           N
-                                        //11:       Y           Y           N           N
-    analog_write_reg8(0x0b, 0x3b);      //poweron_dft:  0x7b -> 0x3b.
-                                        //<6>:mscn_pullup_res_enb,  default:1,->0 enable 1M pullup resistor for mscn PAD.
-    analog_write_reg8(0x05,analog_read_reg8(0x05) & (~BIT(3)));//poweron_dft:   0x02 -> 0x02.
-                                        //<3>:24M_xtl_pd,       default:0,->0 Power up 24MHz XTL oscillator.
-    analog_write_reg8(0x06,analog_read_reg8(0x06) & ~(BIT(0) | vbat_v | BIT(6) | BIT(7)));//poweron_dft:    0xff -> 0x36 or 0x3e.
-                                        //<0>:pd_bbpll_ldo,     default:1,->0 Power on ana LDO.
-                                        //<3>:pd_vbus_sw,       default:1,->0 Power up of bypass switch.
-                                        //<6>:spd_ldo_pd,       default:1,->0 Power up spd ldo.
-                                        //<7>:dig_ret_pd,       default:1,->0 Power up retention  ldo.
-    analog_write_reg8(0x01, 0x45);      //poweron_dft:  0x44 -> 0x45.
-                                        //<0-2>:bbpll_ldo_trim,         default:100,->101 measured 1.186V.The default value is sometimes crashes.
-                                        //<4-6>:ana_ldo_trim,1.0-1.4V   default:100,->100 analog LDO output voltage trim: 1.2V
+    analog_write_reg8(0x0a, power_mode);                                                               //poweron_dft:  0x90.
+                                                                                                       //<0-1>:pd_dcdc_ldo_sw, default:00, dcdc & bypass ldo status bits.
+                                                                                                       //      dcdc_1p4    dcdc_1p8    ldo_1p4     ldo_1p8
+                                                                                                       //00:       N           N           Y           Y
+                                                                                                       //01:       Y           N           N           Y
+                                                                                                       //10:       Y           N           N           N
+                                                                                                       //11:       Y           Y           N           N
+    analog_write_reg8(0x0b, 0x3b);                                                                     //poweron_dft:  0x7b -> 0x3b.
+                                                                                                       //<6>:mscn_pullup_res_enb,  default:1,->0 enable 1M pullup resistor for mscn PAD.
+    analog_write_reg8(0x05, analog_read_reg8(0x05) & (~BIT(3)));                                       //poweron_dft:   0x02 -> 0x02.
+                                                                                                       //<3>:24M_xtl_pd,       default:0,->0 Power up 24MHz XTL oscillator.
+    analog_write_reg8(0x06, (analog_read_reg8(0x06) | BIT(3)) & ~(BIT(0) | vbat_v | BIT(6) | BIT(7))); //poweron_dft: 0xff -> 0x36 or 0x3e.
+                                                                                                       //<0>:pd_bbpll_ldo,     default:1,->0 Power on ana LDO.
+                                                                                                       //<3>:pd_vbus_sw,       default:1,->0 Power up of bypass switch.
+                                                                                                       //<6>:spd_ldo_pd,       default:1,->0 Power up spd ldo.
+                                                                                                       //<7>:dig_ret_pd,       default:1,->0 Power up retention  ldo.
+    analog_write_reg8(0x01, 0x45);                                                                     //poweron_dft:  0x44 -> 0x45.
+                                                                                                       //<0-2>:bbpll_ldo_trim,         default:100,->101 measured 1.186V.The default value is sometimes crashes.
+                                                                                                       //<4-6>:ana_ldo_trim,1.0-1.4V   default:100,->100 analog LDO output voltage trim: 1.2V
     //When using the default value, during the USB charging process, the audio output will hear a sizzling electric current.
     //This problem can be solved by increasing the OCP current limit value to avoid unnecessary shutdown.
     //confirmed by ya.yang, modify by weihua.zhang(20210805)
-    analog_write_reg8(0x1c, 0x4c);      //poweron_dft:  0x40 -> 0x4c.
-                                        //<2-3>:ocp_i_cross_trim,   default:00,->11 the current limit value of OCP is configured to the maximum value.
+    analog_write_reg8(0x1c, 0x4c); //poweron_dft:  0x40 -> 0x4c.
+                                   //<2-3>:ocp_i_cross_trim,   default:00,->11 the current limit value of OCP is configured to the maximum value.
 
     //in B91,the dma_mask is turned on by default and cleared uniformly during initialization.
-    for(unsigned char dma_chn =0;dma_chn<= 7;dma_chn++)
-    {
-        dma_clr_irq_mask(dma_chn,TC_MASK|ERR_MASK|ABT_MASK);
+    for (unsigned char dma_chn = 0; dma_chn <= 7; dma_chn++) {
+        dma_clr_irq_mask(dma_chn, TC_MASK | ERR_MASK | ABT_MASK);
     }
     //the usb ep mask is turned on by default and cleared uniformly during initialization.
-    usbhw_clr_eps_irq_mask(FLD_USB_EDP8_IRQ|FLD_USB_EDP1_IRQ|FLD_USB_EDP2_IRQ|FLD_USB_EDP3_IRQ|FLD_USB_EDP4_IRQ|FLD_USB_EDP5_IRQ|FLD_USB_EDP6_IRQ|FLD_USB_EDP7_IRQ);
+    usbhw_clr_eps_irq_mask(FLD_USB_EDP8_IRQ | FLD_USB_EDP1_IRQ | FLD_USB_EDP2_IRQ | FLD_USB_EDP3_IRQ | FLD_USB_EDP4_IRQ | FLD_USB_EDP5_IRQ | FLD_USB_EDP6_IRQ | FLD_USB_EDP7_IRQ);
     pm_update_status_info();
-    g_pm_vbat_v = vbat_v>>3;
+    g_pm_vbat_v = vbat_v >> 3;
 
     //The xo_ready_ana signal fails, and the tick value of the clock is used to determine whether the crystal oscillator is stable.
     //(add by jilong.liu, confirmed by wenfeng.lou 20240320. Issue:EAG-59)
@@ -241,51 +236,48 @@ void sys_init(power_mode_e power_mode, vbat_type_e vbat_v, cap_typedef_e cap)
     //up to three times.The bbpll ldo trim must wait until 24M is stable.(add by weihua.zhang, confirmed by yi.bao and wenfeng 20200924)
     pm_wait_bbpll_done();
 
-    if(g_pm_status_info.mcu_status == MCU_STATUS_DEEPRET_BACK)
-    {
+    if (g_pm_status_info.mcu_status == MCU_STATUS_DEEPRET_BACK) {
         pm_stimer_recover();
-    }else{
+    } else {
 #if SYS_TIMER_AUTO_MODE
-    reg_system_ctrl |=(FLD_SYSTEM_TIMER_AUTO|FLD_SYSTEM_32K_TRACK_EN);  //enable 32k track and system timer auto.
-    reg_system_tick = 0x01; //initial next tick is 1,kick system timer
+        reg_system_ctrl |= (FLD_SYSTEM_TIMER_AUTO | FLD_SYSTEM_32K_TRACK_EN); //enable 32k track and system timer auto.
+        reg_system_tick = 0x01;                                               //initial next tick is 1,kick system timer
 #else
-    reg_system_ctrl |= FLD_SYSTEM_32K_TRACK_EN | FLD_SYSTEM_TIMER_EN;   //enable 32k track and system timer. Wait for pll to stabilize before using system timer.
+        reg_system_ctrl |= FLD_SYSTEM_32K_TRACK_EN | FLD_SYSTEM_TIMER_EN; //enable 32k track and system timer. Wait for pll to stabilize before using system timer.
 #endif
     }
 
     g_chip_version = read_reg8(0x1401fd);
 
     //if clock src is PAD or PLL, and hclk = 1/2cclk, use reboot may cause problem, need deep to resolve(add by yi.bao, confirm by guangjun 20201016)
-    if(g_pm_status_info.mcu_status == MCU_STATUS_REBOOT_BACK)
-    {
+    if (g_pm_status_info.mcu_status == MCU_STATUS_REBOOT_BACK) {
         //Use PM_ANA_REG_POWER_ON_CLR_BUF0 BIT(1) to represent the reboot+deep process, which is related to the function pm_update_status_info.
-        analog_write_reg8(PM_ANA_REG_POWER_ON_CLR_BUF0, analog_read_reg8(PM_ANA_REG_POWER_ON_CLR_BUF0) | BIT(1));   //(add by weihua.zhang, confirmed by yi.bao 20201222)
-        pm_sleep_wakeup(DEEPSLEEP_MODE, PM_WAKEUP_TIMER, PM_TICK_STIMER_16M, (stimer_get_tick() + 100*SYSTEM_TIMER_TICK_1MS));
+        analog_write_reg8(PM_ANA_REG_POWER_ON_CLR_BUF0, analog_read_reg8(PM_ANA_REG_POWER_ON_CLR_BUF0) | DEEP_AFTER_REBOOT); //(add by weihua.zhang, confirmed by yi.bao 20201222)
+        pm_sleep_wakeup(DEEPSLEEP_MODE, PM_WAKEUP_TIMER, PM_TICK_STIMER_16M, (stimer_get_tick() + 100 * SYSTEM_TIMER_TICK_1MS));
     }
     //**When testing AES_demo, it was found that the timing of baseband was wrong when it was powered on, which caused some of
     //the registers of CV to go wrong, which caused the program to run abnormally.(add by weihua.zhang, confirmed by junwen 20200819)
-    else if(0xff == g_chip_version) //A0
+    else if (0xff == g_chip_version)                            //A0
     {
-        if(g_pm_status_info.mcu_status == MCU_STATUS_POWER_ON)  //power on
+        if (g_pm_status_info.mcu_status == MCU_STATUS_POWER_ON) //power on
         {
-            analog_write_reg8(0x7d, 0x80);  //power on baseband
-            pm_sleep_wakeup(DEEPSLEEP_MODE, PM_WAKEUP_TIMER, PM_TICK_STIMER_16M, (stimer_get_tick() + 100*SYSTEM_TIMER_TICK_1MS));
+            analog_write_reg8(0x7d, 0x80);                      //power on baseband
+            pm_sleep_wakeup(DEEPSLEEP_MODE, PM_WAKEUP_TIMER, PM_TICK_STIMER_16M, (stimer_get_tick() + 100 * SYSTEM_TIMER_TICK_1MS));
         }
     }
-    analog_write_reg8(0x7d, 0x80);      //poweron_dft:  0x03 -> 0x80.
-                                        //<0>:pg_zb_en,     default:1,->0 power on baseband.
-                                        //<1>:pg_usb_en,    default:1,->0 power on usb.
-                                        //<2>:pg_npe_en,    default:1,->0 power on npe.
-                                        //<7>:pg_clk_en,    default:0,->1 enable change power sequence clk.
+    analog_write_reg8(0x7d, 0x80); //poweron_dft:  0x03 -> 0x80.
+                                   //<0>:pg_zb_en,     default:1,->0 power on baseband.
+                                   //<1>:pg_usb_en,    default:1,->0 power on usb.
+                                   //<2>:pg_npe_en,    default:1,->0 power on npe.
+                                   //<7>:pg_clk_en,    default:0,->1 enable change power sequence clk.
 #if DCDC_1P4_DCDC_1P8_EN
     //when VBAT power supply > 4.1V and LDO switch to DCDC,DCDC_1V8 voltage will ascend to the supply power in a period time,
     //cause the program can not run. Need to trim down dcdc_flash_out before switch power mode,refer to the configuration above [analog_write_reg8(0x0c, 0x40)],
     /*Then restore the default value[analog_write_reg8(0x0c, 0x44)].There is a process of switching from LDO to DCDC, which needs to wait for a period of time, so it is restored here,
     confirmed by haitao,modify by minghai.duan(20211018)*/
-    if(DCDC_1P4_DCDC_1P8 == power_mode)
-    {
-        analog_write_reg8(0x0c, 0x44);  //poweron_dft: 0x40 --> 0x44.
-                                        //<2:0> dcdc_trim_flash_out,flash/codec 1.8V/2.8V in DCDC mode.
+    if (DCDC_1P4_DCDC_1P8 == power_mode) {
+        analog_write_reg8(0x0c, 0x44); //poweron_dft: 0x40 --> 0x44.
+                                       //<2:0> dcdc_trim_flash_out,flash/codec 1.8V/2.8V in DCDC mode.
     }
 #endif
     //check protection code
@@ -294,9 +286,8 @@ void sys_init(power_mode_e power_mode, vbat_type_e vbat_v, cap_typedef_e cap)
 #elif SDK_VERSION_SELECT == SDK_VERSION_IGNORE
     efuse_check_protection_code(SDK_VERSION_PROTECTION_CODE_IGNORE);
 #endif
-    rf_clr_irq_mask(FLD_RF_IRQ_ALL);//The default interrupt mask in RF is open.
-                                    //Close the interrupt mask in the initialization code and reopen it when in use
-
+    rf_clr_irq_mask(FLD_RF_IRQ_ALL); //The default interrupt mask in RF is open.
+                                     //Close the interrupt mask in the initialization code and reopen it when in use
 }
 #endif      //BLE SDK use:  in ext_driver
 /**
@@ -307,31 +298,28 @@ void sys_init(power_mode_e power_mode, vbat_type_e vbat_v, cap_typedef_e cap)
  * @return     number of commands are carried out
  */
 
-int write_reg_table(const tbl_cmd_set_t * pt, int size)
+int write_reg_table(const tbl_cmd_set_t *pt, int size)
 {
-    int l=0;
+    int l = 0;
 
-    while (l<size) {
+    while (l < size) {
         unsigned int  cadr = ((unsigned int)0x80000000) | pt[l].adr;
         unsigned char cdat = pt[l].dat;
         unsigned char ccmd = pt[l].cmd;
-        unsigned char cvld =(ccmd & TCMD_UNDER_WR);
+        unsigned char cvld = (ccmd & TCMD_UNDER_WR);
         ccmd &= TCMD_MASK;
         if (cvld) {
             if (ccmd == TCMD_WRITE) {
-                write_reg8 (cadr, cdat);
-            }
-            else if (ccmd == TCMD_WAREG) {
-                analog_write_reg8 (cadr, cdat);
-            }
-            else if (ccmd == TCMD_WAIT) {
-                delay_us(pt[l].adr*256 + cdat);
+                write_reg8(cadr, cdat);
+            } else if (ccmd == TCMD_WAREG) {
+                analog_write_reg8(cadr, cdat);
+            } else if (ccmd == TCMD_WAIT) {
+                delay_us(pt[l].adr * 256 + cdat);
             }
         }
         l++;
     }
     return size;
-
 }
 
 /**
@@ -341,15 +329,15 @@ int write_reg_table(const tbl_cmd_set_t * pt, int size)
  * @param[in] none
  * @return    data(BIT0~BIT31)
  */
-unsigned int  efuse_get_low_word(void)
+unsigned int efuse_get_low_word(void)
 {
     unsigned int efuse_info;
     //Because low word has a key to store flash encryption function, the hardware has a protection function when reading low word.
     //In order to read the correct value, you need to remove this protection first, otherwise you can only read 0.
     write_reg8(0x1401f4, 0x65);        //remove protection, required only when reading low_word
-    efuse_info= read_reg32(0x1401c8);  //read the low_word(BIT<31:0>) data
+    efuse_info = read_reg32(0x1401c8); //read the low_word(BIT<31:0>) data
     write_reg8(0x1401f4, 0x00);        //open protection
-    return efuse_info ;
+    return efuse_info;
 }
 
 /**
@@ -359,11 +347,11 @@ unsigned int  efuse_get_low_word(void)
  * @param[in] none
  * @return    data(BIT32~BIT63)
  */
-unsigned int  efuse_get_high_word(void)
+unsigned int efuse_get_high_word(void)
 {
     unsigned int efuse_info;
-    efuse_info = read_reg32(0x1401cc);  //read the high_word(BIT<63:32>) data
-    return efuse_info ;
+    efuse_info = read_reg32(0x1401cc); //read the high_word(BIT<63:32>) data
+    return efuse_info;
 }
 
 /**
@@ -374,16 +362,17 @@ unsigned int  efuse_get_high_word(void)
  */
 _attribute_ram_code_sec_noinline_ void efuse_refresh_data_ram(void)
 {
-/*   efuse_refresh_data() has two requirements:
+    /*   efuse_refresh_data() has two requirements:
  *   1.It must be sram code, because during the refresh period, the encryption and decryption function of mspi will be enabled.
  *     If the flash operation is performed during the refresh period, program will trap.
  *   2.Global variables and local variables cannot be used in functions.
  *     Because the limit size of sram is an unstable value during refresh, ensure that data, bss, and stack areas are not applicable here.
 */
     mspi_stop_xip();
-    write_reg8(0x1401c7, 0x04);    //[0]efuse_w=0,[2]efuse_sclk_en=1. [2]used as the multiplexing function to trig read here
-    while(BIT(1) == (read_reg8(0x1401c7)&BIT(1)));   //wait read data from EFuse to reg done, Bit(1) as a read busy flag will be auto set to 0,Bit(2) will be set to 0 too.
+    write_reg8(0x1401c7, 0x04); //[0]efuse_w=0,[2]efuse_sclk_en=1. [2]used as the multiplexing function to trig read here
+    while (BIT(1) == (read_reg8(0x1401c7) & BIT(1)));                       //wait read data from EFuse to reg done, Bit(1) as a read busy flag will be auto set to 0,Bit(2) will be set to 0 too.
 }
+
 _attribute_text_sec_ void efuse_refresh_data(void)
 {
     //Because flash operations cannot be performed during refresh period, it is necessary to disable prefetch first.
@@ -399,21 +388,20 @@ _attribute_text_sec_ void efuse_refresh_data(void)
  * @param[out]offset - gpio_calib_value_offset.
  * @return    1 means there is a calibration value in efuse, and 0 means there is no calibration value in efuse.
  */
-unsigned char efuse_get_adc_calib_value(unsigned short* gain, signed char* offset)
+unsigned char efuse_get_adc_calib_value(unsigned short *gain, signed char *offset)
 {
-    unsigned short  efuse_4to18bit_info = (efuse_get_low_word() >> 4) & 0x7fff;
-    if(0 != efuse_4to18bit_info)
-    {
+    unsigned short efuse_4to18bit_info = (efuse_get_low_word() >> 4) & 0x7fff;
+    if (0 != efuse_4to18bit_info) {
         //Before the gain is stored in efuse, in order to reduce the number of bits occupied, 1000 is subtracted.
         //gpio_calib_value:bit[12:4]+1000
-        *gain = (efuse_4to18bit_info & 0x1ff) + 1000;//unit: mv
+        *gain = (efuse_4to18bit_info & 0x1ff) + 1000; //unit: mv
         //gpio_calib_value_offset:bit[18:13]-20
-        *offset = ((efuse_4to18bit_info >> 9) & 0x3f) - 20;//unit: mv
+        *offset = ((efuse_4to18bit_info >> 9) & 0x3f) - 20; //unit: mv
         return 1;
-    }
-    else
+    } else {
         //If efuse_4to18bit_info is 0, there is no calibration value in efuse.
         return 0;
+    }
 }
 
 /**
@@ -427,14 +415,14 @@ unsigned char efuse_get_adc_calib_value(unsigned short* gain, signed char* offse
  * @param[in] data - the data need to be write(2 word)
  * @return    none
  */
-void efuse_set_data(unsigned int* data)
+void efuse_set_data(unsigned int *data)
 {
     write_reg8(0x1401c7, 0x01);     //[0]efuse_w=1,write_enable
     write_reg8(0x1401c7, 0x05);     //[0]efuse_w=1,[2]efuse_sclk_en=1,write_enable & clock_enable. [2]used as the clock enable bit here
     write_reg32(0x1401c8, data[0]); //write low word
     write_reg32(0x1401cc, data[1]); //write high word
     write_reg8(0x1401c7, 0x03);     //[0]efuse_w=1,[1]write trig=1 and trig write
-    while(BIT(1) == (read_reg8(0x1401c7) & BIT(1)));  //wait write data from reg to EFuse done, Bit(1) as a write busy flag will be auto set to 0
+    while (BIT(1) == (read_reg8(0x1401c7) & BIT(1)));                           //wait write data from reg to EFuse done, Bit(1) as a write busy flag will be auto set to 0
     write_reg8(0x1401c7, 0x00);     //[0]efuse_w=0, bit[0] requires software to clear 0, bit[1][2]will be set to 0 by hardware
 }
 

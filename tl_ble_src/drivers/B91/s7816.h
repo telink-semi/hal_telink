@@ -70,38 +70,40 @@
 #include "uart.h"
 #include "stimer.h"
 
-#define s7816_en(uart_num)                uart_rtx_en(uart_num)
-#define s7816_set_rtx_pin(s7816_trx_pin)  uart_set_rtx_pin(s7816_trx_pin)
+#define s7816_en(uart_num)               uart_rtx_en(uart_num)
+#define s7816_set_rtx_pin(s7816_trx_pin) uart_set_rtx_pin(s7816_trx_pin)
 
 /**
  *  @brief  Define 7816 TRX pin.
  */
-typedef enum{
-    S7816_UART0_RTX_A4=GPIO_PA4,
-    S7816_UART0_RTX_B3=GPIO_PB3,
-    S7816_UART0_RTX_D3=GPIO_PD3,
+typedef enum
+{
+    S7816_UART0_RTX_A4 = GPIO_PA4,
+    S7816_UART0_RTX_B3 = GPIO_PB3,
+    S7816_UART0_RTX_D3 = GPIO_PD3,
 
-    S7816_UART1_RTX_C7=GPIO_PC7,
-    S7816_UART1_RTX_D7=GPIO_PD7,
-    S7816_UART1_RTX_E2=GPIO_PE2,
-}s7816_rtx_pin_e;
+    S7816_UART1_RTX_C7 = GPIO_PC7,
+    S7816_UART1_RTX_D7 = GPIO_PD7,
+    S7816_UART1_RTX_E2 = GPIO_PE2,
+} s7816_rtx_pin_e;
 
 /**
  *  @brief  Define 7816 clock.
  */
-typedef enum{
-    S7816_4MHZ=4,
-    S7816_6MHZ=6,
-    S7816_12MHZ=12,
-}s7816_clock_e;
+typedef enum
+{
+    S7816_4MHZ  = 4,
+    S7816_6MHZ  = 6,
+    S7816_12MHZ = 12,
+} s7816_clock_e;
 
 /**
  *  @brief  Define 7816 clk pin.
  */
-typedef enum{
-    S7817_CLK_PA0=GPIO_PA0,
-}s7816_clk_pin_e;
-
+typedef enum
+{
+    S7817_CLK_PA0 = GPIO_PA0,
+} s7816_clk_pin_e;
 
 /**
  * @brief       This function is used to set the s7816 clock.
@@ -122,7 +124,7 @@ extern void s7816_set_clk(unsigned char div);
  * @param[in]   d            - the bitrate regulator of s7816.
  * @return      none.
  */
-extern void s7816_init(uart_num_e uart_num,s7816_clock_e clock,int f,int d);
+extern void s7816_init(uart_num_e uart_num, s7816_clock_e clock, int f, int d);
 
 /**
  * @brief       This function is used to active the IC card,set the trx pin and coldreset.
@@ -140,7 +142,7 @@ extern void s7816_coldreset();
  * @param[in]   trx_pin     - the trx pin of s7816.
  * @return      none.
  */
-extern void s7816_set_pin(gpio_pin_e rst_pin,gpio_pin_e vcc_pin,s7816_clk_pin_e clk_pin,s7816_rtx_pin_e trx_pin);
+extern void s7816_set_pin(gpio_pin_e rst_pin, gpio_pin_e vcc_pin, s7816_clk_pin_e clk_pin, s7816_rtx_pin_e trx_pin);
 
 /**
  * @brief       This function is used to release the trigger
@@ -187,4 +189,3 @@ extern void s7816_set_time(int rst_time_us);
 extern void s7816_send_byte(uart_num_e uart_num, unsigned char tx_data);
 
 #endif /* S7816_H_ */
-

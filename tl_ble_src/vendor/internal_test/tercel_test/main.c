@@ -40,11 +40,12 @@ _attribute_ram_code_ void rf_irq_handler(void)
 {
     DBG_CHN14_HIGH;
 
-    blc_sdk_irq_handler ();
+    blc_sdk_irq_handler();
 
     DBG_CHN14_LOW;
 }
 PLIC_ISR_REGISTER(rf_irq_handler, IRQ_ZB_RT)
+
 /**
  * @brief       System timer interrupt handler.
  * @param[in]   none
@@ -54,7 +55,7 @@ _attribute_ram_code_ void stimer_irq_handler(void)
 {
     DBG_CHN15_HIGH;
 
-    blc_sdk_irq_handler ();
+    blc_sdk_irq_handler();
 
     DBG_CHN15_LOW;
 }
@@ -70,33 +71,32 @@ _attribute_ram_code_ int main(void)
     /* this function must called before "sys_init()" when:
      * (1). For all IC: using 32K RC for power management,
        (2). For B91 only: even no power management */
-//  blc_pm_select_internal_32k_crystal();
+    //  blc_pm_select_internal_32k_crystal();
 
     sys_init();
     gpio_set_up_down_res(GPIO_SWS, GPIO_PIN_PULLUP_1M);
     wd_32k_stop();
     /* detect if MCU is wake_up from deep retention mode */
-//  int deepRetWakeUp = pm_is_MCU_deepRetentionWakeup();  //MCU deep retention wakeUp
+    //  int deepRetWakeUp = pm_is_MCU_deepRetentionWakeup();  //MCU deep retention wakeUp
 
-//  CCLK_32M_HCLK_32M_PCLK_16M;
-//
-//  rf_drv_ble_init();
-//
-//  gpio_init(!deepRetWakeUp);
-//
-//  if( deepRetWakeUp ){ //MCU wake_up from deepSleep retention mode
-//      user_init_deepRetn ();
-//  }
-//  else{ //MCU power_on or wake_up from deepSleep mode
-//      user_init_normal();
-//  }
+    //  CCLK_32M_HCLK_32M_PCLK_16M;
+    //
+    //  rf_drv_ble_init();
+    //
+    //  gpio_init(!deepRetWakeUp);
+    //
+    //  if( deepRetWakeUp ){ //MCU wake_up from deepSleep retention mode
+    //      user_init_deepRetn ();
+    //  }
+    //  else{ //MCU power_on or wake_up from deepSleep mode
+    //      user_init_normal();
+    //  }
 
 
     irq_enable();
 
-    while(1)
-    {
-        main_loop ();
+    while (1) {
+        main_loop();
     }
     return 0;
 }

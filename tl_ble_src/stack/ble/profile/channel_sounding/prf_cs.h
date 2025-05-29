@@ -24,7 +24,8 @@
 
 #pragma once
 
-typedef enum {
+typedef enum
+{
     CS_CLIENT_START = PRF_CHANNEL_SOUNDING_CLIENT_START - 1,
     CS_RAS_CLIENT,
 
@@ -32,14 +33,12 @@ typedef enum {
     CS_RAS_SERVER,
 } channel_souding_service_role_enum;
 
-
-typedef enum {
+typedef enum
+{
     CS_EVT_TYPE_CLIENT_START = PRF_EVTID_CHANNEL_SOUNDING_START,
     CS_EVT_TYPE_RASC,
-    CS_EVT_TYPE_SERVER_START = PRF_EVTID_CHANNEL_SOUNDING_START + PRF_EVENT_ID_SIZE*PRF_SERVER_OFFSET,
+    CS_EVT_TYPE_SERVER_START = PRF_EVTID_CHANNEL_SOUNDING_START + PRF_EVENT_ID_SIZE * PRF_SERVER_OFFSET,
     CS_EVT_TYPE_RASS,
 } channel_sounding_event_enum;
 
 #include "rasp/ras.h"
-
-

@@ -74,7 +74,7 @@ void bls_pm_registerFuncBeforeSuspend (suspend_handler_t func )
  * @param[in] none
  * @return    none
  */
-_attribute_ram_code_com_ void mcu_reboot(void)
+_attribute_ram_code_ void mcu_reboot(void)
 {
     mspi_stop_xip();
 
@@ -91,15 +91,6 @@ _attribute_ram_code_com_ void mcu_reboot(void)
     core_interrupt_disable ();
     REG_ADDR8(0x1401ef) = 0x20;  //reboot
     while (1);
-}
-
-_attribute_text_sec_ _attribute_no_inline_ void start_reboot(void)
-{
-    protected_sys_reboot();
-    //todo
-    //  __asm__("csrci  mmisc_ctl,8");  //disable BTB
-    //mcu_reboot();
-//  __asm__("csrsi  mmisc_ctl,8");  //enable BTB
 }
 
 /**
@@ -138,46 +129,46 @@ _attribute_text_sec_ _attribute_no_inline_ void start_reboot(void)
     }
 }
 #include "../../lib/include/otp.h"
-void efuse_check_protection_code(void)
-{
-    unsigned int pCode = 0;
-    /* set otp active */
-    otp_set_active_mode();
-    otp_read(104, 1, (unsigned int *)&pCode);
-    /* shutdown otp */
-    otp_set_deep_standby_mode();
-    pCode = pCode & 0x1f;//Bit0-4 is market protection code.
+ void efuse_check_protection_code(void)
+ {
+     unsigned int pCode = 0;
+     /* set otp active */
+     otp_set_active_mode();
+     otp_read(104, 1, (unsigned int *)&pCode);
+     /* shutdown otp */
+     otp_set_deep_standby_mode();
+     pCode = pCode & 0x1f;//Bit0-4 is market protection code.
 
-    unsigned char sdk_version = 5; //BLE :p5  Matter:P2 //refer to email "Tercel最新OTP定义 - Protection code 内部说明"
-    switch(sdk_version)
-    {
-        case 0: //p0
-            //Different SDKs have different restrictions. Please modify the code according to your own situation.
-            //The driver here is only for example reference.
-            if(0xE0 > pCode)
-            {
-                sys_reset_all();
-                while(1);
-            }
-            break;
-        case 5: //p5
-            if(0x1A > pCode)
-            {
-                sys_reset_all();
-                while(1);
-            }
-            break;
-        case 0xff:
-            break;
+     unsigned char sdk_version = 5; //BLE :p5  Matter:P2 //refer to email "Tercel newest OTP define - Protection code internal instruction"
+     switch(sdk_version)
+     {
+         case 0: //p0
+             //Different SDKs have different restrictions. Please modify the code according to your own situation.
+             //The driver here is only for example reference.
+             if(0xE0 > pCode)
+             {
+                 sys_reset_all();
+                 while(1);
+             }
+             break;
+         case 5: //p5
+             if(0x1A > pCode)
+             {
+                 sys_reset_all();
+                 while(1);
+             }
+             break;
+         case 0xff:
+             break;
 
-        default:
-        if(1) // Prevent macro setting exceptions from invalidating the ProtectionCode function
-        {
-            sys_reset_all();
-            while(1);
-        }
-    }
-}
+         default:
+         if(1) // Prevent macro setting exceptions from invalidating the ProtectionCode function
+         {
+             sys_reset_all();
+             while(1);
+         }
+     }
+ }
 
 
 
@@ -189,15 +180,16 @@ void efuse_check_protection_code(void)
  * @return     none.
  */
 extern void check_32k_clk_stable(void);
-extern unsigned int pm_tim_recover_32k_xtal(unsigned int now_tick_32k);
-extern   int cpu_sleep_wakeup_32k_xtal(pm_sleep_mode_e sleep_mode,  pm_sleep_wakeup_src_e wakeup_src, unsigned int  wakeup_tick);
-_attribute_ram_code_com_ void blc_pm_select_external_32k_crystal(void)
+//extern void pm_stimer_recover(void);
+extern int cpu_sleep_wakeup_32k_xtal(pm_sleep_mode_e sleep_mode,  pm_sleep_wakeup_src_e wakeup_src, unsigned int  wakeup_tick);
+_attribute_ram_code_ void blc_pm_select_external_32k_crystal(void)
 {
     cpu_sleep_wakeup        = cpu_sleep_wakeup_32k_xtal;
     pm_check_32k_clk_stable = check_32k_clk_stable;
-    ext_pm_tim_recover          = pm_stimer_recover;
+    ext_pm_tim_recover      = pm_stimer_recover;
     g_clk_32k_src = CLK_32K_XTAL;
     blt_miscParam.pad32k_en     = 1; // set '1': 32k clk src use external 32k crystal
+
 }
 
 #if 0
@@ -388,7 +380,7 @@ void pm_32k_rc_offset_init(void)
     pmbcd.ref_tick = 0;
 }
 
-_attribute_ram_code_com_ void pm_ble_update_32k_rc_sleep_tick (unsigned int tick_32k, unsigned int tick)
+_attribute_ram_code_ void pm_ble_update_32k_rc_sleep_tick (unsigned int tick_32k, unsigned int tick)
 {
     pmbcd.rc32_rt = tick_32k - pmbcd.rc32_wakeup; //rc32_rt not used
     if (pmbcd.calib || pmbcd.ref_no > 20 || !pmbcd.ref_tick || ((tick_32k - pmbcd.ref_tick_32k) & 0xfffffff) > 32 * 3000)//3S
@@ -404,7 +396,7 @@ _attribute_ram_code_com_ void pm_ble_update_32k_rc_sleep_tick (unsigned int tick
     }
 }
 
-_attribute_ram_code_com_sec_noinline_ void pm_ble_32k_rc_cal_reset(void)
+_attribute_ram_code_sec_noinline_ void pm_ble_32k_rc_cal_reset(void)
 {
     pmbcd.offset = 0;
     pmbcd.tc = 0;
@@ -413,7 +405,7 @@ _attribute_ram_code_com_sec_noinline_ void pm_ble_32k_rc_cal_reset(void)
 }
 
 #if 1
-_attribute_ram_code_com_sec_noinline_ void pm_ble_cal_32k_rc_offset (int offset_tick, int rc32_cnt)
+_attribute_ram_code_sec_noinline_ void pm_ble_cal_32k_rc_offset (int offset_tick, int rc32_cnt)
 {
     int offset = offset_tick * (256 * 31) / rc32_cnt;       //256mS / sleep_period
     int thres = rc32_cnt/9600;  //240*32=7680  300*32= 9600  400*32= 12800
@@ -439,7 +431,7 @@ _attribute_ram_code_com_sec_noinline_ void pm_ble_cal_32k_rc_offset (int offset_
     pmbcd.offset_cal_tick  = clock_time() | 1;
 }
 #else
-_attribute_ram_code_com_sec_noinline_ void pm_ble_cal_32k_rc_offset (int offset_tick)
+_attribute_ram_code_sec_noinline_ void pm_ble_cal_32k_rc_offset (int offset_tick)
 {
 //  pmbcd.offset_cur = offset_tick;
     int offset = offset_tick * (240 * 31) / pmbcd.rc32;     //240ms / sleep_period
@@ -461,7 +453,7 @@ _attribute_ram_code_com_sec_noinline_ void pm_ble_cal_32k_rc_offset (int offset_
  * @brief       32k rc calibration clock compensation.
  * @return      32k calibration value after compensation.
  */
-_attribute_ram_code_com_ unsigned int pm_ble_get_32k_rc_calib (void)
+_attribute_ram_code_ unsigned int pm_ble_get_32k_rc_calib (void)
 {
     while(!stimer_get_tracking_32k_value());
     int tc = stimer_get_tracking_32k_value();
@@ -483,7 +475,7 @@ _attribute_ram_code_com_ unsigned int pm_ble_get_32k_rc_calib (void)
 }
 
 
-_attribute_ram_code_com_
+_attribute_ram_code_
 unsigned int cpu_stall_WakeUp_By_RF_SystemTick(int WakeupSrc, unsigned short rf_mask, unsigned int tick)
 {
     (void)WakeupSrc;(void)rf_mask;(void)tick;
@@ -492,15 +484,67 @@ unsigned int cpu_stall_WakeUp_By_RF_SystemTick(int WakeupSrc, unsigned short rf_
 }
 
 
-extern unsigned int pm_tim_recover_32k_rc(void);
+extern void pm_tim_recover_32k_rc(void);
 extern   int cpu_sleep_wakeup_32k_rc(pm_sleep_mode_e sleep_mode,  pm_sleep_wakeup_src_e wakeup_src, unsigned int  wakeup_tick);
 void blc_pm_select_internal_32k_crystal(void)
 {
     cpu_sleep_wakeup        = cpu_sleep_wakeup_32k_rc;
     ext_pm_tim_recover      = pm_tim_recover_32k_rc;
-
+    g_clk_32k_src           = CLK_32K_RC;
     blt_miscParam.pm_enter_en   = 1; // allow enter pm, 32k rc does not need to wait for 32k clk to be stable
 }
+#if GENERATE_LIB_FOR_GOOGLE
+extern volatile unsigned char g_pm_system_reboot_event;
+_attribute_ram_code_ void pm_update_boot_info(void)
+{
 
+    if(g_pm_status_info.mcu_status == MCU_DEEPRET_BACK){
+        return;
+    }
+    //PM_ANA_REG_POWER_ON_CLR_BUF2 default value is 0xff, so if its BIT(0)=0, than it is 32K_WD reboot back
+    unsigned char analog_3c = analog_read_reg8(PM_ANA_REG_POWER_ON_CLR_BUF2);
+    if(!(analog_3c&BIT(0))){
+        g_pm_status_info.mcu_status = MCU_HW_REBOOT_32K_WATCHDOG;
+        return;
+    }
+    unsigned char wd_clr0 = analog_read_reg8(PM_ANA_REG_WD_CLR_BUF0);
 
+    if(wd_clr0 & POWERON_FLAG){
+        unsigned char poweron_clr0 = analog_read_reg8(PM_ANA_REG_POWER_ON_CLR_BUF0);
+        if(poweron_clr0 & REBOOT_FLAG){
+            g_pm_status_info.mcu_status = MCU_SW_REBOOT_BACK;
+            if(wd_get_status()){
+                g_pm_status_info.mcu_status = MCU_HW_REBOOT_TIMER_WATCHDOG;
+            }else{
+                g_pm_system_reboot_event = (poweron_clr0>>1);
+            }
+        }else{
+            g_pm_status_info.mcu_status = MCU_POWER_ON;
+            if(wd_32k_get_status()){
+                g_pm_status_info.mcu_status = MCU_HW_REBOOT_32K_WATCHDOG;
+                analog_write_reg8(PM_ANA_REG_POWER_ON_CLR_BUF2, analog_3c&(~BIT(0)));
+            }
+        }
+    }else{
+        g_pm_status_info.mcu_status = MCU_DEEP_BACK;
+    }
+}
 
+_attribute_ram_code_ void pm_clear_boot_info(void)
+{
+    if(g_pm_status_info.mcu_status == MCU_DEEPRET_BACK){
+        return;
+    }
+    unsigned char wd_clr0 = analog_read_reg8(PM_ANA_REG_WD_CLR_BUF0);
+    unsigned char analog_3c = analog_read_reg8(PM_ANA_REG_POWER_ON_CLR_BUF2);
+    if(wd_clr0 & POWERON_FLAG){
+        analog_write_reg8(PM_ANA_REG_WD_CLR_BUF0, wd_clr0 & (~POWERON_FLAG));
+    }else{
+        analog_write_reg8(PM_ANA_REG_WD_CLR_BUF0, wd_clr0 & (~POWERON_FLAG));
+        analog_write_reg8(PM_ANA_REG_POWER_ON_CLR_BUF0, REBOOT_FLAG);
+    }
+    if(!(analog_3c&BIT(0))){
+        analog_write_reg8(PM_ANA_REG_POWER_ON_CLR_BUF2, analog_3c|BIT(0));
+    }
+}
+#endif /* GENERATE_LIB_FOR_GOOGLE */

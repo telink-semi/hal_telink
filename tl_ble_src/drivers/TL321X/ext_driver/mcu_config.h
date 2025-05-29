@@ -35,7 +35,7 @@
 /**
  * @brief   Public Device Address Company ID for this chip
  */
-#define PDA_COMPANY_ID                                          0x3CCFB4    //B92
+#define PDA_COMPANY_ID                                          0xC0A3C7
 
 
 
@@ -55,8 +55,8 @@
 #define FLASH_GD25LQ16E_SUPPORT_EN                              0
 
 #define FLASH_P25Q80SU_SUPPORT_EN                               0
-#define FLASH_GD25LE80E_SUPPORT_EN                              0
-#define FLASH_GD25LE16E_SUPPORT_EN                              0
+#define FLASH_GD25LE80E_SUPPORT_EN                              1
+#define FLASH_GD25LE16E_SUPPORT_EN                              1
 
 
 /**
@@ -67,9 +67,9 @@
 
 
 /**
- * @brief   MAC address burning on EFUSE
+ * @brief   MAC address burning on EFUSE/OTP
  */
-#define BUILT_IN_MAC_ON_EFUSE                                   1
+#define BUILT_IN_MAC_ON_DEVICE                                  1
 
 
 

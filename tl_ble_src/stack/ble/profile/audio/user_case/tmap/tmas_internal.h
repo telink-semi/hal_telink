@@ -24,21 +24,21 @@
 #pragma once
 
 
-#define BLT_TMAS_LOG(fmt, ...)          BLC_AUDIO_PRF_DBG(DBG_PRF_MASK_TMAS_LOG, "[TMAS]"fmt, ##__VA_ARGS__)
+#define BLT_TMAS_LOG(fmt, ...) BLC_AUDIO_PRF_DBG(DBG_PRF_MASK_TMAS_LOG, "[TMAS]" fmt, ##__VA_ARGS__)
 
 /*
  * TMAS: ATT handle information: 4byte
  */
-typedef struct {
+typedef struct
+{
     u16 tmasRoleHdl;
 } blt_tmas_nv_info_t;
 
-int blt_tmasc_init(u8 initType, const void* param);
+int blt_tmasc_init(u8 initType, const void *param);
 int blt_tmasc_connect(u16 connHandle, prf_acl_state_enum connState);
 int blt_tmasc_discovery(u16 connHandle);
-int blt_tmasc_nv_store(u16 connHandle, prf_nv_state_enum nvState, prf_nv_param_t* param);
+int blt_tmasc_nv_store(u16 connHandle, prf_nv_state_enum nvState, prf_nv_param_t *param);
 
 blc_tmas_client_t *blt_tmasc_getClientBuf(u8 instIdx);
 
-int blt_tmass_init(u8 initType, const void* param);
-
+int blt_tmass_init(u8 initType, const void *param);

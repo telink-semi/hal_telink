@@ -41,8 +41,7 @@ u32 gOutputWriteOffset = 0;
  *                                                  ||                  ||
  *  pll(192M default)------->div---->i2s_clk--->2 * div(div=0,bypass)--->blck----->div
  *                           ||                                         ||
- *           i2s_clk_config[0]/i2s_clk_config[1]                 i2s_clk_config[4]-->lrclk_dac(sampling rate)
- * For example:sampling rate=16K，i2s_clk_config[5]={ 8,125,6,64,64}, sampling rate=192M*(8/125)/(2*6)/64=16K
+ * For example:sampling rate=16K, i2s_clk_config[5]={ 8,125,6,64,64}, sampling rate=192M*(8/125)/(2*6)/64=16K
  *
  */
 unsigned short audio_i2s_16k_config[5] = {8,  125,  6,  64,  64}; /* sampling rate = 192M * (8 / 125) / (2 * 6) / 64   = 16K */

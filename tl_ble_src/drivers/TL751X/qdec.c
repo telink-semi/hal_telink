@@ -63,6 +63,7 @@ void qdec_clk_en(void)
     clock_32k_init(CLK_32K_RC);
     clock_cal_32k_rc();
     reg_clk_en3|=FLD_CLK3_QDEC_EN;
+    qdec_reset();
 }
 
 /**
@@ -76,6 +77,8 @@ signed char qdec_get_count_value(void)
 {
     //before reading the hardware counting value,write 1 to reg_qdec_load.
     reg_qdec_load |= FLD_QDEC_COUNT0_RELOAD;
+    // Wait for the count0_reload register to change from 1 to 0 before reading the value, otherwise it will read the old value
+    while(FLD_QDEC_COUNT0_RELOAD == (reg_qdec_load & FLD_QDEC_COUNT0_RELOAD)){}
     return reg_qdec_count0;
 
 }

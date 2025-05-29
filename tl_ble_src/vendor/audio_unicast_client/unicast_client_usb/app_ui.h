@@ -28,10 +28,10 @@
 #if (UNICAST_CLIENT_SELECT == UNICAST_CLIENT_USB)
 
 
-extern  int central_pairing_enable;
-extern  u16 central_unpair_enable;
+extern int central_pairing_enable;
+extern u16 central_unpair_enable;
 
-extern  u16 central_disconnect_connhandle;
+extern u16 central_disconnect_connhandle;
 
 /**
  * @brief      keyboard task handler
@@ -40,7 +40,7 @@ extern  u16 central_disconnect_connhandle;
  * @param[in]  n    - the length of event parameter.
  * @return     none.
  */
-void proc_keyboard (u8 e, u8 *p, int n);
+void proc_keyboard(u8 e, u8 *p, int n);
 
 /**
  * @brief   BLE Unpair handle for central
@@ -52,4 +52,3 @@ void proc_central_role_unpair(void);
 #endif
 
 #endif
-

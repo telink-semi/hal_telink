@@ -170,31 +170,12 @@ static inline void pm_set_avdd1(pm_avdd1_voltage_e voltage)
  * @param[in]   voltage - avdd2 setting gear, can be set from 0 to 7.
  * @return      none.
  */
+#if !PM_IS_TUNE_RAM_VOL
 static inline void pm_set_avdd2(pm_avdd2_voltage_e voltage)
 {
     analog_write_reg8(0x22, (analog_read_reg8(0x22) & 0xf8) | voltage);
 }
-
-/**
- * @brief       This function serves to set DVDD1.
- * @param[in]   voltage - dvdd1 setting gear, can be set from 0 to 7.
- * @return      none.
- */
-static inline void pm_set_dvdd1(pm_dvdd1_voltage_e voltage)
-{
-    analog_write_reg8(0x22, (analog_read_reg8(0x22) & 0x8f) | (voltage << 4));
-}
-
-/**
- * @brief       This function serves to set DVDD2.
- * @param[in]   voltage - dvdd2 setting gear, can be set from 0 to 7.
- * @return      none.
- */
-static inline void pm_set_dvdd2(pm_dvdd2_voltage_e voltage)
-{
-    analog_write_reg8(0x21, (analog_read_reg8(0x21) & 0xf8) | voltage);
-}
-
+#endif
 /**
  * @brief       This function serves to set low power DVDD1.
  * @param[in]   voltage - dvdd1 setting gear, can be set from 0 to 7.

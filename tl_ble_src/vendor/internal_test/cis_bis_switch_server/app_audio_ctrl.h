@@ -109,60 +109,60 @@ void app_audio_media_next_track(u16 connHandle);
  * @param[in]   connHandle - ACL connect handle.
  * @return      none
  */
-void app_audio_call_accept(u16 connHandle,u8 callIndex);
+void app_audio_call_accept(u16 connHandle, u8 callIndex);
 
 /**
  * @brief       This function serves to terminate the call.
  * @param[in]   connHandle - ACL connect handle.
  * @return      none
  */
-void app_audio_call_termiante(u16 connHandle,u8 callIndex);
+void app_audio_call_termiante(u16 connHandle, u8 callIndex);
 
-/*************************** CIS audio function, end *************************************/
-
-
-/*************************** BIS audio function, Begin *************************************/
+    /*************************** CIS audio function, end *************************************/
 
 
+    /*************************** BIS audio function, Begin *************************************/
 
-/*************************** BIS audio function, end *************************************/
 
-///////////////////////audio control LC3 packet and push to DMA///////////////////////
+    /*************************** BIS audio function, end *************************************/
 
-//broadcast sink extend advertising parameter
-#define BROADCAST_SINK_LOCATION         (BLC_AUDIO_LOCATION_FLAG_FL | BLC_AUDIO_LOCATION_FLAG_FR)
+    ///////////////////////audio control LC3 packet and push to DMA///////////////////////
 
-#define APP_AUDIO_FRAME_BYTES           960     //max 48KHz
+    //broadcast sink extend advertising parameter
+    #define BROADCAST_SINK_LOCATION         (BLC_AUDIO_LOCATION_FLAG_FL | BLC_AUDIO_LOCATION_FLAG_FR)
 
-#define APP_SINK_RECV_SPEAK_FRAME_COUNT         8
+    #define APP_AUDIO_FRAME_BYTES           960 //max 48KHz
 
-#define APP_AUDIO_IIS_OUT                           1
-#define APP_AUDIO_LINE_OUT                          2
-#define APP_AUDIO_OUTPUT_TYPE                       APP_AUDIO_LINE_OUT
+    #define APP_SINK_RECV_SPEAK_FRAME_COUNT 8
 
+    #define APP_AUDIO_IIS_OUT               1
+    #define APP_AUDIO_LINE_OUT              2
+    #define APP_AUDIO_OUTPUT_TYPE           APP_AUDIO_LINE_OUT
 
 /**
  *  @brief  app sink sync BIS information parameter
  */
-typedef struct __attribute__((packed)) {
-    u16 bisHandle;
-    u16 codecFrameSize;
-    u8 lc3Count;
-    u8 lc3Index[2];
-    u8 allocation;      //only support FL/FR
-    void* popSdu;
+typedef struct __attribute__((packed))
+{
+    u16   bisHandle;
+    u16   codecFrameSize;
+    u8    lc3Count;
+    u8    lc3Index[2];
+    u8    allocation; //only support FL/FR
+    void *popSdu;
 } appSinkSyncBisInfo_t;
 
 /**
  *  @brief  app sink information parameter
  */
-typedef struct __attribute__((packed)) {
-    u8 bigSyncState;
-    u8 bisSyncNum;
-    u16 frameDataLen;
-    u32 presentationDelay;      //unit us
-    u32 syncLocation;
-    appSinkSyncBisInfo_t bisInfo[2];    //only supported sync 2 bis
+typedef struct __attribute__((packed))
+{
+    u8                   bigSyncState;
+    u8                   bisSyncNum;
+    u16                  frameDataLen;
+    u32                  presentationDelay; //unit us
+    u32                  syncLocation;
+    appSinkSyncBisInfo_t bisInfo[2];        //only supported sync 2 bis
 
     u8 spkState;
 } appSinkInfo_t;
@@ -170,7 +170,8 @@ typedef struct __attribute__((packed)) {
 /**
  *  @brief  app sink sync receive speak parameter
  */
-typedef struct __attribute__((packed)) {
+typedef struct __attribute__((packed))
+{
     u32 seqNum;
     u32 renderPoint;
     u16 rxBuff[APP_AUDIO_FRAME_BYTES];
@@ -192,7 +193,7 @@ void app_codec_setBigSyncState(u8 syncState, u8 numBis, u16 bisHandles[0]);
  * @param[in]   codecEvt: broadcast sink initial codec event.
  * @return      none
  */
-void app_codec_setBigInformation(blc_bapbs_bisSinkInitCodecEvt_t* codecEvt);
+void app_codec_setBigInformation(blc_bapbs_bisSinkInitCodecEvt_t *codecEvt);
 
 /**
  * @brief       broadcast sink audio receive BIS SDU Handler.

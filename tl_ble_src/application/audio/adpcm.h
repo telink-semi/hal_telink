@@ -24,7 +24,7 @@
 #ifndef ADPCM_H_
 #define ADPCM_H_
 
-void mic_to_adpcm_split (signed short *ps, int len, signed short *pds, int start);
-void adpcm_to_pcm (signed short *ps, signed short *pd, int len);
+void mic_to_adpcm_split(signed short *ps, int len, signed short *pds, int start);
+void adpcm_to_pcm(signed short *ps, signed short *pd, int len);
 
 #endif /* ADPCM_H_ */

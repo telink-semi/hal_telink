@@ -25,7 +25,7 @@
  *
  *  Introduction
  *  ===============
- *  TL751X stimer use 24M clock count, have stimer irq.
+ *  stimer use 24M clock count, have stimer irq.
  *
  *  API Reference
  *  ===============

@@ -28,9 +28,6 @@
 #include "lib/include/hash/sm3.h"
 
 
-
-
-
 #ifdef SUPPORT_HASH_SM3
 
 
@@ -60,7 +57,6 @@ unsigned int sm3_update(SM3_CTX *ctx, const unsigned char *msg, unsigned int msg
     return hash_update(ctx, msg, msg_bytes);
 }
 
-
 /**
  * @brief       message update done, get the sm3 digest
  * @param[in]   ctx               - SM3_CTX context pointer.
@@ -75,7 +71,6 @@ unsigned int sm3_final(SM3_CTX *ctx, unsigned char *digest)
 {
     return hash_final(ctx, digest);
 }
-
 
 /**
  * @brief       input whole message and get its sm3 digest
@@ -94,7 +89,7 @@ unsigned int sm3(unsigned char *msg, unsigned int msg_bytes, unsigned char *dige
 }
 
 
-#ifdef HASH_DMA_FUNCTION
+    #ifdef HASH_DMA_FUNCTION
 /**
  * @brief       init dma sm3
  * @param[in]   ctx           - SM3_DMA_CTX context pointer.
@@ -122,7 +117,6 @@ unsigned int sm3_dma_update_blocks(SM3_DMA_CTX *ctx, unsigned int *msg, unsigned
 {
     return hash_dma_update_blocks(ctx, msg, msg_words);
 }
-
 
 /**
  * @brief       dma sm3 final(input the remainder message and get the digest)
@@ -158,6 +152,6 @@ unsigned int sm3_dma(unsigned int *msg, unsigned int msg_bytes, unsigned int *di
 {
     return hash_dma(HASH_SM3, msg, msg_bytes, digest, callback);
 }
-#endif
+    #endif
 
 #endif

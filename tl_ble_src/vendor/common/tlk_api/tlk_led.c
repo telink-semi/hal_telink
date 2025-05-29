@@ -39,48 +39,48 @@
 #define BHV_HIGH_LIHGT_FLASH (1 << 1)
 
 /** All led info */
-static tlk_led_ctrl_t ledInfo[TLK_LED_NUM_MAX] = { 0 };
-static tlk_led_pattern_table_t ledUserPatterns    = { 0 };
+static tlk_led_ctrl_t          ledInfo[TLK_LED_NUM_MAX] = {0};
+static tlk_led_pattern_table_t ledUserPatterns          = {0};
 
 /** Default default led info */
 static const tlk_led_pattern_t ledDfltPatterns[] = {
-  /** behavior ,            duty ,        latency ,     flash_times ,  keep_high ,   keep_low */
-  /** LED flash */
-    { 0,                    TIME_NO_TIME, TIME_FOREVER, 0,             0,            0           }, /** LED_PATTERN_LED_OFF                 */
-    { 0,                    TIME_FOREVER, TIME_NO_TIME, 0,             0,            0           }, /** LED_PATTERN_LED_ON                  */
-    { 0,                    200,          2000,         FLASH_FOREVER, 0,            0           }, /** LED_PATTERN_LED_FLASH_SLOW          */
-    { 0,                    100,          100,          FLASH_FOREVER, 0,            0           }, /** LED_PATTERN_LED_FLASH_FAST          */
-    { 0,                    500,          1500,         FLASH_FOREVER, 0,            0           }, /** LED_PATTERN_LED_PAIR                */
-    { 0,                    100,          1000,         FLASH_FOREVER, 0,            0           }, /** LED_PATTERN_LED_IDLE                */
-    { 0,                    50,           100,          1,             0,            0           }, /** LED_PATTERN_LED_FAST_FLASH_1_TIME   */
-    { 0,                    200,          200,          2,             0,            0           }, /** LED_PATTERN_LED_FAST_FLASH_2_TIMES  */
-    { 0,                    500,          500,          2,             0,            0           }, /** LED_PATTERN_LED_SLOW_FLASH_2_TIMES  */
-    { 0,                    500,          500,          3,             0,            0           }, /** LED_PATTERN_LED_FAST_FLASH_3_TIMES  */
-    { 0,                    500,          50,           1,             0,            0           }, /** LED_PATTERN_LED_ON_500MS            */
-    { 0,                    1000,         50,           1,             0,            0           }, /** LED_PATTERN_LED_ON_1S               */
-    { 0,                    500,          500,          3,             0,            0           }, /** LED_PATTERN_LED_SLOW_FLASH_3_TIMES  */
+    /** behavior ,            duty ,        latency ,     flash_times ,  keep_high ,   keep_low */
+    /** LED flash */
+    {0,                    TIME_NO_TIME, TIME_FOREVER, 0,             0,            0           }, /** LED_PATTERN_LED_OFF                 */
+    {0,                    TIME_FOREVER, TIME_NO_TIME, 0,             0,            0           }, /** LED_PATTERN_LED_ON                  */
+    {0,                    200,          2000,         FLASH_FOREVER, 0,            0           }, /** LED_PATTERN_LED_FLASH_SLOW          */
+    {0,                    100,          100,          FLASH_FOREVER, 0,            0           }, /** LED_PATTERN_LED_FLASH_FAST          */
+    {0,                    500,          1500,         FLASH_FOREVER, 0,            0           }, /** LED_PATTERN_LED_PAIR                */
+    {0,                    100,          1000,         FLASH_FOREVER, 0,            0           }, /** LED_PATTERN_LED_IDLE                */
+    {0,                    50,           100,          1,             0,            0           }, /** LED_PATTERN_LED_FAST_FLASH_1_TIME   */
+    {0,                    200,          200,          2,             0,            0           }, /** LED_PATTERN_LED_FAST_FLASH_2_TIMES  */
+    {0,                    500,          500,          2,             0,            0           }, /** LED_PATTERN_LED_SLOW_FLASH_2_TIMES  */
+    {0,                    500,          500,          3,             0,            0           }, /** LED_PATTERN_LED_FAST_FLASH_3_TIMES  */
+    {0,                    500,          50,           1,             0,            0           }, /** LED_PATTERN_LED_ON_500MS            */
+    {0,                    1000,         50,           1,             0,            0           }, /** LED_PATTERN_LED_ON_1S               */
+    {0,                    500,          500,          3,             0,            0           }, /** LED_PATTERN_LED_SLOW_FLASH_3_TIMES  */
 
-  /** LED breath */
-    { BHV_BREATH,           100,          100,          1,             800,          0           }, /** LED_PATTERN_LED_BREATH_ON_OFF      */
-    { BHV_BREATH,           100,          0,            0,             TIME_FOREVER, 0           }, /** LED_PATTERN_LED_BREATH_ON          */
-    { BHV_BREATH,           TIME_NO_TIME, 400,          0,             0,            TIME_FOREVER}, /** LED_PATTERN_LED_BREATH_OFF         */
-    { BHV_BREATH,           200,          200,          1,             TIME_NO_TIME, TIME_NO_TIME}, /** LED_PATTERN_LED_BREATH_ONE_TIME    */
-    { BHV_BREATH,           200,          200,          2,             TIME_NO_TIME, TIME_NO_TIME}, /** LED_PATTERN_LED_BREATH_TWO_TIMES   */
-    { BHV_BREATH,           200,          200,          3,             TIME_NO_TIME, TIME_NO_TIME}, /** LED_PATTERN_LED_BREATH_THREE_TIMES */
-    { BHV_BREATH,           600,          600,          FLASH_FOREVER, 800,          800         }, /** LED_PATTERN_LED_BREATH             */
-    { BHV_BREATH,           400,          400,          FLASH_FOREVER, 300,          300         }, /** LED_PATTERN_LED_BREATH_PAIR        */
-    { BHV_HIGH_LIHGT_FLASH, 1000,         0,            1,             0,            0           }, /** LED_PATTERN_LED_BREATH_PAIR        */
+                                              /** LED breath */
+    {BHV_BREATH,           100,          100,          1,             800,          0           }, /** LED_PATTERN_LED_BREATH_ON_OFF      */
+    {BHV_BREATH,           100,          0,            0,             TIME_FOREVER, 0           }, /** LED_PATTERN_LED_BREATH_ON          */
+    {BHV_BREATH,           TIME_NO_TIME, 400,          0,             0,            TIME_FOREVER}, /** LED_PATTERN_LED_BREATH_OFF         */
+    {BHV_BREATH,           200,          200,          1,             TIME_NO_TIME, TIME_NO_TIME}, /** LED_PATTERN_LED_BREATH_ONE_TIME    */
+    {BHV_BREATH,           200,          200,          2,             TIME_NO_TIME, TIME_NO_TIME}, /** LED_PATTERN_LED_BREATH_TWO_TIMES   */
+    {BHV_BREATH,           200,          200,          3,             TIME_NO_TIME, TIME_NO_TIME}, /** LED_PATTERN_LED_BREATH_THREE_TIMES */
+    {BHV_BREATH,           600,          600,          FLASH_FOREVER, 800,          800         }, /** LED_PATTERN_LED_BREATH             */
+    {BHV_BREATH,           400,          400,          FLASH_FOREVER, 300,          300         }, /** LED_PATTERN_LED_BREATH_PAIR        */
+    {BHV_HIGH_LIHGT_FLASH, 1000,         0,            1,             0,            0           }, /** LED_PATTERN_LED_BREATH_PAIR        */
 };
 
 /** Static functions */
-static u8 tlk_get_unused_led_index(void);
-static u16 tlk_color_calibrate(tlk_led_ctrl_t *p_led_ctrl, u16 duty);
-static u16 tlk_lum_convert(int is_revert, u16 step);
+static u8   tlk_get_unused_led_index(void);
+static u16  tlk_color_calibrate(tlk_led_ctrl_t *p_led_ctrl, u16 duty);
+static u16  tlk_lum_convert(int is_revert, u16 step);
 static void tlk_pattern_recovery(tlk_led_ctrl_t *p_led_ctrl);
-static void tlk_lum_state_init(tlk_led_ctrl_t *p_led_ctrl,
-                               tlk_lum_state_t *p_lum_state,
+static void tlk_lum_state_init(tlk_led_ctrl_t    *p_led_ctrl,
+                               tlk_lum_state_t   *p_lum_state,
                                tlk_led_pattern_t *p_led_pattern,
-                               int follow);
+                               int                follow);
 static void tlk_led_breath_process(tlk_led_ctrl_t *p_led_ctrl);
 static void tlk_led_flash_process(tlk_led_ctrl_t *p_led_ctrl);
 
@@ -93,13 +93,11 @@ static void tlk_led_flash_process(tlk_led_ctrl_t *p_led_ctrl);
  */
 static u8 tlk_get_unused_led_index(void)
 {
-    u8 i_for          = 0;
+    u8              i_for  = 0;
     tlk_led_ctrl_t *p_temp = ledInfo;
 
-    for (i_for = 0; i_for < TLK_LED_NUM_MAX; ++i_for)
-    {
-        if (p_temp[i_for].led_id == 0)
-        {
+    for (i_for = 0; i_for < TLK_LED_NUM_MAX; ++i_for) {
+        if (p_temp[i_for].led_id == 0) {
             return i_for;
         }
     }
@@ -118,12 +116,11 @@ static u8 tlk_get_unused_led_index(void)
  */
 static u16 tlk_color_calibrate(tlk_led_ctrl_t *p_led_ctrl, u16 duty)
 {
-    if (p_led_ctrl == NULL)
-    {
+    if (p_led_ctrl == NULL) {
         tlkapi_printf(TLK_LED_DBG_FLAG, "p_led_ctrl NULL");
         return TLK_LED_PARAMETER_ERROR;
     }
-    u32 tmp;
+    u32             tmp;
     tlk_led_ctrl_t *p_temp = p_led_ctrl;
 
     tmp = p_temp->color_duty;
@@ -146,16 +143,16 @@ static u16 tlk_color_calibrate(tlk_led_ctrl_t *p_led_ctrl, u16 duty)
  */
 static u16 tlk_lum_convert(int is_revert, u16 step)
 {
-    if (is_revert)
-    {
+    if (is_revert) {
         step = ((BRT_FULL_STEP / 2) + step) % (BRT_FULL_STEP + 1);
     }
 
     return step >= (BRT_FULL_STEP / 2) ? (BRT_FULL_STEP - step) * (BRT_FULL_STEP - step) : step * step;
 }
+
 static void tlk_pattern_recovery(tlk_led_ctrl_t *p_led_ctrl)
 {
-    tlk_led_env_t *p_env        = &p_led_ctrl->led_env;
+    tlk_led_env_t *p_env    = &p_led_ctrl->led_env;
     p_env->p_insert_pattern = NULL;
     p_env->lum_state.ref    = clock_time();
     tlk_color_calibrate(p_led_ctrl,
@@ -174,15 +171,14 @@ static void tlk_pattern_recovery(tlk_led_ctrl_t *p_led_ctrl)
  *
  * @returns none
  */
-static void tlk_lum_state_init(tlk_led_ctrl_t *p_led_ctrl,
-                               tlk_lum_state_t *p_lum_state,
+static void tlk_lum_state_init(tlk_led_ctrl_t    *p_led_ctrl,
+                               tlk_lum_state_t   *p_lum_state,
                                tlk_led_pattern_t *p_led_pattern,
-                               int follow)
+                               int                follow)
 {
-    u16 duty;
+    u16            duty;
     tlk_led_env_t *p_env = &p_led_ctrl->led_env;
-    if (p_env == NULL || p_lum_state == NULL || p_led_pattern == NULL)
-    {
+    if (p_env == NULL || p_lum_state == NULL || p_led_pattern == NULL) {
         tlkapi_printf(TLK_LED_DBG_FLAG, "init parameter NULL");
         return;
     }
@@ -192,31 +188,25 @@ static void tlk_lum_state_init(tlk_led_ctrl_t *p_led_ctrl,
     p_lum_state->flags = follow ? FLG_PATTERN_FOLLOW : 0;
 
     // LED breath init
-    if (p_led_pattern->behavior & BHV_BREATH)
-    {
-        if (p_lum_state == &p_env->lum_state)
-        {
+    if (p_led_pattern->behavior & BHV_BREATH) {
+        if (p_lum_state == &p_env->lum_state) {
             // main state, force change
             p_lum_state->lum   = 0;
             p_lum_state->state = ST_BRT_RISE;
 
             // condition for off state !
-            if (!p_led_pattern->duty)
-            {
+            if (!p_led_pattern->duty) {
                 p_lum_state->lum = BRT_FULL_STEP / 2;
             }
 
             duty = tlk_lum_convert(p_lum_state->flags & FLG_BRT_REVERT_LEVEL, p_lum_state->lum);
-        }
-        else
-        {
+        } else {
             // main state is flashing, determine on-to-off or off-to-on
             p_lum_state->flags |= (p_env->lum_state.lum) ? FLG_BRT_REVERT_LEVEL : 0;
             p_lum_state->lum = 0;
 
             // Auto off
-            if (!p_led_pattern->duty)
-            {
+            if (!p_led_pattern->duty) {
                 p_lum_state->flags &= FLG_PATTERN_FOLLOW;
                 p_lum_state->lum = BRT_FULL_STEP / 2;
             }
@@ -224,18 +214,13 @@ static void tlk_lum_state_init(tlk_led_ctrl_t *p_led_ctrl,
 
             duty = tlk_lum_convert(p_lum_state->flags & FLG_BRT_REVERT_LEVEL, p_lum_state->lum);
         }
-    }
-    else
-    {
+    } else {
         // directly light up.
-        if (p_led_pattern->duty == TIME_NO_TIME)
-        {
+        if (p_led_pattern->duty == TIME_NO_TIME) {
             p_lum_state->state = ST_FLASH_LAT;
             p_lum_state->lum   = 0;
             duty               = 0;
-        }
-        else
-        {
+        } else {
             p_lum_state->state = ST_FLASH_DUTY;
             p_lum_state->lum =
                 (p_led_pattern->behavior & BHV_HIGH_LIHGT_FLASH) ? BRT_BRIGHTEST_FULL_DUTY : BRT_FULL_DUTY;
@@ -256,148 +241,129 @@ static void tlk_lum_state_init(tlk_led_ctrl_t *p_led_ctrl,
  */
 static void tlk_led_breath_process(tlk_led_ctrl_t *p_led_ctrl)
 {
-    if (p_led_ctrl == NULL)
-    {
+    if (p_led_ctrl == NULL) {
         return;
     }
 
     // u32 duty;
     tlk_led_pattern_t *p_pattern;
-    tlk_lum_state_t *p_lum_state;
-    u32 tmp;
-    u16 diff;
-    tlk_led_env_t *env = &p_led_ctrl->led_env;
+    tlk_lum_state_t   *p_lum_state;
+    u32                tmp;
+    u16                diff;
+    tlk_led_env_t     *env = &p_led_ctrl->led_env;
 
     p_pattern   = env->p_insert_pattern ? env->p_insert_pattern : env->p_pattern;
     p_lum_state = env->p_insert_pattern ? &env->insert_lum_state : &env->lum_state;
 
     // default state
-    if (!p_pattern)
-    {
+    if (!p_pattern) {
         tlk_color_calibrate(p_led_ctrl, 0);
         return;
     }
 
-    if (!(p_pattern->behavior & BHV_BREATH))
-    {
+    if (!(p_pattern->behavior & BHV_BREATH)) {
         return;
     }
 
     // breath on
-    switch (p_lum_state->state){
-        case ST_BRT_RISE:
-        {
-            if (p_pattern->duty == TIME_NO_TIME)
-            {
-                p_lum_state->ref = clock_time();
-                p_lum_state->state <<= 1;
-                break;
-            }
-
-            tmp = p_pattern->duty / (BRT_FULL_STEP / 2) + 1;
-            if (clock_time_exceed(p_lum_state->ref, tmp * 1000))
-            {
-                diff = (unsigned int)(stimer_get_tick() - p_lum_state->ref) - tmp * 1000 * SYSTEM_TIMER_TICK_1US;
-                p_lum_state->ref = clock_time() - diff;
-                p_lum_state->lum++;
-
-                if (p_lum_state->lum >= (BRT_FULL_STEP / 2))
-                {
-                    p_lum_state->lum = (BRT_FULL_STEP / 2);
-                    p_lum_state->state <<= 1;
-                }
-
-                tlk_color_calibrate(p_led_ctrl,
-                                    (p_lum_state->flags & FLG_PATTERN_FOLLOW) ?
-                                        0 :
-                                        tlk_lum_convert(p_lum_state->flags & FLG_BRT_REVERT_LEVEL, p_lum_state->lum));
-            }
-        }
-        break;
-
-        case ST_BRT_KEEP_HIGH:
-        {
-            if (p_pattern->keep_high == TIME_FOREVER)
-            {
-                p_lum_state->state = ST_BRT_IDLE;
-                break;
-            }
-
-            if (p_pattern->keep_high && !(clock_time_exceed(p_lum_state->ref, p_pattern->keep_high * 1000)))
-            {
-                return;
-            }
-
-            diff =
-                (unsigned int)(stimer_get_tick() - p_lum_state->ref) - p_pattern->keep_high * 1000 * SYSTEM_TIMER_TICK_1US;
-
-            p_lum_state->ref = clock_time() - diff;
+    switch (p_lum_state->state) {
+    case ST_BRT_RISE:
+    {
+        if (p_pattern->duty == TIME_NO_TIME) {
+            p_lum_state->ref = clock_time();
             p_lum_state->state <<= 1;
+            break;
         }
-        break;
 
-        case ST_BRT_FALL:
-        {
-            tmp = p_pattern->latency / (BRT_FULL_STEP / 2) + 1;
-            if (clock_time_exceed(p_lum_state->ref, tmp * 1000))
-            {
-                diff = (unsigned int)(stimer_get_tick() - p_lum_state->ref) - tmp * 1000 * SYSTEM_TIMER_TICK_1US;
-                p_lum_state->ref = clock_time() - diff;
-                p_lum_state->lum++;
-                tlk_color_calibrate(p_led_ctrl,
-                                    (p_lum_state->flags & FLG_PATTERN_FOLLOW) ?
-                                        0 :
-                                        tlk_lum_convert(p_lum_state->flags & FLG_BRT_REVERT_LEVEL, p_lum_state->lum));
+        tmp = p_pattern->duty / (BRT_FULL_STEP / 2) + 1;
+        if (clock_time_exceed(p_lum_state->ref, tmp * 1000)) {
+            diff             = (unsigned int)(stimer_get_tick() - p_lum_state->ref) - tmp * 1000 * SYSTEM_TIMER_TICK_1US;
+            p_lum_state->ref = clock_time() - diff;
+            p_lum_state->lum++;
 
-                if (p_lum_state->lum >= BRT_FULL_STEP)
-                {
-                    // next state
-                    p_lum_state->lum = 0;
-                    p_lum_state->state <<= 1;
-                }
+            if (p_lum_state->lum >= (BRT_FULL_STEP / 2)) {
+                p_lum_state->lum = (BRT_FULL_STEP / 2);
+                p_lum_state->state <<= 1;
+            }
+
+            tlk_color_calibrate(p_led_ctrl,
+                                (p_lum_state->flags & FLG_PATTERN_FOLLOW) ?
+                                    0 :
+                                    tlk_lum_convert(p_lum_state->flags & FLG_BRT_REVERT_LEVEL, p_lum_state->lum));
+        }
+    } break;
+
+    case ST_BRT_KEEP_HIGH:
+    {
+        if (p_pattern->keep_high == TIME_FOREVER) {
+            p_lum_state->state = ST_BRT_IDLE;
+            break;
+        }
+
+        if (p_pattern->keep_high && !(clock_time_exceed(p_lum_state->ref, p_pattern->keep_high * 1000))) {
+            return;
+        }
+
+        diff =
+            (unsigned int)(stimer_get_tick() - p_lum_state->ref) - p_pattern->keep_high * 1000 * SYSTEM_TIMER_TICK_1US;
+
+        p_lum_state->ref = clock_time() - diff;
+        p_lum_state->state <<= 1;
+    } break;
+
+    case ST_BRT_FALL:
+    {
+        tmp = p_pattern->latency / (BRT_FULL_STEP / 2) + 1;
+        if (clock_time_exceed(p_lum_state->ref, tmp * 1000)) {
+            diff             = (unsigned int)(stimer_get_tick() - p_lum_state->ref) - tmp * 1000 * SYSTEM_TIMER_TICK_1US;
+            p_lum_state->ref = clock_time() - diff;
+            p_lum_state->lum++;
+            tlk_color_calibrate(p_led_ctrl,
+                                (p_lum_state->flags & FLG_PATTERN_FOLLOW) ?
+                                    0 :
+                                    tlk_lum_convert(p_lum_state->flags & FLG_BRT_REVERT_LEVEL, p_lum_state->lum));
+
+            if (p_lum_state->lum >= BRT_FULL_STEP) {
+                // next state
+                p_lum_state->lum = 0;
+                p_lum_state->state <<= 1;
             }
         }
-        break;
+    } break;
 
-        case ST_BRT_KEEP_LOW:
-        {
-            if (p_pattern->keep_low && !clock_time_exceed(p_lum_state->ref, p_pattern->keep_low * 1000))
-            {
+    case ST_BRT_KEEP_LOW:
+    {
+        if (p_pattern->keep_low && !clock_time_exceed(p_lum_state->ref, p_pattern->keep_low * 1000)) {
+            return;
+        }
+
+        p_lum_state->cnt++;
+
+        // check flash times
+        if (p_pattern->flash_times == FLASH_FOREVER || p_lum_state->cnt < p_pattern->flash_times) {
+            diff = (unsigned int)(stimer_get_tick() - p_lum_state->ref) -
+                   p_pattern->keep_low * 1000 * SYSTEM_TIMER_TICK_1US;
+            p_lum_state->state = ST_BRT_RISE;
+            p_lum_state->lum   = 0;
+            p_lum_state->ref   = clock_time() - diff;
+            tlk_color_calibrate(p_led_ctrl,
+                                (p_lum_state->flags & FLG_PATTERN_FOLLOW) ?
+                                    0 :
+                                    tlk_lum_convert(p_lum_state->flags & FLG_BRT_REVERT_LEVEL, p_lum_state->lum));
+        } else {
+            // task finished !
+            p_lum_state->state = ST_BRT_IDLE;
+            if (env->p_insert_pattern) {
+                tlk_pattern_recovery(p_led_ctrl);
                 return;
             }
-
-            p_lum_state->cnt++;
-
-            // check flash times
-            if (p_pattern->flash_times == FLASH_FOREVER || p_lum_state->cnt < p_pattern->flash_times)
-            {
-                diff = (unsigned int)(stimer_get_tick() - p_lum_state->ref) -
-                       p_pattern->keep_low * 1000 * SYSTEM_TIMER_TICK_1US;
-                p_lum_state->state = ST_BRT_RISE;
-                p_lum_state->lum   = 0;
-                p_lum_state->ref   = clock_time() - diff;
-                tlk_color_calibrate(p_led_ctrl,
-                                    (p_lum_state->flags & FLG_PATTERN_FOLLOW) ?
-                                        0 :
-                                        tlk_lum_convert(p_lum_state->flags & FLG_BRT_REVERT_LEVEL, p_lum_state->lum));
-            }
-            else
-            {
-                // task finished !
-                p_lum_state->state = ST_BRT_IDLE;
-                if (env->p_insert_pattern)
-                {
-                    tlk_pattern_recovery(p_led_ctrl);
-                    return;
-                }
-            }
         }
-        break;
+    } break;
 
-        case ST_BRT_IDLE:
-            break;
-        default:
-            break;
+    case ST_BRT_IDLE:
+        break;
+    default:
+        break;
     }
 
     return;
@@ -412,90 +378,77 @@ static void tlk_led_breath_process(tlk_led_ctrl_t *p_led_ctrl)
  */
 static void tlk_led_flash_process(tlk_led_ctrl_t *p_led_ctrl)
 {
-    if (p_led_ctrl == NULL)
-    {
+    if (p_led_ctrl == NULL) {
         return;
     }
     tlk_led_pattern_t *p_pattern;
-    tlk_lum_state_t *p_lum_state;
-    tlk_led_env_t *env = &p_led_ctrl->led_env;
+    tlk_lum_state_t   *p_lum_state;
+    tlk_led_env_t     *env = &p_led_ctrl->led_env;
 
     p_pattern   = env->p_insert_pattern ? env->p_insert_pattern : env->p_pattern;
     p_lum_state = env->p_insert_pattern ? &env->insert_lum_state : &env->lum_state;
 
     // default state
-    if (!p_pattern)
-    {
+    if (!p_pattern) {
         tlk_color_calibrate(p_led_ctrl, 0);
         return;
     }
 
     // is LED flashing or not
-    if (p_pattern->behavior & BHV_BREATH)
-    {
+    if (p_pattern->behavior & BHV_BREATH) {
         return;
     }
 
-    switch (p_lum_state->state)
+    switch (p_lum_state->state) {
+    case ST_FLASH_DUTY:
     {
-        case ST_FLASH_DUTY:
-        {
-            // always on
-            if (p_pattern->duty == TIME_FOREVER)
-            {
-                return;
-            }
+        // always on
+        if (p_pattern->duty == TIME_FOREVER) {
+            return;
+        }
 
-            // duty check
-            if (!clock_time_exceed(p_lum_state->ref, p_pattern->duty * 1000))
-            {
-                return;
-            }
+        // duty check
+        if (!clock_time_exceed(p_lum_state->ref, p_pattern->duty * 1000)) {
+            return;
+        }
 
-            p_lum_state->state <<= 1;
-            p_lum_state->ref = clock_time();
+        p_lum_state->state <<= 1;
+        p_lum_state->ref = clock_time();
 
-            // Turn off LED
-            p_lum_state->lum = 0;
+        // Turn off LED
+        p_lum_state->lum = 0;
+        tlk_color_calibrate(p_led_ctrl, (p_lum_state->flags & FLG_PATTERN_FOLLOW) ? 0 : p_lum_state->lum);
+    } break;
+
+    case ST_FLASH_LAT:
+    {
+        // Latency time out check !
+        if (!clock_time_exceed(p_lum_state->ref, p_pattern->latency * 1000)) {
+            return;
+        }
+
+        // flash completed !
+        p_lum_state->cnt++;
+
+        if (p_pattern->flash_times == FLASH_FOREVER || (p_lum_state->cnt < p_pattern->flash_times)) {
+            p_lum_state->state = ST_FLASH_DUTY;
+            p_lum_state->ref   = clock_time();
+            p_lum_state->lum   = (p_pattern->behavior & BHV_HIGH_LIHGT_FLASH) ? BRT_BRIGHTEST_FULL_DUTY : BRT_FULL_DUTY;
             tlk_color_calibrate(p_led_ctrl, (p_lum_state->flags & FLG_PATTERN_FOLLOW) ? 0 : p_lum_state->lum);
-        }
-        break;
-
-        case ST_FLASH_LAT:
-        {
-            // Latency time out check !
-            if (!clock_time_exceed(p_lum_state->ref, p_pattern->latency * 1000))
-            {
+        } else {
+            // change to idle state
+            p_lum_state->state <<= 1;
+            if (env->p_insert_pattern) {
+                tlk_pattern_recovery(p_led_ctrl);
                 return;
             }
-
-            // flash completed !
-            p_lum_state->cnt++;
-
-            if (p_pattern->flash_times == FLASH_FOREVER || (p_lum_state->cnt < p_pattern->flash_times))
-            {
-                p_lum_state->state = ST_FLASH_DUTY;
-                p_lum_state->ref   = clock_time();
-                p_lum_state->lum = (p_pattern->behavior & BHV_HIGH_LIHGT_FLASH) ? BRT_BRIGHTEST_FULL_DUTY : BRT_FULL_DUTY;
-                tlk_color_calibrate(p_led_ctrl, (p_lum_state->flags & FLG_PATTERN_FOLLOW) ? 0 : p_lum_state->lum);
-            }
-            else
-            {
-                // change to idle state
-                p_lum_state->state <<= 1;
-                if (env->p_insert_pattern)
-                {
-                    tlk_pattern_recovery(p_led_ctrl);
-                    return;
-                }
-            }
         }
-        break;
+    } break;
 
-        case ST_FLASH_IDLE:
-            break;
-        default:
-            break;
+    case ST_FLASH_IDLE:
+        break;
+    default:
+        break;
     }
 
     return;
@@ -511,23 +464,20 @@ static void tlk_led_flash_process(tlk_led_ctrl_t *p_led_ctrl)
  */
 tlk_led_sts_e tlk_led_add(tlk_led_config_t *p)
 {
-    if (p == NULL)
-    {
+    if (p == NULL) {
         tlkapi_printf(TLK_LED_DBG_FLAG, "add parameter NULL");
         return TLK_LED_PARAMETER_ERROR;
     }
 
-    if (tlk_get_led_id_by_gpio(p->led_pin) != 0)
-    {
+    if (tlk_get_led_id_by_gpio(p->led_pin) != 0) {
         tlkapi_printf(TLK_LED_DBG_FLAG, "led exist, pin=%d", p->led_pin);
         return TLK_LED_REPEAT;
     }
 
     tlk_led_ctrl_t *p_temp = ledInfo;
-    u8 index          = tlk_get_unused_led_index();
+    u8              index  = tlk_get_unused_led_index();
 
-    if (index == TLK_LED_INVALID)
-    {
+    if (index == TLK_LED_INVALID) {
         tlkapi_printf(TLK_LED_DBG_FLAG, "led index err");
         return TLK_LED_NOT_ENOUGH;
     }
@@ -535,7 +485,7 @@ tlk_led_sts_e tlk_led_add(tlk_led_config_t *p)
     p_temp[index].led_id                = index + 1;
     p_temp[index].led_info.led_pin      = p->led_pin;
     p_temp[index].led_info.led_on_level = (p->led_on_level <= 1) ? p->led_on_level : TLK_LED_VALID_LEVEL;
-    p_temp[index].led_info.pwmid = p->pwmid;
+    p_temp[index].led_info.pwmid        = p->pwmid;
     p_temp[index].color_duty            = LED_MAX_COLOR;
 
 #if (MCU_CORE_TYPE == MCU_CORE_B91)
@@ -546,14 +496,13 @@ tlk_led_sts_e tlk_led_add(tlk_led_config_t *p)
     pwm_clr_irq_mask(GET_PWM_FRAME_DONE_IRQ_MASK(p_temp[index].led_info.pwmid));
     pwm_clr_irq_status(GET_PWM_FRAME_DONE_IRQ_MASK(p_temp[index].led_info.pwmid));
 
-    if (p_temp[index].led_info.pwmid== 0)
-    {
+    if (p_temp[index].led_info.pwmid == 0) {
         pwm_set_pwm0_mode(PWM_NORMAL_MODE);
     }
 
     pwm_set_tcmp(p_temp[index].led_info.pwmid, 0);
     pwm_set_tmax(p_temp[index].led_info.pwmid, 500);
-#if(MCU_CORE_TYPE == MCU_CORE_B91 && HARDWARE_TYPE == TLSR9517CDK56D)
+#if (MCU_CORE_TYPE == MCU_CORE_B91 && HARDWARE_TYPE == TLSR9517CDK56D)
     pwm_n_invert_en(p_temp[index].led_info.pwmid);
 #endif
     pwm_start(GET_PWM_EN_TYPE(p_temp[index].led_info.pwmid));
@@ -571,16 +520,14 @@ tlk_led_sts_e tlk_led_add(tlk_led_config_t *p)
  */
 tlk_led_sts_e tlk_led_remove(u8 led_id)
 {
-    if (led_id > TLK_LED_NUM_MAX)
-    {
+    if (led_id > TLK_LED_NUM_MAX) {
         return TLK_LED_PARAMETER_ERROR;
     }
 
     tlk_led_ctrl_t *p_temp = ledInfo;
-    u8 index          = led_id - 1;
+    u8              index  = led_id - 1;
 
-    if (p_temp[index].led_id == 0)
-    {
+    if (p_temp[index].led_id == 0) {
         tlkapi_printf(TLK_LED_DBG_FLAG, "led_id == 0", led_id);
         return TLK_LED_NOT_ENOUGH;
     }
@@ -604,13 +551,11 @@ tlk_led_sts_e tlk_led_remove(u8 led_id)
  */
 u8 tlk_get_led_id_by_gpio(TLK_GPIO_TYPE_DEF gpio)
 {
-    u8 i_for          = 0;
+    u8              i_for  = 0;
     tlk_led_ctrl_t *p_temp = ledInfo;
 
-    for (i_for = 0; i_for < TLK_LED_NUM_MAX; ++i_for)
-    {
-        if (p_temp[i_for].led_info.led_pin == gpio)
-        {
+    for (i_for = 0; i_for < TLK_LED_NUM_MAX; ++i_for) {
+        if (p_temp[i_for].led_info.led_pin == gpio) {
             return p_temp[i_for].led_id;
         }
     }
@@ -628,15 +573,13 @@ u8 tlk_get_led_id_by_gpio(TLK_GPIO_TYPE_DEF gpio)
  */
 tlk_led_sts_e tlk_led_user_patterns_register(tlk_led_pattern_table_t *table, u16 tbl_mode_num)
 {
-    if (table == NULL)
-    {
+    if (table == NULL) {
         tlkapi_printf(TLK_LED_DBG_FLAG, "pattern table == NULL");
         return TLK_LED_PARAMETER_ERROR;
     }
 
     tlk_led_pattern_table_t *p_temp = &ledUserPatterns;
-    if (p_temp->p_pattern_table != NULL)
-    {
+    if (p_temp->p_pattern_table != NULL) {
         tlkapi_printf(TLK_LED_DBG_FLAG, "p_temp->pattern_table != NULL");
         return TLK_LED_PARTTEN_ERROR;
     }
@@ -658,8 +601,7 @@ tlk_led_sts_e tlk_led_user_patterns_register(tlk_led_pattern_table_t *table, u16
 tlk_led_sts_e tlk_led_user_patterns_remove(void)
 {
     tlk_led_pattern_table_t *p_temp = &ledUserPatterns;
-    if (p_temp->p_pattern_table == NULL)
-    {
+    if (p_temp->p_pattern_table == NULL) {
         tlkapi_printf(TLK_LED_DBG_FLAG, "p_temp->pattern_table == NULL");
         return TLK_LED_PARAMETER_ERROR;
     }
@@ -683,26 +625,20 @@ tlk_led_sts_e tlk_led_user_patterns_remove(void)
  */
 void tlk_set_led_color_duty(tlk_led_color_t *color)
 {
-    u8 i_for          = 0;
+    u8              i_for  = 0;
     tlk_led_ctrl_t *p_temp = &ledInfo[0];
-    if (color == NULL)
-    {
+    if (color == NULL) {
         return;
     }
 
-    for (i_for = 0; i_for < TLK_LED_NUM_MAX; i_for++)
-    {
-        if (p_temp[i_for].led_id == 0 || color->color_value[i_for] == LED_COLOR_NOT_SET)
-        {
+    for (i_for = 0; i_for < TLK_LED_NUM_MAX; i_for++) {
+        if (p_temp[i_for].led_id == 0 || color->color_value[i_for] == LED_COLOR_NOT_SET) {
             continue;
         }
 
-        if (color->color_value[i_for] > LED_MAX_COLOR)
-        {
+        if (color->color_value[i_for] > LED_MAX_COLOR) {
             p_temp[i_for].color_duty = LED_MAX_COLOR;
-        }
-        else
-        {
+        } else {
             p_temp[i_for].color_duty = color->color_value[i_for];
         }
     }
@@ -717,18 +653,15 @@ void tlk_set_led_color_duty(tlk_led_color_t *color)
  */
 void tlk_get_led_color_duty(tlk_led_color_t *out_color)
 {
-    u8 i_for          = 0;
+    u8              i_for  = 0;
     tlk_led_ctrl_t *p_temp = &ledInfo[0];
 
-    if (out_color == NULL)
-    {
+    if (out_color == NULL) {
         return;
     }
 
-    for (i_for = 0; i_for < TLK_LED_NUM_MAX; i_for++)
-    {
-        if (p_temp[i_for].led_id == 0)
-        {
+    for (i_for = 0; i_for < TLK_LED_NUM_MAX; i_for++) {
+        if (p_temp[i_for].led_id == 0) {
             continue;
         }
         out_color->color_value[i_for] = p_temp[i_for].color_duty;
@@ -744,20 +677,16 @@ void tlk_get_led_color_duty(tlk_led_color_t *out_color)
  */
 u16 tlk_led_get_pattern_duty(int led_id)
 {
-    if (led_id == 0 || led_id > TLK_LED_NUM_MAX)
-    {
+    if (led_id == 0 || led_id > TLK_LED_NUM_MAX) {
         tlkapi_printf(TLK_LED_DBG_FLAG, "led_id err");
         return TLK_LED_PARAMETER_ERROR;
     }
 
     tlk_led_ctrl_t *p_temp = &ledInfo[led_id - 1];
 
-    if (p_temp->led_env.p_insert_pattern != NULL)
-    {
+    if (p_temp->led_env.p_insert_pattern != NULL) {
         return p_temp->led_env.p_insert_pattern->duty;
-    }
-    else if (p_temp->led_env.p_pattern != NULL)
-    {
+    } else if (p_temp->led_env.p_pattern != NULL) {
         return p_temp->led_env.p_pattern->duty;
     }
 
@@ -773,20 +702,16 @@ u16 tlk_led_get_pattern_duty(int led_id)
  */
 u16 tlk_led_get_current_lum(int led_id)
 {
-    if (led_id == 0 || led_id > TLK_LED_NUM_MAX)
-    {
+    if (led_id == 0 || led_id > TLK_LED_NUM_MAX) {
         tlkapi_printf(TLK_LED_DBG_FLAG, "get led_id err");
         return TLK_LED_PARAMETER_ERROR;
     }
 
     tlk_led_ctrl_t *p_temp = &ledInfo[led_id - 1];
 
-    if (p_temp->led_env.p_insert_pattern != NULL)
-    {
+    if (p_temp->led_env.p_insert_pattern != NULL) {
         return p_temp->led_env.insert_lum_state.lum;
-    }
-    else if (p_temp->led_env.p_pattern != NULL)
-    {
+    } else if (p_temp->led_env.p_pattern != NULL) {
         return p_temp->led_env.lum_state.lum;
     }
 
@@ -804,29 +729,24 @@ u16 tlk_led_get_current_lum(int led_id)
  */
 tlk_led_sts_e tlk_led_pattern_set(int led_id, int patt, tlk_led_patt_from_e is_user_patt)
 {
-    if (led_id == 0 || led_id > TLK_LED_NUM_MAX)
-    {
+    if (led_id == 0 || led_id > TLK_LED_NUM_MAX) {
         tlkapi_printf(TLK_LED_DBG_FLAG, "set led_id err");
         return TLK_LED_PARAMETER_ERROR;
     }
 
     tlk_led_pattern_t *p_pattern = NULL;
-    tlk_led_ctrl_t *p_temp   = &ledInfo[led_id - 1];
+    tlk_led_ctrl_t    *p_temp    = &ledInfo[led_id - 1];
 
-    if (is_user_patt == USER_PATTERN)
-    {
-        if (ledUserPatterns.p_pattern_table == NULL || patt >= ledUserPatterns.pattern_count)
-        {
+    if (is_user_patt == USER_PATTERN) {
+        if (ledUserPatterns.p_pattern_table == NULL || patt >= ledUserPatterns.pattern_count) {
             tlkapi_printf(TLK_LED_DBG_FLAG, "set pattern err1");
             return TLK_LED_PARTTEN_ERROR;
         }
 
         p_pattern = &ledUserPatterns.p_pattern_table[patt];
-    }
-    else // is_user_patt==DEFAULT_PATTERN
+    } else // is_user_patt==DEFAULT_PATTERN
     {
-        if (patt >= LED_PATTERN_LED_MAX_STATE)
-        {
+        if (patt >= LED_PATTERN_LED_MAX_STATE) {
             tlkapi_printf(TLK_LED_DBG_FLAG, "set pattern err2");
             return TLK_LED_PARTTEN_ERROR;
         }
@@ -866,29 +786,24 @@ tlk_led_sts_e tlk_led_pattern_set(int led_id, int patt, tlk_led_patt_from_e is_u
  */
 tlk_led_sts_e tlk_led_pattern_insert(int led_id, int patt, tlk_led_patt_from_e is_user_patt)
 {
-    if (led_id == 0 || led_id > TLK_LED_NUM_MAX)
-    {
+    if (led_id == 0 || led_id > TLK_LED_NUM_MAX) {
         tlkapi_printf(TLK_LED_DBG_FLAG, "insert led_id err");
         return TLK_LED_PARAMETER_ERROR;
     }
 
     tlk_led_pattern_t *p_pattern = NULL;
-    tlk_led_ctrl_t *p_temp   = &ledInfo[led_id - 1];
+    tlk_led_ctrl_t    *p_temp    = &ledInfo[led_id - 1];
 
-    if (is_user_patt == USER_PATTERN)
-    {
-        if (ledUserPatterns.p_pattern_table == NULL || patt >= ledUserPatterns.pattern_count)
-        {
+    if (is_user_patt == USER_PATTERN) {
+        if (ledUserPatterns.p_pattern_table == NULL || patt >= ledUserPatterns.pattern_count) {
             tlkapi_printf(TLK_LED_DBG_FLAG, "insert pattern err1");
             return TLK_LED_PARTTEN_ERROR;
         }
 
         p_pattern = &ledUserPatterns.p_pattern_table[patt];
-    }
-    else // is_user_patt==DEFAULT_PATTERN
+    } else // is_user_patt==DEFAULT_PATTERN
     {
-        if (patt >= LED_PATTERN_LED_MAX_STATE)
-        {
+        if (patt >= LED_PATTERN_LED_MAX_STATE) {
             tlkapi_printf(TLK_LED_DBG_FLAG, "insert pattern err2");
             return TLK_LED_PARTTEN_ERROR;
         }
@@ -896,8 +811,7 @@ tlk_led_sts_e tlk_led_pattern_insert(int led_id, int patt, tlk_led_patt_from_e i
     }
     if (p_pattern->duty == TIME_FOREVER || p_pattern->latency == TIME_FOREVER ||
         p_pattern->flash_times == TIME_FOREVER || p_pattern->keep_high == TIME_FOREVER ||
-        p_pattern->keep_low == TIME_FOREVER)
-    {
+        p_pattern->keep_low == TIME_FOREVER) {
         tlkapi_printf(TLK_LED_DBG_FLAG, "param forever, please use tlk_led_pattern_set");
         return TLK_LED_INSERT_CAUTION;
     }
@@ -918,22 +832,19 @@ tlk_led_sts_e tlk_led_pattern_insert(int led_id, int patt, tlk_led_patt_from_e i
  */
 tlk_led_sts_e tlk_led_is_insert_pattern_running(int led_id)
 {
-    if (led_id == 0 || led_id > TLK_LED_NUM_MAX)
-    {
+    if (led_id == 0 || led_id > TLK_LED_NUM_MAX) {
         tlkapi_printf(TLK_LED_DBG_FLAG, "running led_id err");
         return TLK_LED_PARAMETER_ERROR;
     }
 
     tlk_led_ctrl_t *p_temp = &ledInfo[led_id - 1];
 
-    if (p_temp->led_env.p_insert_pattern != NULL)
-    {
+    if (p_temp->led_env.p_insert_pattern != NULL) {
         return TLK_LED_IS_INSERTING;
     }
 
     return TLK_LED_SUCCESS;
 }
-
 
 /**
  * @brief  led breath and flash process.
@@ -944,17 +855,14 @@ tlk_led_sts_e tlk_led_is_insert_pattern_running(int led_id)
  */
 void tlk_led_refresh_process(void)
 {
-    u16 index         = 0;
+    u16             index  = 0;
     tlk_led_ctrl_t *p_temp = &ledInfo[0];
-    if (TLK_LED_NUM_MAX == 0xFFFF)
-    {
+    if (TLK_LED_NUM_MAX == 0xFFFF) {
         return;
     }
 
-    for (index = 0; index < TLK_LED_NUM_MAX; index++)
-    {
-        if (p_temp[index].led_id == 0)
-        {
+    for (index = 0; index < TLK_LED_NUM_MAX; index++) {
+        if (p_temp[index].led_id == 0) {
             continue;
         }
         tlk_led_breath_process(&p_temp[index]);

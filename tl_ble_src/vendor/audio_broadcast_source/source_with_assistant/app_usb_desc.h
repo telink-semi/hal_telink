@@ -28,7 +28,8 @@
 
 #if (SOURCE_VERSION == SOURCE_WITH_ASSISTANT)
 
-typedef enum{
+typedef enum
+{
     USB_SAMPLING_FREQ_8KHZ,
     USB_SAMPLING_FREQ_16KHZ,
     USB_SAMPLING_FREQ_24KHZ,
@@ -36,18 +37,20 @@ typedef enum{
     USB_SAMPLING_FREQ_48KHZ,
 } usb_audioSamplingFreq_enum;
 
-typedef enum{
+typedef enum
+{
     AUDIO_TYPE_MONO,
     AUDIO_TYPE_STEREO,
 } usb_audioType_enum;
 
-typedef struct __attribute__((packed)) {
+typedef struct __attribute__((packed))
+{
     u16 vendorId;
     u16 productId;
     u32 speakSampleRate;
-    u8 speakNum;
+    u8  speakNum;
 } vendor_usbDesc_t;
 
 void app_usb_changeDesc(usb_audioSamplingFreq_enum freq, usb_audioType_enum type);
 
-#endif  //SOURCE_VERSION == SOURCE_WITH_ASSISTANT
+#endif //SOURCE_VERSION == SOURCE_WITH_ASSISTANT

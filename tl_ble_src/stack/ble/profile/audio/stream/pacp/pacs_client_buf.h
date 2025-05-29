@@ -24,7 +24,8 @@
 #pragma once
 
 /* PACS characteristics read */
-typedef enum {
+typedef enum
+{
     PACS_READ_SINK_PAC,
     PACS_READ_SINK_AUDIO_LOC,
     PACS_READ_SRC_PAC,
@@ -35,54 +36,64 @@ typedef enum {
 } blt_pacs_read_enum;
 
 /* PACS characteristics write */
-typedef enum  {
-    PACS_WRITE_SINK_AUDIO_LOC           =   0x00,
-    PACS_WRITE_SRC_AUDIO_LOC            =   0x01,
+typedef enum
+{
+    PACS_WRITE_SINK_AUDIO_LOC = 0x00,
+    PACS_WRITE_SRC_AUDIO_LOC  = 0x01,
     PACS_WRITE_MAX
 } blt_pacs_write_enum;
 
-typedef struct{
+typedef struct
+{
     u16 pacLen;
-    u8 pac[APP_AUDIO_PACS_CLIENT_READ_PAC_MAX_SIZE];
+    u8  pac[APP_AUDIO_PACS_CLIENT_READ_PAC_MAX_SIZE];
 } blc_audio_pacRecordParamEntity_t;
 
-typedef struct{
+typedef struct
+{
     u16 pacLen;
-    u8 pac[];
+    u8  pac[];
 } blt_audio_pac_record_param_t;
 
 /* Read PAC used */
-typedef ble_sts_t (*pacs_read_pac_cb_t) (u16 connHdl, blt_pacs_read_enum  rdType);
-typedef struct {
-    pacs_read_pac_cb_t  func;
-    gattc_read_cfg_t    rdCfg;
-    u8 rdTypeCfg; //blt_pacs_read_enum  rdTypeCfg;
-    u8 currentIdx;
-    u8 reserved1[2];
+typedef ble_sts_t (*pacs_read_pac_cb_t)(u16 connHdl, blt_pacs_read_enum rdType);
+
+typedef struct
+{
+    pacs_read_pac_cb_t func;
+    gattc_read_cfg_t   rdCfg;
+    u8                 rdTypeCfg; //blt_pacs_read_enum  rdTypeCfg;
+    u8                 currentIdx;
+    u8                 reserved1[2];
 } blt_pacs_read_pac_t;
 
-typedef struct {
+typedef struct
+{
     gattc_sub_ccc_msg_t ntfInput;
     /* Characteristic value handle */
-    u16 sinkAudioLcaHdl; /* Sink Audio Locations */
-    u16 srcAudioLcaHdl;  /* Source Audio Locations */
-    u16 avaAudioCtxHdl;  /* Available Contexts */
-    u16 supAudioCtxHdl;  /* Supported Context */
-    u16 sinkPacHdl[STACK_AUDIO_PACS_SNK_PAC_RECORD_NUM];        /* Sink PAC */
-    u16 srcPacHdl[STACK_AUDIO_PACS_SRC_PAC_RECORD_NUM];     /* Source PAC */
+    u16 sinkAudioLcaHdl;                                 /* Sink Audio Locations */
+    u16 srcAudioLcaHdl;                                  /* Source Audio Locations */
+    u16 avaAudioCtxHdl;                                  /* Available Contexts */
+    u16 supAudioCtxHdl;                                  /* Supported Context */
+    u16 sinkPacHdl[STACK_AUDIO_PACS_SNK_PAC_RECORD_NUM]; /* Sink PAC */
+    u16 srcPacHdl[STACK_AUDIO_PACS_SRC_PAC_RECORD_NUM];  /* Source PAC */
 
     /* ACL connection handle */
     u16 connHandle;
     u16 reserved;
 
     /* Characteristic value */
-    u32 sinkAudioLca;   /* Sink Audio Locations*/
-    u32 srcAudioLca;    /* Source Audio Locations */
-    struct {
+    u32 sinkAudioLca; /* Sink Audio Locations*/
+    u32 srcAudioLca;  /* Source Audio Locations */
+
+    struct
+    {
         u16 avaSinkCtx; /* Available Sink Contexts */
         u16 avaSrcCtx;  /* Available Source Context */
     } avaAudioCtx;
-    struct {
+
+    struct
+    {
         u16 supSinkCtx; /* Supported Sink Contexts */
         u16 supSrcCtx;  /* Supported Source Contexts */
     } supAudioCtx;
@@ -99,11 +110,12 @@ typedef struct {
 
 } blc_pacs_client_t;
 
-typedef struct blc_pacs_client_ctrl{
-    blc_prf_proc_t process;
-    blc_pacs_client_t* pPacsClient[STACK_PRF_ACL_CENTRAL_MAX_NUM];
+typedef struct blc_pacs_client_ctrl
+{
+    blc_prf_proc_t     process;
+    blc_pacs_client_t *pPacsClient[STACK_PRF_ACL_CENTRAL_MAX_NUM];
 } blc_pacs_client_ctrl_t;
 
-typedef struct{
-
+typedef struct
+{
 } blc_pacsc_regParam_t;

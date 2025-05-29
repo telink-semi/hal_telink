@@ -24,7 +24,6 @@
 #ifndef LEG_ADV_H_
 #define LEG_ADV_H_
 
-
 /*
  *                     1. Slave Connect                            2. Slave Disconnect                      3. Set ADV enable when ADV task is not running
  *
@@ -40,16 +39,15 @@
  *
  *
  */
-typedef enum{
+typedef enum
+{
     LEG_ADV_EN_STRATEGY_1 = 0, /*!< SDK default strategy */
 
     LEG_ADV_EN_STRATEGY_2 = 1, /*!< ADV task running depends only on API "blc_ll_setAdvEnable" */
 
     LEG_ADV_EN_STRATEGY_3 = 2, /*!< ADV stop when peripheral connect, upper layer should set ADV enable again
                                         if needing another slave connected */
-}legadv_en_str_t;  //legacy ADV enable strategy
-
-
+} legadv_en_str_t;             //legacy ADV enable strategy
 
 /**
  * @brief      for user to initialize legacy advertising module
@@ -57,8 +55,7 @@ typedef enum{
  * @param      none
  * @return     none
  */
-void        blc_ll_initLegacyAdvertising_module(void);
-
+void blc_ll_initLegacyAdvertising_module(void);
 
 
 /**
@@ -67,7 +64,7 @@ void        blc_ll_initLegacyAdvertising_module(void);
  * @param[in]  len - The number of significant octets in the Advertising_Data.
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t   blc_ll_setAdvData(const u8 *data, u8 len);
+ble_sts_t blc_ll_setAdvData(const u8 *data, u8 len);
 
 
 /**
@@ -76,8 +73,7 @@ ble_sts_t   blc_ll_setAdvData(const u8 *data, u8 len);
  * @param[in]  len - The number of significant octets in the Scan_Response_Data.
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t   blc_ll_setScanRspData(const u8 *data, u8 len);
-
+ble_sts_t blc_ll_setScanRspData(const u8 *data, u8 len);
 
 
 /**
@@ -92,8 +88,7 @@ ble_sts_t   blc_ll_setScanRspData(const u8 *data, u8 len);
  * @param[in]  advFilterPolicy - Advertising_Filter_Policy
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t   blc_ll_setAdvParam( adv_inter_t intervalMin, adv_inter_t intervalMax, adv_type_t    advType,        own_addr_type_t ownAddrType,  \
-                                u8 peerAddrType,         u8  *peerAddr,           adv_chn_map_t adv_channelMap, adv_fp_type_t   advFilterPolicy);
+ble_sts_t blc_ll_setAdvParam(adv_inter_t intervalMin, adv_inter_t intervalMax, adv_type_t advType, own_addr_type_t ownAddrType, u8 peerAddrType, u8 *peerAddr, adv_chn_map_t adv_channelMap, adv_fp_type_t advFilterPolicy);
 
 
 /**
@@ -101,7 +96,7 @@ ble_sts_t   blc_ll_setAdvParam( adv_inter_t intervalMin, adv_inter_t intervalMax
  * @param      adv_enable - Advertising_Enable
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t   blc_ll_setAdvEnable(adv_en_t adv_enable);
+ble_sts_t blc_ll_setAdvEnable(adv_en_t adv_enable);
 
 
 /**
@@ -110,7 +105,7 @@ ble_sts_t   blc_ll_setAdvEnable(adv_en_t adv_enable);
  *                      0:default value, stop sending broadcast packets when receiving scan request.
  * @return     none.
  */
-void        blc_ll_continue_adv_after_scan_req(u8 enable);
+void blc_ll_continue_adv_after_scan_req(u8 enable);
 
 
 /**
@@ -119,8 +114,7 @@ void        blc_ll_continue_adv_after_scan_req(u8 enable);
  *                      0:do not respond scan request.
  * @return     none.
  */
-void        blc_ll_set_scan_rsp_en(u8 enable);
-
+void blc_ll_set_scan_rsp_en(u8 enable);
 
 
 /**
@@ -129,8 +123,7 @@ void        blc_ll_set_scan_rsp_en(u8 enable);
  * @param[in]  strategy -
  * @return     none
  */
-void        blc_ll_configLegacyAdvEnableStrategy (legadv_en_str_t strategy);
-
+void blc_ll_configLegacyAdvEnableStrategy(legadv_en_str_t strategy);
 
 
 #endif /* LEG_ADV_H_ */

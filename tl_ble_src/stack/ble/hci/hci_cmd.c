@@ -30,17 +30,17 @@
 
 #include "hci_stack.h"
 
-void hci_initHciMng(void)   //Reset
+void hci_initHciMng(void) //Reset
 {
-    bltHciMng.aclDataPktLen = 0;
+    bltHciMng.aclDataPktLen      = 0;
     bltHciMng.aclDataPktTotalNum = 0;
-    bltHciMng.curCmplPktNum = 0;
-    bltHciMng.flowCtrlEnable = 0;
+    bltHciMng.curCmplPktNum      = 0;
+    bltHciMng.flowCtrlEnable     = 0;
 }
 
-void hci_resetCurHostAvailBufNum(void)//Disconnect
+void hci_resetCurHostAvailBufNum(void) //Disconnect
 {
-    if(!bltHciMng.flowCtrlEnable){
+    if (!bltHciMng.flowCtrlEnable) {
         return;
     }
     bltHciMng.curCmplPktNum = bltHciMng.aclDataPktTotalNum;
@@ -49,7 +49,7 @@ void hci_resetCurHostAvailBufNum(void)//Disconnect
 
 ble_sts_t hci_setControllerToHostFlowCtrl(u8 ctrl)
 {
-    switch(ctrl){
+    switch (ctrl) {
     case 0x00:
     case 0x01:
         //use for ACL
@@ -74,8 +74,7 @@ u8 hci_getControllerToHostFlowCtrlState(void)
 
 u16 hci_getHostAvailBufNum(void)
 {
-    if(bltHciMng.flowCtrlEnable != 0)
-    {
+    if (bltHciMng.flowCtrlEnable != 0) {
         return bltHciMng.curCmplPktNum;
     }
     return 0xFFFF;
@@ -83,7 +82,7 @@ u16 hci_getHostAvailBufNum(void)
 
 void hci_reduceOneHostAvailBuf(void)
 {
-    if((bltHciMng.curCmplPktNum > 0) && (bltHciMng.flowCtrlEnable != 0)) {
+    if ((bltHciMng.curCmplPktNum > 0) && (bltHciMng.flowCtrlEnable != 0)) {
         bltHciMng.curCmplPktNum--;
     }
 }
@@ -101,20 +100,17 @@ ble_sts_t hci_hostNumCompletedPackets(hci_hostNumOfCompletedPkt_cmdParam_t *Comp
 {
     u16 num_packt = 0;
 
-    if((bltHciMng.flowCtrlEnable == 0) && (!CompPackCom->num_sets)){
+    if ((bltHciMng.flowCtrlEnable == 0) && (!CompPackCom->num_sets)) {
         return HCI_ERR_INVALID_HCI_CMD_PARAMS;
     }
 
-    for(int i=0; i<CompPackCom->num_sets; i++){
+    for (int i = 0; i < CompPackCom->num_sets; i++) {
         //CompPackCom.complete_packets[i].Connection_Handle&CONN_IDX_MASK;
         num_packt += CompPackCom->completePktCfg[i].numPktCompleted;
     }
     bltHciMng.curCmplPktNum += num_packt;
-    if(bltHciMng.curCmplPktNum > bltHciMng.aclDataPktTotalNum)
-    {
+    if (bltHciMng.curCmplPktNum > bltHciMng.aclDataPktTotalNum) {
         bltHciMng.curCmplPktNum = bltHciMng.aclDataPktTotalNum;
     }
     return BLE_SUCCESS;
 }
-
-

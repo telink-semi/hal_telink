@@ -27,26 +27,23 @@
  *******************************************************************************************************/
 #pragma once
 
-#define GATT_PROCEDURE_TIMEOUT                  30*1000     //about 30s
+#define GATT_PROCEDURE_TIMEOUT 30 * 1000 //about 30s
 
-#define GATT_TIMEOUT_ATT_ERROR                  0x9F
-
-
+#define GATT_TIMEOUT_ATT_ERROR 0x9F
 
 /** @brief GATT notify procedure parameters configuration */
-typedef struct gatts_notify_cfg{
-    struct gatts_notify_cfg* pNext;
-    u16 attrhandle;
-    u16 valueLen;
-    u8* value;
+typedef struct gatts_notify_cfg
+{
+    struct gatts_notify_cfg *pNext;
+    u16                      attrhandle;
+    u16                      valueLen;
+    u8                      *value;
 } gatts_notify_cfg_t;
 
 ble_sts_t blt_gattc_mtuSizeExchangeReq(u16 connHandle, u16 mtuSize);
-void blt_gattc_notification(u16 connHandle, attr_pkt_t *attr, u16 attrLen);
-void blt_gattc_multiNotification(u16 connHandle, attr_pkt_t *attr, u16 attrLen);
-void blt_gatts_recvIndCfm(u16 connHandle, u16 scid);
+void      blt_gattc_notification(u16 connHandle, attr_pkt_t *attr, u16 attrLen);
+void      blt_gattc_multiNotification(u16 connHandle, attr_pkt_t *attr, u16 attrLen);
+void      blt_gatts_recvIndCfm(u16 connHandle, u16 scid);
 
 u16 blt_gattc_exchangeMtu_rsp(u16 connHandle, u16 mtu);
 u16 blt_gattc_handle_rsp(u16 connHandle, attr_pkt_t *attr, u16 attrLen);
-
-

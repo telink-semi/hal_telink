@@ -25,28 +25,28 @@
 
 #include "common/utility.h"
 
-#define VOCS_READ_OUTPUT_DESC_MAX_SIZE              DATA_LENGTH_ALIGN4(50)
+#define VOCS_READ_OUTPUT_DESC_MAX_SIZE DATA_LENGTH_ALIGN4(50)
 
-typedef struct{
-
+typedef struct
+{
     gattc_sub_ccc_msg_t ntfInput;
 
     /* Characteristic value handle */
-    u16 volOffStateHdl;         /* Volume Offset State */
-    u16 audioLocationHdl;       /* Audio Location */
-    u16 volOffCtrlpntHdl;       /* Volume Offset Control Point */
-    u16 audioOutDescHdl;        /* Audio Output Description */
+    u16 volOffStateHdl;   /* Volume Offset State */
+    u16 audioLocationHdl; /* Audio Location */
+    u16 volOffCtrlpntHdl; /* Volume Offset Control Point */
+    u16 audioOutDescHdl;  /* Audio Output Description */
 
     /* Characteristic value */
     blc_vocs_volume_offset_state_t volOffsetState;
-    bool useFlag;
-    u32 audioLocation;
-    u16 audioOutDescLen;
-    u16 reserved2;
-    u8 audioOutDesc[VOCS_READ_OUTPUT_DESC_MAX_SIZE];
+    bool                           useFlag;
+    u32                            audioLocation;
+    u16                            audioOutDescLen;
+    u16                            reserved2;
+    u8                             audioOutDesc[VOCS_READ_OUTPUT_DESC_MAX_SIZE];
 
-}blc_vocs_client_t;
+} blc_vocs_client_t;
 
-typedef struct{
-
+typedef struct
+{
 } blc_vocsc_regParam_t;

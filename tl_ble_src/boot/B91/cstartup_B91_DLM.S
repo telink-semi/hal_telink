@@ -255,7 +255,9 @@ _IRESET_ENTRY:
     /* Decide whether this is an NMI or cold reset */
     j       _ISTART
 
-    .org 0x22
+    /* BLE SDK use: change from 0x22 to 0x24 */
+    .org 0x24
+
 _ISTART:
 #if 0
     // add debug, PB4 output 1

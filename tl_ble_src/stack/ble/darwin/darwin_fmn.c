@@ -34,17 +34,17 @@
 //Darwin means Apple.
 
 #if (CUSTOM_DARWIN_FMN_ENABLE)
-    _attribute_ble_data_retention_ custom_darwin_fmn_t custom_darwin_fmn = {0};
+_attribute_ble_data_retention_ custom_darwin_fmn_t custom_darwin_fmn = {0};
 
-    void blc_ll_setCustomFMNEnable(u8 en, blc_smp_paringreq_cb_t pr_cb, blc_smp_sec_info_cb_t sir_cb)
-    {
-        custom_darwin_fmn.darwin_fmn_enable = en;
-        if (en) {
-            custom_darwin_fmn.pair_req_cb = pr_cb;
-            custom_darwin_fmn.sec_info_req_cb = sir_cb;
-        } else {
-            custom_darwin_fmn.pair_req_cb = NULL;
-            custom_darwin_fmn.sec_info_req_cb = NULL;
-        }
+void blc_ll_setCustomFMNEnable(u8 en, blc_smp_paringreq_cb_t pr_cb, blc_smp_sec_info_cb_t sir_cb)
+{
+    custom_darwin_fmn.darwin_fmn_enable = en;
+    if (en) {
+        custom_darwin_fmn.pair_req_cb     = pr_cb;
+        custom_darwin_fmn.sec_info_req_cb = sir_cb;
+    } else {
+        custom_darwin_fmn.pair_req_cb     = NULL;
+        custom_darwin_fmn.sec_info_req_cb = NULL;
     }
+}
 #endif

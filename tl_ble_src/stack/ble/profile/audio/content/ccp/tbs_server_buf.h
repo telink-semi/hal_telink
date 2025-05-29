@@ -23,74 +23,78 @@
  *******************************************************************************************************/
 #pragma once
 
-typedef struct{
-    u16 connHandle;
-    bool active : 1;
-    bool bearerProviderNameChanged : 1;
+typedef struct
+{
+    u16  connHandle;
+    bool active                               : 1;
+    bool bearerProviderNameChanged            : 1;
     bool bearerURISchemesSupportedListChanged : 1;
-    bool bearerListCurrentCallsChanged : 1;
-    bool incomingCallTargetBearerURIChanged : 1;
-    bool callStateChanged : 1;
-    bool incomingCallChanged : 1;
-    bool callFriendlyNameChanged : 1;
+    bool bearerListCurrentCallsChanged        : 1;
+    bool incomingCallTargetBearerURIChanged   : 1;
+    bool callStateChanged                     : 1;
+    bool incomingCallChanged                  : 1;
+    bool callFriendlyNameChanged              : 1;
 } value_changed_conn_t;
 
-typedef struct{
-    u16 bearerProviderNameHandle;
-    u16 bearerUCIHandle;
-    u16 bearerTechnologyHandle;
-    u16 bearerURISchemesSupportedListHandle;
-    u16 bearerSignalStrengthHandle;
-    u16 bearerSignalStrengthReportingIntervalHandle;
-    u16 bearerListCurrentCallsHandle;
-    u16 CCIDHandle;
-    u16 statusFlagsHandle;
-    u16 incomingCallTargetBearerURIHandle;
-    u16 callStateHandle;
-    u16 callControlPointHandle;
-    u16 callControlPointOptionalOpcodesHandle;
-    u16 terminatingReasonHandle;
-    u16 incomingCallHandle;
-    u16 callFriendlyNameHandle;
-    u8 terminationReasonValue[2];
+typedef struct
+{
+    u16                  bearerProviderNameHandle;
+    u16                  bearerUCIHandle;
+    u16                  bearerTechnologyHandle;
+    u16                  bearerURISchemesSupportedListHandle;
+    u16                  bearerSignalStrengthHandle;
+    u16                  bearerSignalStrengthReportingIntervalHandle;
+    u16                  bearerListCurrentCallsHandle;
+    u16                  CCIDHandle;
+    u16                  statusFlagsHandle;
+    u16                  incomingCallTargetBearerURIHandle;
+    u16                  callStateHandle;
+    u16                  callControlPointHandle;
+    u16                  callControlPointOptionalOpcodesHandle;
+    u16                  terminatingReasonHandle;
+    u16                  incomingCallHandle;
+    u16                  callFriendlyNameHandle;
+    u8                   terminationReasonValue[2];
     value_changed_conn_t valueChanged[STACK_PRF_ACL_CONN_MAX_NUM];
-    u16 alignment;
+    u16                  alignment;
 } blc_tbs_server_t, blc_gtbs_server_t;
 
-
-typedef struct{
-
+typedef struct
+{
     blc_gtbs_server_t gtbs;
 
-    u8 tbsServerCount;
-    u8 reserved[3];
+    u8                tbsServerCount;
+    u8                reserved[3];
     blc_tbs_server_t *tbs[0];
 } blc_ccp_server_t;
 
-typedef struct blc_ccp_server_ctrl{
-    blc_prf_proc_t process;
+typedef struct blc_ccp_server_ctrl
+{
+    blc_prf_proc_t   process;
     blc_ccp_server_t ccpServer;
 } blc_ccp_server_ctrl_t;
 
-
-typedef struct{
+typedef struct
+{
     const u8 *uri;
-    u16 uriLen;
+    u16       uriLen;
 } blc_tbss_uri_scheme_t;
 
-typedef struct{
-    const u8 *bearerProviderName;
-    u16 bearerProviderNameLen;
-    const u8 *bearerUci;
-    u16 bearerUciLen;
-    u8 bearerTechnology;
+typedef struct
+{
+    const u8                    *bearerProviderName;
+    u16                          bearerProviderNameLen;
+    const u8                    *bearerUci;
+    u16                          bearerUciLen;
+    u8                           bearerTechnology;
     const blc_tbss_uri_scheme_t *bearerUriSchemeList;
-    u8 bearerUriSchemeListLen;
-    u8 signalStrength;
-    u8 CCID;
-    blc_tbs_status_flags_t statusFlags;
+    u8                           bearerUriSchemeListLen;
+    u8                           signalStrength;
+    u8                           CCID;
+    blc_tbs_status_flags_t       statusFlags;
 } blc_gtbss_regParam_t, blc_tbss_regParam_t;
 
-typedef struct{
+typedef struct
+{
     blc_gtbss_regParam_t gtbsParam;
 } blc_ccps_regParam_t;

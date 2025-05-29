@@ -28,11 +28,11 @@
 #if (PRODUCT_CIS_SOURCE_SELECT == PRODUCT_KMLEA_DONGLE)
 
 
-extern  int central_pairing_enable;
-extern  u8  central_pairing_aclCen_index;
-extern  u16 central_unpair_enable;
+extern int central_pairing_enable;
+extern u8  central_pairing_aclCen_index;
+extern u16 central_unpair_enable;
 
-extern  u16 central_disconnect_connhandle;
+extern u16 central_disconnect_connhandle;
 
 /**
  * @brief      keyboard task handler
@@ -41,7 +41,7 @@ extern  u16 central_disconnect_connhandle;
  * @param[in]  n    - the length of event parameter.
  * @return     none.
  */
-void proc_keyboard (u8 e, u8 *p, int n);
+void proc_keyboard(u8 e, u8 *p, int n);
 
 
 /**
@@ -58,7 +58,7 @@ void proc_central_role_unpair(void);
  * @param[in]   p        - Pointer point to data buffer.
  * @return
  */
-void    att_keyboard (u16 conn, u8 *p);
+void att_keyboard(u16 conn, u8 *p);
 
 
 /**
@@ -67,10 +67,8 @@ void    att_keyboard (u16 conn, u8 *p);
  * @param[in]   p - pointer of l2cap data packet
  * @return      none
  */
-void    att_mouse (u16 conn, u8 *p);
-
+void att_mouse(u16 conn, u8 *p);
 
 
 #endif //end of (PRODUCT_CIS_SOURCE_SELECT == ...)
 #endif
-

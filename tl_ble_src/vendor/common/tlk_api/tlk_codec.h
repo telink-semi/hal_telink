@@ -28,33 +28,35 @@
 #include "bit.h"
 
 //codec state,idle,configured or streaming
-typedef enum{
-    TLK_CODEC_STATE_IDLE              = 0,
-    TLK_CODEC_STATE_CONFIGURED        = 1,
-    TLK_CODEC_STATE_STREAMING         = 2,
-}tlk_codec_state_e;
+typedef enum
+{
+    TLK_CODEC_STATE_IDLE       = 0,
+    TLK_CODEC_STATE_CONFIGURED = 1,
+    TLK_CODEC_STATE_STREAMING  = 2,
+} tlk_codec_state_e;
 
 //codec error code
 typedef enum
 {
-    TLK_CODEC_SUCCESS                = 0,
-    TLK_CODEC_NON_SUPPORT            = 1,
-    TLK_CODEC_EMPTY_CODEC            = 2,
-    TLK_CODEC_STATE_ERROR            = 3,
-    TLK_CODEC_OPERATION_REPEAT       = 4,
-    TLK_CODEC_PARAMETER_ERROR        = 5,
-    TLK_CODEC_DATA_INSUFFICIENT      = 6,
-}tlk_codec_sts_e;
+    TLK_CODEC_SUCCESS           = 0,
+    TLK_CODEC_NON_SUPPORT       = 1,
+    TLK_CODEC_EMPTY_CODEC       = 2,
+    TLK_CODEC_STATE_ERROR       = 3,
+    TLK_CODEC_OPERATION_REPEAT  = 4,
+    TLK_CODEC_PARAMETER_ERROR   = 5,
+    TLK_CODEC_DATA_INSUFFICIENT = 6,
+} tlk_codec_sts_e;
 
 //codec control struct
-typedef struct {
-    tlk_codec_state_e    state;
-    u8   cC;      //channel counts
-    u16  freq;    //frequency
-    u8*  pBuffer;
-    u16  pBufferLen;
-    tlk_codec_mode_e mode;
-}tlk_codec_desc_t;
+typedef struct
+{
+    tlk_codec_state_e state;
+    u8                cC;   //channel counts
+    u16               freq; //frequency
+    u8               *pBuffer;
+    u16               pBufferLen;
+    tlk_codec_mode_e  mode;
+} tlk_codec_desc_t;
 
 /**
  * @brief      This function serves to init the hardware codec.
@@ -78,7 +80,7 @@ void tlk_codec_close(void);
  * @param[in]  bufferLen - used buffer length.
  * @return     Succeed or failed,search 'tlk_buffer_sts_e' for detail.
  */
-tlk_codec_sts_e tlk_codec_config(tlk_codec_e codec,tlk_codec_frequency_e freq,tlk_codec_channel_e chanC,tlk_codec_mode_e mode,u8 *buffer,u16 bufferLen);
+tlk_codec_sts_e tlk_codec_config(tlk_codec_e codec, tlk_codec_frequency_e freq, tlk_codec_channel_e chanC, tlk_codec_mode_e mode, u8 *buffer, u16 bufferLen);
 
 /**
  * @brief      This function serves to get the codec state,search 'tlk_codec_state_e' for detail.
@@ -107,7 +109,7 @@ tlk_codec_sts_e tlk_codec_stop(tlk_codec_e codec);
  * @param[in]  pDataLen  - pop data length.
  * @return     Succeed or failed,search 'tlk_buffer_sts_e' for detail.
  */
-tlk_codec_sts_e tlk_codec_input_dataPop(u8 *pData,u16 pDataLen);
+tlk_codec_sts_e tlk_codec_input_dataPop(u8 *pData, u16 pDataLen);
 
 /**
  * @brief      This function serves to push data to the codec output path.
@@ -115,7 +117,7 @@ tlk_codec_sts_e tlk_codec_input_dataPop(u8 *pData,u16 pDataLen);
  * @param[in]  pDataLen  - data length.
  * @return     Succeed or failed,search 'tlk_buffer_sts_e' for detail.
  */
-tlk_codec_sts_e tlk_codec_output_dataPush(u8 *pData,u16 pDataLen);
+tlk_codec_sts_e tlk_codec_output_dataPush(u8 *pData, u16 pDataLen);
 
 /**
  * @brief      This function serves to get the write and read offset of the codec output path. Attenetion, read offset controlled by hardware pointer,
@@ -124,7 +126,7 @@ tlk_codec_sts_e tlk_codec_output_dataPush(u8 *pData,u16 pDataLen);
  * @param[in]  readOffset  - Hardware read offset.
  * @return     Succeed or failed,search 'tlk_buffer_sts_e' for detail.
  */
-tlk_codec_sts_e tlk_codec_output_getOffset(u32* writeOffset,u32* readOffset);
+tlk_codec_sts_e tlk_codec_output_getOffset(u32 *writeOffset, u32 *readOffset);
 
 /**
  * @brief      This function serves to set the software write offset.

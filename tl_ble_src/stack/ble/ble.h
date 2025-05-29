@@ -25,7 +25,6 @@
 #define BLE_H_
 
 
-
 #include "ble_common.h"
 #include "ble_format.h"
 
@@ -57,8 +56,6 @@
 #include "ble_config.h"
 
 /*********************************************************/
-
-
 
 
 #endif /* BLE_H_ */

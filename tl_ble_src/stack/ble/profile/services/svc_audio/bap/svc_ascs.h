@@ -21,7 +21,7 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-#pragma  once
+#pragma once
 
 //ASCS: Audio Stream Control Service
 

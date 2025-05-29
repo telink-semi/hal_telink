@@ -49,19 +49,72 @@
  * brief instruction delay
  */
 
-#define _ASM_NOP_                   __asm__("nop")
+#define _ASM_NOP_       __asm__("nop")
 
-#define CLOCK_DLY_1_CYC             _ASM_NOP_
-#define CLOCK_DLY_2_CYC             _ASM_NOP_;_ASM_NOP_
-#define CLOCK_DLY_3_CYC             _ASM_NOP_;_ASM_NOP_;_ASM_NOP_
-#define CLOCK_DLY_4_CYC             _ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_
-#define CLOCK_DLY_5_CYC             _ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_
-#define CLOCK_DLY_6_CYC             _ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_
-#define CLOCK_DLY_7_CYC             _ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_
-#define CLOCK_DLY_8_CYC             _ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_
-#define CLOCK_DLY_9_CYC             _ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_
-#define CLOCK_DLY_10_CYC            _ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_;_ASM_NOP_
-
+#define CLOCK_DLY_1_CYC _ASM_NOP_
+#define CLOCK_DLY_2_CYC \
+    _ASM_NOP_;          \
+    _ASM_NOP_
+#define CLOCK_DLY_3_CYC \
+    _ASM_NOP_;          \
+    _ASM_NOP_;          \
+    _ASM_NOP_
+#define CLOCK_DLY_4_CYC \
+    _ASM_NOP_;          \
+    _ASM_NOP_;          \
+    _ASM_NOP_;          \
+    _ASM_NOP_
+#define CLOCK_DLY_5_CYC \
+    _ASM_NOP_;          \
+    _ASM_NOP_;          \
+    _ASM_NOP_;          \
+    _ASM_NOP_;          \
+    _ASM_NOP_
+#define CLOCK_DLY_6_CYC \
+    _ASM_NOP_;          \
+    _ASM_NOP_;          \
+    _ASM_NOP_;          \
+    _ASM_NOP_;          \
+    _ASM_NOP_;          \
+    _ASM_NOP_
+#define CLOCK_DLY_7_CYC \
+    _ASM_NOP_;          \
+    _ASM_NOP_;          \
+    _ASM_NOP_;          \
+    _ASM_NOP_;          \
+    _ASM_NOP_;          \
+    _ASM_NOP_;          \
+    _ASM_NOP_
+#define CLOCK_DLY_8_CYC \
+    _ASM_NOP_;          \
+    _ASM_NOP_;          \
+    _ASM_NOP_;          \
+    _ASM_NOP_;          \
+    _ASM_NOP_;          \
+    _ASM_NOP_;          \
+    _ASM_NOP_;          \
+    _ASM_NOP_
+#define CLOCK_DLY_9_CYC \
+    _ASM_NOP_;          \
+    _ASM_NOP_;          \
+    _ASM_NOP_;          \
+    _ASM_NOP_;          \
+    _ASM_NOP_;          \
+    _ASM_NOP_;          \
+    _ASM_NOP_;          \
+    _ASM_NOP_;          \
+    _ASM_NOP_
+#define CLOCK_DLY_10_CYC \
+    _ASM_NOP_;           \
+    _ASM_NOP_;           \
+    _ASM_NOP_;           \
+    _ASM_NOP_;           \
+    _ASM_NOP_;           \
+    _ASM_NOP_;           \
+    _ASM_NOP_;           \
+    _ASM_NOP_;           \
+    _ASM_NOP_;           \
+    _ASM_NOP_
 
 /**********************************************************************************************************************
  *                                         global data type                                                           *
@@ -73,47 +126,50 @@
  *          it may lead to the following problems:
  *          crystal clock frequency is not allowed,  slow crystal vibration caused by the chip reset, etc.
  */
-typedef enum{
+typedef enum
+{
     INTERNAL_CAP_XTAL24M = 0, /**<    Use the chip's internal crystal capacitors,
                                  <p>  hardware boards can not have 24M crystal matching capacitors */
     EXTERNAL_CAP_XTAL24M = 1, /**<    Use an external crystal capacitor,
                                  <p>  the hardware board needs to have a matching capacitor for the 24M crystal,
                                  <p>  the program will turn off the chip's internal capacitor */
-}cap_typedef_e;
+} cap_typedef_e;
 
 /**
  * @brief   Power type for different application
  */
-typedef enum{
-    LDO_1P4_LDO_1P8     = 0x00, /**< 1.4V-LDO & 1.8V-LDO mode */
-    DCDC_1P4_LDO_1P8    = 0x01, /**< 1.4V-DCDC & 1.8V-LDO mode */
-}power_mode_e;
+typedef enum
+{
+    LDO_1P4_LDO_1P8  = 0x00, /**< 1.4V-LDO & 1.8V-LDO mode */
+    DCDC_1P4_LDO_1P8 = 0x01, /**< 1.4V-DCDC & 1.8V-LDO mode */
+} power_mode_e;
 
 /**
  * @brief   This enumeration is used to select whether VBAT can be greater than 3.6V.
  */
-typedef enum{
-    VBAT_MAX_VALUE_GREATER_THAN_3V6 = 0x00,     /**  VBAT must be greater than 2.2V. VBAT may be greater than 3.6V.
+typedef enum
+{
+    VBAT_MAX_VALUE_GREATER_THAN_3V6 = 0x00,   /**  VBAT must be greater than 2.2V. VBAT may be greater than 3.6V.
                                                 <p>  In this configuration the bypass is closed
                                                 <p>  and the VBAT voltage passes through an LDO to supply power to the chip.
                                                 <p>  The voltage of the GPIO pin (V_ioh) is the voltage after VBAT passes through the LDO (V_ldo),
                                                 <p>  and the maximum value is about 3.3V floating 10% (V_ldoh).
                                                 <p>  When VBAT > V_ldoh, <p>V_ioh = V_ldo = V_ldoh(no load).
                                                 <p>  When VBAT < V_ldoh, <p>V_ioh = V_ldo = VBAT(no load) */
-    VBAT_MAX_VALUE_LESS_THAN_3V6    = BIT(3),   /**  VBAT must be below 3.6V. VBAT may be below 2.2V.
+    VBAT_MAX_VALUE_LESS_THAN_3V6    = BIT(3), /**  VBAT must be below 3.6V. VBAT may be below 2.2V.
                                                 <p>  In this configuration bypass is turned on.vbat is directly supplying power to the chip
                                                 <p>  V_ioh(the output voltage of GPIO)= VBAT */
-}vbat_type_e;
+} vbat_type_e;
 
 /**
  * @brief command table for special registers
  */
-typedef struct tbl_cmd_set_t {
-    unsigned int    adr;
-    unsigned char   dat;
-    unsigned char   cmd;
+typedef struct tbl_cmd_set_t
+{
+    unsigned int  adr;
+    unsigned char dat;
+    unsigned char cmd;
 } tbl_cmd_set_t;
-
 
 /**********************************************************************************************************************
  *                                     global variable declaration                                                    *
@@ -129,6 +185,12 @@ extern unsigned int g_chip_version;
  * @return     none
  */
 _attribute_text_sec_ void sys_reboot(void);
+
+/**
+ * @brief      This function reboot mcu.
+ * @return     none
+ */
+_attribute_ram_code_sec_noinline_ void sys_reboot_ram(void);
 
 /**
  * @brief       This function serves to initialize system.
@@ -152,7 +214,7 @@ void sys_init(power_mode_e power_mode, vbat_type_e vbat_v, cap_typedef_e cap);
  * @return     number of commands are carried out
  */
 
-int write_reg_table(const tbl_cmd_set_t * pt, int size);
+int write_reg_table(const tbl_cmd_set_t *pt, int size);
 /**
  * @brief     this function servers to get calibration value from EFUSE.
  *            Only the two-point calibration gain and offset of GPIO sampling are saved in the EFUSE of B91.
@@ -160,7 +222,7 @@ int write_reg_table(const tbl_cmd_set_t * pt, int size);
  * @param[out]offset - gpio_calib_value_offset.
  * @return    1 means there is a calibration value in EFUSE, and 0 means there is no calibration value in EFUSE.
  */
-unsigned char efuse_get_adc_calib_value(unsigned short* gain, signed char* offset);
+unsigned char efuse_get_adc_calib_value(unsigned short *gain, signed char *offset);
 
 /**
  * @brief     this function servers to manual set crystal.

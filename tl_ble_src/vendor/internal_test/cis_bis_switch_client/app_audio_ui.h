@@ -27,7 +27,8 @@
 
 #if (INTER_TEST_MODE == TEST_LE_AUDIO_SWTICH_CLIENT)
 
-typedef enum{
+typedef enum
+{
     APP_AUDIO_UNICAST_CLIENT_STATE_IDLE,
     APP_AUDIO_UNICAST_CLIENT_STATE_CONN,
     APP_AUDIO_UNICAST_CLIENT_STATE_DISCONN,
@@ -52,4 +53,4 @@ void app_audio_ui_init(void);
  */
 void app_audio_ui_loop(void);
 
-#endif  //SOURCE_VERSION == SOURCE_WITH_ASSISTANT
+#endif //SOURCE_VERSION == SOURCE_WITH_ASSISTANT

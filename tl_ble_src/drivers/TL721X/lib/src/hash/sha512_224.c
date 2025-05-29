@@ -28,8 +28,6 @@
 #include "lib/include/hash/sha512_224.h"
 
 
-
-
 #ifdef SUPPORT_HASH_SHA512_224
 /**
  * @brief       init sha512_224
@@ -89,7 +87,7 @@ unsigned int sha512_224(unsigned char *msg, unsigned int msg_bytes, unsigned cha
 }
 
 
-#ifdef HASH_DMA_FUNCTION
+    #ifdef HASH_DMA_FUNCTION
 /**
  * @brief       init dma sha512_224
  * @param[in]   ctx           - SHA512_224_DMA_CTX context pointer.
@@ -100,7 +98,6 @@ unsigned int sha512_224_dma_init(SHA512_224_DMA_CTX *ctx, HASH_CALLBACK callback
 {
     return hash_dma_init(ctx, HASH_SHA512_224, callback);
 }
-
 
 /**
  * @brief       dma sha512_224 update some message blocks
@@ -118,7 +115,6 @@ unsigned int sha512_224_dma_update_blocks(SHA512_224_DMA_CTX *ctx, unsigned int 
 {
     return hash_dma_update_blocks(ctx, msg, msg_words);
 }
-
 
 /**
  * @brief       dma sha512_224 final(input the remainder message and get the digest)
@@ -138,7 +134,6 @@ unsigned int sha512_224_dma_final(SHA512_224_DMA_CTX *ctx, unsigned int *remaind
     return hash_dma_final(ctx, remainder_msg, remainder_bytes, digest);
 }
 
-
 /**
  * @brief       dma sha512_224 digest calculate
  * @param[in]   msg           - message.
@@ -155,6 +150,6 @@ unsigned int sha512_224_dma(unsigned int *msg, unsigned int msg_bytes, unsigned 
 {
     return hash_dma(HASH_SHA512_224, msg, msg_bytes, digest, callback);
 }
-#endif
+    #endif
 
 #endif

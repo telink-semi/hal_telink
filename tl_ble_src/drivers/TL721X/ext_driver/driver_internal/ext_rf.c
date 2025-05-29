@@ -31,6 +31,13 @@
 #include "ext_rf.h"
 #include "stack/ble/controller/ble_controller.h"
 
+
+extern unsigned char        s_dcoc_software_cal_en;
+extern unsigned short       g_rf_dcoc_iq_code;
+extern void rf_rx_dcoc_cali_by_sw(void);                    //use extern to avoid modifying Driver rf.h
+extern void rf_set_dcoc_iq_code(unsigned short iq_code);    //use extern to avoid modifying Driver rf.h
+extern void rf_set_dcoc_iq_offset(signed short iq_offset);  //use extern to avoid modifying Driver rf.h
+
 volatile unsigned int TXADDR = 0xc0013000;
 
 #define   BLE_TXDMA_DATA        (0x170000 + 0x84)      //0x170084
@@ -52,7 +59,7 @@ _attribute_data_retention_ unsigned char *ble_curr_rx_dma_buff = NULL;
 
 _attribute_data_retention_ ext_rf_t blt_extRF;
 
-void ble_rf_set_tx_dma(unsigned char fifo_dep,unsigned char size_div_16)
+void ble_rf_set_tx_dma(unsigned char fifo_dep,unsigned char size_div_16)//rf_set_tx_dma
 {
     unsigned short fifo_byte_size = size_div_16<<4;
     rf_set_tx_dma_config();
@@ -60,8 +67,8 @@ void ble_rf_set_tx_dma(unsigned char fifo_dep,unsigned char size_div_16)
     rf_set_tx_dma_fifo_size(fifo_byte_size);
 }
 
-_attribute_ram_code_com_
-void ble_rf_set_rx_dma(unsigned char *buff, unsigned char size_div_16)
+_attribute_ram_code_
+void ble_rf_set_rx_dma(unsigned char *buff, unsigned char size_div_16)//rf_set_rx_dma
 {
     rf_set_rx_dma_config();
     unsigned short fifo_byte_size = size_div_16<<4;
@@ -76,78 +83,215 @@ void ble_rx_dma_config(void){
 }
 
 
-_attribute_ram_code_com_
-void rf_mode_optimize_init(void)
+_attribute_ram_code_
+void rf_mode_optimize_init(void) //rf_mode_init
 {
     pm_set_dig_module_power_switch(FLD_PD_ZB_EN, PM_POWER_UP);
 
-    reg_rst4    |=  FLD_RST4_ZB;
-    reg_clk_en4 |=  FLD_CLK4_ZB_EN;
+    reg_rst4 |= FLD_RST4_ZB;
+    reg_clk_en4 |= FLD_CLK4_ZB_EN;
 
-    reg_n22_rst = 0xfffe;//reset dma_bb,zb_pon,zb,rstl_stimer,rst_modem,rstl_bb(bb:baseband)
-    reg_n22_clk_en = 0xffff;//enable dma_bb,zb_hclk,clk_bb,clkzb32k_lp clock
+    reg_n22_rst    = 0xfffe; //reset dma_bb,zb_pon,zb,rstl_stimer,rst_modem,rstl_bb(bb:baseband)
+    reg_n22_clk_en = 0xffff; //enable dma_bb,zb_hclk,clk_bb,clkzb32k_lp clock
+    reg_bb_timer_ctrl |= FLD_BB_TIMER_TIMER_EN;
 
-    reg_bb_timer_ctrl |=FLD_BB_TIMER_TIMER_EN;
-
+    //BLE SDK use
     //systime and bbtime are synchronized manually
     extern unsigned int  ext_BBTimerTick_BeforeSleep;  //in ext_pm.c
     extern unsigned int  ext_STimerTick_BeforeSleep; //in ext_pm.c
     reg_bb_timer_tick = (reg_system_tick - ext_STimerTick_BeforeSleep)/3 + ext_BBTimerTick_BeforeSleep;  //bbtime is 8M ,STIME is 24m
 
     //one_time_setup
-    write_reg8(0x1706d2,0x9b);//DCOC_SFIIP:bit<4> DCOC_SFQQP:bit<5> DCOC_SFII_L:bit<6-7>
-    write_reg8(0x1706d3,0x19);//DCOC_SFII_H:bit<0-1> DCOC_SFQQ:bit<2-5>
+    write_reg8(0x1706d2, 0x9b); //DCOC_SFIIP:bit<4> DCOC_SFQQP:bit<5> DCOC_SFII_L:bit<6-7>
+    write_reg8(0x1706d3, 0x19); //DCOC_SFII_H:bit<0-1> DCOC_SFQQ:bit<2-5>
 #if RF_RX_SHORT_MODE_EN
-    write_reg8(0x17047b,0x0e);//BLANK_WINDOW
-    write_reg8(0x170479,0x38);//BIT[3] RX_DIS_PDET_BLANK.BIT_RNG[4,5]SHORT MODE all mode open pdet blank to fix
-                              //per floor issue.modified by zhiwei,confirmed by qiangkai and xuqiang.20221205
+    write_reg8(0x17047b, 0x0e); //BLANK_WINDOW
+    write_reg8(0x170479, 0x38); //BIT[3] RX_DIS_PDET_BLANK.BIT_RNG[4,5]SHORT MODE all mode open pdet blank to fix
+                                //per floor issue.modified by zhiwei,confirmed by qiangkai and xuqiang.20221205
 #else
-    write_reg8(0x17047b,0xfe);//BLANK_WINDOW
-    write_reg8(0x170479,0x08);//RX_DIS_PDET_BLANK.BIT_RNG[4,5]SHORT MODE all mode open pdet blank to fix per floor
-                              //issue.modified by zhiwei,confirmed by qiangkai and xuqiang.20221205
+    write_reg8(0x17047b, 0xfe); //BLANK_WINDOW
+    write_reg8(0x170479, 0x08); //RX_DIS_PDET_BLANK.BIT_RNG[4,5]SHORT MODE all mode open pdet blank to fix per floor
+                                //issue.modified by zhiwei,confirmed by qiangkai and xuqiang.20221205
 #endif
 
     //To set AGC thresholds
-    write_reg8(0x17064a,0x0e);//POW_000_001:bit<0-6> POW_001_010_L:bit<7>
-    write_reg8(0x17064b,0x09);//POW_001_010_H:bit<0-5>
-    write_reg8(0x17064e,0x09);//POW_100_101:bit<0-6> POW_101_100_L:bit<7>
-    write_reg8(0x17064f,0x0f);//POW_101_100_H:bit<0-5>
-    write_reg8(0x170654,0x0e);//POW_000_001:bit<0-6> POW_001_010_L:bit<7>
-    write_reg8(0x170655,0x09);//POW_001_010_H:bit<0-5>
-    write_reg8(0x170656,0x0c);//POW_010_011:bit<0-6> POW_011_100_L:bit<7>
-    write_reg8(0x170657,0x08);//POW_011_100_H:bit<0-5>
-    write_reg8(0x170658,0x09);//POW_100_101:bit<0-6> POW_101_100_L:bit<7>
-    write_reg8(0x170659,0x0f);//POW_101_100_H:bit<0-5>
+    write_reg8(0x17064a, 0x0e); //POW_000_001:bit<0-6> POW_001_010_L:bit<7>
+    write_reg8(0x17064b, 0x09); //POW_001_010_H:bit<0-5>
+    write_reg8(0x17064e, 0x09); //POW_100_101:bit<0-6> POW_101_100_L:bit<7>
+    write_reg8(0x17064f, 0x0f); //POW_101_100_H:bit<0-5>
+    write_reg8(0x170654, 0x0e); //POW_000_001:bit<0-6> POW_001_010_L:bit<7>
+    write_reg8(0x170655, 0x09); //POW_001_010_H:bit<0-5>
+    write_reg8(0x170656, 0x0c); //POW_010_011:bit<0-6> POW_011_100_L:bit<7>
+    write_reg8(0x170657, 0x08); //POW_011_100_H:bit<0-5>
+    write_reg8(0x170658, 0x09); //POW_100_101:bit<0-6> POW_101_100_L:bit<7>
+    write_reg8(0x170659, 0x0f); //POW_101_100_H:bit<0-5>
 
     //For optimum preamble detection
-    write_reg8(0x170476,0x50);//RX_PE_DET_MIN_LO_THRESH
-    write_reg8(0x170477,0x73);//RX_PE_DET_MIN_HI_THRESH
-    rf_clr_irq_mask(FLD_RF_IRQ_ALL);//The default interrupt mask in RF is open.
-    reg_rf_ll_ctrl3 &= ~(FLD_RF_R_TX_EN_DLY_EN);//Turn off the extension tx_en function
+    write_reg8(0x170476, 0x50);                  //RX_PE_DET_MIN_LO_THRESH
+    write_reg8(0x170477, 0x73);                  //RX_PE_DET_MIN_HI_THRESH
+    rf_clr_irq_mask(FLD_RF_IRQ_ALL);             //The default interrupt mask in RF is open.
+    reg_rf_ll_ctrl3 &= ~(FLD_RF_R_TX_EN_DLY_EN); //Turn off the extension tx_en function
     //Close the interrupt mask in the initialization code and reopen it when in use
 
+    if ((g_chip_version == CHIP_VERSION_A0) || (g_chip_version == CHIP_VERSION_A1)) {
+        /*
+        *       bit                 default value               note
+        *                                                       note
+        * ---------------------------------------------------------------------------
+        * <5:4>:pa_vbias           default:01,->00,->11(515mv->535mv->465mv)
+        * Reduce pa_vbais voltage to optimise TX transmit power consumption.modified by chenxi.wang,confirmed
+        * by wenfeng.lou 24020826.
+        */
+        write_reg8(0x17074c, 0x30);
+        /*
+        *       bit                 default value               note
+        *                                                       note
+        * ---------------------------------------------------------------------------
+        * <7:5>:TX_BUF_TRIM_DIG           default:0x04,->0x06 Tx lo buffer vbias trim to adjust the duty cycle.
+        * Adjust the duty cycle of the Tx Lo buffer vbias trim to reduce TX power consumption.modified by chenxi.wang,confirmed
+        * by wenfeng.lou 24020826.
+        */
+        write_reg8(0x170638, 0xc8);
+        /*
+        *       bit                 default value               note
+        *                                                       note
+        * ---------------------------------------------------------------------------
+        * <1:0>:PD_TRIM_FCAL_BIAS           default:0x00,->0x02(0.361-->0.457) Trim for the fcal bias block. Vctrl node is biased to this voltage when PLL is in open loop.
+        * <2>:  PD_EN_VPD_PULLUP            default:0x00 enable pullup of vpd.
+        * <3>:  PD_EN_VPD_PULLDN            default:0x00 enable pulldn of vpd.
+        * <5:4>:DAC_TRIM_IBIAS              default:0x00 Not used inside the DAC.
+        * <7:6>:DAC_TRIM_RLOAD              default:0x00 Trim DAC output resistor.
+        * Adjust the voltage of the fcal bias block to improve fdev performance.Due to the revamped design optimization this setting on the A2 chip can be restored to use
+        * the default values.modified by zhiwei.wang,confirmed by wenfeng.lou 20241012.
+        */
+        write_reg8(0x170752, 0x02);
+        /*
+         *       bit                 default value               note
+         *                                                       note
+         * ---------------------------------------------------------------------------
+         * <2:0>:VCO_TRIM_KVT                default:0x07,->0x00(80MHz/V-->50MHz/V) Adjustment of Kv of vctrl path depending upon reference frequency.
+         *                                                                        Default should change depending upon if the reference frequency is 24MHz or 32MHz.
+         * <3>:VCO_EN_PKDET                  default:0x00 enable peak detector operation.
+         * <5:4>:LDOTRIM_TRIM_VREF           default:0x02 Bump bits for the 900 mV LDOTRIM reference voltage..
+         * Adjust the Kv of vctrl path depending upon reference frequency to improve fdev performance.modified by zhiwei.wang,confirmed by wenfeng.lou 20241012.
+         */
+        write_reg8(0x170754, 0x20);
+    }
     /*
-    *       bit                 default value               note
-    *                                                       note
-    * ---------------------------------------------------------------------------
-    * <5:4>:pa_vbias           default:01,->00,->11(515mv->535mv->465mv)
-    * Reduce pa_vbais voltage to optimise TX transmit power consumption.modified by chenxi.wang,confirmed
-    * by wenfeng.lou 24020826.
-    */
-    write_reg8(0x17074c,0x30);
+     *       bit                 default value               note
+     *                                                       note
+     * ---------------------------------------------------------------------------
+     * <2:0>:DAC_TRIM_VCM                default:0x01,->0x07(0.3105-->0.5675) Trim DAC output common mode.
+     * <4:3>:DAC_TRIM_RFBK               default:0x00 Bump bits for the gain of the output opamp in the DAC.
+     * <5>:DAC_INVERT_CLK                default:0x00 Invert the clock edge on which incoming data from digital is latched. By default falling edge is used.
+     * Adjust the DAC_TRIM_VCM gear to improve fdev performance.modified by zhiwei.wang,confirmed by wenfeng.lou 20241012.
+     */
+    write_reg8(0x170753, 0x27);
+    /*
+     *         bit                        default    value                note
+     * ---------------------------------------------------------------------------
+     * <1:0>:PA_RAMP_MODE           default:01,->03 Increment PA slices to programmed value from 0 using delay of 24M between each step.
+     *                              (1 - 2 - 4 - 8 -16 - 32 - 48-63)
+     * <4:2>:EXT_PA_EN_ASSERT_DLY   default:02 delay of ext_pa_en signal going high.0 to 3.5us in steps of 0.5us.
+     * <7:5>:EXT_PA_EN_DEASSERT_DLY default:02 delay of ext_pa_en signal going low.0 to 3.5us in steps of 0.5us.
+     * This setting is set to 0x4b to improve the bandedge characteristics.modified by chenxi.wang,confirmed by wenfeng.lou 20241218.
+     */
+    write_reg8(0x170624, 0x4b);
+    if (g_chip_version == CHIP_VERSION_A2) {
+        /*
+        *       bit                 default value               note
+        *                                                       note
+        * ---------------------------------------------------------------------------
+        * <1:0>:lna_itrim          default:00,->11(4.4u->6.2u)
+        * <5:4>:pa_vbias           default:01,->00,->11(515mv->535mv->465mv)
+        * Reduce pa_vbais voltage to optimise TX transmit power consumption and Adjusting lna_itrim to optimize RX performance.
+        * modified by chenxi.wang,confirmed by wenfeng.lou 20241205.
+        */
+        write_reg8(0x17074c, 0x33);
+        /*
+         *       bit                 default value               note
+         *                                                       note
+         * ---------------------------------------------------------------------------
+         * <2:0>:VCO_TRIM_KVT                default:0x07,->0x03(80MHz/V-->70MHz/V) Adjustment of Kv of vctrl path depending upon reference frequency.
+         *                                                                        Default should change depending upon if the reference frequency is 24MHz or 32MHz.
+         * <3>:VCO_EN_PKDET                  default:0x00 enable peak detector operation.
+         * <5:4>:LDOTRIM_TRIM_VREF           default:0x02,->0x03 Bump bits for the 900 mV LDOTRIM reference voltage..
+         * Adjust the Kv of vctrl path depending upon reference frequency to improve fdev performance.modified by zhiwei.wang,confirmed by wenfeng.lou 20241012.
+         */
+        write_reg8(0x170754, 0x33);
+        /*
+         * This configuration is used for A2 to improve the performance of rf rx sensitivity.
+         * Defaults to RF_RX_NORMAL_PERFORMANCE for A2.
+         * If you need higher performance, you need to call rf_rx_performance_mode() after rf_mode_init;
+         * Select the RF_RX_HIGH_PERFORMANCE mode, in which the RX sensitivity will increase, but the receiving power consumption will increase
+         * (modified by chenxi.wang,confirmed by wenfeng.lou 20241205.)
+         */
+        rf_rx_performance_mode(RF_RX_HIGH_PERFORMANCE);
+        /*
+         * This configuration is used for A2 to improve the tx power.
+         * Defaults to RF_TX_NORMAL_POWER for A2.
+         * If you need higher power, you need to call rf_tx_power_mode() after rf_mode_init;
+         * RF_TX_HIGH_POWER mode can increase tx power energy.
+         * Note:
+         * (1)In version A2, if the transmission power exceeds 10 dBm, it will cause the 2M transmission drift test to fail.
+         *    To resolve this, it is necessary to increase the preamble length to 7 byte in 2M mode.
+         * (2)This interface is only for internal testing purposes.
+         * (modified by chenxi.wang,confirmed by wenfeng.lou 20241205.)
+         */
+        extern void rf_tx_power_mode(rf_tx_power_e tx_power_mode);
+        rf_tx_power_mode(RF_TX_NORMAL_POWER);
 
+        /*
+         *   reg            bit                 default value               note
+         *                                                       note
+         * ---------------------------------------------------------------------------
+         * LDO1_1(0x170741)       <5>:VCO_TRIM_KVT          default:0,-> 1 Bypass the LDO output to Vline
+         * REG_SPARELV1(0x17075c) <3>:                      default:0,-> 1 Bypass the LDO output to Vline
+         * The following two configurations increase the output power in ANT mode by using ANT_LDO bypass. modified by chenxi.wang,confirmed by wenfeng.lou 20241210.
+         */
+        write_reg8(0x170741, 0x20);
+        write_reg8(0x17075c, 0x09);
+    }
+
+#if(RF_RX_DCOC_SOFTWARE_CAL_EN)
+    if (s_dcoc_software_cal_en == 1) {
+        /*Solve the problem of unstable rx sensitivity test of some chips by software dcoc calibration scheme. If the calibration value is
+         *not lost after a calibration is completed, it can be used directly without recalibration. Since the _attribute_data_retention_sec_ type
+         *variable is not lost in suspend and deep retention modes, it can be used to record the calibration value to avoid having to perform
+         *software calibration again after returning from suspend and deep retention modes.(Modified by zhiwei,confirmed by xuqiang and yuya at 20250102.)
+         *After calibration is completed, it is impossible for the value of g_rf_dcoc_iq_code to be 0.
+         *@Note:
+         *(1)According to B92's setup the solution is to put it at the beginning of rf_mode_init;However, on the TL721x, I found that the dcoc calibration is
+         *not good where it is placed after reg_bb_timer_ctrl |= FLD_BB_TIMER_TIMER_EN;.Confirmed with yuya that it needs to be delayed(typical value:5us) for
+         *a while after power up so put the solution at the end of rf_mode_init on the TL721X.(Modified by zhiwei,confirmed by xuqiang,jianzhi and yuya at 20250102.)
+         *(2)Once the software DCOC is calibrated, there is no need to retrieve the calibration value and set it back during the fast settle process.However, the sequence of
+         * fast settle is only related to the setsettle time, so this part does not need to be changed accordingly to the software dcoc.(Modified by zhiwei,confirmed by yuya at 20250109.)
+         *(3)The calibration of the software DCOC needs to be done after the call to the rf_rx_performance_mode function, as this function changes the current resulting
+         *in different DCOC values.(Modified by zhiwei,confirmed by wenfeng at 20250109.)
+         */
+        if (g_rf_dcoc_iq_code == 0) {
+            rf_rx_dcoc_cali_by_sw();
+        } else {
+            rf_set_dcoc_iq_offset(0x0001);
+            rf_set_dcoc_iq_code(g_rf_dcoc_iq_code);
+        }
+    }
+#endif
     /*
-    *       bit                 default value               note
-    *                                                       note
-    * ---------------------------------------------------------------------------
-    * <7:5>:TX_BUF_TRIM_DIG           default:0x04,->0x06 Tx lo buffer vbias trim to adjust the duty cycle.
-    * Adjust the duty cycle of the Tx Lo buffer vbias trim to reduce TX power consumption.modified by chenxi.wang,confirmed
-    * by wenfeng.lou 24020826.
-    */
-    write_reg8(0x170638,0xc8);
+     *         bit                        default    value                note
+     * ---------------------------------------------------------------------------
+     * <7>:PA_RAMP_TSEQ_OR_TX_ON_SEL      default:0,->1 bit to select between tx on or pa ramp from timing sequence
+     * (1)This setting advances the PA ramp start time to the end of the timing sequence,
+     *    and after configuration, tx performs PA ramp up before preamble carrier.
+     * (2)Due to the PA ramp up performed by tx before preamble transmission, the settling time of tx will increase by 8us.
+     *    To adapt to this TX method, the preamble length will be reduced
+     *  Modified by chenxi.wang,confirmed by xuqiang.zhang 20250114.
+     */
+     reg_rf_lnm_pa_ow_ctrl_val |=FLD_RF_PA_RAMP_TSEQ_OR_TX_ON;
 }
+
 #if BLC_PM_EN
-_attribute_ram_code_com_
+_attribute_ram_code_
 #endif
 void rf_drv_ble_init(void)
 {
@@ -180,7 +324,7 @@ void rf_drv_ble_init(void)
 _attribute_data_retention_ unsigned char rf_channel_power[40];
 _attribute_data_retention_ unsigned char channel_power_calibration_enable = 0;
 
-_attribute_ram_code_com_ //must be RamCode
+_attribute_ram_code_ //must be RamCode
 void ble_rf_set_chn_power(signed char  chn_num)
 {
     unsigned char value = (unsigned char)(rf_channel_power[chn_num] & 0x3F);
@@ -214,40 +358,38 @@ void rf_set_channel_power_enable(unsigned char enable)
  * @param[in]   chn_num  - Bluetooth channel set according to Bluetooth protocol standard.
  * @return      none.
  */
-_attribute_ram_code_com_ //must be RamCode
+_attribute_ram_code_ //must be RamCode
 void rf_set_ble_channel (signed char chn_num)
 {
-#if FAST_SETTLE
-    unsigned char ble_chn = chn_num;
-#endif
+    signed char ble_chn_num = 0;
     write_reg8 (0x170020, chn_num);
-    if (chn_num < 11)
-        chn_num += 2;
-    else if (chn_num < 37)
-        chn_num += 3;
-    else if (chn_num == 37)
-        chn_num = 1;
-    else if (chn_num == 38)
-        chn_num = 13;
-    else if (chn_num == 39)
-        chn_num = 40;
 
-    chn_num = chn_num << 1;
-    rf_set_chn(chn_num);
+    if (chn_num < 11)
+        ble_chn_num = chn_num + 2;
+
+    else if (chn_num < 37)
+        ble_chn_num = chn_num + 3;
+
+    else if (chn_num == 37)
+        ble_chn_num = 1;
+
+    else if (chn_num == 38)
+        ble_chn_num = 13;
+
+    else if (chn_num == 39)
+        ble_chn_num = 40;
 #if RF_THREE_CHANNEL_CALIBRATION
     if(channel_power_calibration_enable)
     {
-        ble_rf_set_chn_power(chn_num);
+        ble_rf_set_chn_power(ble_chn_num - 1);
     }
 #endif
-#if FAST_SETTLE
-    if(fast_settle.tx_fast_en){
-        set_rf_hpmc_cal_val(fast_settle.cal_tbl[ble_chn]);
-    }
-#endif
+    ble_chn_num = ble_chn_num << 1;
+    rf_set_chn(ble_chn_num);
+
 }
 
-_attribute_ram_code_com_
+_attribute_ram_code_
 void rf_start_fsm (fsm_mode_e mode, void* tx_addr, unsigned int tick)
 {
     unsigned int r = core_interrupt_disable(); //prevent user IRQ priority 3 task destroying FSM setting
@@ -273,7 +415,7 @@ void rf_start_fsm (fsm_mode_e mode, void* tx_addr, unsigned int tick)
 
 
 // todo here need to optimize_Bool
-_attribute_ram_code_com_
+_attribute_ram_code_
 _Bool ll_resolvPrivateAddr(u8 *irk, u8 *addr, u8 irk_num)
 {
     reg_cv_llbt_hash_status = FLD_CV_RPASE_STATUS_CLR; //clear flag
@@ -333,231 +475,10 @@ u8 ll_getRpaAddr(u8 *irk, u8 prand[3], u8 rpa[6])
 
 #if FAST_SETTLE
 
-#define RADIOADDR 0x170600
-
-_attribute_data_retention_ Fast_Settle fast_settle;
-
-/* close hpmc(53us), ldotrim(4.5us),save 58us
- * 0x140e84:[0] tx ldo trim
- *          [1] tx fcal
- *          [2] tx hpmc
- *          [3] tx dcoc
- */
-_attribute_ram_code_com_
-void ble_rf_tx_fast_settle()
-{
-    //close hpmc and ldo trim
-    write_reg8(RADIOADDR+0x84,(read_reg8(RADIOADDR+0x84)&0xf0)|0x0a); //1010
-
-    write_reg8(RADIOADDR+0x96,0x00);    //0
-    write_reg8(RADIOADDR+0x97,0x08);    //8us
-    write_reg8(RADIOADDR+0x98,0x30);    //48us
-    write_reg8(RADIOADDR+0x99,0x31);    //48.5us
-    write_reg8(RADIOADDR+0x9a,0x33);    //51us
-    write_reg8(RADIOADDR+0x9b,0x30);    //0x6a
-
-
-    // only close hpmc
-//  write_reg8(RADIOADDR+0x84,(read_reg8(RADIOADDR+0x84)&0xf8)|0x0b); //1011
-//
-//  write_reg8(RADIOADDR+0x96,0x00);    //0
-//  write_reg8(RADIOADDR+0x97,0x0d);    //13us
-//  write_reg8(RADIOADDR+0x98,0x35);    //53us
-//  write_reg8(RADIOADDR+0x99,0x36);    //53.5us
-//  write_reg8(RADIOADDR+0x9a,0x38);    //55.5us
-//  write_reg8(RADIOADDR+0x9b,0x35);    //53us
-
-    // only ldo trim
-//  write_reg8(RADIOADDR+0x84,(read_reg8(RADIOADDR+0x84)&0xf8)|0x0e); //1110
-//
-//  write_reg8(RADIOADDR+0x96,0x00);    //0
-//  write_reg8(RADIOADDR+0x97,0x08);    //8us
-//  write_reg8(RADIOADDR+0x98,0x65);    //48us
-//  write_reg8(RADIOADDR+0x99,0x66);    //48.5us
-//  write_reg8(RADIOADDR+0x9a,0x68);    //51us
-//  write_reg8(RADIOADDR+0x9b,0x65);    //0x6a
-
-    // all open,
-//  write_reg8(RADIOADDR+0x84,(read_reg8(RADIOADDR+0x84)&0xf8)|0x0f); //1111
-//
-//  write_reg8(RADIOADDR+0x96,0x00);    //0
-//  write_reg8(RADIOADDR+0x97,0x0d);    //8us
-//  write_reg8(RADIOADDR+0x98,0x6a);    //48us
-//  write_reg8(RADIOADDR+0x99,0x6b);    //48.5us
-//  write_reg8(RADIOADDR+0x9a,0x6d);    //51us
-//  write_reg8(RADIOADDR+0x9b,0x6a);    //0x6a
-
-
-}
-
-/* close dcoc(40us), ldotrim(4.5us),save 45us
- * 0x140e84:[4] rx ldo trim
- *          [5] rx fcal
- *          [6] rx rccal
- *          [7] rx dcoc
- */
-
-_attribute_ram_code_com_
-void ble_rf_rx_fast_settle()
-{
-    write_reg8(RADIOADDR+0x84,(read_reg8(RADIOADDR+0x84)&0x0f)|0x60);
-
-    write_reg8(RADIOADDR+0x9c,0x00);    //0us
-    write_reg8(RADIOADDR+0x9d,0x08);    //8us
-    write_reg8(RADIOADDR+0x9e,0x08);    //8us
-    write_reg8(RADIOADDR+0x9f,0x1b);    //34us
-    write_reg8(RADIOADDR+0xa0,0x25);    //37us
-    write_reg8(RADIOADDR+0xa1,0x25);    //37us
-}
-
-_attribute_ram_code_com_
-unsigned short get_rf_hpmc_cal_val()
-{
-    unsigned short cali;
-    unsigned short r;
-    cali = read_reg16(RADIOADDR+0xfe);  //140efe<0:10>
-    r = (cali<<1)& 0x0ffe;      //to 140ef6 <1:11>  0000 1111 1111 1110
-    return r;
-}
-
-
-_attribute_ram_code_com_
-void set_rf_hpmc_cal_val(unsigned short value)
-{
-    unsigned short tmp = read_reg16(RADIOADDR+0xf6);
-    tmp = (tmp & 0xf001) | value | 0x0001;  //bit<1:11> 1111 0000 0000 0001
-    write_reg16(RADIOADDR+0xf6,tmp);
-}
-
-/**
- *  @brief      this function serve to enable the tx timing sequence adjusted.
- *  @param[in]  none
- *  @return     none
-*/
-void ble_rf_tx_fast_settle_en(void)
-{
-    fast_settle.tx_fast_en = 1;
-    write_reg8(RADIOADDR+0x29,read_reg8(RADIOADDR+0x29)|0x10);  //140e29 <4>
-}
-
-/**
- *  @brief      this function serve to disable the tx timing sequence adjusted.
- *  @param[in]  none
- *  @return     none
-*/
-void ble_rf_tx_fast_settle_dis(void)
-{
-    fast_settle.tx_fast_en = 0;
-    write_reg8(RADIOADDR+0x29,read_reg8(RADIOADDR+0x29)&0xef);  //140e29 <4>
-}
-
-/**
- *  @brief      this function serve to enable the rx timing sequence adjusted.
- *  @param[in]  none
- *  @return     none
-*/
-void ble_rf_rx_fast_settle_en(void)
-{
-    fast_settle.rx_fast_en = 1;
-    write_reg8(RADIOADDR+0x29,read_reg8(RADIOADDR+0x29)|0x08);  //140e29 <3>
-}
-
-/**
- *  @brief      this function serve to disable the rx timing sequence adjusted.
- *  @param[in]  none
- *  @return     none
-*/
-void ble_rf_rx_fast_settle_dis(void)
-{
-    fast_settle.rx_fast_en = 0;
-    write_reg8(RADIOADDR+0x29,read_reg8(RADIOADDR+0x29)&0xf7);  //140e29 <3>
-}
-
-u8 ble_is_rf_tx_fast_settle_en()
-{
-    return fast_settle.tx_fast_en;
-}
-
-u8 ble_is_rf_rx_fast_settle_en()
-{
-    return fast_settle.rx_fast_en;
-}
-#if 0  //B92 use drivers
-/*
- *  LDOT_RDBK1      0xea        0x00
- *                  LDOT_LDO_CAL_TRIM   [5:0]   0x00
- *  LDOT_RDBK2_0    0xec        0xc0
- *                  LDOT_LDO_RXTXHF_TRIM    [5:0]   0x00
- *                  LDOT_LDO_RXTXLF_TRIM_L  [7:6]   0x3
- *  LDOT_RDBK2_1    0xed        0x05
- *                  LDOT_LDO_RXTXLF_TRIM_H  [3:0]   0x5
- *  LDOT_RDBK3_0    0xee        0x00
- *                  LDOT_LDO_PLL_TRIM   [5:0]   0x00
- *                  LDOT_LDO_VCO_TRIM_L [7:6]   0x0
- *  LDOT_RDBK3_1    0xef        0x00
- *                  LDOT_LDO_VCO_TRIM_H [3:0]   0x0
- */
-void get_ldo_trim_val(u8* p)
-{
-    u8  tmp_val;
-    *p++ = read_reg8(RADIOADDR+0xea) & 0x3f;                        //LDO_CAL_TRIM 0xea[5:0]
-    tmp_val = read_reg8(RADIOADDR+0xec);
-    *p++ = tmp_val & 0x3f;                                          //LDO_RXTXHF_TRIM 0xec[5:0]
-    *p++ = (tmp_val & 0xc0)>>6 | (read_reg8(RADIOADDR+0xed)&0x0f)<<2 ;  //LDO_RXTXLF_TRIM 0xec[7:6]  0xed[3:0]
-    tmp_val = read_reg8(RADIOADDR+0xee);
-    *p++ = tmp_val & 0x3f;                                          //LDO_PLL_TRIM 0xee[5:0]
-    *p++ = (tmp_val & 0xc0)>>6 | (read_reg8(RADIOADDR+0xef)&0x0f)<<2;   //LDO_VCO_TRIM 0xee[7:6]  0xef[3:0]
-}
-
-/*
- *  LDOT_DBG1   0xe2        0x40
- *              LDOT_LDO_CAL_BYPASS [0] 0x0
- *              LDOT_LDO_CAL_TRIM_OVERWRITE [6:1]   0x20
- *  LDOT_DBG2_0 0xe4        0x80
- *              LDOT_LDO_RXTXHF_BYPASS  [0] 0x0
- *              LDOT_LDO_RXTXLF_BYPASS  [1] 0x0
- *              LDOT_LDO_RXTXHF_TRIM_OVERWRITE  [7:2]   0x20
- *  LDOT_DBG2_1 0xe5        0x20
- *              LDOT_LDO_RXTXLF_TRIM_OVERWRITE  [5:0]   0x20
- *  LDOT_DBG3_0 0xe6        0x80
- *              LDOT_LDO_PLL_BYPASS [0] 0x0
- *              LDOT_LDO_VCO_BYPASS [1] 0x0
- *              LDOT_LDO_PLL_TRIM_OVERWRITE [7:2]   0x20
- *  LDOT_DBG3_1 0xe7        0x20
- *              LDOT_LDO_VCO_TRIM_OVERWRITE [5:0]   0x20
- */
-void set_ldo_trim_val(u8* p)
-{
-    write_reg8(RADIOADDR+0xe2 ,(*p++ << 1) | 0x01);
-    write_reg8(RADIOADDR+0xe4 ,(*p++ << 2) | 0x03);
-    write_reg8(RADIOADDR+0xe5 , *p++);
-    write_reg8(RADIOADDR+0xe6 ,(*p++ << 2) | 0x03);
-    write_reg8(RADIOADDR+0xe7 , *p);
-}
-#endif
-/*need to use :
- * PA0,PA1,PA2
- * PB1,PB7,
- * PC0,PC1,PC2,PC3,PC4
- */
-
-void bb_dbg_setting(void)
-{
-    unsigned int GPIO_BASE = 0x140300;
-
-    sub_wr(GPIO_BASE+0x55, 0, 7, 4); //dbg_sel_bt1-4 = 0
-    sub_wr(GPIO_BASE+0x54, 3, 2, 1); //dbg_sel_bb_h/l = 1
-    sub_wr(GPIO_BASE+0x54, 0 ,5, 5); //dbg_axon_bb_sel = 0
-
-    sub_wr(GPIO_BASE+0x0e, 0, 1, 1); //pb_io[1]
-    sub_wr(GPIO_BASE+0x32, 3, 3, 2); //pb[1] tx_data_o
-    sub_wr(GPIO_BASE+0x06, 0, 2, 2); //pa_io[2]
-    sub_wr(GPIO_BASE+0x30, 3, 5, 4); //pa[2] rx_en_o
-    sub_wr(GPIO_BASE+0x06, 0, 1, 1); //pa_io[1]
-    sub_wr(GPIO_BASE+0x30, 3, 3, 2); //pa[1] tx_on_o
-    sub_wr(GPIO_BASE+0x06, 0, 0, 0); //pa_io[0]
-    sub_wr(GPIO_BASE+0x30, 3, 1, 0); //pa[0] tx_en_o
-}
+_attribute_data_retention_ Fast_Settle fast_settle_1M;
+_attribute_data_retention_ Fast_Settle fast_settle_2M;
+_attribute_data_retention_ Fast_Settle fast_settle_S2;
+_attribute_data_retention_ Fast_Settle fast_settle_S8;
 
 
 #endif

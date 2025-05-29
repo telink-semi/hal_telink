@@ -28,8 +28,35 @@
 #else
     .equ __BOOT_SWITCH_FLASH_ADDR, 0x20000000
 #endif
+    
+ /**
+ * @brief   Set "DP_THROUGH_SWIRE_DIS" as "1" to disable the "dp_through_swire" function. Set "DP_THROUGH_SWIRE_DIS" as "0" to enable the "dp_through_swire" function.
+ *          Risk description:
+ *          The "dp_through_swire" function is enabled by default.When DP and DM pin are used as GPIO function and trigger "dp_through_swire" timing,
+ *          there may be a problem of miswriting the chip through swire to cause the chip to crash. Therefore, disable the "dp_through_swire" function in this startup file.(set "DP_THROUGH_SWIRE_DIS" as "1").
+ *          If the chip has only dp pin but no sws pin, using the above scheme (set "DP_THROUGH_SWIRE_DIS" as "1") will cause the following problems.
+ *          1. During fixture production, burning a firmware program that disables the "dp_through_swire"function into unprogrammed chip will cause the problem that chip can not be burned again due to swire communication failure.
+ *          2. Burning a firmware program that disables the "dp_through_swire" function with BDT tool may result in failure of debugging due to swire communication failure.
+ *          If developers evaluate that the above scheme (set "DP_THROUGH_SWIRE_DIS" as "1") cannot be used, they can only set "DP_THROUGH_SWIRE_DIS" to "0" to enable the "dp_through_swire" function. However, be careful not to make DP and DM pin trigger "dp_through_swire" timing.
+ *          In USB applications, 1. calling the usb_set_pin(1) interface (equivalent to usb_set_pin_en) will re-enable the dp_through_swire function 2. calling the usb_set_pin(0) interface will disable the dp_through_swire function.
+ */
+#ifndef DP_THROUGH_SWIRE_DIS
+#define DP_THROUGH_SWIRE_DIS      0
+#endif
 
-#if 1   /*default is open*/
+/* If using Andes toolchain, these two Macro are defined in it's toolchain */
+/* If using std gcc toolchain, these two core registers(not standard risc-v core registers)
+    should be defined here. */
+#ifdef STD_GCC
+#define mmisc_ctl  0x7D0
+#define mcache_ctl 0x7CA
+#endif
+
+//According to the current internal seal flash model of B91m, the maximum time between the flash awakening and the operating flash is 20us, which leaves some margin and is set to 25us.
+//When adding flash later, if tRES1 is greater than 25us, this waiting time needs to be updated. (flash tRES1, which can be viewed in the comments of the variable flash_support_mid.)
+//(add by weihua.zhang 20230811)
+#define EFUSE_LOAD_AND_FLASH_WAKEUP_LOOP_NUM        320 //25us
+
     .section .vectors, "ax"
     .global __BOOT_SWITCH_FLASH_ADDR
     
@@ -49,6 +76,11 @@ _RESET_ENTRY:
     j        _START
     //free the 6th ~ 7th byte to store the crc type of the bin file
 
+    /* This configuration is specifically for RF_Certification and does not need to be enabled for other scenarios */
+#ifdef RF_CERTIFICATION_CGF_EN
+    .org 0x10
+    .word(_RF_CERTIFICATION_CFG_ADDR_OFFSET)
+#endif
 /* used to check flash protection function consistency between the old and new  firmware when OTA upgrading */
 #if APP_FLASH_PROTECTION_ENABLE
     .org 0x15    //correspond to "FIRMWARE_FLASH_PROTECTION_FLAG_ADDR" in mcu_boot.h
@@ -61,17 +93,15 @@ _RESET_ENTRY:
     .word ('T'<<24 | 'L'<<16 | 'N'<<8 | 'K')
 
     .org 0x26
-    //.short (0x0003)           //READ:    cmd:1x, addr:1x, data:1x, dummy:0
-    //.short (0x070B)           //FREAD:   cmd:1x, addr:1x, data:1x, dummy:8
-    .short (0x173B)           //DREAD:   cmd:1x, addr:1x, data:2x, dummy:8
-    //.short (0x53BB)           //X2READ:  cmd:1x, addr:2x, data:2x, dummy:4
-    //.short (0x276B)           //QREAD:   cmd:1x, addr:1x, data:4x, dummy:8
-    //.short (0x65EB)             //X4READ:  cmd:1x, addr:4x, data:4x, dummy:6
+    //.short (0x070B)           //FREAD:   cmd:1x, addr:1x, data:1x, dummy cycle:8
+    .short (0x173B)             //DREAD:   cmd:1x, addr:1x, data:2x, dummy cycle:8
+    //.short (0x53BB)           //X2READ:  cmd:1x, addr:2x, data:2x, dummy cycle:4
+    //.short (0x276B)           //QREAD:   cmd:1x, addr:1x, data:4x, dummy cycle:8
+    //.short (0x65EB)           //X4READ:  cmd:1x, addr:4x, data:4x, dummy cycle:6
     .option pop
     .align 2
 
 _START:
-
 #if 0
     // add debug, PB4 output 1
     lui     t0,0x80140          //0x8014030a
@@ -80,12 +110,39 @@ _START:
     sb      t1 , 0x30a(t0)       //0x8014030a  PB oen     =  0xef
     sb      t2 , 0x30b(t0)       //0x8014030b  PB output  =  0x10
 #endif
+
+    /* timer rst enable. */
+    li      t0, 0x801401e2 /* reg_rst2 register address. */
+    li      t1, 0x39       /* bit0=1 timer enable(reset velue 0x38). */
+    sb      t1, 0x0(t0)    /* (*(volatile unsigned char*)(0x801401e2))= 0x39. */
+
+    /* timer clk enable. */
+    li      t0, 0x801401e6 /* tim_ctrl2 register address. */
+    li      t1, 0x31       /* bit0=1 timer enable(reset velue 0x30). */
+    sb      t1, 0x0(t0)    /* (*(volatile unsigned char*)(0x801401e6))= 0x31. */
+
+    /* set timer watchdog value: 10s. */
+    li      t0, 0x8014014c /* wt_target register address. */
+    li      t1, 0xe4e1c00  /* watchdog value = 0xe4e1c00(10s * 24000000) */
+    sw      t1, 0x0(t0)    /* (*(volatile unsigned long*)(0x8014014c))= 0xe4e1c00. */
+
+    /* start timer watchdog. */
+    li      t0, 0x80140142 /* tim_ctrl2 register address. */
+    li      t1, 0x80       /* bit7=1 watchdog enable(reset velue 0x00). */
+    sb      t1, 0x0(t0)    /* (*(volatile unsigned char*)(0x80140142))= 0x80. */
+    
     /* Initialize global pointer */
     .option push
     .option norelax
     la     gp, __global_pointer$
     .option pop
 
+#if DP_THROUGH_SWIRE_DIS
+    lui     t0, 0x80100
+    addi    t0 , t0 , 0x700
+    li      t1, 0x00
+    sb      t1, 0x501(t0)  //0x80100c01 -> 0x00  <7>: 0 swire_usb_dis 
+#endif
     /* Initialize stack pointer */
     la     t0, _STACK_TOP
     mv     sp, t0
@@ -121,7 +178,7 @@ _START:
 */
     /*vector mode enable bit (VECTORED) of the Feature Enable Register */
     lui     t0, 0xe4000
-    li      t1, 0x03
+    li      t1, 0x02
     sw      t1, 0x0(t0)      //(*(volatile unsigned long*)(0xe4000000))= 0x02
 
     /* Enable I/D-Cache */
@@ -226,8 +283,8 @@ _FILL_STK:
 #if 0
     lui    t0, 0x55555
     addi   t0, t0, 0x555
-    la     t2, _BSS_VMA_END
-    la     t3, _STACK_TOP
+    la     t2, _BSS_VMA_END  //_BSS_VMA_END must be 4-byte aligned
+    la     t3, _STACK_TOP    //_STACK_TOP   must be 4-byte aligend
 _FILL_STK_BEGIN:
     bleu   t3, t2, _MAIN_FUNC
     sw     t0, 0(t2)
@@ -261,32 +318,53 @@ _IRESET_ENTRY:
     /* Decide whether this is an NMI or cold reset */
     j       _ISTART
 
-    .org 0x22
+    /* BLE SDK use: change from 0x22 to 0x24 */
+    .org 0x24
+
 _ISTART:
-
-
 /* GPIO_DEBUG */
 #if 0
-    // add debug, PE1 output 1
-    lui     t0, 0x80140             //0x80140322
-    li      t1, 0xfd
-    li      t2, 0x02
-    sb      t1 , 0x322(t0)       //0x8014030a  Pe oen     =  0xfd
-    sb      t2 , 0x323(t0)       //0x8014030b  Pe output  =  0x02
+    // add debug, PB4 output 1
+    lui     t0, 0x80140             //0x8014030a
+    li      t1, 0xef
+    li      t2, 0x10
+    sb      t1 , 0x30a(t0)       //0x8014030a  PB oen     =  0xef
+    sb      t2 , 0x30b(t0)       //0x8014030b  PB output  =  0x10
 #endif
-#if 0
-    // add debug, PD0 output 1
-    lui     t0,0x80140          //0x8014031a
-    li      t1, 0xfe
-    li      t2, 0x01
-    sb      t1 , 0x31a(t0)       //0x8014031a  PD oen     =  0xfe
-    sb      t2 , 0x31b(t0)       //0x8014031b  PD output  =  0x01
-#endif
+
+    /* timer rst enable. */
+    li      t0, 0x801401e2 /* reg_rst2 register address. */
+    li      t1, 0x39       /* bit0=1 timer enable(reset velue 0x38). */
+    sb      t1, 0x0(t0)    /* (*(volatile unsigned char*)(0x801401e2))= 0x39. */
+
+    /* timer clk enable. */
+    li      t0, 0x801401e6 /* tim_ctrl2 register address. */
+    li      t1, 0x31       /* bit0=1 timer enable(reset velue 0x30). */
+    sb      t1, 0x0(t0)    /* (*(volatile unsigned char*)(0x801401e6))= 0x31. */
+
+    /* set timer watchdog value: 10s. */
+    li      t0, 0x8014014c /* wt_target register address. */
+    li      t1, 0xe4e1c00  /* watchdog value = 0xe4e1c00(10s * 24000000) */
+    sw      t1, 0x0(t0)    /* (*(volatile unsigned long*)(0x8014014c))= 0xe4e1c00. */
+
+    /* start timer watchdog. */
+    li      t0, 0x80140142 /* tim_ctrl2 register address. */
+    li      t1, 0x80       /* bit7=1 watchdog enable(reset velue 0x00). */
+    sb      t1, 0x0(t0)    /* (*(volatile unsigned char*)(0x80140142))= 0x80. */
 
     /* Initialize global pointer */
-
     la     gp, __global_pointer$
     .option pop
+
+/*
+* swire usb enable default.when dp and dm use as GPIO, it has a risk to trigger the swire through usb function
+* to do something unexcept when toggle dp pin
+*/
+_ISWS_USB_DIS:
+    lui     t0, 0x80100
+    addi    t0 , t0 , 0x700
+    li      t1, 0x40
+    sb      t1, 0x501(t0)  //0x80100c01 -> 0x40  <7>: 0 swire_usb_dis
 
     /* Initialize stack pointer */
     la     t0, _STACK_TOP
@@ -324,8 +402,8 @@ _ISTART:
 */
     /*vector mode enable bit (VECTORED) of the Feature Enable Register */
     lui     t0, 0xe4000
-    li      t1, 0x03
-    sw      t1, 0x0(t0)      //(*(volatile unsigned long*)(0xe4000000))= 0x03
+    li      t1, 0x02
+    sw      t1, 0x0(t0)      //(*(volatile unsigned long*)(0xe4000000))= 0x02
 
     /* Enable I/D-Cache */
     csrr   t0,  mcache_ctl
@@ -357,12 +435,14 @@ _MSPI_WAIT:
     li      t1, 0x00
     sb      t1 , 0x30b(t0)       //0x8014030b  PB output  =  0x00
 #endif
-/*efuse load need delay about 18us */
+
+    /*flash wakeup need delay about 20us */
+    /*efuse load need delay about 18us */
     li      t0 , 0
-    li      t1 , 226
-_WAIT_EFUSE_LOAD_FINISH:
+    li      t1 , EFUSE_LOAD_AND_FLASH_WAKEUP_LOOP_NUM
+_WAIT_EFUSE_LOAD_AND_FLASH_WAKEUP_FINISH:
     addi    t0 , t0 , 1
-    bgeu    t1 , t0 , _WAIT_EFUSE_LOAD_FINISH
+    bgeu    t1 , t0 , _WAIT_EFUSE_LOAD_AND_FLASH_WAKEUP_FINISH
 
 #if 0
     // add debug, PB4 output 1
@@ -395,21 +475,6 @@ _IRAMCODE_INIT_BEGIN:
     j      _IRAMCODE_INIT_BEGIN
 #endif
 
-    /* Move Data from flash to sram */
-_IDATA_INIT:
-    la     t1, _DATA_LMA_START
-    la     t2, _DATA_VMA_START
-    la     t3, _DATA_VMA_END
-_IDATA_INIT_BEGIN:
-    bleu   t3, t2, _IZERO_BSS
-    lw     t0, 0(t1)
-    sw     t0, 0(t2)
-    addi   t1, t1, 4
-    addi   t2, t2, 4
-    j      _IDATA_INIT_BEGIN
-
-
-
     /* Zero .bss section in sram */
 _IZERO_BSS:
     lui    t0, 0
@@ -438,14 +503,28 @@ _IFILL_STK:
 #if 0
     lui    t0, 0x55555
     addi   t0, t0, 0x555
-    la     t2, _BSS_VMA_END
-    la     t3, _STACK_TOP
+    la     t2, _BSS_VMA_END     //_BSS_VMA_END  must be 4-byte aligned
+    la     t3, _STACK_TOP       //_STACK_TOP    must be 4-byte aligned
 _IFILL_STK_BEGIN:
-    bleu   t3, t2, _IMAIN_FUNC
+    bleu   t3, t2, _IDATA_INIT
     sw     t0, 0(t2)
     addi   t2, t2, 4
     j      _IFILL_STK_BEGIN
 #endif
+    /* Move Data from flash to sram */
+    //Read the flash as late as possible to lengthen the time from the wake up to the operation of the flash.
+_IDATA_INIT:
+    la     t1, _DATA_LMA_START
+    la     t2, _DATA_VMA_START
+    la     t3, _DATA_VMA_END
+_IDATA_INIT_BEGIN:
+    bleu   t3, t2, _IMAIN_FUNC
+    lw     t0, 0(t1)
+    sw     t0, 0(t2)
+    addi   t1, t1, 4
+    addi   t2, t2, 4
+    j      _IDATA_INIT_BEGIN
+
     /* Jump to the main function */
 _IMAIN_FUNC:
     nop
@@ -499,4 +578,3 @@ __vectors:
     INTERRUPT %irqno
     .set irqno, irqno+1
     .endr
-#endif

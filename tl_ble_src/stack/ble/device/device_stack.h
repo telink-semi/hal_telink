@@ -27,29 +27,32 @@
 #include "stack/ble/ble_config.h"
 
 #if (MULTIPLE_LOCAL_DEVICE_ENABLE)
-    #ifndef     LOCAL_DEVICE_NUM_MAX
-    #define     LOCAL_DEVICE_NUM_MAX                            4
+    #ifndef LOCAL_DEVICE_NUM_MAX
+        #define LOCAL_DEVICE_NUM_MAX 4
     #endif
 #else
-    #define     LOCAL_DEVICE_NUM_MAX                            1
+    #define LOCAL_DEVICE_NUM_MAX 1
 #endif
 
 
-typedef struct {
+typedef struct
+{
     u8 set;
     u8 type;
     u8 address[BLE_ADDR_LEN];
-}dev_addr_t;
+} dev_addr_t;
 
-typedef struct{
-    u8  mldev_en;
-    u8  cur_dev_idx;  //current use index
-    u8  rsvd1;
-    u8  rsvd2;
+typedef struct
+{
+    u8 mldev_en;
+    u8 cur_dev_idx; //current use index
+    u8 rsvd1;
+    u8 rsvd2;
 
-    dev_addr_t  dev_mac[LOCAL_DEVICE_NUM_MAX];
-}loc_dev_mng_t; //local device manage
-extern loc_dev_mng_t    mlDevMng;
+    dev_addr_t dev_mac[LOCAL_DEVICE_NUM_MAX];
+} loc_dev_mng_t; //local device manage
+
+extern loc_dev_mng_t mlDevMng;
 
 
 #endif /* STACK_BLE_DEVICE_DEVICE_STACK_H_ */

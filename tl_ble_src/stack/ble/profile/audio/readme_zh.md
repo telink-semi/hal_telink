@@ -16,9 +16,9 @@ LE Audio SDK注意事项
          但经过测试，当Debug Level=none的时候，应该去掉这个-fno-...。
    总结：出库时，无论是B91或B92或者是其他的芯片，都需要把Debug Level设为None.
          Debug level是None时，-fno-fat-lto-objects是无效的，如果Miscellaneous选项有设置，需要删除。
-		  
+  
 (5)出库时必须关闭VCD_EN，否则VCD log会被编译进lib里面，影响audio功能
-		 
+
 该规范仅针对LE Audio profile开发代码。
 
 1. 函数命名规范
@@ -66,8 +66,8 @@ typedef struct blc_ascs_client_ctrl {
 } blc_ascs_client_ctrl_t;
 ascs server命名为blc_ascs_server_ctrl_t
 typedef struct blc_ascs_server_ctrl{
-	blc_audio_proc_t process;
-	blc_ascs_server_t* pAscsServer[STACK_PRF_ACL_PERIPHRAL_MAX_NUM];
+    blc_audio_proc_t process;
+    blc_ascs_server_t* pAscsServer[STACK_PRF_ACL_PERIPHRAL_MAX_NUM];
 } blc_ascs_server_ctrl;
 
 client/server的控制实例命名为 [profile_name]_[client/server]_ctrl

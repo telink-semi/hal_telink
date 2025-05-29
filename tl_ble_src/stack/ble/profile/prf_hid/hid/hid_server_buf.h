@@ -22,25 +22,58 @@
  *
  *******************************************************************************************************/
 #pragma once
+#if ((!defined(HOST_V2_ENABLE)))
+struct blc_hid_server
+{
+    u16 protocolModeHdl;             /* Protocol Mode */
+    u16 bootKeyboardInputReportHdl;  /* Boot Keyboard Input Report */
+    u16 bootKeyboardOutputReportHdl; /* Boot Keyboard Output Report */
+    u16 bootMouseInputReportHdl;     /* Boot Mouse Input Report */
+    u16 HIDInformationHdl;           /* HID Information */
+    u16 HIDControlPointHdl;          /* HID Control Point */
+    u16 reportMapHdl;                /* Report Map */
 
-struct blc_hid_server{
-    u16 protocolModeHdl;                /* Protocol Mode */
-    u16 bootKeyboardInputReportHdl;     /* Boot Keyboard Input Report */
-    u16 bootKeyboardOutputReportHdl;    /* Boot Keyboard Output Report */
-    u16 bootMouseInputReportHdl;        /* Boot Mouse Input Report */
-    u16 HIDInformationHdl;              /* HID Information */
-    u16 HIDControlPointHdl;             /* HID Control Point */
-    u16 reportMapHdl;                   /* Report Map */
-
-    struct __attribute__((packed)) {
-        u16 attrHandle;
+    struct __attribute__((packed))
+    {
+        u16                             attrHandle;
         struct hid_reportReferenceValue reportReferenceValue;
-    }reportCharInfo[HID_SUPPORT_REPORT_HANDLE_MAX];
+    } reportCharInfo[HID_SUPPORT_REPORT_HANDLE_MAX];
+
     u16 test;
-}__attribute__((packed));
+} __attribute__((packed));
 
-struct blc_hid_server_ctrl{
-    blc_prf_proc_t process;
+struct blc_hid_server_ctrl
+{
+    blc_prf_proc_t        process;
     struct blc_hid_server hidServer;
-}__attribute__((packed));
+} __attribute__((packed));
+#else
+struct blc_hid_server
+{
+    u16 protocolModeHdl;             /* Protocol Mode */
+    u16 bootKeyboardInputReportHdl;  /* Boot Keyboard Input Report */
+    u16 bootKeyboardOutputReportHdl; /* Boot Keyboard Output Report */
+    u16 bootMouseInputReportHdl;     /* Boot Mouse Input Report */
+    u16 HIDInformationHdl;           /* HID Information */
+    u16 HIDControlPointHdl;          /* HID Control Point */
+    u16 reportMapHdl;                /* Report Map */
 
+    struct
+    {
+        u16                             attrHandle;
+        struct hid_reportReferenceValue reportReferenceValue;
+    } reportCharInfo[HID_SUPPORT_REPORT_HANDLE_MAX];
+
+    // struct __attribute__((packed)) {
+    //     u16 attrHandle;
+    //     u16 isSubscribe;
+    // }descCCCCharInfo[HID_SUPPORT_REPORT_HANDLE_MAX];
+    u16 test;
+};
+
+struct blc_hid_server_ctrl
+{
+    struct blc_prf_process process;
+    struct blc_hid_server  hidServer;
+};
+#endif

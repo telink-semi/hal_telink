@@ -32,21 +32,20 @@
 #if OS_SUP_EN
 
 
-_attribute_ble_data_retention_ os_give_sem_t blt_os_giveSem_cb = NULL;
+_attribute_ble_data_retention_ os_give_sem_t blt_os_giveSem_cb        = NULL;
 _attribute_ble_data_retention_ os_give_sem_t blt_os_giveSemFromIrq_cb = NULL;
 
-_attribute_ble_data_retention_ os_give_sem_t blt_os_semCountIncrement_cb = NULL;
+_attribute_ble_data_retention_ os_give_sem_t blt_os_semCountIncrement_cb    = NULL;
 _attribute_ble_data_retention_ os_give_sem_t blt_os_semCountIncrementIrq_cb = NULL;
 
-_attribute_ble_data_retention_ static os_give_sem_t blt_os_give_sem = NULL;
+_attribute_ble_data_retention_ static os_give_sem_t blt_os_give_sem          = NULL;
 _attribute_ble_data_retention_ static os_give_sem_t blt_os_give_sem_from_isr = NULL;
 
 _attribute_ble_data_retention_ static os_mutex_sem_t blt_os_take_mutex_sem = NULL;
 _attribute_ble_data_retention_ static os_mutex_sem_t blt_os_give_mutex_sem = NULL;
 
-_attribute_ble_data_retention_ static volatile u32 SendSemCnt = 0;
-_attribute_ble_data_retention_  bool is_os_sup_en = 0; //default disable OS support module.
-
+_attribute_ble_data_retention_ static volatile u32 SendSemCnt   = 0;
+_attribute_ble_data_retention_ bool                is_os_sup_en = 0; //default disable OS support module.
 
 void blc_setOsSupEnable(bool en)
 {
@@ -58,8 +57,7 @@ bool blc_isOsSupEnable(void)
     return is_os_sup_en;
 }
 
-_attribute_ram_code_
-bool blc_isBleSchedulerBusy(void)
+_attribute_ram_code_ bool blc_isBleSchedulerBusy(void)
 {
     //TODO: need to check if any other conditions are required.
     return (bltSche.task_mask == 0 && blmsParam.sche_run_flag == 0 && blmsParam.state_chng == 0) ? false : true;
@@ -68,7 +66,7 @@ bool blc_isBleSchedulerBusy(void)
 _attribute_ram_code_ static void blt_ll_semCountIncrement(void)
 {
     unsigned int irq = core_interrupt_disable();
-    if(is_os_sup_en){
+    if (is_os_sup_en) {
         SendSemCnt++;
     }
     core_restore_interrupt(irq);
@@ -76,21 +74,21 @@ _attribute_ram_code_ static void blt_ll_semCountIncrement(void)
 
 _attribute_ram_code_ static void blt_ll_semCountIncrement_irq(void)
 {
-    if(is_os_sup_en){
+    if (is_os_sup_en) {
         SendSemCnt++;
     }
 }
 
 _attribute_ram_code_ static void blt_ll_semGive(void)
 {
-    if(is_os_sup_en && blt_os_give_sem){
+    if (is_os_sup_en && blt_os_give_sem) {
         blt_os_give_sem();
     }
 }
 
 _attribute_ram_code_ static void blt_ll_semGive_irq(void)
 {
-    if(is_os_sup_en && blt_os_give_sem_from_isr && SendSemCnt){
+    if (is_os_sup_en && blt_os_give_sem_from_isr && SendSemCnt) {
         blt_os_give_sem_from_isr();
     }
     SendSemCnt = 0;
@@ -99,27 +97,26 @@ _attribute_ram_code_ static void blt_ll_semGive_irq(void)
 void blc_ll_registerGiveSemCb(os_give_sem_t give_sem_from_isr, os_give_sem_t give_sem)
 {
     ///
-    blt_os_give_sem                = give_sem;
-    blt_os_give_sem_from_isr       = give_sem_from_isr;
+    blt_os_give_sem          = give_sem;
+    blt_os_give_sem_from_isr = give_sem_from_isr;
     ///
-    blt_os_giveSem_cb              = blt_ll_semGive;
-    blt_os_giveSemFromIrq_cb       = blt_ll_semGive_irq;
+    blt_os_giveSem_cb        = blt_ll_semGive;
+    blt_os_giveSemFromIrq_cb = blt_ll_semGive_irq;
     ///
     blt_os_semCountIncrement_cb    = blt_ll_semCountIncrement;
     blt_os_semCountIncrementIrq_cb = blt_ll_semCountIncrement_irq;
-
 }
 
 _attribute_ram_code_ bool blt_llms_pushTxfifo_os(u16 connHandle, u8 *p)
 {
     bool retval;
-    if(is_os_sup_en && blt_os_take_mutex_sem){
+    if (is_os_sup_en && blt_os_take_mutex_sem) {
         blt_os_take_mutex_sem();
     }
 
-    retval = blt_llms_pushTxfifo(connHandle,p);
+    retval = blt_llms_pushTxfifo(connHandle, p);
     //
-    if(is_os_sup_en && blt_os_give_mutex_sem){
+    if (is_os_sup_en && blt_os_give_mutex_sem) {
         blt_os_give_mutex_sem();
     }
     return retval;
@@ -127,18 +124,15 @@ _attribute_ram_code_ bool blt_llms_pushTxfifo_os(u16 connHandle, u8 *p)
 
 void blc_ll_registerMutexSemCb(os_mutex_sem_t take_mutex_sem, os_mutex_sem_t give_mutex_sem)
 {
-    blt_os_take_mutex_sem = take_mutex_sem;
-    blt_os_give_mutex_sem = give_mutex_sem;
+    blt_os_take_mutex_sem   = take_mutex_sem;
+    blt_os_give_mutex_sem   = give_mutex_sem;
     ll_push_tx_fifo_handler = blt_llms_pushTxfifo_os;
 }
 
 
+    #if 0 //todo ronglu: In the following way, customers think that BLE's mainloop is executed too often. is enabled
 
-
-
-#if  0 //todo ronglu: In the following way, customers think that BLE's mainloop is executed too often. is enabled
-
-#define MAX_MAINLOOP_NEED_RUN_TASK                32
+        #define MAX_MAINLOOP_NEED_RUN_TASK               32
 _attribute_ble_data_retention_ volatile uint8_t blt_mainloopNeedRunflag[MAX_MAINLOOP_NEED_RUN_TASK]; //slotTask_flg && slotTask_idx
 _attribute_ble_data_retention_ volatile uint8_t blt_deepRetWakeUpFlag; //
 
@@ -149,8 +143,11 @@ static uint8_t slotTask_idx_static;
  */
 void blt_os_setBleLoopNeedAgainRunFlag(uint8_t uslotTask_flg,uint8_t slotTask_idx);
 
-#define CHECK_CONTROLLER_CONNECT_HANDLE_ROLE(id)                ((id&0xF0) == BLM_CONN_HANDLE ? ACL_ROLE_CENTRAL:BLS_CONN_HANDLE)
-#define blt_ll_LegAclSetNeedAgainRunFlag(Role,conn_idx)          {blt_os_setBleLoopNeedAgainRunFlag((Role+1),conn_idx);}
+        #define CHECK_CONTROLLER_CONNECT_HANDLE_ROLE(id) ((id & 0xF0) == BLM_CONN_HANDLE ? ACL_ROLE_CENTRAL : BLS_CONN_HANDLE)
+        #define blt_ll_LegAclSetNeedAgainRunFlag(Role, conn_idx)         \
+            {                                                            \
+                blt_os_setBleLoopNeedAgainRunFlag((Role + 1), conn_idx); \
+            }
 
 _attribute_ram_code_ void blt_os_setBleLoopNeedAgainRunFlag(uint8_t uslotTask_flg,uint8_t slotTask_idx)
 {
@@ -206,5 +203,5 @@ bool blt_os_getBleLoopNeedAgainRunFlagPost_isr(void)
     }
     return ret_val;
 }
-#endif
+    #endif
 #endif

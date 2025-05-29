@@ -28,6 +28,7 @@
 
 #include "core.h"
 #include "../include/pmp.h"
+
 /**
  * @brief      This function serves to configure a PMP entry using the TOR (Top of Region) scheme.
  * @param[in]  entry    PMP entry number (0-7) to configure.
@@ -35,7 +36,7 @@
  * @param[in]  pmpcfg   Configuration value for the PMP entry.
  * @return     None
  */
-void pmp_tor_config(char entry, void* va, char pmpcfg)
+void pmp_tor_config(char entry, void *va, char pmpcfg)
 {
     switch (entry) {
     case 0:
@@ -87,28 +88,28 @@ void pmp_tor_config(char entry, void* va, char pmpcfg)
         write_csr(NDS_PMPADDR15, TOR(va));
         break;
     }
-#if __riscv_xlen == 64  /*64bit-MCU*/
-    switch (entry >> 3){
+#if __riscv_xlen == 64 /*64bit-MCU*/
+    switch (entry >> 3) {
     case 0:
-        write_csr(NDS_PMPCFG0, ((read_csr(NDS_PMPCFG0) & (~(0xFFLL << ((long)(entry%8) << 3)))) | (((long)pmpcfg) << ((long)(entry%8) << 3))));
+        write_csr(NDS_PMPCFG0, ((read_csr(NDS_PMPCFG0) & (~(0xFFLL << ((long)(entry % 8) << 3)))) | (((long)pmpcfg) << ((long)(entry % 8) << 3))));
         break;
     case 1:
-        write_csr(NDS_PMPCFG2, ((read_csr(NDS_PMPCFG2) & (~(0xFFLL << ((long)(entry%8) << 3)))) | (((long)pmpcfg) << ((long)(entry%8) << 3))));
+        write_csr(NDS_PMPCFG2, ((read_csr(NDS_PMPCFG2) & (~(0xFFLL << ((long)(entry % 8) << 3)))) | (((long)pmpcfg) << ((long)(entry % 8) << 3))));
         break;
     }
-#else                  /*32bit-MCU*/
+#else /*32bit-MCU*/
     switch (entry >> 2) {
     case 0:
-        write_csr(NDS_PMPCFG0, ((read_csr(NDS_PMPCFG0) & (~((0xFF) << ((entry%4) << 3)))) | (((long)pmpcfg) << ((entry%4) << 3))));
+        write_csr(NDS_PMPCFG0, ((read_csr(NDS_PMPCFG0) & (~((0xFF) << ((entry % 4) << 3)))) | (((long)pmpcfg) << ((entry % 4) << 3))));
         break;
     case 1:
-        write_csr(NDS_PMPCFG1, ((read_csr(NDS_PMPCFG1) & (~((0xFF) << ((entry%4) << 3)))) | (((long)pmpcfg) << ((entry%4) << 3))));
+        write_csr(NDS_PMPCFG1, ((read_csr(NDS_PMPCFG1) & (~((0xFF) << ((entry % 4) << 3)))) | (((long)pmpcfg) << ((entry % 4) << 3))));
         break;
     case 2:
-        write_csr(NDS_PMPCFG2, ((read_csr(NDS_PMPCFG2) & (~((0xFF) << ((entry%4) << 3)))) | (((long)pmpcfg) << ((entry%4) << 3))));
+        write_csr(NDS_PMPCFG2, ((read_csr(NDS_PMPCFG2) & (~((0xFF) << ((entry % 4) << 3)))) | (((long)pmpcfg) << ((entry % 4) << 3))));
         break;
     case 3:
-        write_csr(NDS_PMPCFG3, ((read_csr(NDS_PMPCFG3) & (~((0xFF) << ((entry%4) << 3)))) | (((long)pmpcfg) << ((entry%4) << 3))));
+        write_csr(NDS_PMPCFG3, ((read_csr(NDS_PMPCFG3) & (~((0xFF) << ((entry % 4) << 3)))) | (((long)pmpcfg) << ((entry % 4) << 3))));
         break;
     }
 #endif
@@ -122,7 +123,7 @@ void pmp_tor_config(char entry, void* va, char pmpcfg)
  * @param[in]  pmpcfg   Configuration value for the PMP entry.
  * @return     None
  */
-void pmp_napot_config(char entry, void* va, unsigned long size, char pmpcfg)
+void pmp_napot_config(char entry, void *va, unsigned long size, char pmpcfg)
 {
     switch (entry) {
     case 0:
@@ -174,28 +175,28 @@ void pmp_napot_config(char entry, void* va, unsigned long size, char pmpcfg)
         write_csr(NDS_PMPADDR15, NAPOT(va, size));
         break;
     }
-#if __riscv_xlen == 64   /*64bit-MCU*/
-    switch (entry >> 3){
+#if __riscv_xlen == 64 /*64bit-MCU*/
+    switch (entry >> 3) {
     case 0:
-        write_csr(NDS_PMPCFG0, ((read_csr(NDS_PMPCFG0) & (~(0xFFLL << ((long)(entry%8) << 3)))) | (((long)pmpcfg) << ((long)(entry%8) << 3))));
+        write_csr(NDS_PMPCFG0, ((read_csr(NDS_PMPCFG0) & (~(0xFFLL << ((long)(entry % 8) << 3)))) | (((long)pmpcfg) << ((long)(entry % 8) << 3))));
         break;
     case 1:
-        write_csr(NDS_PMPCFG2, ((read_csr(NDS_PMPCFG2) & (~(0xFFLL << ((long)(entry%8) << 3)))) | (((long)pmpcfg) << ((long)(entry%8) << 3))));
+        write_csr(NDS_PMPCFG2, ((read_csr(NDS_PMPCFG2) & (~(0xFFLL << ((long)(entry % 8) << 3)))) | (((long)pmpcfg) << ((long)(entry % 8) << 3))));
         break;
     }
-#else                   /*32bit-MCU*/
+#else /*32bit-MCU*/
     switch (entry >> 2) {
     case 0:
-        write_csr(NDS_PMPCFG0, ((read_csr(NDS_PMPCFG0) & (~((0xFF) << ((entry%4) << 3)))) | (((long)pmpcfg) << ((entry%4) << 3))));
+        write_csr(NDS_PMPCFG0, ((read_csr(NDS_PMPCFG0) & (~((0xFF) << ((entry % 4) << 3)))) | (((long)pmpcfg) << ((entry % 4) << 3))));
         break;
     case 1:
-        write_csr(NDS_PMPCFG1, ((read_csr(NDS_PMPCFG1) & (~((0xFF) << ((entry%4) << 3)))) | (((long)pmpcfg) << ((entry%4) << 3))));
+        write_csr(NDS_PMPCFG1, ((read_csr(NDS_PMPCFG1) & (~((0xFF) << ((entry % 4) << 3)))) | (((long)pmpcfg) << ((entry % 4) << 3))));
         break;
     case 2:
-        write_csr(NDS_PMPCFG2, ((read_csr(NDS_PMPCFG2) & (~((0xFF) << ((entry%4) << 3)))) | (((long)pmpcfg) << ((entry%4) << 3))));
+        write_csr(NDS_PMPCFG2, ((read_csr(NDS_PMPCFG2) & (~((0xFF) << ((entry % 4) << 3)))) | (((long)pmpcfg) << ((entry % 4) << 3))));
         break;
     case 3:
-        write_csr(NDS_PMPCFG3, ((read_csr(NDS_PMPCFG3) & (~((0xFF) << ((entry%4) << 3)))) | (((long)pmpcfg) << ((entry%4) << 3))));
+        write_csr(NDS_PMPCFG3, ((read_csr(NDS_PMPCFG3) & (~((0xFF) << ((entry % 4) << 3)))) | (((long)pmpcfg) << ((entry % 4) << 3))));
         break;
     }
 #endif

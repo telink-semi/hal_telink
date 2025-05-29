@@ -133,7 +133,7 @@ if(CONFIG_IEEE802154_TELINK_B9X OR CONFIG_IEEE802154_TELINK_TLX OR CONFIG_BT_B9X
         "./stack/ble/os_sup/*.c"
         "./stack/ble/secureboot/*.c"
         "./stack/ble/controller/*.c"
-        "./stack/ble/controller/cs_drbg/*.c"
+        # "./stack/ble/controller/cs_drbg/*.c"
         "./stack/ble/controller/csa/*.c"
         "./stack/ble/controller/ial/*.c"
         "./stack/ble/controller/ll/*.c"
@@ -281,21 +281,21 @@ endif()
 #BLE flash reference sources
 if (CONFIG_IEEE802154_TELINK_B9X OR CONFIG_IEEE802154_TELINK_TLX)
 	zephyr_include_directories(
-		vendor/controller/${SOC_FAMILY}
+		hal_zephyr/controller/${SOC_FAMILY}
 	)
 endif()
 
 # BLE stack reference sources
 if (CONFIG_BT_B9X OR CONFIG_BT_TLX)
 	zephyr_include_directories(
-		vendor/controller/${SOC_FAMILY}
+		hal_zephyr/controller/${SOC_FAMILY}
 	)
 	zephyr_library_sources(
 		common/utility.c
-		vendor/controller/${SOC_FAMILY}/${SOC_FAMILY}_bt.c
-		vendor/controller/${SOC_FAMILY}/${SOC_FAMILY}_bt_init.c
-		vendor/controller/${SOC_FAMILY}/${SOC_FAMILY}_bt_buffer.c
-		vendor/controller/${SOC_FAMILY}/${SOC_FAMILY}_bt_flash.c
+		hal_zephyr/controller/${SOC_FAMILY}/${SOC_FAMILY}_bt.c
+		hal_zephyr/controller/${SOC_FAMILY}/${SOC_FAMILY}_bt_init.c
+		hal_zephyr/controller/${SOC_FAMILY}/${SOC_FAMILY}_bt_buffer.c
+		hal_zephyr/controller/${SOC_FAMILY}/${SOC_FAMILY}_bt_flash.c
 	)
 endif() # CONFIG_BT_B9X OR CONFIG_BT_TLX
 

@@ -25,38 +25,39 @@
 
 #if (ASSISTANT_VERSION == ASSISTANT_WITH_PERIPHERAL_VERSION)
 
-#include <stdarg.h>
-#include <string.h>
-#include <stdlib.h>
+    #include <stdarg.h>
+    #include <string.h>
+    #include <stdlib.h>
 
-#include "tl_common.h"
-#include "drivers.h"
-#include "application/app/usbcdc.h"
-#include "application/usbstd/usb.h"
-#include "app_parse_char.h"
+    #include "tl_common.h"
+    #include "drivers.h"
+    #include "application/app/usbcdc.h"
+    #include "application/usbstd/usb.h"
+    #include "app_parse_char.h"
 
-typedef struct{
+typedef struct
+{
     u16 write_index;
     u16 read_index;
     u16 size;
     u8 *buffer;
 } ring_buf_t;
 
-u8 shellRecvCmdBuf[PARSE_CHAR_UART_BUFF_SIZE + 1];      //str + '\0'
-u16 shellRecvCmdBufIdx = 0;
-u8 uartRecvBuf[PARSE_CHAR_UART_BUFF_SIZE];
-parse_fun_list_t* gParseList = NULL;
-int gParseSize = 0;
+u8                shellRecvCmdBuf[PARSE_CHAR_UART_BUFF_SIZE + 1]; //str + '\0'
+u16               shellRecvCmdBufIdx = 0;
+u8                uartRecvBuf[PARSE_CHAR_UART_BUFF_SIZE];
+parse_fun_list_t *gParseList = NULL;
+int               gParseSize = 0;
 static ring_buf_t appParseRingBuf;
-static u8 ringBuf[PARSE_CHAR_UART_BUFF_SIZE * 2];
+static u8         ringBuf[PARSE_CHAR_UART_BUFF_SIZE * 2];
 
-#if (APP_AUDIO_UI_IFACE == APP_AUDIO_UI_USB_CDC)
+    #if (APP_AUDIO_UI_IFACE == APP_AUDIO_UI_USB_CDC)
 
 u8 cdcBuf[CDC_TXRX_EPSIZE];
 
-#define RING_BUFF_SIZE                  1024
+        #define RING_BUFF_SIZE 1024
 
-u8 cdcRingBuf[RING_BUFF_SIZE];
+u8  cdcRingBuf[RING_BUFF_SIZE];
 int cdcRingWptr = 0;
 int cdcRingRptr = 0;
 
@@ -69,20 +70,17 @@ void app_cdc_loop(void)
 {
     /* The busy check is repeated in the usb_cdc_tx_data_to_host() function, but it can */
     /* be used separately as well. This is to avoid unnecessary buffer preparation.     */
-    if(usbhw_is_ep_busy(USB_EDP_CDC_IN))
-    {
+    if (usbhw_is_ep_busy(USB_EDP_CDC_IN)) {
         return;
     }
 
-    int size = (cdcRingWptr - cdcRingRptr) & (RING_BUFF_SIZE-1);
-    int resSize = min(size, CDC_TXRX_EPSIZE-1);
+    int size    = (cdcRingWptr - cdcRingRptr) & (RING_BUFF_SIZE - 1);
+    int resSize = min(size, CDC_TXRX_EPSIZE - 1);
 
-    if(resSize != 0)
-    {
-        for(int i=0; i<resSize; i++)
-        {
+    if (resSize != 0) {
+        for (int i = 0; i < resSize; i++) {
             cdcBuf[i] = cdcRingBuf[cdcRingRptr++];
-            cdcRingRptr &= (RING_BUFF_SIZE-1);
+            cdcRingRptr &= (RING_BUFF_SIZE - 1);
         }
         usb_cdc_write(cdcBuf, resSize);
     }
@@ -94,15 +92,14 @@ void app_cdc_loop(void)
  * @param[in]   data_len: print buffer size.
  * @return      none.
  */
-void app_cdc_send_value(unsigned char * data_ptr, unsigned short data_len)
+void app_cdc_send_value(unsigned char *data_ptr, unsigned short data_len)
 {
-    for(int i=0; i < data_len; i++)
-    {
+    for (int i = 0; i < data_len; i++) {
         cdcRingBuf[cdcRingWptr++] = data_ptr[i];
-        cdcRingWptr &= (RING_BUFF_SIZE-1);
+        cdcRingWptr &= (RING_BUFF_SIZE - 1);
     }
 }
-#endif
+    #endif
 
 /**
  * @brief       ring buffer initial function.
@@ -113,10 +110,10 @@ void app_cdc_send_value(unsigned char * data_ptr, unsigned short data_len)
  */
 static void ring_buf_init(ring_buf_t *ring_buf, u16 size, u8 *buffer)
 {
-    ring_buf->size = size;
-    ring_buf->buffer = buffer;
+    ring_buf->size        = size;
+    ring_buf->buffer      = buffer;
     ring_buf->write_index = 0;
-    ring_buf->read_index = 0;
+    ring_buf->read_index  = 0;
 }
 
 /**
@@ -126,16 +123,11 @@ static void ring_buf_init(ring_buf_t *ring_buf, u16 size, u8 *buffer)
  */
 static u16 ring_buf_free_space(ring_buf_t *ring_buf)
 {
-    if (ring_buf->read_index > ring_buf->write_index)
-    {
+    if (ring_buf->read_index > ring_buf->write_index) {
         return ring_buf->read_index - ring_buf->write_index - 1;
-    }
-    else if (ring_buf->write_index > ring_buf->read_index)
-    {
+    } else if (ring_buf->write_index > ring_buf->read_index) {
         return (ring_buf->read_index + ring_buf->size - ring_buf->write_index - 1);
-    }
-    else
-    {
+    } else {
         return ring_buf->size - 1;
     }
 }
@@ -150,14 +142,12 @@ static u16 ring_buf_free_space(ring_buf_t *ring_buf)
 static u16 ring_buf_write(ring_buf_t *ring_buf, u16 length, u8 *buffer)
 {
     u16 free_space = ring_buf_free_space(ring_buf);
-    u16 remaining = length;
+    u16 remaining  = length;
     u16 len;
 
-    if (ring_buf->write_index >= ring_buf->read_index)
-    {
+    if (ring_buf->write_index >= ring_buf->read_index) {
         len = min(free_space, (ring_buf->size - ring_buf->write_index));
-        if (len > remaining)
-        {
+        if (len > remaining) {
             len = remaining;
         }
         memcpy(&ring_buf->buffer[ring_buf->write_index], buffer, len);
@@ -192,29 +182,29 @@ static u16 ring_buf_read(ring_buf_t *ring_buf, u16 length, u8 *buffer)
         if (available > remaining) {
             available = remaining;
         }
-        
+
         memcpy(buffer, &ring_buf->buffer[ring_buf->read_index], available);
         ring_buf->read_index = (ring_buf->read_index + available) % ring_buf->size;
         remaining -= available;
         buffer += available;
     }
-    
+
     if (ring_buf->read_index < ring_buf->write_index) {
         available = ring_buf->write_index - ring_buf->read_index;
         if (available > remaining) {
             available = remaining;
         }
-        
+
         memcpy(buffer, &ring_buf->buffer[ring_buf->read_index], available);
         ring_buf->read_index = (ring_buf->read_index + available) % ring_buf->size;
         remaining -= available;
         buffer += available;
     }
-    
+
     return length - remaining;
 }
 
-#if (APP_AUDIO_UI_IFACE == APP_AUDIO_UI_UART)
+    #if (APP_AUDIO_UI_IFACE == APP_AUDIO_UI_UART)
 /**
  * @brief       uart receive data irq handler.
  * @param[in]   none.
@@ -224,23 +214,21 @@ static u16 ring_buf_read(ring_buf_t *ring_buf, u16 length, u8 *buffer)
 
 _attribute_ram_code_ void uart_irq_handler(void)
 {
-#if(CHIP_TYPE == CHIP_TYPE_B91)
-    if(uart_get_irq_status(PARSE_CHAR_UART_PORT,UART_TXDONE))
-    {
+        #if (CHIP_TYPE == CHIP_TYPE_B91)
+    if (uart_get_irq_status(PARSE_CHAR_UART_PORT, UART_TXDONE)) {
         uart_clr_tx_done(PARSE_CHAR_UART_PORT);
     }
-#elif(CHIP_TYPE == CHIP_TYPE_B92)
-    if(uart_get_irq_status(PARSE_CHAR_UART_PORT,UART_TXDONE_IRQ_STATUS))
-    {
+        #elif (CHIP_TYPE == CHIP_TYPE_B92)
+    if (uart_get_irq_status(PARSE_CHAR_UART_PORT, UART_TXDONE_IRQ_STATUS)) {
         uart_clr_irq_status(PARSE_CHAR_UART_PORT, UART_TXDONE_IRQ_STATUS);
     }
-#endif
+        #endif
 
-#if(CHIP_TYPE == CHIP_TYPE_B91)
-    if(uart_get_irq_status(PARSE_CHAR_UART_PORT,UART_RXDONE))
-#elif(CHIP_TYPE == CHIP_TYPE_B92)
-    if(uart_get_irq_status(PARSE_CHAR_UART_PORT,UART_RXDONE_IRQ_STATUS))
-#endif
+        #if (CHIP_TYPE == CHIP_TYPE_B91)
+    if (uart_get_irq_status(PARSE_CHAR_UART_PORT, UART_RXDONE))
+        #elif (CHIP_TYPE == CHIP_TYPE_B92)
+    if (uart_get_irq_status(PARSE_CHAR_UART_PORT, UART_RXDONE_IRQ_STATUS))
+        #endif
     {
         u32 rxLen;
         /* Get the length of Rx data */
@@ -249,21 +237,20 @@ _attribute_ram_code_ void uart_irq_handler(void)
         // Currently don't care if there is enough room in ring buffer - data may be lost
         ring_buf_write(&appParseRingBuf, rxLen, uartRecvBuf);
 
-        /* Clear RxDone state */
-#if(CHIP_TYPE == CHIP_TYPE_B91)
+            /* Clear RxDone state */
+        #if (CHIP_TYPE == CHIP_TYPE_B91)
         uart_clr_irq_status(PARSE_CHAR_UART_PORT, UART_CLR_RX);
-#elif(CHIP_TYPE == CHIP_TYPE_B92)
+        #elif (CHIP_TYPE == CHIP_TYPE_B92)
         uart_clr_irq_status(PARSE_CHAR_UART_PORT, UART_RXDONE_IRQ_STATUS);
-#endif
-        uart_receive_dma(PARSE_CHAR_UART_PORT, uartRecvBuf, sizeof(uartRecvBuf));//[!!important - must]
+        #endif
+        uart_receive_dma(PARSE_CHAR_UART_PORT, uartRecvBuf, sizeof(uartRecvBuf)); //[!!important - must]
 
-        if((uart_get_irq_status(PARSE_CHAR_UART_PORT,UART_RX_ERR)))
-        {
-            #if(CHIP_TYPE == CHIP_TYPE_B91)
-            uart_clr_irq_status(PARSE_CHAR_UART_PORT,UART_CLR_RX);
-            #elif(CHIP_TYPE == CHIP_TYPE_B92)
-            uart_clr_irq_status(PARSE_CHAR_UART_PORT,UART_RXDONE_IRQ_STATUS);
-            #endif
+        if ((uart_get_irq_status(PARSE_CHAR_UART_PORT, UART_RX_ERR))) {
+        #if (CHIP_TYPE == CHIP_TYPE_B91)
+            uart_clr_irq_status(PARSE_CHAR_UART_PORT, UART_CLR_RX);
+        #elif (CHIP_TYPE == CHIP_TYPE_B92)
+            uart_clr_irq_status(PARSE_CHAR_UART_PORT, UART_RXDONE_IRQ_STATUS);
+        #endif
         }
     }
 }
@@ -274,14 +261,13 @@ _attribute_ram_code_ void uart0_irq_handler(void)
 }
 PLIC_ISR_REGISTER(uart0_irq_handler, IRQ_UART0)
 
-
 _attribute_ram_code_ void uart1_irq_handler(void)
 {
     uart_irq_handler();
 }
 PLIC_ISR_REGISTER(uart1_irq_handler, IRQ_UART1)
 
-#else
+    #else
 
 /**
  * @brief       usb-cdc receive data callback.
@@ -294,7 +280,7 @@ static void usb_cdc_read_cb(unsigned char *data, unsigned short length)
     ring_buf_write(&appParseRingBuf, length, data);
     usb_cdc_read(usb_cdc_read_cb);
 }
-#endif
+    #endif
 
 /**
  * @brief       parse initial interface(uart/usb-cdc) function.
@@ -303,17 +289,17 @@ static void usb_cdc_read_cb(unsigned char *data, unsigned short length)
  */
 static void init_interface(void)
 {
-#if (APP_AUDIO_UI_IFACE == APP_AUDIO_UI_UART)
+    #if (APP_AUDIO_UI_IFACE == APP_AUDIO_UI_UART)
     uart_reset(PARSE_CHAR_UART_PORT);
 
-#if(CHIP_TYPE == CHIP_TYPE_B91)
+        #if (CHIP_TYPE == CHIP_TYPE_B91)
     uart_set_pin(PARSE_CHAR_UART_TX_PIN, PARSE_CHAR_UART_RX_PIN);
-#elif(CHIP_TYPE == CHIP_TYPE_B92)
+        #elif (CHIP_TYPE == CHIP_TYPE_B92)
     uart_set_pin(PARSE_CHAR_UART_PORT, PARSE_CHAR_B92_UART_TX_PIN, PARSE_CHAR_B92_UART_RX_PIN);
-#endif
+        #endif
     unsigned short div;
-    unsigned char bwpc;
-    uart_cal_div_and_bwpc(PARSE_CHAR_UART_BAUDRATE, sys_clk.pclk*1000*1000, &div, &bwpc);
+    unsigned char  bwpc;
+    uart_cal_div_and_bwpc(PARSE_CHAR_UART_BAUDRATE, sys_clk.pclk * 1000 * 1000, &div, &bwpc);
     uart_init(PARSE_CHAR_UART_PORT, div, bwpc, UART_PARITY_NONE, UART_STOP_BIT_ONE);
 
     uart_set_tx_dma_config(PARSE_CHAR_UART_PORT, PARSE_CHAR_UART_TX_DMA);
@@ -321,19 +307,19 @@ static void init_interface(void)
 
     uart_clr_irq_mask(PARSE_CHAR_UART_PORT, UART_RX_IRQ_MASK | UART_TX_IRQ_MASK | UART_TXDONE_MASK | UART_RXDONE_MASK);
 
-#if(CHIP_TYPE == CHIP_TYPE_B91)
+        #if (CHIP_TYPE == CHIP_TYPE_B91)
     uart_clr_tx_done(PARSE_CHAR_UART_PORT);
-#elif(CHIP_TYPE == CHIP_TYPE_B92)
+        #elif (CHIP_TYPE == CHIP_TYPE_B92)
     uart_clr_irq_status(PARSE_CHAR_UART_PORT, UART_TXDONE_IRQ_STATUS);
-#endif
+        #endif
     uart_set_rx_timeout(PARSE_CHAR_UART_PORT, bwpc, 12, UART_BW_MUL3);
     uart_set_irq_mask(PARSE_CHAR_UART_PORT, UART_RXDONE_MASK);
 
-    plic_interrupt_enable(PARSE_CHAR_UART_PORT == UART0 ? IRQ_UART0:IRQ_UART1);
-    plic_set_priority(PARSE_CHAR_UART_PORT == UART0 ? IRQ_UART0:IRQ_UART1, 2);
+    plic_interrupt_enable(PARSE_CHAR_UART_PORT == UART0 ? IRQ_UART0 : IRQ_UART1);
+    plic_set_priority(PARSE_CHAR_UART_PORT == UART0 ? IRQ_UART0 : IRQ_UART1, 2);
 
     uart_receive_dma(PARSE_CHAR_UART_PORT, uartRecvBuf, sizeof(uartRecvBuf));
-#elif (APP_AUDIO_UI_IFACE == APP_AUDIO_UI_USB_CDC)
+    #elif (APP_AUDIO_UI_IFACE == APP_AUDIO_UI_USB_CDC)
     reg_usb_ep1_buf_addr = 0x00;
     reg_usb_ep3_buf_addr = 0x00;
     reg_usb_ep6_buf_addr = 0x00;
@@ -347,11 +333,10 @@ static void init_interface(void)
     usb_init();
     usbhw_data_ep_ack(USB_EDP_CDC_OUT);
     core_interrupt_enable();
-    usbhw_set_irq_mask(USB_IRQ_RESET_MASK|USB_IRQ_SUSPEND_MASK);
+    usbhw_set_irq_mask(USB_IRQ_RESET_MASK | USB_IRQ_SUSPEND_MASK);
     usb_cdc_read(usb_cdc_read_cb);
-#endif
+    #endif
 }
-
 
 /**
  * @brief       parse initial function.
@@ -376,18 +361,18 @@ void app_parse_init(const parse_fun_list_t *parseList, int size)
  */
 void app_parse_printf(const char *format, ...)
 {
-    u8 aclBuf[PARSE_CHAR_UART_BUFF_SIZE];
+    u8      aclBuf[PARSE_CHAR_UART_BUFF_SIZE];
     va_list args;
     va_start(args, format);
 
-    int ret = vsnprintf((char*)aclBuf, PARSE_CHAR_UART_BUFF_SIZE, format, args);
+    int ret = vsnprintf((char *)aclBuf, PARSE_CHAR_UART_BUFF_SIZE, format, args);
     va_end(args);
 
-#if (APP_AUDIO_UI_IFACE == APP_AUDIO_UI_UART)
+    #if (APP_AUDIO_UI_IFACE == APP_AUDIO_UI_UART)
     uart_send(PARSE_CHAR_UART_PORT, aclBuf, ret);
-#elif (APP_AUDIO_UI_IFACE == APP_AUDIO_UI_USB_CDC)
+    #elif (APP_AUDIO_UI_IFACE == APP_AUDIO_UI_USB_CDC)
     app_cdc_send_value(&aclBuf[0], ret);
-#endif
+    #endif
 }
 
 /**
@@ -398,11 +383,10 @@ void app_parse_printf(const char *format, ...)
  */
 static int tlk_split_argv(char *str, char *argv[])
 {
-    argv[0] = strtok(str, " \t\n\r");
+    argv[0]  = strtok(str, " \t\n\r");
     int argc = 0;
 
-    while(argv[argc])
-    {
+    while (argv[argc]) {
         argc++;
         argv[argc] = strtok(NULL, " \t\n\r");
     }
@@ -416,18 +400,17 @@ static int tlk_split_argv(char *str, char *argv[])
  */
 void app_parse_loop(void)
 {
-#if (APP_AUDIO_UI_IFACE == APP_AUDIO_UI_USB_CDC)
+    #if (APP_AUDIO_UI_IFACE == APP_AUDIO_UI_USB_CDC)
     usb_handle_irq();
     app_cdc_loop();
-#endif
-    while (true)
-    {
+    #endif
+    while (true) {
         if (!ring_buf_read(&appParseRingBuf, 1, &shellRecvCmdBuf[shellRecvCmdBufIdx])) {
             return;
         }
 
         if (shellRecvCmdBuf[shellRecvCmdBufIdx] == '\n' || shellRecvCmdBuf[shellRecvCmdBufIdx] == '\r' ||
-                shellRecvCmdBuf[shellRecvCmdBufIdx] == '\0' || shellRecvCmdBufIdx == (sizeof(shellRecvCmdBuf) - 1)) {
+            shellRecvCmdBuf[shellRecvCmdBufIdx] == '\0' || shellRecvCmdBufIdx == (sizeof(shellRecvCmdBuf) - 1)) {
             shellRecvCmdBuf[shellRecvCmdBufIdx] = '\0';
             break;
         }
@@ -438,15 +421,13 @@ void app_parse_loop(void)
     // We have complete line
     if (shellRecvCmdBufIdx && shellRecvCmdBuf[shellRecvCmdBufIdx] == '\0') {
         char *argv[PARSE_CHAR_MAX_ARGV_SIZE];
-        int argc = tlk_split_argv((char *)shellRecvCmdBuf, argv);
+        int   argc = tlk_split_argv((char *)shellRecvCmdBuf, argv);
 
-        for(int i = 0; i<gParseSize; i++)
-        {
-            if(strcasecmp(argv[0], gParseList[i].fun_name) == 0)
-            {
-                gParseList[i].fun(&argv[1], argc-1, gParseList[i].user_data);
+        for (int i = 0; i < gParseSize; i++) {
+            if (strcasecmp(argv[0], gParseList[i].fun_name) == 0) {
+                gParseList[i].fun(&argv[1], argc - 1, gParseList[i].user_data);
                 shellRecvCmdBufIdx = 0;
-                return ;
+                return;
             }
         }
         shellRecvCmdBufIdx = 0;
@@ -464,4 +445,4 @@ int app_parse_str2n(char *ps)
     return strtol(ps, NULL, 0);
 }
 
-#endif  //ASSISTANT_VERSION == ASSISTANT_WITH_PERIPHERAL_VERSION
+#endif //ASSISTANT_VERSION == ASSISTANT_WITH_PERIPHERAL_VERSION

@@ -327,7 +327,7 @@ unsigned int blt_crypto_alg_g2 (unsigned char u[32], unsigned char v[32], unsign
 
     blt_crypto_alg_aes_cmac (x, d, 80, z);
 
-    return z[12] | (z[13] << 8) | (z[14] << 16) | (z[15] << 24);;
+    return z[12] | (z[13] << 8) | (z[14] << 16) | (z[15] << 24);
 }
 
 

@@ -28,6 +28,13 @@
 #include "types.h"
 
 
+#ifndef USE_DRIVER_PM
+    #define USE_DRIVER_PM  0
+#endif
+
+#ifndef _2P4G_DEMO_
+    #define _2P4G_DEMO_  0
+#endif
 
 #define DEEPSLEEP_RAM_SIZE_TO_MODE(ram_size)  ram_size==0x8000? DEEPSLEEP_MODE_RET_SRAM_LOW32K: (ram_size==0x10000)? DEEPSLEEP_MODE_RET_SRAM_LOW64K:DEEPSLEEP_MODE_RET_SRAM_LOW96K
 

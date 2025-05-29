@@ -25,10 +25,11 @@
 
 //VOCS: Volume Offset Control Service
 
-typedef struct{
+typedef struct
+{
     s16 volumeOffset;
-    u8 changeCount;
-}svc_vocsVolOffState_t;
+    u8  changeCount;
+} svc_vocsVolOffState_t;
 
 /**
  * @brief      for user add default VOCS service in all GAP server.

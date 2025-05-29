@@ -23,7 +23,7 @@
  *******************************************************************************************************/
 #pragma once
 
-#include "analog.h"
+#include "lib/include/analog.h"
 #include "reg_include/mdec_reg.h"
 
 /**
@@ -33,8 +33,8 @@
  */
 static inline void mdec_reset(void)
 {
-    analog_write_reg8(mdec_rst_addr,analog_read_reg8(mdec_rst_addr) | FLD_MDEC_RST);
-    analog_write_reg8(mdec_rst_addr,analog_read_reg8(mdec_rst_addr) & (~FLD_MDEC_RST));
+    analog_write_reg8(mdec_rst_addr, analog_read_reg8(mdec_rst_addr) | FLD_MDEC_RST);
+    analog_write_reg8(mdec_rst_addr, analog_read_reg8(mdec_rst_addr) & (~FLD_MDEC_RST));
 }
 
 /**
@@ -57,7 +57,7 @@ static inline unsigned char mdec_get_irq_status(wakeup_status_e status)
  */
 static inline void mdec_clr_irq_status(wakeup_status_e status)
 {
-    analog_write_reg8(reg_wakeup_status,status);/*added by wei.wu, confirmed by jianzhi 20231016*/
+    analog_write_reg8(reg_wakeup_status, status); /*added by wei.wu, confirmed by jianzhi 20231016*/
 }
 
 /**
@@ -74,6 +74,3 @@ void mdec_init(mdec_pin_e pin);
  * @return      1 decode success,  0 decode failure.
  */
 unsigned char mdec_read_dat(unsigned char *dat);
-
-
-

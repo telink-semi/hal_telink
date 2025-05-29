@@ -2,47 +2,43 @@
 #include "drivers.h"
 #include "stack/ble/ble.h"
 
-#include "stack/ble/controller/cs_drbg/drbg_stack.h"
 #if (INTER_TEST_MODE == TEST_CS_DRBG)
 //test data
-u8 st7_chm[10] = {0xFC,0xFF,0x7F,0xFC,0xFF,0xFF,0xFF,0xFF,0xFF,0x1F};
-u8 st7_chm_repetition = 1;
-u8 st7_Main_Mode = 0x02;
-u8 st7_Sub_Mode = 0x01;
-u8 st7_Main_Mode_Min_Steps = 2;
-u8 st7_Main_Mode_Max_steps = 4;
+u8 st7_chm[10]              = {0xFC, 0xFF, 0x7F, 0xFC, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x1F};
+u8 st7_chm_repetition       = 1;
+u8 st7_Main_Mode            = 0x02;
+u8 st7_Sub_Mode             = 0x01;
+u8 st7_Main_Mode_Min_Steps  = 2;
+u8 st7_Main_Mode_Max_steps  = 4;
 u8 st7_Main_Mode_Repetition = 3;
-u8 st7_Mode_0_Steps = 3;
-u8 st7_RTT_Types = 0x01;
-u8 st7_Role = 0b01;
-u8 st7_ChSel = 0;
+u8 st7_Mode_0_Steps         = 3;
+u8 st7_RTT_Types            = 0x01;
+u8 st7_Role                 = 0b01;
+u8 st7_ChSel                = 0;
 
 u8 st7_Filtered_channel[72];
 u8 st7_Filtered_channel_num = 0;
 
-u8 st7_Procedure_Count = 1;
-u16 st7_ACI = 7;
+u8  st7_Procedure_Count = 1;
+u16 st7_ACI             = 7;
 
-u8 st7_h9_cs_iv[]={0x3b ,0x0b ,0xca ,0xe0 ,0x86 ,0x51 ,0x7f ,0x3e ,\
-                                0xe9 ,0xdf ,0xfd ,0x0b ,0x8a ,0xc2 ,0x0b ,0xe1 };
-u8 st7_h9_cs_in[]={0x0d ,0x84 ,0x73 ,0x86 ,0xc1 ,0x77 ,0xf4 ,0x9f };
-u8 st7_h9_cs_pv[]={0x43 ,0xf1 ,0x68 ,0x78 ,0x96 ,0x74 ,0xa6 ,0x64 ,\
-                                0x44 ,0xed ,0x82 ,0x98 ,0xdf ,0xde ,0x80 ,0xc9 };
+u8 st7_h9_cs_iv[] = {0x3b, 0x0b, 0xca, 0xe0, 0x86, 0x51, 0x7f, 0x3e, 0xe9, 0xdf, 0xfd, 0x0b, 0x8a, 0xc2, 0x0b, 0xe1};
+u8 st7_h9_cs_in[] = {0x0d, 0x84, 0x73, 0x86, 0xc1, 0x77, 0xf4, 0x9f};
+u8 st7_h9_cs_pv[] = {0x43, 0xf1, 0x68, 0x78, 0x96, 0x74, 0xa6, 0x64, 0x44, 0xed, 0x82, 0x98, 0xdf, 0xde, 0x80, 0xc9};
 
-u8 st7_shufflingchm[3][80];
-u8 st7_kdrbg[1][16];
-u8 st7_vdrbg[1][16];
-u8 st7_i_accessaddr[14][4];
-u8 st7_r_accessaddr[14][4];
+u8          st7_shufflingchm[3][80];
+u8          st7_kdrbg[1][16];
+u8          st7_vdrbg[1][16];
+u8          st7_i_accessaddr[14][4];
+u8          st7_r_accessaddr[14][4];
 volatile u8 st7_sub_mode_insertion[30];
-u8 st7_tpm_ext[38];
+u8          st7_tpm_ext[38];
 volatile u8 st7_antenna_path_perm[38];
 
 u8 st7_pos_initiator[8][2];
 u8 st7_pos_reflector[8][2];
 u8 st7_sig_initiator[8][1];
 u8 st7_sig_reflector[8][1];
-
 
 
 u8 st7_NonMode0ShuffledChannelArray[160];
@@ -53,9 +49,9 @@ u8 st7_NonMode0ShuffledChannelNum;
  * @param[in]   none
  * @return      none
  */
-_attribute_ram_code_ int sample_test7 (void)   //must on ramcode
+_attribute_ram_code_ int sample_test7(void) //must on ramcode
 {
-    smemset(randomBits_num,0,10);
+    smemset(randomBits_num, 0, 10);
     //h9() instantiation
     drbg_instantiation_func_h9(st7_h9_cs_iv, st7_h9_cs_in, st7_h9_cs_pv, kdrbg_global, vdrbg_global);
 
@@ -68,7 +64,7 @@ _attribute_ram_code_ int sample_test7 (void)   //must on ramcode
     blt_cs_extractEnableChnMap(st7_chm, st7_Filtered_channel);
 
     //Shuffled channels 0
-    chn_sel_3a(st7_Filtered_channel_num,st7_Filtered_channel,st7_shufflingchm[0]);
+    chn_sel_3a(st7_Filtered_channel_num, st7_Filtered_channel, st7_shufflingchm[0]);
 
 
     chn_sel_3c(st7_chm, 1, 4, 2, st7_NonMode0ShuffledChannelArray, &st7_NonMode0ShuffledChannelNum);

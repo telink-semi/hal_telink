@@ -27,21 +27,25 @@
 #include "../ull_hid_config.h"
 #if (ULL_HID_DEMO_SLECT == ULL_HID_DEVICE)
 
-#define DEFAULT_MODE            0
-#define HYBRID_MODE                1
+    #define DEFAULT_MODE 0
+    #define HYBRID_MODE  1
 
-typedef struct{
+typedef struct
+{
     u8 reportID;
     u8 reportType;
-    struct {        //additional_info
+
+    struct
+    { //additional_info
         u8 powerSavingCfm : 1;
-        u8 repetition : 1;
+        u8 repetition     : 1;
     };
+
     u16 cisSduInterval;
-    u8 maxPduSize;
-    u8 retryCount;
-    u8 sequenceNumber;
-    u8 recvAckSeqNum;
+    u8  maxPduSize;
+    u8  retryCount;
+    u8  sequenceNumber;
+    u8  recvAckSeqNum;
 
     u8 recvSequenceNumber;
 } app_ullhid_param_t;
@@ -69,8 +73,8 @@ void user_init_deepRetn(void);
  * @param[in]  none.
  * @return     none.
  */
-void main_loop (void);
+void main_loop(void);
 
-#endif    //INTER_TEST_MODE == TEST_ULL_HID_DEVICE
+#endif //INTER_TEST_MODE == TEST_ULL_HID_DEVICE
 
 #endif

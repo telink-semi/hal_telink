@@ -27,9 +27,8 @@
 #if (UNICAST_SERVER_SELECT == UNICAST_SERVER_ASYNC)
 
 
-
-
-typedef enum {
+typedef enum
+{
     KEY_MODE_NULL = 0,
     KEY_MODE_SWITCH,
     KEY_MODE_TEST2,
@@ -47,10 +46,10 @@ typedef enum {
 void app_key_init(void);
 
 
-void app_key_async(u8* data);
+void app_key_async(u8 *data);
 
 
-void app_key_sync(u8* data);
+void app_key_sync(u8 *data);
 
 #endif
 #endif

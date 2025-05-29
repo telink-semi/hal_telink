@@ -26,33 +26,38 @@
 #include "vendor/common/user_config.h"
 
 #ifndef SVC_DEFAULT_MOUSE_ENABLE
-#define SVC_DEFAULT_MOUSE_ENABLE                    0
+    #define SVC_DEFAULT_MOUSE_ENABLE 0
 #endif
 
-typedef struct{
-    union{
-        struct{
-            unsigned char left:1;
-            unsigned char right:1;
-            unsigned char middle:1;
-            unsigned char btn4:1;
-            unsigned char btn5:1;
+typedef struct
+{
+    union
+    {
+        struct
+        {
+            unsigned char left   : 1;
+            unsigned char right  : 1;
+            unsigned char middle : 1;
+            unsigned char btn4   : 1;
+            unsigned char btn5   : 1;
         };
+
         unsigned char button;
     };
+
     char x;
     char y;
     char wheel;
 } blc_defaultMouseData_t;
 
 #if SVC_DEFAULT_MOUSE_ENABLE
-#define HID_INPUT_REPORT_NUM                1
-#define HID_OUTPUT_REPORT_NUM               0
-#define HID_FEATURE_REPORT_NUM              0
-#define HID_BOOT_PROTOCOL_MODE_ENABLE       1
-#define HID_BOOT_KEYBOARD_INTPUT_ENABLE     0
-#define HID_BOOT_KEYBOARD_OUTPUT_ENABLE     0
-#define HID_BOOT_MOUSE_INTPUT_ENABLE        1
+    #define HID_INPUT_REPORT_NUM            1
+    #define HID_OUTPUT_REPORT_NUM           0
+    #define HID_FEATURE_REPORT_NUM          0
+    #define HID_BOOT_PROTOCOL_MODE_ENABLE   1
+    #define HID_BOOT_KEYBOARD_INTPUT_ENABLE 0
+    #define HID_BOOT_KEYBOARD_OUTPUT_ENABLE 0
+    #define HID_BOOT_MOUSE_INTPUT_ENABLE    1
 
-#define HID_INPUT_REPORT_1_ID               HID_REPORT_ID_MOUSE_INPUT
+    #define HID_INPUT_REPORT_1_ID           HID_REPORT_ID_MOUSE_INPUT
 #endif

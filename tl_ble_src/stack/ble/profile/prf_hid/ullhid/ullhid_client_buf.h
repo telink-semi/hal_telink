@@ -23,19 +23,23 @@
  *******************************************************************************************************/
 #pragma once
 
-struct blc_ullhid_client{
+struct blc_ullhid_client
+{
     gattc_sub_ccc_msg_t ntfInput;
     /* Characteristic value handle */
-    u16 propertiesHdl;      //ULL HID properties attribute handle
-    u16 operationHdl;       //LE HID operation mode attribute handle
+    u16 propertiesHdl; //ULL HID properties attribute handle
+    u16 operationHdl;  //LE HID operation mode attribute handle
 
     struct blc_ullhid_properties_format properties;
-    u16 propertiesLen;
+    u16                                 propertiesLen;
 };
 
-struct blc_ullhid_client_ctrl{
-    blc_prf_proc_t process;
-    struct blc_ullhid_client* pUllhidClient[STACK_PRF_ACL_CENTRAL_MAX_NUM];
+struct blc_ullhid_client_ctrl
+{
+#if ((!defined(HOST_V2_ENABLE)))
+    blc_prf_proc_t            process;
+#else
+    struct blc_prf_process    process;
+#endif
+    struct blc_ullhid_client *pUllhidClient[STACK_PRF_ACL_CENTRAL_MAX_NUM];
 };
-
-

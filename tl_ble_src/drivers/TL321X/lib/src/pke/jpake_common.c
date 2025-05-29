@@ -29,9 +29,6 @@
 #include "lib/include/crypto_common/utility.h"
 #include "lib/include/trng/trng.h"
 
-
-
-
 /**
  * @brief       J-PAKE hash item (byte) length
  * @param[in]   ctx                  - HASH_CTX struct pointer
@@ -46,9 +43,8 @@ unsigned int jpake_hash_length(HASH_CTX *ctx, unsigned int msg_bytes)
 {
     reverse_byte_array((unsigned char *)&msg_bytes, (unsigned char *)&msg_bytes, 4);
 
-    return hash_update(ctx, (const unsigned char *)&msg_bytes, 4);
+    return hash_update(ctx, (unsigned char *)&msg_bytes, 4);
 }
-
 
 /**
  * @brief       J-PAKE hash string
@@ -62,16 +58,14 @@ unsigned int jpake_hash_string(HASH_CTX *ctx, unsigned char *s, unsigned int byt
     unsigned int ret;
 
     ret = jpake_hash_length(ctx, byteLen);
-    if(HASH_SUCCESS != ret)
-    {
+    if (HASH_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    return hash_update(ctx, (const unsigned char *)s, byteLen);
+    return hash_update(ctx, (unsigned char *)s, byteLen);
 }
-
 
 /**
  * @brief       J-PAKE get rand xa less than q
@@ -82,47 +76,41 @@ unsigned int jpake_hash_string(HASH_CTX *ctx, unsigned char *s, unsigned int byt
  * @param[in]   could_be_zero            - could xa be zero, 0(xa can not be zero), other(xa can be zero).
  * @return      0:success     other:error
  */
-unsigned int jpake_get_rand_xa_less_than_q(unsigned int *q, unsigned int *xa, unsigned int wordLen, unsigned int remainder_bits,
-        unsigned int could_be_zero)
+unsigned int jpake_get_rand_xa_less_than_q(unsigned int *q, unsigned int *xa, unsigned int wordLen, unsigned int remainder_bits, unsigned int could_be_zero)
 {
     unsigned int ret;
 
 GET_XA_LOOP:
 
-    ret = get_rand((unsigned char *)xa, wordLen<<2);
-    if(TRNG_SUCCESS != ret)
-    {
+    ret = get_rand((unsigned char *)xa, wordLen << 2);
+    if (TRNG_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //make sure xa has the same bit length as q
-    if(remainder_bits)
-    {
-        xa[wordLen - 1] &= (1<<(remainder_bits))-1;
+    if (remainder_bits) {
+        xa[wordLen - 1] &= (1 << (remainder_bits)) - 1;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    if(uint32_BigNumCmp(xa, wordLen, q, wordLen) >= 0)
-    {
+    if (uint32_BigNumCmp(xa, wordLen, q, wordLen) >= 0) {
         goto GET_XA_LOOP;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    if(!could_be_zero)
-    {
-        if(uint32_BigNum_Check_Zero(xa, wordLen))
-        {
+    if (!could_be_zero) {
+        if (uint32_BigNum_Check_Zero(xa, wordLen)) {
             goto GET_XA_LOOP;
+        } else {
+            ;
         }
-        else
-        {;}
+    } else {
+        ;
     }
-    else
-    {;}
 
     return 0;
 }

@@ -23,40 +23,41 @@
  *******************************************************************************************************/
 #pragma once
 
-#define BLT_MICS_LOG(fmt, ...)          BLC_AUDIO_PRF_DBG(DBG_PRF_MASK_MICS_LOG, "[MICS]"fmt, ##__VA_ARGS__)
+#define BLT_MICS_LOG(fmt, ...) BLC_AUDIO_PRF_DBG(DBG_PRF_MASK_MICS_LOG, "[MICS]" fmt, ##__VA_ARGS__)
 
-
-typedef enum{
-    MICS_ERRCODE_MUTE_DISABLED      = 0x80,
+typedef enum
+{
+    MICS_ERRCODE_MUTE_DISABLED = 0x80,
 } blt_mics_error_code_enum;
-
 
 /*
  * MICS: ATT handle information: 41byte
  * MICS service entity supports a maximum of 4 AICS: refer to STACK_AUDIO_MICS_CLIENT_INCLUDE_AICS_INSTANCE_NUM
  */
-typedef struct{
+typedef struct
+{
     u16 baseHandle;
-    u8 endHdl;
-    u8 muteHdl; //NTF
+    u8  endHdl;
+    u8  muteHdl; //NTF
 } blt_mics_att_hdl_t;
 
-typedef struct {
+typedef struct
+{
     blt_mics_att_hdl_t att;
-    u8 aicsClientCnt;
+    u8                 aicsClientCnt;
 } blt_mics_nv_info_t;
 
-int blt_micsc_nv_store(u16 connHandle, prf_nv_state_enum nvState, prf_nv_param_t* param);
+int blt_micsc_nv_store(u16 connHandle, prf_nv_state_enum nvState, prf_nv_param_t *param);
 
-int blt_micsc_init(u8 initType, const void* param);
+int blt_micsc_init(u8 initType, const void *param);
 int blt_micsc_connect(u16 connHandle, prf_acl_state_enum connState);
 int blt_micsc_discovery(u16 connHandle);
 
 
 blc_micp_client_t *blt_micsc_getClientBuf(u8 instIdx);
 blc_micp_client_t *blt_micp_getClientInst(u16 connHandle);
-void blt_micp_dataInput(u16 connHandle, u16 attHdl, u8 *val, u16 valLen);
+void               blt_micp_dataInput(u16 connHandle, u16 attHdl, u8 *val, u16 valLen);
 
 
-int blt_micss_init(u8 initType, const void* param);
+int blt_micss_init(u8 initType, const void *param);
 int blt_micss_connect(u16 connHandle, prf_acl_state_enum connState);

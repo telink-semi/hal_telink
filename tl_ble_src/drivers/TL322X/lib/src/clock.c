@@ -1,0 +1,527 @@
+/********************************************************************************************************
+ * @file    clock.c
+ *
+ * @brief   This is the source file for tl322x
+ *
+ * @author  Driver Group
+ * @date    2025
+ *
+ * @par     Copyright (c) 2025, Telink Semiconductor (Shanghai) Co., Ltd.
+ *          All rights reserved.
+ *
+ *          The information contained herein is confidential property of Telink
+ *          Semiconductor (Shanghai) Co., Ltd. and is available under the terms
+ *          of Commercial License Agreement between Telink Semiconductor (Shanghai)
+ *          Co., Ltd. and the licensee or the terms described here-in. This heading
+ *          MUST NOT be removed from this file.
+ *
+ *          Licensee shall not delete, modify or alter (or permit any third party to delete, modify, or
+ *          alter) any information contained herein in whole or in part except as expressly authorized
+ *          by Telink semiconductor (shanghai) Co., Ltd. Otherwise, licensee shall be solely responsible
+ *          for any claim to the extent arising out of or relating to such deletion(s), modification(s)
+ *          or alteration(s).
+ *
+ *          Licensees are granted free, non-transferable use of the information in this
+ *          file under Mutual Non-Disclosure Agreement. NO WARRANTY of ANY KIND is provided.
+ *
+ *******************************************************************************************************/
+#include "lib/include/sys.h"
+#include "lib/include/clock.h"
+#include "lib/include/mspi.h"
+#include "lib/include/stimer.h"
+#include "pwm.h"
+#include "lib/include/pm/pm.h"
+#include "lib/include/pm/pm_internal.h"
+
+
+/**********************************************************************************************************************
+ *                                            local constants                                                       *
+ *********************************************************************************************************************/
+
+
+/**********************************************************************************************************************
+ *                                              local macro                                                        *
+ *********************************************************************************************************************/
+
+
+/**********************************************************************************************************************
+ *                                             local data type                                                     *
+ *********************************************************************************************************************/
+
+
+/**********************************************************************************************************************
+ *                                              global variable                                                       *
+ *********************************************************************************************************************/
+sys_clk_t sys_clk = {
+    .pll_clk  = 192,
+    .cclk     = 24,
+    .hclk_n22     = 24,
+    .pclk     = 24,
+    .mspi_clk = 24,
+};
+
+sys_clk_config_t sys_clk_config = {
+    .cclk_cfg       = 0x01,
+    .hclk_pclk_cfg  = 0x00,
+    .mspi_clk_cfg   = 0x01,
+    .rc_24m_is_used = MODULE_CPU | MODULE_MSPI,
+    .bbpll_is_used  = 0x00,
+};
+
+_attribute_data_retention_sec_ unsigned char tl_24mrc_cal;
+clk_32k_type_e                               g_clk_32k_src;
+unsigned char                                pll_vco_itrim    = 0;
+unsigned char                                g_24m_rc_is_used = MODULE_CPU | MODULE_MSPI;
+unsigned char                                g_bbpll_is_used  = 0;
+
+
+/**
+ * @brief system clock type
+ * |                                    |                                     |               |
+ * |                                    | :-------------------------------    | :------------ |
+ * |<6>                                 |               <12:8>                |     <23:16>   |
+ * |analog_81<6> selclkout_bpll_1p05v   | analog_82<4:0> div_bpll_1p05v<4:0>  |      clk      |
+ */
+sys_pll_bb_clk_t  sys_pll_bb_clk[] = {
+    {PLL_144M ,{144,(0x00 |(0x18 <<8)|(144 << 16))}},
+    {PLL_156M ,{156,(0x00 |(0x1a <<8)|(156 << 16))}},
+    {PLL_192M ,{192,(0x40 |(0x10 <<8)|(192 << 16))}},
+};
+/**********************************************************************************************************************
+ *                                              local variable                                                     *
+ *********************************************************************************************************************/
+
+/**********************************************************************************************************************
+ *                                          local function prototype                                               *
+ *********************************************************************************************************************/
+_attribute_ram_code_sec_ static _always_inline unsigned char clock_calculate_div_clk(sys_clock_src_e src, sys_clock_div_e div);
+
+/**********************************************************************************************************************
+ *                                         global function implementation                                             *
+ *********************************************************************************************************************/
+
+/**
+ * @brief       This function serves to set 32k clock source.
+ * @param[in]   src - variable of 32k type.
+ * @return      none.
+ */
+_attribute_ram_code_sec_noinline_ void clock_32k_init(clk_32k_type_e src)
+{
+    unsigned char sel_32k   = analog_read_reg8(areg_aon_0x4e & (~FLD_CLK32K_SEL));
+    unsigned char power_32k = analog_read_reg8(areg_aon_0x05) & (~(FLD_32K_RC_PD | FLD_32K_XTAL_PD));
+    analog_write_reg8(areg_aon_0x4e, sel_32k | (src << 7));
+    if (src) {
+        analog_write_reg8(areg_aon_0x05, power_32k | FLD_32K_RC_PD);   //32k xtal
+    } else {
+        analog_write_reg8(areg_aon_0x05, power_32k | FLD_32K_XTAL_PD); //32k rc
+    }
+    g_clk_32k_src = src;
+}
+
+///**
+// * @brief       This function serves to kick 32k xtal.
+// * @param[in]   xtal_times - kick times.
+// * @return      1 success, 0 error.
+// */
+//unsigned char clock_kick_32k_xtal(unsigned char xtal_times)
+//{
+//    int last_32k_tick;
+//    int curr_32k_tick;
+//    for (unsigned char i = 0; i < xtal_times; i++) {
+//        unsigned char  reg_c8a = read_reg8(0x140c8a);
+//        unsigned char  reg_c36 = read_reg8(0x140c36);
+//        unsigned char  reg_402 = read_reg8(0x140402);
+//        unsigned short reg_408 = read_reg16(0x140408);
+//        unsigned short reg_40a = read_reg16(0x14040a);
+//        unsigned char  reg_403 = read_reg8(0x140403);
+//        unsigned short reg_400 = read_reg16(0x140400);
+//
+//        //set PD2 as pwm output
+//        pwm_set_pin(GPIO_FC_PD2, PWM0);
+//        pwm_set_clk(0);
+//        pwm_set_tcmp(PWM0_ID, sys_clk.pclk * 1000 * 1000 / 32768 / 2);
+//        pwm_set_tmax(PWM0_ID, sys_clk.pclk * 1000 * 1000 / 32768);
+//        pwm_set_pwm0_mode(PWM_NORMAL_MODE);
+//        pwm_start(FLD_PWM0_EN);
+//
+//        //wait for PWM wake up Xtal
+//        delay_ms(100);
+//
+//        //Recover PD2 as Xtal pin
+//        write_reg8(0x140c8a, reg_c8a);
+//        write_reg8(0x140c36, reg_c36);
+//        write_reg8(0x140402, reg_402);
+//        write_reg16(0x140408, reg_408);
+//        write_reg16(0x14040a, reg_40a);
+//        write_reg8(0x140403, reg_403);
+//        write_reg16(0x140400, reg_400);
+//
+//        last_32k_tick = clock_get_32k_tick(); //clock_get_32k_tick()
+//        delay_us(305);                        //for 32k tick accumulator, tick period: 30.5us, dly 10 ticks
+//        curr_32k_tick = clock_get_32k_tick();
+//        if (last_32k_tick != curr_32k_tick)   //clock_get_32k_tick()
+//        {
+//            return 1;                         //pwm kick 32k pad success
+//        }
+//    }
+//    return 0;
+//}
+
+/**
+ * @brief      This function serves to 24m rc calibration wait..
+ * @return     1:busy  0:not busy
+ */
+static bool clock_24m_rc_cal_busy(void)
+{
+    return ((analog_read_reg8(areg_0x14f) & FLD_CAL_24M_DONE) == 0x00);
+}
+
+/**
+ * @brief     This function performs to select 24M as the system clock source.
+ *            24M RC is inaccurate, and it is greatly affected by temperature, if need use it so real-time calibration is required
+ *            The 24M RC needs to be calibrated before the pm_sleep_wakeup function,
+ *            because this clock will be used to kick 24m xtal start after wake up,
+ *            The more accurate this time, the faster the crystal will start.Calibration cycle depends on usage
+ * @return    none.
+ */
+void clock_cal_24m_rc(void)
+{
+
+    analog_write_reg8(areg_0x148, 0x80); //wait 24m rc stable cycles
+
+    analog_write_reg8(areg_aon_0x4f, analog_read_reg8(areg_aon_0x4f) | FLD_RC_24M_CAP_SEL);
+
+    analog_write_reg8(areg_0x147, FLD_CAL_24M_RC_DISABLE);
+    analog_write_reg8(areg_0x147, FLD_CAL_24M_RC_ENABLE);
+
+    wait_condition_fails_or_timeout(clock_24m_rc_cal_busy, g_drv_api_error_timeout_us, drv_timeout_handler, (unsigned int)DRV_API_ERROR_TIMEOUT_RC_24M_CAL);
+
+    analog_write_reg8(areg_aon_0x52, analog_read_reg8(areg_0x14b)); //write 24m cap into manual register
+
+    analog_write_reg8(areg_aon_0x4f, analog_read_reg8(areg_aon_0x4f) & (~FLD_RC_24M_CAP_SEL));
+
+    analog_write_reg8(areg_0x147, FLD_CAL_24M_RC_DISABLE);
+    tl_24mrc_cal = analog_read_reg8(areg_aon_0x52);
+}
+
+/**
+ * @brief      This function serves to 32k rc calibration wait.
+ * @return     1:busy  0: not busy
+ */
+static bool clock_32k_rc_cal_busy(void)
+{
+    return ((analog_read_reg8(areg_0x14f) & FLD_CAL_32K_DONE) == 0x00);
+}
+
+/**
+ * @brief     This function performs to select 32K as the system clock source.
+ * @return    none.
+ */
+void clock_cal_32k_rc(void)
+{
+    analog_write_reg8(areg_aon_0x4f, analog_read_reg8(areg_aon_0x4f) | FLD_RC_32K_CAP_SEL);
+
+    analog_write_reg8(areg_0x146, FLD_CAL_32K_RC_DISABLE);
+    analog_write_reg8(areg_0x146, FLD_CAL_32K_RC_ENABLE);
+    wait_condition_fails_or_timeout(clock_32k_rc_cal_busy, g_drv_api_error_timeout_us, drv_timeout_handler, (unsigned int)DRV_API_ERROR_TIMEOUT_RC_32K_CAL);
+
+    analog_write_reg8(areg_aon_0x51, analog_read_reg8(areg_0x149));                                            //write 32k res[13:6] into manual register
+    analog_write_reg8(areg_aon_0x4f, (analog_read_reg8(areg_aon_0x4f) & 0xc0) | analog_read_reg8(areg_0x14a)); //write 32k res[5:0] into manual register
+    analog_write_reg8(areg_0x146, FLD_CAL_32K_RC_DISABLE);
+    analog_write_reg8(areg_aon_0x4f, analog_read_reg8(areg_aon_0x4f) & (~FLD_RC_32K_CAP_SEL));                //manual on
+}
+
+/**
+ * @brief  This function serves to set the 32k tick.
+ * @param  tick - the value of to be set to 32k.
+ * @return none.
+ */
+_attribute_ram_code_sec_optimize_o2_noinline_ void clock_set_32k_tick(unsigned int tick)
+{
+    stimer_set_32k_write_mode(); //r_32k_wr = 1;
+    stimer_wait_read_32k_done();
+    stimer_set_32k_tick(tick);
+
+    stimer_set_32k_tick_write_trig(); //cmd_sync = 1,trig write
+    /**
+     * This delay time is about 1.38us under the calibrated 24M RC clock.
+     * The minimum waiting time here is 3*pclk cycles+3*24M xtal cycles, a total of 0.25us,
+     * wait 0.25us before you can use wr_busy signal for judgment, jianzhi suggested that this time to 1us is enough.
+     * add by bingyu.li, confirmed by jianzhi.chen 20231115
+     * Each new chip needs to confirm this time with chip design colleagues, which tl721x has confirmed.
+     */
+    core_cclk_delay_tick((unsigned long long)sys_clk.cclk); //1us
+
+    stimer_wait_write_32k_done();                           //wait wr_busy = 0
+}
+
+/**
+ * @brief  This function serves to get the 32k tick.
+ * @return 32k tick value.
+ */
+#if 0
+/*
+ * modify by yi.bao,confirmed by guangjun at 20210105
+ * Use digital register way to get 32k tick may read error tick,cause the wakeup time is
+ * incorrect with the setting time,the sleep time will very little or very big,will not wakeup on time.
+ */
+_attribute_ram_code_sec_noinline_ unsigned int clock_get_32k_tick(void)
+{
+    unsigned int timer_32k_tick;
+    reg_system_st = FLD_SYSTEM_CLR_RD_DONE; //clr rd_done
+    while((reg_system_st & FLD_SYSTEM_CLR_RD_DONE) != 0);   //wait rd_done = 0;
+    reg_system_ctrl &= ~FLD_SYSTEM_32K_WR_EN;   //1:32k write mode; 0:32k read mode
+    while((reg_system_st & FLD_SYSTEM_CLR_RD_DONE) == 0);   //wait rd_done = 1;
+    timer_32k_tick = reg_system_timer_read_32k;
+    reg_system_ctrl |= FLD_SYSTEM_32K_WR_EN;    //1:32k write mode; 0:32k read mode
+    return timer_32k_tick;
+}
+#else
+
+_attribute_ram_code_sec_optimize_o2_noinline_ unsigned int clock_get_32k_tick(void)
+{
+    unsigned int t0 = 0;
+    unsigned int t1 = 0;
+
+    //In the system timer auto mode, when writing a tick value to the system tick, if the writing operation overlaps
+    //with the 32k rising edge, the writing operation will be unsuccessful. When reading the 32k tick value,
+    //first wait for the rising edge to pass to avoid overlap with the subsequent write tick value operation.
+    //modify by weihua.zhang, confirmed by jianzhi at 20210126
+    t0 = analog_read_reg32(0x60);
+
+    while (1) {
+        t1 = analog_read_reg32(0x60);
+
+        if ((t1 - t0) == 1) {
+            return t1;
+        } else if (t1 - t0) {
+            t0 = t1;
+        }
+    }
+}
+#endif
+
+/**
+ * @brief       This function use to configuer pll bb clk.
+ * @param[in]   clk - the baseband pll clk
+ * @return      none.
+ */
+static _always_inline void clock_pll_bb_config(pll_bb_clk_e clk)
+{
+    unsigned long long clk_config = sys_pll_bb_clk[clk].cfg.clk_config;
+    //pll clk
+    analog_write_reg8(0x101, (analog_read_reg8(0x101)&(~BIT(6)))|(clk_config));
+    analog_write_reg8(0x102, ((analog_read_reg8(0x102)&(0x20))|(clk_config>>8)));
+    sys_clk.pll_clk = ((clk_config) >> 16);
+}
+
+/**
+ * @brief       This function use to enable pll_bb,Voltage versus frequency refer to table clock_h_1.
+ * @param[in]   clk - the pll bb clk
+ * @return      none.
+ */
+static _always_inline void clock_pll_bb_init(pll_bb_clk_e clk)
+{
+    if((!(sys_clk.pll_clk == sys_pll_bb_clk[clk].cfg.clk)) || (!g_bbpll_is_used)){
+
+        //The correct order to switch audio pll clock is
+        // pm_audio_pll_power_down() -> clock_audio_pll_config() -> pm_audio_pll_power_on -> pm_wait_audio_pll_done().
+        pm_bbpll_power_down();
+
+        clock_pll_bb_config(clk);
+
+        pm_bbpll_power_up();
+
+        g_bbpll_is_used=1;
+    }
+
+}
+
+/**
+ * @brief       This function use to configure the mspi clock source,Voltage versus frequency refer to table clock_h_1.
+ * @param[in]   src - the mspi clk source
+ * @param[in]   div - mspi_clk can be divided from pll, rc and xtal.
+ *                    When selecting pll as the clock source, in order to not exceed the maximum frequency, if it is built-in flash, the maximum speed of mspi is 64M.
+ * @return      none.
+ */
+static _always_inline void clock_set_mspiclk(sys_clock_src_e src, sys_clock_div_e div){
+    /*
+        At present, tl322x's design supports MSPI to dynamically switch its clock during runtime (fetching or interface reading data),
+        so it does not need to be placed in SRAM for processing.
+        This modification requires further pressure testing, modify by jilong.liu, confirmed by jianzhi at 20231221
+    */
+    write_reg8(0x140800, (read_reg8(0x140800) & 0xc0) | src | div); //src:bit[5:4], div:bit[3:0]
+    sys_clk.mspi_clk = clock_calculate_div_clk(src, (sys_clock_div_e)div);
+}
+
+/**
+ * @brief       This function used to configure the frequency of CCLK/HCLK/PCLK,voltage versus frequency refer to table clock_h_1.
+ *              You need to wait until all the peripherals that use these clocks are idle before you can switch frequencies.
+ * @param[in]   src - clock source.
+ * @param[in]   cclk_div - divider of CCLK.
+ * @param[in]   hclk_div - divider of HCLK.
+ * @param[in]   pclk_div - divider of PCLK.
+ * @param[in]   wt_div - the wt divider
+ * @return      none.
+ */
+static _always_inline void clock_set_d25fclk_hclk_pclk(sys_clock_src_e src, sys_clock_div_e cclk_div, sys_cclk_div_to_hclk_pclk_e hclk_pclk_div){
+    //first set cclk switch to 24rc to avoid the risk of hclk/pclk exceeding its maximum configurable frequency for a short period of time
+    //when switching different clock frequencies using this interface.
+    //change to 24M rc first.
+    write_reg8(0x140828, (read_reg8(0x140828) & 0xc0) | RC_24M | CLK_DIV1);
+
+    //HCLK and PCLK should be set ahead of CCLK, ensure the HCLK and PCLK not exceed the max CCLK(CCLK max 120M, HCLK max 60M, PCLK max 60M)
+    write_reg8(0x140818, (read_reg8(0x140818) & 0xf8) | hclk_pclk_div);
+
+    //Configure the CCLK clock frequency.
+    write_reg8(0x140828, (read_reg8(0x140828) & 0xc0) | src | cclk_div); //clock source. 0:rc 24m, 1:xtl_24m, 2:pll
+
+    sys_clk.cclk = clock_calculate_div_clk(src, cclk_div);
+    sys_clk.hclk_n22 = sys_clk.cclk / (1 << (hclk_pclk_div >> 2));
+    sys_clk.pclk = sys_clk.hclk_n22 / (1 << (hclk_pclk_div & 0x03));
+
+    /*
+     * The maximum pclk is 96. If it is greater than ALG_MODULE_MAX_CLK*2, it should be divided into 4 frequencies; otherwise, it can be divided into two frequencies
+     */
+    if(sys_clk.pclk > ALG_MODULE_MAX_CLK*2){
+        analog_set_clk(0x01);
+    }else{
+        analog_set_clk(0x00);
+    }
+
+}
+
+/**
+ * @brief       This function use to select the system clock source,voltage versus frequency refer to table clock_h_1.
+ * @param[in]   src                   - cclk source.
+ * @param[in]   cclk                  - the cclk divide from src
+ * @param[in]   hclk_div              - the hclk divide from cclk.
+ * @param[in]   pclk_div              - the pclk divide from hclk.
+ * @param[in]   mspi_clk_div - mspi_clk can be divided from pll, rc and xtal.
+ *                             When selecting pll as the clock source, in order to not exceed the maximum frequency.
+ *                             If it is built-in flash, the maximum speed of mspi is 64M.
+ *                             If it is an external flash, the maximum speed of mspi needs to be based on the board test.
+ *                             Because the maximum speed is related to the wiring of the board, and is also affected by temperature and GPIO voltage,
+ *                             the maximum speed needs to be tested at the highest and lowest voltage of the board,
+ *                             and the high and low temperature long-term stability test speed is no problem.
+ * @return      none
+ * @note        1.Do not switch the clock during the DMA sending and receiving process;
+ *              because during the clock switching process, the system clock will be
+ *              suspended for a period of time, which may cause data loss
+ *              2.This interface is to handle mspi_clk and cclk_clk according to a unified clock source;
+ *              3. When switching to pll via clock_d25fclk_hclk_pclk_wtclk_config/clock_mspi_clk_config, it is necessary to place a guarantee
+ *              that the interface will be called as well as selecting the parameter src to the corresponding pll source.
+ */
+_attribute_ram_code_sec_noinline_ void clock_init(sys_clk_src_config_e        src,
+                                                  sys_clock_div_e             cclk,
+                                                  sys_cclk_div_to_hclk_pclk_e hclk_pclk_div,
+                                                  sys_clock_div_e             mspi_clk_div)
+{
+/*
+ * todo: Because turning off the 24M RC without using it involves many modules. At that time, the module coupling will be very strong. It will not be added for the time being. If necessary later, it will be evaluated.
+ */
+     unsigned char src_cfg= src&0xff;
+    //in 24mrc to configure mspi/cclk_hclk_pclk
+    clock_set_d25fclk_hclk_pclk(RC_24M, CLK_DIV1, CCLK_DIV1_TO_HCLK_DIV1_TO_PCLK);
+    clock_set_mspiclk(RC_24M, CLK_DIV1);
+
+    //pll
+    if(src_cfg == BASEBAND_PLL){
+        clock_pll_bb_init((src>>8)&0xff);
+    }
+
+    //set src
+    clock_set_mspiclk(src_cfg, (sys_clock_div_e)mspi_clk_div);
+
+    clock_set_d25fclk_hclk_pclk(src_cfg, cclk, hclk_pclk_div);
+}
+
+/**
+ * @brief       This function used to configure the frequency of CCLK/HCLK/PCLK.
+ *              You need to wait until all the peripherals that use these clocks are idle before you can switch frequencies.
+ * @param[in]   src - clock source.
+ * @param[in]   cclk_div - divider of CCLK.
+ * @param[in]   hclk_div - divider of HCLK.
+ * @param[in]   pclk_div - divider of PCLK.
+ * @return      none
+ */
+_attribute_ram_code_sec_optimize_o2_noinline_ void clock_cclk_hclk_pclk_config(sys_clock_src_e src, sys_clock_div_e cclk_div, sys_cclk_div_to_hclk_pclk_e hclk_pclk_div)
+{
+    clock_set_d25fclk_hclk_pclk(src, cclk_div, hclk_pclk_div);
+}
+
+/**
+ * @brief       This function use to configure the mspi clock source.
+ * @param[in]   src - the mspi clk source
+ * @param[in]   div - the mspi clk source divider
+ * @return      none.
+ */
+_attribute_ram_code_sec_optimize_o2_noinline_ void clock_mspi_clk_config(sys_clock_src_e src, sys_clock_div_e div)
+{
+    clock_set_mspiclk(src,div);
+}
+
+/**
+ * @brief       This function use to set all clock to default. 
+ * @return      none.
+ * @note        After call this, the following clock will set to default source and value:
+ *              -----------------------------------------------------------------------
+ *              clock source |          clock
+ *              -----------------------------------------------------------------------
+ *              RC 24M       | CCLK 24M, HCLK 24M, PCLK 24M, MSPI CLK 24M.
+ *              -----------------------------------------------------------------------
+ */
+_attribute_ram_code_sec_optimize_o2_noinline_ void clock_set_all_clock_to_default(void)
+{
+    clock_cclk_hclk_pclk_config(RC_24M, CLK_DIV1, CCLK_DIV1_TO_HCLK_DIV1_TO_PCLK);
+
+    clock_mspi_clk_config(RC_24M, CLK_DIV1); //mspi clk to 24M rc clock, div 1, 24MHz
+}
+
+/**
+ * @brief       This function use to save all clock configuration for the follow-up restore. 
+ * @return      none.
+ * @note        This function needs to be used in conjunction with clock_restore_clock_config().
+ */
+_attribute_ram_code_sec_optimize_o2_noinline_ void clock_save_clock_config(void)
+{
+    sys_clk_config.cclk_cfg = read_reg8(0x140828);
+    sys_clk_config.hclk_pclk_cfg = read_reg8(0x140818);
+    sys_clk_config.mspi_clk_cfg = read_reg8(0x140800);
+    sys_clk_config.rc_24m_is_used = g_24m_rc_is_used;
+}
+
+/**
+ * @brief       This function use to restore all previously saved clock configurations.
+ * @return      none.
+ * @note        This function needs to be used in conjunction with clock_save_clock_config().
+ */
+_attribute_ram_code_sec_optimize_o2_noinline_ void clock_restore_clock_config(void)
+{
+    clock_cclk_hclk_pclk_config(sys_clk_config.cclk_cfg & BIT_RNG(4, 5),
+                                sys_clk_config.cclk_cfg & BIT_RNG(0, 3),
+                                sys_clk_config.hclk_pclk_cfg);
+
+    clock_mspi_clk_config(sys_clk_config.mspi_clk_cfg & BIT_RNG(4, 5),  //src
+                          sys_clk_config.mspi_clk_cfg & BIT_RNG(0, 3)); //mspiclk_div
+}
+
+/**********************************************************************************************************************
+ *                                          local function implementation                                             *
+ *********************************************************************************************************************/
+/**
+ * @brief       This function is used to calculate the clock after different clock sources, the unit is MHZ.
+ * @param[in]   src - the clock source
+ * @param[in]   div - the clock source divider
+ * @return      clk.
+ */
+_attribute_ram_code_sec_ static _always_inline unsigned char clock_calculate_div_clk(sys_clock_src_e src, sys_clock_div_e div)
+{
+    unsigned char clk = 0;
+    if (BASEBAND_PLL == src) {
+        clk = sys_clk.pll_clk / div;
+    } else {
+        clk = 24 / div;
+    }
+    return clk;
+}

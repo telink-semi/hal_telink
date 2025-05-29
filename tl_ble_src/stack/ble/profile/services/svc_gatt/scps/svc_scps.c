@@ -24,40 +24,39 @@
 #include "stack/ble/ble.h"
 
 #ifndef SCPS_SCAN_REFRESH
-#define SCPS_SCAN_REFRESH                   1
+    #define SCPS_SCAN_REFRESH 1
 #endif
 
-#define SCPS_START_HDL                      SERVICE_SCAN_PARAMETERS_HDL
+#define SCPS_START_HDL SERVICE_SCAN_PARAMETERS_HDL
 
 /*
  * @brief the structure for default ScPS service List.
  */
 static const atts_attribute_t scpsList[] =
-{
-    ATTS_PRIMARY_SERVICE(serviceScanParametersUuid),
+    {
+        ATTS_PRIMARY_SERVICE(serviceScanParametersUuid),
 
-    //Scan Interval Window
-    ATTS_CHAR_UUID_WRITE_NULL(charPropWriteWithout, characteristicScanIntervalWindowUuid),
+        //Scan Interval Window
+        ATTS_CHAR_UUID_WRITE_NULL(charPropWriteWithout, characteristicScanIntervalWindowUuid),
 
 #if SCPS_SCAN_REFRESH
-    //Scan Refresh
-    ATTS_CHAR_UUID_NOTIF_ONLY(characteristicScanRefreshUuid),
-    ATTS_COMMON_CCC_DEFINE,
+        //Scan Refresh
+        ATTS_CHAR_UUID_NOTIF_ONLY(characteristicScanRefreshUuid),
+        ATTS_COMMON_CCC_DEFINE,
 #endif
 };
 
 /*
  * @brief the structure for default ScPS service group.
  */
-_attribute_ble_data_retention_
-static atts_group_t svcScpsGroup =
-{
-    NULL,
-    scpsList,
-    NULL,
-    NULL,
-    SCPS_START_HDL,
-    0,
+_attribute_ble_data_retention_ static atts_group_t svcScpsGroup =
+    {
+        NULL,
+        scpsList,
+        NULL,
+        NULL,
+        SCPS_START_HDL,
+        0,
 };
 
 /**
@@ -67,7 +66,7 @@ static atts_group_t svcScpsGroup =
  */
 void blc_svc_addScpsGroup(void)
 {
-    svcScpsGroup.endHandle = svcScpsGroup.startHandle+ARRAY_SIZE(scpsList)-1;
+    svcScpsGroup.endHandle = svcScpsGroup.startHandle + ARRAY_SIZE(scpsList) - 1;
     blc_gatts_addAttributeServiceGroup(&svcScpsGroup);
 }
 

@@ -29,10 +29,10 @@
 #include "lib/include/otp.h"
 #include "lib/include/pm/pm_internal.h"
 
-#define ADC_CALIB_EN     0
+#define ADC_CALIB_EN 0
 
 #ifndef OTP_OPERATE_MODE
-#define OTP_OPERATE_MODE      1 /* 1: auto mode; 0: manual mode(for internal test). */
+    #define OTP_OPERATE_MODE 1 /* 1: auto mode; 0: manual mode(for internal test). */
 #endif
 
 /**
@@ -40,69 +40,69 @@
  * @note  The usage of OTP will include RC as the clock source. 
  *        Considering the accuracy of RC, so this value is set to the twice of spec min.
  */
-#define Tcs                          (20)
+#define Tcs (20)
 
 /**
  * @brief Program pulse width time, pwe high time, 20 < Tpw < 25(us).
  */
-#define Tpw                             (22)
+#define Tpw (22)
 
 /**
  * @brief Program pulse interval time, pwe low time, 1 < Tpwi < 5(us).
  */
-#define Tpwi                         (4)
+#define Tpwi (4)
 
 /**
  * @brief Program mode recovery time, pporg=0 ---> pce=0, 5 < Tppr < 100(us).
  */
-#define Tppr                         (10)
+#define Tppr (10)
 
 /**
  * @brief Program mode setup time, pprog=1 ---> pwe=1, 5 < Tpps < 20(us).
  */
-#define Tpps                         (5)
+#define Tpps (5)
 
 /**
  * @brief Program mode hold time, pwe=0 ---> pprog=0, 5 < Tpph < 20(us).
  */
-#define Tpph                         (10)
+#define Tpph (10)
 
 /**
  * @brief Deep standby to active mode setup time, deep standby to active mode setup time, Tsas >2(us).
  */
-#define Tsas                         (5)
+#define Tsas (5)
 
 /**
  * @brief PTM mode setup time, ptm  -->  pce = 1, Tms>1(ns).
  */
-#define Tms                          (1)
+#define Tms (1)
 
 /**
  * @brief PTM mode hold time, ptm  -->  pce = 0, Tmh>1(ns).
  */
-#define Tmh                          (1)
+#define Tmh (1)
 
 /**
  * @brief IP enable time in program, pce = 1 ---> pprog=1, 10 < Tcsp < 100(us).
  */
-#define Tcsp                         (20)
+#define Tcsp (20)
 
 /**
  * @brief LDO setup time, ldo setup time, Tpls > 10(us).
  */
-#define Tpls                         (15)
+#define Tpls (15)
 
 /**
  * @brief PTM type.
  */
 typedef enum
 {
-    OTP_PTM_READ = 0x00,                /**< PTM mode read */
-    OTP_PTM_PROG = 0x02,                /**< PTM mode write */
-    OTP_PTM_INIT_MARGIN_READ = 0x01,    /**< PTM mode init margin read */
-    OTP_PTM_PGM_MARGIN_READ = 0x04,     /**< PTM mode pgm(program) margin read */
+    OTP_PTM_READ                = 0x00, /**< PTM mode read */
+    OTP_PTM_PROG                = 0x02, /**< PTM mode write */
+    OTP_PTM_INIT_MARGIN_READ    = 0x01, /**< PTM mode init margin read */
+    OTP_PTM_PGM_MARGIN_READ     = 0x04, /**< PTM mode pgm(program) margin read */
     OTP_PTM_HT_INIT_MARGIN_READ = 0x09, /**< PTM mode ht(high temp) init margin read (internal test)*/
-    OTP_PTM_HT_PGM_MARGIN_READ = 0x0c,  /**< PTM mode ht pgm margin read (internal test)*/
+    OTP_PTM_HT_PGM_MARGIN_READ  = 0x0c, /**< PTM mode ht pgm margin read (internal test)*/
 } otp_ptm_type_e;
 
 /**
@@ -110,14 +110,15 @@ typedef enum
  */
 typedef enum
 {
-    OTP_TIM_CONFIG_24M = 0x00,  /**< PCLK (0-24M] */
-    OTP_TIM_CONFIG_48M = 0x01,  /**< PCLK (24-48M] */
-    OTP_TIM_CONFIG_96M = 0x02,  /**< PCLK (48-96M] */
+    OTP_TIM_CONFIG_24M  = 0x00, /**< PCLK (0-24M] */
+    OTP_TIM_CONFIG_48M  = 0x01, /**< PCLK (24-48M] */
+    OTP_TIM_CONFIG_96M  = 0x02, /**< PCLK (48-96M] */
     OTP_TIM_CONFIG_192M = 0x03, /**< PCLK (96-192M] */
     OTP_TIM_CONFIG_384M = 0x04, /**< PCLK (192-384M] */
 } otp_tim_config_e;
 #if ADC_CALIB_EN
-typedef struct{
+typedef struct
+{
     unsigned char ft_vbat_gain;
     unsigned char ft_vbat_offset;
     unsigned char ft_gpio_gain;
@@ -126,7 +127,7 @@ typedef struct{
     unsigned char cp_vbat_offset;
     unsigned char cp_gpio_gain;
     unsigned char cp_gpio_offset;
-}adc_ft_cp_calib_t;
+} adc_ft_cp_calib_t;
 #endif
 /**********************************************************************************************************************
  *                                                External interface                                                  *
@@ -142,32 +143,23 @@ typedef struct{
  */
 void otp_clk_init(void)
 {
-    otp_tim_config_e tim_config = 0;
-    unsigned char capt_edge_cnt = 0;
+    otp_tim_config_e tim_config    = 0;
+    unsigned char    capt_edge_cnt = 0;
 
-    if (sys_clk.pclk <= 24)
-    {
-        tim_config = OTP_TIM_CONFIG_24M;
-        capt_edge_cnt = 3; /* 3 * (1000 / 24) > 110ns(Tcd) */
-    }
-    else if (sys_clk.pclk <= 48)
-    {
-        tim_config = OTP_TIM_CONFIG_48M;
-        capt_edge_cnt = 6; /* 6 * (1000 / 48) */
-    }
-    else if (sys_clk.pclk <= 96)
-    {
-        tim_config = OTP_TIM_CONFIG_96M;
+    if (sys_clk.pclk <= 24) {
+        tim_config    = OTP_TIM_CONFIG_24M;
+        capt_edge_cnt = 3;  /* 3 * (1000 / 24) > 110ns(Tcd) */
+    } else if (sys_clk.pclk <= 48) {
+        tim_config    = OTP_TIM_CONFIG_48M;
+        capt_edge_cnt = 6;  /* 6 * (1000 / 48) */
+    } else if (sys_clk.pclk <= 96) {
+        tim_config    = OTP_TIM_CONFIG_96M;
         capt_edge_cnt = 12; /* 12 * (1000 / 96) */
-    }
-    else if (sys_clk.pclk <= 192)
-    {
-        tim_config = OTP_TIM_CONFIG_192M;
+    } else if (sys_clk.pclk <= 192) {
+        tim_config    = OTP_TIM_CONFIG_192M;
         capt_edge_cnt = 24; /* 24 * (1000 / 192) */
-    }
-    else
-    {
-        tim_config = OTP_TIM_CONFIG_384M;
+    } else {
+        tim_config    = OTP_TIM_CONFIG_384M;
         capt_edge_cnt = 60; /* 40 * (1000 / 384) */
     }
 
@@ -201,7 +193,7 @@ void otp_set_active_mode(void)
     reg_otp_status |= FLD_OTP_AUTO_PWUP_TRIG;
     otp_wait_done();
 #else
-    reg_otp_ctrl1 |= FLD_OTP_PLDO; /* pldo = 1 */
+    reg_otp_ctrl1 |= FLD_OTP_PLDO;  /* pldo = 1 */
     delay_us(Tpls);
     reg_otp_ctrl1 |= FLD_OTP_PDSTD; /* pdstd = 1 */
     delay_us(Tsas);
@@ -244,7 +236,7 @@ static void otp_start(otp_ptm_type_e ptm_mode)
  * @param[out]  buff - data buff.
  * @return     none
  */
-_attribute_ram_code_com_sec_noinline_ static void otp_read_cycle_auto(otp_ptm_type_e ptm_mode, unsigned int addr, unsigned int word_len, unsigned int *buff)
+_attribute_ram_code_sec_noinline_ static void otp_read_cycle_auto(otp_ptm_type_e ptm_mode, unsigned int addr, unsigned int word_len, unsigned int *buff)
 {
     unsigned int r = core_interrupt_disable();
     /* when write to otp, ptm needs to be configured. */
@@ -252,12 +244,11 @@ _attribute_ram_code_com_sec_noinline_ static void otp_read_cycle_auto(otp_ptm_ty
     core_cclk_delay_tick((unsigned long long)(Tcs * sys_clk.cclk));
 
     reg_otp_pa = addr;
-    buff[0] = reg_otp_rd_dat; /* trigger read */
+    buff[0]    = reg_otp_rd_dat; /* trigger read */
     otp_wait_done();
 
     /* pa auto inc */
-    for (unsigned int i = 0; i < word_len; i++)
-    {
+    for (unsigned int i = 0; i < word_len; i++) {
         buff[i] = reg_otp_rd_dat;
         otp_wait_done();
     }
@@ -273,7 +264,7 @@ _attribute_ram_code_com_sec_noinline_ static void otp_read_cycle_auto(otp_ptm_ty
  * @param[in]  data  - the data need to be write,4 bytes.
  * @return     none
  */
-_attribute_ram_code_com_sec_noinline_ static void otp_write32(otp_ptm_type_e ptm_mode, unsigned int addr, unsigned int data)
+_attribute_ram_code_sec_noinline_ static void otp_write32(otp_ptm_type_e ptm_mode, unsigned int addr, unsigned int data)
 {
     unsigned int r = core_interrupt_disable();
     /* when write to otp, ptm needs to be configured. */
@@ -284,35 +275,27 @@ _attribute_ram_code_com_sec_noinline_ static void otp_write32(otp_ptm_type_e ptm
     /* prog pas addr data */
     reg_otp_ctrl0 |= FLD_OTP_PPROG;
     reg_otp_ctrl0 |= FLD_OTP_PAS;
-    reg_otp_pa = addr;
+    reg_otp_pa     = addr;
     reg_otp_wr_dat = data;
-    reg_otp_paio = 0;
+    reg_otp_paio   = 0;
     /* Tpps */
     delay_us(Tpps);
 
     /* redundancy programming  38*2 */
-    for (unsigned char i = 1; i <= 76; i++)
-    {
+    for (unsigned char i = 1; i <= 76; i++) {
         reg_otp_ctrl0 |= FLD_OTP_PWE;
         delay_us(Tpw);
         reg_otp_ctrl0 &= ~(FLD_OTP_PWE);
-        if (i < 38)
-        {
+        if (i < 38) {
             reg_otp_paio = i;
-        }
-        else if (i == 38)
-        {
+        } else if (i == 38) {
             reg_otp_ctrl0 &= (~FLD_OTP_PAS);
-            reg_otp_pa = addr;
+            reg_otp_pa     = addr;
             reg_otp_wr_dat = data;
-            reg_otp_paio = 0;
-        }
-        else if ((i > 38) && (i < 76))
-        {
+            reg_otp_paio   = 0;
+        } else if ((i > 38) && (i < 76)) {
             reg_otp_paio = i - 38;
-        }
-        else if (i == 76)
-        {
+        } else if (i == 76) {
             break;
         }
         // because the for loop and the if judge the time,choose to use Tpwi/2.
@@ -321,7 +304,7 @@ _attribute_ram_code_com_sec_noinline_ static void otp_write32(otp_ptm_type_e ptm
     delay_us(Tpph);
     reg_otp_ctrl0 &= ~(FLD_OTP_PPROG); /* pporg = 0 */
     delay_us(Tppr);
-    reg_otp_ctrl0 &= ~(FLD_OTP_PCE); /* pce = 0 */
+    reg_otp_ctrl0 &= ~(FLD_OTP_PCE);   /* pce = 0 */
     /* Tmh >= 1(ns) */
     reg_otp_ctrl1 = ~(FLD_OTP_PTM);
     core_restore_interrupt(r);
@@ -360,16 +343,12 @@ void otp_read(unsigned int addr, unsigned int word_len, unsigned int *buff)
  */
 unsigned char otp_write(unsigned int addr, unsigned int word_len, unsigned int *buff)
 {
-    for (unsigned int i = 0; i < word_len; i++)
-    {
+    for (unsigned int i = 0; i < word_len; i++) {
         unsigned int temp = 0;
         otp_read(addr + i * 4, 1, (unsigned int *)&temp);
-        if (temp == 0xffffffff)
-        {
+        if (temp == 0xffffffff) {
             otp_write32(OTP_PTM_PROG, addr + i * 4, buff[i]);
-        }
-        else if (temp != buff[i])
-        {
+        } else if (temp != buff[i]) {
             return 1;
         }
     }
@@ -427,27 +406,26 @@ void otp_check_protection_code(unsigned char sdk_version)
     otp_read(104, 1, (unsigned int *)&pCode);
     /* shutdown otp */
     otp_set_deep_standby_mode();
-    pCode = pCode & 0x1f;//Bit0-4 is market protection code.
+    pCode = pCode & 0x1f; //Bit0-4 is market protection code.
 
-    switch(sdk_version)
-    {
+    switch (sdk_version) {
     case 0:
         //Different SDKs have different restrictions. Please modify the code according to your own situation.
         //The driver here is only for example reference.
-        if(0xE0 > pCode)
-        {
+        if (0xE0 > pCode) {
             sys_reset_all();
-            while(1);
+            while (1);
         }
         break;
     case 0xff:
         break;
     default:
-        if(1) // Prevent macro setting exceptions from invalidating the ProtectionCode function
+        if (1) // Prevent macro setting exceptions from invalidating the ProtectionCode function
         {
             sys_reset_all();
-            while(1);
+            while (1);
         }
+        break;
     }
 }
 
@@ -564,15 +542,14 @@ void otp_ecc_dis(void)
  * @param[out] buff - data buff.
  * @return     none
  */
-_attribute_ram_code_com_sec_noinline_ void otp_read_cycle_manual(otp_ptm_type_e ptm_mode, unsigned int addr, unsigned int word_len, unsigned int *buff)
+_attribute_ram_code_sec_noinline_ void otp_read_cycle_manual(otp_ptm_type_e ptm_mode, unsigned int addr, unsigned int word_len, unsigned int *buff)
 {
     unsigned int r = core_interrupt_disable();
     /* when write to otp, ptm needs to be configured. */
     otp_start(ptm_mode);
     delay_us(Tcs);
 
-    for (unsigned int i = 0; i < word_len; i++)
-    {
+    for (unsigned int i = 0; i < word_len; i++) {
         reg_otp_pa = addr + i * 4;
         /* Tas >= 1(ns) */
         reg_otp_ctrl3 |= FLD_OTP_MAN_PCLK;
@@ -632,7 +609,7 @@ void otp_ht_initial_margin_read(unsigned int addr, unsigned int word_len, unsign
  * @param[in]  data  - the data need to be write,4 bytes.
  * @return     none
  */
-_attribute_ram_code_com_sec_noinline_ static void otp_write32_column(otp_ptm_type_e ptm_mode, unsigned int addr, unsigned int data)
+_attribute_ram_code_sec_noinline_ static void otp_write32_column(otp_ptm_type_e ptm_mode, unsigned int addr, unsigned int data)
 {
     unsigned int r = core_interrupt_disable();
     /* when write to otp, ptm needs to be configured. */
@@ -643,35 +620,27 @@ _attribute_ram_code_com_sec_noinline_ static void otp_write32_column(otp_ptm_typ
     /* prog pas addr data */
     reg_otp_ctrl0 |= FLD_OTP_PPROG;
     reg_otp_ctrl0 |= FLD_OTP_PAS;
-    reg_otp_pa = addr;
+    reg_otp_pa     = addr;
     reg_otp_wr_dat = data;
-    reg_otp_paio = 0;
+    reg_otp_paio   = 0;
     /* Tpps */
     delay_us(Tpps);
 
     /* redundancy programming  38*2 */
-    for (unsigned char i = 1; i <= 76; i++)
-    {
+    for (unsigned char i = 1; i <= 76; i++) {
         reg_otp_ctrl0 |= FLD_OTP_PWE;
         delay_us(Tpw);
         reg_otp_ctrl0 &= ~(FLD_OTP_PWE);
-        if (i < 38)
-        {
+        if (i < 38) {
             reg_otp_paio = 0;
-        }
-        else if (i == 38)
-        {
+        } else if (i == 38) {
             reg_otp_ctrl0 &= (~FLD_OTP_PAS);
-            reg_otp_pa = addr;
+            reg_otp_pa     = addr;
             reg_otp_wr_dat = data;
+            reg_otp_paio   = 0;
+        } else if ((i > 38) && (i < 76)) {
             reg_otp_paio = 0;
-        }
-        else if ((i > 38) && (i < 76))
-        {
-            reg_otp_paio = 0;
-        }
-        else if (i == 76)
-        {
+        } else if (i == 76) {
             break;
         }
         // because the for loop and the if judge the time,choose to use Tpwi/2.
@@ -680,7 +649,7 @@ _attribute_ram_code_com_sec_noinline_ static void otp_write32_column(otp_ptm_typ
     delay_us(Tpph);
     reg_otp_ctrl0 &= ~(FLD_OTP_PPROG); /* pporg = 0 */
     delay_us(Tppr);
-    reg_otp_ctrl0 &= ~(FLD_OTP_PCE); /* pce = 0 */
+    reg_otp_ctrl0 &= ~(FLD_OTP_PCE);   /* pce = 0 */
     /* Tmh >= 1(ns) */
     reg_otp_ctrl1 = ~(FLD_OTP_PTM);
     core_restore_interrupt(r);
@@ -715,16 +684,12 @@ unsigned char otp_write_row(unsigned int addr, unsigned int word_len, unsigned i
 unsigned char otp_write_column(unsigned int addr, unsigned int word_len, unsigned int *buff)
 {
     BM_CLR(addr, BIT_RNG(2, 5));
-    for (unsigned int i = 0; i < word_len; i++)
-    {
+    for (unsigned int i = 0; i < word_len; i++) {
         unsigned int temp = 0;
         otp_read(addr + i * 4, 1, (unsigned int *)&temp);
-        if (temp == 0xffffffff)
-        {
+        if (temp == 0xffffffff) {
             otp_write32_column(OTP_PTM_PROG, addr + i * 4, buff[i]);
-        }
-        else if (temp != buff[i])
-        {
+        } else if (temp != buff[i]) {
             return 1;
         }
     }
@@ -757,6 +722,7 @@ void otp_column_read(unsigned int addr, unsigned int word_len, unsigned int *buf
     addr &= ~(BIT_RNG(6, 7) | (BIT_RNG(0, 1) << 8));
     otp_read(addr, word_len, buff);
 }
+
 /**
  * @brief      This function serves to read IEEE address from OTP.
  * @param[out] buf  - Pointer to IEEE address buffer(IEEE address is 8bytes)
@@ -765,7 +731,7 @@ void otp_column_read(unsigned int addr, unsigned int word_len, unsigned int *buf
 void otp_get_ieee_addr(unsigned char *buf)
 {
     otp_set_active_mode();
-    otp_read(0x6c,2,(unsigned int *)buf);
+    otp_read(0x6c, 2, (unsigned int *)buf);
     otp_set_deep_standby_mode();
 }
 
@@ -780,13 +746,10 @@ void otp_get_ieee_addr(unsigned char *buf)
  */
 drv_api_status_e otp_set_adc_calib_value(unsigned char gain, signed char offset, void (*calib_func)(unsigned short, signed char))
 {
-    if((gain <= 250) && (offset >= -100) && (offset <= 100))
-    {
-        (*calib_func)(gain+1100, offset);
+    if ((gain <= 250) && (offset >= -100) && (offset <= 100)) {
+        (*calib_func)(gain + 1100, offset);
         return true;
-    }
-    else
-    {
+    } else {
         return false;
     }
 }
@@ -804,27 +767,24 @@ drv_api_status_e otp_calib_adc_vref(void)
         The GPIO calibration value and the VBAT calibration value do not necessarily exist at the same time.
     ********************************************************************************************/
     otp_set_active_mode();
-    otp_read(0x94,2,(unsigned int *)&calib_value);
+    otp_read(0x94, 2, (unsigned int *)&calib_value);
     otp_set_deep_standby_mode();
 
-    if(otp_set_adc_calib_value(calib_value.ft_vbat_gain,(signed char)calib_value.ft_vbat_offset,adc_set_vbat_calib_vref)\
-       ||otp_set_adc_calib_value(calib_value.ft_gpio_gain,(signed char)calib_value.ft_gpio_offset,adc_set_gpio_calib_vref))//vbat_ft and gpio_ft
+    if (otp_set_adc_calib_value(calib_value.ft_vbat_gain, (signed char)calib_value.ft_vbat_offset, adc_set_vbat_calib_vref) || otp_set_adc_calib_value(calib_value.ft_gpio_gain, (signed char)calib_value.ft_gpio_offset, adc_set_gpio_calib_vref))     //vbat_ft and gpio_ft
     {
-        if(otp_set_adc_calib_value(calib_value.cp_vbat_gain,(signed char)calib_value.cp_vbat_offset,adc_set_vbat_calib_vref)\
-           ||otp_set_adc_calib_value(calib_value.cp_gpio_gain,(signed char)calib_value.cp_gpio_offset,adc_set_gpio_calib_vref))//vbat_cp and gpio_cp
+        if (otp_set_adc_calib_value(calib_value.cp_vbat_gain, (signed char)calib_value.cp_vbat_offset, adc_set_vbat_calib_vref) || otp_set_adc_calib_value(calib_value.cp_gpio_gain, (signed char)calib_value.cp_gpio_offset, adc_set_gpio_calib_vref)) //vbat_cp and gpio_cp
         {
             return DRV_API_FAILURE;
         }
     }
     return DRV_API_SUCCESS;
-
 }
 #endif
 /**
  * @brief       This function serves to read vdd0p94 and vddo1p8 calibration data from OTP.
  * @return      res 0: ok, 1: vdd0p94 invalid, 2: vddo1p8 invalid, 3: vdd0p94 and vddo1p8 all invalid
  */
-_attribute_ram_code_com_sec_noinline_ unsigned char otp_get_vdd0p94_vddo1p8_calib_value(void)
+_attribute_ram_code_sec_noinline_ unsigned char otp_get_vdd0p94_vddo1p8_calib_value(void)
 {
     unsigned char res_cal_vdd0p94 = 0, res_cal_vddo1p8 = 0;
 
@@ -838,7 +798,7 @@ _attribute_ram_code_com_sec_noinline_ unsigned char otp_get_vdd0p94_vddo1p8_cali
      * 0x8c vdd1P8  FT 1byte  - otp_value[2]
      * 0x90 vdd1P8  CP 1byte  - otp_value[3]
      */
-    otp_read(0x84, 4, otp_value);//readout vdd0p94 and vdd1p8 at once
+    otp_read(0x84, 4, otp_value); //readout vdd0p94 and vdd1p8 at once
     otp_set_deep_standby_mode();
 
     /*
@@ -883,6 +843,7 @@ _attribute_ram_code_com_sec_noinline_ unsigned char otp_get_vdd0p94_vddo1p8_cali
 
     return (res_cal_vdd0p94 + res_cal_vddo1p8);
 }
+
 /**
  * @}
  */

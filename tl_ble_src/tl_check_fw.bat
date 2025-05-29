@@ -9,6 +9,15 @@ riscv32-elf-objcopy -S -O binary %1.elf  output/%1.bin
 riscv32-elf-objcopy -S -O binary %1.elf  %1.bin
 ..\..\..\tl_check_fw2.exe  %1.bin 
 )
+
+@echo off
+@for %%A in (%1.bin) do set "fsize=%%~zA"
+@set "targetSize=262144"
+if %fsize% GTR %targetSize% (
+	@echo bin size is greater 256KB, please refer to handbook!
+)
+@echo on
+
 @echo  "---------------------------  SDK version info ---------------------------"
 @grep -E "[$]{3}[a-zA-Z0-9 _.]+[$]{3}" --text -o %1.bin | sed 's/\$//g'
 @echo  "---------------------------  SDK version end  ---------------------------"

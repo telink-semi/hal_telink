@@ -26,72 +26,66 @@
 #include "config.h"
 #include "bqb_config.h"
 
-#define HCI_TR_EN                                   1
+#define HCI_TR_EN 1
 #if HCI_TR_EN
     /*! HCI UART transport pin define */
-    #if(MCU_CORE_TYPE == MCU_CORE_B91)
-        #define HCI_TR_UART_ID       UART0
-        #define HCI_TR_RX_PIN        UART0_RX_PD3 //UART0_RX_PB3 //--->EBQ TX
-        #define HCI_TR_TX_PIN        UART0_TX_PD2 //UART0_TX_PB2 //--->EBQ RX
-        #define HCI_TR_BAUDRATE      (1000000)
-        #define HCI_UART_SoftwareRxDone_EN    0
+    #if (MCU_CORE_TYPE == MCU_CORE_B91)
+        #define  EXT_HCI_UART_CHANNEL      UART0
+        #define  EXT_HCI_UART_IRQ          IRQ_UART0
+        #define HCI_TR_RX_PIN              UART0_RX_PD3 //UART0_RX_PB3 //--->EBQ TX
+        #define HCI_TR_TX_PIN              UART0_TX_PD2 //UART0_TX_PB2 //--->EBQ RX
+        #define HCI_TR_BAUDRATE            (1000000)
+        #define HCI_UART_SoftwareRxDone_EN 0
         /*** RTS/CTS Pin ***/
         #if (HCI_UART_SoftwareRxDone_EN)
-            #define HCI_TR_RTS_PIN       UART0_RTS_PD1
-            #define HCI_TR_CTS_PIN       UART0_CTS_PD0
+            #define HCI_TR_RTS_PIN UART0_RTS_PD1
+            #define HCI_TR_CTS_PIN UART0_CTS_PD0
         #endif
-    #elif(MCU_CORE_TYPE == MCU_CORE_B92)
-        #define HCI_TR_UART_ID       UART0
-        #define HCI_TR_RX_PIN        GPIO_FC_PC6
-        #define HCI_TR_TX_PIN        GPIO_FC_PC7
-        #define HCI_TR_BAUDRATE      (1000000)
+    #elif (MCU_CORE_TYPE == MCU_CORE_B92)
+        #define HCI_TR_RX_PIN   GPIO_FC_PC6
+        #define HCI_TR_TX_PIN   GPIO_FC_PC7
+        #define HCI_TR_BAUDRATE (1000000)
     #elif (MCU_CORE_TYPE == MCU_CORE_TL721X)
-        #define HCI_TR_RX_PIN        GPIO_FC_PB4
-        #define HCI_TR_TX_PIN        GPIO_FC_PB5
-        #define HCI_TR_BAUDRATE      (1000000)
+        #define HCI_TR_RX_PIN   GPIO_FC_PB4
+        #define HCI_TR_TX_PIN   GPIO_FC_PB5
+        #define HCI_TR_BAUDRATE (1000000)
     #elif (MCU_CORE_TYPE == MCU_CORE_TL321X)
-        #define HCI_TR_RX_PIN        GPIO_FC_PC4
-        #define HCI_TR_TX_PIN        GPIO_FC_PC5
-        #define HCI_TR_BAUDRATE      (1000000)
+        #define HCI_TR_RX_PIN   GPIO_FC_PC4
+        #define HCI_TR_TX_PIN   GPIO_FC_PC5
+        #define HCI_TR_BAUDRATE (1000000)
     #endif
 
     /*! HCI transport buffer size define. */
-    #define HCI_TR_RX_BUF_SIZE     (760)
-    #define HCI_TR_TX_BUF_SIZE     (760)
+    #define HCI_TR_RX_BUF_SIZE (300)
+    #define HCI_TR_TX_BUF_SIZE (300)
 
-    #define HCI_DFU_EN                              0
+    #define HCI_DFU_EN         0
 #else
-    #define HCI_DFU_EN                              0
+    #define HCI_DFU_EN 0
 #endif
 
 
-#define ACL_CENTRAL_MAX_NUM                         1 // ACL central maximum number
-#define ACL_PERIPHR_MAX_NUM                         1 // ACL peripheral maximum number
+#define ACL_CENTRAL_MAX_NUM 1 // ACL central maximum number
+#define ACL_PERIPHR_MAX_NUM 1 // ACL peripheral maximum number
 
-///////////////////////// Feature Configuration////////////////////////////////////////////////
-#define BQB_TEST_EN                                 1
-
-#define BLMS_PM_ENABLE                              1  //save some RamCode
-
-#define TIFS_VARIATION_WORKAROUND_MLP_CODE_IN_RAM   1
-
+#define APP_CS_LOG_EN        0
 ///////////////////////// UI Configuration ////////////////////////////////////////////////////
-#define UI_LED_ENABLE                               1
+#define UI_LED_ENABLE 1
 
 ///////////////////////// DEBUG  Configuration ////////////////////////////////////////////////
-#define DEBUG_GPIO_ENABLE                           1
+#define DEBUG_GPIO_ENABLE     1
 
-#define TLKAPI_DEBUG_ENABLE                         0
-#define TLKAPI_DEBUG_CHANNEL                        TLKAPI_DEBUG_CHANNEL_GSUART
+#define TLKAPI_DEBUG_ENABLE   0
+#define TLKAPI_DEBUG_CHANNEL  TLKAPI_DEBUG_CHANNEL_GSUART
 
-#define APP_LOG_EN                                  1
-#define APP_FLASH_INIT_LOG_EN                       1
-#define APP_CONTR_EVT_LOG_EN                        1   //controller event
-#define APP_HOST_EVT_LOG_EN                         1
-#define APP_SMP_LOG_EN                              0
-#define APP_SIMPLE_SDP_LOG_EN                       0
-#define APP_PAIR_LOG_EN                             1
-#define APP_KEY_LOG_EN                              1
+#define APP_LOG_EN            1
+#define APP_FLASH_INIT_LOG_EN 1
+#define APP_CONTR_EVT_LOG_EN  1 //controller event
+#define APP_HOST_EVT_LOG_EN   1
+#define APP_SMP_LOG_EN        0
+#define APP_SIMPLE_SDP_LOG_EN 0
+#define APP_PAIR_LOG_EN       1
+#define APP_KEY_LOG_EN        1
 
 
 #include "../common/default_config.h"

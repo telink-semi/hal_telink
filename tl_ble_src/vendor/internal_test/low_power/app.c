@@ -31,27 +31,50 @@
 #include "../default_att.h"
 
 
-
 #if (INTER_TEST_MODE == TEST_LOW_POWER)
 
 
-#if  UI_KEYBOARD_ENABLE
-_attribute_ram_code_ void  app_set_kb_wakeup (u8 e, u8 *p, int n);
-void keyboard_init(void);
-#endif
+    #if UI_KEYBOARD_ENABLE
+_attribute_ram_code_ void app_set_kb_wakeup(u8 e, u8 *p, int n);
+void                      keyboard_init(void);
+    #endif
 
-const u8    tbl_advData[] = {
-     7,  DT_COMPLETE_LOCAL_NAME,                'i','n','t','e','s','t',
-     2,  DT_FLAGS,                              0x05,                   // BLE limited discoverable mode and BR/EDR not supported
-     3,  DT_APPEARANCE,                         0x80, 0x01,             // 384, Generic Remote Control, Generic category
-     5,  DT_INCOMPLETE_LIST_16BIT_SERVICE_UUID, 0x12, 0x18, 0x0F, 0x18, // incomplete list of service class UUIDs (0x1812, 0x180F)
+const u8 tbl_advData[] = {
+    7,
+    DT_COMPLETE_LOCAL_NAME,
+    'i',
+    'n',
+    't',
+    'e',
+    's',
+    't',
+    2,
+    DT_FLAGS,
+    0x05, // BLE limited discoverable mode and BR/EDR not supported
+    3,
+    DT_APPEARANCE,
+    0x80,
+    0x01, // 384, Generic Remote Control, Generic category
+    5,
+    DT_INCOMPLETE_LIST_16BIT_SERVICE_UUID,
+    0x12,
+    0x18,
+    0x0F,
+    0x18, // incomplete list of service class UUIDs (0x1812, 0x180F)
 };
 
-const u8    tbl_scanRsp [] = {
-         7,  DT_COMPLETE_LOCAL_NAME,            'i','n','t','e','s','t',
+const u8 tbl_scanRsp[] = {
+    7,
+    DT_COMPLETE_LOCAL_NAME,
+    'i',
+    'n',
+    't',
+    'e',
+    's',
+    't',
 };
 
-#define      APP_DEFAULT_RF_POWER   RF_POWER_P3dBm
+    #define APP_DEFAULT_RF_POWER RF_POWER_P3dBm
 
 /**
  * @brief      BLE Connection complete event handler
@@ -61,50 +84,39 @@ const u8    tbl_scanRsp [] = {
 int app_le_connection_complete_event_handle(u8 *p)
 {
     hci_le_connectionCompleteEvt_t *pConnEvt = (hci_le_connectionCompleteEvt_t *)p;
-    tlkapi_printf(APP_CONTR_EVT_LOG_EN,"le_connection_complete connHandle:%04X mac:%02X %02X %02X %02X %02X %02X",\
-            pConnEvt->connHandle,pConnEvt->peerAddr[0],pConnEvt->peerAddr[1],pConnEvt->peerAddr[2],\
-            pConnEvt->peerAddr[3],pConnEvt->peerAddr[4],pConnEvt->peerAddr[5]);
-    if(pConnEvt->status == BLE_SUCCESS){
-
+    tlkapi_printf(APP_CONTR_EVT_LOG_EN, "le_connection_complete connHandle:%04X mac:%02X %02X %02X %02X %02X %02X", pConnEvt->connHandle, pConnEvt->peerAddr[0], pConnEvt->peerAddr[1], pConnEvt->peerAddr[2], pConnEvt->peerAddr[3], pConnEvt->peerAddr[4], pConnEvt->peerAddr[5]);
+    if (pConnEvt->status == BLE_SUCCESS) {
         dev_char_info_insert_by_conn_event(pConnEvt);
         if (pConnEvt->role == ACL_ROLE_PERIPHERAL) {
-            bls_l2cap_requestConnParamUpdate(pConnEvt->connHandle, CONN_INTERVAL_10MS, CONN_INTERVAL_10MS, 99, CONN_TIMEOUT_4S);    // 1 second
+            bls_l2cap_requestConnParamUpdate(pConnEvt->connHandle, CONN_INTERVAL_10MS, CONN_INTERVAL_10MS, 99, CONN_TIMEOUT_4S); // 1 second
         }
     }
 
     return 0;
 }
 
-
-
 /**
  * @brief      BLE Disconnection event handler
  * @param[in]  p         Pointer point to event parameter buffer.
  * @return
  */
-int     app_disconnect_event_handle(u8 *p)
+int app_disconnect_event_handle(u8 *p)
 {
-    hci_disconnectionCompleteEvt_t  *pDisConn = (hci_disconnectionCompleteEvt_t *)p;
-    tlkapi_printf(APP_CONTR_EVT_LOG_EN,"app Disconnect event connHandle:%04X reason:%02X",pDisConn->connHandle,pDisConn->reason);
+    hci_disconnectionCompleteEvt_t *pDisConn = (hci_disconnectionCompleteEvt_t *)p;
+    tlkapi_printf(APP_CONTR_EVT_LOG_EN, "app Disconnect event connHandle:%04X reason:%02X", pDisConn->connHandle, pDisConn->reason);
     //terminate reason
-    if(pDisConn->reason == HCI_ERR_CONN_TIMEOUT){   //connection timeout
+    if (pDisConn->reason == HCI_ERR_CONN_TIMEOUT) {                 //connection timeout
 
-    }
-    else if(pDisConn->reason == HCI_ERR_REMOTE_USER_TERM_CONN){     //peer device send terminate command on link layer
+    } else if (pDisConn->reason == HCI_ERR_REMOTE_USER_TERM_CONN) { //peer device send terminate command on link layer
 
     }
     //central host disconnect( blm_ll_disconnect(current_connHandle, HCI_ERR_REMOTE_USER_TERM_CONN) )
-    else if(pDisConn->reason == HCI_ERR_CONN_TERM_BY_LOCAL_HOST){
-
-    }
-    else{
-
+    else if (pDisConn->reason == HCI_ERR_CONN_TERM_BY_LOCAL_HOST) {
+    } else {
     }
     dev_char_info_delete_by_connhandle(pDisConn->connHandle);
     return 0;
 }
-
-
 
 //////////////////////////////////////////////////////////
 // event call back
@@ -116,42 +128,39 @@ int     app_disconnect_event_handle(u8 *p)
  * @param[in]  n       the length of event parameter.
  * @return
  */
-int app_controller_event_callback (u32 h, u8 *p, int n)
+int app_controller_event_callback(u32 h, u8 *p, int n)
 {
-    if (h &HCI_FLAG_EVENT_BT_STD)       //Controller HCI event
+    if (h & HCI_FLAG_EVENT_BT_STD) //Controller HCI event
     {
         u8 evtCode = h & 0xff;
 
         //------------ disconnect -------------------------------------
-        if(evtCode == HCI_EVT_DISCONNECTION_COMPLETE)  //connection terminate
+        if (evtCode == HCI_EVT_DISCONNECTION_COMPLETE) //connection terminate
         {
             app_disconnect_event_handle(p);
-        }
-        else if(evtCode == HCI_EVT_LE_META)  //LE Event
+        } else if (evtCode == HCI_EVT_LE_META)         //LE Event
         {
             u8 subEvt_code = p[0];
 
             //------hci le event: le connection complete event---------------------------------
-            if (subEvt_code == HCI_SUB_EVT_LE_CONNECTION_COMPLETE)  // connection complete
+            if (subEvt_code == HCI_SUB_EVT_LE_CONNECTION_COMPLETE) // connection complete
             {
                 app_le_connection_complete_event_handle(p);
             }
             //--------hci le event: le adv report event ----------------------------------------
-            else if (subEvt_code == HCI_SUB_EVT_LE_ADVERTISING_REPORT)  // ADV packet
+            else if (subEvt_code == HCI_SUB_EVT_LE_ADVERTISING_REPORT) // ADV packet
             {
                 //after controller is set to scan state, it will report all the adv packet it received by this event
             }
             //------hci le event: le connection update complete event-------------------------------
-            else if (subEvt_code == HCI_SUB_EVT_LE_CONNECTION_UPDATE_COMPLETE)  // connection update
+            else if (subEvt_code == HCI_SUB_EVT_LE_CONNECTION_UPDATE_COMPLETE) // connection update
             {
-
             }
         }
     }
 
 
     return 0;
-
 }
 
 /**
@@ -162,20 +171,16 @@ int app_controller_event_callback (u32 h, u8 *p, int n)
  */
 int app_gatt_data_handler(u16 connHandle, u8 *pkt)
 {
-    if (dev_char_get_conn_role_by_connhandle(connHandle) == ACL_ROLE_CENTRAL)   //GATT data for Central
-            {
-        rf_packet_att_t *pAtt = (rf_packet_att_t*) pkt;
+    if (dev_char_get_conn_role_by_connhandle(connHandle) == ACL_ROLE_CENTRAL) //GATT data for Central
+    {
+        rf_packet_att_t *pAtt = (rf_packet_att_t *)pkt;
 
         dev_char_info_t *dev_info = dev_char_info_search_by_connhandle(connHandle);
         if (dev_info) {
             //-------   user process ------------------------------------------------
-            if (pAtt->opcode == ATT_OP_HANDLE_VALUE_NOTI)  //peripheral handle notify
+            if (pAtt->opcode == ATT_OP_HANDLE_VALUE_NOTI) //peripheral handle notify
             {
-
-            }
-            else if (pAtt->opcode == ATT_OP_HANDLE_VALUE_IND)
-            {
-
+            } else if (pAtt->opcode == ATT_OP_HANDLE_VALUE_IND) {
             }
         }
 
@@ -201,18 +206,15 @@ int app_gatt_data_handler(u16 connHandle, u8 *pkt)
             case ATT_OP_SIGNED_WRITE_CMD:
                 //ignore
                 break;
-            default:  //no action
+            default: //no action
                 break;
             }
         }
-    }
-    else {   //GATT data for Peripheral
-
+    } else { //GATT data for Peripheral
     }
 
     return 0;
 }
-
 
 /**
  * @brief      BLE host event handler call-back.
@@ -221,50 +223,39 @@ int app_gatt_data_handler(u16 connHandle, u8 *pkt)
  * @param[in]  n       the length of event parameter.
  * @return
  */
-int app_host_event_callback (u32 h, u8 *para, int n)
+int app_host_event_callback(u32 h, u8 *para, int n)
 {
     u8 event = h & 0xFF;
 
-    switch(event)
+    switch (event) {
+    case GAP_EVT_SMP_PAIRING_BEGIN:
     {
-        case GAP_EVT_SMP_PAIRING_BEGIN:
-        {
-        }
-        break;
+    } break;
 
-        case GAP_EVT_SMP_PAIRING_SUCCESS:
-        {
-        }
-        break;
+    case GAP_EVT_SMP_PAIRING_SUCCESS:
+    {
+    } break;
 
-        case GAP_EVT_SMP_PAIRING_FAIL:
-        {
-        }
-        break;
+    case GAP_EVT_SMP_PAIRING_FAIL:
+    {
+    } break;
 
-        case GAP_EVT_SMP_CONN_ENCRYPTION_DONE:
-        {
+    case GAP_EVT_SMP_CONN_ENCRYPTION_DONE:
+    {
+    } break;
 
-        }
-        break;
+    case GAP_EVT_SMP_SECURITY_PROCESS_DONE:
+    {
+    } break;
+    case GAP_EVT_ATT_EXCHANGE_MTU:
+    {
+    } break;
 
-        case GAP_EVT_SMP_SECURITY_PROCESS_DONE:
-        {
-        }
-        break;
-        case GAP_EVT_ATT_EXCHANGE_MTU:
-        {
+    case GAP_EVT_GATT_HANDLE_VALUE_CONFIRM:
+    {
+    } break;
 
-        }
-        break;
-
-        case GAP_EVT_GATT_HANDLE_VALUE_CONFIRM:
-        {
-
-        }
-        break;
-
-        default:
+    default:
         break;
     }
 
@@ -280,8 +271,8 @@ int app_host_event_callback (u32 h, u8 *para, int n)
  */
 _attribute_ram_code_ void user_set_flag_suspend_exit(u8 e, u8 *p, int n)
 {
-
 }
+
 ///////////////////////////////////////////
 
 /**
@@ -291,35 +282,35 @@ _attribute_ram_code_ void user_set_flag_suspend_exit(u8 e, u8 *p, int n)
  */
 _attribute_no_inline_ void user_init_normal(void)
 {
-//////////////////////////// basic hardware Initialization  Begin //////////////////////////////////
+    //////////////////////////// basic hardware Initialization  Begin //////////////////////////////////
     /* random number generator must be initiated here( in the beginning of user_init_normal).
      * When deepSleep retention wakeUp, no need initialize again */
     random_generator_init();
 
     #if (TLKAPI_DEBUG_ENABLE)
-        tlkapi_debug_init();
-        blc_debug_enableStackLog(STK_LOG_NONE);
+    tlkapi_debug_init();
+    blc_debug_enableStackLog(STK_LOG_NONE);
     #endif
 
     blc_readFlashSize_autoConfigCustomFlashSector();
 
     /* attention that this function must be called after "blc readFlashSize_autoConfigCustomFlashSector" !!!*/
     blc_app_loadCustomizedParameters_normal();
-//////////////////////////// basic hardware Initialization  End /////////////////////////////////
+    //////////////////////////// basic hardware Initialization  End /////////////////////////////////
 
 
-//////////////////////////// BLE stack Initialization  Begin //////////////////////////////////
+    //////////////////////////// BLE stack Initialization  Begin //////////////////////////////////
 
-    u8  mac_public[6];
-    u8  mac_random_static[6];
-    
+    u8 mac_public[6];
+    u8 mac_random_static[6];
+
     blc_initMacAddress(flash_sector_mac_address, mac_public, mac_random_static);
 
 
     //////////// LinkLayer Initialization  Begin /////////////////////////
     blc_ll_initBasicMCU();
 
-    blc_ll_initStandby_module(mac_public);                         //mandatory
+    blc_ll_initStandby_module(mac_public); //mandatory
 
     blc_ll_initLegacyAdvertising_module();
 
@@ -330,7 +321,6 @@ _attribute_no_inline_ void user_init_normal(void)
     blc_ll_initAclConnection_module();
     blc_ll_initAclCentralRole_module();
     blc_ll_initAclPeriphrRole_module();
-
 
 
     blc_ll_setMaxConnectionNumber(ACL_CENTRAL_MAX_NUM, ACL_PERIPHR_MAX_NUM);
@@ -352,32 +342,31 @@ _attribute_no_inline_ void user_init_normal(void)
     //////////// LinkLayer Initialization  End /////////////////////////
 
 
-
     //////////// HCI Initialization  Begin /////////////////////////
-    blc_hci_registerControllerDataHandler (blc_l2cap_pktHandler);
+    blc_hci_registerControllerDataHandler(blc_l2cap_pktHandler);
 
     blc_hci_registerControllerEventHandler(app_controller_event_callback); //controller hci event to host all processed in this func
 
     //bluetooth event
-    blc_hci_setEventMask_cmd (HCI_EVT_MASK_DISCONNECTION_COMPLETE);
+    blc_hci_setEventMask_cmd(HCI_EVT_MASK_DISCONNECTION_COMPLETE);
 
     //bluetooth low energy(LE) event
-    blc_hci_le_setEventMask_cmd(        HCI_LE_EVT_MASK_CONNECTION_COMPLETE  \
-                                    |   HCI_LE_EVT_MASK_CONNECTION_UPDATE_COMPLETE);
+    blc_hci_le_setEventMask_cmd(HCI_LE_EVT_MASK_CONNECTION_COMPLETE | HCI_LE_EVT_MASK_CONNECTION_UPDATE_COMPLETE);
 
 
     u8 error_code = blc_contr_checkControllerInitialization();
-    if(error_code != INIT_SUCCESS){
+    if (error_code != INIT_SUCCESS) {
         /* It's recommended that user set some UI alarm to know the exact error, e.g. LED shine, print log */
         write_log32(0x88880000 | error_code);
-        #if (TLKAPI_DEBUG_ENABLE)
-        tlkapi_printf(1,"Controller Init ERROR:0x%x", error_code);
-            while(1){
-                tlkapi_debug_handler();
-            }
-        #else
-            while(1);
-        #endif
+    #if (TLKAPI_DEBUG_ENABLE)
+        tlkapi_printf(1, "Controller Init ERROR:0x%x", error_code);
+        while (1) {
+            tlkapi_debug_handler();
+        }
+    #else
+        while (1)
+            ;
+    #endif
     }
     //////////// HCI Initialization  End /////////////////////////
 
@@ -391,8 +380,8 @@ _attribute_no_inline_ void user_init_normal(void)
     blc_l2cap_initAclCentralBuffer(app_cen_l2cap_rx_buf, CENTRAL_L2CAP_BUFF_SIZE, NULL, 0);
     blc_l2cap_initAclPeripheralBuffer(app_per_l2cap_rx_buf, PERIPHR_L2CAP_BUFF_SIZE, app_per_l2cap_tx_buf, PERIPHR_L2CAP_BUFF_SIZE);
 
-    blc_att_setCentralRxMtuSize(CENTRAL_ATT_RX_MTU); ///must be placed after "blc_gap_init"
-    blc_att_setPeripheralRxMtuSize(PERIPHR_ATT_RX_MTU);   ///must be placed after "blc_gap_init"
+    blc_att_setCentralRxMtuSize(CENTRAL_ATT_RX_MTU);    ///must be placed after "blc_gap_init"
+    blc_att_setPeripheralRxMtuSize(PERIPHR_ATT_RX_MTU); ///must be placed after "blc_gap_init"
 
     /* GATT Initialization */
     my_gatt_init();
@@ -400,70 +389,66 @@ _attribute_no_inline_ void user_init_normal(void)
 
     /* SMP Initialization */
     #if (ACL_PERIPHR_SMP_ENABLE || ACL_CENTRAL_SMP_ENABLE)
-        
-        blc_smp_configPairingSecurityInfoStorageAddressAndSize(flash_sector_smp_storage, FLASH_SMP_PAIRING_MAX_SIZE);
+
+    blc_smp_configPairingSecurityInfoStorageAddressAndSize(flash_sector_smp_storage, FLASH_SMP_PAIRING_MAX_SIZE);
     #endif
 
-    #if (ACL_PERIPHR_SMP_ENABLE)  //Peripheral SMP Enable
-        blc_smp_setSecurityLevel_periphr(Unauthenticated_Pairing_with_Encryption);  //LE_Security_Mode_1_Level_2
+    #if (ACL_PERIPHR_SMP_ENABLE)                                               //Peripheral SMP Enable
+    blc_smp_setSecurityLevel_periphr(Unauthenticated_Pairing_with_Encryption); //LE_Security_Mode_1_Level_2
     #else
-        blc_smp_setSecurityLevel_periphr(No_Security);
+    blc_smp_setSecurityLevel_periphr(No_Security);
     #endif
 
     #if (ACL_CENTRAL_SMP_ENABLE)
-        blc_smp_setSecurityLevel_central(Unauthenticated_Pairing_with_Encryption);  //LE_Security_Mode_1_Level_2
+    blc_smp_setSecurityLevel_central(Unauthenticated_Pairing_with_Encryption); //LE_Security_Mode_1_Level_2
     #else
-        blc_smp_setSecurityLevel_central(No_Security);
+    blc_smp_setSecurityLevel_central(No_Security);
     #endif
 
     blc_smp_smpParamInit();
 
 
     //host(GAP/SMP/GATT/ATT) event process: register host event callback and set event mask
-    blc_gap_registerHostEventHandler( app_host_event_callback );
-    blc_gap_setEventMask( GAP_EVT_MASK_SMP_PAIRING_BEGIN            |  \
-                          GAP_EVT_MASK_SMP_PAIRING_SUCCESS          |  \
-                          GAP_EVT_MASK_SMP_PAIRING_FAIL             |  \
-                          GAP_EVT_MASK_SMP_SECURITY_PROCESS_DONE);
+    blc_gap_registerHostEventHandler(app_host_event_callback);
+    blc_gap_setEventMask(GAP_EVT_MASK_SMP_PAIRING_BEGIN |
+                         GAP_EVT_MASK_SMP_PAIRING_SUCCESS |
+                         GAP_EVT_MASK_SMP_PAIRING_FAIL |
+                         GAP_EVT_MASK_SMP_SECURITY_PROCESS_DONE);
     //////////// Host Initialization  End /////////////////////////
 
-//////////////////////////// BLE stack Initialization  End //////////////////////////////////
+    //////////////////////////// BLE stack Initialization  End //////////////////////////////////
 
 
-
-//////////////////////////// User Configuration for BLE application ////////////////////////////
+    //////////////////////////// User Configuration for BLE application ////////////////////////////
     blc_ll_setAdvData(tbl_advData, sizeof(tbl_advData));
     blc_ll_setScanRspData(tbl_scanRsp, sizeof(tbl_scanRsp));
     blc_ll_setAdvParam(ADV_INTERVAL_200MS, ADV_INTERVAL_200MS, ADV_TYPE_CONNECTABLE_UNDIRECTED, OWN_ADDRESS_PUBLIC, 0, NULL, BLT_ENABLE_ADV_ALL, ADV_FP_NONE);
-    blc_ll_setAdvEnable(BLC_ADV_ENABLE);  //ADV enable
+    blc_ll_setAdvEnable(BLC_ADV_ENABLE); //ADV enable
 
-//  blc_ll_setScanParameter(SCAN_TYPE_PASSIVE, SCAN_INTERVAL_100MS, SCAN_WINDOW_100MS, OWN_ADDRESS_PUBLIC, SCAN_FP_ALLOW_ADV_ANY);
-//  blc_ll_setScanEnable (BLC_SCAN_ENABLE, DUP_FILTER_DISABLE);
+    //  blc_ll_setScanParameter(SCAN_TYPE_PASSIVE, SCAN_INTERVAL_100MS, SCAN_WINDOW_100MS, OWN_ADDRESS_PUBLIC, SCAN_FP_ALLOW_ADV_ANY);
+    //  blc_ll_setScanEnable (BLC_SCAN_ENABLE, DUP_FILTER_DISABLE);
 
-#if (BLE_APP_PM_ENABLE)
+    #if (BLE_APP_PM_ENABLE)
     blc_ll_initPowerManagement_module();
     blc_pm_setSleepMask(PM_SLEEP_LEG_ADV | PM_SLEEP_ACL_PERIPHR);
 
-    #if (PM_DEEPSLEEP_RETENTION_ENABLE)
-        blc_pm_setDeepsleepRetentionEnable(PM_DeepRetn_Enable);
-        blc_pm_setDeepsleepRetentionThreshold(95);
+        #if (PM_DEEPSLEEP_RETENTION_ENABLE)
+    blc_pm_setDeepsleepRetentionEnable(PM_DeepRetn_Enable);
+    blc_pm_setDeepsleepRetentionThreshold(95);
 
-        #if(MCU_CORE_TYPE == MCU_CORE_B91)
-            blc_pm_setDeepsleepRetentionEarlyWakeupTiming(300);
-        #elif(MCU_CORE_TYPE == MCU_CORE_B92)
-            blc_pm_setDeepsleepRetentionEarlyWakeupTiming(300);
+            #if (MCU_CORE_TYPE == MCU_CORE_B91)
+    blc_pm_setDeepsleepRetentionEarlyWakeupTiming(300);
+            #elif (MCU_CORE_TYPE == MCU_CORE_B92)
+    blc_pm_setDeepsleepRetentionEarlyWakeupTiming(300);
+            #endif
+        #else
+    blc_pm_setDeepsleepRetentionEnable(PM_DeepRetn_Disable);
         #endif
-    #else
-        blc_pm_setDeepsleepRetentionEnable(PM_DeepRetn_Disable);
-    #endif
 
-    blc_ll_registerTelinkControllerEventCallback (BLT_EV_FLAG_SUSPEND_EXIT, &user_set_flag_suspend_exit);
-#endif
+    blc_ll_registerTelinkControllerEventCallback(BLT_EV_FLAG_SUSPEND_EXIT, &user_set_flag_suspend_exit);
+    #endif
     tlkapi_send_string_data(APP_LOG_EN, "[APP][INI] intest init", 0, 0);
 }
-
-
-
 
 /**
  * @brief       user initialization when MCU wake_up from deepSleep_retention mode
@@ -472,40 +457,40 @@ _attribute_no_inline_ void user_init_normal(void)
  */
 void user_init_deepRetn(void)
 {
-#if (PM_DEEPSLEEP_RETENTION_ENABLE)
+    #if (PM_DEEPSLEEP_RETENTION_ENABLE)
 
-    blc_ll_initBasicMCU();   //mandatory
+    blc_ll_initBasicMCU(); //mandatory
 
     blc_ll_recoverDeepRetention();
 
-    DBG_CHN0_HIGH;    //debug
+    DBG_CHN0_HIGH; //debug
     irq_enable();
 
-    #if (UI_KEYBOARD_ENABLE)
-        /////////// keyboard GPIO wakeup init ////////
-        u32 pin[] = KB_DRIVE_PINS;
-        for (int i=0; i<(sizeof (pin)/sizeof(*pin)); i++){
-            cpu_set_gpio_wakeup (pin[i], WAKEUP_LEVEL_HIGH, 1);  //drive pin pad high level wakeup deepsleep
-        }
-    #endif
+        #if (UI_KEYBOARD_ENABLE)
+    /////////// keyboard GPIO wakeup init ////////
+    u32 pin[] = KB_DRIVE_PINS;
+    for (int i = 0; i < (sizeof(pin) / sizeof(*pin)); i++) {
+        cpu_set_gpio_wakeup(pin[i], WAKEUP_LEVEL_HIGH, 1); //drive pin pad high level wakeup deepsleep
+    }
+        #endif
 
 
-    #if (TLKAPI_DEBUG_ENABLE)
-        tlkapi_debug_deepRetn_init();
+        #if (TLKAPI_DEBUG_ENABLE)
+    tlkapi_debug_deepRetn_init();
+        #endif
     #endif
-#endif
 }
 
-#if (UI_KEYBOARD_ENABLE)
-extern kb_data_t    kb_event;
-_attribute_ble_data_retention_  int     key_not_released;
+    #if (UI_KEYBOARD_ENABLE)
+extern kb_data_t                   kb_event;
+_attribute_ble_data_retention_ int key_not_released;
 
 
-#define CONSUMER_KEY                1
-#define KEYBOARD_KEY                2
-#define PAIR_UNPAIR_KEY             3
+        #define CONSUMER_KEY    1
+        #define KEYBOARD_KEY    2
+        #define PAIR_UNPAIR_KEY 3
 
-_attribute_ble_data_retention_  u8      key_type;
+_attribute_ble_data_retention_ u8 key_type;
 
 /**
  * @brief   Check changed key value.
@@ -514,26 +499,21 @@ _attribute_ble_data_retention_  u8      key_type;
  */
 void key_change_proc(void)
 {
-
     u8 key0 = kb_event.keycode[0];
-//  u8 key_buf[8] = {0,0,0,0,0,0,0,0};
+    //  u8 key_buf[8] = {0,0,0,0,0,0,0,0};
 
     key_not_released = 1;
-    if (kb_event.cnt == 2)   //two key press
+    if (kb_event.cnt == 2)     //two key press
     {
-
-    }
-    else if(kb_event.cnt == 1)
-    {
-        if(key0 >= CR_VOL_UP )  //volume up/down
+    } else if (kb_event.cnt == 1) {
+        if (key0 >= CR_VOL_UP) //volume up/down
         {
             key_type = CONSUMER_KEY;
             u16 consumer_key;
-            if(key0 == CR_VOL_UP){      //volume up
+            if (key0 == CR_VOL_UP) {        //volume up
                 consumer_key = MKEY_VOL_UP;
                 tlkapi_send_string_data(APP_KEY_LOG_EN, "[UI][KEY] send Vol +", 0, 0);
-            }
-            else if(key0 == CR_VOL_DN){ //volume down
+            } else if (key0 == CR_VOL_DN) { //volume down
                 consumer_key = MKEY_VOL_DN;
                 tlkapi_send_string_data(APP_KEY_LOG_EN, "[UI][KEY] send Vol -", 0, 0);
             }
@@ -544,54 +524,42 @@ void key_change_proc(void)
             For users, you should known that this is not a good method, you should manage your device and GATT data transfer
             according to  conn_dev_list[]
              * */
-            for(int i=ACL_CENTRAL_MAX_NUM; i < (ACL_CENTRAL_MAX_NUM + ACL_PERIPHR_MAX_NUM); i++){ //peripheral index is from "ACL_CENTRAL_MAX_NUM" to "ACL_CENTRAL_MAX_NUM + ACL_PERIPHR_MAX_NUM - 1"
-                if(conn_dev_list[i].conn_state){
-                    blc_gatt_pushHandleValueNotify (conn_dev_list[i].conn_handle, HID_CONSUME_REPORT_INPUT_DP_H, (u8 *)&consumer_key, 2);
+            for (int i = ACL_CENTRAL_MAX_NUM; i < (ACL_CENTRAL_MAX_NUM + ACL_PERIPHR_MAX_NUM); i++) { //peripheral index is from "ACL_CENTRAL_MAX_NUM" to "ACL_CENTRAL_MAX_NUM + ACL_PERIPHR_MAX_NUM - 1"
+                if (conn_dev_list[i].conn_state) {
+                    blc_gatt_pushHandleValueNotify(conn_dev_list[i].conn_handle, HID_CONSUME_REPORT_INPUT_DP_H, (u8 *)&consumer_key, 2);
                 }
             }
-        }
-        else{
+        } else {
             key_type = PAIR_UNPAIR_KEY;
 
-            if(key0 == BTN_PAIR)   //Manual pair triggered by Key Press
+            if (key0 == BTN_PAIR) //Manual pair triggered by Key Press
             {
                 //TODO
-            }
-            else if(key0 == BTN_UNPAIR) //Manual un_pair triggered by Key Press
+            } else if (key0 == BTN_UNPAIR) //Manual un_pair triggered by Key Press
             {
                 //TODO
             }
         }
 
-    }
-    else   //kb_event.cnt == 0,  key release
+    } else //kb_event.cnt == 0,  key release
     {
         key_not_released = 0;
-        if(key_type == CONSUMER_KEY)
-        {
+        if (key_type == CONSUMER_KEY) {
             u16 consumer_key = 0;
             //Here is just Telink Demonstration effect. for all peripheral in connection, send release for previous "Vol+" or "Vol-" to central
-            for(int i=ACL_CENTRAL_MAX_NUM; i < (ACL_CENTRAL_MAX_NUM + ACL_PERIPHR_MAX_NUM); i++){ //peripheral index is from "ACL_CENTRAL_MAX_NUM" to "ACL_CENTRAL_MAX_NUM + ACL_PERIPHR_MAX_NUM - 1"
-                if(conn_dev_list[i].conn_state){
-                    blc_gatt_pushHandleValueNotify ( conn_dev_list[i].conn_handle, HID_CONSUME_REPORT_INPUT_DP_H, (u8 *)&consumer_key, 2);
+            for (int i = ACL_CENTRAL_MAX_NUM; i < (ACL_CENTRAL_MAX_NUM + ACL_PERIPHR_MAX_NUM); i++) { //peripheral index is from "ACL_CENTRAL_MAX_NUM" to "ACL_CENTRAL_MAX_NUM + ACL_PERIPHR_MAX_NUM - 1"
+                if (conn_dev_list[i].conn_state) {
+                    blc_gatt_pushHandleValueNotify(conn_dev_list[i].conn_handle, HID_CONSUME_REPORT_INPUT_DP_H, (u8 *)&consumer_key, 2);
                 }
             }
-        }
-        else if(key_type == KEYBOARD_KEY)
-        {
-
-        }
-        else if(key_type == PAIR_UNPAIR_KEY){
+        } else if (key_type == KEYBOARD_KEY) {
+        } else if (key_type == PAIR_UNPAIR_KEY) {
             //TODO
         }
     }
-
-
 }
 
-
-
-_attribute_ble_data_retention_      static u32 keyScanTick = 0;
+_attribute_ble_data_retention_ static u32 keyScanTick = 0;
 
 /**
  * @brief      keyboard task handler
@@ -600,23 +568,19 @@ _attribute_ble_data_retention_      static u32 keyScanTick = 0;
  * @param[in]  n    - the length of event parameter.
  * @return     none.
  */
-void proc_keyboard (u8 e, u8 *p, int n)
+void proc_keyboard(u8 e, u8 *p, int n)
 {
-    if(clock_time_exceed(keyScanTick, 10 * 1000)){  //keyScan interval: 10mS
+    if (clock_time_exceed(keyScanTick, 10 * 1000)) { //keyScan interval: 10mS
         keyScanTick = clock_time();
-    }
-    else{
+    } else {
         return;
     }
     kb_event.keycode[0] = 0;
-    int det_key = kb_scan_key (0, 1);
-    if (det_key){
+    int det_key         = kb_scan_key(0, 1);
+    if (det_key) {
         key_change_proc();
     }
-
 }
-
-
 
 /**
  * @brief      callback function of LinkLayer Event "BLT_EV_FLAG_SUSPEND_ENTER"
@@ -625,16 +589,15 @@ void proc_keyboard (u8 e, u8 *p, int n)
  * @param[in]  n - data length of event
  * @return     none
  */
-_attribute_ram_code_ void  app_set_kb_wakeup (u8 e, u8 *p, int n)
+_attribute_ram_code_ void app_set_kb_wakeup(u8 e, u8 *p, int n)
 {
-#if (BLE_APP_PM_ENABLE)
+        #if (BLE_APP_PM_ENABLE)
     /* suspend time > 50ms.add GPIO wake_up */
-    if(((u32)(blc_pm_getWakeupSystemTick() - clock_time())) > 100 * SYSTEM_TIMER_TICK_1MS){
-        blc_pm_setWakeupSource(PM_WAKEUP_PAD);  //GPIO PAD wake_up
+    if (((u32)(blc_pm_getWakeupSystemTick() - clock_time())) > 100 * SYSTEM_TIMER_TICK_1MS) {
+        blc_pm_setWakeupSource(PM_WAKEUP_PAD); //GPIO PAD wake_up
     }
-#endif
+        #endif
 }
-
 
 /**
  * @brief      keyboard initialization
@@ -643,36 +606,36 @@ _attribute_ram_code_ void  app_set_kb_wakeup (u8 e, u8 *p, int n)
  */
 void keyboard_init(void)
 {
-#if (BLE_APP_PM_ENABLE)
+        #if (BLE_APP_PM_ENABLE)
     /////////// keyboard GPIO wakeup init ////////
     u32 pin[] = KB_DRIVE_PINS;
-    for (int i=0; i<(sizeof (pin)/sizeof(*pin)); i++){
-        pm_set_gpio_wakeup (pin[i], WAKEUP_LEVEL_HIGH, 1);  //drive pin pad high level wakeup deepsleep
+    for (int i = 0; i < (sizeof(pin) / sizeof(*pin)); i++) {
+        pm_set_gpio_wakeup(pin[i], WAKEUP_LEVEL_HIGH, 1); //drive pin pad high level wakeup deepsleep
     }
 
-    blc_ll_registerTelinkControllerEventCallback (BLT_EV_FLAG_SLEEP_ENTER, &app_set_kb_wakeup);
-    blc_ll_registerTelinkControllerEventCallback (BLT_EV_FLAG_GPIO_EARLY_WAKEUP, &proc_keyboard);
-#endif
+    blc_ll_registerTelinkControllerEventCallback(BLT_EV_FLAG_SLEEP_ENTER, &app_set_kb_wakeup);
+    blc_ll_registerTelinkControllerEventCallback(BLT_EV_FLAG_GPIO_EARLY_WAKEUP, &proc_keyboard);
+        #endif
 }
 
-#endif   //end of UI_KEYBOARD_ENABLE
+    #endif //end of UI_KEYBOARD_ENABLE
 
 
 void app_process_power_management(void)
 {
-#if (BLE_APP_PM_ENABLE)
+    #if (BLE_APP_PM_ENABLE)
 
-    blc_pm_setSleepMask(PM_SLEEP_LEG_ADV | PM_SLEEP_ACL_PERIPHR );
+    blc_pm_setSleepMask(PM_SLEEP_LEG_ADV | PM_SLEEP_ACL_PERIPHR);
 
     int user_task_flg = 0;
-    #if UI_KEYBOARD_ENABLE
-        user_task_flg = user_task_flg || scan_pin_need || key_not_released;
-    #endif
+        #if UI_KEYBOARD_ENABLE
+    user_task_flg = user_task_flg || scan_pin_need || key_not_released;
+        #endif
 
-    if(user_task_flg){
+    if (user_task_flg) {
         blc_pm_setSleepMask(PM_SLEEP_DISABLE);
     }
-#endif
+    #endif
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -684,19 +647,18 @@ void app_process_power_management(void)
  * @param[in]  none.
  * @return     none.
  */
-int main_idle_loop (void)
+int main_idle_loop(void)
 {
-
     ////////////////////////////////////// BLE entry /////////////////////////////////
     blc_sdk_main_loop();
 
     ////////////////////////////////////// Debug entry /////////////////////////////////
     #if (TLKAPI_DEBUG_ENABLE)
-        tlkapi_debug_handler();
+    tlkapi_debug_handler();
     #endif
     ////////////////////////////////////// UI entry /////////////////////////////////
     #if (UI_KEYBOARD_ENABLE)
-        proc_keyboard (0, 0, 0);
+    proc_keyboard(0, 0, 0);
     #endif
 
     ////////////////////////////////////// PM entry /////////////////////////////////
@@ -704,11 +666,9 @@ int main_idle_loop (void)
     return 0; //must return 0 due to SDP flow
 }
 
-
-
-_attribute_no_inline_ void main_loop (void)
+_attribute_no_inline_ void main_loop(void)
 {
-    main_idle_loop ();
+    main_idle_loop();
 }
 
 #endif

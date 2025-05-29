@@ -165,12 +165,12 @@ extern void xPortStartFirstTask( void );
     in this file, otherwise vPortSetupTimerInterrupt() must be implemented to
     configure whichever clock is to be used to generate the tick interrupt. */
     vPortSetupTimerInterrupt();
-    
-    /* Enable mtime and external interrupts.  1<<7 for timer interrupt, 1<<11
-    for external interrupt.  _RB_ What happens here when mtime is not present as
-    with pulpino? */
-    __asm volatile( "csrs mie, %0" :: "r"(0x880) );
 
+    /*enable mtime interrupt and software interrupt */
+    core_mie_enable(FLD_MIE_MTIE | FLD_MIE_MSIE);
+    
+    /* plic_sw interrupt enable */
+    plic_sw_interrupt_enable();
 
     xPortStartFirstTask();
 
@@ -318,8 +318,13 @@ void vPortRestoreTask(void)
 #if OS_PM_EN
     __asm volatile( "csrci   mstatus,8");
 
-    core_mie_enable(FLD_MIE_MTIE | FLD_MIE_MSIE);
     vPortSetupTimerInterrupt();     //  reset the timer compare register to prevent irq triggered immediately
+
+    /*enable mtime interrupt and software interrupt */
+    core_mie_enable(FLD_MIE_MTIE | FLD_MIE_MSIE);
+
+    /* plic_sw interrupt enable */
+    plic_sw_interrupt_enable();
 
     // to reset IDLE task stack
     vPortRestoreActiveTask();
@@ -407,13 +412,12 @@ void xPortIrqHandler(uint32_t mcause, uint32_t mepc)
         /* Machine timer interrupt */
         mtime_handler();
     }
-    else if(mcause == (MCAUSE_INT + IRQ_M_SOFT))
+   // else if(mcause == (MCAUSE_INT + IRQ_M_SOFT))
+    else if ((mcause & 0x80000000UL) && ((mcause & 0x7FFFFFFFUL) == 3)) /* machine software interrupt */
     {
-        /* Machine SWI interrupt */
+        plic_sw_interrupt_claim();
         mswi_handler();
-
-        /* Machine SWI is connected to PLIC_SW source 1 */
-        soft_irq_complete();
+        plic_sw_interrupt_complete();
     }
     else
     {

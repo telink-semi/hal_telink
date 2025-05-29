@@ -21,15 +21,13 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-#pragma  once
-
-
-
+#pragma once
 
 /** GATT Discover types */
-enum {
+enum
+{
     /** Discover Primary Services. */
-    GATT_DISCOVER_PRIMARY,  //Primary Service Discovery: Discover All Primary Services / Discover Primary Service by Service UUID
+    GATT_DISCOVER_PRIMARY, //Primary Service Discovery: Discover All Primary Services / Discover Primary Service by Service UUID
     /** Discover Secondary Services. */
     GATT_DISCOVER_SECONDARY,
     /** Discover Included Services. */
@@ -45,7 +43,8 @@ enum {
 };
 
 /* GATT interaction process type */
-enum {
+enum
+{
     GATT_PROC_END,
     GATT_PROC_CONT,
 };
@@ -70,17 +69,20 @@ typedef void (*gattc_write_func_t)(u16 connHandle, u8 err, struct gattc_write_cf
 
 
 /* GATTC indicate/notify data handle call-back. */
-typedef int (*gattc_sub_data_cb_t) (u16 connHandle, attr_pkt_t *attr, u16 attrLen);
-
+typedef int (*gattc_sub_data_cb_t)(u16 connHandle, attr_pkt_t *attr, u16 attrLen);
 
 /** @brief GATT Discovery procedure parameters configuration */
-typedef struct gattc_sdp_cfg {
+typedef struct gattc_sdp_cfg
+{
     /** Discover UUID type */
     uuid_t *uuid; //UUID size only set 2 on 16
     /** Discover attribute callback */
     gattc_sdp_func_t func;
-    union {
-        struct {
+
+    union
+    {
+        struct
+        {
             /** Include service attribute declaration handle */
             u16 attrHdl;
             /** Included service start handle */
@@ -88,9 +90,11 @@ typedef struct gattc_sdp_cfg {
             /** Included service end handle */
             u16 endHdl;
         } _included;
+
         /** Discover start handle */
         u16 startHdl;
     };
+
     /** Discover end handle */
     u16 endHdl;
     /** Discover type */
@@ -103,31 +107,39 @@ typedef struct gattc_sdp_cfg {
 } gattc_sdp_cfg_t;
 
 /** @brief GATT Read procedure parameters configuration */
-typedef struct gattc_read_cfg{
+typedef struct __attribute__((packed)) gattc_read_cfg
+{
     /** Read attribute callback. */
     gattc_read_func_t func;
     /** If == 1: single.handle and single.offset are used.
      *  If > 1:  multiple.handles are used.
      *  If == 0: byUuid is used for Read Using Characteristic UUID. */
     u16 hdlCnt;
-    union {
-        struct {
+
+    union
+    {
+        struct
+        {
             /** Attribute handle. */
             u16 handle;
             /** Attribute data offset. */
-            u16 offset;
-            u8 *wBuff;
+            u16  offset;
+            u8  *wBuff;
             u16 *wBuffLen;
-            u16 maxLen;
+            u16  maxLen;
         } single;
-        struct {
+
+        struct
+        {
             /** Attribute handles to read with Read Multiple Characteristic Values. */
             u16 *handles;
             /** If TRUE: use Read Multiple Variable Length Characteristic Values procedure.
              *  If FALSE: use Read Multiple Characteristic Values procedure. */
             bool variable;
         } multiple;
-        struct {
+
+        struct
+        {
             /** First requested handle number. */
             u16 startHdl;
             /** Last requested handle number. */
@@ -139,7 +151,8 @@ typedef struct gattc_read_cfg{
 } gattc_read_cfg_t;
 
 /** @brief GATT Write procedure parameters configuration */
-typedef struct gattc_write_cfg {
+typedef struct gattc_write_cfg
+{
     /** Response callback */
     gattc_write_func_t func;
     /** Attribute handle */
@@ -152,20 +165,20 @@ typedef struct gattc_write_cfg {
     u16 length;
     /** If true use Write command procedure. */
     bool withoutRsp;
-    u8 reserved;
+    u8   reserved;
 } gattc_write_cfg_t;
 
-
-typedef struct gattc_sub_ccc_msg {
+typedef struct gattc_sub_ccc_msg
+{
     /* queue's node */
     struct gattc_sub_ccc_msg *pNext;
-    gattc_sub_ccc_msg_func_t ntfOrIndFunc;
-    u16 startHdl;
-    u16 endHdl;
+    gattc_sub_ccc_msg_func_t  ntfOrIndFunc;
+    u16                       startHdl;
+    u16                       endHdl;
 } gattc_sub_ccc_msg_t;
 
-typedef struct gattc_sub_ccc_cfg {
-
+typedef struct gattc_sub_ccc_cfg
+{
     /** Subscribe characteristic UUID type */
     uuid_t *uuid; //UUID size only set 2 on 16
 
@@ -179,18 +192,13 @@ typedef struct gattc_sub_ccc_cfg {
     u16 value;
 } gattc_sub_ccc_cfg_t;
 
-
-
-
-
-
 /**
  * @brief       GATTC Discover: Primary / Include Service / Characteristic / Descriptors
  * @param[in]   connHandle   - connection handle.
  * @param[in]   gattc_sdp_cfg_t  -
  * @return      ble_sts_t.
  */
-ble_sts_t   blc_gattc_discovery(u16 connHandle, gattc_sdp_cfg_t *pSdpCfg);
+ble_sts_t blc_gattc_discovery(u16 connHandle, gattc_sdp_cfg_t *pSdpCfg);
 
 /**
  * @brief       Read Attribute Value by handle
@@ -198,7 +206,7 @@ ble_sts_t   blc_gattc_discovery(u16 connHandle, gattc_sdp_cfg_t *pSdpCfg);
  * @param[in]   gattc_read_cfg_t  -
  * @return      ble_sts_t.
  */
-ble_sts_t   blc_gattc_readAttributeValue(u16 connHandle, gattc_read_cfg_t *pRdCfg);
+ble_sts_t blc_gattc_readAttributeValue(u16 connHandle, gattc_read_cfg_t *pRdCfg);
 
 /**
  * @brief       GATTC Write Attribute Value by handle
@@ -206,12 +214,12 @@ ble_sts_t   blc_gattc_readAttributeValue(u16 connHandle, gattc_read_cfg_t *pRdCf
  * @param[in]   pWrCfg  -
  * @return      ble_sts_t.
  */
-ble_sts_t   blc_gattc_writeAttributeValue(u16 connHandle, gattc_write_cfg_t *pWrCfg);
+ble_sts_t blc_gattc_writeAttributeValue(u16 connHandle, gattc_write_cfg_t *pWrCfg);
 
 /**
 
  */
-bool blc_gattc_addSubscribeCCCNode(u16 connHandle, gattc_sub_ccc_msg_t *pSubNode);
+bool      blc_gattc_addSubscribeCCCNode(u16 connHandle, gattc_sub_ccc_msg_t *pSubNode);
 ble_sts_t blc_gattc_writeSubscribeCCCRequest(u16 connHandle, gattc_sub_ccc_cfg_t *pSubCccCfg);
 
 
@@ -221,14 +229,11 @@ ble_sts_t blc_gattc_writeSubscribeCCCRequest(u16 connHandle, gattc_sub_ccc_cfg_t
  * @param[in]   gattc_sub_ccc_msg_t  -
  * @return      ble_sts_t.
  */
-void        blc_gattc_removeSubscribeCCCNode(u16 connHandle, gattc_sub_ccc_msg_t *pSubNode);
+void blc_gattc_removeSubscribeCCCNode(u16 connHandle, gattc_sub_ccc_msg_t *pSubNode);
 
 /**
  * @brief       GATTC xxx
  * @param[in]   connHandle   - connection handle.
  * @return      ble_sts_t.
  */
-void        blc_gattc_cleanAllSubscribeCCCNode(u16 connHandle);
-
-
-
+void blc_gattc_cleanAllSubscribeCCCNode(u16 connHandle);

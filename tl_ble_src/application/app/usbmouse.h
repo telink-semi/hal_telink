@@ -29,19 +29,15 @@
 #include "tl_common.h"
 #include "drivers.h"
 
-
-typedef struct {
+typedef struct __attribute__((packed))
+{
     u8 btn;
     s8 x;
     s8 y;
     s8 wheel;
-}mouse_data_t;
+} mouse_data_t;
 
-
-
-#define MOUSE_REPORT_DATA_LEN     (sizeof(mouse_data_t))
-#define MEDIA_REPORT_DATA_LEN       4
+#define MOUSE_REPORT_DATA_LEN (sizeof(mouse_data_t))
+#define MEDIA_REPORT_DATA_LEN 4
 
 int usbmouse_hid_report(u8 report_id, u8 *data, int cnt);
-
-

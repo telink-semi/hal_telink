@@ -30,6 +30,7 @@
 
 
 #include "ext_rf.h"
+#include "ext_hadm_rf.h"
 #include "ext_aes.h"
 #include "ext_lib.h"
 #include "mcu_cfg_internal.h"

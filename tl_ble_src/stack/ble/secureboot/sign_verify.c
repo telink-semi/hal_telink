@@ -29,27 +29,25 @@
 #include "drivers.h"
 #include "secureboot_stack.h"
 
-unsigned int sign_verify(unsigned int data_adr,unsigned int data_size, unsigned char *pub_key, unsigned char *sign)
+unsigned int sign_verify(unsigned int data_adr, unsigned int data_size, unsigned char *pub_key, unsigned char *sign)
 {
-        unsigned char data[256];
-        unsigned char bin_hash[32];
-        unsigned int  cycle = (data_size) >> 8;
-        unsigned char leftlen = (data_size & 0xff);
+    unsigned char data[256];
+    unsigned char bin_hash[32];
+    unsigned int  cycle   = (data_size) >> 8;
+    unsigned char leftlen = (data_size & 0xff);
 
-        SHA256_Ctx ctx[1];
-        SHA256_Init(ctx, bin_hash);
+    SHA256_Ctx ctx[1];
+    SHA256_Init(ctx, bin_hash);
 
-        for(unsigned int i = 0; i < cycle; i++)
-        {
-            flash_read_page(data_adr+(i*256), 256, data);
-            SHA256_Process(ctx, data, 256);
-        }
-        if(leftlen != 0)
-        {
-            flash_read_page(data_adr+(cycle*256), leftlen, data);
-            SHA256_Process(ctx, data, leftlen);
-        }
-        SHA256_Done(ctx);
-        eccp_curve_t * curve = secp256r1;
-        return   ecdsa_verify(curve, bin_hash, 32,pub_key, sign);
+    for (unsigned int i = 0; i < cycle; i++) {
+        flash_read_page(data_adr + (i * 256), 256, data);
+        SHA256_Process(ctx, data, 256);
+    }
+    if (leftlen != 0) {
+        flash_read_page(data_adr + (cycle * 256), leftlen, data);
+        SHA256_Process(ctx, data, leftlen);
+    }
+    SHA256_Done(ctx);
+    eccp_curve_t *curve = secp256r1;
+    return ecdsa_verify(curve, bin_hash, 32, pub_key, sign);
 }

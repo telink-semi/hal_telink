@@ -26,13 +26,13 @@
 #include "config.h"
 
 //use codec as audio input and output
-#define UNICAST_CLIENT_CODEC                                1
+#define UNICAST_CLIENT_CODEC 1
 
 //use usb audio as audio input and output
-#define UNICAST_CLIENT_USB                                  2
+#define UNICAST_CLIENT_USB            2
 
 
-#define UNICAST_CLIENT_SELECT                               UNICAST_CLIENT_USB
+#define UNICAST_CLIENT_SELECT         UNICAST_CLIENT_USB
 
-#define BLC_PM_EN                           0
-#define BLC_PM_DEEP_RETENTION_MODE_EN       0
+#define BLC_PM_EN                     0
+#define BLC_PM_DEEP_RETENTION_MODE_EN 0

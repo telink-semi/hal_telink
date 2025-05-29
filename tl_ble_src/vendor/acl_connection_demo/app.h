@@ -25,7 +25,6 @@
 #define VENDOR_APP_H_
 
 
-
 /**
  * @brief       user initialization when MCU power on or wake_up from deepSleep mode
  * @param[in]   none
@@ -47,7 +46,7 @@ void user_init_deepRetn(void);
  * @param[in]  none.
  * @return     none.
  */
-int main_idle_loop (void);
+int main_idle_loop(void);
 
 
 /**
@@ -55,7 +54,7 @@ int main_idle_loop (void);
  * @param[in]  none.
  * @return     none.
  */
-void main_loop (void);
+void main_loop(void);
 
 
 /**
@@ -65,7 +64,7 @@ void main_loop (void);
  * @param[in]  n       the length of event parameter.
  * @return
  */
-int app_controller_event_callback (u32 h, u8 *p, int n);
+int app_controller_event_callback(u32 h, u8 *p, int n);
 
 
 /**
@@ -75,7 +74,7 @@ int app_controller_event_callback (u32 h, u8 *p, int n);
  * @param[in]  n       the length of event parameter.
  * @return
  */
-int app_host_event_callback (u32 h, u8 *para, int n);
+int app_host_event_callback(u32 h, u8 *para, int n);
 
 
 /**
@@ -84,7 +83,7 @@ int app_host_event_callback (u32 h, u8 *para, int n);
  * @param[in]  pkt             Pointer point to data packet buffer.
  * @return
  */
-int app_gatt_data_handler (u16 connHandle, u8 *pkt);
+int app_gatt_data_handler(u16 connHandle, u8 *pkt);
 
 
 /**

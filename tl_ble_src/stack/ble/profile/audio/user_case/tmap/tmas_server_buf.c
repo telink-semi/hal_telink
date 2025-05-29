@@ -26,16 +26,14 @@
 #include "stack/ble/ble.h"
 
 
-
 const blc_tmass_regParam_t defaultTmas = {
     .role = DEFAULT_TMAP_ROLE,
 };
 
 
 const blc_adv_tmapRole_t advDefTmapRole = {
-    .ltv.len = sizeof(blc_adv_tmapRole_t) - 1,
+    .ltv.len  = sizeof(blc_adv_tmapRole_t) - 1,
     .ltv.type = DT_SERVICE_DATA,
     .tamsUuid = SERVICE_UUID_TELEPHONY_AND_MEDIA_AUDIO,
     .tmapRole = DEFAULT_TMAP_ROLE,
 };
-

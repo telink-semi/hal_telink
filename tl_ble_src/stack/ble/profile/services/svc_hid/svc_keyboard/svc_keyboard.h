@@ -26,42 +26,47 @@
 #include "vendor/common/user_config.h"
 
 #ifndef SVC_DEFAULT_KEYBOARD_ENABLE
-#define SVC_DEFAULT_KEYBOARD_ENABLE                 0
+    #define SVC_DEFAULT_KEYBOARD_ENABLE 0
 #endif
 
-typedef struct{
-    union{
-        struct{
-            unsigned char rightGUI:1;
-            unsigned char rightAlt:1;
-            unsigned char rightShift:1;
-            unsigned char rightControl:1;
-            unsigned char leftGUI:1;
-            unsigned char leftAlt:1;
-            unsigned char leftShift:1;
-            unsigned char leftControl:1;
+typedef struct
+{
+    union
+    {
+        struct
+        {
+            unsigned char rightGUI     : 1;
+            unsigned char rightAlt     : 1;
+            unsigned char rightShift   : 1;
+            unsigned char rightControl : 1;
+            unsigned char leftGUI      : 1;
+            unsigned char leftAlt      : 1;
+            unsigned char leftShift    : 1;
+            unsigned char leftControl  : 1;
         };
+
         unsigned char modifiers;
     };
+
     unsigned char padding;
     unsigned char key[6];
 } blc_defaultKeyboardData_t;
 
-typedef struct{
+typedef struct
+{
     unsigned short data;
 } blc_defaultConsumerControlData_t;
 
 #if SVC_DEFAULT_KEYBOARD_ENABLE
-#define HID_INPUT_REPORT_NUM                2
-#define HID_OUTPUT_REPORT_NUM               1
-#define HID_FEATURE_REPORT_NUM              0
-#define HID_BOOT_PROTOCOL_MODE_ENABLE       1
-#define HID_BOOT_KEYBOARD_INTPUT_ENABLE     1
-#define HID_BOOT_KEYBOARD_OUTPUT_ENABLE     1
-#define HID_BOOT_MOUSE_INTPUT_ENABLE        0
+    #define HID_INPUT_REPORT_NUM            2
+    #define HID_OUTPUT_REPORT_NUM           1
+    #define HID_FEATURE_REPORT_NUM          0
+    #define HID_BOOT_PROTOCOL_MODE_ENABLE   1
+    #define HID_BOOT_KEYBOARD_INTPUT_ENABLE 1
+    #define HID_BOOT_KEYBOARD_OUTPUT_ENABLE 1
+    #define HID_BOOT_MOUSE_INTPUT_ENABLE    0
 
-#define HID_INPUT_REPORT_1_ID               HID_REPORT_ID_KEYBOARD_INPUT
-#define HID_INPUT_REPORT_2_ID               HID_REPORT_ID_CONSUME_CONTROL_INPUT
-#define HID_OUTPUT_REPORT_1_ID              HID_REPORT_ID_KEYBOARD_INPUT
+    #define HID_INPUT_REPORT_1_ID           HID_REPORT_ID_KEYBOARD_INPUT
+    #define HID_INPUT_REPORT_2_ID           HID_REPORT_ID_CONSUME_CONTROL_INPUT
+    #define HID_OUTPUT_REPORT_1_ID          HID_REPORT_ID_KEYBOARD_INPUT
 #endif
-

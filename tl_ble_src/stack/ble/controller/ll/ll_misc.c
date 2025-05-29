@@ -29,10 +29,6 @@
 #include "drivers.h"
 #include "stack/ble/controller/ble_controller.h"
 
-
-
-
-
 /*
 test sample:
 write_reg8(0x40001, blt_calBit1Number(0x0) );           // 0
@@ -61,7 +57,6 @@ int blt_calBit1Number_16bit(u32 dat)
     return dat;
 }
 
-
 /* this access code algorithm v1 is now only used for BQB, SDK do not use it */
 u32 blt_ll_connCalcAccessAddr_v1(void)
 {
@@ -71,18 +66,18 @@ u32 blt_ll_connCalcAccessAddr_v1(void)
     u32 temp;
     u32 mask;
     u32 prev_bit;
-    u8 bits_diff;
-    u8 consecutive;
-    u8 transitions;
-    u8 ones;
+    u8  bits_diff;
+    u8  consecutive;
+    u8  transitions;
+    u8  ones;
     int tmp;
 
     /* Calculate a random access address */
     aa = 0;
     while (1) {
         /* Get two, 16-bit random numbers */
-        aa_low = rand() & 0xFFFF;
-        aa_high = rand() & 0xFFFF;
+        aa_low  = trng_rand() & 0xFFFF;
+        aa_high = trng_rand() & 0xFFFF;
 
         /* All four bytes cannot be equal */
         if (aa_low == aa_high) {
@@ -97,10 +92,10 @@ u32 blt_ll_connCalcAccessAddr_v1(void)
         }
 
         /* Cannot be access address or be 1 bit different */
-        aa = aa_high;
-        aa = (aa << 16) | aa_low;
+        aa        = aa_high;
+        aa        = (aa << 16) | aa_low;
         bits_diff = 0;
-        temp = aa ^ 0x8E89BED6;
+        temp      = aa ^ 0x8E89BED6;
         for (mask = 0x00000001; mask != 0; mask <<= 1) {
             if (mask & temp) {
                 ++bits_diff;
@@ -116,8 +111,8 @@ u32 blt_ll_connCalcAccessAddr_v1(void)
         /* Cannot have more than 24 transitions */
         transitions = 0;
         consecutive = 1;
-        ones = 0;
-        mask = 0x00000001;
+        ones        = 0;
+        mask        = 0x00000001;
         while (mask < 0x80000000) {
             prev_bit = aa & mask;
             mask <<= 1;
@@ -175,10 +170,8 @@ u32 blt_ll_connCalcAccessAddr_v1(void)
     return aa;
 }
 
-
 u32 blt_ll_connCalcAccessAddr_v2(void)
 {
-
     /**
      * Refer to BLE Core Specification: Vol 6, Part B, "2.1.2 Access Address" for more information.
      *
@@ -208,9 +201,9 @@ u32 blt_ll_connCalcAccessAddr_v2(void)
      * @ It shall have no more than eleven transitions in the least significant 16 bits
      */
 
-  u32 accessAddr = rand();
+    u32 accessAddr = trng_rand();
 
-  /*
+    /*
    * The following code enforces a pattern to make sure the address meets all requirements
    * (including requirements for the LE coded PHY).  The pattern is
    *
@@ -219,71 +212,95 @@ u32 blt_ll_connCalcAccessAddr_v2(void)
    * with 2^5 choices for the upper six bits.  This provides 2^5 * 2^16 = 2097152 variations.
    */
 
-  /* Patterns for upper six bits.  The lower row contains complemented values of the upper row. */
-  static const u8 upperSixBits[] =
-  {
-    /* 000010 000100 000101 000110 001000 001100 001101 001110 010000 010001 010011 010111 010110 011000 011100 011110 */
-       0x08,  0x10,  0x14,  0x18,  0x20,  0x30,  0x34,  0x38,  0x40,  0x44,  0x4C,  0x5C,  0x58,  0x60,  0x70,  0x78,
-    /* 111101 111011 111010 111001 110111 110011 110010 110001 101111 101110 101100 101000 101001 100111 100011 100001 */
-       0xF4,  0xEC,  0xE8,  0xE4,  0xDC,  0xCC,  0xC8,  0xC4,  0xBC,  0xB8,  0xB0,  0xA0,  0xA4,  0x9C,  0x8C,  0x84
-  };
+    /* Patterns for upper six bits.  The lower row contains complemented values of the upper row. */
+    static const u8 upperSixBits[] =
+        {
+            /* 000010 000100 000101 000110 001000 001100 001101 001110 010000 010001 010011 010111 010110 011000 011100 011110 */
+            0x08,
+            0x10,
+            0x14,
+            0x18,
+            0x20,
+            0x30,
+            0x34,
+            0x38,
+            0x40,
+            0x44,
+            0x4C,
+            0x5C,
+            0x58,
+            0x60,
+            0x70,
+            0x78,
+            /* 111101 111011 111010 111001 110111 110011 110010 110001 101111 101110 101100 101000 101001 100111 100011 100001 */
+            0xF4,
+            0xEC,
+            0xE8,
+            0xE4,
+            0xDC,
+            0xCC,
+            0xC8,
+            0xC4,
+            0xBC,
+            0xB8,
+            0xB0,
+            0xA0,
+            0xA4,
+            0x9C,
+            0x8C,
+            0x84};
 
-  /* Set the upper six bits. */
-  accessAddr  = (accessAddr & ~0xFC000000) | (upperSixBits[accessAddr >> 27] << 24);
+    /* Set the upper six bits. */
+    accessAddr = (accessAddr & ~0xFC000000) | (upperSixBits[accessAddr >> 27] << 24);
 
-  /* Set   ones  with the mask 0b00000010 00000100 00001000 00110001 */
-  accessAddr |=  0x02040831;
+    /* Set   ones  with the mask 0b00000010 00000100 00001000 00110001 */
+    accessAddr |= 0x02040831;
 
-  /* Clear zeros with the mask 0b00000000 10000001 00000010 00000100 */
-  accessAddr &= ~0x00810204;
+    /* Clear zeros with the mask 0b00000000 10000001 00000010 00000100 */
+    accessAddr &= ~0x00810204;
 
-  return accessAddr;
+    return accessAddr;
 }
-
 
 
 #if (!SMP_LOCAL_IRK_MATCH_CONTROLLER_NEW_PRIVACY)
-u8  blt_ll_getOwnAddrType(u16 connHandle)
+u8 blt_ll_getOwnAddrType(u16 connHandle)
 {
-#if (LL_ACL_CEN_EN)
-    if(connHandle & BLM_CONN_HANDLE){  //Master
+    #if (LL_ACL_CEN_EN)
+    if (connHandle & BLM_CONN_HANDLE) { //Master
         return ((bltInit.own_addr_type & BIT(0)) ? OWN_ADDRESS_RANDOM : OWN_ADDRESS_PUBLIC);
-    }
-    else
-#endif
+    } else
+    #endif
     { //Slave
-        #if (MULTIPLE_LOCAL_DEVICE_ENABLE)
-            if(mlDevMng.mldev_en){
-                u8 conn_idx = connHandle & CONN_IDX_MASK;
-                extern u8 local_dev_index[];
-                u8 dev_idx = local_dev_index[conn_idx];
-                return mlDevMng.dev_mac[dev_idx].type;
-            }
-            else
-        #endif
-            {
-                return ((bltLegAdv.legadv_ownAddr_type & BIT(0)) ? OWN_ADDRESS_RANDOM : OWN_ADDRESS_PUBLIC);
-            }
-
+    #if (MULTIPLE_LOCAL_DEVICE_ENABLE)
+        if (mlDevMng.mldev_en) {
+            u8        conn_idx = connHandle & CONN_IDX_MASK;
+            extern u8 local_dev_index[];
+            u8        dev_idx = local_dev_index[conn_idx];
+            return mlDevMng.dev_mac[dev_idx].type;
+        } else
+    #endif
+        {
+            return ((bltLegAdv.legadv_ownAddr_type & BIT(0)) ? OWN_ADDRESS_RANDOM : OWN_ADDRESS_PUBLIC);
+        }
     }
 }
 
-
-u8* blt_ll_getOwnMacAddr(u16 connHandle, u8 addr_type)
+u8 *blt_ll_getOwnMacAddr(u16 connHandle, u8 addr_type)
 {
     (void)connHandle; //unused, remove warning
 
-    u8 *pConnAddr  = addr_type ? bltMac.macAddress_random : bltMac.macAddress_public;
+    u8 *pConnAddr = addr_type ? bltMac.macAddress_random : bltMac.macAddress_public;
 
     #if (MULTIPLE_LOCAL_DEVICE_ENABLE)
-        u8 is_master = (connHandle & BLM_CONN_HANDLE);
-        if(mlDevMng.mldev_en && !is_master){  //only slave support multi_device now
-            u8 conn_idx = connHandle & CONN_IDX_MASK;
-            extern u8 local_dev_index[];
-            u8 dev_idx = local_dev_index[conn_idx];
+    u8 is_master = (connHandle & BLM_CONN_HANDLE);
+    if (mlDevMng.mldev_en && !is_master) { //only slave support multi_device now
+        u8        conn_idx = connHandle & CONN_IDX_MASK;
+        extern u8 local_dev_index[];
+        u8        dev_idx = local_dev_index[conn_idx];
 
-            pConnAddr = mlDevMng.dev_mac[dev_idx].address;
-        }
+        pConnAddr = mlDevMng.dev_mac[dev_idx].address;
+    }
     #endif
 
     return pConnAddr;
@@ -291,45 +308,39 @@ u8* blt_ll_getOwnMacAddr(u16 connHandle, u8 addr_type)
 #endif
 
 
-
-
 int blt_debug_hex_2_dec_display(int src_data)
 {
-    int weight = 1;
+    int weight    = 1;
     int dest_data = 0;
-    while(src_data){
-        dest_data += (src_data%10)*weight;
-        src_data /=10;
-        weight *=16;
+    while (src_data) {
+        dest_data += (src_data % 10) * weight;
+        src_data /= 10;
+        weight *= 16;
     }
 
     return dest_data;
 }
 
-
-
-_attribute_noinline_
-unsigned int zuixiao_gongbeishu(unsigned int x, unsigned int y, int mode)
+_attribute_noinline_ unsigned int zuixiao_gongbeishu(unsigned int x, unsigned int y, int mode)
 {
     unsigned int min, max;
-    if(x > y){
+    if (x > y) {
         max = x;
         min = y;
-    }
-    else{
+    } else {
         max = y;
         min = x;
     }
 
     unsigned int mul = 0;
-    for(unsigned int i=1; i<=min; i++ ){
-        mul = max*i;
-        if((mul%min) == 0){
+    for (unsigned int i = 1; i <= min; i++) {
+        mul = max * i;
+        if ((mul % min) == 0) {
             break;
         }
 
         //special for CIS master
-        if(mode && i > 100){
+        if (mode && i > 100) {
             return 0;
         }
     }
@@ -337,22 +348,9 @@ unsigned int zuixiao_gongbeishu(unsigned int x, unsigned int y, int mode)
     return mul;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
 ble_sts_t blc_hci_readLocalSupportedCommands(hci_readLocSupCmds_retParam_t *pRetPara)
 {
     my_dump_str_data(IUT_HCI_LOG_EN, "[HCI][CMD] Read_Local_Sup_Cmds", 0, 0);
-
 
 
     u8 cmd_tbl[64] = {
@@ -475,9 +473,9 @@ ble_sts_t blc_hci_readLocalSupportedCommands(hci_readLocSupCmds_retParam_t *pRet
         5 HCI_Set_Controller_To_Host_Flow_Control
         6 HCI_Host_Buffer_Size
         7 HCI_Host_Number_Of_Completed_Packets  */
-        HCI_CONTROLLER_TO_HOST_FLOW_CTRL_EN  <<5|
-        HCI_CONTROLLER_TO_HOST_FLOW_CTRL_EN  <<6|
-        HCI_CONTROLLER_TO_HOST_FLOW_CTRL_EN  <<7,
+        HCI_CONTROLLER_TO_HOST_FLOW_CTRL_EN << 5 |
+            HCI_CONTROLLER_TO_HOST_FLOW_CTRL_EN << 6 |
+            HCI_CONTROLLER_TO_HOST_FLOW_CTRL_EN << 7,
 
         /* 11
         0 HCI_Read_Link_Supervision_Timeout
@@ -511,7 +509,7 @@ ble_sts_t blc_hci_readLocalSupportedCommands(hci_readLocSupCmds_retParam_t *pRet
         6 Reserved for future use
         7 Reserved for future use   */
         blmsParam.chncSup_en << 2 |
-        blmsParam.chncSup_en << 3,
+            blmsParam.chncSup_en << 3,
 
         /* 14
         0 Reserved for future use
@@ -534,7 +532,7 @@ ble_sts_t blc_hci_readLocalSupportedCommands(hci_readLocSupCmds_retParam_t *pRet
         6 HCI_Read_AFH_Channel_Map
         7 HCI_Read_Clock    */
         BIT(1) |
-        blmsParam.pwr_ctrl_en <<5,
+            blmsParam.pwr_ctrl_en << 5,
 
         /* 16
         0 HCI_Read_Loopback_Mode
@@ -733,8 +731,8 @@ ble_sts_t blc_hci_readLocalSupportedCommands(hci_readLocSupCmds_retParam_t *pRet
         5 HCI_Write_Authenticated_Payload_Timeout
         6 HCI_Read_Local_OOB_Extended_Data
         7 HCI_Write_Secure_Connections_Test_Mode    */
-        (LL_FEATURE_ENABLE_LE_PING && LE_AUTHENTICATED_PAYLOAD_TIMEOUT_SUPPORT_EN)  <<4 |
-        (LL_FEATURE_ENABLE_LE_PING && LE_AUTHENTICATED_PAYLOAD_TIMEOUT_SUPPORT_EN)  <<5,
+        (LL_FEATURE_ENABLE_LE_PING && LE_AUTHENTICATED_PAYLOAD_TIMEOUT_SUPPORT_EN) << 4 |
+            (LL_FEATURE_ENABLE_LE_PING && LE_AUTHENTICATED_PAYLOAD_TIMEOUT_SUPPORT_EN) << 5,
 
         /* 33
         0 HCI_Read_Extended_Page_Timeout
@@ -745,8 +743,8 @@ ble_sts_t blc_hci_readLocalSupportedCommands(hci_readLocSupCmds_retParam_t *pRet
         5 HCI_LE_Remote_Connection_Parameter_Request_Negative_Reply
         6 HCI_LE_Set_Data_Length
         7 HCI_LE_Read_Suggested_Default_Data_Length */
-        LL_FEATURE_ENABLE_LE_DATA_LENGTH_EXTENSION <<6 |
-        LL_FEATURE_ENABLE_LE_DATA_LENGTH_EXTENSION <<7,
+        LL_FEATURE_ENABLE_LE_DATA_LENGTH_EXTENSION << 6 |
+            LL_FEATURE_ENABLE_LE_DATA_LENGTH_EXTENSION << 7,
 
         /* 34
         0 HCI_LE_Write_Suggested_Default_Data_Length
@@ -757,14 +755,14 @@ ble_sts_t blc_hci_readLocalSupportedCommands(hci_readLocSupCmds_retParam_t *pRet
         5 HCI_LE_Clear_Resolving_List
         6 HCI_LE_Read_Resolving_List_Size
         7 HCI_LE_Read_Peer_Resolvable_Address   */
-        LL_FEATURE_ENABLE_LE_DATA_LENGTH_EXTENSION <<0 |
-        CONTROLLER_GEN_P256KEY_ENABLE              <<1 |
-        CONTROLLER_GEN_P256KEY_ENABLE              <<2 |
-        LL_FEATURE_ENABLE_PRIVACY                  <<3 |
-        LL_FEATURE_ENABLE_PRIVACY                  <<4 |
-        LL_FEATURE_ENABLE_PRIVACY                  <<5 |
-        LL_FEATURE_ENABLE_PRIVACY                  <<6 |
-        LL_FEATURE_ENABLE_PRIVACY                  <<7,
+        LL_FEATURE_ENABLE_LE_DATA_LENGTH_EXTENSION << 0 |
+            CONTROLLER_GEN_P256KEY_ENABLE << 1 |
+            CONTROLLER_GEN_P256KEY_ENABLE << 2 |
+            LL_FEATURE_ENABLE_PRIVACY << 3 |
+            LL_FEATURE_ENABLE_PRIVACY << 4 |
+            LL_FEATURE_ENABLE_PRIVACY << 5 |
+            LL_FEATURE_ENABLE_PRIVACY << 6 |
+            LL_FEATURE_ENABLE_PRIVACY << 7,
 
         /* 35
         0 HCI_LE_Read_Local_Resolvable_Address
@@ -811,14 +809,14 @@ ble_sts_t blc_hci_readLocalSupportedCommands(hci_readLocSupCmds_retParam_t *pRet
         5 HCI_LE_Set_Extended_Scan_Parameters
         6 HCI_LE_Set_Extended_Scan_Enable
         7 HCI_LE_Extended_Create_Connection */
-        blmsParam.extAdvModule_en <<0|
-        blmsParam.extAdvModule_en <<1|
-        blmsParam.prdAdvModule_en <<2|
-        blmsParam.prdAdvModule_en <<3|
-        blmsParam.prdAdvModule_en <<4|
-        blmsParam.extScanModule_en <<5|
-        blmsParam.extScanModule_en <<6|
-        blmsParam.extInitModule_en <<7,
+        blmsParam.extAdvModule_en << 0 |
+            blmsParam.extAdvModule_en << 1 |
+            blmsParam.prdAdvModule_en << 2 |
+            blmsParam.prdAdvModule_en << 3 |
+            blmsParam.prdAdvModule_en << 4 |
+            blmsParam.extScanModule_en << 5 |
+            blmsParam.extScanModule_en << 6 |
+            blmsParam.extInitModule_en << 7,
 
         /* 38
         0 HCI_LE_Periodic_Advertising_Create_Sync
@@ -830,13 +828,13 @@ ble_sts_t blc_hci_readLocalSupportedCommands(hci_readLocSupCmds_retParam_t *pRet
         6 HCI_LE_Read_Periodic_Advertiser_List_Size
         7 HCI_LE_Read_Transmit_Power */
         blmsParam.pda_sync_en << 0 |
-        blmsParam.pda_sync_en << 1 |
-        blmsParam.pda_sync_en << 2 |
-        blmsParam.pda_sync_en << 3 |
-        blmsParam.pda_sync_en << 4 |
-        blmsParam.pda_sync_en << 5 |
-        blmsParam.pda_sync_en << 6 |
-        BIT(7),
+            blmsParam.pda_sync_en << 1 |
+            blmsParam.pda_sync_en << 2 |
+            blmsParam.pda_sync_en << 3 |
+            blmsParam.pda_sync_en << 4 |
+            blmsParam.pda_sync_en << 5 |
+            blmsParam.pda_sync_en << 6 |
+            BIT(7),
 
         /* 39
         0 HCI_LE_Read_RF_Path_Compensation
@@ -866,9 +864,9 @@ ble_sts_t blc_hci_readLocalSupportedCommands(hci_readLocSupCmds_retParam_t *pRet
         6 HCI_LE_Periodic_Advertising_Sync_Transfer
         7 HCI_LE_Periodic_Advertising_Set_Info_Transfer */
         blmsParam.cte_connLess_en << 4 |
-        blmsParam.pda_sync_en <<5 |
-        blmsParam.past_en <<6 |
-        blmsParam.past_en <<7,
+            blmsParam.pda_sync_en << 5 |
+            blmsParam.past_en << 6 |
+            blmsParam.past_en << 7,
 
         /* 41
         0 HCI_LE_Set_Periodic_Advertising_Sync_Transfer_Parameters
@@ -895,14 +893,14 @@ ble_sts_t blc_hci_readLocalSupportedCommands(hci_readLocSupCmds_retParam_t *pRet
         5 HCI_LE_Create_BIG
         6 HCI_LE_Create_BIG_Test
         7 HCI_LE_Terminate_BIG */
-        blmsParam.cis_cen_en <<0 |
-        blmsParam.cis_cen_en <<1 |
-        blmsParam.cis_cen_en <<2 |
-        blmsParam.cis_per_en  <<3 |
-        blmsParam.cis_per_en  <<4 |
-        blmsParam.big_bcst_en<<5|
-        blmsParam.big_bcst_en<<6|
-        blmsParam.big_bcst_en<<7,
+        blmsParam.cis_cen_en << 0 |
+            blmsParam.cis_cen_en << 1 |
+            blmsParam.cis_cen_en << 2 |
+            blmsParam.cis_per_en << 3 |
+            blmsParam.cis_per_en << 4 |
+            blmsParam.big_bcst_en << 5 |
+            blmsParam.big_bcst_en << 6 |
+            blmsParam.big_bcst_en << 7,
 
 
         /* 43
@@ -915,13 +913,13 @@ ble_sts_t blc_hci_readLocalSupportedCommands(hci_readLocSupCmds_retParam_t *pRet
         6 HCI_LE_ISO_Receive_Test
         7 HCI_LE_ISO_Read_Test_Counters */
         0x00 |
-        blmsParam.big_sync_en <<0|
-        blmsParam.big_sync_en <<1|
-        blmsParam.iso_en <<3 |
-        blmsParam.iso_en <<4 |
-        blmsParam.iso_tx_en <<5 |
-        blmsParam.iso_rx_en <<6 |
-        blmsParam.iso_rx_en <<7,
+            blmsParam.big_sync_en << 0 |
+            blmsParam.big_sync_en << 1 |
+            blmsParam.iso_en << 3 |
+            blmsParam.iso_en << 4 |
+            blmsParam.iso_tx_en << 5 |
+            blmsParam.iso_rx_en << 6 |
+            blmsParam.iso_rx_en << 7,
 
         /* 44
         0 HCI_LE_ISO_Test_End
@@ -932,13 +930,13 @@ ble_sts_t blc_hci_readLocalSupportedCommands(hci_readLocSupCmds_retParam_t *pRet
         5 HCI_LE_Set_Path_Loss_Reporting_Parameters
         6 HCI_LE_Set_Path_Loss_Reporting_Enable
         7 HCI_LE_Set_Transmit_Power_Reporting_Enable    */
-        blmsParam.iso_en <<0 |
-        BIT(1) |
-        blmsParam.pwr_ctrl_en <<3 |
-        blmsParam.pwr_ctrl_en <<4 |
-        blmsParam.pwr_ctrl_en <<5 |
-        blmsParam.pwr_ctrl_en <<6 |
-        blmsParam.pwr_ctrl_en <<7,
+        blmsParam.iso_en << 0 |
+            BIT(1) |
+            blmsParam.pwr_ctrl_en << 3 |
+            blmsParam.pwr_ctrl_en << 4 |
+            blmsParam.pwr_ctrl_en << 5 |
+            blmsParam.pwr_ctrl_en << 6 |
+            blmsParam.pwr_ctrl_en << 7,
 
         /* 45
         0 HCI_LE_Transmitter_Test [v4]
@@ -962,30 +960,72 @@ ble_sts_t blc_hci_readLocalSupportedCommands(hci_readLocSupCmds_retParam_t *pRet
          6 HCI_LE_Set_Periodic_Advertising_Response_Data
          7 HCI_LE_Set_Periodic_Sync_Subevent
          */
-        blmsParam.subrate_en<<0   |
-        blmsParam.subrate_en<<1   |
-        blmsParam.advCodeingSel_en<<2 |
-        blmsParam.prdAdvWr_en<<5  |
-        blmsParam.prdSyncWr_en<<6 |
-        blmsParam.prdSyncWr_en<<7,
+        blmsParam.subrate_en << 0 |
+            blmsParam.subrate_en << 1 |
+            blmsParam.advCodeingSel_en << 2 |
+            blmsParam.prdAdvWr_en << 5 |
+            blmsParam.prdSyncWr_en << 6 |
+            blmsParam.prdSyncWr_en << 7,
 
         /* 47
          0 HCI_LE_Extended_Create_Connection [v2]
          1 HCI_LE_Set_Periodic_Advertising_Parameters [v2]
          */
-        blmsParam.prdAdvWr_en<<0 |
-        blmsParam.prdAdvWr_en<<1,
+        blmsParam.prdAdvWr_en << 0 |
+            blmsParam.prdAdvWr_en << 1,
+        /* 48
+        0 HCI_LE_Read_Monitored_Advertisers_List_Size
+        1 HCI_LE_Frame_Space_Update
+        */
+        blmsParam.fsu_en << 0 |
+            blmsParam.fsu_en << 1,
 
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        };
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+        0x00,
+#if LL_FEATURE_ENABLE_HIGHER_DATA_THROUGHPUT
+        /*0x3D
+         7 HCI_LE_Read_Maximum_Data_Length [v2]
+         */
+        0x80,
+        /*0x3E
+         0 HCI_LE_Set_HDT_Parameters_Test
+         1 HCI_LE_Read_HDT_Local_Supported_Capabilities
+         4 HCI_LE_Transmitter_Test [v5]
+         5 HCI_HDT_Test_End [v2]
+         6 HCI_LE_Create_BIG_Test [v2]
+         7 HCI_LE_Set_HDT_Parameters
+         */
+        0xF3,
+        /*0x3F
+         0 HCI_LE_Set_CIG_Parameters [v3]
+         1 HCI_LE_Set_CIG_Parameters_Test [v3]
+         5 HCI_LE_Create_BIG [v2]
+         */
+        0x23,
+#else
+        0x00,
+        0x00,
+        0x00,
+#endif
+    };
 
 #if BQB_HCI_LOCAL_SUP_CMD
-    cmd_tbl[7]  &= ~(BIT(0)|BIT(1));//HCI_Write_Local_Name|HCI_Read_Local_Name
-    cmd_tbl[7]  |= BIT(2)|BIT(3); //HCI_Read/Write_Connection_Accept_Timeout
-    cmd_tbl[10] |= BIT(2);        //HCI_Read_Transmit_Power_Level
-    cmd_tbl[39] |= BIT(3)|BIT(4); //HCI_LE_Receiver/Transmitter_Test [V3]
-    cmd_tbl[45] |= BIT(0);        //HCI_LE_Transmitter_Test [V4]
+    cmd_tbl[7] &= ~(BIT(0) | BIT(1)); //HCI_Write_Local_Name|HCI_Read_Local_Name
+    cmd_tbl[7] |= BIT(2) | BIT(3);    //HCI_Read/Write_Connection_Accept_Timeout
+    cmd_tbl[10] |= BIT(2);            //HCI_Read_Transmit_Power_Level
+    cmd_tbl[39] |= BIT(3) | BIT(4);   //HCI_LE_Receiver/Transmitter_Test [V3]
+    cmd_tbl[45] |= BIT(0);            //HCI_LE_Transmitter_Test [V4]
 #endif
 
 
@@ -995,12 +1035,11 @@ ble_sts_t blc_hci_readLocalSupportedCommands(hci_readLocSupCmds_retParam_t *pRet
     return BLE_SUCCESS;
 }
 
-
 ble_sts_t blc_hci_readLocalSupportedFeatures(hci_readLocSupFeatures_retParam_t *pRetPara)
 {
-    my_dump_str_data(IUT_HCI_LOG_EN, "[HCI][CMD] Read_Local_Sup_Features", 0, 0);
+    my_dump_str_data(IUT_HCI_LOG_EN, "[HCI][CMD] Read_Local_Sup_Features", pRetPara->LMP_features, 8);
 
-    u8 feat_tbl[8] = {0x00,0x00,0x00,0x00, 0x60,0x00,0x00,0x00};
+    u8 feat_tbl[8] = {0x00, 0x00, 0x00, 0x00, 0x60, 0x00, 0x00, 0x00};
 
     pRetPara->status = BLE_SUCCESS;
     smemcpy(pRetPara->LMP_features, feat_tbl, 8);
@@ -1008,61 +1047,60 @@ ble_sts_t blc_hci_readLocalSupportedFeatures(hci_readLocSupFeatures_retParam_t *
     return BLE_SUCCESS;
 }
 
-
 /* for BQB test, manual add feature bit */
 void blc_ll_addFeature_0(u32 feat_mask)
 {
     LL_FEATURE_MASK_0 |= feat_mask;
 
-    if(LL_FEATURE_MASK_0 & LL_FEATURE_MASK_CONNECTED_ISOCHRONOUS_STREAM_MASTER){
+    if (LL_FEATURE_MASK_0 & LL_FEATURE_MASK_CONNECTED_ISOCHRONOUS_STREAM_MASTER) {
         blmsParam.cis_cen_en = 1;
-        blmsParam.cis_en = 1;
+        blmsParam.cis_en     = 1;
     }
 
-    if(LL_FEATURE_MASK_0 & LL_FEATURE_MASK_CONNECTED_ISOCHRONOUS_STREAM_SLAVE){
+    if (LL_FEATURE_MASK_0 & LL_FEATURE_MASK_CONNECTED_ISOCHRONOUS_STREAM_SLAVE) {
         blmsParam.cis_per_en = 1;
-        blmsParam.cis_en = 1;
+        blmsParam.cis_en     = 1;
     }
 
-    if(LL_FEATURE_MASK_0 & LL_FEATURE_MASK_ISOCHRONOUS_BROADCASTER){
+    if (LL_FEATURE_MASK_0 & LL_FEATURE_MASK_ISOCHRONOUS_BROADCASTER) {
         blmsParam.big_bcst_en = 1;
-        blmsParam.bis_en = 1;
+        blmsParam.bis_en      = 1;
     }
 
-    if(LL_FEATURE_MASK_0 & LL_FEATURE_MASK_SYNCHRONIZED_RECEIVER){
+    if (LL_FEATURE_MASK_0 & LL_FEATURE_MASK_SYNCHRONIZED_RECEIVER) {
         blmsParam.big_sync_en = 1;
-        blmsParam.bis_en = 1;
+        blmsParam.bis_en      = 1;
     }
 
-    blmsParam.iso_en = blmsParam.cis_en || blmsParam.bis_en;
+    blmsParam.iso_en    = blmsParam.cis_en || blmsParam.bis_en;
     blmsParam.iso_tx_en = blmsParam.cis_en || blmsParam.big_bcst_en;
     blmsParam.iso_rx_en = blmsParam.cis_en || blmsParam.big_sync_en;
 
-    if(LL_FEATURE_MASK_0 & (LL_FEATURE_MASK_PERIODIC_ADVERTISING_SYNC_TRANSFER_SENDER|
-                            LL_FEATURE_MASK_PERIODIC_ADVERTISING_SYNC_TRANSFER_RECIPIENT)){
-        blmsParam.past_en = 1;
+    if (LL_FEATURE_MASK_0 & (LL_FEATURE_MASK_PERIODIC_ADVERTISING_SYNC_TRANSFER_SENDER |
+                             LL_FEATURE_MASK_PERIODIC_ADVERTISING_SYNC_TRANSFER_RECIPIENT)) {
+        blmsParam.past_en     = 1;
         blmsParam.pda_sync_en = 1;
     }
 
-    if(LL_FEATURE_MASK_0 & LL_FEATURE_MASK_LE_EXTENDED_ADVERTISING){
+    if (LL_FEATURE_MASK_0 & LL_FEATURE_MASK_LE_EXTENDED_ADVERTISING) {
         blmsParam.extAdvModule_en = 1;
     }
 
-    if(LL_FEATURE_MASK_0 & LL_FEATURE_MASK_LE_PERIODIC_ADVERTISING){
+    if (LL_FEATURE_MASK_0 & LL_FEATURE_MASK_LE_PERIODIC_ADVERTISING) {
         blmsParam.prdAdvModule_en = 1;
     }
 
-    if(LL_FEATURE_MASK_0 &
-     (LL_FEATURE_MASK_CONNECTIONLESS_CTE_TRANSMITTER |
-      LL_FEATURE_MASK_CONNECTIONLESS_CTE_RECEIVER    |
-      LL_FEATURE_MASK_ANTENNA_SWITCHING_DURING_CTE_TRANSMISSION |
-      LL_FEATURE_MASK_ANTENNA_SWITCHING_DURING_CTE_RECEPTION|
-      LL_FEATURE_MASK_RECEIVING_CONSTANT_TONE_EXTENSIONS)){
+    if (LL_FEATURE_MASK_0 &
+        (LL_FEATURE_MASK_CONNECTIONLESS_CTE_TRANSMITTER |
+         LL_FEATURE_MASK_CONNECTIONLESS_CTE_RECEIVER |
+         LL_FEATURE_MASK_ANTENNA_SWITCHING_DURING_CTE_TRANSMISSION |
+         LL_FEATURE_MASK_ANTENNA_SWITCHING_DURING_CTE_RECEPTION |
+         LL_FEATURE_MASK_RECEIVING_CONSTANT_TONE_EXTENSIONS)) {
         blmsParam.cte_connLess_en = 1;
     }
 }
 
-void blc_ll_removeFeature_0(u32 feat_mask )
+void blc_ll_removeFeature_0(u32 feat_mask)
 {
     LL_FEATURE_MASK_0 &= ~feat_mask;
 }
@@ -1071,30 +1109,30 @@ void blc_ll_addFeature_1(u32 feat_mask)
 {
     LL_FEATURE_MASK_1 |= feat_mask;
 
-    if(LL_FEATURE_MASK_1 &
-        (LL_FEATURE_MASK_LE_POWER_CTRL_REQUEST|
-        LL_FEATURE_MASK_LE_POWER_CHANGE_INDICATION|
-        LL_FEATURE_MASK_LE_PATH_LOSS_MONITORING)){
+    if (LL_FEATURE_MASK_1 &
+        (LL_FEATURE_MASK_LE_POWER_CTRL_REQUEST |
+         LL_FEATURE_MASK_LE_POWER_CHANGE_INDICATION |
+         LL_FEATURE_MASK_LE_PATH_LOSS_MONITORING)) {
         blmsParam.pwr_ctrl_en = 1;
     }
 
-    if(LL_FEATURE_MASK_1 & LL_FEATURE_MASK_CHANNEL_CLASSIFICATION){
+    if (LL_FEATURE_MASK_1 & LL_FEATURE_MASK_CHANNEL_CLASSIFICATION) {
         blmsParam.chncSup_en = 1;
     }
 
-    if(LL_FEATURE_MASK_1 & LL_FEATURE_MASK_CONNECTION_SUBRATING){
+    if (LL_FEATURE_MASK_1 & LL_FEATURE_MASK_CONNECTION_SUBRATING) {
         blmsParam.subrate_en = 1;
     }
 
-    if(LL_FEATURE_MASK_1 & LL_FEATURE_MASK_ADVERTISING_CODING_SELECTION){
+    if (LL_FEATURE_MASK_1 & LL_FEATURE_MASK_ADVERTISING_CODING_SELECTION) {
         blmsParam.advCodeingSel_en = 1;
     }
 
-    if(LL_FEATURE_MASK_1 & LL_FEATURE_MASK_PERIODIC_ADVERTISING_WITH_RESPONSES_ADVERTISER){
+    if (LL_FEATURE_MASK_1 & LL_FEATURE_MASK_PERIODIC_ADVERTISING_WITH_RESPONSES_ADVERTISER) {
         blmsParam.prdAdvWr_en = 1;
     }
 
-    if(LL_FEATURE_MASK_1 & LL_FEATURE_MASK_PERIODIC_ADVERTISING_WITH_RESPONSES_SCANNER){
+    if (LL_FEATURE_MASK_1 & LL_FEATURE_MASK_PERIODIC_ADVERTISING_WITH_RESPONSES_SCANNER) {
         blmsParam.prdSyncWr_en = 1;
     }
 }
@@ -1103,4 +1141,3 @@ void blc_ll_removeFeature_1(u32 feat_mask)
 {
     LL_FEATURE_MASK_1 &= ~feat_mask;
 }
-

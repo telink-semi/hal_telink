@@ -21,8 +21,65 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-#include "flash_type.h"
+#include "flash_common.h"
+/*
+ *  If add flash type, need pay attention to the read uid command and the bit number of status register
+ *  Flash trim scheme has been added for P25Q80U.If other types of flash adds this scheme, user need to modify "flash_trim" and "flash_trim_check" function.
+ *  When adding flash, if tRES1 is greater than 25us, update the delay of EFUSE_LOAD_AND_FLASH_WAKEUP_LOOP_NUM in the S file.
+ *  If tRES1 is greater than 150us, this flash model cannot be used, because the chip hardware boot program only waits for 150us.
+    Flash Type  uid CMD     MID         Company     tRES1   Sector Erase Time(MAX)
+    P25Q32SL      0x4b      0x166085      PUYA      8us     16ms
+ */
+const flash_hal_handler_t flash_list[] = {
+    //4M
+    {0x166085, flash_get_lock_block_mid166085_with_device_num, flash_unlock_mid166085_with_device_num, flash_lock_mid166085_with_device_num,FLASH_LOCK_LOW_2M_MID166085,flash_write_status_mid166085_with_device_num,FLASH_WRITE_STATUS_QE_MID166085,FLASH_QE_ENABLE_MID166085,FLASH_QE_DISABLE_MID166085},
+};
+const unsigned int FLASH_CNT = sizeof(flash_list)/sizeof(flash_hal_handler_t);
 
+/**
+ * @brief       This function serves to read flash mid and uid,and check the correctness of mid and uid.
+ * @param[in]   device_num  - the number of slave device.
+ * @param[out]  flash_mid   - Flash Manufacturer ID.
+ * @param[out]  flash_uid   - Flash Unique ID.
+ * @return      0: flash no uid or not a known flash model   1:the flash model is known and the uid is read.
+ * @note        Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
+ *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.
+ *              Taking into account the factors such as power supply fluctuations, the safe voltage value needs to be greater
+ *              than the minimum chip operating voltage. For the specific value, please make a reasonable setting according
+ *              to the specific application and hardware circuit.
+ *
+ *              Risk description: When the chip power supply voltage is relatively low, due to the unstable power supply,
+ *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
+ *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
+ */
+_attribute_text_sec_ int flash_read_mid_uid_with_check_with_device_num(mspi_slave_device_num_e device_num, unsigned int *flash_mid ,unsigned char *flash_uid)
+{
+    unsigned char no_uid[16]={0x51,0x01,0x51,0x01,0x51,0x01,0x51,0x01,0x51,0x01,0x51,0x01,0x51,0x01,0x51,0x01};
+    unsigned int i,f_cnt=0;
+    *flash_mid = flash_read_mid_with_device_num(device_num);
+
+    for(i=0; i<FLASH_CNT; i++){
+        if(flash_list[i].mid  == *flash_mid){
+            flash_read_uid_with_device_num(device_num, ((FLASH_READ_UID_CMD_GD_PUYA_ZB_TH>>16)&0xff), (unsigned char *)flash_uid);
+            break;
+        }
+    }
+    if(i == FLASH_CNT){
+        return 0;
+    }
+
+    for(i=0; i<16; i++){
+        if(flash_uid[i] == no_uid[i]){
+            f_cnt++;
+        }
+    }
+
+    if(f_cnt == 16){    //no uid flash
+        return 0;
+    }else{
+        return 1;
+    }
+}
 
 /**
  * @brief       This function is used to enable the four-wire function of flash.
@@ -32,15 +89,14 @@
  */
 unsigned char flash_4line_en_with_device_num(mspi_slave_device_num_e device_num, unsigned int flash_mid)
 {
-    switch(flash_mid)
-    {
-    case MID166085:
-        return flash_write_status_mid166085_with_device_num(device_num, FLASH_QE_ENABLE_MID166085, FLASH_WRITE_STATUS_QE_MID166085);
-        break;
-    default:
-        return 3;
-        break;
+    unsigned int i=0;
+
+    for(i=0; i<FLASH_CNT; i++){
+        if(flash_list[i].mid == flash_mid){
+            return flash_list[i].flash_write_status(device_num,flash_list[i].qe_en,flash_list[i].flash_qe_mask);
+        }
     }
+    return 3;
 }
 
 /**
@@ -49,16 +105,15 @@ unsigned char flash_4line_en_with_device_num(mspi_slave_device_num_e device_num,
  * @param[in]   flash_mid   - the mid of flash.
  * @return      1: success, 0: error, 2: parameter error, 3: mid is not supported.
  */
-unsigned char flash_4line_dis_with_device_num(mspi_slave_device_num_e device_num,unsigned int flash_mid)
+unsigned char flash_4line_dis_with_device_num(mspi_slave_device_num_e device_num, unsigned int flash_mid)
 {
-    switch(flash_mid)
-    {
-    case MID166085:
-        return flash_write_status_mid166085_with_device_num(device_num, FLASH_QE_DISABLE_MID166085, FLASH_WRITE_STATUS_QE_MID166085);
-        break;
-    default:
-        return 3;
-        break;
+    unsigned int i=0;
+
+    for(i=0; i<FLASH_CNT; i++){
+        if(flash_list[i].mid == flash_mid){
+            return flash_list[i].flash_write_status(device_num,flash_list[i].qe_dis,flash_list[i].flash_qe_mask);
+        }
     }
+    return 3;
 }
 

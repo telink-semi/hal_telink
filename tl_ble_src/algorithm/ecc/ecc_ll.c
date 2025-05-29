@@ -101,7 +101,7 @@ static int blt_ecc_gen_rand(unsigned char *dest, unsigned int size)
     /* if len is odd */
     for (unsigned int i=0; i<size; i++ ) {
         if( (i & 3) == 0 ){
-            randNums = rand();
+            randNums = trng_rand();
         }
 
         dest[i] = randNums & 0xff;

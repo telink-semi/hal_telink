@@ -24,7 +24,7 @@
 #ifndef COMPILER_H_
 #define COMPILER_H_
 
-#define _attribute_noinline_                    __attribute__((noinline))
+#define _attribute_noinline_                __attribute__((noinline))
 
 #if (BLC_ZEPHYR_BLE_INTEGRATION)
 #define _attribute_ram_code_      				__attribute__((section(".ram_code_ble"))) __attribute__((noinline))
@@ -38,19 +38,24 @@
 #else
 #define _attribute_ram_code_      				__attribute__((section(".ram_code"))) __attribute__((noinline))
 #define _attribute_ram_code_only_               __attribute__((section(".ram_code")))
-#define _attribute_ram_code_sec_      			__attribute__((section(".ram_code")))
-#define _attribute_ram_code_sec_noinline_      	__attribute__((section(".ram_code"))) __attribute__((noinline))
+#define _attribute_ram_code_sec_            __attribute__((section(".ram_code")))
+#define _attribute_ram_code_sec_noinline_   __attribute__((section(".ram_code"))) __attribute__((noinline))
 #endif
 
-#define _attribute_text_sec_                    __attribute__((section(".text")))
+#define _attribute_text_sec_                __attribute__((section(".text")))
+#define _attribute_text_sec_optimize_o2_    __attribute__((section(".text"))) __attribute__((optimize("O2"))) __attribute__((noinline)) __attribute__((no_execit))
 
+#ifndef STD_GCC //standard open source risc-V GCC
+#define _attribute_flash_code_sec_noinline_     __attribute__((section(".flash_code"))) __attribute__((noinline)) __attribute__((no_execit))
+#else
 #define _attribute_flash_code_sec_noinline_     __attribute__((section(".flash_code"))) __attribute__((noinline))
+#endif
 
-#define _attribute_aes_data_sec_                __attribute__((section(".aes_data")))
+#define _attribute_aes_data_sec_            __attribute__((section(".aes_data")))
 
-#define _attribute_aligned_(s)                  __attribute__((aligned(s)))
+#define _attribute_aligned_(s)              __attribute__((aligned(s)))
 
-#define _always_inline                          inline __attribute__((always_inline))
+#define _always_inline                      inline __attribute__((always_inline))
 
 
 /**
@@ -58,38 +63,37 @@
  * add -mno-exit to the linking phase (see Andes Programming Guide), or add _attribute_((no_execit)) to functions that don't want to use exec.it.
  */
 #ifndef STD_GCC //standard open source risc-V GCC
-#define _attribute_ram_code_sec_optimize_o2_    __attribute__((section(".ram_code"))) __attribute__((optimize("O2"))) __attribute__((no_execit))
-#define _attribute_ram_code_sec_optimize_o2_noinline_    __attribute__((noinline)) __attribute__((section(".ram_code"))) __attribute__((optimize("O2"))) __attribute__((no_execit))
+    #define _attribute_ram_code_sec_optimize_o2_          __attribute__((section(".ram_code"))) __attribute__((optimize("O2"))) __attribute__((no_execit))
+    #define _attribute_ram_code_sec_optimize_o2_noinline_ __attribute__((noinline)) __attribute__((section(".ram_code"))) __attribute__((optimize("O2"))) __attribute__((no_execit))
 #else
-#define _attribute_ram_code_sec_optimize_o2_    __attribute__((section(".ram_code_ble"))) __attribute__((optimize("O2")))
-#define _attribute_ram_code_sec_optimize_o2_noinline_    __attribute__((noinline)) __attribute__((section(".ram_code_ble"))) __attribute__((optimize("O2")))
+    #define _attribute_ram_code_sec_optimize_o2_          __attribute__((section(".ram_code"))) __attribute__((optimize("O2")))
+    #define _attribute_ram_code_sec_optimize_o2_noinline_ __attribute__((noinline)) __attribute__((section(".ram_code"))) __attribute__((optimize("O2")))
 #define _attribute_ram_code_com_sec_optimize_o2_    __attribute__((section(".ram_code"))) __attribute__((optimize("O2")))
 #define _attribute_ram_code_com_sec_optimize_o2_noinline_    __attribute__((noinline)) __attribute__((section(".ram_code"))) __attribute__((optimize("O2")))
 #endif
 
 /// Pack a structure field
-#define __PACKED __attribute__ ((__packed__))
+#define __PACKED __attribute__((__packed__))
 
 /*******************************      BLE Stack Use     ******************************/
 #include "common/config/user_config.h"
 
-#define _attribute_packed_              __attribute__((packed))
-#define _attribute_session_(s)          __attribute__((section(s)))
-#define _attribute_custom_code_         _attribute_session_(".custom") volatile
-#define _attribute_no_inline_           __attribute__((noinline))
-#define _inline_                        inline
-#define _attribute_data_dlm_            _attribute_session_(".dlm_data")//dlm:Data Local Memory
+#define _attribute_packed_                  __attribute__((packed))
+#define _attribute_session_(s)              __attribute__((section(s)))
+#define _attribute_custom_code_             _attribute_session_(".custom") volatile
+#define _attribute_no_inline_               __attribute__((noinline))
+#define _inline_                            inline
+#define _attribute_data_dlm_                _attribute_session_(".dlm_data") // dlm:Data Local Memory
+#define _attribute_data_sec_                _attribute_session_(".data")     // Force only read data to be stored in data segments to avoid compiler optimization
 #define _attribute_data_                __attribute__((section(".data")))
 
-#define _attribute_iram_noinit_data_    __attribute__((section(".iram_noinit_data")))
-#define _attribute_iram_bss_            __attribute__((section(".iram_bss")))
-
-#define _attribute_flash_code_sec_noinline_     __attribute__((section(".flash_code"))) __attribute__((noinline))
+#define _attribute_iram_noinit_data_        __attribute__((section(".iram_noinit_data")))
+#define _attribute_iram_bss_                __attribute__((section(".iram_bss")))
 
 #if (BLC_PM_DEEP_RETENTION_MODE_EN)
-    #define _attribute_data_retention_sec_          __attribute__((section(".retention_data")))
-    #define _attribute_data_retention_              __attribute__((section(".retention_data")))
-    #define _attribute_ble_data_retention_          __attribute__((section(".retention_data")))
+    #define _attribute_data_retention_sec_ __attribute__((section(".retention_data")))
+    #define _attribute_data_retention_     __attribute__((section(".retention_data")))
+    #define _attribute_ble_data_retention_ __attribute__((section(".retention_data")))
 #elif (BLC_PM_RETENTION_DRIVERS_ONLY)
     #define _attribute_data_retention_sec_          __attribute__((section(".retention_data")))
 	#define _attribute_data_retention_              __attribute__((section(".retention_data")))
@@ -101,7 +105,8 @@
 #endif
 
 
-#define _attribute_text_code_      __attribute__((section(".text")))
+
+#define _attribute_text_code_     __attribute__((section(".text")))
 
 /// define the static keyword for this compiler
 #define __STATIC static
@@ -110,7 +115,7 @@
 #define __INLINE static __attribute__((__always_inline__)) inline
 
 /// define the IRQ handler attribute for this compiler
-#define __IRQ   __attribute__ ((interrupt ("machine"), aligned(4)))
+#define __IRQ __attribute__((interrupt("machine"), aligned(4)))
 
 /// define the BLE IRQ handler attribute for this compiler
 #define __BTIRQ

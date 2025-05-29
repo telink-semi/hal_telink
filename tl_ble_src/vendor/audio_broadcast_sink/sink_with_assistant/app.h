@@ -24,7 +24,7 @@
 #include "../sink_config.h"
 #if (SINK_VERSION == SINK_WITH_ASSISTANT_VERSION)
 
-#pragma once
+    #pragma once
 
 
 /**
@@ -48,6 +48,6 @@ void user_init_deepRetn(void);
  * @param[in]  none.
  * @return     none.
  */
-void main_loop (void);
+void main_loop(void);
 
-#endif      //SINK_VERSION == SINK_WITH_ASSISTANT_VERSION
+#endif //SINK_VERSION == SINK_WITH_ASSISTANT_VERSION

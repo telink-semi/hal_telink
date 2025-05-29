@@ -688,21 +688,17 @@ switch_sp_end:
     IRQ_SAVE_REGISTER               //save register
 
     la      t1,g_plic_switch_sp_flag
-    lw      t0,0(t1)                //read flag to t0
-    li      t2,1
-    sll     t2,t2,a1                //t1 = 1<<num
-    or      t0,t0,t2                //t0 = t0|t1
-    sw      t0,0(t1)                //flag |= bit(n)
+    lw      t0, 0(t1)
+    addi    t0, t0, 1
+    sw      t0,0(t1)
 
     jal     plic_isr
 
     la      t1,g_plic_switch_sp_flag//read flag addr
     lw      t0,0(t1)                //read flag to t0
-    li      t2,1
-    lw      a1,44(sp)               //x11 was saved in 11*4(sp)
-    sll     t2,t2,a1                //t1 = 1<<num
-    xor     t0,t0,t2                //t0 = t0|t1
-    sw      t0,0(t1)                //flag |= bit(n)
+    lw      a1,44(sp)
+    addi    t0, t0, -1
+    sw      t0,0(t1)
 
     IRQ_RESTORE_REGISTER
 

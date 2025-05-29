@@ -321,6 +321,99 @@ typedef enum
  */
 
 /**
+ * @brief ANC channel.
+ * 
+ */
+typedef enum
+{
+    ANC0,
+    ANC1,
+} audio_anc_chn_e;
+
+/**
+ * @brief ANC mode.
+ * 
+ */
+typedef enum
+{
+    ANC_MODE_FF,
+} audio_anc_mode_e;
+
+/**
+ * @brief ANC resample input fs.
+ * 
+ */
+typedef enum
+{
+    ANC_RESAMPLE_IN_FS_48K,
+    ANC_RESAMPLE_IN_FS_96K,
+} audio_anc_resample_in_fs_e;
+
+/**
+ * @brief ANC resample output fs.
+ * 
+ */
+typedef enum
+{
+    ANC_RESAMPLE_OUT_FS_768K,
+    ANC_RESAMPLE_OUT_FS_384K,
+} audio_anc_resample_out_fs_e;
+
+/**
+ * @brief ANC adder3 output mode select.
+ * 
+ */
+typedef enum
+{
+    ANC_WZ_PLUS_RESAMPLE_TO_HEADPHONE, /**< wz + resample. */
+    ANC_WZ_TO_HEADPHONE,               /**< wz only. */
+} audio_anc_set_adder3_mode_e;
+
+/**
+ * @brief ANC adder3 output data priority.
+ * 
+ */
+typedef enum
+{
+    ANC_WZ_FIRST,
+    ANC_RESAMPLE_FIRST,
+} audio_anc_adder3_out_pri_e;
+
+/**
+ * @brief ANC resample output fs decision.
+ * 
+ */
+typedef enum
+{
+    ANC_RESAMPLE_DAC_DECISION_FS,
+    ANC_RESAMPLE_OTHERS_DECISION_FS, /**< i2c_rx, dac and hac, etc.*/
+} audio_anc_resample_fs_decision_e;
+
+/**
+ * @brief ANC WZ FIR taps.
+ * 
+ */
+typedef enum
+{
+    ANC_WZ_FIR_39TAPS,
+    ANC_WZ_FIR_78TAPS,
+    ANC_WZ_FIR_156TAPS,
+    ANC_WZ_FIR_312TAPS,
+    ANC_WZ_FIR_384TAPS,
+} audio_anc_wz_fir_taps_e;
+
+/**
+ * @brief ANC CZ FIR taps.
+ * 
+ */
+typedef enum
+{
+    ANC_CZ_FIR_32TAPS,
+    ANC_CZ_FIR_64TAPS,
+    ANC_CZ_FIR_128TAPS,
+} audio_anc_cz_fir_taps_e;
+
+/**
  * @}
  */
 
@@ -331,6 +424,17 @@ typedef enum
  * @name Audio asrc enum/struct.
  * @{
  */
+
+/**
+ * @brief ASRC droop taps.
+ * 
+ */
+typedef enum
+{
+    ASRC_DROOP_9TAPS,
+    ASRC_DROOP_13TAPS,
+    ASRC_DROOP_17TAPS,
+} audio_asrc_droop_taps_e;
 
 /**
  * @}
@@ -350,8 +454,8 @@ typedef enum
  */
 typedef enum
 {
-    AUDIO_CODEC0_ADC_ONLY = 0x08,
-    AUDIO_CODEC0_DAC_ONLY = 0x04,
+    AUDIO_CODEC0_ADC_ONLY    = 0x08,
+    AUDIO_CODEC0_DAC_ONLY    = 0x04,
     AUDIO_CODEC0_ADC_AND_DAC = 0x00,
 } audio_codec0_power_e;
 
@@ -361,21 +465,21 @@ typedef enum
  */
 typedef enum
 {
-    AUDIO_DMIC_ADC_A1 = 0x00, /**< bit[0-3] channel. */
-    AUDIO_DMIC_ADC_A2 = 0x01,
-    AUDIO_DMIC_ADC_B1 = 0x02,
-    AUDIO_DMIC_ADC_B2 = 0x03,
+    AUDIO_DMIC_ADC_A1    = 0x00, /**< bit[0-3] channel. */
+    AUDIO_DMIC_ADC_A2    = 0x01,
+    AUDIO_DMIC_ADC_B1    = 0x02,
+    AUDIO_DMIC_ADC_B2    = 0x03,
     AUDIO_DMIC_ADC_A1_A2 = 0x04,
     AUDIO_DMIC_ADC_B1_B2 = 0x05,
 
-    AUDIO_LINEIN_ADC_A1 = 0x00 | BIT(4), /**< bit4 line_in. */
-    AUDIO_LINEIN_ADC_A2 = 0x01 | BIT(4),
-    AUDIO_LINEIN_ADC_B1 = 0x02 | BIT(4),
+    AUDIO_LINEIN_ADC_A1    = 0x00 | BIT(4), /**< bit4 line_in. */
+    AUDIO_LINEIN_ADC_A2    = 0x01 | BIT(4),
+    AUDIO_LINEIN_ADC_B1    = 0x02 | BIT(4),
     AUDIO_LINEIN_ADC_A1_A2 = 0x04 | BIT(4),
 
-    AUDIO_AMIC_ADC_A1 = 0x00 | BIT(5), /**< bit5: amic. */
-    AUDIO_AMIC_ADC_A2 = 0x01 | BIT(5),
-    AUDIO_AMIC_ADC_B1 = 0x02 | BIT(5),
+    AUDIO_AMIC_ADC_A1    = 0x00 | BIT(5), /**< bit5: amic. */
+    AUDIO_AMIC_ADC_A2    = 0x01 | BIT(5),
+    AUDIO_AMIC_ADC_B1    = 0x02 | BIT(5),
     AUDIO_AMIC_ADC_A1_A2 = 0x04 | BIT(5),
 } audio_codec0_input_select_e;
 
@@ -409,6 +513,17 @@ typedef enum
     AUDIO_CODEC0_ADC_SINGLE_ENDED,
     AUDIO_CODEC0_ADC_DIFFERENTIAL,
 } audio_codec0_adc_mode_e;
+
+/**
+ * @brief codec0 dmic clock selection.
+ *
+ */
+typedef enum
+{
+    AUDIO_CODEC0_DMIC_CLK_3072KHZ = 0x03, /**< DMIC_CLK frequency = 3.072 MHz */
+    AUDIO_CODEC0_DMIC_CLK_1024KHZ = 0x0b, /**< DMIC_CLK frequency = 1.024 MHz */
+    AUDIO_CODEC0_DMIC_CLK_768KHZ  = 0x0f, /**< DMIC_CLK frequency = 0.768 MHz */
+} audio_codec0_dmic_clk_sel_e;
 
 /**
  * @brief codec0 input channel analog gain, [-2dB, 24dB], 2dB steps.
@@ -744,13 +859,13 @@ typedef enum
  */
 typedef enum
 {
-    AUDIO_16K = 0x03 | (767 << 8),
+    AUDIO_16K   = 0x03 | (767 << 8),
     AUDIO_44P1K = 0x08 | (255 << 8),
-    AUDIO_48K = 0x08 | (255 << 8),
-    AUDIO_96K = 0x0a | (127 << 8),
-    AUDIO_192K = 0x0c | (63 << 8),
-    AUDIO_384K = 0x0d | (31 << 8),
-    AUDIO_768K = 0x0e | (15 << 8),
+    AUDIO_48K   = 0x08 | (255 << 8),
+    AUDIO_96K   = 0x0a | (127 << 8),
+    AUDIO_192K  = 0x0c | (63 << 8),
+    AUDIO_384K  = 0x0d | (31 << 8),
+    AUDIO_768K  = 0x0e | (15 << 8),
 } audio_sample_rate_e;
 
 /**
@@ -827,7 +942,7 @@ typedef struct
  */
 typedef enum
 {
-    FIFO0 = 0x00,
+    FIFO0,
     FIFO1,
     FIFO2,
     FIFO3,
@@ -860,6 +975,101 @@ typedef enum
  * @name Audio hac enum/struct.
  * @{
  */
+
+/**
+ * @brief HAC channel.
+ * 
+ */
+typedef enum
+{
+    HAC_CHN0,
+    HAC_CHN1,
+    HAC_CHN2,
+    HAC_CHN3,
+    HAC_CHN4,
+    HAC_CHN5,
+    HAC_CHN6,
+    HAC_CHN7,
+} audio_hac_chn_e;
+
+/**
+ * @brief HAC biquad coefficient select.
+ *
+ */
+typedef enum
+{
+    HAC_BIQUAD0,
+    HAC_BIQUAD1,
+    HAC_BIQUAD2,
+    HAC_BIQUAD3,
+    HAC_BIQUAD4,
+    HAC_BIQUAD5,
+    HAC_BIQUAD6,
+    HAC_BIQUAD7,
+    HAC_BIQUAD8,
+    HAC_BIQUAD9,
+} audio_hac_biquad_e;
+
+/**
+ * @brief HAC data input data select.
+ *
+ */
+typedef enum
+{
+    HAC_INPUT_DATA_MATRIX,
+    HAC_INPUT_DATA_MCU,
+} audio_hac_input_data_e;
+
+/**
+ * @brief HAC data output select.
+ *
+ */
+typedef enum
+{
+    HAC_OUTPUT_DATA_MATRIX,
+    HAC_OUTPUT_DATA_AHB_MST,
+} audio_hac_output_data_e;
+
+/**
+ * @brief HAC in and out fs select.
+ * 
+ */
+typedef enum
+{
+    AUDIO_ASRC_FS_IN_16K_OUT_16K   = 0 | BIT(8), /**< BIT(8) set means in == out */
+    AUDIO_ASRC_FS_IN_32K_OUT_16K   = 1,
+    AUDIO_ASRC_FS_IN_44P1K_OUT_16K = 2,
+    AUDIO_ASRC_FS_IN_48K_OUT_16K   = 3,
+    AUDIO_ASRC_FS_IN_96K_OUT_16K   = 4,
+
+    AUDIO_ASRC_FS_IN_16K_OUT_32K   = 5,
+    AUDIO_ASRC_FS_IN_32K_OUT_32K   = 6 | BIT(8), /**< BIT(8) set means in == out */
+    AUDIO_ASRC_FS_IN_44P1K_OUT_32K = 7,
+    AUDIO_ASRC_FS_IN_48K_OUT_32K   = 8,
+    AUDIO_ASRC_FS_IN_96K_OUT_32K   = 9,
+
+    AUDIO_ASRC_FS_IN_16K_OUT_44P1K   = 10,
+    AUDIO_ASRC_FS_IN_32K_OUT_44P1K   = 11,
+    AUDIO_ASRC_FS_IN_44P1K_OUT_44P1K = 12 | BIT(8), /**< BIT(8) set means in == out */
+    AUDIO_ASRC_FS_IN_48K_OUT_44P1K   = 13,
+    AUDIO_ASRC_FS_IN_96K_OUT_44P1K   = 14,
+
+    AUDIO_ASRC_FS_IN_16K_OUT_48K   = 15,
+    AUDIO_ASRC_FS_IN_32K_OUT_48K   = 16,
+    AUDIO_ASRC_FS_IN_44P1K_OUT_48K = 17,
+    AUDIO_ASRC_FS_IN_48K_OUT_48K   = 18 | BIT(8), /**< BIT(8) set means in == out */
+    AUDIO_ASRC_FS_IN_96K_OUT_48K   = 19,
+
+    AUDIO_ASRC_FS_IN_16K_OUT_96K   = 20,
+    AUDIO_ASRC_FS_IN_32K_OUT_96K   = 21,
+    AUDIO_ASRC_FS_IN_44P1K_OUT_96K = 22,
+    AUDIO_ASRC_FS_IN_48K_OUT_96K   = 23,
+    AUDIO_ASRC_FS_IN_96K_OUT_96K   = 24 | BIT(8), /**< BIT(8) set means in == out */
+
+    AUDIO_ASRC_FS_IN_192K_OUT_192K = 25 | BIT(8), /**< BIT(8) set means in == out */
+    AUDIO_ASRC_FS_IN_384K_OUT_384K = 26 | BIT(8), /**< BIT(8) set means in == out */
+    AUDIO_ASRC_FS_IN_768K_OUT_768K = 27 | BIT(8), /**< BIT(8) set means in == out */
+} audio_hac_fs_in_out_e;
 
 /**
  * @}
@@ -971,8 +1181,8 @@ typedef enum
  */
 typedef enum
 {
-    I2S0_I2S1_ALIGN = BIT(0) | BIT(1),
-    I2S1_I2S2_ALIGN = BIT(1) | BIT(2),
+    I2S0_I2S1_ALIGN      = BIT(0) | BIT(1),
+    I2S1_I2S2_ALIGN      = BIT(1) | BIT(2),
     I2S0_I2S1_I2S2_ALIGN = BIT(0) | BIT(1) | BIT(2),
 } i2s_align_mode_e;
 
@@ -1100,10 +1310,21 @@ typedef enum
     FIFO_RX_ROUTE_I2S0_RX = 0x01,
     FIFO_RX_ROUTE_I2S1_RX,
     FIFO_RX_ROUTE_I2S2_RX,
-
-    FIFO_RX_ROUTE_CODEC0_ADCA = 0x06, /**< codec0 ADC_A1(amic/dmic), ADC_A2(amic/dmic). */
-    FIFO_RX_ROUTE_CODEC0_ADCB,        /**< codec0 ADC_B1(amic/dmic), ADC_B2(dmic). */
-    FIFO_RX_ROUTE_CODEC1_ADCA,        /**< codec1 ADC_A1(dmic), ADC_A2(dmic). */
+    FIFO_RX_ROUTE_ANC0,
+    FIFO_RX_ROUTE_ANC1,
+    FIFO_RX_ROUTE_CODEC0_ADCA, /**< codec0 ADC_A1(amic/dmic), ADC_A2(amic/dmic). */
+    FIFO_RX_ROUTE_CODEC0_ADCB, /**< codec0 ADC_B1(amic/dmic), ADC_B2(dmic). */
+    FIFO_RX_ROUTE_CODEC1_ADCA, /**< codec1 ADC_A1(dmic), ADC_A2(dmic). */
+    FIFO_RX_ROUTE_SPDIF_RX,
+    FIFO_RX_ROUTE_USB_ISO_RX,
+    FIFO_RX_ROUTE_HAC_DATA0,
+    FIFO_RX_ROUTE_HAC_DATA1,
+    FIFO_RX_ROUTE_HAC_DATA2,
+    FIFO_RX_ROUTE_HAC_DATA3,
+    FIFO_RX_ROUTE_HAC_DATA4,
+    FIFO_RX_ROUTE_HAC_DATA5,
+    FIFO_RX_ROUTE_HAC_DATA6,
+    FIFO_RX_ROUTE_HAC_DATA7,
 } audio_matrix_rx_fifo_route_e;
 
 /**
@@ -1122,6 +1343,18 @@ typedef enum
 
     FIFO_RX_I2S0_TDM_20_OR_24 = 0x06, /**< only for i2s0 tdm data format. */
     FIFO_RX_I2S0_TDM_16,
+
+    /* fifo rx route anc data format */
+    FIFO_RX_ANC0_POST_PRE_32BIT = 0x00, /**< fifo rx route from anc0 data format. */
+    FIFO_RX_ANC0_POST_PRE_16BIT,
+    FIFO_RX_ANC0_SPEAKER_OUT,
+
+    FIFO_RX_ANC1_POST_PRE_32BIT = 0x00, /**< fifo rx route from anc1 data format. */
+    FIFO_RX_ANC1_POST_PRE_16BIT,
+    FIFO_RX_ANC1_SPEAKER_OUT,
+    FIFO_RX_ANC1_PORT_PRE_ANC0_PORT_PRE_32BIT,
+    FIFO_RX_ANC1_PORT_PRE_ANC0_PORT_PRE_16BIT,
+    FIFO_RX_ANC1_AND_ANC0_SPEAKER_OUT,
 
     /* fifo rx route adc data format. */
     FIFO_RX_CODEC0_ADCA_A1_A2_32BIT = 0x00, /**< fifo rx route from codec0 adca data format. */
@@ -1144,6 +1377,8 @@ typedef enum
     FIFO_RX_CODEC1_ADCA_A1_16BIT,
     FIFO_RX_CODEC1_ADCA_A2_32BIT,
     FIFO_RX_CODEC1_ADCA_A2_16BIT,
+
+    FIFO_RX_DATA_FORMAT_INVALID = 0xff,
 } audio_matrix_rx_fifo_format_e;
 
 /**
@@ -1184,12 +1419,149 @@ typedef enum
 } audio_matrix_i2s_tx_format_e;
 
 /**
+ * @brief anc_src route source select.
+ * 
+ */
+typedef enum
+{
+    ANC_SRC_ROUTE_FIFO = 0x01,
+    ANC_SRC_ROUTE_I2S0_RX,
+    ANC_SRC_ROUTE_I2S1_RX,
+    ANC_SRC_ROUTE_I2S2_RX,
+    ANC_SRC_ROUTE_CODEC0_ADCA, /**< codec0 ADC_A1(amic/dmic), ADC_A2(amic/dmic). */
+    ANC_SRC_ROUTE_CODEC0_ADCB, /**< codec0 ADC_B1(amic/dmic), ADC_B2(dmic). */
+    ANC_SRC_ROUTE_CODEC1_ADCA, /**< codec1 ADC_A1(dmic), ADC_A2(dmic). */
+    ANC_SRC_ROUTE_HAC_DATA0,
+    ANC_SRC_ROUTE_HAC_DATA1,
+    ANC_SRC_ROUTE_HAC_DATA2,
+    ANC_SRC_ROUTE_HAC_DATA3,
+    ANC_SRC_ROUTE_HAC_DATA4,
+    ANC_SRC_ROUTE_HAC_DATA5,
+    ANC_SRC_ROUTE_HAC_DATA6,
+    ANC_SRC_ROUTE_HAC_DATA7,
+} audio_matrix_anc_src_route_e;
+
+/**
+ * @brief anc_src route data format select.
+ * 
+ */
+typedef enum
+{
+    ANC_SRC_DATA_FIFO0, /**< anc src route from fifo data format select. */
+    ANC_SRC_DATA_FIFO1,
+    ANC_SRC_DATA_FIFO2,
+    ANC_SRC_DATA_FIFO3,
+    ANC_SRC_2FIFO0_24BIT_STEREO,
+    ANC_SRC_2FIFO2_24BIT_STEREO,
+    ANC_SRC_STEREO_DATA_FIFO0,
+    ANC_SRC_STEREO_DATA_FIFO1,
+    ANC_SRC_STEREO_DATA_FIFO2,
+    ANC_SRC_STEREO_DATA_FIFO3,
+    ANC_SRC_FIFO0_16BIT_STEREO,
+    ANC_SRC_FIFO1_16BIT_STEREO,
+    ANC_SRC_FIFO2_16BIT_STEREO,
+    ANC_SRC_FIFO3_16BIT_STEREO,
+
+    ANC_SRC_I2S_CH0_20_OR_24_BIT = 0x02, /**< anc src route from i2s data format select. */
+    ANC_SRC_I2S_CH1_20_OR_24_BIT = 0x04,
+
+    ANC_SRC_ADC_LEFT_32_BIT  = 0x02, /**< anc src route from adc data format select. */
+    ANC_SRC_ADC_RIGHT_32_BIT = 0x04,
+
+    ANC_SRC_DATA_FORMAT_INVALID = 0xff,
+} audio_matrix_anc_src_format_e;
+
+/**
+ * @brief anc_ref route source select.
+ * 
+ */
+typedef enum
+{
+    ANC_REF_ROUTE_I2S0_RX = 0x01,
+    ANC_REF_ROUTE_I2S1_RX,
+    ANC_REF_ROUTE_I2S2_RX,
+    ANC_REF_ROUTE_CODEC0_ADCA, /**< codec0 ADC_A1(amic/dmic), ADC_A2(amic/dmic). */
+    ANC_REF_ROUTE_CODEC0_ADCB, /**< codec0 ADC_B1(amic/dmic), ADC_B2(dmic). */
+    ANC_REF_ROUTE_CODEC1_ADCA, /**< codec1 ADC_A1(dmic), ADC_A2(dmic). */
+    ANC_REF_ROUTE_HAC_DATA0,
+    ANC_REF_ROUTE_HAC_DATA1,
+    ANC_REF_ROUTE_HAC_DATA2,
+    ANC_REF_ROUTE_HAC_DATA3,
+    ANC_REF_ROUTE_HAC_DATA4,
+    ANC_REF_ROUTE_HAC_DATA5,
+    ANC_REF_ROUTE_HAC_DATA6,
+    ANC_REF_ROUTE_HAC_DATA7,
+} audio_matrix_anc_ref_route_e;
+
+/**
+ * @brief anc_ref route data format select.
+ * 
+ */
+typedef enum
+{
+    ANC_REF_I2S_CH0_20_OR_24_BIT = 0x02, /**< anc ref route from i2s data format select. */
+    ANC_REF_I2S_CH1_20_OR_24_BIT = 0x04,
+
+    ANC_REF_ADC_LEFT_32_BIT  = 0x02, /**< anc ref route from adc data format select. */
+    ANC_REF_ADC_RIGHT_32_BIT = 0x04,
+
+    ANC_REF_DATA_FORMAT_INVALID = 0xff,
+} audio_matrix_anc_ref_format_e;
+
+/**
+ * @brief anc_err route source select.
+ * 
+ */
+typedef enum
+{
+    ANC_ERR_ROUTE_I2S0_RX = 0x01,
+    ANC_ERR_ROUTE_I2S1_RX,
+    ANC_ERR_ROUTE_I2S2_RX,
+    ANC_ERR_ROUTE_CODEC0_ADCA, /**< codec0 ADC_A1(amic/dmic), ADC_A2(amic/dmic). */
+    ANC_ERR_ROUTE_CODEC0_ADCB, /**< codec0 ADC_B1(amic/dmic), ADC_B2(dmic). */
+    ANC_ERR_ROUTE_CODEC1_ADCA, /**< codec1 ADC_A1(dmic), ADC_A2(dmic). */
+    ANC_ERR_ROUTE_HAC_DATA0,
+    ANC_ERR_ROUTE_HAC_DATA1,
+    ANC_ERR_ROUTE_HAC_DATA2,
+    ANC_ERR_ROUTE_HAC_DATA3,
+    ANC_ERR_ROUTE_HAC_DATA4,
+    ANC_ERR_ROUTE_HAC_DATA5,
+    ANC_ERR_ROUTE_HAC_DATA6,
+    ANC_ERR_ROUTE_HAC_DATA7,
+} audio_matrix_anc_err_route_e;
+
+/**
+ * @brief anc_err route data format select.
+ * 
+ */
+typedef enum
+{
+    ANC_ERR_I2S_CH0_20_OR_24_BIT = 0x02, /**< anc err route from i2s data format select. */
+    ANC_ERR_I2S_CH1_20_OR_24_BIT = 0x04,
+
+    ANC_ERR_ADC_LEFT_32_BIT  = 0x02, /**< anc err route from adc data format select. */
+    ANC_ERR_ADC_RIGHT_32_BIT = 0x04,
+
+    ANC_ERR_DATA_FORMAT_INVALID = 0xff,
+} audio_matrix_anc_err_format_e;
+
+/**
  * @brief dac route source select.
  * 
  */
 typedef enum
 {
     DAC_ROUTE_FIFO = 0x01,
+    DAC_ROUTE_ANC0_SPEAKER,
+    DAC_ROUTE_ANC1_SPEAKER,
+    DAC_ROUTE_HAC_DATA0,
+    DAC_ROUTE_HAC_DATA1,
+    DAC_ROUTE_HAC_DATA2,
+    DAC_ROUTE_HAC_DATA3,
+    DAC_ROUTE_HAC_DATA4,
+    DAC_ROUTE_HAC_DATA5,
+    DAC_ROUTE_HAC_DATA6,
+    DAC_ROUTE_HAC_DATA7,
 } audio_matrix_dac_route_e;
 
 /**
@@ -1217,7 +1589,50 @@ typedef enum
     DAC_FIFO_STEREO_16BIT_FIFO1,
     DAC_FIFO_STEREO_16BIT_FIFO2,
     DAC_FIFO_STEREO_16BIT_FIFO3,
+
+    DAC_DATA_FORMAT_INVALID = 0xff,
 } audio_matrix_dac_format_e;
+
+/**
+ * @brief hac route source select..
+ *
+ */
+typedef enum
+{
+    HAC_DATA_ROUTE_FIFO0 = 0x01,
+    HAC_DATA_ROUTE_FIFO1,
+    HAC_DATA_ROUTE_FIFO2,
+    HAC_DATA_ROUTE_FIFO3,
+    HAC_DATA_ROUTE_I2S0_RX,
+    HAC_DATA_ROUTE_I2S1_RX,
+    HAC_DATA_ROUTE_I2S2_RX,
+    HAC_DATA_ROUTE_ANC0_PRE,
+    HAC_DATA_ROUTE_ANC0_POST,
+    HAC_DATA_ROUTE_ANC0_SPEAKER,
+    HAC_DATA_ROUTE_ANC1_PRE,
+    HAC_DATA_ROUTE_ANC1_POST,
+    HAC_DATA_ROUTE_ANC1_SPEAKER,
+    HAC_DATA_ROUTE_CODEC0_ADCA, /**< codec0 ADC_A1(amic/dmic), ADC_A2(amic/dmic). */
+    HAC_DATA_ROUTE_CODEC0_ADCB, /**< codec0 ADC_B1(amic/dmic), ADC_B2(dmic). */
+    HAC_DATA_ROUTE_CODEC1_ADCA, /**< codec1 ADC_A1(dmic), ADC_A2(dmic). */
+    HAC_DATA_ROUTE_SPDIF_RX,
+    HAC_DATA_ROUTE_USB_ISO_RX,
+} audio_matrix_hac_route_e;
+
+/**
+ * @brief hac route data format select.
+ *
+ */
+typedef enum
+{
+    HAC_I2S_CH0_20_OR_24_BIT = 0x02, /**< hac route from i2s data format select. */
+    HAC_I2S_CH1_20_OR_24_BIT = 0x04,
+
+    HAC_ADC_LEFT_32_BIT  = 0x02, /**< hac route from adc data format select. */
+    HAC_ADC_RIGHT_32_BIT = 0x04,
+
+    HAC_DATA_FORMAT_INVALID = 0xff,
+} audio_matrix_hac_format_e;
 
 /**
  * @}
@@ -1268,6 +1683,286 @@ typedef enum
  */
 
 /**
+ * @brief      This function serves to enable/disable anc.
+ * 
+ * @param[in]  anc_chn - anc channel.
+ * @param[in]  enable - 1: enable, 0: disable.
+ * @return     none
+ */
+static inline void audio_anc_en(audio_anc_chn_e anc_chn, unsigned char enable)
+{
+    reg_audio_anc_config(anc_chn) = (reg_audio_anc_config(anc_chn) & (~FLD_ANC_EN)) | MASK_VAL(FLD_ANC_EN, enable);
+}
+
+/**
+ * @brief      This function serves to soft reset anc.
+ *
+ * @param[in]  anc_chn - anc channel.
+ * @return     none
+ */
+static inline void audio_anc_soft_reset(audio_anc_chn_e anc_chn)
+{
+    BM_SET(reg_audio_anc_config1(anc_chn), FLD_ANC_SOFT_RST_EN);
+}
+
+/**
+ * @brief      This function serves to select anc mode.
+ * 
+ * @param[in]  anc_chn  - anc channel.
+ * @param[in]  anc_mode - anc mode.
+ * @return     none
+ */
+static inline void audio_anc_mode_sel(audio_anc_chn_e anc_chn, audio_anc_mode_e anc_mode)
+{
+    reg_audio_anc_config2(anc_chn) = (reg_audio_anc_config2(anc_chn) & (~FLD_ANC_MODE_SEL)) | MASK_VAL(FLD_ANC_MODE_SEL, anc_mode);
+}
+
+/**
+ * @brief      This function serves to select anc adder3 output mode.
+ * 
+ * @param[in]  anc_chn     - anc channel.
+ * @param[in]  output_mode - adder3 output mode select.
+ * @note
+ */
+static inline void audio_anc_set_adder3_mode(audio_anc_chn_e anc_chn, audio_anc_set_adder3_mode_e output_mode)
+{
+    reg_audio_anc_config4(anc_chn) = (reg_audio_anc_config4(anc_chn) & (~FLD_ANC_ADD_WZ_SEL)) | MASK_VAL(FLD_ANC_ADD_WZ_SEL, output_mode);
+}
+
+/**
+ * @brief      This function serves to select anc adder3 output data priority.
+ * 
+ * @param[in]  anc_chn  - anc channel.
+ * @param[in]  mode_sel - adder3 output data priority.
+ * @note
+ *        - The adder3 output is the sum of wz and resample, but the two are not consistent in terms of time, this register is used to select which timing is first.
+ */
+static inline void audio_anc_set_adder3_priority(audio_anc_chn_e anc_chn, audio_anc_adder3_out_pri_e mode_sel)
+{
+    reg_audio_anc_config(anc_chn) = (reg_audio_anc_config(anc_chn) & (~FLD_ANC_SPK_SEL)) | MASK_VAL(FLD_ANC_SPK_SEL, mode_sel);
+}
+
+/**
+ * @brief      This function serves to set resample output fs.
+ * 
+ * @param[in]  anc_chn - anc channel.
+ * @param[in]  out_fs  - resample output fs.
+ * @return     none
+ */
+static inline void audio_anc_set_resample_out_fs(audio_anc_chn_e anc_chn, audio_anc_resample_out_fs_e out_fs)
+{
+    reg_audio_anc_config3(anc_chn) = (reg_audio_anc_config3(anc_chn) & (~FLD_ANC_RE_MODE_SEL)) | MASK_VAL(FLD_ANC_RE_MODE_SEL, out_fs);
+}
+
+/**
+ * @brief      This function serves to set resample input fs.
+ * 
+ * @param[in]  anc_chn - anc channel.
+ * @param[in]  in_fs   - resample input fs.
+ * @return     none
+ */
+static inline void audio_anc_set_resample_in_fs(audio_anc_chn_e anc_chn, audio_anc_resample_in_fs_e in_fs)
+{
+    reg_audio_anc_coef_num(anc_chn) = (reg_audio_anc_coef_num(anc_chn) & (~FLD_ANC_RE_INMODE)) | MASK_VAL(FLD_ANC_RE_INMODE, in_fs);
+}
+
+/**
+ * @brief      This function serves to set dac control resample fs.
+ *
+ * @param[in]  anc_chn - anc channel.
+ * @param[in]  in_fs   - resample input fs.
+ * @param[in]  out_fs  - resample output fs.
+ * @note
+ *             - when resample fs rely on dac, this function must be called
+ */
+void audio_dac_ctl_anc_resample_fs(audio_anc_chn_e anc_chn, audio_anc_resample_in_fs_e in_fs, audio_anc_resample_out_fs_e out_fs);
+
+/**
+ * @brief      This function serves to select who decides the resample frequency of anc.
+ * 
+ * @param[in]  anc_chn     - anc channel.
+ * @param[in]  fs_decision - who decides the resample frequency of anc.
+ * @param[in]  in_fs       - resample input fs.
+ * @param[in]  out_fs      - resample output fs.
+ */
+void audio_anc_set_resample_in_out_fs(audio_anc_chn_e anc_chn, audio_anc_resample_fs_decision_e fs_decision, audio_anc_resample_in_fs_e in_fs,
+                                      audio_anc_resample_out_fs_e out_fs);
+
+/**
+ * @brief      This function serves to set anc wz fir taps.
+ *
+ * @param[in]  anc_chn - anc channel.
+ * @param[in]  taps    - anc wz fir taps.
+ * @return     none
+ */
+static inline void audio_anc_set_wz_fir_taps(audio_anc_chn_e anc_chn, audio_anc_wz_fir_taps_e taps)
+{
+    reg_audio_anc_coef_num(anc_chn) = (reg_audio_anc_coef_num(anc_chn) & (~FLD_ANC_WZ_COEF_NUM)) | MASK_VAL(FLD_ANC_WZ_COEF_NUM, taps);
+}
+
+/**
+ * @brief      This function serves to set anc cz fir taps.
+ *
+ * @param[in]  anc_chn - anc channel.
+ * @param[in]  taps    - anc cz fir taps.
+ * @return     none
+ */
+static inline void audio_anc_set_cz_fir_taps(audio_anc_chn_e anc_chn, audio_anc_cz_fir_taps_e taps)
+{
+    reg_audio_anc_coef_num(anc_chn) = (reg_audio_anc_coef_num(anc_chn) & (~FLD_ANC_CZ_COEF_NUM)) | MASK_VAL(FLD_ANC_CZ_COEF_NUM, taps);
+}
+
+/**
+ * @brief      This function servers to set anc wz fir filter coefficients.
+ *
+ * @param[in]  anc_chn  - anc channel.
+ * @param[in]  data     - wz fir filter data address.
+ * @param[in]  data_len - wz fir data len max length is 384(wz fir max is 384taps).
+ * @note
+ *             - bypass coefficients: wz[0] = 0x4000, the rest of the parameters are all set to 0
+ * @return     none
+ */
+void audio_anc_set_wz_fir_coef(audio_anc_chn_e anc_chn, signed short *data, unsigned short data_len);
+
+/**
+ * @brief      This function servers to set anc wz biquad iir filter coefficients.
+ *
+ * @param[in]  anc_chn - anc channel.
+ * @param[in]  data    - wz biquad iir filter data address data[][b0, b1, b2, a1, a2].
+ * @note
+ *             - bypass coefficients: every b[0] = 0x10000000, the rest of the parameters are all set to 0
+ * @return     none
+ */
+void audio_anc_set_wz_iir_coef(audio_anc_chn_e anc_chn, signed int data[5][5]);
+
+/**
+ * @brief      This function servers to sync anc wz fir config after config wz fir filter coefficients.
+ * 
+ * @param[in]  anc_chn - anc channel.
+ * @return     none
+ * @note
+ *             - This function only latch wz fir coefficients.
+ */
+static inline void audio_anc_wz_fir_cfg_sync(audio_anc_chn_e anc_chn)
+{
+    BM_SET(reg_audio_anc_wz_cz_cfg_sync(anc_chn), FLD_ANC_WZ_FIR_CFG_SYNC);
+}
+
+/**
+ * @brief      This function servers to sync anc wz iir config after config wz iir filter coefficients.
+ * 
+ * @param[in]  anc_chn - anc channel.
+ * @return     none
+ * @note
+ *             - This function only latch wz iir coefficients.
+ */
+static inline void audio_anc_wz_iir_cfg_sync(audio_anc_chn_e anc_chn)
+{
+    BM_SET(reg_audio_anc_wz_cz_cfg_sync(anc_chn), FLD_ANC_WZ_IIR_CFG_SYNC);
+}
+
+/**
+ * @brief      This function servers to sync anc wz iir and fir config after config wz iir and fir filter coefficients.
+ * 
+ * @param[in]  anc_chn - anc channel.
+ * @return     none
+ * @note
+ *             - This function latch wz iir and fir coefficients.
+ */
+static inline void audio_anc_wz_iir_fir_cfg_sync(audio_anc_chn_e anc_chn)
+{
+    BM_SET(reg_audio_anc_config1(anc_chn), FLD_ANC_WZ_CONFIG_EN);
+}
+
+/**
+ * @brief      This function servers to set anc cz fir filter coefficients.
+ *
+ * @param[in]  anc_chn  - anc channel.
+ * @param[in]  data     - cz fir filter data address.
+ * @param[in]  data_len - cz fir data len max length is 128(cz fir max is 128taps).
+ * @return     none
+ */
+void audio_anc_cz_fir_set(audio_anc_chn_e anc_chn, signed short *data, unsigned short data_len);
+
+/**
+ * @brief      This function servers to set anc cz biquad iir filter coefficients.
+ *
+ * @param[in]  anc_chn - anc channel.
+ * @param[in]  data    - cz biquad iir filter data address data[][b0, b1, b2, a1, a2].
+ * @return     none
+ */
+void audio_anc_cz_iir_set(audio_anc_chn_e anc_chn, signed int data[5][5]);
+
+/**
+ * @brief      This function servers to sync anc cz iir config after config cz iir filter coefficients.
+ * 
+ * @param[in]  anc_chn - anc channel.
+ * @return     none
+ * @note
+ *             - This function only latch cz iir coefficients.
+ */
+static inline void audio_anc_cz_iir_cfg_sync(audio_anc_chn_e anc_chn)
+{
+    BM_SET(reg_audio_anc_wz_cz_cfg_sync(anc_chn), FLD_ANC_CZ_IIR_CFG_SYNC);
+}
+
+/**
+ * @brief      This function servers to sync anc cz fir config after config cz fir filter coefficients.
+ * 
+ * @param[in]  anc_chn - anc channel.
+ * @return     none
+ * @note
+ *             - This function only latch cz fir coefficients.
+ */
+static inline void audio_anc_cz_fir_cfg_sync(audio_anc_chn_e anc_chn)
+{
+    BM_SET(reg_audio_anc_wz_cz_cfg_sync(anc_chn), FLD_ANC_CZ_FIR_CFG_SYNC);
+}
+
+/**
+ * @brief      This function servers to sync anc cz iir and fir config after config cz iir and fir filter coefficients.
+ * 
+ * @param[in]  anc_chn - anc channel.
+ * @return     none
+ * @note
+ *             - This function latch cz iir and fir coefficients.
+ */
+static inline void audio_anc_cz_iir_fir_cfg_sync(audio_anc_chn_e anc_chn)
+{
+    BM_SET(reg_audio_anc_config1(anc_chn), FLD_ANC_CZ_CONFIG_EN);
+}
+
+/**
+ * @brief      This function serves to set anc ref mic gain ref_mic_gain = ref_gain >> ref_gain_shift.
+ * 
+ * @param[in]  anc_chn        - anc channel.
+ * @param[in]  ref_gain       - ref_gain value bit[0-27] valid.
+ * @param[in]  ref_gain_shift - ref_gain_shift bit[0-5] valid.
+ * @return     none
+ */
+static inline void audio_anc_ref_mic_gain(audio_anc_chn_e anc_chn, unsigned int ref_gain, unsigned char ref_gain_shift)
+{
+    reg_audio_anc_ref_gain(anc_chn)       = ref_gain & FLD_ANC_REF_GAIN;
+    reg_audio_anc_ref_gain_shift(anc_chn) = ref_gain_shift & FLD_ANC_REF_GAIN_SHIFT;
+    BM_SET(reg_audio_anc_update_gain_shift(anc_chn), FLD_ANC_REF_GAIN_SHIFT_LATCH);
+}
+
+/**
+ * @brief      This function serves to set anc wz fir gain wz_fir_gain = wz_gain >> wz_gain_shift.
+ * 
+ * @param[in]  anc_chn       - anc channel.
+ * @param[in]  wz_gain       - wz_gain value bit[0-27] valid.
+ * @param[in]  wz_gain_shift - wz_gain_shift bit[0-5] valid.
+ * @return     none
+ */
+static inline void audio_anc_wz_fir_gain(audio_anc_chn_e anc_chn, unsigned int wz_gain, unsigned char wz_gain_shift)
+{
+    reg_audio_anc_wz_gain(anc_chn)        = wz_gain & FLD_ANC_WZ_GAIN;
+    reg_audio_anc_gain_mul_shift(anc_chn) = wz_gain_shift & FLD_ANC_GAIN_MUL_SHIFT;
+    BM_SET(reg_audio_anc_update_gain_shift(anc_chn), FLD_ANC_WZ_GAIN_SHIFT_LATCH);
+}
+
+/**
  * @}
  */
 
@@ -1278,6 +1973,52 @@ typedef enum
  * @name Audio asrc interface.
  * @{
  */
+
+/**
+ * @brief      This function serves to set asrc droop taps.
+ * 
+ * @param[in]  asrc_chn - asrc channel select.
+ * @param[in]  taps     - asrc droop taps audio_asrc_droop_taps_e.
+ * @return     none
+ */
+static inline void audio_asrc_set_droop_taps(audio_hac_chn_e asrc_chn, audio_asrc_droop_taps_e taps)
+{
+    reg_audio_asrc_drop_len_mod(asrc_chn) = (reg_audio_asrc_drop_len_mod(asrc_chn) & (~FLD_ASRC_DROP_LEN_MOD)) | taps;
+}
+
+/**
+ * @brief      This function serves to update asrc droop coefficients.
+ * 
+ * @param[in]  asrc_chn  - asrc channel select.
+ * @param[in]  d_coef    - asrc droop coefficients data address.
+ * @param[in]  data_len  - asrc droop coefficients data length.
+ * @return     none
+ * @note
+ *             - droop coef max length is 9.
+ */
+void audio_asrc_set_droop_coef(audio_hac_chn_e asrc_chn, signed short *d_coef, unsigned char data_len);
+
+/**
+ * @brief      This function serves to update asrc half_band1 coefficients.
+ * 
+ * @param[in]  asrc_chn - asrc channel.
+ * @param[in]  hb1_coef - asrc half_band1 coefficients data address.
+ * @return     none
+ * @note
+ *             - asrc half_band1 coefficient length is 32 word, bit[0-25] valid.
+ */
+void audio_asrc_set_hb1_coef(audio_hac_chn_e asrc_chn, signed int *hb1_coef);
+
+/**
+ * @brief      This function serves to update asrc half_band2 coefficients.
+ * 
+ * @param[in]  asrc_chn - asrc channel.
+ * @param[in]  hb2_coef - asrc half_band2 coefficients data address. 
+ * @return     none
+ * @note
+ *             - asrc half_band2 coefficient length is 7 word, bit[0-25] valid.
+ */
+void audio_asrc_set_hb2_coef(audio_hac_chn_e asrc_chn, signed int *hb2_coef);
 
 /**
  * @}
@@ -1354,6 +2095,57 @@ static inline void audio_codec0_vol_supply_select(audio_codec0_volt_supply_e vol
 {
     reg_audio_codec0_cr_vic = (reg_audio_codec0_cr_vic & (~FLD_CODEC0_AVD_1V8)) | MASK_VAL(FLD_CODEC0_AVD_1V8, voltage);
 }
+
+/**
+ * @brief      This function configures codec0 stream0 dmic pin.
+ * @param[in]  dmic0_data - the data of  dmic pin
+ * @param[in]  dmic0_clk1 - the clk1 of dmic pin
+ * @param[in]  dmic0_clk2 - the clk2 of dmic pin,if need not set clk2, please set AUDIO_DMIC_NONE_PIN.
+ * @return     none
+ */
+void audio_codec0_set_stream0_dmic_pin(audio_dmic_pin_e dmic0_data, audio_dmic_pin_e dmic0_clk1, audio_dmic_pin_e dmic0_clk2);
+
+/**
+ * @brief      This function configures codec0 stream1 dmic pin.
+ * @param[in]  dmic1_data - the data of dmic pin.
+ * @param[in]  dmic1_clk1 - the clk1 of dmic pin.
+ * @param[in]  dmic1_clk2 - the clk2 of dmic pin, if need not set clk2,please set AUDIO_DMIC_NONE_PIN.
+ * @return     none
+ */
+void audio_codec0_set_stream1_dmic_pin(audio_dmic_pin_e dmic1_data, audio_dmic_pin_e dmic1_clk1, audio_dmic_pin_e dmic1_clk2);
+
+/**
+ * @brief      This function serves to set codec0 dmic0 clock frequency.
+ * @param[in]  clk_sel - dmic0 clock frequency.
+ * @note
+ *             - keep to AUDIO_CODEC0_DMIC_CLK_3072KHZ when FLD_CODEC0_ADCA_POWER_MODE = 00(Normal mode) and to AUDIO_CODEC0_DMIC_CLK_1024KHZ else(Low power mode or Ultra low power mode).
+ *             - dmic0_clk1 and dmic0_clk1 set in pairs.
+ */
+static inline void audio_codec0_set_dmic0_clk(audio_codec0_dmic_clk_sel_e clk_sel)
+{
+    reg_audio_codec0_cr_dmic_adca_12_rate = (reg_audio_codec0_cr_dmic_adca_12_rate & (~FLD_CODEC0_ADCA12_DMIC_RATE)) |
+                                            MASK_VAL(FLD_CODEC0_ADCA12_DMIC_RATE, clk_sel);
+}
+
+/**
+ * @brief      This function serves to set codec0 dmic1 clock frequency.
+ * @param[in]  clk_sel - dmic1 clock frequency.
+ * @note
+ *             - keep to AUDIO_CODEC0_DMIC_CLK_3072KHZ when FLD_CODEC0_ADCB_POWER_MODE = 00(Normal mode) and to AUDIO_CODEC0_DMIC_CLK_1024KHZ else(Low power mode or Ultra low power mode).
+ *             - dmic1_clk1 and dmic0_clk1 set in pairs.
+ */
+static inline void audio_codec0_set_dmic1_clk(audio_codec0_dmic_clk_sel_e clk_sel)
+{
+    reg_audio_codec0_cr_dmic_adcb_12_rate = (reg_audio_codec0_cr_dmic_adcb_12_rate & (~FLD_CODEC0_ADCB12_DMIC_RATE)) |
+                                            MASK_VAL(FLD_CODEC0_ADCB12_DMIC_RATE, clk_sel);
+}
+
+/**
+ * @brief      This function serves to enable/disable codec0 dmic clock.
+ * @param[in]  input  - input channel.
+ * @param[in]  enable - 1: active dmic clock, 0: power-down dmic clock.
+ */
+void audio_codec0_dmic_clk_en(audio_codec0_input_select_e input, unsigned char enable);
 
 /**
  * @brief      This function serves to enable/disable codec0 micbias output(2.5V).
@@ -1474,6 +2266,43 @@ void audio_codec0_set_output_dgain(audio_codec0_output_select_e output, audio_co
 void audio_codec0_set_input_snr_opt(audio_codec0_input_select_e input, unsigned char enable);
 
 /**
+ * @brief      This function serves to enable/disable codec0 output SNR optimisation.
+ * @param[in]  enable - 1: dac SNR optimisation active, 0:dac SNR optimisation inactive.
+ * @return     none 
+ * @note
+ *             - DAC_A1/2 SNR optimisation are set in pairs.
+ */
+static inline void audio_codec0_set_output_snr_opt(unsigned char enable)
+{
+    reg_audio_codec0_cr_daca12_agc = (reg_audio_codec0_cr_daca12_agc & (~FLD_CODEC0_DACA12_SNR_OPT_EN)) |
+                                     MASK_VAL(FLD_CODEC0_DACA12_SNR_OPT_EN, enable);
+}
+
+/**
+ * @brief      This function serves to enable/disable codec0 input.
+ * @param[in]  input  - input channel.
+ * @param[in]  enable - 1: enable, 0: disable.
+ * @return     none 
+ * @note
+ *             - Must be disable when switching the input sample rate.
+ *             - ADC_A1/2 or ADC_B1/2 are set in pairs.
+ */
+void audio_codec0_input_en(audio_codec0_input_select_e input, unsigned char enable);
+
+/**
+ * @brief      This function serves to enable/disable codec0 output.
+ * @param[in]  enable - 1: enable, 0: disable.
+ * @return     none 
+ * @note
+ *             - Must be disable when switching the output sample rate.
+ *             - DAC_A1/2 are set in pairs.
+ */
+static inline void audio_codec0_output_en(unsigned char enable)
+{
+    reg_audio_codec_ctrl = (reg_audio_codec_ctrl & (~FLD_CODEC_CTRL_DAC_MST_EN)) | MASK_VAL(FLD_CODEC_CTRL_DAC_MST_EN, enable);
+}
+
+/**
  * @brief      This function serves to enable/disable codec0 input HPF(High Pass Filter).
  * @param[in]  input  - input channel.
  * @param[in]  enable - 1: adc High Pass Filter active, 0:adc High Pass Filter inactive.
@@ -1535,14 +2364,11 @@ static inline void audio_set_fifo_rx_trig_num(audio_fifo_chn_e rx_fifo_chn, unsi
 /**
  * @brief      This function serves to clear fifo data.
  * @param[in]  fifo_chn   - fifo channel
- * @param[in]  clear_flag
- *                        - 1: audio fifo cnt clear
- *                        - 0: audio fifo cnt clear release.
  * @return     none.
  */
-static inline void audio_fifo_clear(audio_fifo_type_e fifo_chn, char clear_flag)
+static inline void audio_fifo_clear(audio_fifo_type_e fifo_chn)
 {
-    reg_audio_dma_fifo_clr = reg_audio_dma_fifo_clr | MASK_VAL(fifo_chn, clear_flag);
+    BM_SET(reg_audio_dma_fifo_clr, fifo_chn);
 }
 
 /**
@@ -1805,6 +2631,211 @@ void audio_tx_dma_chain_init(audio_fifo_chn_e tx_fifo_chn, dma_chn_e chn, unsign
  */
 
 /**
+ * @brief      This function servers to enable/disable hac reset.
+ *
+ * @param[in]  hac_chn    - hac channel.
+ * @param[in]  reset_flag
+ *                        - 1: hac reset
+ *                        - 0: release reset hac.
+ * @return     none
+ */
+static inline void audio_hac_rst_en(audio_hac_chn_e hac_chn, char reset_flag)
+{
+    reg_audio_hac_eq_srst_en = (reg_audio_hac_eq_srst_en & (~BIT(hac_chn))) | MASK_VAL(BIT(hac_chn), reset_flag);
+}
+
+/**
+ * @brief      This function servers to set frac adc data.
+ * 
+ * @param[in]  hac_chn  - hac channel.
+ * @param[in]  frac_adc - frac adc value.
+ * @return     none
+ */
+static inline void audio_asrc_frac_adc_set(audio_hac_chn_e hac_chn, int frac_adc)
+{
+    reg_audio_hac_frac_adc(hac_chn) = frac_adc & FLD_HAC_FRAC_ADC;
+}
+
+/**
+ * @brief      This function servers to set den rate data.
+ * 
+ * @param[in]  hac_chn  - hac channel.
+ * @param[in]  den_rate - den rate value.
+ * @return     none
+ */
+static inline void audio_asrc_den_rate_set(audio_hac_chn_e hac_chn, int den_rate)
+{
+    reg_audio_hac_den_rate(hac_chn) = den_rate & FLD_HAC_DEN_RATE;
+}
+
+/**
+ * @brief      This function servers to set int adv data.
+ *
+ * @param[in]  hac_chn  - hac channel.
+ * @param[in]  int_adv  - int adv value.
+ * @return     none
+ */
+static inline void audio_asrc_int_adv_set(audio_hac_chn_e hac_chn, char int_adv)
+{
+    reg_audio_hac_int_adv(hac_chn) = int_adv & FLD_HAC_INT_ADV;
+}
+
+/**
+ * @brief      This function servers to set lag_int config done.
+ * 
+ * @param[in]  hac_chn  - hac channel.
+ * @return     none
+ * @note
+ *             - After configuring the correlation coefficients, set the bit of the corresponding channel to 1, so that the coefficients will be uniformly latched into lag_int.
+ */
+static inline void audio_asrc_lag_int_config_done(audio_hac_chn_e hac_chn)
+{
+    BM_SET(reg_audio_hac_asrc_lag_update, BIT(hac_chn));
+}
+
+/**
+ * @brief      This function servers to enable/disable asrc bypass.
+ *
+ * @param[in]  asrc_chn - asrc channel select.
+ * @param[in]  enable   - 1: asrc by pass, 0: asrc no bypass.
+ * @return     none
+ */
+static inline void audio_hac_bypass_asrc(audio_hac_chn_e asrc_chn, unsigned char enable)
+{
+    enable ? BM_SET(reg_audio_hac_bypass_asrc, BIT(asrc_chn)) : BM_CLR(reg_audio_hac_bypass_asrc, BIT(asrc_chn));
+}
+
+/**
+ * @brief      This function servers to select hac data src.
+ *
+ * @param[in]  hac_chn - hac channel.
+ * @param[in]  src     - hac data source.
+ * @return     none
+ */
+static inline void audio_hac_data_src(audio_hac_chn_e hac_chn, audio_hac_input_data_e src)
+{
+    reg_audio_hac_mux_sel = (reg_audio_hac_mux_sel & (~BIT(hac_chn))) | MASK_VAL(BIT(hac_chn), src);
+}
+
+/**
+ * @brief      This function servers to select hac data dst.
+ *
+ * @param[in]  hac_chn - hac channel.
+ * @param[in]  dst     - hac data dst.
+ * @return     none
+ */
+static inline void audio_hac_data_dst(audio_hac_chn_e hac_chn, audio_hac_output_data_e dst)
+{
+    reg_audio_hac_hmst_sel = (reg_audio_hac_hmst_sel & (~BIT(hac_chn))) | MASK_VAL(BIT(hac_chn), dst);
+}
+
+/**
+ * @brief      This function servers to set hac output data address when out type is HAC_OUTPUT_DATA_AHB_MST.
+ *
+ * @param[in]  hac_chn - hac channel.
+ * @param[in]  address - output data address.
+ * @return     none
+ */
+static inline void audio_hac_out_data_addr(audio_hac_chn_e hac_chn, unsigned int address)
+{
+    reg_audio_hac_haddr(hac_chn) = address;
+    BM_SET(reg_audio_hac_haddr_set, BIT(hac_chn)); /* latch data address. */
+}
+
+/**
+ * @brief      This function servers to set hac in data rate.
+ *
+ * @param[in]  hac_chn  - hac channel.
+ * @param[in]  rate_div - hac in data rate, rate_div = audio_clk / fs. for example, audio_clk = 36.864MHz, HAC sample = 48KHz, rate_div = 36.864MHz / 48KHz = 768.
+ * @return     none
+ * @note
+ *             - If the data coming from matrix itself has a fixed sample rate, then there is no need for the HAC to control the input sample rate, then you need to write 0 to the above registers.
+ */
+static inline void audio_hac_in_data_rate(audio_hac_chn_e hac_chn, unsigned int rate_div)
+{
+    reg_audio_hac_rd_num(hac_chn) = (rate_div - 1) & FLD_HAC_RD_NUM;
+}
+
+/**
+ * @brief      This function servers to set hac out data rate.
+ * 
+ * @param[in]  hac_chn  - hac channel.
+ * @param[in]  rate_div - hac out data rate, rate_div = audio_clk / fs. for example, audio_clk = 36.864MHz, HAC sample = 48KHz, rate_div = 36.864MHz / 48KHz = 768.
+ * @return     none
+ * @note
+ *             - If the HAC data is output via AHB_MST, then there is no need to match this register, when txfifo will read away the output as soon as the AHB_MST is not empty.
+ */
+static inline void audio_hac_out_data_rate(audio_hac_chn_e hac_chn, unsigned int rate_div)
+{
+    reg_audio_hac_txfifo_rd_num(hac_chn) = (rate_div - 1) & FLD_HAC_TXFIFO_RD_NUM;
+}
+
+/**
+ * @brief      This function servers to set hac interval.
+ * 
+ * @param[in]  hac_chn - hac channel.
+ * @param[in]  in_fs   - sample rate audio_hac_fs_in_out_e.
+ * @return     none
+ */
+static inline void audio_asrc_interval_set(audio_hac_chn_e hac_chn, audio_hac_fs_in_out_e in_fs)
+{
+    if (in_fs >= AUDIO_ASRC_FS_IN_192K_OUT_192K)
+    {
+        reg_audio_hac_asrc_interval = (reg_audio_hac_asrc_interval & (~BIT_RNG(hac_chn << 1, (hac_chn << 1) + 1))) |
+                                      MASK_VAL(BIT_RNG(hac_chn << 1, (hac_chn << 1) + 1), 0); /* 0: 192/384/768KHz */
+    }
+    else
+    {
+        reg_audio_hac_asrc_interval = (reg_audio_hac_asrc_interval & (~BIT_RNG(hac_chn << 1, (hac_chn << 1) + 1))) |
+                                      MASK_VAL(BIT_RNG(hac_chn << 1, (hac_chn << 1) + 1), 3); /* 3: 16/32/44.1/48/96KHz */
+    }
+}
+
+/**
+ * @brief      This function servers to clear hac fifo cnt.
+ *
+ * @param[in]  hac_chn    - hac channel.
+ * @param[in]  reset_flag
+ *                        - 1: hac fifo cnt clear.
+ *                        - 0: hac fifo cnt clear release.
+ * @return     none
+ */
+static inline void audio_hac_fifo_cnt_clr(audio_hac_chn_e hac_chn, char reset_flag)
+{
+    reg_audio_hac_fifo_cnt_clr = (reg_audio_hac_fifo_cnt_clr & (~BIT(hac_chn))) | MASK_VAL(BIT(hac_chn), reset_flag);
+}
+
+/**
+ * @brief      This function servers to update hac biquad filter coefficients.
+ *
+ * @param[in]  hac_chn - hac channel.
+ * @param[in]  biquad  - biquad taps audio_hac_biquad_e.
+ * @param[in]  data    - biquad filter data address, [b0, b1, b2, a1, a2].
+ * @return     none
+ */
+void audio_hac_biquad_coef_update(audio_hac_chn_e hac_chn, audio_hac_biquad_e biquad, signed int *data);
+
+/**
+ * @brief      This function servers to select hac's asrc input and output fs.
+ * 
+ * @param[in]  hac_chn   - hac channel.
+ * @param[in]  fs_in_out - input and output fs audio_hac_fs_in_out_e.
+ * @param[in]  ppm       - ppm value.
+ * @return     none
+ */
+void audio_asrc_fs_select(audio_hac_chn_e hac_chn, audio_hac_fs_in_out_e fs_in_out, int ppm);
+
+/**
+ * @brief      This function serves to get asrc out data cnt.
+ *
+ * @param[in]  hac_chn - hac channel.
+ * @return     hac out data cnt, 0 means timeout, the unit is word.
+ * @note
+ *             - You need to stop the ASRC data input before calling this interface.
+ */
+unsigned int audio_asrc_get_out_data_cnt(audio_hac_chn_e hac_chn);
+
+/**
  * @}
  */
 
@@ -1826,7 +2857,7 @@ void audio_tx_dma_chain_init(audio_fifo_chn_e tx_fifo_chn, dma_chn_e chn, unsign
 static inline void audio_i2s_set_clk(i2s_select_e i2s_select, unsigned short div_numerator, unsigned short div_denominator)
 {
     reg_audio_clk_i2s_step(i2s_select) = div_numerator & FLD_CLK_I2S_STEP;
-    reg_audio_clk_i2s_mod(i2s_select) = div_denominator;
+    reg_audio_clk_i2s_mod(i2s_select)  = div_denominator;
 }
 
 /**
@@ -1930,7 +2961,7 @@ static inline void audio_i2s_align_dis(void)
  */
 static inline void audio_i2s_align_config(i2s_align_config_t *align_config)
 {
-    reg_audio_i2s0_timer_th = align_config->align_th;
+    reg_audio_i2s0_timer_th  = align_config->align_th;
     reg_audio_i2s0_align_cfg = MASK_VAL(FLD_I2S_ALIGN_EN, 1, FLD_I2S_ALIGN_CTRL, align_config->align_mode, FLD_I2S_ALIGN_MASK, 0, FLD_I2S_CLK_SEL,
                                         align_config->align_clk);
 }
@@ -1977,6 +3008,36 @@ void audio_matrix_set_rx_fifo_route(audio_fifo_chn_e fifo_num, audio_matrix_rx_f
 void audio_matrix_set_i2s_tx_route(audio_i2s_tx_chn_e i2s_tx_chn, audio_matrix_i2s_tx_route_e route_from, audio_matrix_i2s_tx_format_e data_format);
 
 /**
+ * @brief      This function serves to select anc_src route source and format.
+ *
+ * @param[in]  anc_chn     - anc channel.
+ * @param[in]  route_from  - anc_src route from.
+ * @param[in]  data_format - anc src data format(route from fifo/i2s/adc valid), others select ANC_SRC_DATA_FORMAT_INVALID.
+ * @return     none
+ */
+void audio_matrix_set_anc_src_route(audio_anc_chn_e anc_chn, audio_matrix_anc_src_route_e route_from, audio_matrix_anc_src_format_e data_format);
+
+/**
+ * @brief      This function serves to select anc_src route source and format.
+ *
+ * @param[in]  anc_chn     - anc channel.
+ * @param[in]  route_from  - anc_ref route from.
+ * @param[in]  data_format - anc ref data format(route from i2s/adc valid), others select ANC_REF_DATA_FORMAT_INVALID.
+ * @return     none
+ */
+void audio_matrix_set_anc_ref_route(audio_anc_chn_e anc_chn, audio_matrix_anc_ref_route_e route_from, audio_matrix_anc_ref_format_e data_format);
+
+/**
+ * @brief      This function serves to select anc_err route source and data format.
+ *
+ * @param[in]  anc_chn     - anc channel.
+ * @param[in]  route_from  - anc_err route from.
+ * @param[in]  data_format - anc err data format(route from i2s/adc valid), others select ANC_ERR_DATA_FORMAT_INVALID.
+ * @return     none
+ */
+void audio_matrix_set_anc_err_route(audio_anc_chn_e anc_chn, audio_matrix_anc_err_route_e route_from, audio_matrix_anc_err_format_e data_format);
+
+/**
  * @brief      This function serves to select dac route source and data format.
  *
  * @param[in]  dac_chn     - dac channel.
@@ -1985,6 +3046,18 @@ void audio_matrix_set_i2s_tx_route(audio_i2s_tx_chn_e i2s_tx_chn, audio_matrix_i
  * @return     none
  */
 void audio_matrix_set_dac_route(audio_codec0_output_select_e dac_chn, audio_matrix_dac_route_e route_from, audio_matrix_dac_format_e data_format);
+
+/**
+ * @brief      This function serves to select hac route source and data format.
+ *
+ * @param[in]  hac_chn     - hac channel.
+ * @param[in]  route_from  - hac route from.
+ * @param[in]  data_format - hac data format(route from i2s/adc valid), others select HAC_DATA_FORMAT_INVALID.
+ * @return     none
+ * @note
+ *             - The filters inside the HAC are processed according to 24bit data.
+ */
+void audio_matrix_set_hac_route(audio_hac_chn_e hac_chn, audio_matrix_hac_route_e route_from, audio_matrix_hac_format_e data_format);
 
 /**
  * @}

@@ -26,13 +26,13 @@
 #include "config.h"
 
 //unicast server headset version
-#define UNICAST_SERVER_HEADSET                              1
+#define UNICAST_SERVER_HEADSET 1
 
 //unicast server tws version
-#define UNICAST_SERVER_TWS                                  2
+#define UNICAST_SERVER_TWS            2
 
 
-#define UNICAST_SERVER_SELECT                               UNICAST_SERVER_HEADSET
+#define UNICAST_SERVER_SELECT         UNICAST_SERVER_HEADSET
 
-#define BLC_PM_EN                           0
-#define BLC_PM_DEEP_RETENTION_MODE_EN       0
+#define BLC_PM_EN                     0
+#define BLC_PM_DEEP_RETENTION_MODE_EN 0

@@ -30,122 +30,119 @@
 #if (INTER_TEST_MODE == TEST_BIS_AUDIO_SENDER)
 
 
-#if(APP_AUDIO_INPUT_TYPE != APP_AUDIO_INPUT_USB_MIC)
+    #if (APP_AUDIO_INPUT_TYPE != APP_AUDIO_INPUT_USB_MIC)
 
-#if(MCU_CORE_TYPE == MCU_CORE_B92)
+        #if (MCU_CORE_TYPE == MCU_CORE_B92)
 extern audio_codec_stream0_input_t audio_codec_input;
-extern audio_codec_output_t audio_codec_output;
-#endif
+extern audio_codec_output_t        audio_codec_output;
+        #endif
 
 u32 gframeDataLen = 0;
+
 void app_audio_codec_init(void)
 {
     audio_sample_rate_e rate;
-    switch(gbisSamplingFreq)
-    {
+    switch (gbisSamplingFreq) {
     case BLC_AUDIO_FREQ_CFG_8000:
-        rate = AUDIO_8K;
+        rate          = AUDIO_8K;
         gframeDataLen = 80;
         break;
     case BLC_AUDIO_FREQ_CFG_16000:
-        rate = AUDIO_16K;
+        rate          = AUDIO_16K;
         gframeDataLen = 160;
         break;
     case BLC_AUDIO_FREQ_CFG_32000:
-        rate = AUDIO_32K;
+        rate          = AUDIO_32K;
         gframeDataLen = 320;
         break;
-//  case BLC_AUDIO_FREQ_CFG_44100:
-//      rate = AUDIO_44EP1K;
-//      break;
+        //  case BLC_AUDIO_FREQ_CFG_44100:
+        //      rate = AUDIO_44EP1K;
+        //      break;
     case BLC_AUDIO_FREQ_CFG_48000:
-        rate = AUDIO_48K;
+        rate          = AUDIO_48K;
         gframeDataLen = 480;
         break;
     default:
-        rate = AUDIO_16K;
+        rate          = AUDIO_16K;
         gframeDataLen = 160;
         break;
     }
-#if(MCU_CORE_TYPE == MCU_CORE_B91)
-#if (APP_AUDIO_INPUT_TYPE == APP_AUDIO_INPUT_IISIN)
-    extern int  gAudioIisConfig;
+        #if (MCU_CORE_TYPE == MCU_CORE_B91)
+            #if (APP_AUDIO_INPUT_TYPE == APP_AUDIO_INPUT_IISIN)
+    extern int gAudioIisConfig;
     gAudioIisConfig = I2S_S_CODEC_M;
-    gpio_input_en(I2S_BCK_PC3|I2S_DAC_LR_PC6|I2S_DAC_DAT_PC7);
+    gpio_input_en(I2S_BCK_PC3 | I2S_DAC_LR_PC6 | I2S_DAC_DAT_PC7);
     ble_audio_codec_init(BLC_CODEC_SUBDEV_IIS, rate, STEREO_BIT_16);
-#else
+            #else
     ble_audio_codec_init(BLC_CODEC_SUBDEV_DEF, rate, STEREO_BIT_16);
-#endif
+            #endif
 
-    #if (APP_AUDIO_INPUT_TYPE == APP_AUDIO_INPUT_AMIC)
-        audio_init(AMIC_IN_TO_BUF_TO_LINE_OUT, rate, STEREO_BIT_16);
-    #elif (APP_AUDIO_INPUT_TYPE == APP_AUDIO_INPUT_LINEIN)
-        audio_init(LINE_IN_TO_BUF_TO_LINE_OUT, rate, STEREO_BIT_16);
-    #elif (APP_AUDIO_INPUT_TYPE == APP_AUDIO_INPUT_DMIC)
-        audio_set_dmic_pin(DMIC_GROUPD_D4_DAT_D5_D6_CLK);
-        audio_init(DMIC_IN_TO_BUF_TO_LINE_OUT, rate, STEREO_BIT_16);
-    #endif
-#elif(MCU_CORE_TYPE == MCU_CORE_B92)
-    #if (APP_AUDIO_INPUT_TYPE == APP_AUDIO_INPUT_AMIC)
-        audio_codec_input.sample_rate = AUDIO_16K;
-        audio_codec_output.sample_rate = AUDIO_16K;
-        audio_codec_input.input_src = AMIC_STREAM0_STEREO;
-        ble_audio_codec_init(BLC_CODEC_SUBDEV_MIC_SPK, &audio_codec_input, &audio_codec_output);
-    #elif (APP_AUDIO_INPUT_TYPE == APP_AUDIO_INPUT_LINEIN)
-        audio_codec_input.sample_rate = AUDIO_16K;
-        audio_codec_output.sample_rate = AUDIO_16K;
-        audio_codec_input.input_src = LINE_STREAM0_STEREO;
-        ble_audio_codec_init(BLC_CODEC_SUBDEV_MIC_SPK, &audio_codec_input, &audio_codec_output);
-    #elif (APP_AUDIO_INPUT_TYPE == APP_AUDIO_INPUT_DMIC)
-        audio_codec_input.sample_rate = AUDIO_16K;
-        audio_codec_output.sample_rate = AUDIO_16K;
-        ble_audio_codec_init(BLC_CODEC_SUBDEV_MIC_SPK, &audio_codec_input, &audio_codec_output);
-    #endif
-#endif
-    ble_codec_setSpkBuffer((u8*)gAppAudioBuffer, sizeof(gAppAudioBuffer));
-    ble_codec_setMicBuffer((u8*)gAppAudioBuffer, sizeof(gAppAudioBuffer));
+            #if (APP_AUDIO_INPUT_TYPE == APP_AUDIO_INPUT_AMIC)
+    audio_init(AMIC_IN_TO_BUF_TO_LINE_OUT, rate, STEREO_BIT_16);
+            #elif (APP_AUDIO_INPUT_TYPE == APP_AUDIO_INPUT_LINEIN)
+    audio_init(LINE_IN_TO_BUF_TO_LINE_OUT, rate, STEREO_BIT_16);
+            #elif (APP_AUDIO_INPUT_TYPE == APP_AUDIO_INPUT_DMIC)
+    audio_set_dmic_pin(DMIC_GROUPD_D4_DAT_D5_D6_CLK);
+    audio_init(DMIC_IN_TO_BUF_TO_LINE_OUT, rate, STEREO_BIT_16);
+            #endif
+        #elif (MCU_CORE_TYPE == MCU_CORE_B92)
+            #if (APP_AUDIO_INPUT_TYPE == APP_AUDIO_INPUT_AMIC)
+    audio_codec_input.sample_rate  = AUDIO_16K;
+    audio_codec_output.sample_rate = AUDIO_16K;
+    audio_codec_input.input_src    = AMIC_STREAM0_STEREO;
+    ble_audio_codec_init(BLC_CODEC_SUBDEV_MIC_SPK, &audio_codec_input, &audio_codec_output);
+            #elif (APP_AUDIO_INPUT_TYPE == APP_AUDIO_INPUT_LINEIN)
+    audio_codec_input.sample_rate  = AUDIO_16K;
+    audio_codec_output.sample_rate = AUDIO_16K;
+    audio_codec_input.input_src    = LINE_STREAM0_STEREO;
+    ble_audio_codec_init(BLC_CODEC_SUBDEV_MIC_SPK, &audio_codec_input, &audio_codec_output);
+            #elif (APP_AUDIO_INPUT_TYPE == APP_AUDIO_INPUT_DMIC)
+    audio_codec_input.sample_rate  = AUDIO_16K;
+    audio_codec_output.sample_rate = AUDIO_16K;
+    ble_audio_codec_init(BLC_CODEC_SUBDEV_MIC_SPK, &audio_codec_input, &audio_codec_output);
+            #endif
+        #endif
+    ble_codec_setSpkBuffer((u8 *)gAppAudioBuffer, sizeof(gAppAudioBuffer));
+    ble_codec_setMicBuffer((u8 *)gAppAudioBuffer, sizeof(gAppAudioBuffer));
     ble_codec_micOpen();
     ble_codec_spkOpen();
 }
 
 void app_audio_buffer_handle(void)
 {
-    u16 lenPcm  = blc_codec_getMicDataLen();
+    u16 lenPcm = blc_codec_getMicDataLen();
 
-    if(lenPcm<4*gframeDataLen)  //STEREO_BIT_16 control
+    if (lenPcm < 4 * gframeDataLen) //STEREO_BIT_16 control
     {
         return;
     }
 
     u16 pcmData[APP_AUDIO_FRAME_BYTES];
 
-    blc_codec_readMicBuff((u8*)pcmData, 4*gframeDataLen);
+    blc_codec_readMicBuff((u8 *)pcmData, 4 * gframeDataLen);
 
-    if(!app_audio_check_send_flag())
-    {
-        return ;
+    if (!app_audio_check_send_flag()) {
+        return;
     }
 
     u16 audioBuff[APP_AUDIO_FRAME_SAMPLE];
-    u8 coded_raw[155];      //Max LC3 encode data
-    for(int i = 0; i<gframeDataLen; i++)
-    {
-        audioBuff[i] = pcmData[2*i];
+    u8  coded_raw[155]; //Max LC3 encode data
+    for (int i = 0; i < gframeDataLen; i++) {
+        audioBuff[i] = pcmData[2 * i];
     }
-    lc3enc_encode_pkt(0, (u8*)audioBuff, coded_raw);
+    lc3enc_encode_pkt(0, (u8 *)audioBuff, coded_raw);
     blc_iso_sendData(app_bisBcstHandle[0], coded_raw, gbisOctetPer);
 
-#if SUBGROUP_NUM_BIS > 1
-    for(int i = 0; i<gframeDataLen; i++)
-    {
-        audioBuff[i] = pcmData[2*i + 1];
+        #if SUBGROUP_NUM_BIS > 1
+    for (int i = 0; i < gframeDataLen; i++) {
+        audioBuff[i] = pcmData[2 * i + 1];
     }
-//  lc3enc_encode_pkt(1, (u8*)audioBuff, coded_raw);
+    //  lc3enc_encode_pkt(1, (u8*)audioBuff, coded_raw);
     blc_iso_sendData(app_bisBcstHandle[1], coded_raw, gbisOctetPer);
-#endif
+        #endif
 }
 
-#endif
+    #endif
 
 
 #endif /* INTER_TEST_MODE */

@@ -26,14 +26,11 @@
 #include "../bis_sink_config.h"
 #if (PRODUCT_BIS_SINK_SELECT == PRODUCT_GOOGLE_BROADCAST_SINK)
 
-#include "tl_common.h"
+    #include "tl_common.h"
 
 
-
-
-
-/*********************************** Extended ADV data buffer allocation, Begin ************************************/
-/**
+    /*********************************** Extended ADV data buffer allocation, Begin ************************************/
+    /**
  * @brief   Extended Advertising Set number and data buffer length
  *
  *  APP_EXT_ADV_SETS_NUMBER:
@@ -50,34 +47,29 @@
  *  if ADV set number bigger than 1, this length should be maximum value of scan response data length for all ADV Sets
  *  if all ADV Set use legacy ADV mode, 31 byte is enough
  */
-#define APP_EXT_ADV_SETS_NUMBER             1     //user set value
-#define APP_EXT_ADV_DATA_LENGTH             128   //user set value
+    #define APP_EXT_ADV_SETS_NUMBER 1   //user set value
+    #define APP_EXT_ADV_DATA_LENGTH 128 //user set value
 //#define APP_EXT_SCANRSP_DATA_LENGTH       128   //user set value
-
 
 
 extern u8 app_extAdvSetParam_buf[];
 extern u8 app_extAdvData_buf[];
-//extern u8 app_extScanRspData_buf[];
-/*********************************** Extended ADV data buffer allocation, End** ************************************/
+    //extern u8 app_extScanRspData_buf[];
+    /*********************************** Extended ADV data buffer allocation, End** ************************************/
 
 
-
-
-
-
-/********************* ACL connection LinkLayer TX & RX data FIFO allocation, Begin ************************************************/
-/**
+    /********************* ACL connection LinkLayer TX & RX data FIFO allocation, Begin ************************************************/
+    /**
  * @brief   connMaxRxOctets
  * refer to BLE SPEC "4.5.10 Data PDU length management" & "2.4.2.21 LL_LENGTH_REQ and LL_LENGTH_RSP"
  * usage limitation:
  * 1. should be in range of 27 ~ 251
  * 2. for CIS peripheral, receive ll_cis_req(36Byte), must be equal to or greater than 36
  */
-#define ACL_CONN_MAX_RX_OCTETS          64  //user set value
+    #define ACL_CONN_MAX_RX_OCTETS 64 //user set value
 
 
-/**
+    /**
  * @brief   connMaxTxOctets
  * refer to BLE SPEC: Vol 6, Part B, "4.5.10 Data PDU length management"
  *                    Vol 6, Part B, "2.4.2.21 LL_LENGTH_REQ and LL_LENGTH_RSP"
@@ -88,12 +80,11 @@ extern u8 app_extAdvData_buf[];
  * 1. should be in range of 27 ~ 251
  * 2. for CIS central, send ll_cis_req(36Byte), ACL_CENTRAL_MAX_TX_OCTETS must be equal to or greater than 36
  */
-#define ACL_CENTRAL_MAX_TX_OCTETS       27  //user set value
-#define ACL_PERIPHR_MAX_TX_OCTETS       64  //user set value
+    #define ACL_CENTRAL_MAX_TX_OCTETS 27 //user set value
+    #define ACL_PERIPHR_MAX_TX_OCTETS 64 //user set value
 
 
-
-/**
+    /**
  * @brief   ACL RX buffer size & number
  *          ACL RX buffer is shared by all connections to hold LinkLayer RF RX data.
  * usage limitation for ACL_RX_FIFO_SIZE:
@@ -103,8 +94,8 @@ extern u8 app_extAdvData_buf[];
  * 1. must be: 2^n, (power of 2)
  * 2. at least 4; recommended value: 4, 8, 16
  */
-#define ACL_RX_FIFO_SIZE                CAL_LL_ACL_RX_FIFO_SIZE(ACL_CONN_MAX_RX_OCTETS)  //user can not change !!!
-#define ACL_RX_FIFO_NUM                 8   //user set value
+    #define ACL_RX_FIFO_SIZE CAL_LL_ACL_RX_FIFO_SIZE(ACL_CONN_MAX_RX_OCTETS) //user can not change !!!
+    #define ACL_RX_FIFO_NUM  8                                               //user set value
 
 
 /**
@@ -123,23 +114,17 @@ extern u8 app_extAdvData_buf[];
  *    so when ACL TX FIFO size equal to or bigger than 256, ACL TX FIFO number can only be 9(can not use 17 or 33), cause 256*(17-1)=4096
  */
 
-#define ACL_PERIPHR_TX_FIFO_SIZE        CAL_LL_ACL_TX_FIFO_SIZE(ACL_PERIPHR_MAX_TX_OCTETS) //user can not change !!!
-#define ACL_PERIPHR_TX_FIFO_NUM         9   //user set value
+    #define ACL_PERIPHR_TX_FIFO_SIZE CAL_LL_ACL_TX_FIFO_SIZE(ACL_PERIPHR_MAX_TX_OCTETS) //user can not change !!!
+    #define ACL_PERIPHR_TX_FIFO_NUM  9                                                  //user set value
 
 
+extern u8 app_acl_rx_fifo[];
+extern u8 app_acl_per_tx_fifo[];
+    /******************** ACL connection LinkLayer TX & RX data FIFO allocation, End ***************************************************/
 
 
-extern  u8  app_acl_rx_fifo[];
-extern  u8  app_acl_per_tx_fifo[];
-/******************** ACL connection LinkLayer TX & RX data FIFO allocation, End ***************************************************/
-
-
-
-
-
-
-/***************** ACL connection L2CAP RX & TX data Buffer allocation, Begin **************************************/
-/**
+    /***************** ACL connection L2CAP RX & TX data Buffer allocation, Begin **************************************/
+    /**
  * @brief   RX MTU size & L2CAP buffer size
  * RX MTU:
  * refer to BLE SPEC: Vol 3, Part F, "3.2.8 Exchanging MTU size" & "3.4.2 MTU exchange"; Vol 3, Part G, "4.3.1 Exchange MTU"
@@ -152,31 +137,27 @@ extern  u8  app_acl_per_tx_fifo[];
  * CENTRAL_L2CAP_BUFF_SIZE & PERIPHR_L2CAP_BUFF_SIZE
  * 1. must use CAL_L2CAP_BUFF_SIZE to calculate, user can not change !!!
  */
-#define PERIPHR_ATT_RX_MTU              64  //user set value
-#define PERIPHR_L2CAP_BUFF_SIZE         CAL_L2CAP_BUFF_SIZE(PERIPHR_ATT_RX_MTU) //user can not change !!!
+    #define PERIPHR_ATT_RX_MTU      64                                      //user set value
+    #define PERIPHR_L2CAP_BUFF_SIZE CAL_L2CAP_BUFF_SIZE(PERIPHR_ATT_RX_MTU) //user can not change !!!
 
 
-extern  u8 app_per_l2cap_rx_buf[]; //ACL Peripheral L2cap RX data buffer
-extern  u8 app_per_l2cap_tx_buf[]; //ACL Peripheral L2cap TX data buffer
-/***************** ACL connection L2CAP RX & TX data Buffer allocation, End ****************************************/
+extern u8 app_per_l2cap_rx_buf[];                                           //ACL Peripheral L2cap RX data buffer
+extern u8 app_per_l2cap_tx_buf[];                                           //ACL Peripheral L2cap TX data buffer
+    /***************** ACL connection L2CAP RX & TX data Buffer allocation, End ****************************************/
 
 
+    /******************************** BIS SYNC RX ISO PDU buffer FIFO allocation, Begin **********************************/
 
-
-
-
-/******************************** BIS SYNC RX ISO PDU buffer FIFO allocation, Begin **********************************/
-
-/**
+    /**
  * @brief   BIS_RX_MAX_PDU is the maximum number of data octets that can be carried in a BIS Data PDU
  * refer to BLE SPEC "Vol 6, Part B, 2.6 ISOCHRONOUS PHYSICAL CHANNEL PDU"
  *
  * usage limitation:
  * 1. should be in range of 0 ~ 251
  */
-#define BIS_RX_MAX_PDU              251 //user set value
+    #define BIS_RX_MAX_PDU 251 //user set value
 
-/**
+    /**
  * @brief   BIS SYNC RX buffer size & number
  *          BIS SYNC RX buffer is shared by all bis_sync to hold LinkLayer RF RX BIS data.
  *
@@ -187,18 +168,16 @@ extern  u8 app_per_l2cap_tx_buf[]; //ACL Peripheral L2cap TX data buffer
  * 1. must be: 2^n, (power of 2)
  * 2. at least 2; recommended value: 2, 4, 8, 16, 32
  */
-#define BIS_RX_PDU_FIFO_SIZE            BIS_PDU_ALIGN4_RXBUFF(BIS_RX_MAX_PDU)  //user can not change !!!
-#define BIS_RX_PDU_FIFO_NUM             (32)
+    #define BIS_RX_PDU_FIFO_SIZE BIS_PDU_ALIGN4_RXBUFF(BIS_RX_MAX_PDU) //user can not change !!!
+    #define BIS_RX_PDU_FIFO_NUM  (32)
 
 
-extern  u8  app_bisSyncRxfifo[];
-/******************************* BIS SYNC RX ISO PDU buffer FIFO allocation, End *************************************/
+extern u8 app_bisSyncRxfifo[];
+    /******************************* BIS SYNC RX ISO PDU buffer FIFO allocation, End *************************************/
 
 
-
-
-/*************************** BIS SYNC RX ISOAL SDU buffer FIFO allocation, Begin *************************************/
-/*
+    /*************************** BIS SYNC RX ISOAL SDU buffer FIFO allocation, Begin *************************************/
+    /*
  * @brief   BIS SDU out buffer
             SDU out is SDU from controller to host, so SDU out buffer is used to hold SDU data received by RF from peer device.
 
@@ -212,35 +191,32 @@ extern  u8  app_bisSyncRxfifo[];
  * 1. must be: 2^n, (power of 2)
  * 2. at least 2; recommended value: 2, 4, 8, 16, 32
  */
-#define BIS_SDU_OUT_OCTETS_MAX          155*2  //user set value
+    #define BIS_SDU_OUT_OCTETS_MAX 155 * 2                                           //user set value
 
-#define BIS_SDU_OUT_FIFO_SIZE           CAL_IAL_ISO_SDU_FIFO_SIZE(BIS_SDU_OUT_OCTETS_MAX) //user can not change !!!
+    #define BIS_SDU_OUT_FIFO_SIZE  CAL_IAL_ISO_SDU_FIFO_SIZE(BIS_SDU_OUT_OCTETS_MAX) //user can not change !!!
 
-#define BIS_SDU_OUT_FIFO_NUM            (32)
+    #define BIS_SDU_OUT_FIFO_NUM   (32)
 
-extern  u8  app_bis_sdu_out_fifo[];
-/**************************** BIS SYNC RX ISOAL SDU buffer FIFO allocation, End  *************************************/
-
-
+extern u8 app_bis_sdu_out_fifo[];
+    /**************************** BIS SYNC RX ISOAL SDU buffer FIFO allocation, End  *************************************/
 
 
-/********************************** BIS BYNC Global Data Definition, Begin *****************************************/
-#define APP_BIG_BCST_NUMBER             0   // Number of Supported BIG_BCST number (must <= LL_BIG_BCST_NUM_MAX)
-#define APP_BIG_SYNC_NUMBER             1   // Number of Supported BIG_SYNC number (must <= LL_BIG_SYNC_NUM_MAX)
-#define APP_BIS_NUM_IN_PER_BIG_BCST     0   // Number of Supported BISes in Per BIG_BCST (must <= LL_BIS_IN_PER_BIG_BCST_NUM_MAX)
-#define APP_BIS_NUM_IN_PER_BIG_SYNC     2   // Number of Supported BISes in Per BIG_SYNC (must <= LL_BIS_IN_PER_BIG_SYNC_NUM_MAX)
+    /********************************** BIS BYNC Global Data Definition, Begin *****************************************/
+    #define APP_BIG_BCST_NUMBER         0 // Number of Supported BIG_BCST number (must <= LL_BIG_BCST_NUM_MAX)
+    #define APP_BIG_SYNC_NUMBER         1 // Number of Supported BIG_SYNC number (must <= LL_BIG_SYNC_NUM_MAX)
+    #define APP_BIS_NUM_IN_PER_BIG_BCST 0 // Number of Supported BISes in Per BIG_BCST (must <= LL_BIS_IN_PER_BIG_BCST_NUM_MAX)
+    #define APP_BIS_NUM_IN_PER_BIG_SYNC 2 // Number of Supported BISes in Per BIG_SYNC (must <= LL_BIS_IN_PER_BIG_SYNC_NUM_MAX)
 
-// The total number of BIS supported by BIG_BCST
-#define APP_BIS_NUM_IN_ALL_BIG_BCST     (APP_BIG_BCST_NUMBER * APP_BIS_NUM_IN_PER_BIG_BCST)
-// The total number of BIS supported by BIG_SYNC
-#define APP_BIS_NUM_IN_ALL_BIG_SYNC     (APP_BIG_SYNC_NUMBER * APP_BIS_NUM_IN_PER_BIG_SYNC)
-// The total number of BIS supported by BIG (BCST and SYNC)
-#define APP_TOTAL_BIS_NUMBER            (APP_BIS_NUM_IN_ALL_BIG_BCST + APP_BIS_NUM_IN_ALL_BIG_SYNC)
+    // The total number of BIS supported by BIG_BCST
+    #define APP_BIS_NUM_IN_ALL_BIG_BCST (APP_BIG_BCST_NUMBER * APP_BIS_NUM_IN_PER_BIG_BCST)
+    // The total number of BIS supported by BIG_SYNC
+    #define APP_BIS_NUM_IN_ALL_BIG_SYNC (APP_BIG_SYNC_NUMBER * APP_BIS_NUM_IN_PER_BIG_SYNC)
+    // The total number of BIS supported by BIG (BCST and SYNC)
+    #define APP_TOTAL_BIS_NUMBER (APP_BIS_NUM_IN_ALL_BIG_BCST + APP_BIS_NUM_IN_ALL_BIG_SYNC)
 
-extern  u8  app_bigSyncParam[];
-extern  u8  app_bisToatlParam[];
+extern u8 app_bigSyncParam[];
+extern u8 app_bisToatlParam[];
 /********************************** BIS SYNC Global Data Definition, end  *****************************************/
 
 
 #endif
-

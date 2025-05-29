@@ -24,6 +24,25 @@
 #ifndef VENDOR_COMMON_APP_COMMON_H_
 #define VENDOR_COMMON_APP_COMMON_H_
 
+#include "vendor/common/user_config.h"
+
+
+/**
+ * @brief Enables the common logging functionality for the application
+ */
+#ifndef APP_LOG_COMMON_EN
+    #define APP_LOG_COMMON_EN (1 & APP_LOG_EN)
+#endif
+
+
+/**
+ * @brief       this function is used to set deepsleep retention SRAM size for all application project.
+ *              select DEEPSLEEP_MODE_RET_SRAM_** according to retention data size used.
+ * @param[in]   none
+ * @return      none
+ */
+void blc_app_setDeepsleepRetentionSramSize(void);
+
 
 /**
  * @brief      This function is check If IRK(local IRK or peer IRK) valid
@@ -31,7 +50,7 @@
  * @return     1: IRK valid
  *             0: IRK invalid
  */
-int blc_app_isIrkValid(u8* pIrk);
+int blc_app_isIrkValid(u8 *pIrk);
 
 
 #endif /* VENDOR_COMMON_APP_COMMON_H_ */

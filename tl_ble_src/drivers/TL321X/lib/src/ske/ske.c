@@ -30,17 +30,16 @@
 #include "lib/include/ske/ske.h"
 
 
-
 static SKE_CTX g_ske_ctx[1];
 
 
 //since hardware does not support 3DES
 #if (defined(SUPPORT_SKE_TDES_128))
-static SKE_ALG g_ske_alg;              //hold current ske algorithm(for 3DES)
-static SKE_MODE g_ske_mode;            //hold input mode for 3DES
-static SKE_CRYPTO g_ske_crypto_action; //hold current block cipher crypto for 3DES
-static unsigned int g_ske_key_buf[6];      //hold key for 3DES
-static unsigned int g_ske_iv_buf[4];       //hold current IV for 3DES
+static SKE_ALG      g_ske_alg;           //hold current ske algorithm(for 3DES)
+static SKE_MODE     g_ske_mode;          //hold input mode for 3DES
+static SKE_CRYPTO   g_ske_crypto_action; //hold current block cipher crypto for 3DES
+static unsigned int g_ske_key_buf[6];    //hold key for 3DES
+static unsigned int g_ske_iv_buf[4];     //hold current IV for 3DES
 #endif
 
 
@@ -59,20 +58,16 @@ void ske_big_endian_add_uint8(unsigned char *a, unsigned int a_bytes, unsigned c
 {
     int i;
 
-    for(i=a_bytes; i>0; )
-    {
+    for (i = a_bytes; i > 0;) {
         a[--i] += b;
-        if(a[i] < b)
-        {
+        if (a[i] < b) {
             b = 1;
-        }
-        else
-        {
-#if 1
-            b = 0;   //for security
-#else
+        } else {
+    #if 1
+            b = 0; //for security
+    #else
             break;
-#endif
+    #endif
         }
     }
 }
@@ -87,8 +82,7 @@ unsigned char ske_lp_check_alg(SKE_ALG ske_alg)
 {
     unsigned char ret;
 
-    switch(ske_alg)
-    {
+    switch (ske_alg) {
 #ifdef SUPPORT_SKE_DES
     case SKE_ALG_DES:
 #endif
@@ -145,8 +139,7 @@ unsigned char ske_lp_check_mode(SKE_ALG ske_alg, SKE_MODE ske_mode)
 {
     unsigned char ret;
 
-    switch(ske_mode)
-    {
+    switch (ske_mode) {
 #ifdef SUPPORT_SKE_MODE_ECB
     case SKE_MODE_ECB:
 #endif
@@ -173,31 +166,30 @@ unsigned char ske_lp_check_mode(SKE_ALG ske_alg, SKE_MODE ske_mode)
         ret = SKE_SUCCESS;
         break;
 
-    //for DES/3DES, CAMC is not supported at present
+        //for DES/3DES, CAMC is not supported at present
 #ifdef SUPPORT_SKE_MODE_CMAC
     case SKE_MODE_CMAC:
-        switch(ske_alg)
-        {
-#ifdef SUPPORT_SKE_AES_128
-        case SKE_ALG_AES_128 :
-#endif
+        switch (ske_alg) {
+    #ifdef SUPPORT_SKE_AES_128
+        case SKE_ALG_AES_128:
+    #endif
 
-#ifdef SUPPORT_SKE_AES_192
-        case SKE_ALG_AES_192 :
-#endif
+    #ifdef SUPPORT_SKE_AES_192
+        case SKE_ALG_AES_192:
+    #endif
 
-#ifdef SUPPORT_SKE_AES_256
-        case SKE_ALG_AES_256 :
-#endif
+    #ifdef SUPPORT_SKE_AES_256
+        case SKE_ALG_AES_256:
+    #endif
 
-#ifdef SUPPORT_SKE_SM4
-        case SKE_ALG_SM4 :
-#endif
+    #ifdef SUPPORT_SKE_SM4
+        case SKE_ALG_SM4:
+    #endif
 
-#if (defined(SUPPORT_SKE_AES_128) || defined(SUPPORT_SKE_AES_192) || defined(SUPPORT_SKE_AES_256) || defined(SUPPORT_SKE_SM4))
+    #if (defined(SUPPORT_SKE_AES_128) || defined(SUPPORT_SKE_AES_192) || defined(SUPPORT_SKE_AES_256) || defined(SUPPORT_SKE_SM4))
             ret = SKE_SUCCESS;
             break;
-#endif
+    #endif
 
         default:
             ret = SKE_INPUT_INVALID;
@@ -205,7 +197,7 @@ unsigned char ske_lp_check_mode(SKE_ALG ske_alg, SKE_MODE ske_mode)
         break;
 #endif
 
-    //for DES/3DES, XTS, CCM and GCM mode are not supported due to the definition or standard
+        //for DES/3DES, XTS, CCM and GCM mode are not supported due to the definition or standard
 #ifdef SUPPORT_SKE_MODE_XTS
     case SKE_MODE_XTS:
 #endif
@@ -219,28 +211,27 @@ unsigned char ske_lp_check_mode(SKE_ALG ske_alg, SKE_MODE ske_mode)
 #endif
 
 #if (defined(SUPPORT_SKE_MODE_XTS) || defined(SUPPORT_SKE_MODE_CCM) || defined(SUPPORT_SKE_MODE_GCM))
-        switch(ske_alg)
-        {
-#ifdef SUPPORT_SKE_AES_128
-        case SKE_ALG_AES_128 :
-#endif
+        switch (ske_alg) {
+    #ifdef SUPPORT_SKE_AES_128
+        case SKE_ALG_AES_128:
+    #endif
 
-#ifdef SUPPORT_SKE_AES_192
-        case SKE_ALG_AES_192 :
-#endif
+    #ifdef SUPPORT_SKE_AES_192
+        case SKE_ALG_AES_192:
+    #endif
 
-#ifdef SUPPORT_SKE_AES_256
-        case SKE_ALG_AES_256 :
-#endif
+    #ifdef SUPPORT_SKE_AES_256
+        case SKE_ALG_AES_256:
+    #endif
 
-#ifdef SUPPORT_SKE_SM4
-        case SKE_ALG_SM4 :
-#endif
+    #ifdef SUPPORT_SKE_SM4
+        case SKE_ALG_SM4:
+    #endif
 
-#if (defined(SUPPORT_SKE_AES_128) || defined(SUPPORT_SKE_AES_192) || defined(SUPPORT_SKE_AES_256) || defined(SUPPORT_SKE_SM4))
+    #if (defined(SUPPORT_SKE_AES_128) || defined(SUPPORT_SKE_AES_192) || defined(SUPPORT_SKE_AES_256) || defined(SUPPORT_SKE_SM4))
             ret = SKE_SUCCESS;
             break;
-#endif
+    #endif
 
         default:
             ret = SKE_INPUT_INVALID;
@@ -258,7 +249,6 @@ unsigned char ske_lp_check_mode(SKE_ALG ske_alg, SKE_MODE ske_mode)
     return ret;
 }
 
-
 /**
  * @brief       get block byte length for specific ske_lp alg.
  * @param[in]   ske_alg              - ske_lp algorithm.
@@ -272,62 +262,59 @@ unsigned char ske_lp_get_block_byte_len(SKE_ALG ske_alg)
 {
     unsigned char byteLen;
 
-    switch(ske_alg)
-    {
+    switch (ske_alg) {
 #ifdef SUPPORT_SKE_DES
-    case SKE_ALG_DES :
+    case SKE_ALG_DES:
 #endif
 
 #ifdef SUPPORT_SKE_TDES_128
-    case SKE_ALG_TDES_128 :
+    case SKE_ALG_TDES_128:
 #endif
 
 #ifdef SUPPORT_SKE_TDES_192
-    case SKE_ALG_TDES_192 :
+    case SKE_ALG_TDES_192:
 #endif
 
 #ifdef SUPPORT_SKE_TDES_EEE_128
-    case SKE_ALG_TDES_EEE_128 :
+    case SKE_ALG_TDES_EEE_128:
 #endif
 
 #ifdef SUPPORT_SKE_TDES_EEE_192
-    case SKE_ALG_TDES_EEE_192 :
+    case SKE_ALG_TDES_EEE_192:
 #endif
 
-#if (defined(SUPPORT_SKE_DES) ||defined(SUPPORT_SKE_TDES_128) ||defined(SUPPORT_SKE_TDES_192)   \
-    ||defined(SUPPORT_SKE_TDES_EEE_128) ||defined(SUPPORT_SKE_TDES_EEE_192))
+#if (defined(SUPPORT_SKE_DES) || defined(SUPPORT_SKE_TDES_128) || defined(SUPPORT_SKE_TDES_192) || defined(SUPPORT_SKE_TDES_EEE_128) || defined(SUPPORT_SKE_TDES_EEE_192))
         byteLen = 8;
         break;
 #endif
 
 #ifdef SUPPORT_SKE_AES_128
-    case SKE_ALG_AES_128 :
+    case SKE_ALG_AES_128:
 #endif
 
 #ifdef SUPPORT_SKE_AES_192
-    case SKE_ALG_AES_192 :
+    case SKE_ALG_AES_192:
 #endif
 
 #ifdef SUPPORT_SKE_AES_256
-    case SKE_ALG_AES_256 :
+    case SKE_ALG_AES_256:
 #endif
 
 #ifdef SUPPORT_SKE_SM4
-    case SKE_ALG_SM4 :
+    case SKE_ALG_SM4:
 #endif
 
-#if (defined(SUPPORT_SKE_AES_128) ||defined(SUPPORT_SKE_AES_192) ||defined(SUPPORT_SKE_AES_256) ||defined(SUPPORT_SKE_SM4))
+#if (defined(SUPPORT_SKE_AES_128) || defined(SUPPORT_SKE_AES_192) || defined(SUPPORT_SKE_AES_256) || defined(SUPPORT_SKE_SM4))
         byteLen = 16;
         break;
 #endif
 
     default:
-        byteLen = 16;   //default alg SM4
+        byteLen = 16; //default alg SM4
     }
 
     return byteLen;
 }
-
 
 /**
  * @brief       get key byte length for specific ske_lp alg.
@@ -342,46 +329,44 @@ unsigned char ske_lp_get_key_byte_len(SKE_ALG ske_alg)
 {
     unsigned char byte_len;
 
-    switch(ske_alg)
-    {
+    switch (ske_alg) {
 #ifdef SUPPORT_SKE_DES
-    case SKE_ALG_DES :
+    case SKE_ALG_DES:
         byte_len = 8;
         break;
 #endif
 
 #ifdef SUPPORT_SKE_TDES_128
-    case SKE_ALG_TDES_128 :
+    case SKE_ALG_TDES_128:
 #endif
 
 #ifdef SUPPORT_SKE_TDES_EEE_128
-    case SKE_ALG_TDES_EEE_128 :
+    case SKE_ALG_TDES_EEE_128:
 #endif
 
 #ifdef SUPPORT_SKE_AES_128
-    case SKE_ALG_AES_128 :
+    case SKE_ALG_AES_128:
 #endif
 
 #ifdef SUPPORT_SKE_SM4
-    case SKE_ALG_SM4 :
+    case SKE_ALG_SM4:
 #endif
 
-#if (defined(SUPPORT_SKE_TDES_128) || defined(SUPPORT_SKE_TDES_EEE_128) || defined(SUPPORT_SKE_AES_128) \
-    ||defined(SUPPORT_SKE_SM4))
+#if (defined(SUPPORT_SKE_TDES_128) || defined(SUPPORT_SKE_TDES_EEE_128) || defined(SUPPORT_SKE_AES_128) || defined(SUPPORT_SKE_SM4))
         byte_len = 16;
         break;
 #endif
 
 #ifdef SUPPORT_SKE_TDES_192
-    case SKE_ALG_TDES_192 :
+    case SKE_ALG_TDES_192:
 #endif
 
 #ifdef SUPPORT_SKE_TDES_EEE_192
-    case SKE_ALG_TDES_EEE_192 :
+    case SKE_ALG_TDES_EEE_192:
 #endif
 
 #ifdef SUPPORT_SKE_AES_192
-    case SKE_ALG_AES_192 :
+    case SKE_ALG_AES_192:
 #endif
 
 #if (defined(SUPPORT_SKE_TDES_192) || defined(SUPPORT_SKE_TDES_EEE_192) || defined(SUPPORT_SKE_AES_192))
@@ -390,18 +375,17 @@ unsigned char ske_lp_get_key_byte_len(SKE_ALG ske_alg)
 #endif
 
 #ifdef SUPPORT_SKE_AES_256
-    case SKE_ALG_AES_256 :
+    case SKE_ALG_AES_256:
         byte_len = 32;
         break;
 #endif
 
     default:
-        byte_len = 16;   //default alg SM4
+        byte_len = 16; //default alg SM4
     }
 
     return byte_len;
 }
-
 
 /**
  * @brief       set ske_lp iv.
@@ -417,17 +401,13 @@ void ske_lp_set_iv(unsigned char *iv, unsigned int block_bytes)
 {
     unsigned int tmp[4];
 
-    if(((unsigned int)iv) & 3)
-    {
+    if (((unsigned int)iv) & 3) {
         memcpy_(tmp, iv, block_bytes);
-        ske_lp_set_iv_uint32(tmp, block_bytes/4);
-    }
-    else
-    {
-        ske_lp_set_iv_uint32((unsigned int *)iv, block_bytes/4);
+        ske_lp_set_iv_uint32(tmp, block_bytes / 4);
+    } else {
+        ske_lp_set_iv_uint32((unsigned int *)iv, block_bytes / 4);
     }
 }
-
 
 /**
  * @brief       ske_lp setting key
@@ -452,18 +432,17 @@ void ske_lp_set_key(SKE_ALG alg, const unsigned char *key, unsigned short key_by
     memcpy_(tmp, key, key_bytes);
 
     //for 3DES-2key, set key3=key1
-    switch(alg)
-    {
+    switch (alg) {
 #ifdef SUPPORT_SKE_TDES_128
-    case SKE_ALG_TDES_128 :
+    case SKE_ALG_TDES_128:
 #endif
 
 #ifdef SUPPORT_SKE_TDES_EEE_128
-    case SKE_ALG_TDES_EEE_128 :
+    case SKE_ALG_TDES_EEE_128:
 #endif
 
 #if (defined(SUPPORT_SKE_TDES_128) || defined(SUPPORT_SKE_TDES_EEE_128))
-        memcpy_(tmp+4, key, 8);
+        memcpy_(tmp + 4, key, 8);
         key_bytes += 8;
         break;
 #endif
@@ -472,9 +451,8 @@ void ske_lp_set_key(SKE_ALG alg, const unsigned char *key, unsigned short key_by
         break;
     }
 
-    ske_lp_set_key_uint32(tmp, key_idx, key_bytes/4);
+    ske_lp_set_key_uint32(tmp, key_idx, key_bytes / 4);
 }
-
 
 /**
  * @brief       ske_lp init config
@@ -497,94 +475,77 @@ void ske_lp_set_key(SKE_ALG alg, const unsigned char *key, unsigned short key_by
         otherwise, key is from secure port, and (sp_key_idx & 0x7FFF) must be in [1,SKE_MAX_KEY_IDX].
   @endverbatim
  */
-unsigned int ske_lp_init_internal(SKE_CTX *ctx, SKE_ALG alg, SKE_MODE mode, SKE_CRYPTO crypto, const unsigned char *key,
-        unsigned short sp_key_idx, unsigned char *iv, unsigned int dma_en)
+unsigned int ske_lp_init_internal(SKE_CTX *ctx, SKE_ALG alg, SKE_MODE mode, SKE_CRYPTO crypto, const unsigned char *key, unsigned short sp_key_idx, unsigned char *iv, unsigned int dma_en)
 {
     unsigned int key_bytes;
-    (void)sp_key_idx;
+    ctx->sp_key_idx = sp_key_idx;
 
-    if(NULL == ctx)
-    {
+    if (NULL == ctx) {
         return SKE_BUFFER_NULL;
-    }
-    else if(SKE_SUCCESS != ske_lp_check_alg(alg))
-    {
+    } else if (SKE_SUCCESS != ske_lp_check_alg(alg)) {
         return SKE_INPUT_INVALID;
-    }
-    else if(SKE_SUCCESS != ske_lp_check_mode(alg, mode))
-    {
+    } else if (SKE_SUCCESS != ske_lp_check_mode(alg, mode)) {
         return SKE_INPUT_INVALID;
-    }
-    else if(crypto > SKE_CRYPTO_DECRYPT)
-    {
+    } else if (crypto > SKE_CRYPTO_DECRYPT) {
         return SKE_INPUT_INVALID;
-    }
-    else if(NULL == key)   //secure port
+    } else if (NULL == key) //secure port
     {
 #ifdef SKE_SECURE_PORT_FUNCTION
-        /*  TODO. to add some checking actions about secure port, this depends on user */
+        /*  TODO. to add some checking actions about secure port, this depends on user
         if((SKE_ALG_SM4 != alg) || (sp_key_idx > 3))
         {
             return SKE_ERROR;//SKE_BUFFER_NULL;
-        }
+        }*/
 #else
         return SKE_INPUT_INVALID;
 #endif
+    } else {
+        ;
     }
-    else
-    {;}
 
-    if(SKE_MODE_ECB == mode)
-    {
+    if (SKE_MODE_ECB == mode) {
         iv = NULL;
+    } else if (NULL == iv) {
+        return SKE_BUFFER_NULL; //SKE_ERROR;//
+    } else {
+        ;
     }
-    else if(NULL == iv)
-    {
-        return SKE_BUFFER_NULL;//SKE_ERROR;//
-    }
-    else
-    {;}
 
 #if (defined(SUPPORT_SKE_TDES_128))
     /******************* because hw does not support TDES ******************/
 
-    g_ske_alg = alg;   //very important!!! to distinguish 3DES and other algorithm, if the MACRO is available
+    g_ske_alg = alg; //very important!!! to distinguish 3DES and other algorithm, if the MACRO is available
 
-    if((SKE_ALG_TDES_128 == alg) || (SKE_ALG_TDES_192 == alg) || (SKE_ALG_TDES_EEE_128 == alg) ||
-            (SKE_ALG_TDES_EEE_192 == alg))
-    {
-        if((SKE_ALG_TDES_128 == alg) || (SKE_ALG_TDES_EEE_128 == alg))
-        {
+    if ((SKE_ALG_TDES_128 == alg) || (SKE_ALG_TDES_192 == alg) || (SKE_ALG_TDES_EEE_128 == alg) ||
+        (SKE_ALG_TDES_EEE_192 == alg)) {
+        if ((SKE_ALG_TDES_128 == alg) || (SKE_ALG_TDES_EEE_128 == alg)) {
             memcpy_(g_ske_key_buf, key, 16);
-            memcpy_(g_ske_key_buf+16/4, key, 8);
-        }
-        else
-        {
+            memcpy_(g_ske_key_buf + 16 / 4, key, 8);
+        } else {
             memcpy_(g_ske_key_buf, key, 24);
         }
 
         g_ske_ctx->block_bytes = ske_lp_get_block_byte_len(alg);
-        g_ske_ctx->block_words = g_ske_ctx->block_bytes>>2;
+        g_ske_ctx->block_words = g_ske_ctx->block_bytes >> 2;
 
-        g_ske_mode = mode;
+        g_ske_mode          = mode;
         g_ske_crypto_action = crypto;
-        alg = SKE_ALG_DES;
+        alg                 = SKE_ALG_DES;
 
-        if(SKE_MODE_ECB != mode)
-        {
+        if (SKE_MODE_ECB != mode) {
             memcpy_(g_ske_iv_buf, iv, 8);
             mode = SKE_MODE_ECB;
+        } else {
+            ;
         }
-        else
-        {;}
+    } else {
+        ;
     }
-    else
-    {;}
     /***********************************************************************/
 #endif
 
     ctx->block_bytes = ske_lp_get_block_byte_len(alg);
-    ctx->block_words = ctx->block_bytes>>2;
+    ctx->block_words = ctx->block_bytes >> 2;
 
     ske_lp_set_endian_uint32();
     ske_lp_set_alg(alg);
@@ -593,20 +554,18 @@ unsigned int ske_lp_init_internal(SKE_CTX *ctx, SKE_ALG alg, SKE_MODE mode, SKE_
     ske_lp_set_last_block(0);
 
     //set iv or nonce
-    if(NULL != iv)
-    {
+    if (NULL != iv) {
         ske_lp_set_iv(iv, ctx->block_bytes);
+    } else {
+        ;
     }
-    else
-    {;}
 
-    if(NULL != key)    //key is from user input
+    if (NULL != key) //key is from user input
     {
         // key1
         key_bytes = ske_lp_get_key_byte_len(alg);
         ske_lp_set_key(alg, key, key_bytes, 1);
-    }
-    else              //key is from secure port
+    } else //key is from secure port
     {
         //TODO. set secure port.
     }
@@ -636,7 +595,7 @@ unsigned int ske_lp_init(SKE_ALG alg, SKE_MODE mode, SKE_CRYPTO crypto, unsigned
 {
     ske_lp_set_cpu_mode();
 #if defined(SUPPORT_SKE_MODE_XTS)
-    ske_lp_set_c_len_uint32(0);  //just for XTS mode
+    ske_lp_set_c_len_uint32(0); //just for XTS mode
 #endif
 
     return ske_lp_init_internal(g_ske_ctx, alg, mode, crypto, key, sp_key_idx, iv, SKE_LP_DMA_DISABLE);
@@ -660,135 +619,111 @@ unsigned int ske_lp_init(SKE_ALG alg, SKE_MODE mode, SKE_CRYPTO crypto, unsigned
  */
 unsigned int ske_tdes_update_blocks(unsigned char *in, unsigned char *out, unsigned int bytes)
 {
-    unsigned int tmp_in[2], tmp_out[2];
-    unsigned int tmp_iv[2];
+    unsigned int   tmp_in[2], tmp_out[2];
+    unsigned int   tmp_iv[2];
     unsigned char *p_out = out;
-    unsigned int is_EEE;
-    unsigned int i;
-    unsigned int ret;
+    unsigned int   is_EEE;
+    unsigned int   i;
+    unsigned int   ret;
 
-    if(NULL == in)
-    {
+    if (NULL == in) {
         return SKE_BUFFER_NULL;
-    }
-    else if(bytes & (g_ske_ctx->block_bytes-1))
-    {
+    } else if (bytes & (g_ske_ctx->block_bytes - 1)) {
         return SKE_INPUT_INVALID;
-    }
-    else if (0 == bytes)
-    {
+    } else if (0 == bytes) {
         return SKE_SUCCESS;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    if((SKE_ALG_TDES_128 == g_ske_alg) || (SKE_ALG_TDES_192 == g_ske_alg))
-    {
+    if ((SKE_ALG_TDES_128 == g_ske_alg) || (SKE_ALG_TDES_192 == g_ske_alg)) {
         is_EEE = 0;
-    }
-    else
-    {
+    } else {
         is_EEE = 1;
     }
 
     //input one block ---> calculating ---> output one block
-    for (i = 0; i < bytes; i += g_ske_ctx->block_bytes)
-    {
+    for (i = 0; i < bytes; i += g_ske_ctx->block_bytes) {
         /************* first **************/
         memcpy_(tmp_in, in, g_ske_ctx->block_bytes);
 
-        if((SKE_MODE_CFB == g_ske_mode) || (SKE_MODE_OFB == g_ske_mode) || (SKE_MODE_CTR == g_ske_mode))
-        {
+        if ((SKE_MODE_CFB == g_ske_mode) || (SKE_MODE_OFB == g_ske_mode) || (SKE_MODE_CTR == g_ske_mode)) {
             ret = tdes_ecb_update_one_block(is_EEE, g_ske_key_buf, SKE_CRYPTO_ENCRYPT, g_ske_iv_buf, tmp_iv);
-            if(SKE_SUCCESS != ret)
-            {
+            if (SKE_SUCCESS != ret) {
                 ret = SKE_ERROR;
                 goto END;
+            } else {
+                ;
             }
-            else
-            {;}
 
             tmp_out[0] = tmp_iv[0] ^ tmp_in[0];
             tmp_out[1] = tmp_iv[1] ^ tmp_in[1];
-        }
-        else    //ECB or CBC
+        } else                                                                               //ECB or CBC
         {
-            if((SKE_MODE_CBC == g_ske_mode) && (SKE_CRYPTO_ENCRYPT == g_ske_crypto_action)) //CBC encrypt
+            if ((SKE_MODE_CBC == g_ske_mode) && (SKE_CRYPTO_ENCRYPT == g_ske_crypto_action)) //CBC encrypt
             {
                 tmp_in[0] ^= g_ske_iv_buf[0];
                 tmp_in[1] ^= g_ske_iv_buf[1];
+            } else {
+                ;
             }
-            else
-            {;}
 
             ret = tdes_ecb_update_one_block(is_EEE, g_ske_key_buf, g_ske_crypto_action, tmp_in, tmp_out);
-            if(SKE_SUCCESS != ret)
-            {
+            if (SKE_SUCCESS != ret) {
                 ret = SKE_ERROR;
                 goto END;
+            } else {
+                ;
             }
-            else
-            {;}
 
-            if((SKE_MODE_CBC == g_ske_mode) && (SKE_CRYPTO_DECRYPT == g_ske_crypto_action)) //CBC decrypt
+            if ((SKE_MODE_CBC == g_ske_mode) && (SKE_CRYPTO_DECRYPT == g_ske_crypto_action)) //CBC decrypt
             {
                 tmp_out[0] ^= g_ske_iv_buf[0];
                 tmp_out[1] ^= g_ske_iv_buf[1];
+            } else {
+                ;
             }
-            else
-            {;}
         }
 
         //update iv
-        if(SKE_MODE_CTR == g_ske_mode)
-        {
+        if (SKE_MODE_CTR == g_ske_mode) {
             ske_big_endian_add_uint8((unsigned char *)g_ske_iv_buf, g_ske_ctx->block_bytes, 1);
-        }
-        else if(SKE_MODE_OFB == g_ske_mode)
-        {
+        } else if (SKE_MODE_OFB == g_ske_mode) {
             uint32_copy(g_ske_iv_buf, tmp_iv, g_ske_ctx->block_words);
-        }
-        else if((SKE_MODE_CBC == g_ske_mode) || (SKE_MODE_CFB == g_ske_mode))
-        {
-            if(SKE_CRYPTO_ENCRYPT == g_ske_crypto_action)
-            {
+        } else if ((SKE_MODE_CBC == g_ske_mode) || (SKE_MODE_CFB == g_ske_mode)) {
+            if (SKE_CRYPTO_ENCRYPT == g_ske_crypto_action) {
                 uint32_copy(g_ske_iv_buf, tmp_out, g_ske_ctx->block_words);
-            }
-            else
-            {
+            } else {
                 uint32_copy(g_ske_iv_buf, tmp_in, g_ske_ctx->block_words);
             }
+        } else {
+            ;
         }
-        else
-        {;}
 
         //output
-        if(out)
-        {
+        if (out) {
             memcpy_(out, tmp_out, g_ske_ctx->block_bytes);
             out += g_ske_ctx->block_bytes;
+        } else {
+            ;
         }
-        else
-        {;}
 
         in += g_ske_ctx->block_bytes;
     }
 
 END:
 
-    if(SKE_ERROR == ret)
-    {
-        uint32_clear(g_ske_key_buf, sizeof(g_ske_key_buf)/4);
-        uint32_clear(g_ske_iv_buf, sizeof(g_ske_iv_buf)/4);
-        if(p_out)
-        {
+    if (SKE_ERROR == ret) {
+        uint32_clear(g_ske_key_buf, sizeof(g_ske_key_buf) / 4);
+        uint32_clear(g_ske_iv_buf, sizeof(g_ske_iv_buf) / 4);
+        if (p_out) {
             memset_(p_out, 0, bytes);
+        } else {
+            ;
         }
-        else
-        {;}
+    } else {
+        ;
     }
-    else
-    {;}
 
     return ret;
 }
@@ -810,29 +745,23 @@ END:
  */
 unsigned int ske_lp_update_blocks(unsigned char *in, unsigned char *out, unsigned int bytes)
 {
-    if((NULL == in) || (NULL == out))
-    {
+    if ((NULL == in) || (NULL == out)) {
         return SKE_BUFFER_NULL;
-    }
-    else if(bytes & (g_ske_ctx->block_bytes - 1))
-    {
+    } else if (bytes & (g_ske_ctx->block_bytes - 1)) {
         return SKE_INPUT_INVALID;
-    }
-    else if (0 == bytes)
-    {
+    } else if (0 == bytes) {
         return SKE_SUCCESS;
+    } else {
+        ;
     }
-    else
-    {;}
 
 #if (defined(SUPPORT_SKE_TDES_128))
-    if((SKE_ALG_TDES_128 == g_ske_alg) || (SKE_ALG_TDES_192 == g_ske_alg) ||
-            (SKE_ALG_TDES_EEE_128 == g_ske_alg) || (SKE_ALG_TDES_EEE_192 == g_ske_alg))
-    {
+    if ((SKE_ALG_TDES_128 == g_ske_alg) || (SKE_ALG_TDES_192 == g_ske_alg) ||
+        (SKE_ALG_TDES_EEE_128 == g_ske_alg) || (SKE_ALG_TDES_EEE_192 == g_ske_alg)) {
         return ske_tdes_update_blocks(in, out, bytes);
+    } else {
+        ;
     }
-    else
-    {;}
 #endif
 
     return ske_lp_update_blocks_internal(g_ske_ctx, in, out, bytes);
@@ -851,11 +780,11 @@ unsigned int ske_lp_final(void)
     memset_(g_ske_ctx, 0, sizeof(SKE_CTX));
 
 #if (defined(SUPPORT_SKE_TDES_128))
-    g_ske_alg = SKE_ALG_DES;
+    g_ske_alg           = SKE_ALG_DES;
     g_ske_crypto_action = SKE_CRYPTO_ENCRYPT;
-    g_ske_mode = SKE_MODE_ECB;
-    uint32_clear(g_ske_key_buf, sizeof(g_ske_key_buf)/4);
-    uint32_clear(g_ske_iv_buf, sizeof(g_ske_iv_buf)/4);
+    g_ske_mode          = SKE_MODE_ECB;
+    uint32_clear(g_ske_key_buf, sizeof(g_ske_key_buf) / 4);
+    uint32_clear(g_ske_iv_buf, sizeof(g_ske_iv_buf) / 4);
 #endif
 
     return SKE_SUCCESS;
@@ -885,54 +814,46 @@ unsigned int ske_lp_final(void)
       -# 5.bytes must be a multiple of block byte length.
   @endverbatim
  */
-unsigned int ske_lp_crypto(SKE_ALG alg, SKE_MODE mode, SKE_CRYPTO crypto, unsigned char *key, unsigned short sp_key_idx, unsigned char *iv,
-        unsigned char *in, unsigned char *out, unsigned int bytes)
+unsigned int ske_lp_crypto(SKE_ALG alg, SKE_MODE mode, SKE_CRYPTO crypto, unsigned char *key, unsigned short sp_key_idx, unsigned char *iv, unsigned char *in, unsigned char *out, unsigned int bytes)
 {
     unsigned int ret;
 
     ske_lp_set_cpu_mode();
 #if defined(SUPPORT_SKE_MODE_XTS)
-    ske_lp_set_c_len_uint32(0);  //just for XTS mode
+    ske_lp_set_c_len_uint32(0); //just for XTS mode
 #endif
 
     ret = ske_lp_init_internal(g_ske_ctx, alg, mode, crypto, key, sp_key_idx, iv, SKE_LP_DMA_DISABLE);
-    if(SKE_SUCCESS != ret)
-    {
+    if (SKE_SUCCESS != ret) {
         return ret;
-    }
-    else
-    {
+    } else {
         return ske_lp_update_blocks(in, out, bytes);
     }
 }
 
-
 unsigned int ske_lp_update_blocks_no_output_(SKE_CTX *ctx, unsigned char *in, unsigned int bytes)
 {
 #if (defined(SUPPORT_SKE_TDES_128))
-    if((SKE_ALG_TDES_128 == g_ske_alg) || (SKE_ALG_TDES_192 == g_ske_alg) ||
-            (SKE_ALG_TDES_EEE_128 == g_ske_alg) || (SKE_ALG_TDES_EEE_192 == g_ske_alg))
-    {
+    if ((SKE_ALG_TDES_128 == g_ske_alg) || (SKE_ALG_TDES_192 == g_ske_alg) ||
+        (SKE_ALG_TDES_EEE_128 == g_ske_alg) || (SKE_ALG_TDES_EEE_192 == g_ske_alg)) {
         return ske_tdes_update_blocks(in, NULL, bytes);
+    } else {
+        ;
     }
-    else
-    {;}
 #endif
 
     return ske_lp_update_blocks_no_output(ctx, in, bytes);
 }
 
-
 unsigned int ske_lp_update_blocks_internal_(SKE_CTX *ctx, unsigned char *in, unsigned char *out, unsigned int bytes)
 {
 #if (defined(SUPPORT_SKE_TDES_128))
-    if((SKE_ALG_TDES_128 == g_ske_alg) || (SKE_ALG_TDES_192 == g_ske_alg) ||
-            (SKE_ALG_TDES_EEE_128 == g_ske_alg) || (SKE_ALG_TDES_EEE_192 == g_ske_alg))
-    {
+    if ((SKE_ALG_TDES_128 == g_ske_alg) || (SKE_ALG_TDES_192 == g_ske_alg) ||
+        (SKE_ALG_TDES_EEE_128 == g_ske_alg) || (SKE_ALG_TDES_EEE_192 == g_ske_alg)) {
         return ske_tdes_update_blocks(in, out, bytes);
+    } else {
+        ;
     }
-    else
-    {;}
 #endif
 
     return ske_lp_update_blocks_internal(ctx, in, out, bytes);
@@ -961,9 +882,9 @@ unsigned int ske_lp_update_blocks_internal_(SKE_CTX *ctx, unsigned char *in, uns
 unsigned int ske_lp_dma_init(SKE_ALG alg, SKE_MODE mode, SKE_CRYPTO crypto, unsigned char *key, unsigned short sp_key_idx, unsigned char *iv)
 {
     ske_lp_set_cpu_mode();
-#if defined(SUPPORT_SKE_MODE_XTS)
-    ske_lp_set_c_len_uint32(0);  //just for XTS mode
-#endif
+    #if defined(SUPPORT_SKE_MODE_XTS)
+    ske_lp_set_c_len_uint32(0); //just for XTS mode
+    #endif
 
     return ske_lp_init_internal(g_ske_ctx, alg, mode, crypto, key, sp_key_idx, iv, SKE_LP_DMA_ENABLE);
 }
@@ -985,20 +906,14 @@ unsigned int ske_lp_dma_init(SKE_ALG alg, SKE_MODE mode, SKE_CRYPTO crypto, unsi
  */
 unsigned int ske_lp_dma_update_blocks(unsigned int *in, unsigned int *out, unsigned int words, SKE_CALLBACK callback)
 {
-    if(0 == words)
-    {
+    if (0 == words) {
         return SKE_SUCCESS;
-    }
-    else if(words & (g_ske_ctx->block_words - 1))
-    {
+    } else if (words & (g_ske_ctx->block_words - 1)) {
         return SKE_INPUT_INVALID;
-    }
-    else
-    {
+    } else {
         return ske_lp_dma_operate(g_ske_ctx, in, out, words, words, callback);
     }
 }
-
 
 /**
  * @brief       ske_lp finish(DMA style)
@@ -1015,7 +930,6 @@ unsigned int ske_lp_dma_final(void)
     return SKE_SUCCESS;
 }
 
-
 /**
  * @brief       ske_lp encryption or decryption(DMA style)
  * @param[in]   alg              - ske_lp algorithm.
@@ -1031,7 +945,7 @@ unsigned int ske_lp_dma_final(void)
  * @param[in]   callback         - callback function pointer, this could be NULL, means do nothing.
  * @return      0:success     other:error
  * @note
-  @verbatim
+  @verbatim 
       -# 1.if mode is ECB, then there is no iv, in this case iv could be NULL.
       -# 2.this function is designed for ECB/CBC/CFB/OFB/CTR/XTS modes, and input/output unit is a block.
       -# 3.if key is from user input, please make sure key is not NULL(now sp_key_idx is useless),
@@ -1041,18 +955,16 @@ unsigned int ske_lp_dma_final(void)
       -# 5.words must be a multiple of block word length.
   @endverbatim
  */
-unsigned int ske_lp_dma_crypto(SKE_ALG alg, SKE_MODE mode, SKE_CRYPTO crypto, unsigned char *key, unsigned short sp_key_idx, unsigned char *iv,
-        unsigned int *in, unsigned int *out, unsigned int words, SKE_CALLBACK callback)
+unsigned int ske_lp_dma_crypto(SKE_ALG alg, SKE_MODE mode, SKE_CRYPTO crypto, unsigned char *key, unsigned short sp_key_idx, unsigned char *iv, unsigned int *in, unsigned int *out, unsigned int words, SKE_CALLBACK callback)
 {
     unsigned int ret;
 
     ret = ske_lp_dma_init(alg, mode, crypto, key, sp_key_idx, iv);
-    if(SKE_SUCCESS != ret)
-    {
+    if (SKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     return ske_lp_dma_update_blocks(in, out, words, callback);
 }

@@ -39,7 +39,6 @@
  * @brief     This function serves to  set ble_1M  mode of RF.
  * @return    none.
  */
-_attribute_ram_code_
 void rf_set_ble_1M_mode(void)
 {
     //ble1m_set_up
@@ -77,7 +76,6 @@ void rf_set_ble_1M_NO_PN_mode(void)
  * @brief     This function serves to  set ble_2M  mode of RF.
  * @return    none.
  */
-_attribute_ram_code_
 void rf_set_ble_2M_mode(void)
 {
     reg_rf_tx_mode1 = 0x1f;
@@ -115,7 +113,6 @@ void rf_set_ble_2M_NO_PN_mode(void)
  * @brief     This function serves to  set ble_500K  mode of RF.
  * @return    none.
  */
-_attribute_ram_code_
 void rf_set_ble_500K_mode(void)
 {
     //ble_500K_set_up
@@ -135,7 +132,6 @@ void rf_set_ble_500K_mode(void)
  * @brief     This function serves to  set zigbee_125K  mode of RF.
  * @return    none.
  */
-_attribute_ram_code_
 void rf_set_ble_125K_mode(void)
 {
     //ble_125K_set_up
@@ -159,7 +155,6 @@ void rf_set_ble_125K_mode(void)
  * @param[in]   tick   - It indicates timeout duration in Rx status.Max value: 0xffffff (16777215).
  * @return      none
  */
-_attribute_ram_code_
 void rf_start_brx  (void* addr, unsigned int tick)
 {
     write_reg32 (0xd4170228, 0x0fffffff);
@@ -179,7 +174,6 @@ void rf_start_brx  (void* addr, unsigned int tick)
  * @param[in]   tick   - It indicates timeout duration in Rx status.Max value: 0xffffff (16777215).
  * @return      none.
  */
-_attribute_ram_code_
 void rf_start_btx (void* addr, unsigned int tick)
 {
     write_reg32(0xd4170218, tick);
@@ -193,7 +187,6 @@ void rf_start_btx (void* addr, unsigned int tick)
  * @param[in]   chn_num  - Bluetooth channel set according to Bluetooth protocol standard.
  * @return      none.
  */
-_attribute_ram_code_
 void rf_set_ble_chn (signed char chn_num)
 {
 //  signed char ble_chn_num = 0;

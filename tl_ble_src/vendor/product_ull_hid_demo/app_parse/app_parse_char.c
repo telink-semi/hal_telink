@@ -30,13 +30,14 @@
 #include "app_parse_cfg.h"
 #include "app_ringbuffer.h"
 
-static u8 ringBuf[PARSE_CHAR_UART_BUFF_SIZE * 2];
-u8 shellRecvCmdBuf[PARSE_CHAR_UART_BUFF_SIZE + 1];        //str + '\0'
-u16 shellRecvCmdBufIdx = 0;
-int gParseSize = 0;
-ring_buf_t appParseRingBuf;
-parse_fun_list_t* gParseList = NULL;
-extern void init_interface(void);
+static u8         ringBuf[PARSE_CHAR_UART_BUFF_SIZE * 2];
+u8                shellRecvCmdBuf[PARSE_CHAR_UART_BUFF_SIZE + 1]; //str + '\0'
+u16               shellRecvCmdBufIdx = 0;
+int               gParseSize         = 0;
+ring_buf_t        appParseRingBuf;
+parse_fun_list_t *gParseList = NULL;
+extern void       init_interface(void);
+
 /**
  * @brief        parse initial function.
  * @param[in]    parseList: parse command list.
@@ -60,12 +61,12 @@ void app_parse_init(const parse_fun_list_t *parseList, int size)
  */
 void app_parse_printf(const char *format, ...)
 {
-    u8 aclBuf[PARSE_CHAR_UART_BUFF_SIZE];
+    u8      aclBuf[PARSE_CHAR_UART_BUFF_SIZE];
     va_list args;
-    va_start( args, format );
+    va_start(args, format);
 
-    int ret = vsnprintf((char*)(aclBuf), PARSE_CHAR_UART_BUFF_SIZE, format, args);
-    va_end( args );
+    int ret = vsnprintf((char *)(aclBuf), PARSE_CHAR_UART_BUFF_SIZE, format, args);
+    va_end(args);
 
 #if (APP_AUDIO_UI_IFACE == APP_AUDIO_UI_UART)
     uart_send(PARSE_CHAR_UART_PORT, aclBuf, ret);
@@ -79,42 +80,35 @@ void app_parse_printf(const char *format, ...)
  * @param[in]    str: input string, '\0' ending, ' ' or '\t' separator.
  * @return        next input parameter pointer.
  */
-static char* tlk_strchr(char *str)
+static char *tlk_strchr(char *str)
 {
     bool stringFlag = false;
 
-    while(*str == ' ' || *str == '\t')
-    {
+    while (*str == ' ' || *str == '\t') {
         str++;
     }
 
-    if(*str == '"')
-    {
+    if (*str == '"') {
         stringFlag = true;
         str++;
     }
 
-    while(*str != '\0')
-    {
-        if(*str == '\\')    //Escape character
+    while (*str != '\0') {
+        if (*str == '\\') //Escape character
         {
             str++;
-            if(*str == '"')
-                str ++;
+            if (*str == '"') {
+                str++;
+            }
         }
 
-        if(stringFlag)
-        {
-            if(*str == '"')
-            {
+        if (stringFlag) {
+            if (*str == '"') {
                 *str++ = '\0';
                 break;
             }
-        }
-        else
-        {
-            if(*str == ' ' || *str == '\t')
-            {
+        } else {
+            if (*str == ' ' || *str == '\t') {
                 *str++ = '\0';
                 break;
             }
@@ -135,47 +129,40 @@ static int tlk_split_argv(char *str, char *argv[])
 {
     int argc = 0;
 
-    if (!strlen(str))
-    {
+    if (!strlen(str)) {
         return 0;
     }
 
-    for(int i = strlen(str)-1; i>0; i--)
-    {
-        if(str[i] == '\r' || str[i] == '\n')
+    for (int i = strlen(str) - 1; i > 0; i--) {
+        if (str[i] == '\r' || str[i] == '\n') {
             str[i] = '\0';
-        else
+        } else {
             break;
+        }
     }
 
-    while (*str && (*str == ' ' || *str == '\t'))
-    {
-        str++;    //skip empty or tab
+    while (*str && (*str == ' ' || *str == '\t')) {
+        str++; //skip empty or tab
     }
 
-    if (!*str)
-    {
+    if (!*str) {
         return 0;
     }
 
     argv[argc++] = str;
 
-    while ((str = tlk_strchr(str)))
-    {
-        while (*str && (*str == ' ' || *str == '\t'))
-        {
+    while ((str = tlk_strchr(str))) {
+        while (*str && (*str == ' ' || *str == '\t')) {
             str++;
         }
 
-        if (!*str)
-        {
+        if (!*str) {
             break;
         }
 
-        argv[argc++] = *str == '"'? str+1: str;
+        argv[argc++] = *str == '"' ? str + 1 : str;
 
-        if (argc == PARSE_CHAR_MAX_ARGV_SIZE)
-        {
+        if (argc == PARSE_CHAR_MAX_ARGV_SIZE) {
             app_parse_printf("Too many parameters (max %zu)\r\n", PARSE_CHAR_MAX_ARGV_SIZE);
             return 0;
         }
@@ -204,7 +191,7 @@ void app_parse_loop(void)
         }
 
         if (shellRecvCmdBuf[shellRecvCmdBufIdx] == '\n' || shellRecvCmdBuf[shellRecvCmdBufIdx] == '\r' ||
-                shellRecvCmdBuf[shellRecvCmdBufIdx] == '\0' || shellRecvCmdBufIdx == (sizeof(shellRecvCmdBuf) - 1)) {
+            shellRecvCmdBuf[shellRecvCmdBufIdx] == '\0' || shellRecvCmdBufIdx == (sizeof(shellRecvCmdBuf) - 1)) {
             shellRecvCmdBuf[shellRecvCmdBufIdx] = '\0';
             break;
         }
@@ -216,12 +203,10 @@ void app_parse_loop(void)
     // We have complete line
     if (shellRecvCmdBuf[shellRecvCmdBufIdx] == '\0') {
         char *argv[PARSE_CHAR_MAX_ARGV_SIZE];
-        int argc = tlk_split_argv((char *)shellRecvCmdBuf, argv);
-        for(int i = 0; i<gParseSize; i++)
-        {
-            if(strcasecmp(argv[0], gParseList[i].fun_name) == 0)
-            {
-                gParseList[i].fun(&argv[1], argc-1, gParseList[i].user_data);
+        int   argc = tlk_split_argv((char *)shellRecvCmdBuf, argv);
+        for (int i = 0; i < gParseSize; i++) {
+            if (strcasecmp(argv[0], gParseList[i].fun_name) == 0) {
+                gParseList[i].fun(&argv[1], argc - 1, gParseList[i].user_data);
             }
         }
         shellRecvCmdBufIdx = 0;
@@ -233,7 +218,7 @@ void app_parse_loop(void)
  * @param[in]    ps: value string, '\0' ending, supported -1, -0xAB, 1.
  * @return        immediate value.
  */
-int app_parse_str2n (char * ps)
+int app_parse_str2n(char *ps)
 {
     int n = 0;
     int s = 1;
@@ -242,30 +227,23 @@ int app_parse_str2n (char * ps)
 
     while (ps[i]) {
         int c = ps[i];
-        if (i==0 && c == '-') {
+        if (i == 0 && c == '-') {
             s = -1;
-        }
-        else if (c == 'x' || c == 'X') {
+        } else if (c == 'x' || c == 'X') {
             b = 16;
-        }
-        else {    //
-            if (c>='A' && c<='F') {
+        } else { //
+            if (c >= 'A' && c <= 'F') {
                 c = c - 'A' + 10;
-            }
-            else if (c>='a' && c<='f') {
+            } else if (c >= 'a' && c <= 'f') {
                 c = c - 'a' + 10;
-            }
-            else if (c>='0' && c<='9' ) {
+            } else if (c >= '0' && c <= '9') {
                 c -= '0';
-            }
-            else {
+            } else {
                 c = 0;
             }
             n = n * b + c;
-
         }
         i++;
     }
     return s * n;
 }
-

@@ -25,24 +25,27 @@
 
 //OTS: Object Transfer Service
 
-struct svc_ots_feature{
+struct svc_ots_feature
+{
     u32 OACP_feature;
     u32 OLCP_feature;
 };
 
-struct svc_ots_object_size{
+struct svc_ots_object_size
+{
     u32 currentSize;
     u32 allocatedSize;
 };
 
-struct svc_ots_universal_time{
+struct svc_ots_universal_time
+{
     u16 year;
-    u8 month;
-    u8 day;
-    u8 hour;
-    u8 minute;
-    u8 second;
-}__attribute__((packed));
+    u8  month;
+    u8  day;
+    u8  hour;
+    u8  minute;
+    u8  second;
+} __attribute__((packed));
 
 /**
  * @brief      for user add default OTS service in all GAP server.

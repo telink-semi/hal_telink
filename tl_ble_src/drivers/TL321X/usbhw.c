@@ -69,8 +69,7 @@ void usbhw_enable_manual_interrupt(int m)
 void usbhw_write_ep(unsigned int ep, unsigned char *data, int len)
 {
     usbhw_reset_ep_ptr(ep);
-    for (int i = 0; i < (len); ++i)
-    {
+    for (int i = 0; i < (len); ++i) {
         reg_usb_ep_dat(ep) = data[i];
     }
     usbhw_data_ep_ack(ep); // ACK
@@ -115,14 +114,45 @@ void usbhw_set_ep_map(usb_ep_index source_ep, usb_ep_index target_ep)
  */
 void usbhw_ep_map_en(usb_ep_map_sel_e map_en)
 {
-    if (map_en == EP_MAP_AUTO_EN)
-    {
+    if (map_en == EP_MAP_AUTO_EN) {
         reg_usb_min1 |= FLD_USB_EDP_MAP_AUTO_EN | FLD_USB_EDPS_SM_MAP_EN | FLD_USB_EDPS_MAP_TGL_EN | FLD_USB_GET_STA_MAP_EN;
-    }
-    else
-    {
+    } else {
         reg_usb_min1 &= ~(FLD_USB_EDP_MAP_AUTO_EN | FLD_USB_EDP_MAP_MANUAL_EN);
     }
+}
+
+/**
+ * @brief   This function serves to resume host by hardware.
+ * @note    When the host can send Set/Clear Feature, you can directly wake up the host by manipulating the register.
+ * @param   none.
+ * @return    none.
+ */
+void usb_hardware_remote_wakeup(void)
+{
+    reg_wakeup_en = FLD_USB_RESUME;
+    reg_wakeup_en = FLD_USB_PWDN_I;
+}
+
+/**
+ * @brief   This function serves to resume host by software.
+ * @note    When the host cannot send Set/Clear Feature, it needs to use IO simulation to wake up host remotely.
+ * @param   none.
+ * @return    none.
+ */
+void usb_software_remote_wakeup(void)
+{
+    gpio_function_en(GPIO_DP);
+    gpio_input_dis(GPIO_DP);
+    gpio_output_en(GPIO_DP);
+    gpio_function_en(GPIO_DM);
+    gpio_input_dis(GPIO_DM);
+    gpio_output_en(GPIO_DM);
+
+    gpio_set_low_level(GPIO_DP);
+    gpio_set_high_level(GPIO_DM);
+    delay_ms(22); /* If 22ms cannot wake up normally, you can extend this time appropriately. */
+
+    usb_set_pin_en();
 }
 
 /**
@@ -132,12 +162,9 @@ void usbhw_ep_map_en(usb_ep_map_sel_e map_en)
  */
 void dp_through_swire_en(bool dp_through_swire)
 {
-    if (dp_through_swire)
-    {
-        write_reg8(0x100c01, (read_reg8(0x100c01) | BIT(7))); // BIT(7) = 1 : swire_usb_en
-    }
-    else
-    {
+    if (dp_through_swire) {
+        write_reg8(0x100c01, (read_reg8(0x100c01) | BIT(7)));  // BIT(7) = 1 : swire_usb_en
+    } else {
         write_reg8(0x100c01, (read_reg8(0x100c01) & ~BIT(7))); // BIT(7) = 0 : swire_usb_dis
     }
 }
@@ -152,10 +179,10 @@ void dp_through_swire_en(bool dp_through_swire)
  */
 void usb_set_pin(bool dp_through_swire)
 {
-    reg_gpio_func_mux(GPIO_PA5) = 0x00; /* DM */
-    reg_gpio_func_mux(GPIO_PA6) = 0x00; /* DP */
-    gpio_function_dis(GPIO_PA5 | GPIO_PA6);
-    gpio_input_en(GPIO_PA5 | GPIO_PA6); /* DP/DM must set input enable */
+    reg_gpio_func_mux(GPIO_PA5) = 0x00;               /* DM */
+    reg_gpio_func_mux(GPIO_PA6) = 0x00;               /* DP */
+    gpio_function_dis((gpio_pin_e)(GPIO_PA5 | GPIO_PA6));
+    gpio_input_en((gpio_pin_e)(GPIO_PA5 | GPIO_PA6)); /* DP/DM must set input enable */
     usb_dp_pullup_en(1);
     /*                                      Note
      * If you want to enable the dp_through_swire function, there are the following considerations:

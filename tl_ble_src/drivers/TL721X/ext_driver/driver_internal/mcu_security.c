@@ -67,7 +67,7 @@ enum{
 
 /**
  * @brief   compatible identifier, Byte [100:103]    Bit [800:831]
- *          [0]:  fast_boot_enable, 1: enable£¬ 0 :disable;
+ *          [0]:  fast_boot_enable, 1: enable£; 0 :disable;
  */
 #define efuse_addr_boot_config3             100
 enum{

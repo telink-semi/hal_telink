@@ -27,37 +27,30 @@
 #include "stack/ble/ble.h"
 
 
-
-
-u8 defaultGmcsMediaPlayerName[] = { 'T', 'e', 'l', 'i', 'n', 'k', '-', 'M', 'e', 'd', 'i', 'a' };
+u8 defaultGmcsMediaPlayerName[] = {'T', 'e', 'l', 'i', 'n', 'k', '-', 'M', 'e', 'd', 'i', 'a'};
 
 const blc_mcps_regParam_t defaultMcpsParam = {
     .gmcsParam = {
-        .mediaPlayerName = defaultGmcsMediaPlayerName,
-        .mediaPlayerNameLen = sizeof(defaultGmcsMediaPlayerName),
-        .mediaPlayerIconObjectIdPresent = false,
-        .currentTrackSegmentsObjectIdPresent = false,
-        .currentTrackObjectIdPresent = false,
-        .nextTrackObjectIdPresent = false,
-        .parentGroupObjectIdPresent = false,
-        .currentGroupObjectIdPresent = false,
-        .mediaPlayerIconUrl = NULL,
-        .mediaPlayerIconUrlLen = 0,
-        .trackTitle = NULL,
-        .trackTitleLen = 0,
-        .trackDuration = -1,
-        .trackPosition = -1,
-        .mediaState = 0,
-        .CCID = 0,
-        .mediaControlPointOpcodesSupported = 0,
-        .playbackSpeed = 0,
-        .seekingSpeed = 0,
-        .playingOrdersSupported = 0,
-        .playingOrder = 1,
-    }
+                  .mediaPlayerName                     = defaultGmcsMediaPlayerName,
+                  .mediaPlayerNameLen                  = sizeof(defaultGmcsMediaPlayerName),
+                  .mediaPlayerIconObjectIdPresent      = false,
+                  .currentTrackSegmentsObjectIdPresent = false,
+                  .currentTrackObjectIdPresent         = false,
+                  .nextTrackObjectIdPresent            = false,
+                  .parentGroupObjectIdPresent          = false,
+                  .currentGroupObjectIdPresent         = false,
+                  .mediaPlayerIconUrl                  = NULL,
+                  .mediaPlayerIconUrlLen               = 0,
+                  .trackTitle                          = NULL,
+                  .trackTitleLen                       = 0,
+                  .trackDuration                       = -1,
+                  .trackPosition                       = -1,
+                  .mediaState                          = 0,
+                  .CCID                                = 0,
+                  .mediaControlPointOpcodesSupported   = 0,
+                  .playbackSpeed                       = 0,
+                  .seekingSpeed                        = 0,
+                  .playingOrdersSupported              = 0,
+                  .playingOrder                        = 1,
+                  }
 };
-
-
-
-
-

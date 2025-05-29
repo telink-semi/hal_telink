@@ -32,21 +32,19 @@
 //just for internal test
 //#define PRIME_TEST
 #ifdef PRIME_TEST
-volatile unsigned int xxxx=0,xxxx2=0,count=0;
+volatile unsigned int xxxx = 0, xxxx2 = 0, count = 0;
 #endif
 
 
-extern void pke_load_operand(volatile unsigned int *baseaddr, volatile const unsigned int *data, unsigned int wordLen);
-extern void pke_set_operand_width(unsigned int bitLen);
+extern void         pke_load_operand(volatile unsigned int *baseaddr, volatile const unsigned int *data, unsigned int wordLen);
+extern void         pke_set_operand_width(unsigned int bitLen);
 extern unsigned int pke_get_operand_bytes(void);
-extern void pke_clear_interrupt(void);
-extern void pke_set_microcode(unsigned int addr);
-extern void pke_start(void);
+extern void         pke_clear_interrupt(void);
+extern void         pke_set_microcode(unsigned int addr);
+extern void         pke_start(void);
 extern unsigned int pke_check_rt_code(void);
-extern void pke_wait_till_done(void);
+extern void         pke_wait_till_done(void);
 extern unsigned int pke_pre_calc_mont(volatile const unsigned int *modulus, unsigned int bitLen, unsigned int *H, unsigned int *n1);
-
-
 
 
 //small prime number table
@@ -92,7 +90,8 @@ const unsigned short PrimeTable[PTL_MAX] =
     2543,   2549,   2551,   2557,   2579,   2591,   2593,   2609,   2617,   2621,
     2633,   2647,   2657,   2659,   2663,   2671,   2677,   2683,   2687,   2689,
     2693,   2699,   2707,   2711,   2713,   2719,   2729,   2731,   2741,   2749,   //400
-/*  2753,   2767,   2777,   2789,   2791,   2797,   2801,   2803,   2819,   2833,
+
+        /*  2753,   2767,   2777,   2789,   2791,   2797,   2801,   2803,   2819,   2833,
     2837,   2843,   2851,   2857,   2861,   2879,   2887,   2897,   2903,   2909,
     2917,   2927,   2939,   2953,   2957,   2963,   2969,   2971,   2999,   3001,
     3011,   3019,   3023,   3037,   3041,   3049,   3061,   3067,   3079,   3083,
@@ -690,212 +689,411 @@ const unsigned short PrimeTable[PTL_MAX] =
 };
 
 
-
-#if(BIGINT_DIV_CHOICE == 1)
+#if (BIGINT_DIV_CHOICE == 1)
 
 //0xFFFFFFFFFFFFFFFF/prime
 const double_uint32_t PrimeTable_s[PTL_MAX] =
-{
-    {0x55555555, 0x55555555}, {0x33333333, 0x33333333},
-    {0x92492492, 0x24924924}, {0x5d1745d1, 0x1745d174},
-    {0xb13b13b1, 0x13b13b13}, {0x0f0f0f0f, 0x0f0f0f0f},
-    {0x50d79435, 0x0d79435e}, {0x8590b216, 0x0b21642c},
-    {0x8d3dcb08, 0x08d3dcb0}, {0x21084210, 0x08421084},
-    {0x306eb3e4, 0x06eb3e45}, {0xe7063e70, 0x063e7063},
-    {0x5f417d05, 0x05f417d0}, {0xe4c415c9, 0x0572620a},
-    {0xcade304d, 0x04d4873e}, {0xdd49c341, 0x0456c797},
-    {0xef368eb0, 0x04325c53}, {0x7e16ece5, 0x03d22635},
-    {0x2073615a, 0x039b0ad1}, {0x70381c0e, 0x0381c0e0},
-    {0xa2067b23, 0x033d91d2}, {0xed7e7534, 0x03159721},
-    {0x81702e05, 0x02e05c0b}, {0x5c5f02a3, 0x02a3a0fd},
-    {0xac5b3f5d, 0x0288df0c}, {0x9c95204f, 0x027c4597},
-    {0x456217ec, 0x02647c69}, {0xb02593f6, 0x02593f69},
-    {0x243f6f02, 0x0243f6f0}, {0x20408102, 0x02040810},
-    {0xe4a42715, 0x01f44659}, {0x3f8868a4, 0x01de5d6e},
-    {0x4b82c339, 0x01d77b65}, {0xdda338b2, 0x01b7d6c3},
-    {0x06c80d90, 0x01b20364}, {0x97a4b01a, 0x01a16d3f},
-    {0x9d0e228d, 0x01920fb4}, {0x0abb0499, 0x01886e5f},
-    {0x8e0ecc35, 0x017ad220}, {0xb4337c6c, 0x016e1f76},
-    {0x15372904, 0x016a13cd}, {0xc506b39a, 0x01571ed3},
-    {0x8f40feac, 0x01539094}, {0x725af6e7, 0x014cab88},
-    {0x3b2d066e, 0x0149539e}, {0x3de07479, 0x013698df},
-    {0x08092f11, 0x0125e227}, {0xc67c0d88, 0x0120b470},
-    {0xb3fb8744, 0x011e2ef3}, {0x08ca29c0, 0x01194538},  //50
-    {0x75d30336, 0x0112358e}, {0x0fef010f, 0x010fef01},
-    {0x7d734041, 0x0105197f}, {0x00ff00ff, 0x00ff00ff},
-    {0x211855a8, 0x00f92fb2}, {0x2cba8723, 0x00f3a0d5},
-    {0xcee0d399, 0x00f1d48b}, {0x18f3fc4d, 0x00ec9791},
-    {0x1fe2d8d3, 0x00e93965}, {0xe225fe30, 0x00e79372},
-    {0x74346c57, 0x00dfac1f}, {0x7c3f5fe5, 0x00d578e9},
-    {0x3b445250, 0x00d2ba08}, {0x3e28e502, 0x00d16154},
-    {0xbb5b4169, 0x00cebcf8}, {0x0317f9d0, 0x00c5fe74},
-    {0x13c0309e, 0x00c27806}, {0x5db1cc5b, 0x00bcdd53},
-    {0x8cd63069, 0x00bbc840}, {0x2a0ff465, 0x00b9a786},
-    {0x340e4307, 0x00b68d31}, {0x29da5519, 0x00b2927c},
-    {0xa1496fdf, 0x00afb321}, {0x891e6551, 0x00aceb0f},
-    {0xd3e2970f, 0x00ab1cbd}, {0x088e262b, 0x00a87917},
-    {0x6bb00a51, 0x00a513fd}, {0xa2cb0331, 0x00a36e71},
-    {0x88732b30, 0x00a03c16}, {0x9b30446d, 0x009c6916},
-    {0x8e4a2f6e, 0x009baade}, {0x56201301, 0x00980e41},
-    {0x0ff68a58, 0x00975a75}, {0x979e0829, 0x009548e4},
-    {0xc50e726b, 0x0093efd1}, {0xb8bb02d9, 0x0091f5bc},
-    {0xe3fdc261, 0x008f67a1}, {0xe0e702c6, 0x008e2917},
-    {0x3f95d715, 0x008d8be3}, {0x1c815ed5, 0x008c5584},
-    {0xcd3a4133, 0x0088d180}, {0xb1acf1ce, 0x00869222},
-    {0x917765ab, 0x0085797b}, {0xe3c897db, 0x008355ac},
-    {0x60b3262b, 0x00824a4e}, {0xb28bd1ba, 0x0080c121},
-    {0x397d4c29, 0x007dc9f3}, {0x8fe88139, 0x007d4ece},
-    {0x65bcce50, 0x0079237d}, {0xc5f7936c, 0x0077cf53},  //100
-    {0xcfbdd11e, 0x0075a8ac}, {0x557c228e, 0x007467ac},
-    {0xed8db8e9, 0x00732d70}, {0x24c3797f, 0x0072c62a},
-    {0x7f55a10d, 0x007194a1}, {0xb41da7e7, 0x006fa549},
-    {0xe6f61221, 0x006e8419}, {0x356c207b, 0x006d68b5},
-    {0x3685c01b, 0x006d0b80}, {0xa8b2d207, 0x006bf790},
-    {0xef4b96c2, 0x006ae907}, {0x1a23aead, 0x006a3799},
-    {0xd4295b66, 0x0069dfbd}, {0x45c8033e, 0x0067dc4c},
-    {0xff99c27f, 0x00663d80}, {0xe3559948, 0x0065ec17},
-    {0x35cfba5c, 0x00654ac8}, {0x4ae10772, 0x00645c85},
-    {0x0e5f901f, 0x00637299}, {0x3c07beef, 0x00632591},
-    {0x9e9f0061, 0x006160ff}, {0x20e5e88e, 0x0060cdb5},
-    {0x7fd005ff, 0x005ff401}, {0x31a4dccd, 0x005ed79e},
-    {0xd48ac5ef, 0x005d7d42}, {0xccba5028, 0x005c6f35},
-    {0xec6ad0a5, 0x005b2618}, {0x748e42e7, 0x005a2553},
-    {0xf744cd5b, 0x0059686c}, {0xbab79976, 0x0058ae97},
-    {0x1876865f, 0x0058345f}, {0xbb24795a, 0x005743d5},
-    {0xd1ab74ab, 0x005692c4}, {0xa4d5f337, 0x00561e46},
-    {0x06533997, 0x005538ed}, {0xf2c0bec2, 0x0054c807},
-    {0xbc572d36, 0x005345ef}, {0x8f941345, 0x00523a75},
-    {0x0f816c89, 0x00510237}, {0x9fb94acf, 0x0050cf12},
-    {0x41cafdd1, 0x004fd319}, {0x4aa75945, 0x004fa170},
-    {0xd45a63ad, 0x004f3ed6}, {0x7154ebed, 0x004f0de5},
-    {0x8815f811, 0x004e1cae}, {0xa5f6ff19, 0x004cd47b},
-    {0x734df709, 0x004c78ae}, {0xed85cfb8, 0x004c4b19},
-    {0x221d1218, 0x004bf093}, {0x21dc633f, 0x004aba3c},  //150
-    {0xc344de00, 0x004a6360}, {0x9f74d68a, 0x004a383e},
-    {0xbabb9940, 0x0049e28f}, {0x57c78cd7, 0x0048417b},
-    {0x713f3a2b, 0x0047f043}, {0xa10281cf, 0x00474ff2},
-    {0x9a978f91, 0x00468b6f}, {0x1caff2e2, 0x0045f13f},
-    {0x8cec23e9, 0x0045a522}, {0x556c66b9, 0x0045342c},
-    {0x3feeced7, 0x0044c4a2}, {0x0d3c9fe6, 0x0043c5c2},
-    {0x4b239798, 0x00437e49}, {0x118e47cb, 0x0043142d},
-    {0x73a13458, 0x0042ab5c}, {0x0db0f3db, 0x00422195},
-    {0xf80a4553, 0x0041bbb2}, {0x612c6680, 0x0040f391},
-    {0x4173fefd, 0x0040b1e9}, {0x7d9d0445, 0x00405064},
-    {0x1b144f3b, 0x00403024}, {0xab542cb1, 0x003f90c2},
-    {0x2d59f597, 0x003f7141}, {0x01b98841, 0x003f1377},
-    {0x6b60e278, 0x003e7988}, {0x16a7181d, 0x003e5b19},
-    {0x0968f524, 0x003dc4a5}, {0xc9550321, 0x003da6e4},
-    {0x06f1def3, 0x003d4e4f}, {0xdd24f9a4, 0x003c4a6b},
-    {0x4b525c73, 0x003c11d5}, {0xc5721065, 0x003bf5b1},
-    {0x862f23b4, 0x003bbdb9}, {0x01db5440, 0x003b6a88},
-    {0xf0fed886, 0x003b183c}, {0x94bdc3f4, 0x003aabe3},
-    {0xe76156da, 0x003a5ba3}, {0x953378db, 0x003a0c3e},
-    {0x61320b1e, 0x0038f035}, {0xaef5908a, 0x0038d6ec},
-    {0x221e6069, 0x003859cf}, {0x5dc9588a, 0x0037f741},
-    {0xd3902626, 0x00377df0}, {0x136907fa, 0x00373622},
-    {0x3b39b92f, 0x0036ef0c}, {0x47d55e6d, 0x0036915f},
-    {0xf3f866fd, 0x0036072c}, {0x37be5ea8, 0x0035d9b7},
-    {0x59cc81c7, 0x00359615}, {0x897a4592, 0x0035531c},  //200
-    {0xbd3e98a4, 0x00353cee}, {0x81585e5e, 0x0034fad3},
-    {0xd1103130, 0x00347884}, {0xac39bf56, 0x00340dd3},
-    {0xfecc140c, 0x003351fd}, {0xb089b524, 0x00333d72},
-    {0x44d6b261, 0x0033148d}, {0xf8412458, 0x0032d7ae},
-    {0x0e79c0f1, 0x0032c385}, {0xd59048a2, 0x00328766},
-    {0x8cb11833, 0x00325fa1}, {0x59327e22, 0x00324bd6},
-    {0x784360f4, 0x0032246e}, {0xf1a33a08, 0x0031afa5},
-    {0xff398e70, 0x00319c63}, {0x519a86a7, 0x003162f7},
-    {0xc9d3fc3c, 0x0030271f}, {0xae89750b, 0x002ff104},
-    {0xa236d133, 0x002fbb62}, {0x7d2070b4, 0x002f7499},
-    {0xa8b6fce3, 0x002ed84a}, {0xf7a46dbd, 0x002e832d},
-    {0x46857cab, 0x002e0e08}, {0xdfb55ee6, 0x002decfb},
-    {0x6f3ff488, 0x002ddc87}, {0xd4c482c4, 0x002dbbc1},
-    {0xe0de0556, 0x002d8af0}, {0x7d14b30a, 0x002d4a7b},
-    {0x073bcf4e, 0x002d2a85}, {0xb13e8be4, 0x002d1a9a},
-    {0xb4b9fd8b, 0x002ceb1e}, {0x3a79794c, 0x002c8d50},
-    {0x708784ed, 0x002c404d}, {0x6315ec52, 0x002c3106},
-    {0xd80f2664, 0x002c1297}, {0x44c55f6b, 0x002c0370},
-    {0x4cd13086, 0x002be540}, {0xadaf0cce, 0x002bb845},
-    {0xc639f16d, 0x002b5f62}, {0x734f2b88, 0x002b07e6},
-    {0x9d8342b7, 0x002ace56}, {0x5dbd4dcf, 0x002a791d},
-    {0x8113017c, 0x002a4eff}, {0xe156df32, 0x002a3319},
-    {0x286526ea, 0x002a0986}, {0x51d91e39, 0x0029d295},
-    {0x9e109f0a, 0x0029b752}, {0x491ea465, 0x00298137},
-    {0x1eb9f9da, 0x0029665e}, {0x2e019a5e, 0x00290975},  //250
-    {0xe2e5efb0, 0x0028ef35}, {0xaa4b8278, 0x0028c815},
-    {0x867199da, 0x0028bb1b}, {0xf5d7b002, 0x0028a13f},
-    {0xf173e755, 0x00287ab3}, {0xd67713bd, 0x00286dea},
-    {0xcda6503e, 0x002847bf}, {0xea6b4777, 0x002808c1},
-    {0x0f23ff61, 0x00278d0e}, {0x3c093c7f, 0x00276886},
-    {0x15a73ca8, 0x00275051}, {0xa61dc1b9, 0x00274441},
-    {0x66113cf0, 0x0026b5c1}, {0xad07b18e, 0x00269e65},
-    {0x5f877560, 0x002692c2}, {0x7523cd11, 0x002658fa},
-    {0x10cf0f9e, 0x00261487}, {0x3b22524f, 0x00260936},
-    {0x5a1c1122, 0x0025d106}, {0x382b863f, 0x0025a48a},
-    {0x90eccdbc, 0x00258371}, {0xe95d510c, 0x00256292},
-    {0xa98d068c, 0x002541ed}, {0x87fed8f5, 0x0024e150},
-    {0x20979e5d, 0x0024c18b}, {0x336de0c5, 0x0024ac7b},
-    {0x478c60bb, 0x0024a1fc}, {0x1231c009, 0x00246380},
-    {0xd506ed33, 0x0024300f}, {0xa494da81, 0x0023f314},
-    {0xdd2fad3a, 0x0023cade}, {0xd2664a03, 0x00237b7e},
-    {0x67dbaf1d, 0x00233729}, {0x8a371f20, 0x00231a30},
-    {0x63e1e600, 0x002306fa}, {0x31575684, 0x0022fd67},
-    {0x7805749c, 0x0022ea50}, {0xe8b3d720, 0x0022e0cc},
-    {0x7857d161, 0x0022b188}, {0xfcc49cc0, 0x00227977},
-    {0x7b5e5f4f, 0x00225db3}, {0x91322ed6, 0x0022421b},
-    {0x35f52102, 0x0021f05b}, {0xe5c70d60, 0x0021e75d},
-    {0x6c19be96, 0x0021a01d}, {0x6615c81a, 0x0021974a},
-    {0x697cf36a, 0x00213767}, {0x7fad35f1, 0x00211d9f},
-    {0x9dd36c18, 0x0020fb7d}, {0x3d661e0e, 0x0020e212},  //300
-    {0xb66ae990, 0x0020d135}, {0xed4d7a8e, 0x0020c8cd},
-    {0x3f43ddbf, 0x0020b80b}, {0x180f46a6, 0x002096b9},
-    {0xe28de5da, 0x00207de7}, {0xc8cf1fb3, 0x002054de},
-    {0x30b3aab5, 0x00204cb6}, {0xadc37beb, 0x00202428},
-    {0x7834def4, 0x001fec0c}, {0xae98a1d0, 0x001fc46f},
-    {0x430ff619, 0x001facda}, {0xdd8e15e5, 0x001f7e17},
-    {0x3556a4ee, 0x001f765a}, {0x49d802f1, 0x001f66ea},
-    {0x00faf9c0, 0x001f5f38}, {0xe6c0f1f9, 0x001f38f4},
-    {0x46752578, 0x001f0b85}, {0x83f001f0, 0x001f03ff},
-    {0xb0a3883c, 0x001ec853}, {0x573723eb, 0x001ec0ee},
-    {0x8e6f6894, 0x001eaad3}, {0xa765fe53, 0x001e9c28},
-    {0x758c2003, 0x001e94d8}, {0xa8f65e68, 0x001e707b},
-    {0xa68f574e, 0x001e53a2}, {0xa56b438d, 0x001e1380},
-    {0x513a3802, 0x001dbf9f}, {0xd58bc600, 0x001db1d1},
-    {0x8f53de38, 0x001d9d35}, {0xdf6165c7, 0x001d81e6},
-    {0x7fd40e30, 0x001d4bdf}, {0x7a1c958d, 0x001d452c},
-    {0x9b902659, 0x001d37cf}, {0x5791e97b, 0x001d1d3a},
-    {0xe6b47416, 0x001ce89f}, {0xf3235071, 0x001ce219},
-    {0xdcf92139, 0x001cd516}, {0xbd1c2b8b, 0x001cbb33},
-    {0xd2546688, 0x001ca7e7}, {0xc1b3dbd3, 0x001c94b5},
-    {0xf9c241c1, 0x001c87f7}, {0x706c35a9, 0x001c6202},
-    {0xa9437632, 0x001c5bb8}, {0x43b4111e, 0x001c1743},
-    {0xd3e46b42, 0x001c04d0}, {0x0fbf4308, 0x001bfeb0},
-    {0xce0b202d, 0x001bec5d}, {0x44620037, 0x001be034},
-    {0xc66f6fc3, 0x001bce09}, {0x28d02b30, 0x001ba402},  //350
-    {0xb1cf8919, 0x001b9225}, {0x2ff3f53f, 0x001b864a},
-    {0x4150e49b, 0x001b8060}, {0xaaeaacf3, 0x001b6eb1},
-    {0x8da3c8cc, 0x001b62f4}, {0xabe96092, 0x001b516b},
-    {0xef1e0c87, 0x001b2e9c}, {0xbedc849b, 0x001b1d56},
-    {0x7546aec0, 0x001b0c26}, {0x62024fa0, 0x001ae45f},
-    {0x631b5f54, 0x001ad917}, {0x18cb608f, 0x001ac83d},
-    {0xad8c063f, 0x001aa6c7}, {0xb1228e2a, 0x001a90a7},
-    {0xc03ba059, 0x001a8027}, {0x289deb89, 0x001a7533},
-    {0xce16b49f, 0x001a2ed7}, {0x0a279a73, 0x0019fefc},
-    {0xcd873b5f, 0x0019e4b0}, {0xfd60e514, 0x0019cfcd},
-    {0x32d66c85, 0x0019c569}, {0xab6fc7c2, 0x0019b5e1},
-    {0xa62f2a73, 0x0019b0b8}, {0xfc98942c, 0x0019a149},
-    {0x7ec25b85, 0x00196951}, {0x83360ba8, 0x00194b30},
-    {0xf4bebdc1, 0x00194631}, {0x127268fd, 0x00191e84},
-    {0xb543984f, 0x00190adb}, {0x0bd18200, 0x00190113},
-    {0xb889ac94, 0x0018e3e6}, {0x420e1ec1, 0x0018c233},
-    {0x72d92bd6, 0x0018aa58}, {0x9945ccf9, 0x0018a598},
-    {0x60b57f60, 0x00189c1e}, {0xbc8690b9, 0x0018893f},
-    {0xb3e1041c, 0x00187b2b}, {0xc9cdcfb8, 0x00186d27},
-    {0xbf4f2c1c, 0x001863d8}, {0xe2ad7593, 0x00185f33},
-    {0x75973e13, 0x001855ef}, {0x0153f134, 0x00184816},
-    {0x2e6f0656, 0x001835b7}, {0x2d83eb39, 0x00182c92},
-    {0x43c0365a, 0x00182802}, {0xd5898e73, 0x00181a5c},
-    {0x961773aa, 0x001803c0}, {0x05ffd001, 0x0017ff40},
-    {0x70433edb, 0x0017e8d6}, {0x6cf4bb5d, 0x0017d706},  //400  /**/
+    {
+        {0x55555555, 0x55555555},
+        {0x33333333, 0x33333333},
+        {0x92492492, 0x24924924},
+        {0x5d1745d1, 0x1745d174},
+        {0xb13b13b1, 0x13b13b13},
+        {0x0f0f0f0f, 0x0f0f0f0f},
+        {0x50d79435, 0x0d79435e},
+        {0x8590b216, 0x0b21642c},
+        {0x8d3dcb08, 0x08d3dcb0},
+        {0x21084210, 0x08421084},
+        {0x306eb3e4, 0x06eb3e45},
+        {0xe7063e70, 0x063e7063},
+        {0x5f417d05, 0x05f417d0},
+        {0xe4c415c9, 0x0572620a},
+        {0xcade304d, 0x04d4873e},
+        {0xdd49c341, 0x0456c797},
+        {0xef368eb0, 0x04325c53},
+        {0x7e16ece5, 0x03d22635},
+        {0x2073615a, 0x039b0ad1},
+        {0x70381c0e, 0x0381c0e0},
+        {0xa2067b23, 0x033d91d2},
+        {0xed7e7534, 0x03159721},
+        {0x81702e05, 0x02e05c0b},
+        {0x5c5f02a3, 0x02a3a0fd},
+        {0xac5b3f5d, 0x0288df0c},
+        {0x9c95204f, 0x027c4597},
+        {0x456217ec, 0x02647c69},
+        {0xb02593f6, 0x02593f69},
+        {0x243f6f02, 0x0243f6f0},
+        {0x20408102, 0x02040810},
+        {0xe4a42715, 0x01f44659},
+        {0x3f8868a4, 0x01de5d6e},
+        {0x4b82c339, 0x01d77b65},
+        {0xdda338b2, 0x01b7d6c3},
+        {0x06c80d90, 0x01b20364},
+        {0x97a4b01a, 0x01a16d3f},
+        {0x9d0e228d, 0x01920fb4},
+        {0x0abb0499, 0x01886e5f},
+        {0x8e0ecc35, 0x017ad220},
+        {0xb4337c6c, 0x016e1f76},
+        {0x15372904, 0x016a13cd},
+        {0xc506b39a, 0x01571ed3},
+        {0x8f40feac, 0x01539094},
+        {0x725af6e7, 0x014cab88},
+        {0x3b2d066e, 0x0149539e},
+        {0x3de07479, 0x013698df},
+        {0x08092f11, 0x0125e227},
+        {0xc67c0d88, 0x0120b470},
+        {0xb3fb8744, 0x011e2ef3},
+        {0x08ca29c0, 0x01194538}, //50
+        {0x75d30336, 0x0112358e},
+        {0x0fef010f, 0x010fef01},
+        {0x7d734041, 0x0105197f},
+        {0x00ff00ff, 0x00ff00ff},
+        {0x211855a8, 0x00f92fb2},
+        {0x2cba8723, 0x00f3a0d5},
+        {0xcee0d399, 0x00f1d48b},
+        {0x18f3fc4d, 0x00ec9791},
+        {0x1fe2d8d3, 0x00e93965},
+        {0xe225fe30, 0x00e79372},
+        {0x74346c57, 0x00dfac1f},
+        {0x7c3f5fe5, 0x00d578e9},
+        {0x3b445250, 0x00d2ba08},
+        {0x3e28e502, 0x00d16154},
+        {0xbb5b4169, 0x00cebcf8},
+        {0x0317f9d0, 0x00c5fe74},
+        {0x13c0309e, 0x00c27806},
+        {0x5db1cc5b, 0x00bcdd53},
+        {0x8cd63069, 0x00bbc840},
+        {0x2a0ff465, 0x00b9a786},
+        {0x340e4307, 0x00b68d31},
+        {0x29da5519, 0x00b2927c},
+        {0xa1496fdf, 0x00afb321},
+        {0x891e6551, 0x00aceb0f},
+        {0xd3e2970f, 0x00ab1cbd},
+        {0x088e262b, 0x00a87917},
+        {0x6bb00a51, 0x00a513fd},
+        {0xa2cb0331, 0x00a36e71},
+        {0x88732b30, 0x00a03c16},
+        {0x9b30446d, 0x009c6916},
+        {0x8e4a2f6e, 0x009baade},
+        {0x56201301, 0x00980e41},
+        {0x0ff68a58, 0x00975a75},
+        {0x979e0829, 0x009548e4},
+        {0xc50e726b, 0x0093efd1},
+        {0xb8bb02d9, 0x0091f5bc},
+        {0xe3fdc261, 0x008f67a1},
+        {0xe0e702c6, 0x008e2917},
+        {0x3f95d715, 0x008d8be3},
+        {0x1c815ed5, 0x008c5584},
+        {0xcd3a4133, 0x0088d180},
+        {0xb1acf1ce, 0x00869222},
+        {0x917765ab, 0x0085797b},
+        {0xe3c897db, 0x008355ac},
+        {0x60b3262b, 0x00824a4e},
+        {0xb28bd1ba, 0x0080c121},
+        {0x397d4c29, 0x007dc9f3},
+        {0x8fe88139, 0x007d4ece},
+        {0x65bcce50, 0x0079237d},
+        {0xc5f7936c, 0x0077cf53}, //100
+        {0xcfbdd11e, 0x0075a8ac},
+        {0x557c228e, 0x007467ac},
+        {0xed8db8e9, 0x00732d70},
+        {0x24c3797f, 0x0072c62a},
+        {0x7f55a10d, 0x007194a1},
+        {0xb41da7e7, 0x006fa549},
+        {0xe6f61221, 0x006e8419},
+        {0x356c207b, 0x006d68b5},
+        {0x3685c01b, 0x006d0b80},
+        {0xa8b2d207, 0x006bf790},
+        {0xef4b96c2, 0x006ae907},
+        {0x1a23aead, 0x006a3799},
+        {0xd4295b66, 0x0069dfbd},
+        {0x45c8033e, 0x0067dc4c},
+        {0xff99c27f, 0x00663d80},
+        {0xe3559948, 0x0065ec17},
+        {0x35cfba5c, 0x00654ac8},
+        {0x4ae10772, 0x00645c85},
+        {0x0e5f901f, 0x00637299},
+        {0x3c07beef, 0x00632591},
+        {0x9e9f0061, 0x006160ff},
+        {0x20e5e88e, 0x0060cdb5},
+        {0x7fd005ff, 0x005ff401},
+        {0x31a4dccd, 0x005ed79e},
+        {0xd48ac5ef, 0x005d7d42},
+        {0xccba5028, 0x005c6f35},
+        {0xec6ad0a5, 0x005b2618},
+        {0x748e42e7, 0x005a2553},
+        {0xf744cd5b, 0x0059686c},
+        {0xbab79976, 0x0058ae97},
+        {0x1876865f, 0x0058345f},
+        {0xbb24795a, 0x005743d5},
+        {0xd1ab74ab, 0x005692c4},
+        {0xa4d5f337, 0x00561e46},
+        {0x06533997, 0x005538ed},
+        {0xf2c0bec2, 0x0054c807},
+        {0xbc572d36, 0x005345ef},
+        {0x8f941345, 0x00523a75},
+        {0x0f816c89, 0x00510237},
+        {0x9fb94acf, 0x0050cf12},
+        {0x41cafdd1, 0x004fd319},
+        {0x4aa75945, 0x004fa170},
+        {0xd45a63ad, 0x004f3ed6},
+        {0x7154ebed, 0x004f0de5},
+        {0x8815f811, 0x004e1cae},
+        {0xa5f6ff19, 0x004cd47b},
+        {0x734df709, 0x004c78ae},
+        {0xed85cfb8, 0x004c4b19},
+        {0x221d1218, 0x004bf093},
+        {0x21dc633f, 0x004aba3c}, //150
+        {0xc344de00, 0x004a6360},
+        {0x9f74d68a, 0x004a383e},
+        {0xbabb9940, 0x0049e28f},
+        {0x57c78cd7, 0x0048417b},
+        {0x713f3a2b, 0x0047f043},
+        {0xa10281cf, 0x00474ff2},
+        {0x9a978f91, 0x00468b6f},
+        {0x1caff2e2, 0x0045f13f},
+        {0x8cec23e9, 0x0045a522},
+        {0x556c66b9, 0x0045342c},
+        {0x3feeced7, 0x0044c4a2},
+        {0x0d3c9fe6, 0x0043c5c2},
+        {0x4b239798, 0x00437e49},
+        {0x118e47cb, 0x0043142d},
+        {0x73a13458, 0x0042ab5c},
+        {0x0db0f3db, 0x00422195},
+        {0xf80a4553, 0x0041bbb2},
+        {0x612c6680, 0x0040f391},
+        {0x4173fefd, 0x0040b1e9},
+        {0x7d9d0445, 0x00405064},
+        {0x1b144f3b, 0x00403024},
+        {0xab542cb1, 0x003f90c2},
+        {0x2d59f597, 0x003f7141},
+        {0x01b98841, 0x003f1377},
+        {0x6b60e278, 0x003e7988},
+        {0x16a7181d, 0x003e5b19},
+        {0x0968f524, 0x003dc4a5},
+        {0xc9550321, 0x003da6e4},
+        {0x06f1def3, 0x003d4e4f},
+        {0xdd24f9a4, 0x003c4a6b},
+        {0x4b525c73, 0x003c11d5},
+        {0xc5721065, 0x003bf5b1},
+        {0x862f23b4, 0x003bbdb9},
+        {0x01db5440, 0x003b6a88},
+        {0xf0fed886, 0x003b183c},
+        {0x94bdc3f4, 0x003aabe3},
+        {0xe76156da, 0x003a5ba3},
+        {0x953378db, 0x003a0c3e},
+        {0x61320b1e, 0x0038f035},
+        {0xaef5908a, 0x0038d6ec},
+        {0x221e6069, 0x003859cf},
+        {0x5dc9588a, 0x0037f741},
+        {0xd3902626, 0x00377df0},
+        {0x136907fa, 0x00373622},
+        {0x3b39b92f, 0x0036ef0c},
+        {0x47d55e6d, 0x0036915f},
+        {0xf3f866fd, 0x0036072c},
+        {0x37be5ea8, 0x0035d9b7},
+        {0x59cc81c7, 0x00359615},
+        {0x897a4592, 0x0035531c}, //200
+        {0xbd3e98a4, 0x00353cee},
+        {0x81585e5e, 0x0034fad3},
+        {0xd1103130, 0x00347884},
+        {0xac39bf56, 0x00340dd3},
+        {0xfecc140c, 0x003351fd},
+        {0xb089b524, 0x00333d72},
+        {0x44d6b261, 0x0033148d},
+        {0xf8412458, 0x0032d7ae},
+        {0x0e79c0f1, 0x0032c385},
+        {0xd59048a2, 0x00328766},
+        {0x8cb11833, 0x00325fa1},
+        {0x59327e22, 0x00324bd6},
+        {0x784360f4, 0x0032246e},
+        {0xf1a33a08, 0x0031afa5},
+        {0xff398e70, 0x00319c63},
+        {0x519a86a7, 0x003162f7},
+        {0xc9d3fc3c, 0x0030271f},
+        {0xae89750b, 0x002ff104},
+        {0xa236d133, 0x002fbb62},
+        {0x7d2070b4, 0x002f7499},
+        {0xa8b6fce3, 0x002ed84a},
+        {0xf7a46dbd, 0x002e832d},
+        {0x46857cab, 0x002e0e08},
+        {0xdfb55ee6, 0x002decfb},
+        {0x6f3ff488, 0x002ddc87},
+        {0xd4c482c4, 0x002dbbc1},
+        {0xe0de0556, 0x002d8af0},
+        {0x7d14b30a, 0x002d4a7b},
+        {0x073bcf4e, 0x002d2a85},
+        {0xb13e8be4, 0x002d1a9a},
+        {0xb4b9fd8b, 0x002ceb1e},
+        {0x3a79794c, 0x002c8d50},
+        {0x708784ed, 0x002c404d},
+        {0x6315ec52, 0x002c3106},
+        {0xd80f2664, 0x002c1297},
+        {0x44c55f6b, 0x002c0370},
+        {0x4cd13086, 0x002be540},
+        {0xadaf0cce, 0x002bb845},
+        {0xc639f16d, 0x002b5f62},
+        {0x734f2b88, 0x002b07e6},
+        {0x9d8342b7, 0x002ace56},
+        {0x5dbd4dcf, 0x002a791d},
+        {0x8113017c, 0x002a4eff},
+        {0xe156df32, 0x002a3319},
+        {0x286526ea, 0x002a0986},
+        {0x51d91e39, 0x0029d295},
+        {0x9e109f0a, 0x0029b752},
+        {0x491ea465, 0x00298137},
+        {0x1eb9f9da, 0x0029665e},
+        {0x2e019a5e, 0x00290975}, //250
+        {0xe2e5efb0, 0x0028ef35},
+        {0xaa4b8278, 0x0028c815},
+        {0x867199da, 0x0028bb1b},
+        {0xf5d7b002, 0x0028a13f},
+        {0xf173e755, 0x00287ab3},
+        {0xd67713bd, 0x00286dea},
+        {0xcda6503e, 0x002847bf},
+        {0xea6b4777, 0x002808c1},
+        {0x0f23ff61, 0x00278d0e},
+        {0x3c093c7f, 0x00276886},
+        {0x15a73ca8, 0x00275051},
+        {0xa61dc1b9, 0x00274441},
+        {0x66113cf0, 0x0026b5c1},
+        {0xad07b18e, 0x00269e65},
+        {0x5f877560, 0x002692c2},
+        {0x7523cd11, 0x002658fa},
+        {0x10cf0f9e, 0x00261487},
+        {0x3b22524f, 0x00260936},
+        {0x5a1c1122, 0x0025d106},
+        {0x382b863f, 0x0025a48a},
+        {0x90eccdbc, 0x00258371},
+        {0xe95d510c, 0x00256292},
+        {0xa98d068c, 0x002541ed},
+        {0x87fed8f5, 0x0024e150},
+        {0x20979e5d, 0x0024c18b},
+        {0x336de0c5, 0x0024ac7b},
+        {0x478c60bb, 0x0024a1fc},
+        {0x1231c009, 0x00246380},
+        {0xd506ed33, 0x0024300f},
+        {0xa494da81, 0x0023f314},
+        {0xdd2fad3a, 0x0023cade},
+        {0xd2664a03, 0x00237b7e},
+        {0x67dbaf1d, 0x00233729},
+        {0x8a371f20, 0x00231a30},
+        {0x63e1e600, 0x002306fa},
+        {0x31575684, 0x0022fd67},
+        {0x7805749c, 0x0022ea50},
+        {0xe8b3d720, 0x0022e0cc},
+        {0x7857d161, 0x0022b188},
+        {0xfcc49cc0, 0x00227977},
+        {0x7b5e5f4f, 0x00225db3},
+        {0x91322ed6, 0x0022421b},
+        {0x35f52102, 0x0021f05b},
+        {0xe5c70d60, 0x0021e75d},
+        {0x6c19be96, 0x0021a01d},
+        {0x6615c81a, 0x0021974a},
+        {0x697cf36a, 0x00213767},
+        {0x7fad35f1, 0x00211d9f},
+        {0x9dd36c18, 0x0020fb7d},
+        {0x3d661e0e, 0x0020e212}, //300
+        {0xb66ae990, 0x0020d135},
+        {0xed4d7a8e, 0x0020c8cd},
+        {0x3f43ddbf, 0x0020b80b},
+        {0x180f46a6, 0x002096b9},
+        {0xe28de5da, 0x00207de7},
+        {0xc8cf1fb3, 0x002054de},
+        {0x30b3aab5, 0x00204cb6},
+        {0xadc37beb, 0x00202428},
+        {0x7834def4, 0x001fec0c},
+        {0xae98a1d0, 0x001fc46f},
+        {0x430ff619, 0x001facda},
+        {0xdd8e15e5, 0x001f7e17},
+        {0x3556a4ee, 0x001f765a},
+        {0x49d802f1, 0x001f66ea},
+        {0x00faf9c0, 0x001f5f38},
+        {0xe6c0f1f9, 0x001f38f4},
+        {0x46752578, 0x001f0b85},
+        {0x83f001f0, 0x001f03ff},
+        {0xb0a3883c, 0x001ec853},
+        {0x573723eb, 0x001ec0ee},
+        {0x8e6f6894, 0x001eaad3},
+        {0xa765fe53, 0x001e9c28},
+        {0x758c2003, 0x001e94d8},
+        {0xa8f65e68, 0x001e707b},
+        {0xa68f574e, 0x001e53a2},
+        {0xa56b438d, 0x001e1380},
+        {0x513a3802, 0x001dbf9f},
+        {0xd58bc600, 0x001db1d1},
+        {0x8f53de38, 0x001d9d35},
+        {0xdf6165c7, 0x001d81e6},
+        {0x7fd40e30, 0x001d4bdf},
+        {0x7a1c958d, 0x001d452c},
+        {0x9b902659, 0x001d37cf},
+        {0x5791e97b, 0x001d1d3a},
+        {0xe6b47416, 0x001ce89f},
+        {0xf3235071, 0x001ce219},
+        {0xdcf92139, 0x001cd516},
+        {0xbd1c2b8b, 0x001cbb33},
+        {0xd2546688, 0x001ca7e7},
+        {0xc1b3dbd3, 0x001c94b5},
+        {0xf9c241c1, 0x001c87f7},
+        {0x706c35a9, 0x001c6202},
+        {0xa9437632, 0x001c5bb8},
+        {0x43b4111e, 0x001c1743},
+        {0xd3e46b42, 0x001c04d0},
+        {0x0fbf4308, 0x001bfeb0},
+        {0xce0b202d, 0x001bec5d},
+        {0x44620037, 0x001be034},
+        {0xc66f6fc3, 0x001bce09},
+        {0x28d02b30, 0x001ba402}, //350
+        {0xb1cf8919, 0x001b9225},
+        {0x2ff3f53f, 0x001b864a},
+        {0x4150e49b, 0x001b8060},
+        {0xaaeaacf3, 0x001b6eb1},
+        {0x8da3c8cc, 0x001b62f4},
+        {0xabe96092, 0x001b516b},
+        {0xef1e0c87, 0x001b2e9c},
+        {0xbedc849b, 0x001b1d56},
+        {0x7546aec0, 0x001b0c26},
+        {0x62024fa0, 0x001ae45f},
+        {0x631b5f54, 0x001ad917},
+        {0x18cb608f, 0x001ac83d},
+        {0xad8c063f, 0x001aa6c7},
+        {0xb1228e2a, 0x001a90a7},
+        {0xc03ba059, 0x001a8027},
+        {0x289deb89, 0x001a7533},
+        {0xce16b49f, 0x001a2ed7},
+        {0x0a279a73, 0x0019fefc},
+        {0xcd873b5f, 0x0019e4b0},
+        {0xfd60e514, 0x0019cfcd},
+        {0x32d66c85, 0x0019c569},
+        {0xab6fc7c2, 0x0019b5e1},
+        {0xa62f2a73, 0x0019b0b8},
+        {0xfc98942c, 0x0019a149},
+        {0x7ec25b85, 0x00196951},
+        {0x83360ba8, 0x00194b30},
+        {0xf4bebdc1, 0x00194631},
+        {0x127268fd, 0x00191e84},
+        {0xb543984f, 0x00190adb},
+        {0x0bd18200, 0x00190113},
+        {0xb889ac94, 0x0018e3e6},
+        {0x420e1ec1, 0x0018c233},
+        {0x72d92bd6, 0x0018aa58},
+        {0x9945ccf9, 0x0018a598},
+        {0x60b57f60, 0x00189c1e},
+        {0xbc8690b9, 0x0018893f},
+        {0xb3e1041c, 0x00187b2b},
+        {0xc9cdcfb8, 0x00186d27},
+        {0xbf4f2c1c, 0x001863d8},
+        {0xe2ad7593, 0x00185f33},
+        {0x75973e13, 0x001855ef},
+        {0x0153f134, 0x00184816},
+        {0x2e6f0656, 0x001835b7},
+        {0x2d83eb39, 0x00182c92},
+        {0x43c0365a, 0x00182802},
+        {0xd5898e73, 0x00181a5c},
+        {0x961773aa, 0x001803c0},
+        {0x05ffd001, 0x0017ff40},
+        {0x70433edb, 0x0017e8d6},
+        {0x6cf4bb5d, 0x0017d706}, //400  /**/
 };
 
 //(0xFFFFFFFFFFFFFFFF%prime)+1
@@ -941,6 +1139,7 @@ const unsigned short PrimeTable_r[PTL_MAX] =
     725,   342,   11,    1156,  801,   1704,  31,    1427,  105,   1536,
     460,   617,   2026,  437,   96,    1481,  1844,  664,   1564,  749,
     545,   196,   158,   1889,  54,    2195,  198,   1365,  297,   2647,  //400 /**/
+
 };
 
 /**
@@ -953,36 +1152,33 @@ const unsigned short PrimeTable_r[PTL_MAX] =
  * @param[in]   PTL         - prime table level.
  * @return      none.
  */
-unsigned int bigint_div_table_high(unsigned int *a, unsigned int aWordLen, unsigned short *r, double_uint32_t *s,
-        unsigned short *high_result, unsigned int PTL)
+unsigned int bigint_div_table_high(unsigned int *a, unsigned int aWordLen, unsigned short *r, double_uint32_t *s, unsigned short *high_result, unsigned int PTL)
 {
-    unsigned int tmp_step, i, ret;
+    unsigned int           tmp_step, i, ret;
     volatile unsigned int *p, *q;
 
-    pke_set_operand_width(aWordLen<<5);
+    pke_set_operand_width(aWordLen << 5);
     tmp_step = pke_get_operand_bytes();
 
-    p = (PKE_B(1,tmp_step));
-    q = (PKE_A(2,tmp_step));
+    p = (PKE_B(1, tmp_step));
+    q = (PKE_A(2, tmp_step));
 
-    pke_load_operand((PKE_A(1,tmp_step)), a, aWordLen);
+    pke_load_operand((PKE_A(1, tmp_step)), a, aWordLen);
 
     //clear the high part(this action can not be deleted)
-    if(tmp_step > aWordLen)
-    {
-        uint32_clear((PKE_A(1,tmp_step))+aWordLen, (tmp_step/4)-aWordLen);
+    if (tmp_step > aWordLen) {
+        uint32_clear((PKE_A(1, tmp_step)) + aWordLen, (tmp_step / 4) - aWordLen);
     }
 
     p[1] = 0;
     p[3] = 0;
-    for(i=0; i<PTL; i++)
-    {
+    for (i = 0; i < PTL; i++) {
         p[0] = PrimeTable[i];
         p[2] = r[i];
         p[4] = s[i].low;
         p[5] = s[i].high;
 
-        pke_set_microcode(MICROCODE_MODRES);    //must be called every time
+        pke_set_microcode(MICROCODE_MODRES); //must be called every time
 
         pke_clear_interrupt();
 
@@ -991,8 +1187,7 @@ unsigned int bigint_div_table_high(unsigned int *a, unsigned int aWordLen, unsig
         pke_wait_till_done();
 
         ret = pke_check_rt_code();
-        if(PKE_SUCCESS != ret)
-        {
+        if (PKE_SUCCESS != ret) {
             return ret;
         }
 
@@ -1013,24 +1208,23 @@ unsigned int bigint_div_table_high(unsigned int *a, unsigned int aWordLen, unsig
  */
 unsigned int bigint_div_table_low(unsigned int *a, unsigned short *r, double_uint32_t *s, unsigned short *high_result, unsigned int PTL)
 {
-    unsigned int tmp_step, i;//, ret;
+    unsigned int           tmp_step, i; //, ret;
     volatile unsigned int *p, *q, *k;
 
-    pke_set_operand_width(2<<5);
+    pke_set_operand_width(2 << 5);
     tmp_step = pke_get_operand_bytes();
 
-    p = (PKE_B(1,tmp_step));
-    q = (PKE_A(2,tmp_step));
-    k = (PKE_A(1,tmp_step));
+    p = (PKE_B(1, tmp_step));
+    q = (PKE_A(2, tmp_step));
+    k = (PKE_A(1, tmp_step));
 
     *k = *a;
-    uint32_clear(k+2, (tmp_step/4)-2);
+    uint32_clear(k + 2, (tmp_step / 4) - 2);
 
     p[1] = 0;
     p[3] = 0;
-    for(i=0; i<PTL; i++)
-    {
-        *(k+1) = high_result[i];
+    for (i = 0; i < PTL; i++) {
+        *(k + 1) = high_result[i];
 
         p[0] = PrimeTable[i];
         p[2] = r[i];
@@ -1047,20 +1241,18 @@ unsigned int bigint_div_table_low(unsigned int *a, unsigned short *r, double_uin
 
         pke_wait_till_done();
 
-#if 0
+    #if 0
         ret = pke_check_rt_code();
         if(PKE_SUCCESS != ret)
         {
             return ret;
         }
-#else
-        if(PKE_SUCCESS != PKE_RT_CODE)
-        {
+    #else
+        if (PKE_SUCCESS != PKE_RT_CODE) {
             return PKE_RT_CODE;
         }
-#endif
-        if(0 == (*q))
-        {
+    #endif
+        if (0 == (*q)) {
             return NOT_PRIME;
         }
     }
@@ -1068,11 +1260,11 @@ unsigned int bigint_div_table_low(unsigned int *a, unsigned short *r, double_uin
     return MAYBE_PRIME;
 }
 
-#elif(BIGINT_DIV_CHOICE == 2)
+#elif (BIGINT_DIV_CHOICE == 2)
 
 //0xFFFFFFFF/prime
 const double_uint32_t PrimeTable_s[PTL_MAX] =
-{
+    {
     0x55555555,0x33333333,0x24924924,0x1745d174,0x13b13b13,0x0f0f0f0f,0x0d79435e,0x0b21642c,0x08d3dcb0,0x08421084,
     0x06eb3e45,0x063e7063,0x05f417d0,0x0572620a,0x04d4873e,0x0456c797,0x04325c53,0x03d22635,0x039b0ad1,0x0381c0e0,
     0x033d91d2,0x03159721,0x02e05c0b,0x02a3a0fd,0x0288df0c,0x027c4597,0x02647c69,0x02593f69,0x0243f6f0,0x02040810,
@@ -1113,7 +1305,8 @@ const double_uint32_t PrimeTable_s[PTL_MAX] =
     0x0019c569,0x0019b5e1,0x0019b0b8,0x0019a149,0x00196951,0x00194b30,0x00194631,0x00191e84,0x00190adb,0x00190113,
     0x0018e3e6,0x0018c233,0x0018aa58,0x0018a598,0x00189c1e,0x0018893f,0x00187b2b,0x00186d27,0x001863d8,0x00185f33,
     0x001855ef,0x00184816,0x001835b7,0x00182c92,0x00182802,0x00181a5c,0x001803c0,0x0017ff40,0x0017e8d6,0x0017d706,//400
-/*  0x0017ce28,0x0017af52,0x0017997d,0x00177f7e,0x00177b2f,0x00176e4a,0x001765b9,0x00176173,0x00173f7a,0x00172211,
+
+        /*  0x0017ce28,0x0017af52,0x0017997d,0x00177f7e,0x00177b2f,0x00176e4a,0x001765b9,0x00176173,0x00173f7a,0x00172211,
     0x001719b7,0x00170d3c,0x0016fcad,0x0016f051,0x0016e81b,0x0016c372,0x0016b34c,0x00169f3c,0x00169344,0x00168759,
     0x00167787,0x001663e1,0x00164c7a,0x0016316a,0x001629ba,0x00161e3d,0x001612cc,0x00160efe,0x0015da45,0x0015d68a,
     0x0015c3f9,0x0015b535,0x0015addb,0x00159445,0x00158d01,0x00157e87,0x001568f5,0x00155e3c,0x001548ea,0x001541d8,
@@ -1713,7 +1906,7 @@ const double_uint32_t PrimeTable_s[PTL_MAX] =
 
 //(0xFFFFFFFF%prime)+1
 const unsigned short PrimeTable_r[PTL_MAX] =
-{
+    {
     1,     1,     4,     4,     9,     1,     6,     12,    16,    4,
     7,     37,    16,    42,    42,    51,    57,    33,    9,     32,
     50,    77,    45,    35,    68,    63,    29,    75,    16,    16,
@@ -1754,7 +1947,8 @@ const unsigned short PrimeTable_r[PTL_MAX] =
     505,   1707,  1656,  2523,  1277,  1328,  2479,  188,   1853,  121,
     1898,  683,   1192,  1592,  1006,  1967,  1881,  2115,  2008,  2381,
     1237,  14,    491,   482,   718,   2268,  1600,  64,    1202,  1170,  //400
-/*  984,   2226,  779,   2122,  663,   382,   727,   471,   914,   479,
+
+        /*  984,   2226,  779,   2122,  663,   382,   727,   471,   914,   479,
     1789,  1708,  1369,  2055,  2625,  242,   492,   2564,  2020,  427,
     2749,  1649,  866,   70,    1678,  1017,  20,    566,   429,   2118,
     1621,  2041,  747,   2415,  1823,  2593,  1671,  1836,  2458,  3000,
@@ -2362,33 +2556,28 @@ const unsigned short PrimeTable_r[PTL_MAX] =
  * @param[in]   PTL         - prime table level.
  * @return      none.
  */
-unsigned int bigint_div_table_high(unsigned int *a, unsigned int aWordLen, const unsigned short *r, double_uint32_t const *s,
-        unsigned short *high_result, unsigned int PTL)
+unsigned int bigint_div_table_high(unsigned int *a, unsigned int aWordLen, const unsigned short *r, double_uint32_t const *s, unsigned short *high_result, unsigned int PTL)
 {
-    int j;
-    unsigned int i;
+    int                    j;
+    unsigned int           i;
     unsigned long long int carry, a1, a2, high1;
 
-    for(i=0; i<PTL; i++)
-    {
+    for (i = 0; i < PTL; i++) {
         carry = 0;
-        for (j = aWordLen - 1; j >= 0; j--)
-        {
-            a1=carry*r[i]+a[j];           //С˳ʾ
-            while(a1>0xFFFFFFFF)
-            {
-                a2=a1&0xFFFFFFFF;
-                high1=a1>>32;
-                a1=high1*r[i]+a2;
+        for (j = aWordLen - 1; j >= 0; j--) {
+            a1 = carry * r[i] + a[j]; //С˳ʾ
+            while (a1 > 0xFFFFFFFF) {
+                a2    = a1 & 0xFFFFFFFF;
+                high1 = a1 >> 32;
+                a1    = high1 * r[i] + a2;
             }
-            a2=(a1*s[i])>>32;
-            carry=a1-a2*PrimeTable[i];
-            if(carry>=PrimeTable[i])
-            {
+            a2    = (a1 * s[i]) >> 32;
+            carry = a1 - a2 * PrimeTable[i];
+            if (carry >= PrimeTable[i]) {
                 carry -= PrimeTable[i];
             }
         }
-        high_result[i]=(unsigned short)carry;
+        high_result[i] = (unsigned short)carry;
     }
 
     return PKE_SUCCESS;
@@ -2405,29 +2594,25 @@ unsigned int bigint_div_table_high(unsigned int *a, unsigned int aWordLen, const
  */
 unsigned int bigint_div_table_low(unsigned int *a, const unsigned short *r, double_uint32_t const *s, unsigned short *high_result, unsigned int PTL)
 {
-    unsigned int i;
+    unsigned int           i;
     unsigned long long int carry, a1, a2, high1;
 
-    for(i=0; i<PTL; i++)
-    {
+    for (i = 0; i < PTL; i++) {
         carry = high_result[i];
         {
-            a1=carry*r[i]+a[0];           //С˳ʾ
-            while(a1>0xFFFFFFFF)
-            {
-                a2=a1&0xFFFFFFFF;
-                high1=a1>>32;
-                a1=high1*r[i]+a2;
+            a1 = carry * r[i] + a[0]; //С˳ʾ
+            while (a1 > 0xFFFFFFFF) {
+                a2    = a1 & 0xFFFFFFFF;
+                high1 = a1 >> 32;
+                a1    = high1 * r[i] + a2;
             }
-            a2=(a1*s[i])>>32;
-            carry=a1-a2*PrimeTable[i];
-            if(carry>=PrimeTable[i])
-            {
+            a2    = (a1 * s[i]) >> 32;
+            carry = a1 - a2 * PrimeTable[i];
+            if (carry >= PrimeTable[i]) {
                 carry -= PrimeTable[i];
             }
         }
-        if(0 == (unsigned int)carry)
-        {
+        if (0 == (unsigned int)carry) {
             return NOT_PRIME;
         }
     }
@@ -2458,53 +2643,44 @@ unsigned int primality_test_Fermat(unsigned int *p, unsigned int pBitLen, unsign
     pke_set_operand_width(pBitLen);
     tmp_step = pke_get_operand_bytes();
 
-    for(i=0; i<round; i++)
-    {
+    for (i = 0; i < round; i++) {
         //A1, exponent, make it to be (p-1)
-        uint32_copy((PKE_A(1,tmp_step)), p, pWordLen);
-        *(PKE_A(1,tmp_step)) -= 1;
+        uint32_copy((PKE_A(1, tmp_step)), p, pWordLen);
+        *(PKE_A(1, tmp_step)) -= 1;
 
         //B0, base, make it to be in [2, p-2]
-        uint32_clear((PKE_B(0,tmp_step)), pWordLen);
+        uint32_clear((PKE_B(0, tmp_step)), pWordLen);
 
 GET_RAND_BASE:
 
         ret = rand_get((unsigned char *)&tag, 4);
-        if(TRNG_SUCCESS != ret)
-        {
+        if (TRNG_SUCCESS != ret) {
             return ret;
         }
 
-        if(tag < 2)
-        {
+        if (tag < 2) {
             goto GET_RAND_BASE;
         }
 
-        *(PKE_B(0,tmp_step)) = tag;
-        uint32_clear((PKE_B(0,tmp_step))+pWordLen-1, (tmp_step/4)-pWordLen+1);
+        *(PKE_B(0, tmp_step)) = tag;
+        uint32_clear((PKE_B(0, tmp_step)) + pWordLen - 1, (tmp_step / 4) - pWordLen + 1);
 
         //get pre-calculated mont paras
         ret = pke_pre_calc_mont(p, pBitLen, NULL, NULL);
-        if(PKE_SUCCESS != ret)
-        {
+        if (PKE_SUCCESS != ret) {
             return ret;
         }
 
         //A0, base^d mod p
-        ret = pke_modexp((PKE_B(3,tmp_step)), (PKE_A(1,tmp_step)), (PKE_B(0,tmp_step)),
-                (PKE_A(0,tmp_step)), pWordLen, pWordLen);
-        if(PKE_SUCCESS != ret)
-        {
+        ret = pke_modexp((PKE_B(3, tmp_step)), (PKE_A(1, tmp_step)), (PKE_B(0, tmp_step)), (PKE_A(0, tmp_step)), pWordLen, pWordLen);
+        if (PKE_SUCCESS != ret) {
             return ret;
         }
 
         //if the result is 1 mod p, then p is probably prime
-        if(Bigint_Check_1((PKE_A(0,tmp_step)), pWordLen))
-        {
+        if (Bigint_Check_1((PKE_A(0, tmp_step)), pWordLen)) {
             continue;
-        }
-        else
-        {
+        } else {
             return NOT_PRIME;
         }
     }
@@ -2528,78 +2704,67 @@ unsigned int primality_test_Miller_Rabin(unsigned int *p, unsigned int pBitLen, 
 {
     unsigned int pWordLen = GET_WORD_LEN(pBitLen);
     unsigned int tmp_step, i, j, tag, even_num;
-    signed int ret;
+    signed int   ret;
 
     pke_set_operand_width(pBitLen);
     tmp_step = pke_get_operand_bytes();
 
-    for(i=0; i<round; i++)
-    {
+    for (i = 0; i < round; i++) {
         //A1, exponent, make it to be (p-1)=d*(2^t), where d is odd
-        uint32_copy((PKE_A(1,tmp_step)), p, pWordLen);
-        *(PKE_A(1,tmp_step)) -= 1;
+        uint32_copy((PKE_A(1, tmp_step)), p, pWordLen);
+        *(PKE_A(1, tmp_step)) -= 1;
 
         //make exponent to be d
-        even_num = Get_Multiple2_Number((unsigned int *)(PKE_A(1,tmp_step)));
-        Big_Div2n((unsigned int *)(PKE_A(1,tmp_step)), pWordLen, even_num);
+        even_num = Get_Multiple2_Number((unsigned int *)(PKE_A(1, tmp_step)));
+        Big_Div2n((unsigned int *)(PKE_A(1, tmp_step)), pWordLen, even_num);
 
         //B0, base, make it to be in [2, p-2]
-        uint32_clear((PKE_B(0,tmp_step)), pWordLen);
+        uint32_clear((PKE_B(0, tmp_step)), pWordLen);
 
 GET_RAND_BASE:
 
         ret = rand_get((unsigned char *)&tag, 4);
-        if(TRNG_SUCCESS != ret)
-        {
+        if (TRNG_SUCCESS != ret) {
             return ret;
         }
 
-        if(tag < 2)
-        {
+        if (tag < 2) {
             goto GET_RAND_BASE;
         }
 
-        *((unsigned int *)(PKE_B(0,tmp_step))) = tag;
-        uint32_clear((PKE_B(0,tmp_step))+pWordLen-1, (tmp_step/4)-pWordLen+1);
+        *((unsigned int *)(PKE_B(0, tmp_step))) = tag;
+        uint32_clear((PKE_B(0, tmp_step)) + pWordLen - 1, (tmp_step / 4) - pWordLen + 1);
 
         //get pre-calculated mont paras
         ret = pke_pre_calc_mont(p, pBitLen, NULL, NULL);
-        if(PKE_SUCCESS != ret)
-        {
+        if (PKE_SUCCESS != ret) {
             return ret;
         }
 
         //A0, base^d mod p
-        ret = pke_modexp((PKE_B(3,tmp_step)), (PKE_A(1,tmp_step)), (PKE_B(0,tmp_step)),
-                (PKE_A(0,tmp_step)), pWordLen, pWordLen);
-        if(PKE_SUCCESS != ret)
-        {
+        ret = pke_modexp((PKE_B(3, tmp_step)), (PKE_A(1, tmp_step)), (PKE_B(0, tmp_step)), (PKE_A(0, tmp_step)), pWordLen, pWordLen);
+        if (PKE_SUCCESS != ret) {
             return ret;
         }
 
         //if the result is 1 or -1 mod p, then p is probably prime
-        if(Bigint_Check_1((unsigned int *)(PKE_A(0,tmp_step)), pWordLen)
-                || Bigint_Check_p_1((unsigned int *)(PKE_A(0,tmp_step)), p, pWordLen))
-        {
+        if (Bigint_Check_1((unsigned int *)(PKE_A(0, tmp_step)), pWordLen) || Bigint_Check_p_1((unsigned int *)(PKE_A(0, tmp_step)), p, pWordLen)) {
             continue;
         }
 
         tag = 0;
-        for(j=1; j<even_num; j++)
-        {
-#if 0
+        for (j = 1; j < even_num; j++) {
+    #if 0
             //A2, exponent, make it to be 2
             *((unsigned int *)(PKE_A(2,step))) = 2;
             uint32_clear((PKE_A(2,step))+1, pWordLen-1);
 
             ret = pke_modexp((PKE_A(0,tmp_step)), (PKE_A(2,tmp_step)),(PKE_A(1,tmp_step)),
                     (PKE_A(1,tmp_step)), pWordLen, pWordLen);
-#else
-            ret = pke_modmul_internal((PKE_B(3,tmp_step)), (PKE_A(0,tmp_step)), (PKE_A(0,tmp_step)),
-                    (PKE_A(0,tmp_step)), pWordLen);
-#endif
-            if(PKE_SUCCESS != ret)
-            {
+    #else
+            ret = pke_modmul_internal((PKE_B(3, tmp_step)), (PKE_A(0, tmp_step)), (PKE_A(0, tmp_step)), (PKE_A(0, tmp_step)), pWordLen);
+    #endif
+            if (PKE_SUCCESS != ret) {
                 return ret;
             }
 
@@ -2612,19 +2777,15 @@ GET_RAND_BASE:
             */
 
             //if the result is -1 mod p, then p is probably prime
-            if(Bigint_Check_p_1((unsigned int *)(PKE_A(0,tmp_step)), p, pWordLen))
-            {
+            if (Bigint_Check_p_1((unsigned int *)(PKE_A(0, tmp_step)), p, pWordLen)) {
                 tag = 1;
                 break;
             }
         }
 
-        if(1 == tag)
-        {
+        if (1 == tag) {
             continue;
-        }
-        else
-        {
+        } else {
             return NOT_PRIME;
         }
     }
@@ -2643,43 +2804,35 @@ GET_RAND_BASE:
  */
 unsigned int get_prime(unsigned int p[], unsigned int pBitLen)
 {
-    unsigned int ret;
-    unsigned int bitLen, pWordLen = (pBitLen+0x1F)>>5;
+    unsigned int   ret;
+    unsigned int   bitLen, pWordLen = (pBitLen + 0x1F) >> 5;
     unsigned short high_result[PTL_MAX];
-    unsigned int PTL;
+    unsigned int   PTL;
 
-    if(pBitLen <= 512)
-    {
+    if (pBitLen <= 512) {
         PTL = PTL_512;
-    }
-    else if(pBitLen >= 1024)
-    {
+    } else if (pBitLen >= 1024) {
         PTL = PTL_1024;
-    }
-    else
-    {
-        PTL = ((PTL_1024-PTL_512)/(1024-512))*(pBitLen-512)+PTL_512;
+    } else {
+        PTL = ((PTL_1024 - PTL_512) / (1024 - 512)) * (pBitLen - 512) + PTL_512;
     }
 
-    if(PTL > PTL_MAX)
-    {
+    if (PTL > PTL_MAX) {
         PTL = PTL_MAX;
     }
 
 #ifdef PRIME_TEST
     uint32_set(p, 0x22222222, pWordLen);
 #else
-    ret = rand_get((unsigned char *)p, pWordLen<<2);
-    if(TRNG_SUCCESS != ret)
-    {
+    ret = rand_get((unsigned char *)p, pWordLen << 2);
+    if (TRNG_SUCCESS != ret) {
         return ret;
     }
 #endif
 
     //make high two bit all 1
     bitLen = pBitLen & 0x1F;
-    switch(bitLen)
-    {
+    switch (bitLen) {
     case 0:
         p[pWordLen - 1] |= 0xC0000000;
         break;
@@ -2690,27 +2843,23 @@ unsigned int get_prime(unsigned int p[], unsigned int pBitLen)
         break;
 
     default:
-        p[pWordLen-1] &= ((1<<bitLen)-1);
-        p[pWordLen-1] |= (0x3<<(bitLen-2));
+        p[pWordLen - 1] &= ((1 << bitLen) - 1);
+        p[pWordLen - 1] |= (0x3 << (bitLen - 2));
         break;
     }
     //make p odd
     p[0] |= 0x01;
 
-    ret = bigint_div_table_high(p+1, pWordLen-1, (const unsigned short *)PrimeTable_r, (const double_uint32_t *)PrimeTable_s, high_result, PTL);
-    if(PKE_SUCCESS != ret)
-    {
+    ret = bigint_div_table_high(p + 1, pWordLen - 1, (const unsigned short *)PrimeTable_r, (const double_uint32_t *)PrimeTable_s, high_result, PTL);
+    if (PKE_SUCCESS != ret) {
         return ret;
     }
 ADD_2:
     p[0] += 2;
     ret = bigint_div_table_low(p, (const unsigned short *)PrimeTable_r, (const double_uint32_t *)PrimeTable_s, high_result, PTL);
-    if(NOT_PRIME == ret)
-    {
+    if (NOT_PRIME == ret) {
         goto ADD_2;
-    }
-    else if(MAYBE_PRIME != ret)
-    {
+    } else if (MAYBE_PRIME != ret) {
         return ret;
     }
 
@@ -2720,21 +2869,18 @@ ADD_2:
     ret = primality_test_Miller_Rabin(p, pBitLen, MILLER_RABIN_ROUND);
 #endif
 
-    if(NOT_PRIME == ret)
-    {
+    if (NOT_PRIME == ret) {
         goto ADD_2;
     }
 #ifdef PRIME_TEST
-    else if(MAYBE_PRIME == ret)
-    {
+    else if (MAYBE_PRIME == ret) {
         count++;
         //if(count % 20 == 0)
-            //xil_printf("\r\n%08x", p[0]);
-//          xil_printf("\r\n %d  %d  %d", count, xxxx, xxxx2);//
+        //xil_printf("\r\n%08x", p[0]);
+        //          xil_printf("\r\n %d  %d  %d", count, xxxx, xxxx2);//
         goto ADD_2;
     }
 #endif
 
     return ret;
 }
-

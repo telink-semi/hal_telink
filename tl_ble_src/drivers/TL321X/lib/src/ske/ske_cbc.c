@@ -28,8 +28,6 @@
 #include "lib/include/ske/ske_cbc.h"
 
 
-
-
 #ifdef SUPPORT_SKE_MODE_CBC
 
 /**
@@ -61,14 +59,13 @@ unsigned int ske_lp_cbc_final(void)
     return ske_lp_final();
 }
 
-unsigned int ske_lp_cbc_crypto(SKE_ALG alg, SKE_CRYPTO crypto, unsigned char *key, unsigned short sp_key_idx, unsigned char *iv,
-        unsigned char *in, unsigned char *out, unsigned int bytes)
+unsigned int ske_lp_cbc_crypto(SKE_ALG alg, SKE_CRYPTO crypto, unsigned char *key, unsigned short sp_key_idx, unsigned char *iv, unsigned char *in, unsigned char *out, unsigned int bytes)
 {
     return ske_lp_crypto(alg, SKE_MODE_CBC, crypto, key, sp_key_idx, iv, in, out, bytes);
 }
 
 
-#ifdef SKE_LP_DMA_FUNCTION
+    #ifdef SKE_LP_DMA_FUNCTION
 unsigned int ske_lp_dma_cbc_init(SKE_ALG alg, SKE_CRYPTO crypto, unsigned char *key, unsigned short sp_key_idx, unsigned char *iv)
 {
     return ske_lp_dma_init(alg, SKE_MODE_CBC, crypto, key, sp_key_idx, iv);
@@ -84,13 +81,11 @@ unsigned int ske_lp_dma_cbc_final(void)
     return ske_lp_dma_final();
 }
 
-unsigned int ske_lp_dma_cbc_crypto(SKE_ALG alg, SKE_CRYPTO crypto, unsigned char *key, unsigned short sp_key_idx, unsigned char *iv,
-        unsigned int *in, unsigned int *out, unsigned int words, SKE_CALLBACK callback)
+unsigned int ske_lp_dma_cbc_crypto(SKE_ALG alg, SKE_CRYPTO crypto, unsigned char *key, unsigned short sp_key_idx, unsigned char *iv, unsigned int *in, unsigned int *out, unsigned int words, SKE_CALLBACK callback)
 {
     return ske_lp_dma_crypto(alg, SKE_MODE_CBC, crypto, key, sp_key_idx, iv, in, out, words, callback);
 }
-#endif
+    #endif
 
 
 #endif
-

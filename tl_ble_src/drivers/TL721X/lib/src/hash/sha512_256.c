@@ -28,9 +28,6 @@
 #include "lib/include/hash/sha512_256.h"
 
 
-
-
-
 #ifdef SUPPORT_HASH_SHA512_256
 
 
@@ -43,7 +40,6 @@ unsigned int sha512_256_init(SHA512_256_CTX *ctx)
 {
     return hash_init(ctx, HASH_SHA512_256);
 }
-
 
 /**
  * @brief       sha512_256 update message
@@ -61,7 +57,6 @@ unsigned int sha512_256_update(SHA512_256_CTX *ctx, const unsigned char *msg, un
     return hash_update(ctx, msg, msg_bytes);
 }
 
-
 /**
  * @brief       message update done, get the sha512_256 digest
  * @param[in]   ctx               - SHA512_256_CTX context pointer.
@@ -76,7 +71,6 @@ unsigned int sha512_256_final(SHA512_256_CTX *ctx, unsigned char *digest)
 {
     return hash_final(ctx, digest);
 }
-
 
 /**
  * @brief       input whole message and get its sha512_256 digest
@@ -95,7 +89,7 @@ unsigned int sha512_256(unsigned char *msg, unsigned int msg_bytes, unsigned cha
 }
 
 
-#ifdef HASH_DMA_FUNCTION
+    #ifdef HASH_DMA_FUNCTION
 /**
  * @brief       input whole message and get its sha512_256 digest
  * @param[in]   ctx            - SHA512_256_CTX context pointer.
@@ -162,6 +156,6 @@ unsigned int sha512_256_dma(unsigned int *msg, unsigned int msg_bytes, unsigned 
 {
     return hash_dma(HASH_SHA512_256, msg, msg_bytes, digest, callback);
 }
-#endif
+    #endif
 
 #endif

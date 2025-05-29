@@ -25,67 +25,54 @@
 #define STACK_BLE_DEBUG_SIHUI_VCD_DEF_H_
 
 
-
-
-
-
 #if (DBG_SLAVE_CONN_UPDATE)
-#define         SLET_upt_cmd_1              10
-#define         SLET_upt_cmd_2              11
-#define         SLET_upt_cmd_3              12
-#define         SLET_upt_cmd_4              13
-#define         SLET_upt_sync_1             20
-#define         SLET_upt_sync_2             21
-#define         SLET_upt_sync_3             22
-#define         SLET_upt_sync_4             23
+    #define SLET_upt_cmd_1  10
+    #define SLET_upt_cmd_2  11
+    #define SLET_upt_cmd_3  12
+    #define SLET_upt_cmd_4  13
+    #define SLET_upt_sync_1 20
+    #define SLET_upt_sync_2 21
+    #define SLET_upt_sync_3 22
+    #define SLET_upt_sync_4 23
 #endif
 
 #if 0
-#define         SLET_05_rx_crc              5
-#define         SLET_06_rx_1st              6
-#define         SLET_07_rx_new              7
-#define         SLET_10_tx                  10
-#define         SLET_11_c_cmdDone           11
-#define         SLET_12_c_1stRxTmt          12
-#define         SLET_13_c_rxTmt             13
-#define         SLET_14_c_rxCrc2            14
+    #define SLET_05_rx_crc     5
+    #define SLET_06_rx_1st     6
+    #define SLET_07_rx_new     7
+    #define SLET_10_tx         10
+    #define SLET_11_c_cmdDone  11
+    #define SLET_12_c_1stRxTmt 12
+    #define SLET_13_c_rxTmt    13
+    #define SLET_14_c_rxCrc2   14
 #endif
-
-
-
 
 
 #if 0
-#define         SLEV_txFifo_push            17
-#define         SLEV_txFifo_empty           18
-#define         SLEV_txFifo_RX              19
-#define         SLEV_txFifo_post            20
-#define         SLEV_test_event             31
+    #define SLEV_txFifo_push  17
+    #define SLEV_txFifo_empty 18
+    #define SLEV_txFifo_RX    19
+    #define SLEV_txFifo_post  20
+    #define SLEV_test_event   31
 
-#define         SL16_tf_hw_push             1
-#define         SL16_tf_sw_push             2
-#define         SL16_tf_hw_load1            3
-#define         SL16_tf_sw_load1            4
-#define         SL16_tf_hw_load2            5
-#define         SL16_tf_sw_load2            6
-#define         SL16_tf_hw_RX               7
-#define         SL16_tf_sw_RX               8
-#define         SL16_tf_hw_TX               9
-#define         SL16_tf_sw_TX               10
-#define         SL16_tf_hw_post             11
-#define         SL16_tf_sw_post             12
-#define         SL16_tf_save                13
+    #define SL16_tf_hw_push   1
+    #define SL16_tf_sw_push   2
+    #define SL16_tf_hw_load1  3
+    #define SL16_tf_sw_load1  4
+    #define SL16_tf_hw_load2  5
+    #define SL16_tf_sw_load2  6
+    #define SL16_tf_hw_RX     7
+    #define SL16_tf_sw_RX     8
+    #define SL16_tf_hw_TX     9
+    #define SL16_tf_sw_TX     10
+    #define SL16_tf_hw_post   11
+    #define SL16_tf_sw_post   12
+    #define SL16_tf_save      13
 
-#define         SL16_seq_notify             15
-#define         SL16_seq_write              16
-#define         SL16_test_2B                17
+    #define SL16_seq_notify   15
+    #define SL16_seq_write    16
+    #define SL16_test_2B      17
 #endif
-
-
-
-
-
-
 
 
 #endif /* STACK_BLE_DEBUG_SIHUI_VCD_DEF_H_ */

@@ -26,23 +26,19 @@
 #include "tmas_client_buf.h"
 #include "tmas_server_buf.h"
 
-
-
 /******************************* TMAS Common Start **********************************************************************/
 
 /******************************* TMAS Common End **********************************************************************/
 
 
-
-
 /******************************* TMAS Client Start **********************************************************************/
 
 //TMAS Client Event ID
-typedef enum{
+typedef enum
+{
     AUDIO_EVT_TMASC_START = AUDIO_EVT_TYPE_TMASC,
     //NONE:
 } audio_tmasc_evt_enum;
-
 
 /**
  * @brief       This function serves to register TMAS Client function
@@ -56,21 +52,19 @@ void blc_audio_registerTMASControlClient(const blc_tmasc_regParam_t *param);
 int blc_tmasc_readTmapRole(u16 connHandle, prf_read_cb_t readCb);
 
 //TMAS Client Get Characteristic Value Operation API
-int blc_tmasc_getTmapRole(u16 connHandle, u16* tmapRole);
+int blc_tmasc_getTmapRole(u16 connHandle, u16 *tmapRole);
 
 /******************************* TMAS Client End **********************************************************************/
-
-
 
 
 /******************************* TMAS Server Start **********************************************************************/
 
 //TMAS Server Event ID
-typedef enum{
+typedef enum
+{
     AUDIO_EVT_TMASS_START = AUDIO_EVT_TYPE_TMASS,
     //NONE:
 } audio_tmass_evt_enum;
-
 
 /**
  * @brief       This function serves to register TMAS Server function

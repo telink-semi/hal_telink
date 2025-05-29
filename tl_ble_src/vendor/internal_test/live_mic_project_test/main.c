@@ -39,14 +39,13 @@ _attribute_ram_code_ void rf_irq_handler(void)
     DBG_CHN14_HIGH;
     DBG_SIHUI_CHN14_HIGH;
 
-    blc_sdk_irq_handler ();
+    blc_sdk_irq_handler();
 
     DBG_CHN14_LOW;
     DBG_SIHUI_CHN14_LOW;
 }
 
 PLIC_ISR_REGISTER(rf_irq_handler, IRQ_ZB_RT)
-
 
 /**
  * @brief       System timer interrupt handler.
@@ -59,7 +58,7 @@ _attribute_ram_code_ void stimer_irq_handler(void)
     DBG_SIHUI_CHN15_HIGH;
 
     gpio_write(GPIO_PB6, 1);
-    blc_sdk_irq_handler ();
+    blc_sdk_irq_handler();
     gpio_write(GPIO_PB6, 0);
 
     DBG_SIHUI_CHN15_LOW;
@@ -69,9 +68,9 @@ _attribute_ram_code_ void stimer_irq_handler(void)
 PLIC_ISR_REGISTER(stimer_irq_handler, IRQ_SYSTIMER)
 
 
+    #define LED1 GPIO_PF1
+    #define LED2 GPIO_PE7
 
-#define LED1                    GPIO_PF1
-#define LED2                    GPIO_PE7
 /**
  * @brief       This is main function
  * @param[in]   none
@@ -87,12 +86,12 @@ _attribute_ram_code_ int main(void)
     blc_pm_select_internal_32k_crystal();
 
     #if (MCU_CORE_TYPE == MCU_CORE_B92)
-        sys_init(DCDC_1P4_LDO_2P0, VBAT_MAX_VALUE_GREATER_THAN_3V6, GPIO_VOLTAGE_3V3, INTERNAL_CAP_XTAL24M);
-        wd_32k_stop();
-        CCLK_32M_HCLK_32M_PCLK_16M;
+    sys_init(DCDC_1P4_LDO_2P0, VBAT_MAX_VALUE_GREATER_THAN_3V6, GPIO_VOLTAGE_3V3, INTERNAL_CAP_XTAL24M);
+    wd_32k_stop();
+    CCLK_32M_HCLK_32M_PCLK_16M;
     #elif (MCU_CORE_TYPE == MCU_CORE_TL751X)
-        sys_init(VBAT_MAX_VALUE_GREATER_THAN_3V6);
-        CCLK_96M_HCLK_96M_PCLK_24M_MSPI_48M;
+    sys_init(VBAT_MAX_VALUE_GREATER_THAN_3V6);
+    CCLK_96M_HCLK_96M_PCLK_24M_MSPI_48M;
     #endif
 
     rf_drv_ble_init();
@@ -105,13 +104,11 @@ _attribute_ram_code_ int main(void)
     gpio_output_en(LED1);
     gpio_output_en(LED2);
 
-    while(1)
-    {
-        main_loop ();
+    while (1) {
+        main_loop();
 
         static u32 cpuRunTime = 0;
-        if(clock_time_exceed(cpuRunTime, 500*1000))
-        {
+        if (clock_time_exceed(cpuRunTime, 500 * 1000)) {
             cpuRunTime = clock_time();
             gpio_toggle(LED2);
         }
@@ -119,7 +116,6 @@ _attribute_ram_code_ int main(void)
 
     return 0;
 }
-
 
 
 #endif

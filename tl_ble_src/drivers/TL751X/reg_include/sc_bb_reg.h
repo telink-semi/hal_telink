@@ -101,9 +101,11 @@ enum{
     FLD_CLKZB32K_SEL            =   BIT_RNG(0, 3),
     FLD_CLKBB_SEL               =   BIT(4),
 };
+#define N22_SRAM_EMA_REG_ADDR               (SC_BB_BASE_ADDR + 0x20)
+#define N22_SRAM_EMA_DATA_LEN                    2
 
-#define reg_n22_sram_cfg                REG_ADDR16(SC_BB_BASE_ADDR + 0x20)
-#define reg_n22_sram_cfg0               REG_ADDR8(SC_BB_BASE_ADDR + 0x20)
+#define reg_n22_sram_cfg                REG_ADDR16(N22_SRAM_EMA_REG_ADDR)
+#define reg_n22_sram_cfg0               REG_ADDR8(N22_SRAM_EMA_REG_ADDR)
 enum{
     FLD_N22_SRAM_EMA            = BIT_RNG(0, 2),
     FLD_N22_SRAM_EMAW           = BIT_RNG(3, 4),

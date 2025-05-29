@@ -42,9 +42,9 @@ void print_buf_U8(unsigned char buf[], unsigned int byteLen, char name[])
 {
     unsigned int i;
 
-    printf("\r\n %s: ",name); fflush(stdout);
-    for(i=0; i<byteLen; i++)
-    {
+    printf("\r\n %s: ", name);
+    fflush(stdout);
+    for (i = 0; i < byteLen; i++) {
         printf("%02x", buf[i]);
     }
 
@@ -62,13 +62,15 @@ void print_buf_U32(unsigned int buf[], unsigned int wordLen, char name[])
 {
     unsigned int i;
 
-    printf("\r\n %s: %08x\r\n",name, (unsigned int)buf);fflush(stdout);
-    for(i=0; i<wordLen; i++)
-    {
-        printf("%08x", buf[i]);fflush(stdout);
+    printf("\r\n %s: %08x\r\n", name, (unsigned int)buf);
+    fflush(stdout);
+    for (i = 0; i < wordLen; i++) {
+        printf("%08x", buf[i]);
+        fflush(stdout);
     }
 
-    printf("\r\n");fflush(stdout);
+    printf("\r\n");
+    fflush(stdout);
 }
 
 /**
@@ -82,17 +84,18 @@ void print_BN_buf_U32(unsigned int buf[], unsigned int wordLen, char name[])
 {
     unsigned int i;
 
-    printf("\r\n %08x %s: ", (unsigned int)buf, name);fflush(stdout);
-    for(i=0; i<wordLen; i++)
-    {
-        printf("%08x", buf[wordLen-1-i]);
+    printf("\r\n %08x %s: ", (unsigned int)buf, name);
+    fflush(stdout);
+    for (i = 0; i < wordLen; i++) {
+        printf("%08x", buf[wordLen - 1 - i]);
     }
-    printf("\r\n");fflush(stdout);
+    printf("\r\n");
+    fflush(stdout);
 }
 #endif
 
 static unsigned long start_tick = 0;
-static unsigned long end_tick = 0;
+static unsigned long end_tick   = 0;
 
 /**
  * @brief       gets the current system clock period and stores it in the global variable start_tick.
@@ -115,19 +118,20 @@ unsigned int startP(void)
 unsigned int endP(unsigned char mode, unsigned int once_bytes, unsigned int round)
 {
     unsigned long total_bytes = 0;
-    double delta_s = 0.0;
-    double speed = 0.0;
+    double        delta_s     = 0.0;
+    double        speed       = 0.0;
 
     end_tick = stimer_get_tick();
-    delta_s = (end_tick - start_tick) / (1000.0 * 1000 * SYSTEM_TIMER_TICK_1US) /* s */;
+    delta_s  = (end_tick - start_tick) / (1000.0 * 1000 * SYSTEM_TIMER_TICK_1US) /* s */;
 
     total_bytes = once_bytes * round;
 
     speed = (total_bytes / delta_s) / (1024 * 1024); /* Mbyte/s */
-    if (0 == mode)
+    if (0 == mode) {
         printf("\r\n CPU mode speed %f Mbyte/s\r\n", speed);
-    else
+    } else {
         printf("\r\n DMA mode speed %f Mbyte/s\r\n", speed);
+    }
 
     printf("finished\r\n");
     return end_tick;
@@ -145,12 +149,12 @@ void memcpy_(void *dst, void *src, unsigned int size)
 {
     unsigned char *a = (unsigned char *)dst;
     unsigned char *b = (unsigned char *)src;
-#if 0
+    #if 0
     while(size--)
     {
         *a++ = *b++;
     }
-#else
+    #else
     unsigned int *aa = (unsigned int *)dst;
     unsigned int *bb = (unsigned int *)src;
     unsigned int i, count, tmp;
@@ -183,7 +187,7 @@ void memcpy_(void *dst, void *src, unsigned int size)
         else
         {;}
     }
-#endif
+    #endif
 }
 
 /**
@@ -196,12 +200,12 @@ void memcpy_(void *dst, void *src, unsigned int size)
 void memset_(void *dst, unsigned char value, unsigned int size)
 {
     volatile unsigned char *a = (unsigned char *)dst;
-#if 0
+    #if 0
     while(size--)
     {
         *a++ = value;
     }
-#else
+    #else
     unsigned int i, count, tmp;
 
     tmp = ((unsigned int)dst) & 3;
@@ -253,7 +257,7 @@ void memset_(void *dst, unsigned char value, unsigned int size)
     }
     else
     {;}
-#endif
+    #endif
 }
 
 /**
@@ -296,8 +300,7 @@ char memcmp_(void *m1, void *m2, unsigned int size)
  */
 void uint32_set(volatile unsigned int *a, unsigned int value, unsigned int wordLen)
 {
-    while(wordLen)
-    {
+    while (wordLen) {
         a[--wordLen] = value;
     }
 }
@@ -309,19 +312,17 @@ void uint32_set(volatile unsigned int *a, unsigned int value, unsigned int wordL
  * @param[in]   wordLen      - word length of buffer dst or src.
  * @return      none
  */
-void uint32_copy(volatile unsigned int *dst, volatile  unsigned int *src, unsigned int wordLen)
+void uint32_copy(volatile unsigned int *dst, volatile unsigned int *src, unsigned int wordLen)
 {
     unsigned int i;
 
-    if(dst != src)
-    {
-        for(i=0; i<wordLen; i++)
-        {
+    if (dst != src) {
+        for (i = 0; i < wordLen; i++) {
             dst[i] = src[i];
         }
+    } else {
+        ;
     }
-    else
-    {;}
 }
 
 /**
@@ -335,14 +336,12 @@ void uint32_clear(volatile unsigned int *a, unsigned int wordLen)
 #if 1
     volatile unsigned int i = wordLen;
 
-    while(i)
-    {
+    while (i) {
         a[--i] = 0;
     }
 #else
     volatile unsigned int i = 0;
-    for(i=0;i<wordLen;i++)
-    {
+    for (i = 0; i < wordLen; i++) {
         a[i] = 0;
     }
 #endif
@@ -354,14 +353,13 @@ void uint32_clear(volatile unsigned int *a, unsigned int wordLen)
  */
 static void uint32_sleep1(unsigned int count)
 {
-    volatile unsigned int a=0;
-    volatile unsigned int b=0;
-    volatile unsigned int result=0;
+    volatile unsigned int a      = 0;
+    volatile unsigned int b      = 0;
+    volatile unsigned int result = 0;
     volatile unsigned int i;
 
-    for(i=0;i<count;i++)
-    {
-        result |= ((a+i) - (b+i));
+    for (i = 0; i < count; i++) {
+        result |= ((a + i) - (b + i));
     }
 }
 
@@ -371,14 +369,13 @@ static void uint32_sleep1(unsigned int count)
  */
 static void uint32_sleep2(unsigned int count)
 {
-    volatile unsigned int a=0;
-    volatile unsigned int b=0;
-    volatile unsigned int result=0;
+    volatile unsigned int a      = 0;
+    volatile unsigned int b      = 0;
+    volatile unsigned int result = 0;
     volatile unsigned int i;
 
-    for(i=0;i<count;i++)
-    {
-        result |= ((a+i) ^ (b+i));
+    for (i = 0; i < count; i++) {
+        result |= ((a + i) ^ (b + i));
     }
 }
 
@@ -391,12 +388,9 @@ void uint32_sleep(unsigned int count, unsigned char rand)
 {
     unsigned char rand1 = rand & 0x01;
 
-    if(0 == rand1)
-    {
+    if (0 == rand1) {
         uint32_sleep1(count);
-    }
-    else
-    {
+    } else {
         uint32_sleep2(count);
     }
 }
@@ -500,22 +494,20 @@ void reverse_word_array(unsigned char *in, unsigned int *out, unsigned int wordL
   */
 void reverse_byte_array(volatile const unsigned char *in, unsigned char *out, unsigned int byteLen)
 {
-    unsigned int idx, round = byteLen >> 1;
+    unsigned int  idx, round = byteLen >> 1;
     unsigned char tmp;
 
-    for (idx = 0; idx < round; idx++)
-    {
-        tmp = in[idx];
-        out[idx] = in[byteLen - 1 - idx];
+    for (idx = 0; idx < round; idx++) {
+        tmp                    = in[idx];
+        out[idx]               = in[byteLen - 1 - idx];
         out[byteLen - 1 - idx] = tmp;
     }
 
-    if ((byteLen & 0x1) && (in != out))
-    {
+    if ((byteLen & 0x1) && (in != out)) {
         out[round] = in[round];
+    } else {
+        ;
     }
-    else
-    {;}
 }
 
 #if 0
@@ -639,8 +631,7 @@ void uint8_XOR(unsigned char *A, unsigned char *B, unsigned char *C, unsigned in
 {
     unsigned int i;
 
-    for(i=0; i<byteLen; i++)
-    {
+    for (i = 0; i < byteLen; i++) {
         C[i] = A[i] ^ B[i];
     }
 }
@@ -657,8 +648,7 @@ void uint32_XOR(unsigned int *A, unsigned int *B, unsigned int *C, unsigned int 
 {
     unsigned int i;
 
-    for(i=0; i<wordLen; i++)
-    {
+    for (i = 0; i < wordLen; i++) {
         C[i] = A[i] ^ B[i];
     }
 }
@@ -669,43 +659,37 @@ void uint32_XOR(unsigned int *A, unsigned int *B, unsigned int *C, unsigned int 
  * @param[in]   wordLen   - length of the array in words (unsigned integers).
  * @return      the number of valid bits in the array, or 0 if the array is empty or all elements are zero
  */
-unsigned int get_valid_bits( unsigned int *a, unsigned int wordLen)
+unsigned int get_valid_bits(unsigned int *a, unsigned int wordLen)
 {
     unsigned int i = 0;
     unsigned int j = 0;
 
-    if(0 == wordLen)
-    {
+    if (0 == wordLen) {
         return 0;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    for (i = wordLen; i > 0; i--)
-    {
-        if (a[i - 1])
-        {
+    for (i = wordLen; i > 0; i--) {
+        if (a[i - 1]) {
             break;
+        } else {
+            ;
         }
-        else
-        {;}
     }
 
-    if(0 == i)
-    {
+    if (0 == i) {
         return 0;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    for (j = 32; j > 0; j--)
-    {
-        if (a[i - 1] & (((unsigned int)0x1) << (j - 1)))
-        {
+    for (j = 32; j > 0; j--) {
+        if (a[i - 1] & (((unsigned int)0x1) << (j - 1))) {
             break;
+        } else {
+            ;
         }
-        else
-        {;}
     }
 
     return ((i - 1) << 5) + j;
@@ -717,18 +701,16 @@ unsigned int get_valid_bits( unsigned int *a, unsigned int wordLen)
  * @param[in]   max_words   - max word length of a.
  * @return      real word length of big number a
  */
-unsigned int get_valid_words(volatile  unsigned int *a, unsigned int max_words)
+unsigned int get_valid_words(volatile unsigned int *a, unsigned int max_words)
 {
     unsigned int i;
 
-    for (i = max_words; i > 0; i--)
-    {
-        if (a[i - 1])
-        {
+    for (i = max_words; i > 0; i--) {
+        if (a[i - 1]) {
             return i;
+        } else {
+            ;
         }
-        else
-        {;}
     }
 
     return 0;
@@ -744,14 +726,12 @@ unsigned char uint8_BigNum_Check_Zero(unsigned char a[], unsigned int aByteLen)
 {
     unsigned int i;
 
-    for(i=0; i<aByteLen; i++)
-    {
-        if(a[i])
-        {
+    for (i = 0; i < aByteLen; i++) {
+        if (a[i]) {
             return 0;
+        } else {
+            ;
         }
-        else
-        {;}
     }
 
     return 1;
@@ -767,14 +747,12 @@ unsigned int uint32_BigNum_Check_Zero(unsigned int a[], unsigned int aWordLen)
 {
     unsigned int i;
 
-    for(i=0; i<aWordLen; i++)
-    {
-        if(a[i])
-        {
+    for (i = 0; i < aWordLen; i++) {
+        if (a[i]) {
             return 0;
+        } else {
+            ;
         }
-        else
-        {;}
     }
 
     return 1;
@@ -788,36 +766,29 @@ unsigned int uint32_BigNum_Check_Zero(unsigned int a[], unsigned int aWordLen)
  * @param[in]   bWordLen    - word length of b.
  * @return      0:a=b,   1:a>b,   -1: a<b
  */
-int uint32_BigNumCmp(volatile unsigned int *a, unsigned int aWordLen, volatile  unsigned int *b, unsigned int bWordLen)
+int uint32_BigNumCmp(volatile unsigned int *a, unsigned int aWordLen, volatile unsigned int *b, unsigned int bWordLen)
 {
     int i;
 
     aWordLen = get_valid_words(a, aWordLen);
     bWordLen = get_valid_words(b, bWordLen);
 
-    if(aWordLen > bWordLen)
-    {
+    if (aWordLen > bWordLen) {
         return 1;
-    }
-    else if(aWordLen < bWordLen)
-    {
+    } else if (aWordLen < bWordLen) {
         return -1;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    for(i=(aWordLen-1);i>=0;i--)
-    {
-        if(a[i] > b[i])
-        {
+    for (i = (aWordLen - 1); i >= 0; i--) {
+        if (a[i] > b[i]) {
             return 1;
-        }
-        else if(a[i] < b[i])
-        {
+        } else if (a[i] < b[i]) {
             return -1;
+        } else {
+            ;
         }
-        else
-        {;}
     }
 
     return 0;
@@ -834,21 +805,19 @@ int uint32_BigNumCmp(volatile unsigned int *a, unsigned int aWordLen, volatile  
  */
 unsigned int Get_Multiple2_Number(unsigned int a[])
 {
-    unsigned int t, i=0, j=0;
+    unsigned int t, i = 0, j = 0;
 
-    while(0 == (a[i]))
-    {
+    while (0 == (a[i])) {
         i++;
     }
 
     t = a[i];
-    while(!(t&1))
-    {
+    while (!(t & 1)) {
         j++;
-        t>>=1;
+        t >>= 1;
     }
 
-    return (i<<5)+j;
+    return (i << 5) + j;
 }
 
 /**
@@ -866,82 +835,65 @@ unsigned int Get_Multiple2_Number(unsigned int a[])
  */
 unsigned int Big_Div2n(unsigned int a[], int aWordLen, unsigned int n)
 {
-    int i;
+    int          i;
     unsigned int j;
 
     aWordLen = get_valid_words(a, aWordLen);
 
-    if(0 == n)
-    {
+    if (0 == n) {
         return aWordLen;
-    }
-    else if(!aWordLen)
-    {
+    } else if (!aWordLen) {
         return 0;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //now a is not zero(aWordLen is not zero), and n is not zero either.
 
-    if(n<32)
-    {
-        for(i=0; i<aWordLen-1; i++)
-        {
+    if (n < 32) {
+        for (i = 0; i < aWordLen - 1; i++) {
             a[i] >>= n;
-            a[i] |= (a[i+1]<<(32-n));
+            a[i] |= (a[i + 1] << (32 - n));
         }
         a[i] >>= n;
 
-        if(!a[i])
-        {
+        if (!a[i]) {
             return i;
-        }
-        else
-        {
+        } else {
             return aWordLen;
         }
+    } else {
+        ;
     }
-    else
-    {;}
 
-    j=n>>5; //j=n/32;
-    n&=31;  //n=n%32;
+    j = n >> 5; //j=n/32;
+    n &= 31;    //n=n%32;
 
-    if((int)j<aWordLen)
-    {
-        if(n)   //n is in [1, 31]
+    if ((int)j < aWordLen) {
+        if (n)  //n is in [1, 31]
         {
-            for(i=0; i<aWordLen-(int)j-1; i++)
-            {
-                a[i] = a[i+j]>>n;
-                a[i] |= (a[i+j+1]<<(32-n));
+            for (i = 0; i < aWordLen - (int)j - 1; i++) {
+                a[i] = a[i + j] >> n;
+                a[i] |= (a[i + j + 1] << (32 - n));
             }
-            a[i] = a[i+j]>>n;
-            uint32_clear(a+aWordLen-j, j);
+            a[i] = a[i + j] >> n;
+            uint32_clear(a + aWordLen - j, j);
 
-            if(!a[i])
-            {
+            if (!a[i]) {
                 return i;
+            } else {
+                return aWordLen - j;
             }
-            else
-            {
-                return aWordLen-j;
-            }
-        }
-        else    //n is 0
+        } else //n is 0
         {
-            for(i=0; i<aWordLen-(int)j; i++)
-            {
-                a[i] = a[i+j];
+            for (i = 0; i < aWordLen - (int)j; i++) {
+                a[i] = a[i + j];
             }
-            uint32_clear(a+aWordLen-j, j);
+            uint32_clear(a + aWordLen - j, j);
 
-            return aWordLen-j;
+            return aWordLen - j;
         }
-    }
-    else
-    {
+    } else {
         uint32_clear(a, aWordLen);
         return 0;
     }
@@ -963,25 +915,20 @@ unsigned char Bigint_Check_1(volatile unsigned int a[], unsigned int aWordLen)
 {
     unsigned int i;
 
-    if(!aWordLen)
-    {
+    if (!aWordLen) {
         return 0;
-    }
-    else if(a[0] != 1)
-    {
+    } else if (a[0] != 1) {
         return 0;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    for(i=1; i<aWordLen; i++)
-    {
-        if(a[i])
-        {
+    for (i = 1; i < aWordLen; i++) {
+        if (a[i]) {
             return 0;
+        } else {
+            ;
         }
-        else
-        {;}
     }
 
     return 1;
@@ -1002,25 +949,20 @@ unsigned char Bigint_Check_p_1(unsigned int a[], unsigned int p[], unsigned int 
 {
     unsigned int i;
 
-    if(!wordLen)
-    {
+    if (!wordLen) {
         return 0;
-    }
-    else if(a[0] != p[0] - 1)
-    {
+    } else if (a[0] != p[0] - 1) {
         return 0;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    for(i=1; i<wordLen; i++)
-    {
-        if(a[i] != p[i])
-        {
+    for (i = 1; i < wordLen; i++) {
+        if (a[i] != p[i]) {
             return 0;
+        } else {
+            ;
         }
-        else
-        {;}
     }
 
     return 1;
@@ -1033,20 +975,15 @@ unsigned char Bigint_Check_p_1(unsigned int a[], unsigned int p[], unsigned int 
  * @param[in]   wordLen            - word length of k and n.
  * @return      ret_zero(k is zero)   ret_big(k is greater/bigger than or equal to n)  ret_success(k is in [1, n-1])
  */
-unsigned int uint32_integer_check(unsigned int *k,  unsigned int *n, unsigned int wordLen, unsigned int ret_zero, unsigned int ret_big,
-        unsigned int ret_success)
+unsigned int uint32_integer_check(unsigned int *k, unsigned int *n, unsigned int wordLen, unsigned int ret_zero, unsigned int ret_big, unsigned int ret_success)
 {
-    if(uint32_BigNum_Check_Zero(k, wordLen))
-    {
+    if (uint32_BigNum_Check_Zero(k, wordLen)) {
         return ret_zero;
-    }
-    else if(uint32_BigNumCmp(k, wordLen, n, wordLen) >= 0)
-    {
+    } else if (uint32_BigNumCmp(k, wordLen, n, wordLen) >= 0) {
         return ret_big;
+    } else {
+        ;
     }
-    else
-    {;}
 
     return ret_success;
 }
-

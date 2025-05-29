@@ -31,71 +31,59 @@
 #include "lib/include/ske/ske_portable.h"
 
 
-
 #ifdef SUPPORT_SKE_MODE_CCM
 
 
-
 //this function is common part for ske_lp_ccm_init() and ske_lp_dma_ccm_init()
-unsigned int ske_lp_ccm_pre_init(SKE_CCM_CTX *ctx, SKE_CRYPTO crypto, unsigned char *nonce, unsigned char M, unsigned char L,
-        unsigned int aad_bytes, unsigned int c_bytes)
+unsigned int ske_lp_ccm_pre_init(SKE_CCM_CTX *ctx, SKE_CRYPTO crypto, unsigned char *nonce, unsigned char M, unsigned char L, unsigned int aad_bytes, unsigned int c_bytes)
 {
     unsigned int tmp, len;
 
-    if(NULL == ctx || NULL == nonce)
-    {
+    if (NULL == ctx || NULL == nonce) {
         return SKE_BUFFER_NULL;
-    }
-    else if((0 == aad_bytes) && (0 == c_bytes))
-    {
+    } else if ((0 == aad_bytes) && (0 == c_bytes)) {
         return SKE_INPUT_INVALID;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //check M(the valid candidates are 4,6,8,10,12,14,16)
-    if(M & 1)
-    {
+    if (M & 1) {
         return SKE_INPUT_INVALID;
-    }
-    else if((M < 4) || (M > 16))
-    {
+    } else if ((M < 4) || (M > 16)) {
         return SKE_INPUT_INVALID;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //check L(the valid candidates are 2,3,4,5,6,7,8)
-    if((L < 2) || (L > 8))
-    {
+    if ((L < 2) || (L > 8)) {
         return SKE_INPUT_INVALID;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //check c_bytes
     tmp = c_bytes;
     len = 0;
-    while(tmp)
-    {
+    while (tmp) {
         len++;
         tmp >>= 8;
     }
 
-    if(len > L)
-    {
+    if (len > L) {
         return SKE_INPUT_INVALID;
+    } else {
+        ;
     }
-    else
-    {;}
 
     /***** init the ctx fields *****/
     ctx->M = M;
     ctx->L = L;
 
     //A0
-    ctx->buf[0] = (ctx->L)-1;
-    memcpy_(ctx->buf + 1, nonce, 15-(ctx->L));
+    ctx->buf[0] = (ctx->L) - 1;
+    memcpy_(ctx->buf + 1, nonce, 15 - (ctx->L));
     memset_(ctx->buf + 16 - ctx->L, 0, ctx->L);
 
     ctx->aad_bytes = aad_bytes;
@@ -105,7 +93,7 @@ unsigned int ske_lp_ccm_pre_init(SKE_CCM_CTX *ctx, SKE_CRYPTO crypto, unsigned c
     ske_lp_set_c_len_uint32(c_bytes);
 
     ctx->current_bytes = 0;
-    ctx->crypto = crypto;
+    ctx->crypto        = crypto;
 
     return SKE_SUCCESS;
 }
@@ -126,43 +114,38 @@ void ske_lp_ccm_get_B0(unsigned char *nonce, unsigned char M, unsigned char L, u
 
     //B0 flag
     out[0] = 0;
-    out[0] |= (M-2)/2;
+    out[0] |= (M - 2) / 2;
     out[0] <<= 3;
-    out[0] |= L-1;
+    out[0] |= L - 1;
 
-    if(aad_bytes)
-    {
-        out[0] |= 0x40;    //with aad flag
+    if (aad_bytes) {
+        out[0] |= 0x40; //with aad flag
+    } else {
+        ;
     }
-    else
-    {;}
 
     //B0 nonce
-    if(nonce != out+1)    //namely, if out is not ctx->buf
+    if (nonce != out + 1) //namely, if out is not ctx->buf
     {
-        memcpy_(out+1, nonce, 15-L);
-        memset_(out+1+15-L, 0, L);
+        memcpy_(out + 1, nonce, 15 - L);
+        memset_(out + 1 + 15 - L, 0, L);
+    } else {
+        ;
     }
-    else
-    {;}
 
     //B0 message byte length
-#ifdef SKE_LP_CPU_BIG_ENDIAN
+    #ifdef SKE_LP_CPU_BIG_ENDIAN
     memcpy_(tmp, &c_bytes, 4);
-#else
+    #else
     reverse_byte_array((unsigned char *)(&c_bytes), tmp, 4);
-#endif
+    #endif
 
-    if(L <= 4)
-    {
-        memcpy_(out+16-L, tmp+4-L, L);
-    }
-    else
-    {
-        memcpy_(out+16-4, tmp, 4);
+    if (L <= 4) {
+        memcpy_(out + 16 - L, tmp + 4 - L, L);
+    } else {
+        memcpy_(out + 16 - 4, tmp, 4);
     }
 }
-
 
 /**
  * @brief       to get B1 block(if aad exists), please make sure all parameters are valid.
@@ -180,83 +163,71 @@ void ske_lp_ccm_get_B0(unsigned char *nonce, unsigned char M, unsigned char L, u
 void ske_lp_ccm_get_B1(unsigned char *aad, unsigned int aad_bytes, unsigned int *aad_offset, unsigned char out[16])
 {
     unsigned char tmp[4];
-    unsigned int current_bytes, left_bytes;
+    unsigned int  current_bytes, left_bytes;
 
-#ifdef SKE_LP_CPU_BIG_ENDIAN
+    #ifdef SKE_LP_CPU_BIG_ENDIAN
     memcpy_(tmp, &aad_bytes, 4);
-#else
+    #else
     reverse_byte_array((unsigned char *)(&aad_bytes), tmp, 4);
-#endif
+    #endif
 
-    if(aad_bytes < ((1<<16)-(1<<8)))
-    {
+    if (aad_bytes < ((1 << 16) - (1 << 8))) {
         memcpy_(out, tmp + 2, 2);
         current_bytes = 2;
-        left_bytes = 16-2;
-    }
-    else
-    {
+        left_bytes    = 16 - 2;
+    } else {
         out[0] = 0xFF;
         out[1] = 0xFE;
         memcpy_(out + 2, tmp, 4);
         current_bytes = 6;
-        left_bytes = 16-6;
+        left_bytes    = 16 - 6;
     }
 
-    if(aad_bytes <= left_bytes)
-    {
+    if (aad_bytes <= left_bytes) {
         memcpy_(out + current_bytes, aad, aad_bytes);
         memset_(out + current_bytes + aad_bytes, 0, left_bytes - aad_bytes);
         *aad_offset = aad_bytes;
-    }
-    else
-    {
+    } else {
         memcpy_(out + current_bytes, aad, left_bytes);
         *aad_offset = left_bytes;
     }
 }
 
 
-#ifdef SKE_LP_CCM_CPU_UPDATE_AAD_BY_STEP
+    #ifdef SKE_LP_CCM_CPU_UPDATE_AAD_BY_STEP
 //to prepare B1 block without input aad(if aad exists), please make sure all parameters are valid
 void ske_lp_ccm_pre_B1(SKE_CCM_CTX *ctx)
 {
     unsigned char tmp[4];
-    unsigned int left_bytes;
+    unsigned int  left_bytes;
 
-#ifdef SKE_LP_CPU_BIG_ENDIAN
+        #ifdef SKE_LP_CPU_BIG_ENDIAN
     memcpy_(tmp, &ctx->aad_bytes, 4);
-#else
+        #else
     reverse_byte_array((unsigned char *)(&ctx->aad_bytes), tmp, 4);
-#endif
+        #endif
 
-    if(ctx->aad_bytes < ((1<<16)-(1<<8)))
-    {
+    if (ctx->aad_bytes < ((1 << 16) - (1 << 8))) {
         memcpy_(ctx->buf, tmp + 2, 2);
         ctx->current_bytes = 2;
-        left_bytes = 16-2;
-    }
-    else
-    {
+        left_bytes         = 16 - 2;
+    } else {
         ctx->buf[0] = 0xFF;
         ctx->buf[1] = 0xFE;
         memcpy_(ctx->buf + 2, tmp, 4);
         ctx->current_bytes = 6;
-        left_bytes = 16-6;
+        left_bytes         = 16 - 6;
     }
 
     ctx->b1_aad_start_offset = ctx->current_bytes;
-    if(ctx->aad_bytes <= left_bytes)
-    {
+    if (ctx->aad_bytes <= left_bytes) {
         ctx->b1_aad_end_offset = ctx->b1_aad_start_offset + ctx->aad_bytes;
         memset_(ctx->buf + ctx->b1_aad_end_offset, 0, 16 - ctx->b1_aad_end_offset);
-    }
-    else
-    {
+    } else {
         ctx->b1_aad_end_offset = 16;
     }
 }
-#endif
+    #endif
 
 
 /**
@@ -282,18 +253,16 @@ void ske_lp_ccm_pre_B1(SKE_CCM_CTX *ctx)
       -# 5.aad_bytes and c_bytes could not be zero at the same time due to hardware implementation.
   @endverbatim
  */
-unsigned int ske_lp_ccm_init(SKE_CCM_CTX *ctx, SKE_ALG alg, SKE_CRYPTO crypto, unsigned char *key, unsigned short sp_key_idx,
-        unsigned char *nonce, unsigned char M, unsigned char L, unsigned int aad_bytes, unsigned int c_bytes)
+unsigned int ske_lp_ccm_init(SKE_CCM_CTX *ctx, SKE_ALG alg, SKE_CRYPTO crypto, unsigned char *key, unsigned short sp_key_idx, unsigned char *nonce, unsigned char M, unsigned char L, unsigned int aad_bytes, unsigned int c_bytes)
 {
     unsigned int ret;
 
     ret = ske_lp_ccm_pre_init(ctx, crypto, nonce, M, L, aad_bytes, c_bytes);
-    if(SKE_SUCCESS != ret)
-    {
+    if (SKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ske_lp_set_aad_len_uint32(ctx->aad_bytes);
 
@@ -301,53 +270,48 @@ unsigned int ske_lp_ccm_init(SKE_CCM_CTX *ctx, SKE_ALG alg, SKE_CRYPTO crypto, u
 
     //caution: iv here is A0
     ret = ske_lp_init_internal(ctx->ske_ccm_ctx, alg, SKE_MODE_CCM, crypto, key, sp_key_idx, ctx->buf, SKE_LP_DMA_DISABLE);
-    if(SKE_SUCCESS != ret)
-    {
+    if (SKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //get and inplut B0
     ske_lp_ccm_get_B0(nonce, M, L, aad_bytes, c_bytes, ctx->buf);
 
-    if(0 == ctx->aad_bytes)
-    {
-        ske_lp_set_last_block(1);    //last block;
+    if (0 == ctx->aad_bytes) {
+        ske_lp_set_last_block(1); //last block;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ret = ske_lp_update_blocks_no_output(ctx->ske_ccm_ctx, ctx->buf, ctx->ske_ccm_ctx->block_bytes);
-    if(SKE_SUCCESS != ret)
-    {
+    if (SKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    if(0 == ctx->aad_bytes)
-    {
-        ske_lp_set_last_block(0);    //not last block
+    if (0 == ctx->aad_bytes) {
+        ske_lp_set_last_block(0); //not last block
+    } else {
+        ;
     }
-    else
-    {;}
 
-#ifdef SKE_LP_CCM_CPU_UPDATE_AAD_BY_STEP
+    #ifdef SKE_LP_CCM_CPU_UPDATE_AAD_BY_STEP
     //prepare B1
-    if(0 != aad_bytes)
-    {
+    if (0 != aad_bytes) {
         ske_lp_ccm_pre_B1(ctx);
+    } else {
+        ;
     }
-    else
-    {;}
-#endif
+    #endif
 
     return SKE_SUCCESS;
 }
 
 
-#ifdef SKE_LP_CCM_CPU_UPDATE_AAD_BY_STEP
+    #ifdef SKE_LP_CCM_CPU_UPDATE_AAD_BY_STEP
 /**
  * @brief       ske_lp ccm mode input aad(multiple step style).
  * @param[in]   ctx              - SKE_GCM_CTX context pointer.
@@ -369,98 +333,79 @@ unsigned int ske_lp_ccm_update_aad(SKE_CCM_CTX *ctx, unsigned char *aad, unsigne
     unsigned int total_bytes, idx, capacity_bytes;
     unsigned int ret;
 
-    if(NULL == ctx || (NULL == aad && ctx->aad_bytes != 0))
-    {
+    if (NULL == ctx || (NULL == aad && ctx->aad_bytes != 0)) {
         return SKE_BUFFER_NULL;
-    }
-    else if((0 == ctx->aad_bytes) || (NULL == aad) || (0 == bytes))
-    {
+    } else if ((0 == ctx->aad_bytes) || (NULL == aad) || (0 == bytes)) {
         return SKE_SUCCESS;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //now bytes is not 0
 
-    if(ctx->current_bytes < ctx->b1_aad_end_offset)
-    {
+    if (ctx->current_bytes < ctx->b1_aad_end_offset) {
         remainder_bytes = ctx->b1_aad_end_offset - ctx->current_bytes;
-        if(bytes >= remainder_bytes)
-        {
+        if (bytes >= remainder_bytes) {
             memcpy_(ctx->buf + ctx->current_bytes, aad, remainder_bytes);
             aad += remainder_bytes;
             bytes -= remainder_bytes;
             ctx->current_bytes += remainder_bytes;
 
-            if(ctx->current_bytes == ctx->aad_bytes + ctx->b1_aad_start_offset)
-            {
-                ske_lp_set_last_block(1);    //last block;
+            if (ctx->current_bytes == ctx->aad_bytes + ctx->b1_aad_start_offset) {
+                ske_lp_set_last_block(1); //last block;
             }
 
             ret = ske_lp_update_blocks_no_output(ctx->ske_ccm_ctx, ctx->buf, ctx->ske_ccm_ctx->block_bytes);
-            if(SKE_SUCCESS != ret)
-            {
+            if (SKE_SUCCESS != ret) {
                 return ret;
+            } else {
+                ;
             }
-            else
-            {;}
 
-            if(ctx->current_bytes == ctx->aad_bytes + ctx->b1_aad_start_offset)
-            {
-                ske_lp_set_last_block(0);    //not last block;
+            if (ctx->current_bytes == ctx->aad_bytes + ctx->b1_aad_start_offset) {
+                ske_lp_set_last_block(0); //not last block;
                 ctx->current_bytes = 0;
-                return SKE_SUCCESS;          //aad input finished
+                return SKE_SUCCESS;       //aad input finished
+            } else {
+                ;
             }
-            else
-            {;}
-        }
-        else
-        {
+        } else {
             memcpy_(ctx->buf + ctx->current_bytes, aad, bytes);
             ctx->current_bytes += bytes;
             return SKE_SUCCESS;
         }
+    } else {
+        ;
     }
-    else
-    {;}
 
     //now bytes is not 0
-    if(0 == bytes)
-    {
+    if (0 == bytes) {
         return SKE_SUCCESS;
+    } else {
+        ;
     }
-    else
-    {;}
 
     /******** input B2,B3... ********/
-    idx = ctx->current_bytes & 0x0F;
+    idx            = ctx->current_bytes & 0x0F;
     capacity_bytes = 16 - idx;
 
     total_bytes = ctx->current_bytes + bytes;
-    if(total_bytes < bytes || total_bytes > (ctx->b1_aad_start_offset + ctx->aad_bytes))
-    {
+    if (total_bytes < bytes || total_bytes > (ctx->b1_aad_start_offset + ctx->aad_bytes)) {
         return SKE_INPUT_INVALID;
-    }
-    else if(total_bytes == (ctx->b1_aad_start_offset + ctx->aad_bytes))
-    {
-        if(idx)
-        {
-            if(bytes > capacity_bytes)
-            {
+    } else if (total_bytes == (ctx->b1_aad_start_offset + ctx->aad_bytes)) {
+        if (idx) {
+            if (bytes > capacity_bytes) {
                 memcpy_(ctx->buf + idx, aad, capacity_bytes);
                 ret = ske_lp_update_blocks_no_output(ctx->ske_ccm_ctx, ctx->buf, 16);
-                if(SKE_SUCCESS != ret)
-                {
+                if (SKE_SUCCESS != ret) {
                     return ret;
+                } else {
+                    ;
                 }
-                else
-                {;}
 
                 aad += capacity_bytes;
                 bytes -= capacity_bytes;
-            }
-            else
-            {
+            } else {
                 //the last block
                 memcpy_(ctx->buf + idx, aad, bytes);
                 memset_(ctx->buf + idx + bytes, 0, sizeof(ctx->buf) - (idx + bytes));
@@ -468,93 +413,81 @@ unsigned int ske_lp_ccm_update_aad(SKE_CCM_CTX *ctx, unsigned char *aad, unsigne
             }
         }
 
-        blocks_bytes = (bytes)&(~0x0F);  //assume that ctx->ske_ccm_ctx->block_bytes is 16
-        remainder_bytes = (bytes)&0x0F;
-        if(0 == remainder_bytes)
-        {
+        blocks_bytes    = (bytes) & (~0x0F); //assume that ctx->ske_ccm_ctx->block_bytes is 16
+        remainder_bytes = (bytes) & 0x0F;
+        if (0 == remainder_bytes) {
             blocks_bytes -= 16;
             remainder_bytes = 16;
+        } else {
+            ;
         }
-        else
-        {;}
 
         ret = ske_lp_update_blocks_no_output(ctx->ske_ccm_ctx, aad, blocks_bytes);
-        if(SKE_SUCCESS != ret)
-        {
+        if (SKE_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
 
-        memcpy_(ctx->buf, aad+blocks_bytes, remainder_bytes);
+        memcpy_(ctx->buf, aad + blocks_bytes, remainder_bytes);
         memset_(ctx->buf + remainder_bytes, 0, ctx->ske_ccm_ctx->block_bytes - remainder_bytes);
 
 LAST_BLOCK:
 
-        ske_lp_set_last_block(1);    //last block
+        ske_lp_set_last_block(1); //last block
         ret = ske_lp_update_blocks_no_output(ctx->ske_ccm_ctx, ctx->buf, ctx->ske_ccm_ctx->block_bytes);
-        ske_lp_set_last_block(0);    //not last block
-        if(SKE_SUCCESS != ret)
-        {
+        ske_lp_set_last_block(0); //not last block
+        if (SKE_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
 
         ctx->current_bytes = 0;
-    }
-    else
-    {
+    } else {
         ctx->current_bytes = total_bytes;
 
-        if(idx)
-        {
-            if(bytes >= capacity_bytes)
-            {
+        if (idx) {
+            if (bytes >= capacity_bytes) {
                 memcpy_(ctx->buf + idx, aad, capacity_bytes);
                 ret = ske_lp_update_blocks_no_output(ctx->ske_ccm_ctx, ctx->buf, 16);
-                if(SKE_SUCCESS != ret)
-                {
+                if (SKE_SUCCESS != ret) {
                     return ret;
+                } else {
+                    ;
                 }
-                else
-                {;}
 
                 aad += capacity_bytes;
                 bytes -= capacity_bytes;
-            }
-            else
-            {
+            } else {
                 memcpy_(ctx->buf + idx, aad, bytes);
                 ret = SKE_SUCCESS;
                 goto END;
             }
         }
 
-        blocks_bytes = (bytes)&(~0x0F);
-        remainder_bytes = (bytes)&0x0F;
+        blocks_bytes    = (bytes) & (~0x0F);
+        remainder_bytes = (bytes) & 0x0F;
 
         ret = ske_lp_update_blocks_no_output(ctx->ske_ccm_ctx, aad, blocks_bytes);
-        if(SKE_SUCCESS != ret)
-        {
+        if (SKE_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
 
-        if(remainder_bytes)
-        {
-            memcpy_(ctx->buf, aad+blocks_bytes, remainder_bytes);
+        if (remainder_bytes) {
+            memcpy_(ctx->buf, aad + blocks_bytes, remainder_bytes);
+        } else {
+            ;
         }
-        else
-        {;}
     }
 
 END:
 
     return SKE_SUCCESS;
 }
-#endif
+    #endif
 
 
 /**
@@ -571,21 +504,18 @@ END:
  */
 unsigned int ske_lp_ccm_aad(SKE_CCM_CTX *ctx, unsigned char *aad)
 {
-#ifndef SKE_LP_CCM_CPU_UPDATE_AAD_BY_STEP
+    #ifndef SKE_LP_CCM_CPU_UPDATE_AAD_BY_STEP
     unsigned int blocks_bytes, remainder_bytes;
     unsigned int aad_bytes, aad_offset;
     unsigned int ret;
 
-    if(NULL == ctx || (NULL == aad && ctx->aad_bytes != 0))
-    {
+    if (NULL == ctx || (NULL == aad && ctx->aad_bytes != 0)) {
         return SKE_BUFFER_NULL;
-    }
-    else if((NULL == aad) || (0 == ctx->aad_bytes))
-    {
+    } else if ((NULL == aad) || (0 == ctx->aad_bytes)) {
         return SKE_SUCCESS;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //now aad is not NULL, and ctx->aad_bytes is not 0
 
@@ -597,76 +527,66 @@ unsigned int ske_lp_ccm_aad(SKE_CCM_CTX *ctx, unsigned char *aad)
 
     aad_bytes -= aad_offset;
     aad += aad_offset;
-    if(0 == aad_bytes)
-    {
-        ske_lp_set_last_block(1);    //last block;
+    if (0 == aad_bytes) {
+        ske_lp_set_last_block(1); //last block;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ret = ske_lp_update_blocks_no_output(ctx->ske_ccm_ctx, ctx->buf, ctx->ske_ccm_ctx->block_bytes);
-    if(SKE_SUCCESS != ret)
-    {
+    if (SKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    if(0 == aad_bytes)
-    {
-        ske_lp_set_last_block(0);    //not last block
+    if (0 == aad_bytes) {
+        ske_lp_set_last_block(0); //not last block
         ctx->current_bytes = 0;
         return SKE_SUCCESS;
+    } else {
+        ;
     }
-    else
-    {;}
 
     /******** input B2,B3... ********/
-    blocks_bytes = (aad_bytes)&(~0x0F);  //assume that ctx->ske_ccm_ctx->block_bytes is 16
-    remainder_bytes = (aad_bytes)&0x0F;
-    if(0 == remainder_bytes)
-    {
+    blocks_bytes    = (aad_bytes) & (~0x0F); //assume that ctx->ske_ccm_ctx->block_bytes is 16
+    remainder_bytes = (aad_bytes) & 0x0F;
+    if (0 == remainder_bytes) {
         blocks_bytes -= 16;
         remainder_bytes = 16;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ret = ske_lp_update_blocks_no_output(ctx->ske_ccm_ctx, aad, blocks_bytes);
-    if(SKE_SUCCESS != ret)
-    {
+    if (SKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    memcpy_(ctx->buf, aad+blocks_bytes, remainder_bytes);
+    memcpy_(ctx->buf, aad + blocks_bytes, remainder_bytes);
     memset_(ctx->buf + remainder_bytes, 0, ctx->ske_ccm_ctx->block_bytes - remainder_bytes);
-    ske_lp_set_last_block(1);    //last block
+    ske_lp_set_last_block(1); //last block
     ret = ske_lp_update_blocks_no_output(ctx->ske_ccm_ctx, ctx->buf, ctx->ske_ccm_ctx->block_bytes);
-    ske_lp_set_last_block(0);    //not last block
-    if(SKE_SUCCESS != ret)
-    {
+    ske_lp_set_last_block(0); //not last block
+    if (SKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ctx->current_bytes = 0;
 
     return SKE_SUCCESS;
-#else
-    if(NULL == ctx)
-    {
+    #else
+    if (NULL == ctx) {
         return SKE_BUFFER_NULL;
-    }
-    else
-    {
+    } else {
         return ske_lp_ccm_update_aad(ctx, aad, ctx->aad_bytes);
     }
-#endif
+    #endif
 }
-
 
 /**
  * @brief       ske_lp ccm mode input plaintext/ciphertext.
@@ -694,43 +614,36 @@ unsigned int ske_lp_ccm_update_blocks(SKE_CCM_CTX *ctx, unsigned char *in, unsig
     unsigned int total_bytes;
     unsigned int ret;
 
-    if(NULL == ctx|| NULL == in || NULL == out)
-    {
+    if (NULL == ctx || NULL == in || NULL == out) {
         return SKE_BUFFER_NULL;
-    }
-    else if(0 == bytes)
-    {
+    } else if (0 == bytes) {
         return SKE_SUCCESS;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //now bytes is not 0
 
     total_bytes = ctx->current_bytes + bytes;
-    if(total_bytes < bytes || total_bytes > ctx->c_bytes)  // overflow
+    if (total_bytes < bytes || total_bytes > ctx->c_bytes) // overflow
     {
         return SKE_INPUT_INVALID;
-    }
-    else if(total_bytes == ctx->c_bytes)
-    {
-        blocks_bytes = bytes & (~0x0F);
+    } else if (total_bytes == ctx->c_bytes) {
+        blocks_bytes    = bytes & (~0x0F);
         remainder_bytes = bytes & 0x0F;
-        if(0 == remainder_bytes)
-        {
+        if (0 == remainder_bytes) {
             blocks_bytes -= 16;
             remainder_bytes = 16;
+        } else {
+            ;
         }
-        else
-        {;}
 
         ret = ske_lp_update_blocks_internal(ctx->ske_ccm_ctx, in, out, blocks_bytes);
-        if(SKE_SUCCESS != ret)
-        {
+        if (SKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
         //the last block
         memcpy_(ctx->buf, in + blocks_bytes, remainder_bytes);
@@ -739,42 +652,34 @@ unsigned int ske_lp_ccm_update_blocks(SKE_CCM_CTX *ctx, unsigned char *in, unsig
         ske_lp_set_last_block(1);
         ret = ske_lp_update_blocks_internal(ctx->ske_ccm_ctx, ctx->buf, ctx->buf, 16);
         ske_lp_set_last_block(0);
-        if(SKE_SUCCESS != ret)
-        {
+        if (SKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
-        memcpy_(out+blocks_bytes, ctx->buf, remainder_bytes);
-    }
-    else
-    {
-        if(bytes & (16-1))
-        {
+        memcpy_(out + blocks_bytes, ctx->buf, remainder_bytes);
+    } else {
+        if (bytes & (16 - 1)) {
             ret = SKE_INPUT_INVALID;
             goto END;
-        }
-        else
-        {
+        } else {
             ret = ske_lp_update_blocks_internal(ctx->ske_ccm_ctx, in, out, bytes);
-            if(SKE_SUCCESS != ret)
-            {
+            if (SKE_SUCCESS != ret) {
                 goto END;
+            } else {
+                ;
             }
-            else
-            {;}
         }
     }
 
-    ret = SKE_SUCCESS;
+    ret                = SKE_SUCCESS;
     ctx->current_bytes = total_bytes;
 
 END:
 
     return ret;
 }
-
 
 /**
  * @brief       ske_lp ccm mode input plaintext/ciphertext.
@@ -798,33 +703,28 @@ unsigned int ske_lp_ccm_final(SKE_CCM_CTX *ctx, unsigned char *mac)
 {
     unsigned int ret;
 
-    if(NULL == ctx || NULL == mac)
-    {
+    if (NULL == ctx || NULL == mac) {
         return SKE_BUFFER_NULL;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ske_lp_start();
 
     //get mac
     ret = ske_lp_wait_till_done();
-    if(SKE_SUCCESS != ret)
-    {
+    if (SKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ske_lp_simple_get_output_block((unsigned int *)ctx->buf, ctx->ske_ccm_ctx->block_words);
 
-    if(SKE_CRYPTO_ENCRYPT == ctx->crypto)
-    {
+    if (SKE_CRYPTO_ENCRYPT == ctx->crypto) {
         memcpy_(mac, ctx->buf, ctx->M);
         ret = SKE_SUCCESS;
-    }
-    else
-    {
+    } else {
         ret = memcmp_(mac, ctx->buf, ctx->M);
     }
 
@@ -832,7 +732,6 @@ unsigned int ske_lp_ccm_final(SKE_CCM_CTX *ctx, unsigned char *mac)
 
     return ret;
 }
-
 
 /**
  * @brief       ske_lp ccm mode encrypt/decrypt(one-off style).
@@ -866,44 +765,37 @@ unsigned int ske_lp_ccm_final(SKE_CCM_CTX *ctx, unsigned char *mac)
  *        that means certification passed, otherwise not.
   @endverbatim
  */
-unsigned int ske_lp_ccm_crypto(SKE_ALG alg, SKE_CRYPTO crypto, unsigned char *key, unsigned short sp_key_idx, unsigned char *nonce,
-        unsigned char M, unsigned char L, unsigned char *aad, unsigned int aad_bytes, unsigned char *in, unsigned char *out, unsigned int c_bytes,
-        unsigned char *mac)
+unsigned int ske_lp_ccm_crypto(SKE_ALG alg, SKE_CRYPTO crypto, unsigned char *key, unsigned short sp_key_idx, unsigned char *nonce, unsigned char M, unsigned char L, unsigned char *aad, unsigned int aad_bytes, unsigned char *in, unsigned char *out, unsigned int c_bytes, unsigned char *mac)
 {
-    SKE_CCM_CTX ctx[1];
+    SKE_CCM_CTX  ctx[1];
     unsigned int ret;
 
-    ret = ske_lp_ccm_init(ctx, alg, crypto, key, sp_key_idx, nonce, M, L, aad_bytes, c_bytes );
-    if(SKE_SUCCESS != ret)
-    {
+    ret = ske_lp_ccm_init(ctx, alg, crypto, key, sp_key_idx, nonce, M, L, aad_bytes, c_bytes);
+    if (SKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ret = ske_lp_ccm_aad(ctx, aad);
-    if(SKE_SUCCESS != ret)
-    {
+    if (SKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ret = ske_lp_ccm_update_blocks(ctx, in, out, c_bytes);
-    if(SKE_SUCCESS != ret)
-    {
+    if (SKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     return ske_lp_ccm_final(ctx, mac);
 }
 
 
-
-
-#ifdef SKE_LP_DMA_FUNCTION
+    #ifdef SKE_LP_DMA_FUNCTION
 /**
  * @brief       ske_lp dma ccm mode init config.
  * @param[in]   ctx              - SKE_CCM_CTX context pointer.
@@ -928,36 +820,29 @@ unsigned int ske_lp_ccm_crypto(SKE_ALG alg, SKE_CRYPTO crypto, unsigned char *ke
       -# 5.aad_bytes and c_bytes could not be zero at the same time due to hardware implementation.
   @endverbatim
  */
-unsigned int ske_lp_dma_ccm_init(SKE_CCM_CTX *ctx, SKE_ALG alg, SKE_CRYPTO crypto, unsigned char *key, unsigned short sp_key_idx,
-        unsigned char *nonce, unsigned char M, unsigned char L, unsigned int aad_bytes, unsigned int c_bytes)
+unsigned int ske_lp_dma_ccm_init(SKE_CCM_CTX *ctx, SKE_ALG alg, SKE_CRYPTO crypto, unsigned char *key, unsigned short sp_key_idx, unsigned char *nonce, unsigned char M, unsigned char L, unsigned int aad_bytes, unsigned int c_bytes)
 {
     unsigned int ret;
 
     ret = ske_lp_ccm_pre_init(ctx, crypto, nonce, M, L, aad_bytes, c_bytes);
-    if(SKE_SUCCESS != ret)
-    {
+    if (SKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //get aad start offset in B1
-    if(0 == aad_bytes)
-    {
-        ctx->b1_aad_start_offset = 0;  //only B0
-    }
-    else if(aad_bytes < ((1<<16)-(1<<8)))
-    {
+    if (0 == aad_bytes) {
+        ctx->b1_aad_start_offset = 0; //only B0
+    } else if (aad_bytes < ((1 << 16) - (1 << 8))) {
         ctx->b1_aad_start_offset = 2;
-    }
-    else
-    {
+    } else {
         ctx->b1_aad_start_offset = 6;
     }
 
     //set total block length except plaintext/ciphertext, this is due to the hardware requires
     aad_bytes += (16 + ctx->b1_aad_start_offset);
-    aad_bytes = (aad_bytes+15)&(~0x0F);
+    aad_bytes = (aad_bytes + 15) & (~0x0F);
     ske_lp_set_aad_len_uint32(aad_bytes);
 
     ske_lp_set_cpu_mode();
@@ -965,7 +850,6 @@ unsigned int ske_lp_dma_ccm_init(SKE_CCM_CTX *ctx, SKE_ALG alg, SKE_CRYPTO crypt
     //caution: iv here is A0
     return ske_lp_init_internal(ctx->ske_ccm_ctx, alg, SKE_MODE_CCM, crypto, key, sp_key_idx, ctx->buf, SKE_LP_DMA_ENABLE);
 }
-
 
 /**
  * @brief       ske_lp dma ccm mode update B0(multiple steps style).
@@ -981,16 +865,14 @@ unsigned int ske_lp_dma_ccm_init(SKE_CCM_CTX *ctx, SKE_ALG alg, SKE_CRYPTO crypt
  */
 unsigned int ske_lp_dma_ccm_update_B0_block(SKE_CCM_CTX *ctx, unsigned int B0[4], SKE_CALLBACK callback)
 {
-    if((NULL == ctx) || (NULL == B0))
-    {
+    if ((NULL == ctx) || (NULL == B0)) {
         return SKE_BUFFER_NULL;
+    } else {
+        ;
     }
-    else
-    {;}
 
     return ske_lp_dma_operate(ctx->ske_ccm_ctx, B0, NULL, 4, 0, callback);
 }
-
 
 /**
  * @brief       ske_lp dma ccm mode update aad(multiple steps style).
@@ -1015,62 +897,51 @@ unsigned int ske_lp_dma_ccm_update_B0_block(SKE_CCM_CTX *ctx, unsigned int B0[4]
  */
 unsigned int ske_lp_dma_ccm_update_aad_blocks(SKE_CCM_CTX *ctx, unsigned int *aad, unsigned int bytes, SKE_CALLBACK callback)
 {
-    unsigned int aad_blocks_words = ((bytes+15)&(~0x0F))/4;
+    unsigned int aad_blocks_words = ((bytes + 15) & (~0x0F)) / 4;
     unsigned int total_bytes;
     unsigned int ret;
 
-    if(NULL == ctx)
-    {
+    if (NULL == ctx) {
         return SKE_BUFFER_NULL;
-    }
-    else if((NULL == aad) || (0 == bytes))
-    {
+    } else if ((NULL == aad) || (0 == bytes)) {
         return SKE_SUCCESS;
+    } else {
+        ;
     }
-    else
-    {;}
 
     total_bytes = ctx->current_bytes + bytes;
 
-    if (total_bytes < bytes || total_bytes > ctx->aad_bytes + ctx->b1_aad_start_offset)  // overflow
+    if (total_bytes < bytes || total_bytes > ctx->aad_bytes + ctx->b1_aad_start_offset) // overflow
     {
         return SKE_INPUT_INVALID;
-    }
-    else if(total_bytes == ctx->aad_bytes + ctx->b1_aad_start_offset)
-    {
+    } else if (total_bytes == ctx->aad_bytes + ctx->b1_aad_start_offset) {
         ret = ske_lp_dma_operate(ctx->ske_ccm_ctx, aad, NULL, aad_blocks_words, 0, callback);
-        if(SKE_SUCCESS != ret)
-        {
+        if (SKE_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
 
         ctx->current_bytes = 0;
-    }
-    else
-    {
-        if(bytes & (16-1))
-        {
+    } else {
+        if (bytes & (16 - 1)) {
             return SKE_INPUT_INVALID;
+        } else {
+            ;
         }
-        else
-        {;}
 
         ret = ske_lp_dma_operate(ctx->ske_ccm_ctx, aad, NULL, aad_blocks_words, 0, callback);
-        if(SKE_SUCCESS != ret)
-        {
+        if (SKE_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
 
         ctx->current_bytes = total_bytes;
     }
 
     return SKE_SUCCESS;
 }
-
 
 /**
  * @brief       ske_lp dma ccm mode input plaintext/ciphertext, get ciphertext/plaintext or
@@ -1097,97 +968,79 @@ unsigned int ske_lp_dma_ccm_update_aad_blocks(SKE_CCM_CTX *ctx, unsigned int *aa
        cover the input.
   @endverbatim
  */
-unsigned int ske_lp_dma_ccm_update_blocks(SKE_CCM_CTX *ctx, unsigned int *in, unsigned int *out, unsigned int in_bytes,
-        SKE_CALLBACK callback)
+unsigned int ske_lp_dma_ccm_update_blocks(SKE_CCM_CTX *ctx, unsigned int *in, unsigned int *out, unsigned int in_bytes, SKE_CALLBACK callback)
 {
-    unsigned int in_blocks_words = ((in_bytes+15)&(~0x0F))/4;
+    unsigned int in_blocks_words = ((in_bytes + 15) & (~0x0F)) / 4;
     unsigned int total_bytes;
     unsigned int ret;
 
-    if((NULL == ctx) || (NULL == in) || (NULL == out))
-    {
+    if ((NULL == ctx) || (NULL == in) || (NULL == out)) {
         return SKE_BUFFER_NULL;
-    }
-    else if(0 == in_bytes)
-    {
+    } else if (0 == in_bytes) {
         return SKE_SUCCESS;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    if(0 == ctx->c_bytes)
-    {
-        if (0 == ctx->aad_bytes)
-        {
+    if (0 == ctx->c_bytes) {
+        if (0 == ctx->aad_bytes) {
             //hardware does not support
             return SKE_INPUT_INVALID;
-        }
-        else
-        {
+        } else {
             //just for the case that aad is not NULL, and c is NULL, here input aad block including tail.
             ret = ske_lp_dma_operate(ctx->ske_ccm_ctx, in, out, in_blocks_words, 4, callback);
-            if(SKE_SUCCESS != ret)
-            {
+            if (SKE_SUCCESS != ret) {
                 return ret;
+            } else {
+                ;
             }
-            else
-            {;}
 
             clear_block_tail(out, ctx->M);
 
             return SKE_SUCCESS;
         }
+    } else {
+        ;
     }
-    else
-    {;}
 
     total_bytes = ctx->current_bytes + in_bytes;
-    if (total_bytes < in_bytes || total_bytes > ctx->c_bytes)  // overflow
+    if (total_bytes < in_bytes || total_bytes > ctx->c_bytes) // overflow
     {
         return SKE_INPUT_INVALID;
-    }
-    else if(total_bytes == ctx->c_bytes)
-    {
+    } else if (total_bytes == ctx->c_bytes) {
         ret = ske_lp_dma_operate(ctx->ske_ccm_ctx, in, out, in_blocks_words, in_blocks_words + 4, callback);
-        if(SKE_SUCCESS != ret)
-        {
+        if (SKE_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
 
-        if(ctx->c_bytes & 0x0F)
-        {
+        if (ctx->c_bytes & 0x0F) {
             clear_block_tail(out + in_blocks_words - 4, (ctx->c_bytes & 0x0F));
+        } else {
+            ;
         }
-        else
-        {;}
 
         clear_block_tail(out + in_blocks_words, ctx->M);
-    }
-    else
-    {
-        if(in_bytes & (16-1))
-        {
+    } else {
+        if (in_bytes & (16 - 1)) {
             return SKE_INPUT_INVALID;
+        } else {
+            ;
         }
-        else
-        {;}
 
         ret = ske_lp_dma_operate(ctx->ske_ccm_ctx, in, out, in_blocks_words, in_blocks_words, callback);
-        if(SKE_SUCCESS != ret)
-        {
+        if (SKE_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
     }
 
     ctx->current_bytes = total_bytes;
 
     return SKE_SUCCESS;
 }
-
 
 /**
  * @brief       ske_lp dma ccm mode finish.
@@ -1200,18 +1053,16 @@ unsigned int ske_lp_dma_ccm_update_blocks(SKE_CCM_CTX *ctx, unsigned int *in, un
  */
 unsigned int ske_lp_dma_ccm_final(SKE_CCM_CTX *ctx)
 {
-    if(NULL == ctx)
-    {
+    if (NULL == ctx) {
         return SKE_BUFFER_NULL;
+    } else {
+        ;
     }
-    else
-    {;}
 
     memset_(ctx, 0, sizeof(SKE_CCM_CTX));
 
     return SKE_SUCCESS;
 }
-
 
 /**
  * @brief       ske_lp ccm mode encrypt/decrypt(one-off style).
@@ -1249,92 +1100,80 @@ unsigned int ske_lp_dma_ccm_final(SKE_CCM_CTX *ctx)
         cover the input.
   @endverbatim
  */
-unsigned int ske_lp_dma_ccm_crypto(SKE_ALG alg, SKE_CRYPTO crypto, unsigned char *key, unsigned short sp_key_idx, unsigned char *nonce,
-        unsigned char M, unsigned char L, unsigned int aad_bytes, unsigned int *in, unsigned int *out, unsigned int c_bytes, SKE_CALLBACK callback)
+unsigned int ske_lp_dma_ccm_crypto(SKE_ALG alg, SKE_CRYPTO crypto, unsigned char *key, unsigned short sp_key_idx, unsigned char *nonce, unsigned char M, unsigned char L, unsigned int aad_bytes, unsigned int *in, unsigned int *out, unsigned int c_bytes, SKE_CALLBACK callback)
 {
     unsigned int aad_blocks_words, c_blocks_words;
-    SKE_CCM_CTX ctx[1];
+    SKE_CCM_CTX  ctx[1];
     unsigned int ret;
 
     ret = ske_lp_dma_ccm_init(ctx, alg, crypto, key, sp_key_idx, nonce, M, L, aad_bytes, c_bytes);
-    if(SKE_SUCCESS != ret)
-    {
+    if (SKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    aad_blocks_words = ((aad_bytes + ctx->b1_aad_start_offset + 15)/16)*4;
-    c_blocks_words = ((c_bytes + 15)/16)*4;
+    aad_blocks_words = ((aad_bytes + ctx->b1_aad_start_offset + 15) / 16) * 4;
+    c_blocks_words   = ((c_bytes + 15) / 16) * 4;
 
-#if 1
-    if(NULL == in || NULL == out)
-    {
+        #if 1
+    if (NULL == in || NULL == out) {
         return SKE_BUFFER_NULL;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ret = ske_lp_dma_operate(ctx->ske_ccm_ctx, in, out, 4 + aad_blocks_words + c_blocks_words, c_blocks_words + 4, callback);
-    if(SKE_SUCCESS != ret)
-    {
+    if (SKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //clear useless data
-    if(c_bytes & 0x0F)
-    {
+    if (c_bytes & 0x0F) {
         clear_block_tail(out + c_blocks_words - 4, (c_bytes & 0x0F));
+    } else {
+        ;
     }
-    else
-    {;}
 
     clear_block_tail(out + c_blocks_words, M);
-#else
+        #else
     ret = ske_lp_dma_ccm_update_B0_block(ctx, in, callback);
-    if(SKE_SUCCESS != ret)
-    {
+    if (SKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    if(aad_bytes && (0 == c_bytes))
-    {
-        ret = ske_lp_dma_ccm_update_blocks(ctx, in+4, out, aad_bytes, callback);
-        if(SKE_SUCCESS != ret)
-        {
+    if (aad_bytes && (0 == c_bytes)) {
+        ret = ske_lp_dma_ccm_update_blocks(ctx, in + 4, out, aad_bytes, callback);
+        if (SKE_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
-    }
-    else
-    {
-        ret = ske_lp_dma_ccm_update_aad_blocks(ctx, in+4, ctx->b1_aad_start_offset + aad_bytes, callback);
-        if(SKE_SUCCESS != ret)
-        {
+    } else {
+        ret = ske_lp_dma_ccm_update_aad_blocks(ctx, in + 4, ctx->b1_aad_start_offset + aad_bytes, callback);
+        if (SKE_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
 
-        ret = ske_lp_dma_ccm_update_blocks(ctx, in+4+aad_blocks_words, out, c_bytes, callback);
-        if(SKE_SUCCESS != ret)
-        {
+        ret = ske_lp_dma_ccm_update_blocks(ctx, in + 4 + aad_blocks_words, out, c_bytes, callback);
+        if (SKE_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
     }
-#endif
+        #endif
 
     return ske_lp_dma_ccm_final(ctx);
 }
 
-#endif
+    #endif
 
 
 #endif

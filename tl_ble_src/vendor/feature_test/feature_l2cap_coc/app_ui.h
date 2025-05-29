@@ -28,7 +28,7 @@
 
 #if (FEATURE_TEST_MODE == TEST_L2CAP_COC)
 
-extern  int central_pairing_enable;
+extern int central_pairing_enable;
 
 /**
  * @brief      keyboard task handler
@@ -37,7 +37,7 @@ extern  int central_pairing_enable;
  * @param[in]  n    - the length of event parameter.
  * @return     none.
  */
-void proc_keyboard (u8 e, u8 *p, int n);
+void proc_keyboard(u8 e, u8 *p, int n);
 
 /**
  * @brief   BLE Unpair handle for central

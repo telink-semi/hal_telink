@@ -55,7 +55,7 @@
   * @brief  exception handler.this defines an exception handler to handle all the platform pre-defined exceptions.
   * @return none
   */
- _attribute_ram_code_com_sec_ __attribute__((weak)) void except_handler(void)
+ _attribute_ram_code_sec_ __attribute__((weak)) void except_handler(void)
  {
         exception_mtval = read_csr(NDS_MTVAL);
         exception_mepc = read_csr(NDS_MEPC);
@@ -70,7 +70,7 @@
         }
     }
  }
- _attribute_ram_code_com_sec_noinline_  __attribute__((weak)) void trap_entry(void) __attribute__ ((interrupt ("machine") , aligned(4)));
+ _attribute_ram_code_sec_noinline_  __attribute__((weak)) void trap_entry(void) __attribute__ ((interrupt ("machine") , aligned(4)));
  void trap_entry(void)
  {
     except_handler();

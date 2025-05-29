@@ -59,7 +59,7 @@
 /**
  * @brief   MAC address burning on EFUSE
  */
-#define BUILT_IN_MAC_ON_EFUSE                                   0
+#define BUILT_IN_MAC_ON_DEVICE                                   0
 
 
 

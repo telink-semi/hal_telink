@@ -71,12 +71,12 @@ void trng_init(void)
     reg_clk_en2 |= FLD_CLK2_TRNG_EN;
 
     reg_trng_cr0 &= ~(FLD_TRNG_CR0_RBGEN); //disable
-    reg_trng_rtcr = 0x00;               //TCR_MSEL
-    reg_trng_cr0 |= (FLD_TRNG_CR0_RBGEN); //enable
+    reg_trng_rtcr = 0x00;                  //TCR_MSEL
+    reg_trng_cr0 |= (FLD_TRNG_CR0_RBGEN);  //enable
 
-    while(!(reg_rbg_sr & FLD_RBG_SR_DRDY));
-    g_rnd_m_w = reg_rbg_dr;   //get the random number
-    while(!(reg_rbg_sr & FLD_RBG_SR_DRDY));
+    while (!(reg_rbg_sr & FLD_RBG_SR_DRDY));
+    g_rnd_m_w = reg_rbg_dr; //get the random number
+    while (!(reg_rbg_sr & FLD_RBG_SR_DRDY));
     g_rnd_m_z = reg_rbg_dr;
 
     //Reset TRNG module
@@ -84,24 +84,22 @@ void trng_init(void)
     //turn off TRNG module clock
     reg_clk_en2 &= ~(FLD_CLK2_TRNG_EN);
 
-    reg_trng_cr0 &= ~(FLD_TRNG_CR0_RBGEN | FLD_TRNG_CR0_ROSEN0 | FLD_TRNG_CR0_ROSEN1 \
-                                            | FLD_TRNG_CR0_ROSEN2 | FLD_TRNG_CR0_ROSEN3);
+    reg_trng_cr0 &= ~(FLD_TRNG_CR0_RBGEN | FLD_TRNG_CR0_ROSEN0 | FLD_TRNG_CR0_ROSEN1 | FLD_TRNG_CR0_ROSEN2 | FLD_TRNG_CR0_ROSEN3);
 }
 
 /**
  * @brief     This function performs to get one random number.
  * @return    the value of one random number.
  */
-_attribute_ram_code_sec_noinline_  unsigned int trng_rand(void)  //16M clock, code in flash 23us, code in sram 4us
+_attribute_ram_code_sec_noinline_ unsigned int trng_rand(void) //16M clock, code in flash 23us, code in sram 4us
 {
-
-    g_rnd_m_w = 18000 * (g_rnd_m_w & 0xffff) + (g_rnd_m_w >> 16);
-    g_rnd_m_z = 36969 * (g_rnd_m_z & 0xffff) + (g_rnd_m_z >> 16);
+    g_rnd_m_w           = 18000 * (g_rnd_m_w & 0xffff) + (g_rnd_m_w >> 16);
+    g_rnd_m_z           = 36969 * (g_rnd_m_z & 0xffff) + (g_rnd_m_z >> 16);
     unsigned int result = (g_rnd_m_z << 16) + g_rnd_m_w;
 
-    return (unsigned int)( result  ^ stimer_get_tick() );
+    return (unsigned int)(result ^ stimer_get_tick());
 }
- /**********************************************************************************************************************
+
+/**********************************************************************************************************************
   *                                         local function implementation                                             *
   *********************************************************************************************************************/
-

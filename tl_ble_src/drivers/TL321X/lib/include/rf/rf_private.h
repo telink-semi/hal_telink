@@ -21,8 +21,8 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-#ifndef     RF_PRIVATE_H
-#define     RF_PRIVATE_H
+#ifndef RF_PRIVATE_H
+#define RF_PRIVATE_H
 
 /**********************************************************************************************************************
  *                                       Private global data type                                                          *
@@ -39,15 +39,34 @@
  *          rf_pkt_mask_low   - Set mask to match the lower 4bytes of the match value
  *          rf_pkt_mask_high  - Set mask to match the higher 4bytes of the match value
  */
-typedef struct{
+typedef struct
+{
     unsigned char rf_pkt_flt_start;
     unsigned char rf_pkt_flt_end;
     unsigned char rf_pkt_match_threshold;
-    unsigned int rf_pkt_match_low;
-    unsigned int rf_pkt_match_high;
-    unsigned int rf_pkt_mask_low;
-    unsigned int rf_pkt_mask_high;
-}rf_pkt_flt_t;
+    unsigned int  rf_pkt_match_low;
+    unsigned int  rf_pkt_match_high;
+    unsigned int  rf_pkt_mask_low;
+    unsigned int  rf_pkt_mask_high;
+} rf_pkt_flt_t;
+
+/**
+ *  @brief  set the modulation index.
+ */
+typedef enum
+{
+    RF_MI_P0p00  = 0,    /**< MI = 0 */
+    RF_MI_P0p076 = 76,   /**< MI = 0.076 */
+    RF_MI_P0p32  = 320,  /**< MI = 0.32 */
+    RF_MI_P0p50  = 500,  /**< MI = 0.5 */
+    RF_MI_P0p60  = 600,  /**< MI = 0.6 */
+    RF_MI_P0p70  = 700,  /**< MI = 0.7 */
+    RF_MI_P0p80  = 800,  /**< MI = 0.8 */
+    RF_MI_P0p90  = 900,  /**< MI = 0.9 */
+    RF_MI_P1p20  = 1200, /**< MI = 1.2 */
+    RF_MI_P1p30  = 1300, /**< MI = 1.3 */
+    RF_MI_P1p40  = 1400, /**< MI = 1.4 */
+} rf_mi_value_e;
 
 /**********************************************************************************************************************
  *                                         RF_PRIVATE global macro                                                    *
@@ -58,18 +77,18 @@ typedef struct{
 /**
  *  @brief Those setting of offset according to private tpll packet format, so this setting for ble only.
  */
-#define     RF_PRI_TPLL_DMA_RFRX_OFFSET_RFLEN               4
+#define RF_PRI_TPLL_DMA_RFRX_OFFSET_RFLEN 4
 
 /**
  *  @brief According to the packet format find the information of packet through offset.
  */
-#define     rf_pri_tpll_dma_rx_offset_crc(p)                    (p[RF_PRI_TPLL_DMA_RFRX_OFFSET_RFLEN]+5)  //data len:2
-#define     rf_pri_tpll_dma_rx_offset_time_stamp(p)             (p[RF_PRI_TPLL_DMA_RFRX_OFFSET_RFLEN]+7)  //data len:4
-#define     rf_pri_tpll_dma_rx_offset_freq_offset(p)            (p[RF_PRI_TPLL_DMA_RFRX_OFFSET_RFLEN]+11) //data len:2
-#define     rf_pri_tpll_dma_rx_offset_rssi(p)                   (p[RF_PRI_TPLL_DMA_RFRX_OFFSET_RFLEN]+13) //data len:1, signed
-#define     rf_pri_tpll_packet_crc_ok(p)                        ((p[((p[4] & 0x3f) + 11+3)] & 0x01) == 0x00)
-#define     rf_pri_sb_packet_crc_ok(p)                          ((p[(reg_rf_sblen & 0x3f)+4+9] & 0x01) == 0x00)
-#define     rf_ant_packet_crc_ok(p)                             ((p[(reg_rf_sblen & 0x3f)+4+9] & 0x01) == 0x00)
+#define rf_pri_tpll_dma_rx_offset_crc(p)         (p[RF_PRI_TPLL_DMA_RFRX_OFFSET_RFLEN] + 5)  //data len:2
+#define rf_pri_tpll_dma_rx_offset_time_stamp(p)  (p[RF_PRI_TPLL_DMA_RFRX_OFFSET_RFLEN] + 7)  //data len:4
+#define rf_pri_tpll_dma_rx_offset_freq_offset(p) (p[RF_PRI_TPLL_DMA_RFRX_OFFSET_RFLEN] + 11) //data len:2
+#define rf_pri_tpll_dma_rx_offset_rssi(p)        (p[RF_PRI_TPLL_DMA_RFRX_OFFSET_RFLEN] + 13) //data len:1, signed
+#define rf_pri_tpll_packet_crc_ok(p)             ((p[((p[4] & 0x3f) + 11 + 3)] & 0x01) == 0x00)
+#define rf_pri_sb_packet_crc_ok(p)               ((p[(reg_rf_sblen & 0x3f) + 4 + 9] & 0x01) == 0x00)
+#define rf_ant_packet_crc_ok(p)                  ((p[(reg_rf_sblen & 0x3f) + 4 + 9] & 0x01) == 0x00)
 
 /*********************************************************************************************************************
  *                                         RF_PRIVATE function declaration                                           *
@@ -159,7 +178,7 @@ void rf_set_ant_mode(void);
  * @return    none.
  * @note      Attention:The sum of the sizes (in bits) of H0, LENGTH and H1 must be an integer multiple of 8 bits.
  */
-void rf_set_pri_generic_header_size(unsigned char h0_size,unsigned char length_size,unsigned char h1_size);
+void rf_set_pri_generic_header_size(unsigned char h0_size, unsigned char length_size, unsigned char h1_size);
 
 /**
  * @brief     This function is used to set a fixed offset for the extracted length field.
@@ -241,5 +260,25 @@ void rf_set_pri_generic_noack_start_bit(unsigned char noack_start_bit);
  * @return    none.
  */
 void rf_set_pri_generic_noack_en(void);
+
+/**
+  * @brief      This function is used to  set the modulation index of the receiver.
+  *              This function is common to all modes,the order of use requirement:configure mode first,
+  *              then set the the modulation index,default is 0.5 in drive,both sides need to be consistent
+  *              otherwise performance will suffer,if don't specifically request,don't need to call this function.
+  * @param[in]  mi_value- the value of modulation_index*100.
+  * @return     none.
+  */
+void rf_set_rx_modulation_index(rf_mi_value_e mi_value);
+
+/**
+  * @brief      This function is used to  set the modulation index of the sender.
+  *              This function is common to all modes,the order of use requirement:configure mode first,
+  *              then set the the modulation index,default is 0.5 in drive,both sides need to be consistent
+  *              otherwise performance will suffer,if don't specifically request,don't need to call this function.
+  * @param[in]  mi_value- the value of modulation_index*100.
+  * @return     none.
+  */
+void rf_set_tx_modulation_index(rf_mi_value_e mi_value);
 
 #endif

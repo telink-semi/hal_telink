@@ -25,14 +25,13 @@
 #define LL_WHITELIST_H_
 
 
-
 /**
  * @brief      This function is used to clear WhiteList
  * @param[in]  none
  * @return     Status - 0x00: command succeeded;
  *  *                   Others: command failed, refer to definition of "ble_sts_t" to know the reason
  */
-ble_sts_t       blc_ll_clearWhiteList(void);
+ble_sts_t blc_ll_clearWhiteList(void);
 
 
 /**
@@ -43,7 +42,7 @@ ble_sts_t       blc_ll_clearWhiteList(void);
  * @return     Status - 0x00: command succeeded;
  *                      Others: command failed, refer to definition of "ble_sts_t" to know the reason
  */
-ble_sts_t       blc_ll_addDeviceToWhiteList(u8 adr_type, u8 *addr);
+ble_sts_t blc_ll_addDeviceToWhiteList(u8 adr_type, u8 *addr);
 
 
 /**
@@ -53,8 +52,7 @@ ble_sts_t       blc_ll_addDeviceToWhiteList(u8 adr_type, u8 *addr);
  * @return     Status - 0x00: command succeeded;
  *                      Others: command failed, refer to definition of "ble_sts_t" to know the reason
  */
-ble_sts_t       blc_ll_removeDeviceFromWhiteList(u8 adr_type, u8 *addr);
-
+ble_sts_t blc_ll_removeDeviceFromWhiteList(u8 adr_type, u8 *addr);
 
 
 #endif /* LL_WHITELIST_H_ */

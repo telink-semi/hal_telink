@@ -33,21 +33,20 @@
 #if (LL_FEATURE_ENABLE_CHANNEL_SELECTION_ALGORITHM2)
 
 
-_attribute_ble_data_retention_  ll_chn_index_calc_callback_t ll_chn_index_calc_cb = NULL;
+_attribute_ble_data_retention_ ll_chn_index_calc_callback_t ll_chn_index_calc_cb = NULL;
 
 
 _attribute_ble_data_retention_ channel_algorithm_t local_chsel = CHANNEL_SELECTION_ALGORITHM_1;
 
-static u8 csa2_calcSubEvent1Map(struct le_channel_map* map, u16 counter, u16 channelIdentifier);
+static u8 csa2_calcSubEvent1Map(struct le_channel_map *map, u16 counter, u16 channelIdentifier);
 
 void blc_ll_initChannelSelectionAlgorithm_2_feature(void)
 {
-    LL_FEATURE_MASK_0 |= (LL_FEATURE_ENABLE_CHANNEL_SELECTION_ALGORITHM2    <<14);
+    LL_FEATURE_MASK_0 |= (LL_FEATURE_ENABLE_CHANNEL_SELECTION_ALGORITHM2 << 14);
     local_chsel = CHANNEL_SELECTION_ALGORITHM_2;
 
     ll_chn_index_calc_cb = csa2_calcSubEvent1Map;
 }
-
 
 /////////////////////////////////////// LE CSA2 //////////////////////////////////////////////
 /*
@@ -56,7 +55,7 @@ void blc_ll_initChannelSelectionAlgorithm_2_feature(void)
  * @return  16bit output
  * @reference core 5.4 | Vol 6, Part B 4.5.8.3.2 Figure 4.51 page 2820
  */
-#if (STACK_IRQ_CODE_IN_SRAM_DUE_TO_FLASH_OPERATION_V2) //for RISC-V IRQ priority
+#if (!STACK_IRQ_CODE_IN_SRAM_DUE_TO_FLASH_OPERATION_V2) //for RISC-V IRQ priority
 _attribute_ram_code_
 #else
 __INLINE
@@ -69,13 +68,13 @@ u32 csa2_permutation(u32 x)
     return x;
 }
 
-/*
+    /*
  * @brief CSA2: Multiply, Add, and Modulo block operation.
  * @param: 16bit input.
  * @return  16bit output
  * @reference core 5.4 | Vol 6, Part B 4.5.8.3.2 Figure 4.52 page 2820
  */
-#define MAM(a, b)       ((a) * 17 + b)
+    #define MAM(a, b) ((a) * 17 + b)
 
 #if (STACK_IRQ_CODE_IN_SRAM_DUE_TO_FLASH_OPERATION_V2) //for RISC-V IRQ priority
 _attribute_ram_code_
@@ -132,36 +131,28 @@ static u8 csa2_calcSubEvent1(struct le_channel_map* map, u16 prn_e, u8 *remappin
     /*
     * remappingIndexOfLastUsedChannel = Index of UnmappedChannel in the remapping table
     */
-    if(map->chmTbl[unmappedChanel>>3] & BIT(unmappedChanel & 0x07))
-    {
-        if(remappingIndexUsedChannel)
-        {
-            u8 left = 0, right = map->numUsedChn-1;
+    if (map->chmTbl[unmappedChanel >> 3] & BIT(unmappedChanel & 0x07)) {
+        if (remappingIndexUsedChannel) {
+            u8 left = 0, right = map->numUsedChn - 1;
             u8 mid;
-            while(left <= right)
-            {
-                mid = (right + left)>>1;
-                if(map->rempChmTbl[mid] == unmappedChanel)
-                {
+            while (left <= right) {
+                mid = (right + left) >> 1;
+                if (map->rempChmTbl[mid] == unmappedChanel) {
                     break;
-                }
-                else if(unmappedChanel > map->rempChmTbl[mid])
-                {
+                } else if (unmappedChanel > map->rempChmTbl[mid]) {
                     left = mid + 1;
-                }
-                else
-                {
+                } else {
                     right = mid - 1;
                 }
             }
             *remappingIndexUsedChannel = mid;
-//          for(u8 idxOfUnmappedChn = 0; idxOfUnmappedChn < map->numUsedChn; idxOfUnmappedChn++){
-//              if(map->rempChmTbl[idxOfUnmappedChn] == channel_unmapped){
-//                  tlkapi_printf(0, "%d %d %d %s\n", idxOfUnmappedChn, channel_unmapped, map->rempChmTbl[idxOfUnmappedChn], hex_to_str(map->rempChmTbl, 37));
-//                  *remappingIndexUsedChannel = idxOfUnmappedChn;
-//                  break;
-//              }
-//          }
+            //          for(u8 idxOfUnmappedChn = 0; idxOfUnmappedChn < map->numUsedChn; idxOfUnmappedChn++){
+            //              if(map->rempChmTbl[idxOfUnmappedChn] == channel_unmapped){
+            //                  tlkapi_printf(0, "%d %d %d %s\n", idxOfUnmappedChn, channel_unmapped, map->rempChmTbl[idxOfUnmappedChn], hex_to_str(map->rempChmTbl, 37));
+            //                  *remappingIndexUsedChannel = idxOfUnmappedChn;
+            //                  break;
+            //              }
+            //          }
         }
         return unmappedChanel;
     }
@@ -173,8 +164,7 @@ static u8 csa2_calcSubEvent1(struct le_channel_map* map, u16 prn_e, u8 *remappin
     */
     u8 remap_index = (map->numUsedChn * prn_e) >> 16;
 
-    if(remappingIndexUsedChannel)
-    {
+    if (remappingIndexUsedChannel) {
         *remappingIndexUsedChannel = remap_index;
     }
     /*
@@ -205,7 +195,9 @@ static u8 csa2_calcSubEvent1Map(struct le_channel_map* map, u16 counter, u16 cha
     return csa2_calcSubEvent1(map, prn_e, NULL);
 }
 
-#if (LL_FEATURE_ENABLE_ISO)
+    #if (LL_FEATURE_ENABLE_ISO ||                                            \
+         LL_FEATURE_ENABLE_PERIODIC_ADVERTISING_WITH_RESPONSES_ADVERTISER || \
+         LL_FEATURE_ENABLE_PERIODIC_ADVERTISING_WITH_RESPONSES_SCANNER)
 /*
  * @brief CSA2: generate next sub event channel index.
  * @param:  pChnParam: the channel map information.
@@ -228,17 +220,13 @@ _attribute_ram_code_
 #endif 
 u8 blt_ll_generateNextChannel(struct csa2_param *pChnParam, u16 counter, u16 channelIdentifier, int subEventNum)
 {
-    if(subEventNum == 1)
-    {
+    if (subEventNum == 1) {
         pChnParam->prn_s = csa2_pseudoRandomNumberGenerate(counter, channelIdentifier);
-        u16 prn_e = pChnParam->prn_s ^ channelIdentifier;
+        u16 prn_e        = pChnParam->prn_s ^ channelIdentifier;
         tlkapi_printf(0, "prn_e=%d\n", prn_e);
         return csa2_calcSubEvent1(&pChnParam->map, prn_e, &pChnParam->remappingIndexUsedChannel);
-    }
-    else
-    {
-        if(subEventNum == 2)
-        {
+    } else {
+        if (subEventNum == 2) {
             tlkapi_printf(0, "remappingIndexOfLastUsedChannel=%d\n", pChnParam->lastSubEventIndex);
         }
 
@@ -253,13 +241,13 @@ u8 blt_ll_generateNextChannel(struct csa2_param *pChnParam, u16 counter, u16 cha
         tlkapi_printf(0, "prnSubEvent_se=%d, subEventIndex=%d\n", prnSubEvent_se, subEventIndex);
 
         pChnParam->lastPrnSubEvent_lu = prnSubEvent_lu;
-        pChnParam->lastSubEventIndex = subEventIndex;
+        pChnParam->lastSubEventIndex  = subEventIndex;
         return pChnParam->map.rempChmTbl[subEventIndex];
     }
 }
 
-/////////////////// LE CHANNEL SELECTION ALGORITHM #2 SAMPLE DATA FOR SUBEVENT ///////////////////////
-    #if 0 //test CSA#2 for subEvent, sample data in core 5.4 vol 6 part C 3 LE CAS#2
+    /////////////////// LE CHANNEL SELECTION ALGORITHM #2 SAMPLE DATA FOR SUBEVENT ///////////////////////
+        #if 0 //test CSA#2 for subEvent, sample data in core 5.4 vol 6 part C 3 LE CAS#2
 //  unsigned char chnMap[5] = {0x00, 0x06, 0xE0, 0x00, 0x1E};
     unsigned char chnMap[5] = {0xFF, 0xFF, 0xFF, 0xFF, 0x1F};
     struct csa2_param pChnParam;
@@ -272,37 +260,30 @@ u8 blt_ll_generateNextChannel(struct csa2_param *pChnParam, u16 counter, u16 cha
         u8 time_us = (clock_time()- last_time);
         tlkapi_printf(1, "i=%d, map is %d, calc time=%dus\n", i, map, time_us);
     }
+        #endif
     #endif
-#endif
 
 
-#if (STACK_IRQ_CODE_IN_SRAM_DUE_TO_FLASH_OPERATION)
+    #if (STACK_IRQ_CODE_IN_SRAM_DUE_TO_FLASH_OPERATION)
 _attribute_ram_code_
-#endif
-void csa2_calculateMapInfo(struct le_channel_map *mapInfo)
+    #endif
+    void
+    csa2_calculateMapInfo(struct le_channel_map *mapInfo)
 {
     /*
      * A remapping table is built that contains all the used channels in ascending
      * order, indexed from zero.
      */
     mapInfo->numUsedChn = 0;
-    foreach(k, 37)
-    {
-        if(mapInfo->chmTbl[k>>3] & BIT(k & 0x07)){
+    foreach (k, 37) {
+        if (mapInfo->chmTbl[k >> 3] & BIT(k & 0x07)) {
             mapInfo->rempChmTbl[mapInfo->numUsedChn++] = k;
         }
     }
 
-    u8 N = mapInfo->numUsedChn;
-    mapInfo->d = max(1, max(min(3, N-5), min(11, (N-10)>>1)));
+    u8 N       = mapInfo->numUsedChn;
+    mapInfo->d = max(1, max(min(3, N - 5), min(11, (N - 10) >> 1)));
 }
 
 
-
-
-
-
-#endif  //end of  LL_FEATURE_ENABLE_ CHANNEL_SELECTION_ALGORITHM2
-
-
-
+#endif //end of  LL_FEATURE_ENABLE_ CHANNEL_SELECTION_ALGORITHM2

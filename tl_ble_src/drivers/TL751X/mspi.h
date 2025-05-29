@@ -39,6 +39,7 @@ typedef enum{
     SLAVE1 = 1,
     SLAVE2 = 2,
     SLAVE3 = 3,
+    SLAVE_CNT,
 }mspi_slave_device_num_e;
 
 /**

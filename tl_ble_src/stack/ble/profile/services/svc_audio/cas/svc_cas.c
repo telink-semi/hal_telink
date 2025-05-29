@@ -28,30 +28,29 @@
  * There shall be no more than one CAS instance on a server.
  * The CAS shall include no more than one instance of CSIS
  */
-#define CAS_START_HDL                   SERVICE_COMMON_AUDIO_HDL
+#define CAS_START_HDL SERVICE_COMMON_AUDIO_HDL
 
 extern const u16 csisIncludeValue[3];
 /*
  * @brief the structure for default CAS service List.
  */
 static const atts_attribute_t casList[] =
-{
-    ATTS_PRIMARY_SERVICE(serviceCommonAudioUuid),
-    ATTS_INCLUDE_DEFINE(csisIncludeValue),
+    {
+        ATTS_PRIMARY_SERVICE(serviceCommonAudioUuid),
+        ATTS_INCLUDE_DEFINE(csisIncludeValue),
 };
 
 /*
  * @brief the structure for default CAS service group.
  */
-_attribute_ble_data_retention_ 
-static atts_group_t svcCasGroup =
-{
-    NULL,
-    casList,
-    NULL,
-    NULL,
-    CAS_START_HDL,
-    0,
+_attribute_ble_data_retention_ static atts_group_t svcCasGroup =
+    {
+        NULL,
+        casList,
+        NULL,
+        NULL,
+        CAS_START_HDL,
+        0,
 };
 
 /**
@@ -61,7 +60,7 @@ static atts_group_t svcCasGroup =
  */
 void blc_svc_addCasGroup(void)
 {
-    svcCasGroup.endHandle = svcCasGroup.startHandle+ARRAY_SIZE(casList)-1;
+    svcCasGroup.endHandle = svcCasGroup.startHandle + ARRAY_SIZE(casList) - 1;
     blc_gatts_addAttributeServiceGroup(&svcCasGroup);
 }
 

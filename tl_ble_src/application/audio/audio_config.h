@@ -21,27 +21,27 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
- 
-#include  "application/audio/audio_common.h"
-#include  "tl_common.h"
+
+#include "application/audio/audio_common.h"
+#include "tl_common.h"
 
 
-#ifndef     TL_AUDIO_MODE
-#define     TL_AUDIO_MODE                                   AUDIO_DISABLE
+#ifndef TL_AUDIO_MODE
+    #define TL_AUDIO_MODE AUDIO_DISABLE
 #endif
 
-#if (TL_AUDIO_MODE & RCU_PROJECT)                       //RCU
+#if (TL_AUDIO_MODE & RCU_PROJECT) //RCU
     #if (TL_AUDIO_MODE == TL_AUDIO_RCU_ADPCM_GATT_TELINK)
-        #define ADPCM_PACKET_LEN                128
-        #define TL_MIC_ADPCM_UNIT_SIZE          248
-        #define TL_MIC_BUFFER_SIZE              992
+        #define ADPCM_PACKET_LEN       128
+        #define TL_MIC_ADPCM_UNIT_SIZE 248
+        #define TL_MIC_BUFFER_SIZE     992
     #endif
 
-#elif (TL_AUDIO_MODE & DONGLE_PROJECT)                  //Dongle
+#elif (TL_AUDIO_MODE & DONGLE_PROJECT) //Dongle
 
     #if (TL_AUDIO_MODE == TL_AUDIO_DONGLE_ADPCM_GATT_TELINK)
-        #define MIC_ADPCM_FRAME_SIZE        128
-        #define MIC_SHORT_DEC_SIZE          248
+        #define MIC_ADPCM_FRAME_SIZE 128
+        #define MIC_SHORT_DEC_SIZE   248
     #endif
 #else
 

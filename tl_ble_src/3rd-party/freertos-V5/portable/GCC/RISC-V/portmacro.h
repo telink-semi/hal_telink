@@ -90,15 +90,11 @@ not need to be guarded with a critical section. */
     #define portBYTE_ALIGNMENT          16
 #endif
 /*-----------------------------------------------------------*/
+#define portYIELD()                              do{plic_sw_set_pending();  delay_us(1);}while(0);        //  use  xPortYield to trigger a software interrupt
 
+#define portEND_SWITCHING_ISR( xSwitchRequired)  do { if( xSwitchRequired ) portYIELD(); } while( 0 )
+#define portYIELD_FROM_ISR( x )                  portEND_SWITCHING_ISR( x )
 
-/* Scheduler utilities. */
-extern void xPortYield(void);
-
-// #define portYIELD() __asm volatile( "ecall" );
-#define portYIELD() xPortYield()        //  use  xPortYield to trigger a software interrupt
-#define portEND_SWITCHING_ISR( xSwitchRequired ) if( xSwitchRequired )  set_csr(NDS_MIP, BIT(3));
-#define portYIELD_FROM_ISR( x ) portEND_SWITCHING_ISR( x )
 /*-----------------------------------------------------------*/
 
 

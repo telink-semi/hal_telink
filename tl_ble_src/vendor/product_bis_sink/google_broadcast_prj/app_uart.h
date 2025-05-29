@@ -26,39 +26,39 @@
 #include "../bis_sink_config.h"
 #if (PRODUCT_BIS_SINK_SELECT == PRODUCT_GOOGLE_BROADCAST_SINK)
 
-#ifndef UART_PORT
-#define UART_PORT                   UART1
-#endif
+    #ifndef UART_PORT
+        #define UART_PORT UART1
+    #endif
 
-#ifndef UART_TX_DMA
-#define UART_TX_DMA                 DMA5
-#endif
+    #ifndef UART_TX_DMA
+        #define UART_TX_DMA DMA5
+    #endif
 
-#ifndef UART_RX_DMA
-#define UART_RX_DMA                 DMA6
-#endif
+    #ifndef UART_RX_DMA
+        #define UART_RX_DMA DMA6
+    #endif
 
-#ifndef UART_TX_PIN
-#define UART_TX_PIN                 UART1_TX_PC6
-#endif
+    #ifndef UART_TX_PIN
+        #define UART_TX_PIN UART1_TX_PC6
+    #endif
 
-#ifndef UART_RX_PIN
-#define UART_RX_PIN                 UART1_RX_PC7
-#endif
+    #ifndef UART_RX_PIN
+        #define UART_RX_PIN UART1_RX_PC7
+    #endif
 
-#ifndef UART_RTS_PIN
-#define UART_RTS_PIN                UART1_RTS_PC5
-#endif
+    #ifndef UART_RTS_PIN
+        #define UART_RTS_PIN UART1_RTS_PC5
+    #endif
 
-#ifndef UART_BAUDRATE
-#define UART_BAUDRATE               1000000
-#endif
+    #ifndef UART_BAUDRATE
+        #define UART_BAUDRATE 1000000
+    #endif
 
-#ifndef UART_TX_BUFF_SIZE
-#define UART_TX_BUFF_SIZE           256
-#endif
+    #ifndef UART_TX_BUFF_SIZE
+        #define UART_TX_BUFF_SIZE 256
+    #endif
 
 void app_uart_init(void);
-void app_uart_send_value(u8* inBuf, int size);
+void app_uart_send_value(u8 *inBuf, int size);
 
 #endif

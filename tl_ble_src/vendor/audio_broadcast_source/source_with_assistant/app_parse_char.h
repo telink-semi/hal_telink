@@ -25,50 +25,51 @@
 
 #if (SOURCE_VERSION == SOURCE_WITH_ASSISTANT)
 
-#pragma once
+    #pragma once
 
 
-#ifndef PARSE_CHAR_UART_PORT
-#define PARSE_CHAR_UART_PORT                    UART1
-#endif
+    #ifndef PARSE_CHAR_UART_PORT
+        #define PARSE_CHAR_UART_PORT UART1
+    #endif
 
-#ifndef PARSE_CHAR_UART_TX_DMA
-#define PARSE_CHAR_UART_TX_DMA                  DMA5
-#endif
+    #ifndef PARSE_CHAR_UART_TX_DMA
+        #define PARSE_CHAR_UART_TX_DMA DMA5
+    #endif
 
-#ifndef PARSE_CHAR_UART_RX_DMA
-#define PARSE_CHAR_UART_RX_DMA                  DMA6
-#endif
+    #ifndef PARSE_CHAR_UART_RX_DMA
+        #define PARSE_CHAR_UART_RX_DMA DMA6
+    #endif
 
-#ifndef PARSE_CHAR_UART_TX_PIN
-#define PARSE_CHAR_UART_TX_PIN                  UART1_TX_PD6
-#endif
+    #ifndef PARSE_CHAR_UART_TX_PIN
+        #define PARSE_CHAR_UART_TX_PIN UART1_TX_PD6
+    #endif
 
-#ifndef PARSE_CHAR_UART_RX_PIN
-#define PARSE_CHAR_UART_RX_PIN                  UART1_RX_PD7
-#endif
+    #ifndef PARSE_CHAR_UART_RX_PIN
+        #define PARSE_CHAR_UART_RX_PIN UART1_RX_PD7
+    #endif
 
-#ifndef PARSE_CHAR_B92_UART_TX_PIN
-#define PARSE_CHAR_B92_UART_TX_PIN              GPIO_FC_PA0
-#endif
+    #ifndef PARSE_CHAR_B92_UART_TX_PIN
+        #define PARSE_CHAR_B92_UART_TX_PIN GPIO_FC_PA0
+    #endif
 
-#ifndef PARSE_CHAR_B92_UART_RX_PIN
-#define PARSE_CHAR_B92_UART_RX_PIN              GPIO_FC_PA1
-#endif
+    #ifndef PARSE_CHAR_B92_UART_RX_PIN
+        #define PARSE_CHAR_B92_UART_RX_PIN GPIO_FC_PA1
+    #endif
 
-#ifndef PARSE_CHAR_UART_BAUDRATE
-#define PARSE_CHAR_UART_BAUDRATE                1000000
-#endif
+    #ifndef PARSE_CHAR_UART_BAUDRATE
+        #define PARSE_CHAR_UART_BAUDRATE 1000000
+    #endif
 
-#ifndef PARSE_CHAR_UART_BUFF_SIZE
-#define PARSE_CHAR_UART_BUFF_SIZE               128
-#endif
+    #ifndef PARSE_CHAR_UART_BUFF_SIZE
+        #define PARSE_CHAR_UART_BUFF_SIZE 128
+    #endif
 
-#ifndef PARSE_CHAR_MAX_ARGV_SIZE
-#define PARSE_CHAR_MAX_ARGV_SIZE                16
-#endif
+    #ifndef PARSE_CHAR_MAX_ARGV_SIZE
+        #define PARSE_CHAR_MAX_ARGV_SIZE 16
+    #endif
 
-typedef struct{
+typedef struct
+{
     char *fun_name;
     void (*fun)(char *argv[], int argc, void *user_data);
     void *user_data;
@@ -97,7 +98,7 @@ void app_parse_loop(void);
  *
  * @return      immediate value.
  */
-int app_parse_str2n(char * ps);
+int app_parse_str2n(char *ps);
 
 /**
  * @brief       parse print log function.
@@ -106,4 +107,4 @@ int app_parse_str2n(char * ps);
  */
 void app_parse_printf(const char *format, ...);
 
-#endif  //SOURCE_VERSION == SOURCE_WITH_ASSISTANT
+#endif //SOURCE_VERSION == SOURCE_WITH_ASSISTANT

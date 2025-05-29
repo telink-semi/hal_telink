@@ -21,9 +21,7 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-#pragma  once
-
-
+#pragma once
 
 
 /**
@@ -32,7 +30,7 @@
  * @param[in]   mtuSize - ATT MTU size.
  * @return      ble_sts_t.
  */
-ble_sts_t   blc_attc_sendMtuSizeExchangeRequest (u16 connHandle, u16 mtuSize);
+ble_sts_t blc_attc_sendMtuSizeExchangeRequest(u16 connHandle, u16 mtuSize);
 
 /**
  * @brief       Send ATT Prepare Write Request.
@@ -43,7 +41,7 @@ ble_sts_t   blc_attc_sendMtuSizeExchangeRequest (u16 connHandle, u16 mtuSize);
  * @param[in]   len         - Pointer point to application data buffer.
  * @return      ble_sts_t.
  */
-ble_sts_t   blc_attc_sendPrepareWriteRequest (u16 connHandle, u16 attHandle, u16 offset, u8 *p, u16 len);
+ble_sts_t blc_attc_sendPrepareWriteRequest(u16 connHandle, u16 attHandle, u16 offset, u8 *p, u16 len);
 
 /**
  * @brief       Send ATT Execute Write Request.
@@ -53,7 +51,7 @@ ble_sts_t   blc_attc_sendPrepareWriteRequest (u16 connHandle, u16 attHandle, u16
  *                          - 0x01: Immediately write all pending prepared values
  * @return      ble_sts_t.
  */
-ble_sts_t   blc_attc_sendExecuteWriteRequest (u16 connHandle, u16 attHandle, u8 flags);
+ble_sts_t blc_attc_sendExecuteWriteRequest(u16 connHandle, u16 attHandle, u8 flags);
 
 /**
  * @brief       Send ATT Write Request.
@@ -63,7 +61,7 @@ ble_sts_t   blc_attc_sendExecuteWriteRequest (u16 connHandle, u16 attHandle, u8 
  * @param[in]   len         - Pointer point to application data buffer.
  * @return      ble_sts_t.
  */
-ble_sts_t   blc_attc_sendWriteRequest (u16 connHandle, u16 attHandle, u8 *p, u16 len);
+ble_sts_t blc_attc_sendWriteRequest(u16 connHandle, u16 attHandle, u8 *p, u16 len);
 
 /**
  * @brief       Send ATT Write Command.
@@ -73,7 +71,7 @@ ble_sts_t   blc_attc_sendWriteRequest (u16 connHandle, u16 attHandle, u8 *p, u16
  * @param[in]   len         - Pointer point to application data buffer.
  * @return      ble_sts_t.
  */
-ble_sts_t   blc_attc_sendWriteCommand (u16 connHandle, u16 attHandle, u8 *p, u16 len);
+ble_sts_t blc_attc_sendWriteCommand(u16 connHandle, u16 attHandle, u8 *p, u16 len);
 
 /**
  * @brief       Send ATT Find Info Request.
@@ -82,7 +80,7 @@ ble_sts_t   blc_attc_sendWriteCommand (u16 connHandle, u16 attHandle, u8 *p, u16
  * @param[in]   endAttHdl   - the end of ATT handle.
  * @return      ble_sts_t.
  */
-ble_sts_t   blc_attc_sendFindInfoRequest (u16 connHandle, u16 startAttHdl, u16 endAttHdl);
+ble_sts_t blc_attc_sendFindInfoRequest(u16 connHandle, u16 startAttHdl, u16 endAttHdl);
 
 /**
  * @brief       Send ATT Find By Type Value Request.
@@ -93,7 +91,7 @@ ble_sts_t   blc_attc_sendFindInfoRequest (u16 connHandle, u16 startAttHdl, u16 e
  * @param[in]   len            - the length of value.
  * @return      ble_sts_t.
  */
-ble_sts_t   blc_attc_sendFindByTypeValueRequest (u16 connHandle, u16 startAttHdl, u16 endAttHdl, u16 uuid, u8 *attrVal, u16 len);
+ble_sts_t blc_attc_sendFindByTypeValueRequest(u16 connHandle, u16 startAttHdl, u16 endAttHdl, u16 uuid, u8 *attrVal, u16 len);
 
 /**
  * @brief       Send ATT Read By Type Request.
@@ -103,7 +101,7 @@ ble_sts_t   blc_attc_sendFindByTypeValueRequest (u16 connHandle, u16 startAttHdl
  * @param[in]   uuid           - attribute type.
  * @param[in]   uuid_len       - the length of attribute type.
  */
-ble_sts_t   blc_attc_sendReadByTypeRequest (u16 connHandle, u16 startAttHdl, u16 endAttHdl, u8 *uuid, u8 uuid_len);
+ble_sts_t blc_attc_sendReadByTypeRequest(u16 connHandle, u16 startAttHdl, u16 endAttHdl, u8 *uuid, u8 uuid_len);
 
 /**
  * @brief       Send ATT Read By Group Type Request.
@@ -114,7 +112,7 @@ ble_sts_t   blc_attc_sendReadByTypeRequest (u16 connHandle, u16 startAttHdl, u16
  * @param[in]   uuid_len       - the length of attribute type.
  * @return      ble_sts_t.
  */
-ble_sts_t   blc_attc_sendReadByGroupTypeRequest (u16 connHandle, u16 startAttHdl, u16 endAttHdl, u8 *uuid, u8 uuid_len);
+ble_sts_t blc_attc_sendReadByGroupTypeRequest(u16 connHandle, u16 startAttHdl, u16 endAttHdl, u8 *uuid, u8 uuid_len);
 
 /**
  * @brief       Send ATT Read Request.
@@ -122,7 +120,7 @@ ble_sts_t   blc_attc_sendReadByGroupTypeRequest (u16 connHandle, u16 startAttHdl
  * @param[in]   attHandle       - ATT handle.
  * @return      ble_sts_t.
  */
-ble_sts_t   blc_attc_sendReadRequest (u16 connHandle, u16 attHandle);
+ble_sts_t blc_attc_sendReadRequest(u16 connHandle, u16 attHandle);
 
 /**
  * @brief       Send ATT Read Blob Request.
@@ -131,7 +129,7 @@ ble_sts_t   blc_attc_sendReadRequest (u16 connHandle, u16 attHandle);
  * @param[in]   offset      - ATT value offset.
  * @return      ble_sts_t.
  */
-ble_sts_t   blc_attc_sendReadBlobRequest (u16 connHandle, u16 attHandle, u16 offset);
+ble_sts_t blc_attc_sendReadBlobRequest(u16 connHandle, u16 attHandle, u16 offset);
 
 /**
  * @brief       Send ATT Read Multiple Request.
@@ -140,7 +138,7 @@ ble_sts_t   blc_attc_sendReadBlobRequest (u16 connHandle, u16 attHandle, u16 off
  * @param[in]   pHandle -.
  * @return      ble_sts_t.
  */
-ble_sts_t   blc_attc_sendReadMultReq(u16 connHandle, u8 numHandles, u16 *pHandle);
+ble_sts_t blc_attc_sendReadMultReq(u16 connHandle, u8 numHandles, u16 *pHandle);
 
 /**
  * @brief       Send ATT Read Multiple Variable Request.
@@ -149,15 +147,14 @@ ble_sts_t   blc_attc_sendReadMultReq(u16 connHandle, u8 numHandles, u16 *pHandle
  * @param[in]   pHandle -.
  * @return      ble_sts_t.
  */
-ble_sts_t   blc_attc_sendReadMultVarReq(u16 connHandle, u8 numHandles, u16 *pHandle);
+ble_sts_t blc_attc_sendReadMultVarReq(u16 connHandle, u8 numHandles, u16 *pHandle);
 
 /**
  * @brief       Send ATT Handle Value Confirm.
  * @param[in]   connHandle      - connection handle.
  * @return      ble_sts_t.
  */
-ble_sts_t   blc_attc_sendAttHdlValueCfm (u16 connHandle);
-
+ble_sts_t blc_attc_sendAttHdlValueCfm(u16 connHandle);
 
 
 /**
@@ -166,4 +163,4 @@ ble_sts_t   blc_attc_sendAttHdlValueCfm (u16 connHandle);
  *                      0: disable, allowing ATT Response PDU during in pairing phase
  * @return     none.
  */
-void         blc_att_holdAttributeResponsePayloadDuringPairingPhase(u8 hold_enable);
+void blc_att_holdAttributeResponsePayloadDuringPairingPhase(u8 hold_enable);

@@ -50,7 +50,7 @@ unsigned int chacha20_poly1305_get_version(void)
  */
 void chacha20_poly1305_set_cpu_mode(void)
 {
-    volatile unsigned int mask = ~(((unsigned int)1)<<CHACHA20_POLY1305_DMA_OFFSET);
+    volatile unsigned int mask = ~(((unsigned int)1) << CHACHA20_POLY1305_DMA_OFFSET);
 
     rCHACHA20_POLY1305_CFG &= mask;
 }
@@ -61,7 +61,7 @@ void chacha20_poly1305_set_cpu_mode(void)
  */
 void chacha20_poly1305_set_dma_mode(void)
 {
-    volatile unsigned int flag = (((unsigned int)1)<<CHACHA20_POLY1305_DMA_OFFSET);
+    volatile unsigned int flag = (((unsigned int)1) << CHACHA20_POLY1305_DMA_OFFSET);
 
     rCHACHA20_POLY1305_CFG |= flag;
 }
@@ -72,7 +72,7 @@ void chacha20_poly1305_set_dma_mode(void)
  */
 void chacha20_poly1305_soft_reset(void)
 {
-    volatile unsigned int flag = (((unsigned int)1)<<CHACHA20_POLY1305_SOFT_RESET_OFFSET);
+    volatile unsigned int flag = (((unsigned int)1) << CHACHA20_POLY1305_SOFT_RESET_OFFSET);
 
     rCHACHA20_POLY1305_SOFT_RST_N |= flag;
 }
@@ -99,10 +99,9 @@ void chacha20_poly1305_set_sec_stage(CHACHA20_POLY1305_SEC_STAGE stage)
 {
     volatile unsigned int mask = ~(0x00000003U << CHACHA20_POLY1305_SEC_STAGE_OFFSET);
 
-    rCHACHA20_POLY1305_CFG &= mask;                                                              //clear bit [0:1]
-    rCHACHA20_POLY1305_CFG |= (((unsigned int)stage) << CHACHA20_POLY1305_SEC_STAGE_OFFSET);         //set stage
+    rCHACHA20_POLY1305_CFG &= mask;                                                          //clear bit [0:1]
+    rCHACHA20_POLY1305_CFG |= (((unsigned int)stage) << CHACHA20_POLY1305_SEC_STAGE_OFFSET); //set stage
 }
-
 
 /**
  * @brief       chacha20_poly1305 start
@@ -115,7 +114,6 @@ void chacha20_poly1305_start(void)
     rCHACHA20_POLY1305_CTRL |= start_flag;
 }
 
-
 /**
  * @brief       chacha20_poly1305 start
  * @return      none
@@ -123,14 +121,14 @@ void chacha20_poly1305_start(void)
 void chacha20_poly1305_wait_till_done(void)
 {
     volatile unsigned int finish_flag = 1;
-    volatile unsigned int clear_flag = 0;
+    volatile unsigned int clear_flag  = 0;
 
-    while(!(rCHACHA20_POLY1305_RISR & finish_flag))
-    {;}
+    while (!(rCHACHA20_POLY1305_RISR & finish_flag)) {
+        ;
+    }
 
-    rCHACHA20_POLY1305_RISR = clear_flag;  //write 0 to clear
+    rCHACHA20_POLY1305_RISR = clear_flag; //write 0 to clear
 }
-
 
 /**
  * @brief       chacha20_poly1305 set key
@@ -140,21 +138,18 @@ void chacha20_poly1305_wait_till_done(void)
 void chacha20_poly1305_set_key(unsigned char key[32])
 {
     unsigned char i = 8;
-    unsigned int tmp[8];
+    unsigned int  tmp[8];
     unsigned int *key_ptr = (unsigned int *)key;
 
-    if(((unsigned int)key)&3)
-    {
+    if (((unsigned int)key) & 3) {
         memcpy_((unsigned char *)tmp, key, 32);
         key_ptr = tmp;
     }
-    
-    while (i--)
-    {
+
+    while (i--) {
         rCHACHA20_POLY1305_KEY(i) = key_ptr[i];
     }
 }
-
 
 /**
  * @brief       chacha20_poly1305 set key
@@ -166,7 +161,6 @@ void chacha20_poly1305_set_const(unsigned int constant)
     rCHACHA20_POLY1305_CONSTANT = constant;
 }
 
-
 /**
  * @brief       chacha20_poly1305 set nonce
  * @param[in]   iv            - iv in word buffer.
@@ -174,11 +168,10 @@ void chacha20_poly1305_set_const(unsigned int constant)
  */
 void chacha20_poly1305_set_iv(unsigned char iv[8])
 {
-    unsigned int tmp[2];
+    unsigned int  tmp[2];
     unsigned int *iv_ptr = (unsigned int *)iv;
 
-    if(((unsigned int)iv)&3)
-    {
+    if (((unsigned int)iv) & 3) {
         memcpy_((unsigned char *)tmp, iv, 8);
         iv_ptr = tmp;
     }
@@ -195,21 +188,19 @@ void chacha20_poly1305_set_iv(unsigned char iv[8])
  */
 void chacha20_poly1305_set_length(unsigned long long aad_bytes, unsigned long long payload_bytes)
 {
-    unsigned int last_aad = aad_bytes & 3;
+    unsigned int last_aad     = aad_bytes & 3;
     unsigned int last_payload = payload_bytes & 3;
 
-    if ((0 == last_aad) && (0 != aad_bytes))
-    {
+    if ((0 == last_aad) && (0 != aad_bytes)) {
         last_aad = 4;
     }
 
-    if ((0 == last_payload) && (0 != payload_bytes))
-    {
+    if ((0 == last_payload) && (0 != payload_bytes)) {
         last_payload = 4;
     }
 
     chacha20_poly1305_set_length_clean_aad_last(aad_bytes, payload_bytes);
-    
+
     rCHACHA20_POLY1305_LENGTH(4) = (last_aad << 3) | (last_payload << 0);
 }
 
@@ -223,8 +214,7 @@ void chacha20_poly1305_set_length_clean_aad_last(unsigned long long aad_bytes, u
 {
     unsigned int last_payload = payload_bytes & 3;
 
-    if ((0 == last_payload) && (0 != payload_bytes))
-    {
+    if ((0 == last_payload) && (0 != payload_bytes)) {
         last_payload = 4;
     }
 
@@ -253,8 +243,7 @@ void chacha20_poly1305_set_cnt(unsigned int counter)
 void chacha20_poly1305_set_tag_in(unsigned char tag_in[17])
 {
     unsigned int i = 4;
-    while (i--)
-    {
+    while (i--) {
         rCHACHA20_POLY1305_TAG_IN(i) = ((unsigned int *)tag_in)[i];
     }
 
@@ -281,7 +270,7 @@ void chacha20_poly1305_get_current_tag(unsigned char tag[17])
     ((unsigned int *)tag)[1] = rCHACHA20_POLY1305_TOUT(1);
     ((unsigned int *)tag)[2] = rCHACHA20_POLY1305_TOUT(2);
     ((unsigned int *)tag)[3] = rCHACHA20_POLY1305_TOUT(3);
-    tag[16] = rCHACHA20_POLY1305_TOUT(4) & 3;
+    tag[16]                  = rCHACHA20_POLY1305_TOUT(4) & 3;
 }
 
 /**
@@ -290,12 +279,9 @@ void chacha20_poly1305_get_current_tag(unsigned char tag[17])
  */
 unsigned int chacha20_poly1305_get_error(void)
 {
-    if(0 == rCHACHA20_POLY1305_ERR_CODE)
-    {
+    if (0 == rCHACHA20_POLY1305_ERR_CODE) {
         return CHACHA20_POLY1305_SUCCESS;
-    }
-    else
-    {
+    } else {
         return CHACHA20_POLY1305_CONFIG_INVALID;
     }
 }
@@ -310,12 +296,9 @@ void chacha20_poly1305_set_last_word(unsigned int is_last_word)
     volatile unsigned int flag = 1;
     volatile unsigned int mask = 0;
 
-    if(is_last_word)
-    {
+    if (is_last_word) {
         rCHACHA20_POLY1305_LAST |= flag;
-    }
-    else
-    {
+    } else {
         rCHACHA20_POLY1305_LAST &= mask;
     }
 }
@@ -328,8 +311,9 @@ void chacha20_poly1305_wait_ready_data_signal(void)
 {
     volatile unsigned int finish_flag = 1;
 
-    while(!(rCHACHA20_POLY1305_DIN_RDY & finish_flag))
-    {;}
+    while (!(rCHACHA20_POLY1305_DIN_RDY & finish_flag)) {
+        ;
+    }
 }
 
 /**
@@ -338,15 +322,15 @@ void chacha20_poly1305_wait_ready_data_signal(void)
  */
 void chacha20_poly1305_wait_core_idle(void)
 {
-    volatile unsigned int busy_flag = 1;
+    volatile unsigned int busy_flag  = 1;
     volatile unsigned int clear_flag = 0;
 
-    while(rCHACHA20_POLY1305_STATUS & busy_flag)
-    {;}
-        
+    while (rCHACHA20_POLY1305_STATUS & busy_flag) {
+        ;
+    }
+
     rCHACHA20_POLY1305_RISR = clear_flag;
 }
-
 
 /**
  * @brief       set one word data
@@ -354,12 +338,11 @@ void chacha20_poly1305_wait_core_idle(void)
  * @return      none
  */
 void chacha20_poly1305_simple_set_input_word(unsigned int in[1])
-{   
+{
     chacha20_poly1305_wait_ready_data_signal();
-    
+
     rCHACHA20_POLY1305_DIN = in[0];
 }
-
 
 /**
  * @brief       set 4 words input data as one block
@@ -367,9 +350,9 @@ void chacha20_poly1305_simple_set_input_word(unsigned int in[1])
  * @return      none
  */
 void chacha20_poly1305_set_input_block(unsigned int in[4])
-{   
+{
     chacha20_poly1305_wait_ready_data_signal();
-    
+
     rCHACHA20_POLY1305_DIN = in[0];
     rCHACHA20_POLY1305_DIN = in[1];
     rCHACHA20_POLY1305_DIN = in[2];
@@ -401,70 +384,52 @@ void chacha20_poly1305_get_output_block(unsigned int out[4])
  */
 unsigned int chacha20_poly1305_update_blocks(unsigned char *in, unsigned char *out, unsigned int bytes)
 {
-    unsigned int in_word_align, out_word_align;
-    unsigned int tmp[4];
+    unsigned int       in_word_align, out_word_align;
+    unsigned int       tmp[4];
     unsigned long long i;
-    unsigned long long round = bytes/16;
+    unsigned long long round = bytes / 16;
 
-    if(bytes & 63)
-    {
+    if (bytes & 63) {
         return CHACHA20_POLY1305_INPUT_INVALID;
+    } else {
+        ;
     }
-    else
-    {;}
-    
-    if(((unsigned int)in) & 3)
-    {
+
+    if (((unsigned int)in) & 3) {
         in_word_align = 0;
-    }
-    else
-    {
+    } else {
         in_word_align = 1;
     }
 
-    if(((unsigned int)out) & 3)
-    {
+    if (((unsigned int)out) & 3) {
         out_word_align = 0;
-    }
-    else
-    {
+    } else {
         out_word_align = 1;
     }
 
-    if(in_word_align && out_word_align)
-    {
-        for(i=0; i<round; i++)
-        {
+    if (in_word_align && out_word_align) {
+        for (i = 0; i < round; i++) {
             chacha20_poly1305_set_input_block((unsigned int *)in);
             chacha20_poly1305_wait_till_done();
             chacha20_poly1305_get_output_block((unsigned int *)out);
-            
+
             out += 16;
             in += 16;
         }
-    }
-    else
-    {
-        for(i = 0; i < round; i++)
-        {
-            if(in_word_align)
-            {
+    } else {
+        for (i = 0; i < round; i++) {
+            if (in_word_align) {
                 chacha20_poly1305_set_input_block((unsigned int *)in);
-            }
-            else
-            {
+            } else {
                 memcpy_((unsigned char *)tmp, in, 16);
                 chacha20_poly1305_set_input_block(tmp);
             }
 
             chacha20_poly1305_wait_till_done();
 
-            if(out_word_align)
-            {
+            if (out_word_align) {
                 chacha20_poly1305_get_output_block((unsigned int *)out);
-            }
-            else
-            {
+            } else {
                 chacha20_poly1305_get_output_block(tmp);
                 memcpy_(out, (unsigned char *)tmp, 16);
             }
@@ -492,52 +457,45 @@ unsigned int chacha20_poly1305_update_last_block(unsigned char *in, unsigned cha
 {
     unsigned long long i;
     unsigned long long round;
-    unsigned int tmp[4];
-    unsigned int last_block_bytes = remainder & 15;
+    unsigned int       tmp[4];
+    unsigned int       last_block_bytes = remainder & 15;
 
-    round = (remainder+3)>>2;
+    round     = (remainder + 3) >> 2;
     remainder = remainder & 3;
-    
-    if(0 == remainder)
-    {
-        remainder = 4;
-    }
-    else
-    {;}
 
-    if(0 == last_block_bytes)
-    {
+    if (0 == remainder) {
+        remainder = 4;
+    } else {
+        ;
+    }
+
+    if (0 == last_block_bytes) {
         last_block_bytes = 16;
     }
-    
-    for(i=1; i <= round-1; i++)
-    {
+
+    for (i = 1; i <= round - 1; i++) {
         chacha20_poly1305_set_input_word((unsigned int *)in, 1);
         in += 4;
 
-        if(0 == (i & 3))
-        {
+        if (0 == (i & 3)) {
             chacha20_poly1305_wait_till_done();
-            
-            if(((unsigned int)out)&3)
-            {
+
+            if (((unsigned int)out) & 3) {
                 chacha20_poly1305_get_output_block(tmp);
                 memcpy_(out, (unsigned char *)tmp, 16);
-            }
-            else
-            {
+            } else {
                 chacha20_poly1305_get_output_block((unsigned int *)out);
             }
             out += 16;
         }
     }
-    
+
     chacha20_poly1305_set_last_word(1);
     memcpy_((unsigned char *)tmp, in, remainder);
     chacha20_poly1305_set_input_word(tmp, 1);
-    
+
     chacha20_poly1305_wait_core_idle();
-    
+
     chacha20_poly1305_get_output_block((unsigned int *)tmp);
     memcpy_(out, (unsigned char *)tmp, last_block_bytes);
 
@@ -556,27 +514,20 @@ unsigned int chacha20_poly1305_update_last_block(unsigned char *in, unsigned cha
  */
 void chacha20_poly1305_set_input_word(unsigned int *in, unsigned int words)
 {
-    unsigned int in_word_align;
-    unsigned int tmp_in[1];
+    unsigned int       in_word_align;
+    unsigned int       tmp_in[1];
     unsigned long long i;
 
-    if(((unsigned int)in) & 3)
-    {
+    if (((unsigned int)in) & 3) {
         in_word_align = 0;
-    }
-    else
-    {
+    } else {
         in_word_align = 1;
     }
 
-    for (i = 0; i < words; i++)
-    {
-        if(in_word_align)
-        {
+    for (i = 0; i < words; i++) {
+        if (in_word_align) {
             chacha20_poly1305_simple_set_input_word((unsigned int *)in);
-        }
-        else
-        {
+        } else {
             memcpy_((unsigned char *)tmp_in, (unsigned char *)in, 4);
             chacha20_poly1305_simple_set_input_word((unsigned int *)tmp_in);
         }
@@ -599,7 +550,6 @@ void chacha20_poly1305_dma_set_aad(unsigned int *aad, unsigned int aad_bytes)
     rCHACHA20_POLY1305_DMA_RLEN_A  = aad_bytes;
 }
 
-
 /**
  * @brief       basic chacha20_poly1305 DMA set source address and byte length of payload
  * @param[in]   payload             - source address of payload.
@@ -621,20 +571,19 @@ void chacha20_poly1305_dma_set_payload(unsigned int *payload, unsigned int paylo
  */
 unsigned int chacha20_poly1305_dma_operate(unsigned int *in, unsigned int *out, unsigned int bytes)
 {
-    if((NULL == in && 0 != bytes) || (NULL == out && 0 != bytes))
-    {
+    if ((NULL == in && 0 != bytes) || (NULL == out && 0 != bytes)) {
         return CHACHA20_POLY1305_BUFFER_NULL;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //src & dst addr
     rCHACHA20_POLY1305_DMA_SADDR_D = (unsigned int)in;
     rCHACHA20_POLY1305_DMA_DADDR_D = (unsigned int)out;
-    
+
     //data byte length
     rCHACHA20_POLY1305_DMA_RLEN_A = 0;
-    rCHACHA20_POLY1305_DMA_LEN_D = bytes;
+    rCHACHA20_POLY1305_DMA_LEN_D  = bytes;
 
     chacha20_poly1305_tx_dma(chacha20_poly1305_get_tx_dma_channel(), (unsigned int)in, bytes);
 
@@ -647,7 +596,3 @@ unsigned int chacha20_poly1305_dma_operate(unsigned int *in, unsigned int *out, 
 }
 
 #endif
-
-
-
-

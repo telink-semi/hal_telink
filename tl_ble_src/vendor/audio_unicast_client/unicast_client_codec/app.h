@@ -31,22 +31,24 @@
 /*
  * @brief   adv struture, length-type-value
  */
-typedef struct{
-    u8 length;
-    u8 type;
-    u8 data[0];
+typedef struct
+{
+    u8  length;
+    u8  type;
+    u8  data[0];
     u16 resved;
-}app_advdata_LTV;
+} app_advdata_LTV;
 
 /*
  * @brief   unicast server announcement
  */
-typedef struct{
-   u8  announcement_type;
-   u32 available_audio_context;
-   u8  metadata_length;
-   u8  metadata[0];
-}app_adv_announcement_t;
+typedef struct
+{
+    u8  announcement_type;
+    u32 available_audio_context;
+    u8  metadata_length;
+    u8  metadata[0];
+} app_adv_announcement_t;
 
 /**
  * @brief       user initialization when MCU power on or wake_up from deepSleep mode
@@ -69,7 +71,7 @@ void user_init_deepRetn(void);
  * @param[in]  none.
  * @return     none.
  */
-int main_idle_loop (void);
+int main_idle_loop(void);
 
 
 /**
@@ -77,7 +79,7 @@ int main_idle_loop (void);
  * @param[in]  none.
  * @return     none.
  */
-void main_loop (void);
+void main_loop(void);
 
 
 /**
@@ -87,7 +89,7 @@ void main_loop (void);
  * @param[in]  n       the length of event parameter.
  * @return
  */
-int app_controller_event_callback (u32 h, u8 *p, int n);
+int app_controller_event_callback(u32 h, u8 *p, int n);
 
 
 /**
@@ -97,7 +99,7 @@ int app_controller_event_callback (u32 h, u8 *p, int n);
  * @param[in]  n       the length of event parameter.
  * @return
  */
-int app_host_event_callback (u32 h, u8 *para, int n);
+int app_host_event_callback(u32 h, u8 *para, int n);
 
 
 /**
@@ -106,11 +108,10 @@ int app_host_event_callback (u32 h, u8 *para, int n);
  * @param[in]  pkt             Pointer point to data packet buffer.
  * @return
  */
-int app_gatt_data_handler (u16 connHandle, u8 *pkt);
+int app_gatt_data_handler(u16 connHandle, u8 *pkt);
 
 
 #endif
 
 
 #endif
-

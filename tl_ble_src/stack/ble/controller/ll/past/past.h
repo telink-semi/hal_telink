@@ -26,90 +26,12 @@
 
 #include "stack/ble/hci/hci_cmd.h"
 
-
-/*! \brief  PAST source. */
-enum
-{
-    PAST_SYNC_SRC_SCAN, //Periodic sync info from ext_scanner
-    PAST_SYNC_SRC_BCST, //Periodic sync info from ext_broadcaster
-    PAST_SYNC_SRC_TOTAL
-};
-
-
-/*! \brief  PAST parameter receive mode. */
-enum
-{
-    PAST_MODE_OFF           = 0,    /*!< LE_Periodic_Advertising_Sync_Transfer_Received event is disabled. */
-    PAST_MODE_RPT_DISABLED  = 1,    /*!< LE_Periodic_Advertising_Sync_Transfer_Received event is enabled, LE_Periodic_Advertising_Report events is disabled. */
-    PAST_MODE_RPT_ENABLED_DUP_FILTER_DIS    = 2,    /*!< LE_Periodic_Advertising_Sync_Transfer_Received event is enabled, LE_Periodic_Advertising_Report events is enabled with duplicate filtering disabled. */
-    PAST_MODE_RPT_ENABLED_DUP_FILTER_EN     = 3,    /*!< LE_Periodic_Advertising_Sync_Transfer_Received event is enabled, LE_Periodic_Advertising_Report events is enabled with duplicate filtering enabled. */
-    PAST_MODE_TOTAL = PAST_MODE_RPT_ENABLED_DUP_FILTER_EN
-};
-
-
-/*! \brief  PAST parameter CTE type. */
-enum
-{
-    PAST_CTE_TYPE_NOT_SYNC_TO_AOA     = BIT(0), /*!< Do not sync to packets with an AoA Constant Tone Extension. */
-    PAST_CTE_TYPE_NOT_SYNC_TO_AOD_1US = BIT(1), /*!< Do not sync to packets with an AoD Constant Tone Extension with 1 s slots. */
-    PAST_CTE_TYPE_NOT_SYNC_TO_AOD_2US = BIT(2), /*!< Do not sync to packets with an AoD Constant Tone Extension with 2 s slots. */
-    PAST_CTE_TYPE_ONLY_SYNC_TO_CTE    = BIT(4), /*!< Do not sync to packets without a Constant Tone Extension. */
-
-    PAST_CTE_TYPE_SYNC_TO_WITHOUT_CTE = PAST_CTE_TYPE_NOT_SYNC_TO_AOA |
-                                        PAST_CTE_TYPE_NOT_SYNC_TO_AOD_1US |
-                                        PAST_CTE_TYPE_NOT_SYNC_TO_AOD_2US,
-};
-
-
-#define PAST_SYNC_MIN_TIMEOUT   0x000A  /*!< Minimum synchronization timeout. */
-#define PAST_SYNC_MAX_TIMEOUT   0x4000  /*!< Maximum synchronization timeout. */
-#define PAST_MAX_SKIP           0x01F3  /*!< Maximum synchronization skip. */
-
-typedef struct{
-    u8      pastMode;
-    u8      cteType;
-    u16     pastSkip;
-    u16     pastSyncTimeout;
-}ll_past_mng_t;
-
-
-typedef struct{
-    u8      perSyncSrc; /*!< Periodic sync source. */
-    u8      pastMode;
-    u16     pastRcvdCEt; //Mark CEt
-
-    u8      pastSyncCteType; //AOA/AOD concerned
-    u8      past_occpied;
-    bool    pastRcvdSucc;
-    u8      rsvd[1];
-
-    u16     perServiceData; /*!< ID for periodic sync indication. */
-    u16     perSyncHandle; /*!< Periodic sync handle.(src:ext_scan, syncHandle /src:own_prd_bcst, advHandle) */
-    u16     pastSkip;
-    u16     pastSyncTimeout;
-
-    u32     pastSendPending;
-    u32     pastCreateSync; /*!< Create PeriodicAdv sync by receiving LL_PERIODIC_SYNC_IND packet method. */
-    u32     pastRcvdTick; //Special use
-
-#if (1) /* dec special */
-    u32     pastRcvdNo;
-    u8     *pastDecPending;
-    u8      pastTemBuf[48]; /* 39payload +2rf_header +4dma_header */
-#endif
-
-}ll_past_cb_t;
-
-
-extern ll_past_mng_t   blt_PastMng;
-
-
 /**
  * @brief      This function is used to initialize the PAST module
  * @param[in]  none
  * @return     none
  */
-void        blc_ll_initPAST_module(void);
+void blc_ll_initPAST_module(void);
 
 
 /**
@@ -121,7 +43,7 @@ void        blc_ll_initPAST_module(void);
  * @param[in]  sync_handle - Sync_Handle identifying the periodic advertising train
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t   blc_ll_periodicAdvSyncTransfer(u16 connHandle, u16 serviceData, u16  syncHandle);
+ble_sts_t blc_ll_periodicAdvSyncTransfer(u16 connHandle, u16 serviceData, u16 syncHandle);
 
 
 /**
@@ -132,7 +54,7 @@ ble_sts_t   blc_ll_periodicAdvSyncTransfer(u16 connHandle, u16 serviceData, u16 
  * @param[in]  advHandle - Used to identify an advertising set: 0x00C0xEF
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t   blc_ll_periodicAdvSetInfoTransfer(u16   connHandle, u16     serviceData, u8     advHandle);
+ble_sts_t blc_ll_periodicAdvSetInfoTransfer(u16 connHandle, u16 serviceData, u8 advHandle);
 
 
 /**
@@ -148,7 +70,7 @@ ble_sts_t   blc_ll_periodicAdvSetInfoTransfer(u16   connHandle, u16     serviceD
  * @param[in]  cteType -
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t   blc_ll_setPeriodicAdvSyncTransferParams(u16 connHandle, u8 mode, u16 skip, u16 syncTimeout, u8 cteType);
+ble_sts_t blc_ll_setPeriodicAdvSyncTransferParams(u16 connHandle, u8 mode, u16 skip, u16 syncTimeout, u8 cteType);
 
 
 /**
@@ -163,9 +85,7 @@ ble_sts_t   blc_ll_setPeriodicAdvSyncTransferParams(u16 connHandle, u8 mode, u16
  * @param[in]  cteType -
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t   blc_ll_setDftPeriodicAdvSyncTransferParams(u8 mode, u16 skip, u16 syncTimeout, u8 cteType);
-
-
+ble_sts_t blc_ll_setDftPeriodicAdvSyncTransferParams(u8 mode, u16 skip, u16 syncTimeout, u8 cteType);
 
 
 /**
@@ -175,7 +95,7 @@ ble_sts_t   blc_ll_setDftPeriodicAdvSyncTransferParams(u8 mode, u16 skip, u16 sy
  * @param[in]  enable
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t   blc_hci_le_periodicAdvertisingReceiveEn(hci_le_setPeriodicAdvReceiveEnCmdParams_t *cmdPara);
+ble_sts_t blc_hci_le_periodicAdvertisingReceiveEn(hci_le_setPeriodicAdvReceiveEnCmdParams_t *cmdPara);
 
 
 /**
@@ -186,7 +106,7 @@ ble_sts_t   blc_hci_le_periodicAdvertisingReceiveEn(hci_le_setPeriodicAdvReceive
  * @param[out] *retPara - refer to 'hci_le_pastRetParams_t'
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t   blc_hci_le_periodicAdvSyncTransfer(hci_le_pastCmdParams_t *cmdPara, hci_le_pastRetParams_t *retPara);
+ble_sts_t blc_hci_le_periodicAdvSyncTransfer(hci_le_pastCmdParams_t *cmdPara, hci_le_pastRetParams_t *retPara);
 
 
 /**
@@ -196,7 +116,7 @@ ble_sts_t   blc_hci_le_periodicAdvSyncTransfer(hci_le_pastCmdParams_t *cmdPara, 
  * @param[out] *retPara - refer to 'hci_le_paSetInfoTransferRetParams_t'
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t   blc_hci_le_periodicAdvSetInfoTransfer(hci_le_paSetInfoTransferCmdParams_t *cmdPara, hci_le_paSetInfoTransferRetParams_t *retPara);
+ble_sts_t blc_hci_le_periodicAdvSetInfoTransfer(hci_le_paSetInfoTransferCmdParams_t *cmdPara, hci_le_paSetInfoTransferRetParams_t *retPara);
 
 /**
  * @brief      This function is used to specify how the Controller will process periodic advertising
@@ -206,7 +126,7 @@ ble_sts_t   blc_hci_le_periodicAdvSetInfoTransfer(hci_le_paSetInfoTransferCmdPar
  * @param[out] *retPara - refer to 'hci_le_pastParamsRetParams_t'
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t   blc_hci_le_setPeriodicAdvSyncTransferParams(hci_le_pastParamsCmdParams_t *cmdPara, hci_le_pastParamsRetParams_t *retPara);
+ble_sts_t blc_hci_le_setPeriodicAdvSyncTransferParams(hci_le_pastParamsCmdParams_t *cmdPara, hci_le_pastParamsRetParams_t *retPara);
 
 /**
  * @brief      This function is used to specify the initial value for the mode, skip, timeout, and
@@ -215,8 +135,7 @@ ble_sts_t   blc_hci_le_setPeriodicAdvSyncTransferParams(hci_le_pastParamsCmdPara
  * @param[in]  *cmdPara - refer to 'hci_le_dftPastParamsCmdParams_t'
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t   blc_hci_le_setDftPeriodicAdvSyncTransferParams(hci_le_dftPastParamsCmdParams_t *cmdPara);
-
+ble_sts_t blc_hci_le_setDftPeriodicAdvSyncTransferParams(hci_le_dftPastParamsCmdParams_t *cmdPara);
 
 
 #endif /* LL_PC_H_ */

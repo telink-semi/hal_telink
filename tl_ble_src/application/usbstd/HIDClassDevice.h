@@ -28,32 +28,29 @@
 
 /* Enable C linkage for C++ Compilers: */
 #if defined(__cplusplus)
-    extern "C" {
+extern "C"
+{
 #endif
 
-typedef struct
-{
-    u8  InterfaceNumber;
-    u8  ReportINEndpointNumber;
-    u16 ReportINEndpointSize;
-    bool ReportINEndpointDoubleBank;
-    void* PrevReportINBuffer;
-    u8  PrevReportINBufferSize;
-} usbhid_config_t;
+    typedef struct __attribute__((packed))
+    {
+        u8    InterfaceNumber;
+        u8    ReportINEndpointNumber;
+        u16   ReportINEndpointSize;
+        bool  ReportINEndpointDoubleBank;
+        void *PrevReportINBuffer;
+        u8    PrevReportINBufferSize;
+    } usbhid_config_t;
 
-typedef struct
-{
-    bool UsingReportProtocol;
-    u16 PrevFrameNum;
-    u16 IdleCount;
-    u16 IdleMSRemaining;
-} usbhid_state_t;
-
-
+    typedef struct __attribute__((packed))
+    {
+        bool UsingReportProtocol;
+        u16  PrevFrameNum;
+        u16  IdleCount;
+        u16  IdleMSRemaining;
+    } usbhid_state_t;
 
 /* Disable C linkage for C++ Compilers: */
 #if defined(__cplusplus)
-    }
+}
 #endif
-
-

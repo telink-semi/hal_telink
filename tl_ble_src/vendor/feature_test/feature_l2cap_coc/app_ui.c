@@ -36,16 +36,16 @@
 
 int central_pairing_enable = 0;
 
-#if (UI_KEYBOARD_ENABLE)
+    #if (UI_KEYBOARD_ENABLE)
 
-_attribute_ble_data_retention_  int     key_not_released;
+_attribute_ble_data_retention_ int key_not_released;
 
 
-#define CONSUMER_KEY                1
-#define KEYBOARD_KEY                2
-#define PAIR_UNPAIR_KEY             3
+        #define CONSUMER_KEY    1
+        #define KEYBOARD_KEY    2
+        #define PAIR_UNPAIR_KEY 3
 
-_attribute_ble_data_retention_  u8      key_type;
+_attribute_ble_data_retention_ u8 key_type;
 
 /**
  * @brief   Check changed key value.
@@ -54,62 +54,50 @@ _attribute_ble_data_retention_  u8      key_type;
  */
 void key_change_proc(void)
 {
-
     u8 key0 = kb_event.keycode[0];
-//  u8 key_buf[8] = {0,0,0,0,0,0,0,0};
+    //  u8 key_buf[8] = {0,0,0,0,0,0,0,0};
 
     key_not_released = 1;
-    if (kb_event.cnt == 2)   //two key press
+    if (kb_event.cnt == 2) //two key press
     {
-    }
-    else if(kb_event.cnt == 1)
-    {
-        if(key0 >= CR_VOL_UP )
-        {
+    } else if (kb_event.cnt == 1) {
+        if (key0 >= CR_VOL_UP) {
             key_type = CONSUMER_KEY;
 
-            if(key0 == CR_VOL_UP){
+            if (key0 == CR_VOL_UP) {
                 app_createLeCreditBasedConnect();
-//              app_createCreditBasedConnect();
-            }
-            else if(key0 == CR_VOL_DN){
+                //              app_createCreditBasedConnect();
+            } else if (key0 == CR_VOL_DN) {
                 app_sendCocData();
             }
-        }
-        else{
+        } else {
             key_type = PAIR_UNPAIR_KEY;
 
-            if(key0 == BTN_PAIR)   //Manual pair triggered by Key Press
+            if (key0 == BTN_PAIR) //Manual pair triggered by Key Press
             {
                 central_pairing_enable = 1;
                 tlkapi_printf(APP_PAIR_LOG_EN, "[UI][PAIR] Pair begin...\r\n");
 
-            }
-            else if(key0 == BTN_UNPAIR) //Manual un_pair triggered by Key Press
+            } else if (key0 == BTN_UNPAIR) //Manual un_pair triggered by Key Press
             {
                 app_disconnCocConnect();
             }
-
         }
 
-    }
-    else   //kb_event.cnt == 0,  key release
+    } else //kb_event.cnt == 0,  key release
     {
         key_not_released = 0;
 
-        if(key_type == PAIR_UNPAIR_KEY){
-            if(central_pairing_enable){
+        if (key_type == PAIR_UNPAIR_KEY) {
+            if (central_pairing_enable) {
                 central_pairing_enable = 0;
                 tlkapi_printf(APP_PAIR_LOG_EN, "[UI][PAIR] Pair end.\r\n");
             }
         }
     }
-
 }
 
-
-
-_attribute_ble_data_retention_      static u32 keyScanTick = 0;
+_attribute_ble_data_retention_ static u32 keyScanTick = 0;
 
 /**
  * @brief      keyboard task handler
@@ -118,27 +106,26 @@ _attribute_ble_data_retention_      static u32 keyScanTick = 0;
  * @param[in]  n    - the length of event parameter.
  * @return     none.
  */
-void proc_keyboard (u8 e, u8 *p, int n)
+void proc_keyboard(u8 e, u8 *p, int n)
 {
-    (void)e;(void)n;(void)p;
-    if(clock_time_exceed(keyScanTick, 10 * 1000)){  //keyScan interval: 10mS
+    (void)e;
+    (void)n;
+    (void)p;
+    if (clock_time_exceed(keyScanTick, 10 * 1000)) { //keyScan interval: 10mS
         keyScanTick = clock_time();
-    }
-    else{
+    } else {
         return;
     }
 
     kb_event.keycode[0] = 0;
-    int det_key = kb_scan_key (0, 1);
+    int det_key         = kb_scan_key(0, 1);
 
-    if (det_key){
+    if (det_key) {
         key_change_proc();
     }
 }
 
 
+    #endif //end of UI_KEYBOARD_ENABLE
 
-
-#endif   //end of UI_KEYBOARD_ENABLE
-
-#endif //end of (FEATURE_TEST_MODE == ...)
+#endif     //end of (FEATURE_TEST_MODE == ...)

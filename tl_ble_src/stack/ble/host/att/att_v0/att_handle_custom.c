@@ -30,24 +30,16 @@
 #include "stack/ble/ble.h"
 
 
+_attribute_ble_data_retention_ attHl_convert_t *gAttCusTbl = NULL;
 
-
-
-_attribute_ble_data_retention_  attHl_convert_t* gAttCusTbl = NULL;
-
-
-
-
-ble_sts_t blc_att_setAttributeHandleCustomTable (attHl_convert_t *pAttCus, int attHlConvert_num)
+ble_sts_t blc_att_setAttributeHandleCustomTable(attHl_convert_t *pAttCus, int attHlConvert_num)
 {
-    gAttCusTbl = pAttCus;
-    bltAtt.attHl_cusNum = attHlConvert_num;
+    gAttCusTbl             = pAttCus;
+    bltAtt.attHl_cusNum    = attHlConvert_num;
     bltAtt.attHl_custom_en = 1;
 
     return BLE_SUCCESS;
 }
-
-
 
 
 #if 0 //demo code
@@ -65,16 +57,12 @@ blc_att_setAttributeHandleCustomTable(attHandCustom_tbl, 4);
 #endif
 
 
-
-
-
-
 u16 blt_att_change_sdkAttHandle_to_customAttHandle(u16 sdk_attHl)
 {
     u16 custom_attHl = sdk_attHl;
 
-    for(int i=0; i<bltAtt.attHl_cusNum; i++){
-        if(sdk_attHl == gAttCusTbl[i].attHl_sdk){
+    for (int i = 0; i < bltAtt.attHl_cusNum; i++) {
+        if (sdk_attHl == gAttCusTbl[i].attHl_sdk) {
             custom_attHl = gAttCusTbl[i].attHl_cus;
             break;
         }
@@ -83,23 +71,22 @@ u16 blt_att_change_sdkAttHandle_to_customAttHandle(u16 sdk_attHl)
     return custom_attHl;
 }
 
-
 u16 blt_att_change_customAttHandle_to_sdkAttHandle(u16 custom_attHl)
 {
     u16 sdk_attHl = custom_attHl;
 
     //>=: sdk att handle do not change.
-    if(custom_attHl >= gAttCusTbl[0].attHl_cus){
-        for(int i=0; i<bltAtt.attHl_cusNum; i++){
+    if (custom_attHl >= gAttCusTbl[0].attHl_cus) {
+        for (int i = 0; i < bltAtt.attHl_cusNum; i++) {
             //<=: start handle in Read by Group Req may be +1 value, not in custom handle table.
-            if(custom_attHl <= gAttCusTbl[i].attHl_cus){
+            if (custom_attHl <= gAttCusTbl[i].attHl_cus) {
                 sdk_attHl = gAttCusTbl[i].attHl_sdk;
                 break;
             }
         }
     }
     //eg. find range: 0x000F~0x3002, when gAttCusTbl[0] = {0x0008, 0x1000}, 0x000F should be change to 0x0008.
-    else if(custom_attHl > gAttCusTbl[0].attHl_sdk){
+    else if (custom_attHl > gAttCusTbl[0].attHl_sdk) {
         sdk_attHl = gAttCusTbl[0].attHl_sdk;
     }
 
@@ -123,9 +110,10 @@ u16 blt_att_change_customAttHandle_to_sdkAttHandle(u16 custom_attHl)
 // ATT_OP_WRITE_CMD                    0x52     [7]h
 // ATT_OP_SIGNED_WRITE_CMD             0xd2     [7]h
 
-typedef struct __attribute__((packed)) {
-    u8  type;
-    u8  rf_len;
+typedef struct __attribute__((packed))
+{
+    u8 type;
+    u8 rf_len;
 
     u16 l2capLen;
     u16 chanId;
@@ -134,36 +122,32 @@ typedef struct __attribute__((packed)) {
     u16 handle2;
 } rf_packet_att_get_handle_t;
 
-void blt_att_processAttHandle_in_attCmd(rf_packet_l2cap_req_t * pL2capReq)
+void blt_att_processAttHandle_in_attCmd(rf_packet_l2cap_req_t *pL2capReq)
 {
-    rf_packet_att_get_handle_t * pkt = (rf_packet_att_get_handle_t *)pL2capReq;
-    switch(pL2capReq->opcode)
+    rf_packet_att_get_handle_t *pkt = (rf_packet_att_get_handle_t *)pL2capReq;
+    switch (pL2capReq->opcode) {
+    //startingHandle+endingHandle
+    case ATT_OP_FIND_INFO_REQ:
+    case ATT_OP_FIND_BY_TYPE_VALUE_REQ:
+    case ATT_OP_READ_BY_TYPE_REQ:
+    case ATT_OP_READ_BY_GROUP_TYPE_REQ:
     {
-        //startingHandle+endingHandle
-        case ATT_OP_FIND_INFO_REQ:
-        case ATT_OP_FIND_BY_TYPE_VALUE_REQ:
-        case ATT_OP_READ_BY_TYPE_REQ:
-        case ATT_OP_READ_BY_GROUP_TYPE_REQ:
-        {
-            pkt->handle1 = blt_att_change_customAttHandle_to_sdkAttHandle(pkt->handle1);
-            pkt->handle2 = blt_att_change_customAttHandle_to_sdkAttHandle(pkt->handle2);
-        }
-        break;
+        pkt->handle1 = blt_att_change_customAttHandle_to_sdkAttHandle(pkt->handle1);
+        pkt->handle2 = blt_att_change_customAttHandle_to_sdkAttHandle(pkt->handle2);
+    } break;
 
-        //one handle
-        case ATT_OP_READ_REQ:
-        case ATT_OP_READ_BLOB_REQ:
-        case ATT_OP_WRITE_REQ:
-        case ATT_OP_PREPARE_WRITE_REQ:
-        case ATT_OP_WRITE_CMD:
-        case ATT_OP_SIGNED_WRITE_CMD:
-        {
-            pkt->handle1 = blt_att_change_customAttHandle_to_sdkAttHandle(pkt->handle1);
-        }
-        break;
+    //one handle
+    case ATT_OP_READ_REQ:
+    case ATT_OP_READ_BLOB_REQ:
+    case ATT_OP_WRITE_REQ:
+    case ATT_OP_PREPARE_WRITE_REQ:
+    case ATT_OP_WRITE_CMD:
+    case ATT_OP_SIGNED_WRITE_CMD:
+    {
+        pkt->handle1 = blt_att_change_customAttHandle_to_sdkAttHandle(pkt->handle1);
+    } break;
 
-        default:
-            break;
+    default:
+        break;
     }
-
 }

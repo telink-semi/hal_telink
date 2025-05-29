@@ -27,6 +27,28 @@
 #include "compiler.h"
 #include "gpio.h"
 #include "clock.h"
+#include "dma.h"
+/*
+ * DVDD1 and AVDD2 share a common analog register, however, when adjusting the DVDD, the dma needs to move the data from the flash to configure,
+ * so the configuration needs to be given the initial value in advance, and can not be modified later, however, the AVDD1 may be modified, there is a conflict!
+ * The current solution is as follows, through the macro to control whether to adjust the DVDD, to avoid the use of flash erase and then write the situation:
+ * 1. If enabled, AVDD2 is also configured using the macro, and when AVDD2 needs to be calibrated, the static library needs to be recompiled.
+ * 2. If not enabled, it can be set via the interface.
+ * The situation is more complicated if the calibration is specific to each chip.
+ */
+#define  PM_IS_TUNE_RAM_VOL             1
+#define  AVDD2_VOL_CONFG                PM_AVDD2_VOLTAGE_2V500
+#define  DVDD1_DVDD2_VOL_0P8_CONFG      PM_DVDD1_DVDD2_0V800
+#define  DVDD1_DVDD2_VOL_0P9_CONFG      PM_DVDD1_DVDD2_0V900
+
+
+
+
+
+
+#define  DVDD1_DVDD2_DEFAULT_VOL  PM_DVDD1_DVDD2_0V800
+#define  ALG0X21_DEFAULT_CONFIG      0xca
+#define  ALG0X22_DEFAULT_CONFIG      0xbc
 
 
 /**
@@ -198,6 +220,24 @@ typedef struct{
 extern _attribute_aligned_(4) pm_status_info_s g_pm_status_info;
 extern _attribute_data_retention_sec_ unsigned char g_pm_vbat_v;
 
+/**
+ * @brief   active mode DVDD1/DVDD2 output trim definition
+ * @note    The voltage values of the following gears are all theoretical values, and there may be deviations between the actual and theoretical values.
+ */
+typedef enum {
+    PM_DVDD1_DVDD2_0V800        = 0x03<<8|0x02,
+    PM_DVDD1_DVDD2_0V825        = 0x04<<8|0x03,
+    PM_DVDD1_DVDD2_0V850        = 0x05<<8|0x04,
+    PM_DVDD1_DVDD2_0V875        = 0x06<<8|0x05,
+    PM_DVDD1_DVDD2_0V800_0V825  = 0x03<<8|0x03,
+    PM_DVDD1_DVDD2_0V800_0V850  = 0x03<<8|0x04,
+    PM_DVDD1_DVDD2_0V800_0V875  = 0x03<<8|0x05,
+    PM_DVDD1_DVDD2_0V825_0V850  = 0x04<<8|0x04,
+    PM_DVDD1_DVDD2_0V825_0V875  = 0x04<<8|0x05,
+    PM_DVDD1_DVDD2_0V850_0V875  = 0x05<<8|0x05,
+    PM_DVDD1_DVDD2_0V900        = 0x07<<8|0x06,
+    PM_DVDD1_DVDD2_0V900_0V925  = 0x07<<8|0x07,
+}pm_dvdd_voltage_e;
 
 /**
  * @brief       This function serves to get deep retention flag.
@@ -314,6 +354,7 @@ void pm_set_suspend_power_cfg(pm_pd_module_e value, unsigned char on_off);
  * @param[in]   wakeup_tick_type    - tick type select. For long timer sleep.currently only 24M is supported(PM_TICK_STIMER).
  * @param[in]   wakeup_tick         - the time of short sleep, which means MCU can sleep for less than 5 minutes.
  * @return      indicate whether the cpu is wake up successful.
+ * @attention   Must ensure that all GPIOs cannot be floating status before going to sleep to prevent power leakage.
  */
 _attribute_text_sec_ int pm_sleep_wakeup(pm_sleep_mode_e sleep_mode,  pm_sleep_wakeup_src_e wakeup_src, pm_wakeup_tick_type_e wakeup_tick_type, unsigned int  wakeup_tick);
 #endif
@@ -338,3 +379,25 @@ _attribute_ram_code_sec_noinline_ void pm_32k_rc_offset_init(void);
  */
 void pm_set_dig_module_power_switch(pm_pd_module_e module, pm_power_sel_e power_sel);
 
+/**
+ * @brief       This function serves to set dvdd
+ * @param[in]   vol      - DVDD1_DVDD2_VOL_0P8_CONFG/DVDD1_DVDD2_VOL_0P9_CONFG.
+ *                       - the 0.8v/0.9v confirms which of the pm_dvdd1_dvdd2_voltage_e enumeration is configured, and then assigns the value to the macro DVDD1_DVDD2_VOL_0P8_CONFG/DVDD1_DVDD2_VOL_0P9_CONFG.
+ * @param[in]   chn      - dma channel.
+ * @param[in]   core     - sys_core_e,which cores are used in the application choose the corresponding enumeration (or just).
+ * @param[in]   dma_timeout_us - wait dma all chn complete timeout.
+ * @return      DRV_API_SUCCESS - successful;
+ *              DRV_API_INVALID_PARAM - equal to the current voltage configuration or dvdd1_dvdd2_vol error;
+ *              DRV_API_FAILURE - core error(need contains all the cores used);
+ *              DRV_API_TIMEOUT - wait for dma all chn idle timeout to exit;
+ *              DRV_API_OTHER_ERROR - clear all interrupt requests failed;
+ * @note        1.If the voltage goes up, after calling the interface first, then adjust the frequency;
+ *                If the voltage goes down,adjust the frequency first,then  calling the interface;
+ *              2.When adjusting this voltage, no access ram operation is allowed, so it will wait for dma idle in this interface,
+ *                modifying dma_timeout_us won't work if there are dma chains working all the time, and needs to be turned off by the upper layers themselves depending on the situation.
+ *              3.When adjusting this voltage, the mcu will be stalled because the ram cannot be operated, use the dma method to modify the dvdd configuration and wake up the d25f with this dma interrupt,
+ *                so will turns off the general interrupt and clears all interrupt requests.
+ *              4.When adjusting this voltage, no access ram operation is allowed,disable swire.
+ *              5.if the check configuration fails, reboot.
+ */
+drv_api_status_e pm_set_dvdd(pm_dvdd_voltage_e vol,dma_chn_e chn,sys_core_e core,unsigned int dma_timeout_us);

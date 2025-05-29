@@ -25,18 +25,17 @@
 
 #if (SOURCE_VERSION == SOURCE_WITH_ASSISTANT)
 
-#include "tl_common.h"
-#include "drivers.h"
-#include "stack/ble/ble.h"
+    #include "tl_common.h"
+    #include "drivers.h"
+    #include "stack/ble/ble.h"
 
-#include "app_parse_char.h"
-#include "app_assistant.h"
-#include "app_audio.h"
+    #include "app_parse_char.h"
+    #include "app_assistant.h"
+    #include "app_audio.h"
 
 
-extern u8  mac_public[6];
+extern u8                     mac_public[6];
 extern app_auracastCfgParam_t auracastCfg;
-
 
 /**
  * @brief       Assistant UI show information(scan sink device/connected sink device/scan source/sink vcp).
@@ -47,24 +46,18 @@ extern app_auracastCfgParam_t auracastCfg;
  */
 static void app_audio_ui_show_info(char *argv[], int argc, void *user_data)
 {
-    if(strcasecmp(argv[0], "conn") == 0)
-    {
+    if (strcasecmp(argv[0], "conn") == 0) {
         app_parse_printf("connect sink info\r\n");
         app_audio_showConnInfo();
-    }
-    else if(strcasecmp(argv[0], "sink") == 0)
-    {
+    } else if (strcasecmp(argv[0], "sink") == 0) {
         app_parse_printf("scan sink info\r\n");
         app_audio_showSinkInfo();
-    }
-    else if(strcasecmp(argv[0], "vcp") == 0)
-    {
+    } else if (strcasecmp(argv[0], "vcp") == 0) {
         int index = app_parse_str2n(argv[1]);
 
         u16 connHandle = app_audio_getConnHandle(index);
 
-        if(!connHandle)
-        {
+        if (!connHandle) {
             return app_parse_printf("index error.You can run the \"show conn\" command to view connection information. \r\n");
         }
 
@@ -72,62 +65,48 @@ static void app_audio_ui_show_info(char *argv[], int argc, void *user_data)
 
         audio_error_enum state = blc_vcpc_getState(connHandle, &vcpState);
 
-        if(state != AUDIO_ESUCC)
+        if (state != AUDIO_ESUCC) {
             return app_parse_printf("get vcp state error\r\n");
+        }
 
         app_parse_printf("Remote Volume Control State, connHandle: 0x%02x\r\n", connHandle);
 
-        app_parse_printf("volume(min:0, max:255) is %d, muteSate:%s\r\n", vcpState.volState.volumeSetting, vcpState.volState.mute?"Mute":"Unmute");
-        if(vcpState.vosCnt)
-        {
-            for(int i=0; i<vcpState.vosCnt; i++)
-            {
+        app_parse_printf("volume(min:0, max:255) is %d, muteSate:%s\r\n", vcpState.volState.volumeSetting, vcpState.volState.mute ? "Mute" : "Unmute");
+        if (vcpState.vosCnt) {
+            for (int i = 0; i < vcpState.vosCnt; i++) {
                 app_parse_printf("VOCS index is %d \r\n", i);
-                blc_audio_volumeOffsetState_t* vocs = &vcpState.voc[i];
+                blc_audio_volumeOffsetState_t *vocs = &vcpState.voc[i];
                 app_parse_printf("Location:");
-                for(int j=0; j<32; j++)
-                {
-                    if(vocs->location & BIT(j))
-                    {
+                for (int j = 0; j < 32; j++) {
+                    if (vocs->location & BIT(j)) {
                         app_parse_printf("%s ", &locationStr[j][0]);
                     }
                 }
                 app_parse_printf("\r\nAudio Description is %.*s\r\n", vocs->outDescLen, vocs->outDesc);
                 app_parse_printf("Volume Offset(min:-255, max:255) is %d\r\n", vocs->volumeOffset);
             }
-        }
-        else
-        {
+        } else {
             app_parse_printf("Not Had VOCS\r\n");
         }
-    }
-    else if(strcasecmp(argv[0], "param") == 0)
-    {
+    } else if (strcasecmp(argv[0], "param") == 0) {
         app_parse_printf("Source Information.\r\n");
         app_parse_printf("the Address is %s\r\n", addr_to_str(mac_public));
         app_parse_printf("complete name is %s.\r\n", DEFAULT_DEV_NAME);
         app_parse_printf("broadcast ID is 0x%02x%02x%02x.\r\n", auracastCfg.broadcastID[2], auracastCfg.broadcastID[1], auracastCfg.broadcastID[0]);
         app_parse_printf("broadcast name is %.*s.\r\n", auracastCfg.broadcastNameLen, auracastCfg.broadcastName);
-        app_parse_printf("BIG is %s.\r\n", auracastCfg.encryptionFlag? "Encrypted": "Unencrypted");
-        if(auracastCfg.encryptionFlag)
-        {
+        app_parse_printf("BIG is %s.\r\n", auracastCfg.encryptionFlag ? "Encrypted" : "Unencrypted");
+        if (auracastCfg.encryptionFlag) {
             app_parse_printf("broadcast code is %s.\r\n", auracastCfg.broadcastCode);
             app_parse_printf("broadcast code ASCII is %s.\r\n", hex_to_str(auracastCfg.broadcastCode, 16));
         }
-        if(auracastCfg.audioMode == 2)
-        {
+        if (auracastCfg.audioMode == 2) {
             app_parse_printf("current audio mode is stereo.\r\n");
-        }
-        else
-        {
+        } else {
             app_parse_printf("current audio mode is mono.\r\n");
         }
-    }
-    else
-    {
+    } else {
         app_parse_printf("show <conn|sink|source|vcp>\r\n");
     }
-
 }
 
 /**
@@ -144,24 +123,17 @@ static void app_audio_ui_scan_sink(char *argv[], int argc, void *user_data)
         return;
     }
 
-    if(strcasecmp(argv[0], "start") == 0)
-    {
+    if (strcasecmp(argv[0], "start") == 0) {
         app_parse_printf("assistant start scan sink\r\n");
         app_audio_initSinkInfoBuf();
         app_audio_openScanSink();
-    }
-    else if(strcasecmp(argv[0], "stop") == 0)
-    {
+    } else if (strcasecmp(argv[0], "stop") == 0) {
         app_parse_printf("assistant stop scan sink\r\n");
         app_audio_closeScanSink();
-    }
-    else if(strcasecmp(argv[0], "clear") == 0)
-    {
+    } else if (strcasecmp(argv[0], "clear") == 0) {
         app_audio_initSinkInfoBuf();
         app_parse_printf("assistant clear sink info\r\n");
-    }
-    else
-    {
+    } else {
         app_parse_printf("scan-sink not support [%s]", argv[0]);
         app_parse_printf("scan-sink <start|stop|clear>\r\n");
     }
@@ -176,24 +148,19 @@ static void app_audio_ui_scan_sink(char *argv[], int argc, void *user_data)
  */
 static void app_audio_ui_conn_sink(char *argv[], int argc, void *user_data)
 {
-    if(argc != 1)
-    {
+    if (argc != 1) {
         app_parse_printf("conn-sink <dev_idx>\r\n");
-        return ;
+        return;
     }
 
-    if(app_audio_aclConnFull())
-    {
+    if (app_audio_aclConnFull()) {
         app_parse_printf("connect sink fail: Connection already exists");
-        return ;
+        return;
     }
 
-    if(app_audio_createSinkConn(app_parse_str2n(argv[0])))
-    {
+    if (app_audio_createSinkConn(app_parse_str2n(argv[0]))) {
         app_parse_printf("assistant start connect sink\r\n");
-    }
-    else
-    {
+    } else {
         app_parse_printf("connect sink index error\r\n");
         app_parse_printf("show sink to view sink index\r\n");
     }
@@ -208,41 +175,37 @@ static void app_audio_ui_conn_sink(char *argv[], int argc, void *user_data)
  */
 static void app_audio_ui_add_local(char *argv[], int argc, void *user_data)
 {
-    if(argc < 3)
-    {
+    if (argc < 3) {
         app_parse_printf("add-source <conn_idx> <source_idx> <bis_sync> [broadcast_key]\r\n");
-        return ;
+        return;
     }
 
     u16 connHandle = app_audio_getConnHandle(app_parse_str2n(argv[0]));
-    if(!connHandle)
-    {
+    if (!connHandle) {
         return app_parse_printf("index error.You can run the \"show conn\" command to view connection information. \r\n");
     }
 
-    connect_info_t* pConn = app_audio_getConn(connHandle);
+    connect_info_t *pConn = app_audio_getConn(connHandle);
 
-    if(pConn->sinkState == SINK_STATE_NO_SOURCE) {
+    if (pConn->sinkState == SINK_STATE_NO_SOURCE) {
         blc_audio_source_head_t head = {
-            .addrType = 0x00,
-            .addr = {},
-            .sid = PRIVATE_EXT_FILTER_SPECIFIC_SID,
+            .addrType    = 0x00,
+            .addr        = {},
+            .sid         = PRIVATE_EXT_FILTER_SPECIFIC_SID,
             .broadcastId = {U24_TO_BYTES(DEFAULT_BROADCAST_ID)},
         };
         blc_ll_readBDAddr(head.addr);
         blc_bapba_writeAddSourcePast(connHandle, &head, 0x03);
 
         blc_bapba_setLocalSourceInfo(ADV_HANDLE0, &head);
-    }
-    else
-    {
-        if(pConn->sinkState == SINK_STATE_HAD_SOURCE) {
+    } else {
+        if (pConn->sinkState == SINK_STATE_HAD_SOURCE) {
             pConn->sinkState = SINK_STATE_MODIFY_SOURCE;
             blc_bapba_writeModifySourceNotSyncPA(connHandle, pConn->remoteSourceId, 0);
 
-        }
-        else{
-            app_parse_printf("please use clean-source command, reset sink state\r\n"); return ;
+        } else {
+            app_parse_printf("please use clean-source command, reset sink state\r\n");
+            return;
         }
     }
 
@@ -264,41 +227,31 @@ static void app_source_set_param(char *argv[], int argc, void *user_data)
     }
 
     if (!strcasecmp("Broadcast-name", argv[0])) {
-        if(argc == 2 && app_audio_setBroadcastName(argv[1], strlen(argv[1])))
-        {
+        if (argc == 2 && app_audio_setBroadcastName(argv[1], strlen(argv[1]))) {
             app_parse_printf("set Broadcast name successful, new name is %.*s", auracastCfg.broadcastNameLen, auracastCfg.broadcastName);
-        }
-        else
-        {
+        } else {
             app_parse_printf("set Broadcast-name <name>, name length must less than 32 bytes.\r\n");
         }
-    } else if(!strcasecmp("Broadcast-ID", argv[0])) {
-        if(argc == 2)
-        {
+    } else if (!strcasecmp("Broadcast-ID", argv[0])) {
+        if (argc == 2) {
             int bcstId = app_parse_str2n(argv[1]);
             app_audio_setBroadcastID(bcstId);
 
             app_parse_printf("new broadcast ID is 0x%02x%02x%02x.\r\n", auracastCfg.broadcastID[2], auracastCfg.broadcastID[1], auracastCfg.broadcastID[0]);
-        }
-        else
-        {
+        } else {
             app_parse_printf("set Broadcast-ID <id>, id is 24bit value.\r\n");
         }
-    } else if(!strcasecmp("broadcast-code", argv[0])) {
-        if(argc == 2)
-        {
+    } else if (!strcasecmp("broadcast-code", argv[0])) {
+        if (argc == 2) {
             app_audio_setBroadcastCode(argv[1]);
             app_parse_printf("open broadcast encrypted, broadcast code is %s.\r\n", auracastCfg.broadcastCode);
             app_parse_printf("broadcast code ASCII is %s.\r\n", hex_to_str(auracastCfg.broadcastCode, 16));
-        }
-        else
-        {
+        } else {
             app_parse_printf("set broadcast-code <code>, name length must less than 17 bytes.\r\n");
         }
     }
 
     app_audio_storeInformation();
-
 }
 
 void app_audio_bcast(char *argv[], int argc, void *user_data)
@@ -335,16 +288,14 @@ void app_audio_bcast(char *argv[], int argc, void *user_data)
         }
         app_audio_closeEncryptBig();
         app_parse_printf("close broadcast encrypted.\r\n");
-    } else if(!strcasecmp("stereo", argv[0]))
-    {
+    } else if (!strcasecmp("stereo", argv[0])) {
         if (app_audio_getBroadcastState() != APP_AUDIO_BRODCAST_SOURCE_STATE_IDLE) {
             app_parse_printf("broadcasting active\r\n");
             return;
         }
         app_audio_setStereoAudio();
         app_parse_printf("audio mode is stereo.\r\n");
-    } else if(!strcasecmp("mono", argv[0]))
-    {
+    } else if (!strcasecmp("mono", argv[0])) {
         if (app_audio_getBroadcastState() != APP_AUDIO_BRODCAST_SOURCE_STATE_IDLE) {
             app_parse_printf("broadcasting active\r\n");
             return;
@@ -356,32 +307,32 @@ void app_audio_bcast(char *argv[], int argc, void *user_data)
 }
 
 static const parse_fun_list_t assistantParse[] = {
-    {"show", app_audio_ui_show_info},
+    {"show",      app_audio_ui_show_info},
     {"scan-sink", app_audio_ui_scan_sink},
     {"conn-sink", app_audio_ui_conn_sink},
     {"add-local", app_audio_ui_add_local},
-    {"set", app_source_set_param},
-    {"bcast", app_audio_bcast},
+    {"set",       app_source_set_param  },
+    {"bcast",     app_audio_bcast       },
 };
 
 static void app_audio_ui_bcast_state_changed(app_audio_brodcast_state_enum state)
 {
     switch (state) {
-        case APP_AUDIO_BRODCAST_SOURCE_STATE_IDLE:
-            app_parse_printf("Broadcast disabled\r\n");
-            break;
-        case APP_AUDIO_BRODCAST_SOURCE_STATE_ENABLING:
-            app_parse_printf("Broadcast enabling\r\n");
-            break;
-        case APP_AUDIO_BRODCAST_SOURCE_STATE_ACTIVE:
-            app_parse_printf("Broadcast active\r\n");
-            break;
-        case APP_AUDIO_BRODCAST_SOURCE_STATE_DISABLING:
-            app_parse_printf("Broadcast disabling\r\n");
-            break;
-        default:
-            app_parse_printf("Broadcast state unknown: %d\r\n", state);
-            break;
+    case APP_AUDIO_BRODCAST_SOURCE_STATE_IDLE:
+        app_parse_printf("Broadcast disabled\r\n");
+        break;
+    case APP_AUDIO_BRODCAST_SOURCE_STATE_ENABLING:
+        app_parse_printf("Broadcast enabling\r\n");
+        break;
+    case APP_AUDIO_BRODCAST_SOURCE_STATE_ACTIVE:
+        app_parse_printf("Broadcast active\r\n");
+        break;
+    case APP_AUDIO_BRODCAST_SOURCE_STATE_DISABLING:
+        app_parse_printf("Broadcast disabling\r\n");
+        break;
+    default:
+        app_parse_printf("Broadcast state unknown: %d\r\n", state);
+        break;
     }
 }
 
@@ -406,6 +357,4 @@ void app_audio_ui_loop(void)
     app_parse_loop();
 }
 
-#endif  //SOURCE_VERSION == SOURCE_WITH_ASSISTANT
-
-
+#endif //SOURCE_VERSION == SOURCE_WITH_ASSISTANT

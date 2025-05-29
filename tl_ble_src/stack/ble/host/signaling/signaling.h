@@ -31,18 +31,19 @@
  *        CID - Channel Identifier
  *        SPSM - Simplified Protocol/Service Multiplexer
  */
-#define SIGNAL_MINIMUM_MTU          23
-#define SIGNAL_MINIMUM_MPS          23
-#define SIGNAL_MAXIMUM_MPS          65533
+#define SIGNAL_MINIMUM_MTU        23
+#define SIGNAL_MINIMUM_MPS        23
+#define SIGNAL_MAXIMUM_MPS        65533
 
-#define SIGNAL_CREDIT_MINIMUM_MTU   64
-#define SIGNAL_CREDIT_MINIMUM_MPS   64
-#define SIGNAL_CREDIT_MAXIMUM_MPS   65533
+#define SIGNAL_CREDIT_MINIMUM_MTU 64
+#define SIGNAL_CREDIT_MINIMUM_MPS 64
+#define SIGNAL_CREDIT_MAXIMUM_MPS 65533
 
 /**
  * @brief   data structure of CoC channel
  */
-typedef struct{
+typedef struct
+{
     u16 connHandle;
     u16 SPSM;
     u16 srcCID;
@@ -56,43 +57,41 @@ typedef struct{
     u16 recvCredits;
     u16 sendCredits;
 
-    u8* pRxSdu;
-    u8* pTxSdu;
-}l2cap_coc_cid_t;
+    u8 *pRxSdu;
+    u8 *pTxSdu;
+} l2cap_coc_cid_t;
 
 /**
  * @brief   data structure of CoC CID
  *          LE Only supported CID 0x0040 to 0x007F
  *          0x0020 to 0x003E LE-U Reserved for future use, 0xFFFF for send reconfigure request
  */
-typedef struct{
+typedef struct
+{
     u16 connHandle;
     u16 SPSM;
     u16 dstCIDNum;
     u16 dstCID[5];
-}l2cap_coc_acl_t;
-
+} l2cap_coc_acl_t;
 
 /**
  * @brief   tx or rx packet, for MTU size
  */
-#define COC_MODULE_BUFFER_SIZE(createConnCnt, cocCidCnt, eattCidCnt, mtu)           \
-        (\
-            (createConnCnt)*sizeof(l2cap_coc_acl_t)  \
-            +(cocCidCnt+eattCidCnt)*sizeof(l2cap_coc_cid_t) \
-            +(mtu)*(cocCidCnt+2*eattCidCnt)  \
-        )
+#define COC_MODULE_BUFFER_SIZE(createConnCnt, cocCidCnt, eattCidCnt, mtu) \
+    (                                                                     \
+        (createConnCnt) * sizeof(l2cap_coc_acl_t) + (cocCidCnt + eattCidCnt) * sizeof(l2cap_coc_cid_t) + (mtu) * (cocCidCnt + 2 * eattCidCnt))
 
 /**
  * @brief   data structure of CoC initial parameter
  */
-typedef struct{
-    u16 SPSM;   //supported SPSM.
-    u16 MTU;    //CID receive MTU.
-    u16 createConnCnt;  //supported maximum ACL connect, create COC connect.
-    u16 cocCidCnt;  //supported maximum COC CID count.
-    u16 eattCidCnt; //supported maximum EATT CID count.
-}blc_coc_initParam_t;
+typedef struct
+{
+    u16 SPSM;          //supported SPSM.
+    u16 MTU;           //CID receive MTU.
+    u16 createConnCnt; //supported maximum ACL connect, create COC connect.
+    u16 cocCidCnt;     //supported maximum COC CID count.
+    u16 eattCidCnt;    //supported maximum EATT CID count.
+} blc_coc_initParam_t;
 
 /**
  * @brief   This function is used to register CoC module
@@ -102,7 +101,7 @@ typedef struct{
  * @return  state - 0: command succeeded; others: failed
  */
 
-int blc_l2cap_registerCocModule(blc_coc_initParam_t* param, u8 *pBuffer, u16 buffLen);
+int blc_l2cap_registerCocModule(blc_coc_initParam_t *param, u8 *pBuffer, u16 buffLen);
 
 /**
  * @brief   This function is used to disconnect CoC channel
@@ -139,7 +138,7 @@ ble_sts_t blc_l2cap_createCreditBasedConnect(u16 connHandle, u8 srcCnt);
  * @return  BLE_SUCCESS
  */
 
-ble_sts_t blc_l2cap_sendCocData(u16 connHandle, u16 srcCID, u8* data, u16 dataLen);
+ble_sts_t blc_l2cap_sendCocData(u16 connHandle, u16 srcCID, u8 *data, u16 dataLen);
 
 /**
  * @brief   CoC main loop

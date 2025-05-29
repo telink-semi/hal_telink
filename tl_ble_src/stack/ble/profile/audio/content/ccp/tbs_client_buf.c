@@ -26,10 +26,8 @@
 #include "stack/ble/ble.h"
 
 
-
 _attribute_ble_data_retention_
-blc_ccp_client_t gCcp[ACL_CENTRAL_MAX_NUM + ACL_PERIPHR_MAX_NUM];
-
+    blc_ccp_client_t gCcp[ACL_CENTRAL_MAX_NUM + ACL_PERIPHR_MAX_NUM];
 
 /**
  * @brief       CCP(GTBS/TBS) get client control buffer.
@@ -42,5 +40,3 @@ blc_ccp_client_t *blt_ccp_getClientControlBuffer(u8 instIdx)
 
     return &gCcp[instIdx];
 }
-
-

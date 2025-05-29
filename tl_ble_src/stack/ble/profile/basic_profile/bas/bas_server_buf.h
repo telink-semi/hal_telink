@@ -23,13 +23,22 @@
  *******************************************************************************************************/
 #pragma once
 
-struct blc_bas_server{
-    u16 batteryLevelHdl;            //Battery level attribute handle
-    u16 batteryPowerStateHdl;   //Battery power state attribute handle
+struct blc_bas_server
+{
+    u16 batteryLevelHdl;      //Battery level attribute handle
+    u16 batteryPowerStateHdl; //Battery power state attribute handle
 };
 
-struct blc_bas_server_ctrl{
-    blc_prf_proc_t process;
+#if (MCU_CORE_TYPE != CHIP_TYPE_TL322X)
+struct blc_bas_server_ctrl
+{
+    blc_prf_proc_t        process;
     struct blc_bas_server basServer;
-}__attribute__((packed));
-
+} __attribute__((packed));
+#else
+struct blc_bas_server_ctrl
+{
+    struct blc_prf_process process;
+    struct blc_bas_server  basServer;
+};
+#endif

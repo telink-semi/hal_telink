@@ -28,31 +28,34 @@
 
 #if (INTER_TEST_MODE == TEST_ULL_HID_HOST)
 
-#define DEFAULT_MODE            0
-#define HYBRID_MODE             1
+    #define DEFAULT_MODE  0
+    #define HYBRID_MODE   1
 
-#define CIS_MODE_TEST           0
-#define CIS_MODE_ULL            1
+    #define CIS_MODE_TEST 0
+    #define CIS_MODE_ULL  1
 
-typedef struct{
+typedef struct
+{
     int reportInterval;
-    u8 nse;
-    u8 reportID;
-    u8 reportType;
-    struct {        //additional_info
+    u8  nse;
+    u8  reportID;
+    u8  reportType;
+
+    struct
+    { //additional_info
         u8 powerSavingCfm : 1;
-        u8 repetition : 1;
+        u8 repetition     : 1;
     };
 
     u8 cisSduM2S;
     u8 cisSduS2M;
 
     u16 cisSduInterval;
-    u8 maxPduSize;
-    u8 retryCount;
-    u8 sequenceNumber;
-    u8 recvAckSeqNum;
-    u8 recvSequenceNumber;
+    u8  maxPduSize;
+    u8  retryCount;
+    u8  sequenceNumber;
+    u8  recvAckSeqNum;
+    u8  recvSequenceNumber;
 } app_ullhid_param_t;
 
 extern app_ullhid_param_t ullhidParam;
@@ -78,7 +81,7 @@ void user_init_deepRetn(void);
  * @param[in]  none.
  * @return     none.
  */
-int main_idle_loop (void);
+int main_idle_loop(void);
 
 
 /**
@@ -86,7 +89,7 @@ int main_idle_loop (void);
  * @param[in]  none.
  * @return     none.
  */
-void main_loop (void);
+void main_loop(void);
 
 
 /**
@@ -96,7 +99,7 @@ void main_loop (void);
  * @param[in]  n       the length of event parameter.
  * @return
  */
-int app_controller_event_callback (u32 h, u8 *p, int n);
+int app_controller_event_callback(u32 h, u8 *p, int n);
 
 
 /**
@@ -106,7 +109,7 @@ int app_controller_event_callback (u32 h, u8 *p, int n);
  * @param[in]  n       the length of event parameter.
  * @return
  */
-int app_host_event_callback (u32 h, u8 *para, int n);
+int app_host_event_callback(u32 h, u8 *para, int n);
 
 
 /**
@@ -115,10 +118,9 @@ int app_host_event_callback (u32 h, u8 *para, int n);
  * @param[in]  pkt             Pointer point to data packet buffer.
  * @return
  */
-int app_gatt_data_handler (u16 connHandle, u8 *pkt);
+int app_gatt_data_handler(u16 connHandle, u8 *pkt);
 
 
-#endif  //INTER_TEST_MODE == TEST_ULL_HID_HOST
+#endif //INTER_TEST_MODE == TEST_ULL_HID_HOST
 
 #endif
-

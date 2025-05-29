@@ -35,7 +35,7 @@
  * @param[in]  n    - the length of event parameter.
  * @return     none.
  */
-void proc_keyboard (u8 e, u8 *p, int n);
+void proc_keyboard(u8 e, u8 *p, int n);
 
 
 /**
@@ -45,7 +45,6 @@ void proc_keyboard (u8 e, u8 *p, int n);
  */
 void proc_central_role_unpair(void);
 
-#endif  //INTER_TEST_MODE == TEST_ULL_HID_HOST
+#endif //INTER_TEST_MODE == TEST_ULL_HID_HOST
 
 #endif
-

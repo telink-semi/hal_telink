@@ -37,21 +37,27 @@
 #define BAPBA_REALLOC(ptr, len) realloc_nonreten(ptr, len)
 #define BAPBA_FREE(ptr)         free_nonreten(ptr)
 
-typedef struct {
+typedef struct
+{
     u16 connHandle;
-    union{
+
+    union
+    {
         u8 scanEn;
         u8 localPAST;
     };
-    union{
+
+    union
+    {
         u16 syncHandle;
         u16 advHandle;
     };
-    u8  paSyncState;
-    u8  advAddrType;
-    u8  advAddr[6];
-    u8  advSID;
-    u8  BcstId[3];
+
+    u8 paSyncState;
+    u8 advAddrType;
+    u8 advAddr[6];
+    u8 advSID;
+    u8 BcstId[3];
 } blt_bcst_assistant_scan_t;
 
 blt_bcst_assistant_scan_t bapbaScanSourceState;
@@ -71,12 +77,12 @@ void blc_audio_registerBroadcastAssistant(const blc_bapba_regParam_t *param)
 
 static int blt_audio_assistantStartSyncPA(blc_bapba_startSyncPaEvt_t *evt)
 {
-    return blt_prf_sendEvent(0xFFFF, AUDIO_EVT_BAPBA_START_SYNC_PA, (u8*)evt, sizeof(blc_bapba_startSyncPaEvt_t));
+    return blt_prf_sendEvent(0xFFFF, AUDIO_EVT_BAPBA_START_SYNC_PA, (u8 *)evt, sizeof(blc_bapba_startSyncPaEvt_t));
 }
 
 static int blt_audio_assistantFoundSink(blc_bapba_foundSinkEvt_t *evt)
 {
-    return blt_prf_sendEvent(0xFFFF, AUDIO_EVT_BAPBA_FOUND_SINK, (u8*)evt, sizeof(blc_bapba_foundSinkEvt_t));
+    return blt_prf_sendEvent(0xFFFF, AUDIO_EVT_BAPBA_FOUND_SINK, (u8 *)evt, sizeof(blc_bapba_foundSinkEvt_t));
 }
 
 static int blt_audio_assistantPastStartedReady(void)
@@ -84,24 +90,22 @@ static int blt_audio_assistantPastStartedReady(void)
     return blt_prf_sendEvent(bapbaSyncPASTState.connHandle, AUDIO_EVT_BAPBA_PAST_STARTED_READY, NULL, 0);
 }
 
-static u8* blt_audio_getAdvTypeInfo(u8 *pAdvDat, u32 len, data_type_t advType, u8* outLen)
+static u8 *blt_audio_getAdvTypeInfo(u8 *pAdvDat, u32 len, data_type_t advType, u8 *outLen)
 {
-    u8 adLen = 0;
-    u8 *p = pAdvDat;
+    u8  adLen = 0;
+    u8 *p     = pAdvDat;
 
-    while(len)
-    {
+    while (len) {
         adLen = p[0];
-        if(p[1] == advType)
-        {
-            *outLen = adLen-1;
-            return p+2;
+        if (p[1] == advType) {
+            *outLen = adLen - 1;
+            return p + 2;
         }
 
-        if(len > (u32)(adLen + 1)){
+        if (len > (u32)(adLen + 1)) {
             len -= (adLen + 1);
-            p   += (adLen + 1);
-        }else{
+            p += (adLen + 1);
+        } else {
             len = 0;
         }
     }
@@ -110,99 +114,100 @@ static u8* blt_audio_getAdvTypeInfo(u8 *pAdvDat, u32 len, data_type_t advType, u
     return NULL;
 }
 
-static u8* blt_audio_getCompleteNameInfo(u8 *pAdvDat, u32 len, u8* outLen)
+static u8 *blt_audio_getCompleteNameInfo(u8 *pAdvDat, u32 len, u8 *outLen)
 {
     return blt_audio_getAdvTypeInfo(pAdvDat, len, DT_COMPLETE_LOCAL_NAME, outLen);
 }
 
-static u8* blt_audio_getBroadcastNameInfo(u8 *pAdvDat, u32 len, u8* outLen)
+static u8 *blt_audio_getBroadcastNameInfo(u8 *pAdvDat, u32 len, u8 *outLen)
 {
     return blt_audio_getAdvTypeInfo(pAdvDat, len, DT_BROADCAST_NAME, outLen);
 }
 
 static bool blt_audio_findSolicitationReq(u8 *pAdvDat, u32 len)
 {
-    u8 adLen = 0;
-    u8 *p = pAdvDat;
+    u8  adLen = 0;
+    u8 *p     = pAdvDat;
 
-    while(len)
-    {
+    while (len) {
         adLen = p[0];
-        if(p[1] == DT_SERVICE_DATA_16BIT_UUID && bstream_to_u16_le(&p[2]) == SERVICE_UUID_BROADCAST_AUDIO_SCAN)
-        {
+        if (p[1] == DT_SERVICE_DATA_16BIT_UUID && bstream_to_u16_le(&p[2]) == SERVICE_UUID_BROADCAST_AUDIO_SCAN) {
             return true;
         }
 
-        if(len > (u32)(adLen + 1)){
+        if (len > (u32)(adLen + 1)) {
             len -= (adLen + 1);
-            p   += (adLen + 1);
-        }else{
+            p += (adLen + 1);
+        } else {
             len = 0;
         }
     }
     return false;
 }
 
-static void blt_bapba_scanSolicitationRequest(extAdvEvt_info_t* pExtAdv)
+static void blt_bapba_scanSolicitationRequest(extAdvEvt_info_t *pExtAdv)
 {
-    if(blt_audio_findSolicitationReq(pExtAdv->data, pExtAdv->data_length))
-    {
+    if (blt_audio_findSolicitationReq(pExtAdv->data, pExtAdv->data_length)) {
         blc_bapba_foundSinkEvt_t foundSinkEvt;
         foundSinkEvt.addrType = pExtAdv->address_type;
         memcpy(foundSinkEvt.address, pExtAdv->address, 6);
-        u8* completeName = blt_audio_getCompleteNameInfo(pExtAdv->data, pExtAdv->data_length, &foundSinkEvt.completeNameLen);
+        u8 *completeName          = blt_audio_getCompleteNameInfo(pExtAdv->data, pExtAdv->data_length, &foundSinkEvt.completeNameLen);
         foundSinkEvt.completeName = BAPBA_MALLOC(foundSinkEvt.completeNameLen + 1);
-        if(foundSinkEvt.completeName == NULL)   return ;
+        if (foundSinkEvt.completeName == NULL) {
+            return;
+        }
 
         memcpy(foundSinkEvt.completeName, completeName, foundSinkEvt.completeNameLen);
         foundSinkEvt.completeName[foundSinkEvt.completeNameLen] = '\0';
-//          if(blt_audio_findSolicitationReq(pExtAdv->data, pExtAdv->data_length))
+        //          if(blt_audio_findSolicitationReq(pExtAdv->data, pExtAdv->data_length))
         blt_audio_assistantFoundSink(&foundSinkEvt);
-//          if(memcmp(foundSinkEvt.completeName, "PTS-", 4) == 0)
-//              blt_audio_assistantFoundSink(&foundSinkEvt);
+        //          if(memcmp(foundSinkEvt.completeName, "PTS-", 4) == 0)
+        //              blt_audio_assistantFoundSink(&foundSinkEvt);
         BAPBA_FREE(foundSinkEvt.completeName);
     }
 }
 
-static void blt_bapba_scanBroadcastSource(extAdvEvt_info_t* pExtAdv)
+static void blt_bapba_scanBroadcastSource(extAdvEvt_info_t *pExtAdv)
 {
-    if(!bapbaScanSourceState.scanEn || bapbaScanSourceState.paSyncState != PA_SYNC_STATE_NONE)
-        return ;
+    if (!bapbaScanSourceState.scanEn || bapbaScanSourceState.paSyncState != PA_SYNC_STATE_NONE) {
+        return;
+    }
 
     u8 *pAdvData = pExtAdv->data;
-    u8 broadcastId[3];
+    u8  broadcastId[3];
 
     //parse broadcastId from adv data
-    if((pExtAdv->perd_adv_inter == PERIODIC_ADV_INTER_NO_PERIODIC_ADV) ||
-            (!blt_audio_sinkGetBroadcastId(broadcastId, pAdvData, pExtAdv->data_length))){
+    if ((pExtAdv->perd_adv_inter == PERIODIC_ADV_INTER_NO_PERIODIC_ADV) ||
+        (!blt_audio_sinkGetBroadcastId(broadcastId, pAdvData, pExtAdv->data_length))) {
         return;
     }
 
     blc_bapba_startSyncPaEvt_t paSyncEvt = {
-        .sid = pExtAdv->advertising_sid,
+        .sid      = pExtAdv->advertising_sid,
         .addrType = pExtAdv->address_type,
     };
     memcpy(paSyncEvt.address, pExtAdv->address, 6);
     memcpy(paSyncEvt.broadcastId, broadcastId, 3);
 
-    u8* name = blt_audio_getCompleteNameInfo(pAdvData, pExtAdv->data_length, &paSyncEvt.completeNameLen);
+    u8 *name               = blt_audio_getCompleteNameInfo(pAdvData, pExtAdv->data_length, &paSyncEvt.completeNameLen);
     paSyncEvt.completeName = BAPBA_MALLOC(paSyncEvt.completeNameLen + 1);
-    if(paSyncEvt.completeName == NULL)  return ;
+    if (paSyncEvt.completeName == NULL) {
+        return;
+    }
     memcpy(paSyncEvt.completeName, name, paSyncEvt.completeNameLen);
     paSyncEvt.completeName[paSyncEvt.completeNameLen] = '\0';
 
-    name = blt_audio_getBroadcastNameInfo(pAdvData, pExtAdv->data_length, &paSyncEvt.broadcastNameLen);
+    name                    = blt_audio_getBroadcastNameInfo(pAdvData, pExtAdv->data_length, &paSyncEvt.broadcastNameLen);
     paSyncEvt.broadcastName = BAPBA_MALLOC(paSyncEvt.broadcastNameLen + 1);
 
-    if(paSyncEvt.broadcastName == NULL)
-    {
+    if (paSyncEvt.broadcastName == NULL) {
         BAPBA_FREE(paSyncEvt.completeName);
-        return ;
+        return;
     }
     memcpy(paSyncEvt.broadcastName, name, paSyncEvt.broadcastNameLen);
     paSyncEvt.broadcastName[paSyncEvt.broadcastNameLen] = '\0';
 
-    if(blt_audio_assistantStartSyncPA(&paSyncEvt)) {
+    if (blt_audio_assistantStartSyncPA(&paSyncEvt)) {
         BAPBA_FREE(paSyncEvt.completeName);
         BAPBA_FREE(paSyncEvt.broadcastName);
         return;
@@ -217,19 +222,20 @@ static void blt_bapba_scanBroadcastSource(extAdvEvt_info_t* pExtAdv)
                                                      pExtAdv->advertising_sid,
                                                      pExtAdv->address_type,
                                                      pExtAdv->address,
-                                                     0, SYNC_TIMEOUT_2S, 0);
-    if(status != BLE_SUCCESS){
+                                                     0,
+                                                     SYNC_TIMEOUT_2S,
+                                                     0);
+    if (status != BLE_SUCCESS) {
         BLT_BIS_ASSISTANT_LOG("PA sync create start -- Failed(status is %d)", status);
         memset(&bapbaScanSourceState, 0, sizeof(blt_bcst_assistant_scan_t));
-    }else{
+    } else {
         bapbaScanSourceState.paSyncState = PA_SYNC_STATE_START;
-        bapbaScanSourceState.advSID = pExtAdv->advertising_sid;
+        bapbaScanSourceState.advSID      = pExtAdv->advertising_sid;
         bapbaScanSourceState.advAddrType = pExtAdv->address_type;
         memcpy(bapbaScanSourceState.advAddr, pExtAdv->address, 6);
         memcpy(bapbaScanSourceState.BcstId, broadcastId, 3);
         BLT_BIS_ASSISTANT_LOG("PA sync create start -- OK");
     }
-
 }
 
 static void blt_audio_assistantAdvReportEvt(u8 *p, int len)
@@ -240,8 +246,7 @@ static void blt_audio_assistantAdvReportEvt(u8 *p, int len)
     int offset = 0;
 
     extAdvEvt_info_t *pExtAdv = NULL;
-    for(int i=0; i<pExtAdvRpt->num_reports ; i++)
-    {
+    for (int i = 0; i < pExtAdvRpt->num_reports; i++) {
         pExtAdv = (extAdvEvt_info_t *)(pExtAdvRpt->advEvtInfo + offset);
         offset += (EXTADV_INFO_LENGTH + pExtAdv->data_length);
 
@@ -255,35 +260,29 @@ static void blt_audio_assistantAdvReportEvt(u8 *p, int len)
 
 static void blt_bapba_periodicAdvSyncSourceScan(hci_le_periodicAdvSyncEstablishedEvt_t *pEvt)
 {
-    if(pEvt->status == BLE_SUCCESS)
-    {
+    if (pEvt->status == BLE_SUCCESS) {
         bapbaScanSourceState.paSyncState = PA_SYNC_STATE_SUCCESS;
-    }
-    else
-    {
+    } else {
         memset(&bapbaScanSourceState, 0, sizeof(blt_bcst_assistant_scan_t));
     }
 }
 
 static void blt_bapba_periodicAdvSyncPAST(hci_le_periodicAdvSyncEstablishedEvt_t *pEvt)
 {
-    if(pEvt->status == BLE_SUCCESS)
-    {
+    if (pEvt->status == BLE_SUCCESS) {
         bapbaSyncPASTState.paSyncState = PA_SYNC_STATE_SUCCESS;
         blt_audio_assistantPastStartedReady();
-    }
-    else
-    {
+    } else {
         memset(&bapbaSyncPASTState, 0, sizeof(blt_bcst_assistant_scan_t));
     }
 }
 
-static bool blt_bapba_checkSyncIfo(blt_bcst_assistant_scan_t* scan, u8 advAddrType, u8 advSID, u8 advAddr[6])
+static bool blt_bapba_checkSyncIfo(blt_bcst_assistant_scan_t *scan, u8 advAddrType, u8 advSID, u8 advAddr[6])
 {
-    if(scan->paSyncState != PA_SYNC_STATE_START ||
-            advAddrType != scan->advAddrType ||
-            advSID != scan->advSID ||
-            memcmp(advAddr, scan->advAddr, 6)) {
+    if (scan->paSyncState != PA_SYNC_STATE_START ||
+        advAddrType != scan->advAddrType ||
+        advSID != scan->advSID ||
+        memcmp(advAddr, scan->advAddr, 6)) {
         return false;
     }
 
@@ -293,41 +292,40 @@ static bool blt_bapba_checkSyncIfo(blt_bcst_assistant_scan_t* scan, u8 advAddrTy
 static void blt_audio_assistantPeriodicAdvSync(u8 *p, int len)
 {
     (void)len;
-    hci_le_periodicAdvSyncEstablishedEvt_t *pEvt = (hci_le_periodicAdvSyncEstablishedEvt_t*)p;
+    hci_le_periodicAdvSyncEstablishedEvt_t *pEvt = (hci_le_periodicAdvSyncEstablishedEvt_t *)p;
 
     BLT_BIS_ASSISTANT_LOG("PDA sync(sync Handle 0x%x) status is 0x%x", pEvt->syncHandle, pEvt->status);
 
-    if(blt_bapba_checkSyncIfo(&bapbaScanSourceState, pEvt->advAddrType, pEvt->advSID, pEvt->advAddr)) {
+    if (blt_bapba_checkSyncIfo(&bapbaScanSourceState, pEvt->advAddrType, pEvt->advSID, pEvt->advAddr)) {
         bapbaScanSourceState.syncHandle = pEvt->syncHandle;
         blt_bapba_periodicAdvSyncSourceScan(pEvt);
     }
-    if(blt_bapba_checkSyncIfo(&bapbaSyncPASTState, pEvt->advAddrType, pEvt->advSID, pEvt->advAddr)) {
+    if (blt_bapba_checkSyncIfo(&bapbaSyncPASTState, pEvt->advAddrType, pEvt->advSID, pEvt->advAddr)) {
         bapbaSyncPASTState.syncHandle = pEvt->syncHandle;
         blt_bapba_periodicAdvSyncPAST(pEvt);
     }
-
 }
 
-static int blt_audio_assistantCheckCodecConfig(blc_audio_codec_id_t* codec, blc_audio_codecSpecCfgParsed_t* codecCfg, blc_audio_metadata_parsed_t* metadata)
+static int blt_audio_assistantCheckCodecConfig(blc_audio_codec_id_t *codec, blc_audio_codecSpecCfgParsed_t *codecCfg, blc_audio_metadata_parsed_t *metadata)
 {
     return blc_pacsc_checkSinkPAC(bapbaScanSourceState.connHandle, codec, codecCfg, metadata);
 }
 
 static void blt_audio_assistantSendFoundSourceInfo(blc_bapba_foundSourceInfoEvt_t *pEvt)
 {
-    blt_prf_sendEvent(bapbaScanSourceState.connHandle, AUDIO_EVT_BAPBA_FOUND_SOURCE_INFO, (u8*)pEvt, sizeof(blc_bapba_foundSourceInfoEvt_t));
-    pEvt->presentationDelay = 0xFFFFFFFF;           //Used to indicate that is a continuous event.
+    blt_prf_sendEvent(bapbaScanSourceState.connHandle, AUDIO_EVT_BAPBA_FOUND_SOURCE_INFO, (u8 *)pEvt, sizeof(blc_bapba_foundSourceInfoEvt_t));
+    pEvt->presentationDelay = 0xFFFFFFFF; //Used to indicate that is a continuous event.
 }
 
-pda_recombination_t gPdaPkt={
-    .dataOffset = 0
-};
+pda_recombination_t gPdaPkt = {
+    .dataOffset = 0};
 
-typedef struct {
+typedef struct
+{
     u16 syncHandle;
     u16 length;
-    u8* data;
-}paRecombination_t;
+    u8 *data;
+} paRecombination_t;
 
 static paRecombination_t gPaData[TSKNUM_PDA_SYNC] = {
     {0x0000, 0, NULL},
@@ -336,42 +334,47 @@ static paRecombination_t gPaData[TSKNUM_PDA_SYNC] = {
 
 void blt_clearPeriodicAdvertisingDataRecombination(u16 syncHandle)
 {
-    for(size_t i=0; i<ARRAY_SIZE(gPaData); i++) {
-        if(gPaData[i].syncHandle == syncHandle) {
+    for (size_t i = 0; i < ARRAY_SIZE(gPaData); i++) {
+        if (gPaData[i].syncHandle == syncHandle) {
             BAPBA_FREE(gPaData[i].data);
             memset(&gPaData[i], 0, sizeof(paRecombination_t));
         }
     }
 }
 
-paRecombination_t* blt_periodicAdvertisingDataRecombination(hci_le_periodicAdvReportEvt_t *pEvt)
+paRecombination_t *blt_periodicAdvertisingDataRecombination(hci_le_periodicAdvReportEvt_t *pEvt)
 {
-    paRecombination_t* pPaData = NULL;
+    paRecombination_t *pPaData = NULL;
 
-    for(size_t i=0; i<ARRAY_SIZE(gPaData); i++) {
-        if(gPaData[i].syncHandle == pEvt->syncHandle) {
+    for (size_t i = 0; i < ARRAY_SIZE(gPaData); i++) {
+        if (gPaData[i].syncHandle == pEvt->syncHandle) {
             pPaData = &gPaData[i];
             break;
         }
-        if(gPaData[i].syncHandle == 0x0000) {
+        if (gPaData[i].syncHandle == 0x0000) {
             pPaData = &gPaData[i];
         }
     }
 
-    if(pPaData == NULL)     return NULL;
+    if (pPaData == NULL) {
+        return NULL;
+    }
 
-    if(pEvt->dataStatus == PDA_SYNC_REPORT_DATA_COMPLETE || pEvt->dataStatus == PDA_SYNC_REPORT_DATA_INCOMPLETE) {
+    if (pEvt->dataStatus == PDA_SYNC_REPORT_DATA_COMPLETE || pEvt->dataStatus == PDA_SYNC_REPORT_DATA_INCOMPLETE) {
         pPaData->data = BAPBA_REALLOC(pPaData->data, gPaData->length + pEvt->dataLength);
-        if(pPaData->data == NULL)   return NULL;
+        if (pPaData->data == NULL) {
+            return NULL;
+        }
 
         memcpy(pPaData->data + pPaData->length, pEvt->data, pEvt->dataLength);
         pPaData->length += pEvt->dataLength;
 
         pPaData->syncHandle = pEvt->syncHandle;
 
-        if(pEvt->dataStatus == PDA_SYNC_REPORT_DATA_COMPLETE)   return pPaData;
-    }
-    else if(pEvt->dataStatus == PDA_SYNC_REPORT_DATA_TRUNCATED) {
+        if (pEvt->dataStatus == PDA_SYNC_REPORT_DATA_COMPLETE) {
+            return pPaData;
+        }
+    } else if (pEvt->dataStatus == PDA_SYNC_REPORT_DATA_TRUNCATED) {
         BAPBA_FREE(pPaData->data);
         pPaData->length = 0;
     }
@@ -381,77 +384,71 @@ paRecombination_t* blt_periodicAdvertisingDataRecombination(hci_le_periodicAdvRe
 
 int blt_pda_recombination_handler(u8 *p)
 {
-    hci_le_periodicAdvReportEvt_t *pEvt = (hci_le_periodicAdvReportEvt_t *)p;
-    u8 syncHdl = pEvt->syncHandle&0x03;
+    hci_le_periodicAdvReportEvt_t *pEvt    = (hci_le_periodicAdvReportEvt_t *)p;
+    u8                             syncHdl = pEvt->syncHandle & 0x03;
 
-    if(syncHdl >= TSKNUM_PDA_SYNC){ //0/1
+    if (syncHdl >= TSKNUM_PDA_SYNC) { //0/1
         return PDA_SYNC_REPORT_DATA_TRUNCATED;
     }
 
-    if(pEvt->dataStatus == PDA_SYNC_REPORT_DATA_INCOMPLETE || pEvt->dataStatus == PDA_SYNC_REPORT_DATA_COMPLETE){
-
-        memcpy((u8*)(gPdaPkt.data + gPdaPkt.dataOffset), pEvt->data, pEvt->dataLength);
+    if (pEvt->dataStatus == PDA_SYNC_REPORT_DATA_INCOMPLETE || pEvt->dataStatus == PDA_SYNC_REPORT_DATA_COMPLETE) {
+        memcpy((u8 *)(gPdaPkt.data + gPdaPkt.dataOffset), pEvt->data, pEvt->dataLength);
 
         gPdaPkt.dataOffset += pEvt->dataLength;
 
-        if(pEvt->dataStatus == PDA_SYNC_REPORT_DATA_COMPLETE){
+        if (pEvt->dataStatus == PDA_SYNC_REPORT_DATA_COMPLETE) {
             gPdaPkt.dataLength = gPdaPkt.dataOffset;
             gPdaPkt.dataOffset = 0;
             return PDA_SYNC_REPORT_DATA_COMPLETE; //complete
         }
-    }
-    else if(pEvt->dataStatus == PDA_SYNC_REPORT_DATA_TRUNCATED){
+    } else if (pEvt->dataStatus == PDA_SYNC_REPORT_DATA_TRUNCATED) {
         gPdaPkt.dataOffset = 0;
         return PDA_SYNC_REPORT_DATA_TRUNCATED; //truncated
     }
 
-    return PDA_SYNC_REPORT_DATA_INCOMPLETE; ///incomplete
+    return PDA_SYNC_REPORT_DATA_INCOMPLETE;    ///incomplete
 }
 
-static void blt_bapba_periodicAdvReportSourceScan(u8* BASE, u16 len)
+static void blt_bapba_periodicAdvReportSourceScan(u8 *BASE, u16 len)
 {
-
     BLT_BIS_ASSISTANT_LOG("BASE is %s", hex_to_str(BASE, len));
     blc_bapba_foundSourceInfoEvt_t sourceInfoEvt;
 
-    sourceInfoEvt.sid = bapbaScanSourceState.advSID;
+    sourceInfoEvt.sid      = bapbaScanSourceState.advSID;
     sourceInfoEvt.addrType = bapbaScanSourceState.advAddrType;
     memcpy(sourceInfoEvt.address, bapbaScanSourceState.advAddr, 6);
 
-    while(len)
-    {
+    while (len) {
         u8 adLen = BASE[0];
-        if(BASE[1] == DT_SERVICE_DATA_16BIT_UUID && bstream_to_u16_le(&BASE[2]) == SERVICE_UUID_BASIC_AUDIO_ANNOUNCEMENT)
-        {
-            u8* ptr = &BASE[4];
+        if (BASE[1] == DT_SERVICE_DATA_16BIT_UUID && bstream_to_u16_le(&BASE[2]) == SERVICE_UUID_BASIC_AUDIO_ANNOUNCEMENT) {
+            u8 *ptr = &BASE[4];
             STREAM_TO_U24(sourceInfoEvt.presentationDelay, ptr);
 
             u8 numSubGroup = 0;
             STREAM_TO_U8(numSubGroup, ptr);
             u8 numBis = 0;
-            for(int i=0; i<numSubGroup; i++)
-            {
+            for (int i = 0; i < numSubGroup; i++) {
                 STREAM_TO_U8(numBis, ptr);
                 blc_audio_codec_id_t codecId;
                 STREAM_TO_STR(&codecId.id, ptr, sizeof(blc_audio_codec_id_t));
                 blc_audio_codecSpecCfgParsed_t codecCfg;
                 codecCfg.fieldExistFlg = 0;
                 blt_audio_getCodecSpecCfgParam(ptr, &codecCfg);
-                ptr += ptr[0] + 1;  //skip codec specific configuration
-                u8* metadata = ptr;
-                ptr += ptr[0] + 1;  //skip metadata & metadata Len
-                for(int j=0; j<numBis; j++)
-                {
-                    sourceInfoEvt.bisInfo[0].CodecId = codecId;
+                ptr += ptr[0] + 1; //skip codec specific configuration
+                u8 *metadata = ptr;
+                ptr += ptr[0] + 1; //skip metadata & metadata Len
+                for (int j = 0; j < numBis; j++) {
+                    sourceInfoEvt.bisInfo[0].CodecId  = codecId;
                     sourceInfoEvt.bisInfo[0].metadata = metadata;
                     sourceInfoEvt.bisInfo[0].codecCfg = codecCfg;
 
-                    blt_audio_getCodecSpecCfgParam(ptr+1, &sourceInfoEvt.bisInfo[0].codecCfg);
+                    blt_audio_getCodecSpecCfgParam(ptr + 1, &sourceInfoEvt.bisInfo[0].codecCfg);
                     sourceInfoEvt.bisIndex = ptr[0];
                     ptr += ptr[1] + 2;
 
-                    if(blt_audio_assistantCheckCodecConfig(&sourceInfoEvt.bisInfo[0].CodecId, &sourceInfoEvt.bisInfo[0].codecCfg, NULL))
+                    if (blt_audio_assistantCheckCodecConfig(&sourceInfoEvt.bisInfo[0].CodecId, &sourceInfoEvt.bisInfo[0].codecCfg, NULL)) {
                         continue;
+                    }
 
                     blt_audio_assistantSendFoundSourceInfo(&sourceInfoEvt);
                     BLT_BIS_ASSISTANT_LOG("FoundSourceInfo");
@@ -459,10 +456,10 @@ static void blt_bapba_periodicAdvReportSourceScan(u8* BASE, u16 len)
             }
         }
 
-        if(len > (adLen+1)){
+        if (len > (adLen + 1)) {
             len -= adLen + 1;
             BASE += adLen + 1;
-        }else{
+        } else {
             len = 0;
         }
     }
@@ -474,19 +471,17 @@ static void blt_audio_assistantPeriodicAdvReport(u8 *p, int len)
     //BLT_BIS_ASSISTANT_LOG("PDA report is %s", hex_to_str(p, len));
     hci_le_periodicAdvReportEvt_t *pEvt = (hci_le_periodicAdvReportEvt_t *)p;
 
-    paRecombination_t* pPaData = blt_periodicAdvertisingDataRecombination(pEvt);
+    paRecombination_t *pPaData = blt_periodicAdvertisingDataRecombination(pEvt);
 
-    if(pPaData == NULL)
-    {
-        return ;
+    if (pPaData == NULL) {
+        return;
     }
 
-    if(pEvt->syncHandle == bapbaScanSourceState.syncHandle && bapbaScanSourceState.paSyncState == PA_SYNC_STATE_SUCCESS) {
+    if (pEvt->syncHandle == bapbaScanSourceState.syncHandle && bapbaScanSourceState.paSyncState == PA_SYNC_STATE_SUCCESS) {
         blt_bapba_periodicAdvReportSourceScan(pPaData->data, pPaData->length);
     }
 
     blt_clearPeriodicAdvertisingDataRecombination(pEvt->syncHandle);
-
 }
 
 static void blt_audio_assistantBiginfoAdvReport(u8 *p, int len)
@@ -494,13 +489,12 @@ static void blt_audio_assistantBiginfoAdvReport(u8 *p, int len)
     (void)len;
     hci_le_bigInfoAdvReportEvt_t *pEvt = (hci_le_bigInfoAdvReportEvt_t *)p;
 
-    if(pEvt->syncHandle == bapbaScanSourceState.syncHandle)
-    {
+    if (pEvt->syncHandle == bapbaScanSourceState.syncHandle) {
         ble_sts_t status = blc_ll_periodicAdvertisingTerminateSync(bapbaScanSourceState.syncHandle);
         BLT_BIS_ASSISTANT_LOG("terminate PDA Sync status is %d", status);
         blt_clearPeriodicAdvertisingDataRecombination(pEvt->syncHandle);
         blc_bapba_sourceEncStateEvt_t sourceEncEvt = {.enc = pEvt->enc};
-        blt_prf_sendEvent(bapbaScanSourceState.connHandle, AUDIO_EVT_BAPBA_SOURCE_ENC_STATE, (u8*)&sourceEncEvt, sizeof(blc_bapba_sourceEncStateEvt_t));
+        blt_prf_sendEvent(bapbaScanSourceState.connHandle, AUDIO_EVT_BAPBA_SOURCE_ENC_STATE, (u8 *)&sourceEncEvt, sizeof(blc_bapba_sourceEncStateEvt_t));
         memset(&bapbaScanSourceState, 0, sizeof(blt_bcst_assistant_scan_t));
     }
 }
@@ -508,54 +502,50 @@ static void blt_audio_assistantBiginfoAdvReport(u8 *p, int len)
 static void blt_audio_assistantPeriodicAdvLost(u8 *p, int len)
 {
     (void)len;
-    hci_le_periodicAdvSyncLostEvt_t *pEvt = (hci_le_periodicAdvSyncLostEvt_t*)p;
+    hci_le_periodicAdvSyncLostEvt_t *pEvt = (hci_le_periodicAdvSyncLostEvt_t *)p;
     BLT_BIS_ASSISTANT_LOG("PDA Sync lost");
 
-    if(pEvt->syncHandle == bapbaScanSourceState.syncHandle) {
-
+    if (pEvt->syncHandle == bapbaScanSourceState.syncHandle) {
     }
 
     blt_clearPeriodicAdvertisingDataRecombination(pEvt->syncHandle);
 }
 
 static prf_hciLeMetaEvtCb_t assistantHciEvt[] = {
-    {HCI_SUB_EVT_LE_EXTENDED_ADVERTISING_REPORT,    blt_audio_assistantAdvReportEvt},
-    {HCI_SUB_EVT_LE_PERIODIC_ADVERTISING_SYNC_ESTABLISHED, blt_audio_assistantPeriodicAdvSync},
-    {HCI_SUB_EVT_LE_PERIODIC_ADVERTISING_REPORT,    blt_audio_assistantPeriodicAdvReport},
-    {HCI_SUB_EVT_LE_BIGINFO_ADVERTISING_REPORT,     blt_audio_assistantBiginfoAdvReport},
-    {HCI_SUB_EVT_LE_PERIODIC_ADVERTISING_SYNC_LOST, blt_audio_assistantPeriodicAdvLost},
+    {HCI_SUB_EVT_LE_EXTENDED_ADVERTISING_REPORT,           blt_audio_assistantAdvReportEvt     },
+    {HCI_SUB_EVT_LE_PERIODIC_ADVERTISING_SYNC_ESTABLISHED, blt_audio_assistantPeriodicAdvSync  },
+    {HCI_SUB_EVT_LE_PERIODIC_ADVERTISING_REPORT,           blt_audio_assistantPeriodicAdvReport},
+    {HCI_SUB_EVT_LE_BIGINFO_ADVERTISING_REPORT,            blt_audio_assistantBiginfoAdvReport },
+    {HCI_SUB_EVT_LE_PERIODIC_ADVERTISING_SYNC_LOST,        blt_audio_assistantPeriodicAdvLost  },
 };
 
 PRF_HCI_EVT_CALLBACK(assistantHciEvt);
 
 int blt_audio_bcstAssistantRecvEvt(u16 connHandle, int evtID, u8 *pData, u16 dataLen)
 {
-    switch(evtID)
+    switch (evtID) {
+    case AUDIO_EVT_BASSC_RECV_SYNCINFO_REQ:
     {
-        case AUDIO_EVT_BASSC_RECV_SYNCINFO_REQ: {
-            if(bapbaSyncPASTState.localPAST) {
-                hci_le_paSetInfoTransferCmdParams_t cmdPara = {
-                    .connHandle = connHandle,
-                    .serviceData = 0x0100,      //TODO: by qihang.mou, BAP define SourceID+Adv type
-                    .advHandle = bapbaSyncPASTState.advHandle
-                };
-                hci_le_paSetInfoTransferRetParams_t retPara;
-                ble_sts_t status = blc_hci_le_periodicAdvSetInfoTransfer(&cmdPara, &retPara);
-                BLT_BIS_ASSISTANT_LOG("recv syncInfo req, 0x%x, status is %d", connHandle, status);
-            }
-            else{
-                hci_le_pastCmdParams_t cmdPara = {
-                    .connHandle = connHandle,
-                    .serviceData = 0x0100,      //TODO: by qihang.mou, BAP define SourceID+Adv type
-                    .syncHandle = bapbaSyncPASTState.syncHandle
-                };
-                hci_le_pastRetParams_t retPara;
-                ble_sts_t status = blc_hci_le_periodicAdvSyncTransfer(&cmdPara, &retPara);
-                BLT_BIS_ASSISTANT_LOG("recv syncInfo req, 0x%x, status is %d", connHandle, status);
-            }
-        }break;
-        default:
-            break;
+        if (bapbaSyncPASTState.localPAST) {
+            hci_le_paSetInfoTransferCmdParams_t cmdPara = {
+                .connHandle  = connHandle,
+                .serviceData = 0x0100, //TODO: by qihang.mou, BAP define SourceID+Adv type
+                .advHandle   = bapbaSyncPASTState.advHandle};
+            hci_le_paSetInfoTransferRetParams_t retPara;
+            ble_sts_t                           status = blc_hci_le_periodicAdvSetInfoTransfer(&cmdPara, &retPara);
+            BLT_BIS_ASSISTANT_LOG("recv syncInfo req, 0x%x, status is %d", connHandle, status);
+        } else {
+            hci_le_pastCmdParams_t cmdPara = {
+                .connHandle  = connHandle,
+                .serviceData = 0x0100, //TODO: by qihang.mou, BAP define SourceID+Adv type
+                .syncHandle  = bapbaSyncPASTState.syncHandle};
+            hci_le_pastRetParams_t retPara;
+            ble_sts_t              status = blc_hci_le_periodicAdvSyncTransfer(&cmdPara, &retPara);
+            BLT_BIS_ASSISTANT_LOG("recv syncInfo req, 0x%x, status is %d", connHandle, status);
+        }
+    } break;
+    default:
+        break;
     }
 
     return blt_prf_sendEvent(connHandle, evtID, pData, dataLen);
@@ -565,14 +555,14 @@ int blt_audio_bcstAssistantRecvEvt(u16 connHandle, int evtID, u8 *pData, u16 dat
 void blc_bapba_writeRemoteScanStarted(u16 connHandle)
 {
     blc_bassc_writeRemoteScanStarted(connHandle);
-    bapbaScanSourceState.scanEn = true;
+    bapbaScanSourceState.scanEn     = true;
     bapbaScanSourceState.connHandle = connHandle;
 }
 
 void blc_bapba_writeRemoteScanStopped(u16 connHandle)
 {
     blc_bassc_writeRemoteScanStopped(connHandle);
-    bapbaScanSourceState.scanEn = false;
+    bapbaScanSourceState.scanEn     = false;
     bapbaScanSourceState.connHandle = 0x00;
 }
 
@@ -585,21 +575,25 @@ void blc_bapba_setLocalSourceInfo(u16 advHandle, blc_audio_source_head_t *head)
 
 bool blc_bapba_startPAST(u16 connHandle, blc_audio_source_head_t *head)
 {
-    if(bapbaSyncPASTState.paSyncState != PA_SYNC_STATE_NONE) {
+    if (bapbaSyncPASTState.paSyncState != PA_SYNC_STATE_NONE) {
         return false;
     }
 
-    bapbaSyncPASTState.localPAST = 0;
+    bapbaSyncPASTState.localPAST  = 0;
     bapbaSyncPASTState.connHandle = connHandle;
     memcpy(&bapbaSyncPASTState.advAddrType, head, sizeof(blc_audio_source_head_t));
 
     u8 status = blc_ll_periodicAdvertisingCreateSync(SYNC_ADV_SPECIFY | REPORTING_INITIALLY_EN,
-                                                     head->sid, head->addrType, head->addr,
-                                                     0, SYNC_TIMEOUT_2S, 0);
-    if(status != BLE_SUCCESS){
+                                                     head->sid,
+                                                     head->addrType,
+                                                     head->addr,
+                                                     0,
+                                                     SYNC_TIMEOUT_2S,
+                                                     0);
+    if (status != BLE_SUCCESS) {
         BLT_BIS_ASSISTANT_LOG("PA sync create start -- Failed(status is %d)", status);
         memset(&bapbaSyncPASTState, 0, sizeof(blt_bcst_assistant_scan_t));
-    }else{
+    } else {
         bapbaSyncPASTState.paSyncState = PA_SYNC_STATE_START;
         BLT_BIS_ASSISTANT_LOG("PA sync create start -- OK");
     }
@@ -610,13 +604,11 @@ bool blc_bapba_startPAST(u16 connHandle, blc_audio_source_head_t *head)
 void blc_bapba_stopPAST(u16 connHandle)
 {
     (void)connHandle;
-    if(bapbaSyncPASTState.paSyncState == PA_SYNC_STATE_START)
-    {
+    if (bapbaSyncPASTState.paSyncState == PA_SYNC_STATE_START) {
         blc_ll_periodicAdvertisingCreateSyncCancel();
     }
 
-    if(bapbaSyncPASTState.paSyncState == PA_SYNC_STATE_SUCCESS)
-    {
+    if (bapbaSyncPASTState.paSyncState == PA_SYNC_STATE_SUCCESS) {
         ble_sts_t status = blc_ll_periodicAdvertisingTerminateSync(bapbaSyncPASTState.syncHandle);
         BLT_BIS_ASSISTANT_LOG("PAST:terminate PDA Sync status is %d", status);
     }
@@ -626,10 +618,10 @@ void blc_bapba_stopPAST(u16 connHandle)
 
 static void blc_bapba_writeAddSource(u16 connHandle, blc_audio_source_head_t *head, u8 paSync, u32 bisSync)
 {
-    u8 addSourceCmd[20];
-    u8* ptr = addSourceCmd;
+    u8  addSourceCmd[20];
+    u8 *ptr = addSourceCmd;
 
-    STR_TO_STREAM(ptr, (u8*)head, sizeof(blc_audio_source_head_t));
+    STR_TO_STREAM(ptr, (u8 *)head, sizeof(blc_audio_source_head_t));
     U8_TO_STREAM(ptr, paSync);
     U16_TO_STREAM(ptr, 0xFFFF);
     U8_TO_STREAM(ptr, 1);

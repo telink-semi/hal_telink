@@ -32,91 +32,93 @@
 #include "stack/ble/host/gatt/tlk_timer_stack.h"
 #include "stack/ble/host/gatt/tlk_malloc_stack.h"
 
-#define GATTC_MALLOC(size)                  malloc_nonreten(size)
-#define GATTC_FREE(ptr)                     free_nonreten(ptr)
+#define GATTC_MALLOC(size) malloc_nonreten(size)
+#define GATTC_FREE(ptr)    free_nonreten(ptr)
 
 typedef void (*gatt_rsp_func_t)(u16 connHdl, u8 err, attr_pkt_t *attr, u16 attrLen, void *userData);
 
-typedef struct {
-    gatt_rsp_func_t attRspFunc;
-    void            *userData; //keep gatt_xxx_params initiator pointer
-    u16             expectRecvOp;
-    u16             connHandle;
+typedef struct
+{
+    gatt_rsp_func_t   attRspFunc;
+    void             *userData; //keep gatt_xxx_params initiator pointer
+    u16               expectRecvOp;
+    u16               connHandle;
     struct soft_timer gattcReqTimer;
 } gattcConn_t;
 
 /*  */
-static _attribute_ble_data_retention_
-struct single_list gattc_subCccEntry[LL_MAX_ACL_CONN_NUM];
+static _attribute_ble_data_retention_ struct single_list gattc_subCccEntry[LL_MAX_ACL_CONN_NUM];
 
-static _attribute_ble_data_retention_
-gattcConn_t* gattcConn[LL_MAX_ACL_CONN_NUM] = {NULL, };
+static _attribute_ble_data_retention_ gattcConn_t *gattcConn[LL_MAX_ACL_CONN_NUM] = {
+    NULL,
+};
 
-static void blt_gattc_aclStateChangeCb(u16 connHandle, GAP_STATE_ENUM state, void* node);
+static void blt_gattc_aclStateChangeCb(u16 connHandle, GAP_STATE_ENUM state, void *node);
 
-static _attribute_ble_data_retention_
-struct gap_stateChangeNode gattcStateChange = {
+static _attribute_ble_data_retention_ struct gap_stateChangeNode gattcStateChange = {
     .next = NULL,
-    .cb = blt_gattc_aclStateChangeCb,
+    .cb   = blt_gattc_aclStateChangeCb,
 };
 
 ////////////////////////// Internal API declarations ///////////////////////////
 static void blt_gattc_discoveryNext(u16 connHandle, u16 lastHandle, gattc_sdp_cfg_t *pSdpCfg);
-static int blt_gattc_attRequestTimerCb(void* arg);
+static int  blt_gattc_attRequestTimerCb(void *arg);
 
-#define GATTC_SET_PENDING(connHandle, opcode, func, funcData)       \
-        gattcConn_t* pGattcConn = GATTC_MALLOC(sizeof(gattcConn_t));    \
-        gattcConn[connHandle&0x0f] = pGattcConn;    \
-        pGattcConn->attRspFunc = func;  \
-        pGattcConn->expectRecvOp = opcode;  \
-        pGattcConn->connHandle = connHandle;    \
-        pGattcConn->userData = (void*)funcData;     \
-        pGattcConn->gattcReqTimer.timer = GATT_PROCEDURE_TIMEOUT;   \
-        pGattcConn->gattcReqTimer.arg = pGattcConn; \
-        pGattcConn->gattcReqTimer.cb = blt_gattc_attRequestTimerCb; \
-        soft_timer_add(&pGattcConn->gattcReqTimer);     \
-        blt_gap_regAclConnState(&gattcStateChange)  \
+#define GATTC_SET_PENDING(connHandle, opcode, func, funcData)            \
+    gattcConn_t *pGattcConn         = GATTC_MALLOC(sizeof(gattcConn_t)); \
+    gattcConn[connHandle & 0x0f]    = pGattcConn;                        \
+    pGattcConn->attRspFunc          = func;                              \
+    pGattcConn->expectRecvOp        = opcode;                            \
+    pGattcConn->connHandle          = connHandle;                        \
+    pGattcConn->userData            = (void *)funcData;                  \
+    pGattcConn->gattcReqTimer.timer = GATT_PROCEDURE_TIMEOUT;            \
+    pGattcConn->gattcReqTimer.arg   = pGattcConn;                        \
+    pGattcConn->gattcReqTimer.cb    = blt_gattc_attRequestTimerCb;       \
+    soft_timer_add(&pGattcConn->gattcReqTimer);                          \
+    blt_gap_regAclConnState(&gattcStateChange)
 
 
-#define GATTC_CHECK_PENDING             \
-if (blt_ll_isAclhdlInvalid(connHandle) != BLE_SUCCESS)  \
-    return HCI_ERR_UNKNOWN_CONN_ID; \
-else if(gattcConn[connHandle&0x0f]) \
+#define GATTC_CHECK_PENDING                                \
+    if (blt_ll_isAclhdlInvalid(connHandle) != BLE_SUCCESS) \
+        return HCI_ERR_UNKNOWN_CONN_ID;                    \
+    else if (gattcConn[connHandle & 0x0f])                 \
     return GATT_ERR_DATA_PENDING_DUE_TO_SERVICE_DISCOVERY_BUSY
 
 static void blt_gattc_clearAttr(u16 connHandle)
 {
-    gattcConn_t* pGattcConn = gattcConn[connHandle&0x0f];
+    gattcConn_t *pGattcConn = gattcConn[connHandle & 0x0f];
+    if (pGattcConn == NULL) {
+        return;
+    }
     soft_timer_delete(&pGattcConn->gattcReqTimer);
     GATTC_FREE(pGattcConn);
-    gattcConn[connHandle&0x0f] = NULL;
-    for(unsigned int i=0; i<ARRAY_SIZE(gattcConn); i++)
-    {
-        if(gattcConn[i])    return ;
+    gattcConn[connHandle & 0x0f] = NULL;
+    for (unsigned int i = 0; i < ARRAY_SIZE(gattcConn); i++) {
+        if (gattcConn[i]) {
+            return;
+        }
     }
     blt_gap_unregAclConnState(&gattcStateChange);
 }
 
-static void blt_gattc_aclStateChangeCb(u16 connHandle, GAP_STATE_ENUM state, void* node)
+static void blt_gattc_aclStateChangeCb(u16 connHandle, GAP_STATE_ENUM state, void *node)
 {
     (void)node;
-    if(state == GAP_STATE_ACL_DISCONNECTED)
-    {
+    if (state == GAP_STATE_ACL_DISCONNECTED) {
         blt_gattc_clearAttr(connHandle);
     }
 }
 
-static int blt_gattc_attRequestTimerCb(void* arg)
+static int blt_gattc_attRequestTimerCb(void *arg)
 {
-    gattcConn_t* pGattcConn = (gattcConn_t*) arg;
+    gattcConn_t *pGattcConn = (gattcConn_t *)arg;
 
     u16 connHandle = pGattcConn->connHandle;
 
     gatt_rsp_func_t pfunc = pGattcConn->attRspFunc;
-    void* param = pGattcConn->userData;
+    void           *param = pGattcConn->userData;
 
-    if(pfunc)
-    {
+    if (pfunc) {
         pfunc(connHandle, GATT_TIMEOUT_ATT_ERROR, NULL, 0, param);
     }
 
@@ -127,9 +129,9 @@ static int blt_gattc_attRequestTimerCb(void* arg)
 
 u16 blt_gattc_exchangeMtu_rsp(u16 connHandle, u16 mtu)
 {
-    gattcConn_t* pGattcConn = gattcConn[connHandle&0x0f];
+    gattcConn_t *pGattcConn = gattcConn[connHandle & 0x0f];
 
-    if(pGattcConn->expectRecvOp != ATT_OP_EXCHANGE_MTU_RSP) {
+    if (pGattcConn->expectRecvOp != ATT_OP_EXCHANGE_MTU_RSP) {
         return 0;
     }
 
@@ -144,35 +146,30 @@ u16 blt_gattc_exchangeMtu_rsp(u16 connHandle, u16 mtu)
 
 u16 blt_gattc_handle_rsp(u16 connHandle, attr_pkt_t *attr, u16 attrLen)
 {
-    gattcConn_t* pGattcConn = gattcConn[connHandle&0x0f];
+    gattcConn_t *pGattcConn = gattcConn[connHandle & 0x0f];
 
     u8 err = ATT_SUCCESS;
 
-    if(attr->opcode == ATT_OP_ERROR_RSP)
-    {
-        blt_attr_errorRsp_t *pRsp = (blt_attr_errorRsp_t*)attr;
+    if (attr->opcode == ATT_OP_ERROR_RSP) {
+        blt_attr_errorRsp_t *pRsp = (blt_attr_errorRsp_t *)attr;
         //if ATT request and response command not -1.
-        if(pRsp->reqOpcode != (pGattcConn->expectRecvOp - 1))
-        {
+        if (pRsp->reqOpcode != (pGattcConn->expectRecvOp - 1)) {
             return 0;
         }
         err = pRsp->errorCode;
-        my_dump_str_data(DBG_GATTC_LOG, "   [ATT]<--- ATT Error Response", (u8*)&pRsp->errorCode, 1);
-        my_dump_str_data(DBG_GATTC_LOG, "       | Request Opcode In Error", (u8*)&pRsp->reqOpcode, 1);
-        my_dump_str_data(DBG_GATTC_LOG, "       | Attribute Handle In Error", (u8*)&pRsp->attrHandle, 2);
-        my_dump_str_data(DBG_GATTC_LOG, "       | Error Code", (u8*)&pRsp->errorCode, 1);
-    }
-    else if(attr->opcode != pGattcConn->expectRecvOp)
-    {
+        my_dump_str_data(DBG_GATTC_LOG, "   [ATT]<--- ATT Error Response", (u8 *)&pRsp->errorCode, 1);
+        my_dump_str_data(DBG_GATTC_LOG, "       | Request Opcode In Error", (u8 *)&pRsp->reqOpcode, 1);
+        my_dump_str_data(DBG_GATTC_LOG, "       | Attribute Handle In Error", (u8 *)&pRsp->attrHandle, 2);
+        my_dump_str_data(DBG_GATTC_LOG, "       | Error Code", (u8 *)&pRsp->errorCode, 1);
+    } else if (attr->opcode != pGattcConn->expectRecvOp) {
         return 0;
     }
 
     gatt_rsp_func_t pfunc = pGattcConn->attRspFunc;
-    void* param = pGattcConn->userData;
+    void           *param = pGattcConn->userData;
     blt_gattc_clearAttr(connHandle);
 
-    if(pfunc)
-    {
+    if (pfunc) {
         pfunc(connHandle, err, attr, attrLen, param);
     }
     return 0;
@@ -187,13 +184,13 @@ static void blt_gattc_readGroupRsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRspP
 {
     my_dump_str_data(DBG_GATTC_LOG, "[SDP]<--- Read By Group Type Response", 0, 0);
 
-    gattc_sdp_cfg_t *pSdpCfg = userData;
-    blt_attr_readByGroupTypeRsp_t *rsp = (blt_attr_readByGroupTypeRsp_t*)pAttrRspPkt;
-    u16 length = attrLen - OFFSETOF(blt_attr_readByGroupTypeRsp_t, data); /* skip opcode && length */
-    u8 pairLen = rsp->length;
+    gattc_sdp_cfg_t               *pSdpCfg = userData;
+    blt_attr_readByGroupTypeRsp_t *rsp     = (blt_attr_readByGroupTypeRsp_t *)pAttrRspPkt;
+    u16                            length  = attrLen - OFFSETOF(blt_attr_readByGroupTypeRsp_t, data); /* skip opcode && length */
+    u8                             pairLen = rsp->length;
 
     if (err) {
-        my_dump_str_data(DBG_GATTC_LOG, "   | err", (u8*)&err, 1);
+        my_dump_str_data(DBG_GATTC_LOG, "   | err", (u8 *)&err, 1);
         goto done;
     }
 
@@ -201,30 +198,30 @@ static void blt_gattc_readGroupRsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRspP
 
     /* Data can be either in UUID16 or UUID128 */
     switch (pairLen) {
-        case 6: /* UUID16: sizeof(attr_group_data_list)+2 = 6 */
-            uuid.uuidLen = ATT_16_UUID_LEN;
-            my_dump_str_data(DBG_GATTC_LOG, "   |_Pair Length", (u8*)&pairLen, 1);
-            break;
-        case 20: /* UUID128: sizeof(attr_group_data_list)+16 =20 */
-            uuid.uuidLen = ATT_128_UUID_LEN;
-            my_dump_str_data(DBG_GATTC_LOG, "   |_Pair Length", (u8*)&pairLen, 1);
-            break;
-        default:
-        my_dump_str_data(DBG_GATTC_LOG, "Invalid data len", (u8*)&rsp->length, 1);
+    case 6: /* UUID16: sizeof(attr_group_data_list)+2 = 6 */
+        uuid.uuidLen = ATT_16_UUID_LEN;
+        my_dump_str_data(DBG_GATTC_LOG, "   |_Pair Length", (u8 *)&pairLen, 1);
+        break;
+    case 20: /* UUID128: sizeof(attr_group_data_list)+16 =20 */
+        uuid.uuidLen = ATT_128_UUID_LEN;
+        my_dump_str_data(DBG_GATTC_LOG, "   |_Pair Length", (u8 *)&pairLen, 1);
+        break;
+    default:
+        my_dump_str_data(DBG_GATTC_LOG, "Invalid data len", (u8 *)&rsp->length, 1);
         goto done;
     }
 
     /*/////////// parse service begin///////////// */
-    uuid_t uuid_svc;
-    gatt_attr_t attr;
-    gatt_service_val_t attrSrvVal;
-    u16 startHandle, endHandle = 0;
+    uuid_t                       uuid_svc;
+    gatt_attr_t                  attr;
+    gatt_service_val_t           attrSrvVal;
+    u16                          startHandle, endHandle = 0;
     struct attr_group_data_list *pAttrGrpData;
-    u8 pairCnt = length / pairLen;
+    u8                           pairCnt = length / pairLen;
 
     /* Parse services found */
     for (int i = 0; i < pairCnt; i++) {
-        pAttrGrpData = (struct attr_group_data_list*)((u8 *)rsp->data + i * pairLen);
+        pAttrGrpData = (struct attr_group_data_list *)((u8 *)rsp->data + i * pairLen);
 
         startHandle = pAttrGrpData->startHandle;
         if (!startHandle) {
@@ -236,9 +233,9 @@ static void blt_gattc_readGroupRsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRspP
             goto done;
         }
 
-        my_dump_str_data(DBG_GATTC_LOG, "   |_Triple", (u8*)&i, 1);
-        my_dump_str_data(DBG_GATTC_LOG, "    |_Attribute Handle", (u8*)&startHandle, 2);
-        my_dump_str_data(DBG_GATTC_LOG, "    |_End Grpup Handle", (u8*)&endHandle, 2);
+        my_dump_str_data(DBG_GATTC_LOG, "   |_Triple", (u8 *)&i, 1);
+        my_dump_str_data(DBG_GATTC_LOG, "    |_Attribute Handle", (u8 *)&startHandle, 2);
+        my_dump_str_data(DBG_GATTC_LOG, "    |_End Grpup Handle", (u8 *)&endHandle, 2);
 
         memcpy(uuid.uuidVal.u, pAttrGrpData->attrValue, uuid.uuidLen);
         my_dump_str_data(DBG_GATTC_LOG, "    |_Attribute Data", pAttrGrpData->attrValue, uuid.uuidLen);
@@ -251,7 +248,7 @@ static void blt_gattc_readGroupRsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRspP
         }
 
         attrSrvVal.endHdl = endHandle;
-        attrSrvVal.uuid = &uuid;
+        attrSrvVal.uuid   = &uuid;
 
         /*-------------------+-----------------------------+-------------------+----------------------+
         | Attribute Handle  |       Attribute Type        | Attribute Value   | Attribute Permission |
@@ -263,11 +260,11 @@ static void blt_gattc_readGroupRsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRspP
         | Service declaration                                                                        |
         +--------------------------------------------------------------------------------------------*/
 
-        attr = (gatt_attr_t) {
+        attr = (gatt_attr_t){
             /* Attribute_handle: handle */
             .handle = startHandle,
             /* Initialize Attribute_types: UUID */
-            .uuid = (uuid_t*)&uuid_svc,
+            .uuid = (uuid_t *)&uuid_svc,
             /* Attribute_value: User data */
             .user_data = &attrSrvVal,
         };
@@ -289,17 +286,17 @@ static ble_sts_t blt_gattc_readGroupReq(u16 connHandle, gattc_sdp_cfg_t *pSdpCfg
 {
     my_dump_str_data(DBG_GATTC_LOG, "[SDP]---> Read By Group Type Request", 0, 0);
 
-    u8 uuidLen;
-    u16 uuidVal,startAttHdl, endAttHdl;
+    u8        uuidLen;
+    u16       uuidVal, startAttHdl, endAttHdl;
     ble_sts_t status = BLE_SUCCESS;
 
     assert(blt_ll_isAclhdlInvalid(connHandle) == BLE_SUCCESS);
 
     startAttHdl = pSdpCfg->startHdl;
-    endAttHdl = pSdpCfg->endHdl;
+    endAttHdl   = pSdpCfg->endHdl;
 
-    my_dump_str_data(DBG_GATTC_LOG, "   |_Starting Handle", (u8*)&startAttHdl, 2);
-    my_dump_str_data(DBG_GATTC_LOG, "   |_Ending Handle", (u8*)&endAttHdl, 2);
+    my_dump_str_data(DBG_GATTC_LOG, "   |_Starting Handle", (u8 *)&startAttHdl, 2);
+    my_dump_str_data(DBG_GATTC_LOG, "   |_Ending Handle", (u8 *)&endAttHdl, 2);
 
     if (pSdpCfg->type == GATT_DISCOVER_PRIMARY) {
         uuidLen = ATT_16_UUID_LEN;
@@ -311,7 +308,7 @@ static ble_sts_t blt_gattc_readGroupReq(u16 connHandle, gattc_sdp_cfg_t *pSdpCfg
         my_dump_str_data(DBG_GATTC_LOG, "   |_Attribute Group Type: 2nd Service", 0, 0);
     }
 
-    status = blc_attc_sendReadByGroupTypeRequest (connHandle, startAttHdl, endAttHdl, (u8*)&uuidVal, uuidLen);
+    status = blc_attc_sendReadByGroupTypeRequest(connHandle, startAttHdl, endAttHdl, (u8 *)&uuidVal, uuidLen);
 
     if (status == BLE_SUCCESS) {
         GATTC_SET_PENDING(connHandle, ATT_OP_READ_BY_GROUP_TYPE_RSP, blt_gattc_readGroupRsp, pSdpCfg);
@@ -319,7 +316,6 @@ static ble_sts_t blt_gattc_readGroupReq(u16 connHandle, gattc_sdp_cfg_t *pSdpCfg
 
     return status;
 }
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -330,31 +326,34 @@ static void blt_gattc_findByTypeRsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRsp
 {
     my_dump_str_data(DBG_GATTC_LOG, "[SDP]<--- Find By Type Value Response", pAttrRspPkt, attrLen);
 
-    gattc_sdp_cfg_t *pSdpCfg = userData;
-    blt_attr_findByTypeValueRsp_t *rsp = (blt_attr_findByTypeValueRsp_t*)pAttrRspPkt;
-    u16 length = attrLen - 1; /* skip opcode t*/
+    gattc_sdp_cfg_t               *pSdpCfg = userData;
+    blt_attr_findByTypeValueRsp_t *rsp     = (blt_attr_findByTypeValueRsp_t *)pAttrRspPkt;
+    u16                            length  = attrLen - 1; /* skip opcode t*/
 
     if (err) {
-        my_dump_str_data(DBG_GATTC_LOG, "   | err", (u8*)&err, 1);
+        my_dump_str_data(DBG_GATTC_LOG, "   | err", (u8 *)&err, 1);
         goto done;
     }
 
-    u16 startAttHdl, endAttHdl = 0;
-    u8 pairCnt = length / sizeof(struct attr_handle_group);
-    uuid_t uuid_svc;
-    gatt_attr_t attr;
-    gatt_service_val_t attrSrvVal;
+    u16                       startAttHdl, endAttHdl = 0;
+    u8                        pairCnt = length / sizeof(struct attr_handle_group);
+    uuid_t                    uuid_svc;
+    gatt_attr_t               attr;
+    gatt_service_val_t        attrSrvVal;
+#ifndef MCU_CORE_D25F_ENABLE
     struct attr_handle_group *attrHdlGrp = rsp->list;
+#else
+    struct attr_handle_group1 *attrHdlGrp = rsp->list;
+#endif
 
     /*/////////// parse attributes found begin///////////// */
     for (int i = 0; i < pairCnt; i++) {
-
         startAttHdl = attrHdlGrp[i].startHandle;
-        endAttHdl = attrHdlGrp[i].endHandle;
+        endAttHdl   = attrHdlGrp[i].endHandle;
 
-        my_dump_str_data(DBG_GATTC_LOG, "       |_Pair", (u8*)&i, 1);
-        my_dump_str_data(DBG_GATTC_LOG, "    |_Starting Handle", (u8*)&startAttHdl, 2);
-        my_dump_str_data(DBG_GATTC_LOG, "    |_Ending Handle", (u8*)&endAttHdl, 2);
+        my_dump_str_data(DBG_GATTC_LOG, "       |_Pair", (u8 *)&i, 1);
+        my_dump_str_data(DBG_GATTC_LOG, "    |_Starting Handle", (u8 *)&startAttHdl, 2);
+        my_dump_str_data(DBG_GATTC_LOG, "    |_Ending Handle", (u8 *)&endAttHdl, 2);
 
         uuid_svc.uuidLen = ATT_16_UUID_LEN;
         if (pSdpCfg->type == GATT_DISCOVER_PRIMARY) {
@@ -364,7 +363,7 @@ static void blt_gattc_findByTypeRsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRsp
         }
 
         attrSrvVal.endHdl = endAttHdl;
-        attrSrvVal.uuid = pSdpCfg->uuid;
+        attrSrvVal.uuid   = pSdpCfg->uuid;
 
         /*-------------------+-----------------------------+-------------------+------------------------+
         | Attribute Handle  |       Attribute Type        | Attribute Value   | Attribute Permission   |
@@ -376,11 +375,11 @@ static void blt_gattc_findByTypeRsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRsp
         | Service declaration                                                                          |
         +----------------------------------------------------------------------------------------------*/
 
-        attr = (gatt_attr_t) {
+        attr = (gatt_attr_t){
             /* Attribute_handle: handle */
             .handle = startAttHdl,
             /* Initialize Attribute_types: UUID */
-            .uuid = (uuid_t*)&uuid_svc,
+            .uuid = (uuid_t *)&uuid_svc,
             /* Attribute_value: User data */
             .user_data = &attrSrvVal,
         };
@@ -400,9 +399,9 @@ done:
 
 static ble_sts_t blt_gattc_findTypeReq(u16 connHandle, gattc_sdp_cfg_t *pSdpCfg)
 {
-    u8 attrValLen;
-    u8 *pAttrVal = NULL;
-    u16 uuidVal, startAttHdl, endAttHdl;
+    u8        attrValLen;
+    u8       *pAttrVal = NULL;
+    u16       uuidVal, startAttHdl, endAttHdl;
     ble_sts_t status = BLE_SUCCESS;
 
     assert(blt_ll_isAclhdlInvalid(connHandle) == BLE_SUCCESS);
@@ -410,10 +409,10 @@ static ble_sts_t blt_gattc_findTypeReq(u16 connHandle, gattc_sdp_cfg_t *pSdpCfg)
     my_dump_str_data(DBG_GATTC_LOG, "[SDP]---> Find_By_Type_Value_Request", 0, 0);
 
     startAttHdl = pSdpCfg->startHdl;
-    endAttHdl = pSdpCfg->endHdl;
+    endAttHdl   = pSdpCfg->endHdl;
 
-    my_dump_str_data(DBG_GATTC_LOG, "   |_Starting Handle", (u8*)&startAttHdl, 2);
-    my_dump_str_data(DBG_GATTC_LOG, "   |_Ending Handle", (u8*)&endAttHdl, 2);
+    my_dump_str_data(DBG_GATTC_LOG, "   |_Starting Handle", (u8 *)&startAttHdl, 2);
+    my_dump_str_data(DBG_GATTC_LOG, "   |_Ending Handle", (u8 *)&endAttHdl, 2);
 
     /* Attribute Type */
     if (pSdpCfg->type == GATT_DISCOVER_PRIMARY) {
@@ -426,14 +425,14 @@ static ble_sts_t blt_gattc_findTypeReq(u16 connHandle, gattc_sdp_cfg_t *pSdpCfg)
 
     /* Attribute Value */
     switch (pSdpCfg->uuid->uuidLen) {
-        case ATT_16_UUID_LEN:
-        case ATT_128_UUID_LEN:
-            attrValLen = pSdpCfg->uuid->uuidLen;
-            pAttrVal = (u8*)pSdpCfg->uuid->uuidVal.u;
-            break;
-        default:
-            my_dump_str_data(DBG_GATTC_LOG, "Unknown UUID", pSdpCfg->uuid->uuidVal.u, pSdpCfg->uuid->uuidLen);
-            return GATT_ERR_INVALID_PARAMETER;
+    case ATT_16_UUID_LEN:
+    case ATT_128_UUID_LEN:
+        attrValLen = pSdpCfg->uuid->uuidLen;
+        pAttrVal   = (u8 *)pSdpCfg->uuid->uuidVal.u;
+        break;
+    default:
+        my_dump_str_data(DBG_GATTC_LOG, "Unknown UUID", pSdpCfg->uuid->uuidVal.u, pSdpCfg->uuid->uuidLen);
+        return GATT_ERR_INVALID_PARAMETER;
     }
 
     my_dump_str_data(DBG_GATTC_LOG, "   |_UUID", pAttrVal, attrValLen);
@@ -447,7 +446,6 @@ static ble_sts_t blt_gattc_findTypeReq(u16 connHandle, gattc_sdp_cfg_t *pSdpCfg)
     return status;
 }
 
-
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                  GATT_FIND_INFORMATION_REQ / GATT_FIND_INFORMATION_RSP
@@ -460,36 +458,37 @@ static void blt_gattc_findInfoRsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRspPk
     gattc_sdp_cfg_t *pSdpCfg = userData;
 
     if (err) {
-        my_dump_str_data(DBG_GATTC_LOG, "   | err", (u8*)&err, 1);
+        my_dump_str_data(DBG_GATTC_LOG, "   | err", (u8 *)&err, 1);
         goto done;
     }
 
-    blt_attr_findInfoRsp_t *rsp = (blt_attr_findInfoRsp_t*)pAttrRspPkt;
-    u16 length = attrLen - OFFSETOF(blt_attr_findInfoRsp_t, infoData); /* skip opcode && format*/
-    u16 len, attrHdl = 0;
+    blt_attr_findInfoRsp_t *rsp    = (blt_attr_findInfoRsp_t *)pAttrRspPkt;
+    u16                     length = attrLen - OFFSETOF(blt_attr_findInfoRsp_t, infoData); /* skip opcode && format*/
+    u16                     len, attrHdl = 0;
 
     uuid_t uuid;
 
-    union {
-        struct att_info16 *i16;
+    union
+    {
+        struct att_info16  *i16;
         struct att_info128 *i128;
     } info;
 
     /* Data can be either in UUID16 or UUID128 */
     switch (rsp->format) {
-        case ATT_INFO_FORMAT_16:
-            uuid.uuidLen = ATT_16_UUID_LEN;
-            len = sizeof(*info.i16);
-            my_dump_str_data(DBG_GATTC_LOG, "   |_Format: 16bit UUIDs", 0, 0);
-            break;
-        case ATT_INFO_FORMAT_128:
-            uuid.uuidLen = ATT_128_UUID_LEN;
-            len = sizeof(*info.i128);
-            my_dump_str_data(DBG_GATTC_LOG, "   |_Format: 128bit UUIDs", 0, 0);
-            break;
-        default:
-            my_dump_str_data(DBG_GATTC_LOG, "Invalid format", (u8*)&rsp->format, 1);
-            goto done;
+    case ATT_INFO_FORMAT_16:
+        uuid.uuidLen = ATT_16_UUID_LEN;
+        len          = sizeof(*info.i16);
+        my_dump_str_data(DBG_GATTC_LOG, "   |_Format: 16bit UUIDs", 0, 0);
+        break;
+    case ATT_INFO_FORMAT_128:
+        uuid.uuidLen = ATT_128_UUID_LEN;
+        len          = sizeof(*info.i128);
+        my_dump_str_data(DBG_GATTC_LOG, "   |_Format: 128bit UUIDs", 0, 0);
+        break;
+    default:
+        my_dump_str_data(DBG_GATTC_LOG, "Invalid format", (u8 *)&rsp->format, 1);
+        goto done;
     }
 
     /* Check if there is a least one descriptor in the response */
@@ -498,16 +497,15 @@ static void blt_gattc_findInfoRsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRspPk
     }
 
     /*/////////// parse descriptors found begin///////////// */
-    int i;
-    u8 *infoData;
+    int         i;
+    u8         *infoData;
     gatt_attr_t attr;
-    bool skip = false;
-    u8 pairCnt = 0; /* debug used only */
-    for (i = length / len, infoData = rsp->infoData; i != 0; \
-         i--, infoData = (u8 *)infoData + len) {
-
+    bool        skip    = false;
+    u8          pairCnt = 0; /* debug used only */
+    for (i = length / len, infoData = rsp->infoData; i != 0;
+         i--, infoData              = (u8 *)infoData + len) {
         info.i16 = (struct att_info16 *)infoData;
-        attrHdl = info.i16->handle;
+        attrHdl  = info.i16->handle;
 
         pairCnt++;
 
@@ -517,24 +515,24 @@ static void blt_gattc_findInfoRsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRspPk
         }
 
         switch (uuid.uuidLen) {
-            case ATT_16_UUID_LEN:
-                uuid.uuidVal.u16 = info.i16->uuid;
-                break;
-            case ATT_128_UUID_LEN:
-                memcpy(uuid.uuidVal.u128, info.i128->uuid, 16);
-                break;
-            default:
-                goto done;
+        case ATT_16_UUID_LEN:
+            uuid.uuidVal.u16 = info.i16->uuid;
+            break;
+        case ATT_128_UUID_LEN:
+            memcpy(uuid.uuidVal.u128, info.i128->uuid, 16);
+            break;
+        default:
+            goto done;
         }
 
         my_dump_str_data(DBG_GATTC_LOG, "       |_Pair", &pairCnt, 1);
-        my_dump_str_data(DBG_GATTC_LOG, "    |_Attribute Handle", (u8*)&attrHdl, 2);
+        my_dump_str_data(DBG_GATTC_LOG, "    |_Attribute Handle", (u8 *)&attrHdl, 2);
         my_dump_str_data(DBG_GATTC_LOG, "    |_UUID", uuid.uuidVal.u, uuid.uuidLen);
 
         /* Skip if UUID is set but doesn't match */
-//      if (pSdpCfg->uuid && blc_uuid_cmp(&uuid, pSdpCfg->uuid)) {
-//          continue;
-//      }
+        //      if (pSdpCfg->uuid && blc_uuid_cmp(&uuid, pSdpCfg->uuid)) {
+        //          continue;
+        //      }
 
         if (pSdpCfg->type == GATT_DISCOVER_DESCRIPTOR) {
             /* Skip attributes that are not considered descriptors. */
@@ -551,7 +549,7 @@ static void blt_gattc_findInfoRsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRspPk
             }
         }
 
-        attr = (gatt_attr_t) {
+        attr = (gatt_attr_t){
             /* Attribute_handle: handle */
             .handle = attrHdl,
             /* Attribute_types: UUID */
@@ -574,7 +572,7 @@ done:
 
 static ble_sts_t blt_gattc_findInfoReq(u16 connHandle, gattc_sdp_cfg_t *pSdpCfg)
 {
-    u16 startAttHdl, endAttHdl;
+    u16       startAttHdl, endAttHdl;
     ble_sts_t status = BLE_SUCCESS;
 
     assert(blt_ll_isAclhdlInvalid(connHandle) == BLE_SUCCESS);
@@ -582,10 +580,10 @@ static ble_sts_t blt_gattc_findInfoReq(u16 connHandle, gattc_sdp_cfg_t *pSdpCfg)
     my_dump_str_data(DBG_GATTC_LOG, "[SDP]---> Find Information Request", 0, 0);
 
     startAttHdl = pSdpCfg->startHdl;
-    endAttHdl = pSdpCfg->endHdl;
+    endAttHdl   = pSdpCfg->endHdl;
 
-    my_dump_str_data(DBG_GATTC_LOG, "   |_Starting Handle", (u8*)&startAttHdl, 2);
-    my_dump_str_data(DBG_GATTC_LOG, "   |_Ending Handle", (u8*)&endAttHdl, 2);
+    my_dump_str_data(DBG_GATTC_LOG, "   |_Starting Handle", (u8 *)&startAttHdl, 2);
+    my_dump_str_data(DBG_GATTC_LOG, "   |_Ending Handle", (u8 *)&endAttHdl, 2);
 
     status = blc_attc_sendFindInfoRequest(connHandle, startAttHdl, endAttHdl);
 
@@ -596,7 +594,6 @@ static ble_sts_t blt_gattc_findInfoReq(u16 connHandle, gattc_sdp_cfg_t *pSdpCfg)
     return status;
 }
 
-
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                  GATT_READ_BY_TYPE_REQ / GATT_READ_BY_TYPE_RSP
@@ -606,20 +603,20 @@ static void blt_read_incUuid128Rsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRspP
 {
     my_dump_str_data(DBG_GATTC_LOG, "[SDP]<--- Read Response (Include UUID_128)", 0, 0);
 
-    gatt_attr_t attr;
-    gattc_sdp_cfg_t *pSdpCfg = userData;
-    blt_attr_readRsp_t *rsp = (blt_attr_readRsp_t*)pAttrRspPkt;
-    u16 length = attrLen - 1; /* skip opcode */
+    gatt_attr_t         attr;
+    gattc_sdp_cfg_t    *pSdpCfg = userData;
+    blt_attr_readRsp_t *rsp     = (blt_attr_readRsp_t *)pAttrRspPkt;
+    u16                 length  = attrLen - 1; /* skip opcode */
 
     if (err || length != ATT_128_UUID_LEN) {
-        my_dump_str_data(DBG_GATTC_LOG, "   | err", (u8*)&err, 1);
+        my_dump_str_data(DBG_GATTC_LOG, "   | err", (u8 *)&err, 1);
         pSdpCfg->func(connHandle, NULL, pSdpCfg);
         return;
     }
 
     uuid_t uuid;
-    u16 attrHdl = pSdpCfg->_included.attrHdl;
-    uuid.uuidLen = ATT_128_UUID_LEN;
+    u16    attrHdl = pSdpCfg->_included.attrHdl;
+    uuid.uuidLen   = ATT_128_UUID_LEN;
     memcpy(uuid.uuidVal.u128, rsp->value, ATT_128_UUID_LEN);
 
     /* Skip if UUID is set but doesn't match */
@@ -629,18 +626,18 @@ static void blt_read_incUuid128Rsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRspP
 
     gatt_include_t incl;
     incl.startHdl = pSdpCfg->_included.startHdl;
-    incl.endHdl = pSdpCfg->_included.endHdl;
-    incl.uuid = uuid;
+    incl.endHdl   = pSdpCfg->_included.endHdl;
+    incl.uuid     = uuid;
 
     /* Handle-Value pair:  att_hdl + include_declaration
      *                       (2B)           |_ startHdl (2B)
      *                                      |_ endHdl (2B)
      *                                      |_ UUID (16B)
      */
-    my_dump_str_data(DBG_GATTC_LOG, "   |_Attribute Handle", (u8*)&attrHdl, 2);
-    my_dump_str_data(DBG_GATTC_LOG, "   |_Include_Declaration",0, 0);
-    my_dump_str_data(DBG_GATTC_LOG, "     |_Starting Handle", (u8*)&incl.startHdl, 2);
-    my_dump_str_data(DBG_GATTC_LOG, "     |_Ending Handle", (u8*)&incl.endHdl, 2);
+    my_dump_str_data(DBG_GATTC_LOG, "   |_Attribute Handle", (u8 *)&attrHdl, 2);
+    my_dump_str_data(DBG_GATTC_LOG, "   |_Include_Declaration", 0, 0);
+    my_dump_str_data(DBG_GATTC_LOG, "     |_Starting Handle", (u8 *)&incl.startHdl, 2);
+    my_dump_str_data(DBG_GATTC_LOG, "     |_Ending Handle", (u8 *)&incl.endHdl, 2);
     my_dump_str_data(DBG_GATTC_LOG, "     |_UUID", incl.uuid.uuidVal.u, incl.uuid.uuidLen);
 
     /*-------------------+---------------------------+---------------------------+------------------------+
@@ -654,7 +651,7 @@ static void blt_read_incUuid128Rsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRspP
     | Include declaration                                                                                |
     +----------------------------------------------------------------------------------------------------*/
 
-    attr = (gatt_attr_t) {
+    attr = (gatt_attr_t){
         /* Attribute_handle: handle */
         .handle = attrHdl,
         /* Attribute_types: UUID */
@@ -681,8 +678,8 @@ static ble_sts_t blt_read_incUuid128Req(u16 connHandle, gattc_sdp_cfg_t *pSdpCfg
     my_dump_str_data(DBG_GATTC_LOG, "[SDP]---> Read Request(Include UUID_128)", 0, 0);
 
     u16 startAttHdl = pSdpCfg->_included.startHdl;
-    my_dump_str_data(DBG_GATTC_LOG, "   |_Attribute Handle", (u8*)&pSdpCfg->startHdl, 2);
-    status = blc_attc_sendReadRequest (connHandle, startAttHdl);
+    my_dump_str_data(DBG_GATTC_LOG, "   |_Attribute Handle", (u8 *)&pSdpCfg->startHdl, 2);
+    status = blc_attc_sendReadRequest(connHandle, startAttHdl);
 
     if (status == BLE_SUCCESS) {
         GATTC_SET_PENDING(connHandle, ATT_OP_READ_RSP, blt_read_incUuid128Rsp, pSdpCfg);
@@ -695,48 +692,48 @@ static void blt_gattc_readTypeRsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRspPk
 {
     my_dump_str_data(DBG_GATTC_LOG, "[SDP]<--- Read By Type Response", 0, 0);
 
-    gattc_sdp_cfg_t *pSdpCfg = userData;
-    blt_attr_readByTypeRsp_t *rsp = (blt_attr_readByTypeRsp_t*)pAttrRspPkt;
-    u16 length = attrLen - OFFSETOF(blt_attr_readByTypeRsp_t, list); /* skip opcode && length */
-    u8 pairLen = rsp->length;
+    gattc_sdp_cfg_t          *pSdpCfg = userData;
+    blt_attr_readByTypeRsp_t *rsp     = (blt_attr_readByTypeRsp_t *)pAttrRspPkt;
+    u16                       length  = attrLen - OFFSETOF(blt_attr_readByTypeRsp_t, list); /* skip opcode && length */
+    u8                        pairLen = rsp->length;
 
     if (err) {
-        my_dump_str_data(DBG_GATTC_LOG, "   | err", (u8*)&err, 1);
+        my_dump_str_data(DBG_GATTC_LOG, "   | err", (u8 *)&err, 1);
         goto done;
     }
 
-    u16 attrHdl = 0;
-    gatt_attr_t attr;
-    u8 pairCnt = length / pairLen;
+    u16                    attrHdl = 0;
+    gatt_attr_t            attr;
+    u8                     pairCnt = length / pairLen;
     struct attr_data_list *pAttrDataList;
-    uuid_t uuid;
+    uuid_t                 uuid;
 
     if (pSdpCfg->type == GATT_DISCOVER_INCLUDE) {
         /*/////////// parse include service begin ///////////// */
 #if (1)
         /* Data can be either in UUID16 or UUID128 */
         switch (pairLen) {
-            case 8: /* UUID16 */
-                uuid.uuidLen = ATT_16_UUID_LEN;
+        case 8: /* UUID16 */
+            uuid.uuidLen = ATT_16_UUID_LEN;
             break;
-            case 6: /* UUID128 (not contain UUID field)*/
-                uuid.uuidLen = ATT_128_UUID_LEN;
-                /* Core 5.3 | Vol 3, Part G, page 1501
+        case 6: /* UUID128 (not contain UUID field)*/
+            uuid.uuidLen = ATT_128_UUID_LEN;
+            /* Core 5.3 | Vol 3, Part G, page 1501
                 * To get the included service UUID when the included service uses a 128-bit UUID,
                 * the ATT_READ_REQ PDU is used. The Attribute Handle for the ATT_READ_REQ PDU is
                 * the Attribute Handle of the included service.
                 */
             break;
-            default:
-                my_dump_str_data(DBG_GATTC_LOG, "Invalid data len", (u8*)&pairLen, 1);
-                goto done;
+        default:
+            my_dump_str_data(DBG_GATTC_LOG, "Invalid data len", (u8 *)&pairLen, 1);
+            goto done;
         }
 
         gatt_include_t incl;
 
         /* Parse characteristics found */
-        for (int i = 0; i< pairCnt; i++) {
-            pAttrDataList = (struct attr_data_list *)((u8*)rsp->list + i * pairLen);
+        for (int i = 0; i < pairCnt; i++) {
+            pAttrDataList = (struct attr_data_list *)((u8 *)rsp->list + i * pairLen);
 
             /* Attribute Handle */
             attrHdl = pAttrDataList->handle;
@@ -745,37 +742,40 @@ static void blt_gattc_readTypeRsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRspPk
                 goto done;
             }
 
-            struct incl_attr_data {
+            struct incl_attr_data
+            {
                 /* Service start handle. */
                 u16 startHdl;
                 /* Service end handle. */
                 u16 endHdl;
-                /* Service UUID. */
-                union {
-                    u8 u[0];
-                    u16 uuid16;
-                    u8 uuid128[ATT_128_UUID_LEN];
-                };
-            } * pInclAttrData __attribute__((packed));
 
-            pInclAttrData = (struct incl_attr_data *)pAttrDataList->value;
-            incl.startHdl = pInclAttrData->startHdl;
-            incl.endHdl = pInclAttrData->endHdl;
+                /* Service UUID. */
+                union
+                {
+                    u8  u[0];
+                    u16 uuid16;
+                    u8  uuid128[ATT_128_UUID_LEN];
+                };
+            } __attribute__((packed));
+
+            struct incl_attr_data *pInclAttrData = (struct incl_attr_data *)pAttrDataList->value;
+            incl.startHdl                        = pInclAttrData->startHdl;
+            incl.endHdl                          = pInclAttrData->endHdl;
 
             if (uuid.uuidLen == ATT_16_UUID_LEN) {
                 uuid.uuidVal.u16 = pInclAttrData->uuid16;
-                incl.uuid = uuid;
+                incl.uuid        = uuid;
                 /* Skip if UUID is set but doesn't match */
                 if (pSdpCfg->uuid && blc_uuid_cmp(&uuid, pSdpCfg->uuid)) {
                     continue;
                 }
             } else { /* uuid.uuidLen == ATT_128_UUID_LEN */
-                pSdpCfg->_included.attrHdl = attrHdl;
+                pSdpCfg->_included.attrHdl  = attrHdl;
                 pSdpCfg->_included.startHdl = pInclAttrData->startHdl;
-                pSdpCfg->_included.endHdl = pInclAttrData->endHdl;
+                pSdpCfg->_included.endHdl   = pInclAttrData->endHdl;
 
-                if(blt_read_incUuid128Req(connHandle, pSdpCfg) != BLE_SUCCESS){
-                    my_dump_str_data(DBG_GATTC_LOG, "[incl]read UUID128 failed", (u8*)&incl.startHdl, 2);
+                if (blt_read_incUuid128Req(connHandle, pSdpCfg) != BLE_SUCCESS) {
+                    my_dump_str_data(DBG_GATTC_LOG, "[incl]read UUID128 failed", (u8 *)&incl.startHdl, 2);
                     goto done;
                 }
             }
@@ -785,11 +785,11 @@ static void blt_gattc_readTypeRsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRspPk
              *                                      |_ endHdl (2B)
              *                                      |_ UUID (2B)
              */
-            my_dump_str_data(DBG_GATTC_LOG, "   |_Pair", (u8*)&i, 1);
-            my_dump_str_data(DBG_GATTC_LOG, "    |_Attribute Handle", (u8*)&attrHdl, 2);
-            my_dump_str_data(DBG_GATTC_LOG, "    |_Include_Declaration",0, 0);
-            my_dump_str_data(DBG_GATTC_LOG, "      | Starting Handle", (u8*)&incl.startHdl, 2);
-            my_dump_str_data(DBG_GATTC_LOG, "      | Ending Handle", (u8*)&incl.endHdl, 2);
+            my_dump_str_data(DBG_GATTC_LOG, "   |_Pair", (u8 *)&i, 1);
+            my_dump_str_data(DBG_GATTC_LOG, "    |_Attribute Handle", (u8 *)&attrHdl, 2);
+            my_dump_str_data(DBG_GATTC_LOG, "    |_Include_Declaration", 0, 0);
+            my_dump_str_data(DBG_GATTC_LOG, "      | Starting Handle", (u8 *)&incl.startHdl, 2);
+            my_dump_str_data(DBG_GATTC_LOG, "      | Ending Handle", (u8 *)&incl.endHdl, 2);
             my_dump_str_data(DBG_GATTC_LOG, "      | UUID", incl.uuid.uuidVal.u, incl.uuid.uuidLen);
 
             /*-------------------+---------------------------+---------------------------+------------------------+
@@ -803,7 +803,7 @@ static void blt_gattc_readTypeRsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRspPk
             | Include declaration                                                                                |
             +----------------------------------------------------------------------------------------------------*/
 
-            attr = (gatt_attr_t) {
+            attr = (gatt_attr_t){
                 /* Attribute_handle: handle */
                 .handle = attrHdl,
                 /* Attribute_types: UUID */
@@ -823,22 +823,22 @@ static void blt_gattc_readTypeRsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRspPk
 #if (1)
         /* Data can be either in UUID16 or UUID128 */
         switch (pairLen) {
-            case 7: /* UUID16 */
-                uuid.uuidLen = ATT_16_UUID_LEN;
-                break;
-            case 21: /* UUID128 */
-                uuid.uuidLen = ATT_128_UUID_LEN;
-                break;
-            default:
-                my_dump_str_data(DBG_GATTC_LOG, "Invalid data len", (u8*)&pairLen, 1);
-                goto done;
+        case 7:  /* UUID16 */
+            uuid.uuidLen = ATT_16_UUID_LEN;
+            break;
+        case 21: /* UUID128 */
+            uuid.uuidLen = ATT_128_UUID_LEN;
+            break;
+        default:
+            my_dump_str_data(DBG_GATTC_LOG, "Invalid data len", (u8 *)&pairLen, 1);
+            goto done;
         }
 
         gatt_chrc_t chrc;
 
         /* Parse characteristics found */
-        for (int i = 0; i< pairCnt; i++) {
-            pAttrDataList = (struct attr_data_list *)((u8*)rsp->list + i * pairLen);
+        for (int i = 0; i < pairCnt; i++) {
+            pAttrDataList = (struct attr_data_list *)((u8 *)rsp->list + i * pairLen);
 
             /* Attribute Handle */
             attrHdl = pAttrDataList->handle;
@@ -847,35 +847,38 @@ static void blt_gattc_readTypeRsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRspPk
                 goto done;
             }
 
-            struct chrc_attr_data_t {
+            struct chrc_attr_data_t
+            {
                 /** GATT Characteristic Properties. */
-                u8  properties;
+                u8 properties;
                 /** GATT Characteristic Value Attribute Handle. */
                 u16 valueHdl;
-                /** GATT Characteristic UUID. */
-                union {
-                    u8 u[0];
-                    u16 uuid16;
-                    u8 uuid128[ATT_128_UUID_LEN];
-                };
-            } *pChrcAttVal __attribute__((packed));
 
-            pChrcAttVal = (struct chrc_attr_data_t *)pAttrDataList->value;
+                /** GATT Characteristic UUID. */
+                union
+                {
+                    u8  u[0];
+                    u16 uuid16;
+                    u8  uuid128[ATT_128_UUID_LEN];
+                };
+            } __attribute__((packed));
+
+            struct chrc_attr_data_t *pChrcAttVal = (struct chrc_attr_data_t *)pAttrDataList->value;
 
             /* Convert 'struct chrc_attr_data_t' to 'gatt_chrc_t' */
-            chrc.attrHdl = pAttrDataList->handle;
+            chrc.attrHdl    = pAttrDataList->handle;
             chrc.properties = pChrcAttVal->properties;
-            chrc.valueHdl = pChrcAttVal->valueHdl;
+            chrc.valueHdl   = pChrcAttVal->valueHdl;
 
             switch (uuid.uuidLen) {
-                case ATT_16_UUID_LEN:
-                    uuid.uuidVal.u16 = pChrcAttVal->uuid16;
-                    break;
-                case ATT_128_UUID_LEN:
-                    memcpy(uuid.uuidVal.u128, pChrcAttVal->uuid128, ATT_128_UUID_LEN);
-                    break;
-                default:
-                    goto done;
+            case ATT_16_UUID_LEN:
+                uuid.uuidVal.u16 = pChrcAttVal->uuid16;
+                break;
+            case ATT_128_UUID_LEN:
+                memcpy(uuid.uuidVal.u128, pChrcAttVal->uuid128, ATT_128_UUID_LEN);
+                break;
+            default:
+                goto done;
             }
 
             chrc.uuid = uuid;
@@ -885,16 +888,16 @@ static void blt_gattc_readTypeRsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRspPk
              *                                              |_ value_handle (2B)
              *                                              |_ UUID (2B OR 16B)
              */
-            my_dump_str_data(DBG_GATTC_LOG, "   |_Pair", (u8*)&i, 1);
-            my_dump_str_data(DBG_GATTC_LOG, "    |_Attribute Handle", (u8*)&attrHdl, 2);
-            my_dump_str_data(DBG_GATTC_LOG, "    |_Chrc Properties", (u8*)&chrc.properties, 1);
-            my_dump_str_data(DBG_GATTC_LOG, "    |_Chrc Value Handle", (u8*)&chrc.valueHdl, 2);
+            my_dump_str_data(DBG_GATTC_LOG, "   |_Pair", (u8 *)&i, 1);
+            my_dump_str_data(DBG_GATTC_LOG, "    |_Attribute Handle", (u8 *)&attrHdl, 2);
+            my_dump_str_data(DBG_GATTC_LOG, "    |_Chrc Properties", (u8 *)&chrc.properties, 1);
+            my_dump_str_data(DBG_GATTC_LOG, "    |_Chrc Value Handle", (u8 *)&chrc.valueHdl, 2);
             my_dump_str_data(DBG_GATTC_LOG, "    |_Chrc UUID", chrc.uuid.uuidVal.u, uuid.uuidLen);
 
             /* Skip if UUID is set but doesn't match */
-//          if (pSdpCfg->uuid && blc_uuid_cmp(&uuid, pSdpCfg->uuid)) {
-//              continue;
-//          }
+            //          if (pSdpCfg->uuid && blc_uuid_cmp(&uuid, pSdpCfg->uuid)) {
+            //              continue;
+            //          }
 
             /*-------------------+---------------------------+------------------------------+------------------------+
             | Attribute Handle  |       Attribute Type      |   Attribute Value            |  Attribute Permission  |
@@ -907,7 +910,7 @@ static void blt_gattc_readTypeRsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRspPk
             | Characteristic declaration                                                                            |
             +-------------------------------------------------------------------------------------------------------*/
 
-            attr = (gatt_attr_t) {
+            attr = (gatt_attr_t){
                 /* Attribute_handle: handle */
                 .handle = attrHdl,
                 /* Attribute_types: UUID */
@@ -929,7 +932,8 @@ static void blt_gattc_readTypeRsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRspPk
             goto done;
         }
 
-        union {
+        union
+        {
             gatt_ccc_t ccc;
             gatt_cpf_t cpf;
             gatt_cep_t cep;
@@ -939,9 +943,8 @@ static void blt_gattc_readTypeRsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRspPk
         u16 uuidVal = pSdpCfg->uuid->uuidVal.u16;
 
         /* Parse characteristics found */
-        for (int i = 0; i< pairCnt; i++) {
-
-            pAttrDataList = (struct attr_data_list *)((u8*)rsp->list + i * pairLen);
+        for (int i = 0; i < pairCnt; i++) {
+            pAttrDataList = (struct attr_data_list *)((u8 *)rsp->list + i * pairLen);
             /* Attribute Value */
             attrHdl = pAttrDataList->handle;
             /* Handle 0 is invalid */
@@ -949,52 +952,52 @@ static void blt_gattc_readTypeRsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRspPk
                 goto done;
             }
 
-            my_dump_str_data(DBG_GATTC_LOG, "   |_Pair", (u8*)&i, 1);
-            my_dump_str_data(DBG_GATTC_LOG, "    |_Attribute Value", (u8*)&attrHdl, 2);
+            my_dump_str_data(DBG_GATTC_LOG, "   |_Pair", (u8 *)&i, 1);
+            my_dump_str_data(DBG_GATTC_LOG, "    |_Attribute Value", (u8 *)&attrHdl, 2);
 
             switch (uuidVal) {
-                case DESCRIPTOR_UUID_CHARACTERISTIC_EXTENDED_PROPERTIES: {
-                    gatt_cep_t *cep = (gatt_cep_t *)pAttrDataList->value;
-                    attrVal.cep.properties = cep->properties;
-                    my_dump_str_data(DBG_GATTC_LOG, "    |_Chrc Extended Properties", (u8*)&cep->properties, 2);
-                }
-                    break;
-                case DESCRIPTOR_UUID_CLIENT_CHARACTERISTIC_CONFIGURATION: {
-                    gatt_ccc_t *ccc = (gatt_ccc_t *)pAttrDataList->value;
-                    attrVal.ccc.flags = ccc->flags;
-                    my_dump_str_data(DBG_GATTC_LOG, "    |_Client Chrc  Config flags", (u8*)&ccc->flags, 2);
-                }
-                    break;
-                case DESCRIPTOR_UUID_SERVER_CHARACTERISTIC_CONFIGURATION: {
-                    gatt_scc_t *scc = (gatt_scc_t *)pAttrDataList->value;
-                    attrVal.scc.flags = scc->flags;
-                    my_dump_str_data(DBG_GATTC_LOG, "    |_Server Chrc Config flags", (u8*)&scc->flags, 2);
-                }
-                    break;
-                case DESCRIPTOR_UUID_CHARACTERISTIC_PRESENTATION_FORMAT: {
-                    gatt_cpf_t *cpf = (gatt_cpf_t *)pAttrDataList->value;
-                    attrVal.cpf.format = cpf->format;
-                    attrVal.cpf.exponent = cpf->exponent;
-                    attrVal.cpf.unit = cpf->unit;
-                    attrVal.cpf.name_space = cpf->name_space;
-                    attrVal.cpf.description = cpf->description;
-                    my_dump_str_data(DBG_GATTC_LOG, "    |_Chrc Presentation Format", 0, 0);
-                    my_dump_str_data(DBG_GATTC_LOG, "      |_Format", (u8*)&cpf->format, 1);
-                    my_dump_str_data(DBG_GATTC_LOG, "      |_Exponent", (u8*)&cpf->exponent, 1);
-                    my_dump_str_data(DBG_GATTC_LOG, "      |_Unit", (u8*)&cpf->unit, 2);
-                    my_dump_str_data(DBG_GATTC_LOG, "      |_Name space", (u8*)&cpf->name_space, 1);
-                    my_dump_str_data(DBG_GATTC_LOG, "      |_Description", (u8*)&cpf->description, 2);
-                }
-                    break;
-                default:
-                    my_dump_str_data(DBG_GATTC_LOG, "Unsupported chrc descriptor UUIDs", (u8*)&uuidVal, 2);
-                    goto done;
+            case DESCRIPTOR_UUID_CHARACTERISTIC_EXTENDED_PROPERTIES:
+            {
+                gatt_cep_t *cep        = (gatt_cep_t *)pAttrDataList->value;
+                attrVal.cep.properties = cep->properties;
+                my_dump_str_data(DBG_GATTC_LOG, "    |_Chrc Extended Properties", (u8 *)&cep->properties, 2);
+            } break;
+            case DESCRIPTOR_UUID_CLIENT_CHARACTERISTIC_CONFIGURATION:
+            {
+                gatt_ccc_t *ccc   = (gatt_ccc_t *)pAttrDataList->value;
+                attrVal.ccc.flags = ccc->flags;
+                my_dump_str_data(DBG_GATTC_LOG, "    |_Client Chrc  Config flags", (u8 *)&ccc->flags, 2);
+            } break;
+            case DESCRIPTOR_UUID_SERVER_CHARACTERISTIC_CONFIGURATION:
+            {
+                gatt_scc_t *scc   = (gatt_scc_t *)pAttrDataList->value;
+                attrVal.scc.flags = scc->flags;
+                my_dump_str_data(DBG_GATTC_LOG, "    |_Server Chrc Config flags", (u8 *)&scc->flags, 2);
+            } break;
+            case DESCRIPTOR_UUID_CHARACTERISTIC_PRESENTATION_FORMAT:
+            {
+                gatt_cpf_t *cpf         = (gatt_cpf_t *)pAttrDataList->value;
+                attrVal.cpf.format      = cpf->format;
+                attrVal.cpf.exponent    = cpf->exponent;
+                attrVal.cpf.unit        = cpf->unit;
+                attrVal.cpf.name_space  = cpf->name_space;
+                attrVal.cpf.description = cpf->description;
+                my_dump_str_data(DBG_GATTC_LOG, "    |_Chrc Presentation Format", 0, 0);
+                my_dump_str_data(DBG_GATTC_LOG, "      |_Format", (u8 *)&cpf->format, 1);
+                my_dump_str_data(DBG_GATTC_LOG, "      |_Exponent", (u8 *)&cpf->exponent, 1);
+                my_dump_str_data(DBG_GATTC_LOG, "      |_Unit", (u8 *)&cpf->unit, 2);
+                my_dump_str_data(DBG_GATTC_LOG, "      |_Name space", (u8 *)&cpf->name_space, 1);
+                my_dump_str_data(DBG_GATTC_LOG, "      |_Description", (u8 *)&cpf->description, 2);
+            } break;
+            default:
+                my_dump_str_data(DBG_GATTC_LOG, "Unsupported chrc descriptor UUIDs", (u8 *)&uuidVal, 2);
+                goto done;
             }
 
-            attr = (gatt_attr_t) {
-                .uuid = pSdpCfg->uuid,
+            attr = (gatt_attr_t){
+                .uuid      = pSdpCfg->uuid,
                 .user_data = &attrVal,
-                .handle = attrHdl,
+                .handle    = attrHdl,
             };
 
             if (pSdpCfg->func(connHandle, &attr, pSdpCfg) == GATT_PROC_END) {
@@ -1014,8 +1017,8 @@ done:
 
 static ble_sts_t blt_gattc_readTypeReq(u16 connHandle, gattc_sdp_cfg_t *pSdpCfg)
 {
-    u8 uuidLen;
-    u16 uuidVal, startAttHdl, endAttHdl;
+    u8        uuidLen;
+    u16       uuidVal, startAttHdl, endAttHdl;
     ble_sts_t status = BLE_SUCCESS;
 
     assert(blt_ll_isAclhdlInvalid(connHandle) == BLE_SUCCESS);
@@ -1023,30 +1026,30 @@ static ble_sts_t blt_gattc_readTypeReq(u16 connHandle, gattc_sdp_cfg_t *pSdpCfg)
     my_dump_str_data(DBG_GATTC_LOG, "[SDP]---> Read By Type Request", 0, 0);
 
     startAttHdl = pSdpCfg->startHdl;
-    endAttHdl = pSdpCfg->endHdl;
+    endAttHdl   = pSdpCfg->endHdl;
 
-    my_dump_str_data(DBG_GATTC_LOG, "   |_Starting Handle", (u8*)&startAttHdl, 2);
-    my_dump_str_data(DBG_GATTC_LOG, "   |_Ending Handle", (u8*)&endAttHdl, 2);
+    my_dump_str_data(DBG_GATTC_LOG, "   |_Starting Handle", (u8 *)&startAttHdl, 2);
+    my_dump_str_data(DBG_GATTC_LOG, "   |_Ending Handle", (u8 *)&endAttHdl, 2);
 
     switch (pSdpCfg->type) {
-        case GATT_DISCOVER_INCLUDE:
-            uuidLen = ATT_16_UUID_LEN;
-            uuidVal = DECLARATIONS_UUID_INCLUDE;
-            my_dump_str_data(DBG_GATTC_LOG, "   |_Attribute Type: Include Service", 0, 0);
-            break;
-        case GATT_DISCOVER_CHARACTERISTIC:
-            uuidLen = ATT_16_UUID_LEN;
-            uuidVal = DECLARATIONS_UUID_CHARACTERISTIC;
-            my_dump_str_data(DBG_GATTC_LOG, "   |_Attribute Type: Characteristic", 0, 0);
-            break;
-        default: /* Only 16-bit UUIDs supported */
-            uuidLen = ATT_16_UUID_LEN;
-            uuidVal = pSdpCfg->uuid->uuidVal.u16;
-            my_dump_str_data(DBG_GATTC_LOG, "   |_Attribute Type: Others 16-bit UUIDs", &uuidVal, 2);
-            break;
+    case GATT_DISCOVER_INCLUDE:
+        uuidLen = ATT_16_UUID_LEN;
+        uuidVal = DECLARATIONS_UUID_INCLUDE;
+        my_dump_str_data(DBG_GATTC_LOG, "   |_Attribute Type: Include Service", 0, 0);
+        break;
+    case GATT_DISCOVER_CHARACTERISTIC:
+        uuidLen = ATT_16_UUID_LEN;
+        uuidVal = DECLARATIONS_UUID_CHARACTERISTIC;
+        my_dump_str_data(DBG_GATTC_LOG, "   |_Attribute Type: Characteristic", 0, 0);
+        break;
+    default: /* Only 16-bit UUIDs supported */
+        uuidLen = ATT_16_UUID_LEN;
+        uuidVal = pSdpCfg->uuid->uuidVal.u16;
+        my_dump_str_data(DBG_GATTC_LOG, "   |_Attribute Type: Others 16-bit UUIDs", &uuidVal, 2);
+        break;
     }
 
-    status = blc_attc_sendReadByTypeRequest (connHandle, startAttHdl, endAttHdl, (u8*)&uuidVal, uuidLen);
+    status = blc_attc_sendReadByTypeRequest(connHandle, startAttHdl, endAttHdl, (u8 *)&uuidVal, uuidLen);
 
     if (status == BLE_SUCCESS) {
         GATTC_SET_PENDING(connHandle, ATT_OP_READ_BY_TYPE_RSP, blt_gattc_readTypeRsp, pSdpCfg);
@@ -1054,9 +1057,6 @@ static ble_sts_t blt_gattc_readTypeReq(u16 connHandle, gattc_sdp_cfg_t *pSdpCfg)
 
     return status;
 }
-
-
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -1066,8 +1066,9 @@ static ble_sts_t blt_gattc_readTypeReq(u16 connHandle, gattc_sdp_cfg_t *pSdpCfg)
 static void blt_gattc_discoveryNext(u16 connHandle, u16 lastHandle, gattc_sdp_cfg_t *pSdpCfg)
 {
     /* Skip if last_handle is not set */
-    if (lastHandle == ATT_HANDLE_NONE)
+    if (lastHandle == ATT_HANDLE_NONE) {
         goto discover;
+    }
 
     /* Continue from the last found handle */
     pSdpCfg->startHdl = lastHandle;
@@ -1082,7 +1083,7 @@ static void blt_gattc_discoveryNext(u16 connHandle, u16 lastHandle, gattc_sdp_cf
         goto done;
     }
 
-    discover:
+discover:
     /* Discover next range */
     if (!blc_gattc_discovery(connHandle, pSdpCfg)) {
         return;
@@ -1097,8 +1098,8 @@ ble_sts_t blc_gattc_discovery(u16 connHandle, gattc_sdp_cfg_t *pSdpCfg)
     /* Parameters check */
     GATTC_CHECK_PENDING;
 
-    if ((pSdpCfg == NULL) ||  \
-        (pSdpCfg->startHdl == ATT_HANDLE_NONE|| pSdpCfg->endHdl == ATT_HANDLE_NONE) || \
+    if ((pSdpCfg == NULL) ||
+        (pSdpCfg->startHdl == ATT_HANDLE_NONE || pSdpCfg->endHdl == ATT_HANDLE_NONE) ||
         (pSdpCfg->startHdl > pSdpCfg->endHdl)) {
         return GATT_ERR_INVALID_PARAMETER;
     }
@@ -1106,64 +1107,52 @@ ble_sts_t blc_gattc_discovery(u16 connHandle, gattc_sdp_cfg_t *pSdpCfg)
     ble_sts_t state = GATT_ERR_INVALID_PARAMETER;
 
     switch (pSdpCfg->type) {
-        case GATT_DISCOVER_PRIMARY:
-        case GATT_DISCOVER_SECONDARY:
-        {
-            state = pSdpCfg->uuid? blt_gattc_findTypeReq(connHandle, pSdpCfg): blt_gattc_readGroupReq(connHandle, pSdpCfg);
-        }break;
-        case GATT_DISCOVER_STD_CHAR_DESC:
-        {
-            if (!(pSdpCfg->uuid && pSdpCfg->uuid->uuidLen == ATT_16_UUID_LEN &&
-                (!blc_uuid_cmp(pSdpCfg->uuid, UUID16_DEF(DESCRIPTOR_UUID_CHARACTERISTIC_EXTENDED_PROPERTIES)) ||
-                !blc_uuid_cmp(pSdpCfg->uuid, UUID16_DEF(DESCRIPTOR_UUID_CLIENT_CHARACTERISTIC_CONFIGURATION)) ||
-                !blc_uuid_cmp(pSdpCfg->uuid, UUID16_DEF(DESCRIPTOR_UUID_SERVER_CHARACTERISTIC_CONFIGURATION)) ||
-                !blc_uuid_cmp(pSdpCfg->uuid, UUID16_DEF(DESCRIPTOR_UUID_CHARACTERISTIC_PRESENTATION_FORMAT))))) {
-                state = GATT_ERR_INVALID_PARAMETER;
-        }
-        else
-        {
+    case GATT_DISCOVER_PRIMARY:
+    case GATT_DISCOVER_SECONDARY:
+    {
+        state = pSdpCfg->uuid ? blt_gattc_findTypeReq(connHandle, pSdpCfg) : blt_gattc_readGroupReq(connHandle, pSdpCfg);
+    } break;
+    case GATT_DISCOVER_STD_CHAR_DESC:
+    {
+        if (!(pSdpCfg->uuid && pSdpCfg->uuid->uuidLen == ATT_16_UUID_LEN &&
+              (!blc_uuid_cmp(pSdpCfg->uuid, UUID16_DEF(DESCRIPTOR_UUID_CHARACTERISTIC_EXTENDED_PROPERTIES)) ||
+               !blc_uuid_cmp(pSdpCfg->uuid, UUID16_DEF(DESCRIPTOR_UUID_CLIENT_CHARACTERISTIC_CONFIGURATION)) ||
+               !blc_uuid_cmp(pSdpCfg->uuid, UUID16_DEF(DESCRIPTOR_UUID_SERVER_CHARACTERISTIC_CONFIGURATION)) ||
+               !blc_uuid_cmp(pSdpCfg->uuid, UUID16_DEF(DESCRIPTOR_UUID_CHARACTERISTIC_PRESENTATION_FORMAT))))) {
+            state = GATT_ERR_INVALID_PARAMETER;
+        } else {
             state = blt_gattc_readTypeReq(connHandle, pSdpCfg);
         }
-        }break;
-        case GATT_DISCOVER_INCLUDE:
-        case GATT_DISCOVER_CHARACTERISTIC:
-        {
-            state = blt_gattc_readTypeReq(connHandle, pSdpCfg);
-        }break;
-        case GATT_DISCOVER_DESCRIPTOR:
-        {
-            /* Only descriptors can be filtered */
-            if (pSdpCfg->uuid &&
-                (!blc_uuid_cmp(pSdpCfg->uuid, UUID16_DEF(DECLARATIONS_UUID_PRIMARY_SERVICE)) ||
-                !blc_uuid_cmp(pSdpCfg->uuid, UUID16_DEF(DECLARATIONS_UUID_SECONDARY_SERVICE)) ||
-                !blc_uuid_cmp(pSdpCfg->uuid, UUID16_DEF(DECLARATIONS_UUID_INCLUDE)) ||
-                !blc_uuid_cmp(pSdpCfg->uuid, UUID16_DEF(DECLARATIONS_UUID_CHARACTERISTIC)))) {
-                state = GATT_ERR_INVALID_PARAMETER;
-        }
-        else
-        {
+    } break;
+    case GATT_DISCOVER_INCLUDE:
+    case GATT_DISCOVER_CHARACTERISTIC:
+    {
+        state = blt_gattc_readTypeReq(connHandle, pSdpCfg);
+    } break;
+    case GATT_DISCOVER_DESCRIPTOR:
+    {
+        /* Only descriptors can be filtered */
+        if (pSdpCfg->uuid &&
+            (!blc_uuid_cmp(pSdpCfg->uuid, UUID16_DEF(DECLARATIONS_UUID_PRIMARY_SERVICE)) ||
+             !blc_uuid_cmp(pSdpCfg->uuid, UUID16_DEF(DECLARATIONS_UUID_SECONDARY_SERVICE)) ||
+             !blc_uuid_cmp(pSdpCfg->uuid, UUID16_DEF(DECLARATIONS_UUID_INCLUDE)) ||
+             !blc_uuid_cmp(pSdpCfg->uuid, UUID16_DEF(DECLARATIONS_UUID_CHARACTERISTIC)))) {
+            state = GATT_ERR_INVALID_PARAMETER;
+        } else {
             state = blt_gattc_findInfoReq(connHandle, pSdpCfg);
         }
-        }break;
-        case GATT_DISCOVER_ATTRIBUTE:
-        {
-            state = blt_gattc_findInfoReq(connHandle, pSdpCfg);
-        }break;
-        default:
-        {
-            my_dump_str_data(DBG_GATTC_LOG, "Invalid discovery type", (u8*)&pSdpCfg->type, 1);
-        }break;
+    } break;
+    case GATT_DISCOVER_ATTRIBUTE:
+    {
+        state = blt_gattc_findInfoReq(connHandle, pSdpCfg);
+    } break;
+    default:
+    {
+        my_dump_str_data(DBG_GATTC_LOG, "Invalid discovery type", (u8 *)&pSdpCfg->type, 1);
+    } break;
     }
     return state;
 }
-
-
-
-
-
-
-
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -1172,14 +1161,13 @@ ble_sts_t blc_gattc_discovery(u16 connHandle, gattc_sdp_cfg_t *pSdpCfg)
 /////////////////////////////////////////////////////////////////////////////////////////////////
 ble_sts_t blt_gattc_mtuSizeExchangeReq(u16 connHandle, u16 mtuSize)
 {
-
     GATTC_CHECK_PENDING;
 
     if (mtuSize < ATT_MTU_SIZE) {
         return GATT_ERR_INVALID_PARAMETER;
     }
 
-    ble_sts_t status = blc_attc_sendMtuSizeExchangeRequest (connHandle, mtuSize);
+    ble_sts_t status = blc_attc_sendMtuSizeExchangeRequest(connHandle, mtuSize);
 
     if (status == BLE_SUCCESS) {
         my_dump_str_data(DBG_GATTC_LOG, "[GATTC]---> ATT MTU Size Exchange Request", 0, 0);
@@ -1188,14 +1176,6 @@ ble_sts_t blt_gattc_mtuSizeExchangeReq(u16 connHandle, u16 mtuSize)
 
     return status;
 }
-
-
-
-
-
-
-
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -1206,12 +1186,12 @@ static void blt_gattc_readMultRsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRspPk
 {
     my_dump_str_data(DBG_GATTC_LOG, "[GATTC]<--- Read Multiple Response", 0, 0);
 
-    gattc_read_cfg_t *pRdCfg = userData;
-    u8 *pData = pAttrRspPkt->data;
-    u16 dataLen = attrLen - 1; /* skip opcode */
+    gattc_read_cfg_t *pRdCfg  = userData;
+    u8               *pData   = pAttrRspPkt->data;
+    u16               dataLen = attrLen - 1; /* skip opcode */
 
     if (err) {
-        my_dump_str_data(DBG_GATTC_LOG, "   | err", (u8*)&err, 1);
+        my_dump_str_data(DBG_GATTC_LOG, "   | err", (u8 *)&err, 1);
         goto done;
     }
 
@@ -1235,7 +1215,7 @@ static ble_sts_t blt_gattc_readMultReq(u16 connHandle, gattc_read_cfg_t *pRdCfg)
 
     assert(blt_ll_isAclhdlInvalid(connHandle) == BLE_SUCCESS);
 
-    ble_sts_t status = blc_attc_sendReadMultReq (connHandle, pRdCfg->hdlCnt, pRdCfg->multiple.handles);
+    ble_sts_t status = blc_attc_sendReadMultReq(connHandle, pRdCfg->hdlCnt, pRdCfg->multiple.handles);
 
     if (status == BLE_SUCCESS) {
         GATTC_SET_PENDING(connHandle, ATT_OP_READ_MULTIPLE_RSP, blt_gattc_readMultRsp, pRdCfg);
@@ -1243,7 +1223,6 @@ static ble_sts_t blt_gattc_readMultReq(u16 connHandle, gattc_read_cfg_t *pRdCfg)
 
     return status;
 }
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -1254,34 +1233,34 @@ static void blt_gattc_readMultVarRsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRs
 {
     my_dump_str_data(DBG_GATTC_LOG, "[GATTC]<--- Read Multiple Variable Response", 0, 0);
 
-    gattc_read_cfg_t *pRdCfg = userData;
-    u16 dataLen = attrLen - 1; /* skip opcode */
+    gattc_read_cfg_t *pRdCfg  = userData;
+    u16               dataLen = attrLen - 1; /* skip opcode */
 
     if (err) {
-        my_dump_str_data(DBG_GATTC_LOG, "   | err", (u8*)&err, 1);
+        my_dump_str_data(DBG_GATTC_LOG, "   | err", (u8 *)&err, 1);
         goto done;
     }
 
-    blt_attr_readMultiVarRsp_t *rsp = (blt_attr_readMultiVarRsp_t*)pAttrRspPkt;
+    blt_attr_readMultiVarRsp_t *rsp = (blt_attr_readMultiVarRsp_t *)pAttrRspPkt;
 
-    u8 i = 0;
-    struct attr_value_tuple_list * pLenValTupleList;
-    u16 tupleHdrLen = sizeof(pLenValTupleList->length);
+    u8                            i = 0;
+    struct attr_value_tuple_list *pLenValTupleList;
+    u16                           tupleHdrLen = sizeof(pLenValTupleList->length);
 
-    while(dataLen > tupleHdrLen) {
+    while (dataLen > tupleHdrLen) {
         pLenValTupleList = &rsp->list[i++];
-        u16 tupleLen = pLenValTupleList->length + tupleHdrLen;
+        u16 tupleLen     = pLenValTupleList->length + tupleHdrLen;
 
         /* If a Length Value Tuple is truncated, then the amount of Attribute
          * Value will be less than the value of the Value Length field. */
-        if(dataLen < tupleLen) {
+        if (dataLen < tupleLen) {
             tupleLen = dataLen;
         }
 
         gatt_read_data_t rdData = {
             .rdState = GATT_RD_CMPLT,
             .dataVal = pLenValTupleList->attrValue,
-            .dataLen = tupleLen-tupleHdrLen,
+            .dataLen = tupleLen - tupleHdrLen,
         };
 
         pRdCfg->func(connHandle, 0, &rdData, pRdCfg);
@@ -1301,7 +1280,7 @@ static ble_sts_t blt_gattc_readMultVarReq(u16 connHandle, gattc_read_cfg_t *pRdC
 
     assert(blt_ll_isAclhdlInvalid(connHandle) == BLE_SUCCESS);
 
-    ble_sts_t status = blc_attc_sendReadMultVarReq (connHandle, pRdCfg->hdlCnt, pRdCfg->multiple.handles);
+    ble_sts_t status = blc_attc_sendReadMultVarReq(connHandle, pRdCfg->hdlCnt, pRdCfg->multiple.handles);
 
     if (status == BLE_SUCCESS) {
         GATTC_SET_PENDING(connHandle, ATT_OP_READ_MULTIPLE_VARIABLE_RSP, blt_gattc_readMultVarRsp, pRdCfg);
@@ -1309,7 +1288,6 @@ static ble_sts_t blt_gattc_readMultVarReq(u16 connHandle, gattc_read_cfg_t *pRdC
 
     return status;
 }
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -1322,36 +1300,35 @@ static ble_sts_t blt_gattc_readMultVarReq(u16 connHandle, gattc_read_cfg_t *pRdC
 /////////////////////////////////////////////////////////////////////////////////////////////////
 static void blt_gattc_readRsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRspPkt, u16 attrLen, void *userData)
 {
-    gattc_read_cfg_t *pRdCfg = userData;
-    u8 *pData = pAttrRspPkt->data;
-    u16 dataLen = attrLen - 1; /* skip opcode */
-    u8 readState;
+    gattc_read_cfg_t *pRdCfg  = userData;
+    u8               *pData   = pAttrRspPkt->data;
+    u16               dataLen = attrLen - 1; /* skip opcode */
+    u8                readState;
 
     if (err) {
-        my_dump_str_data(DBG_GATTC_LOG, "   | err", (u8*)&err, 1);
+        my_dump_str_data(DBG_GATTC_LOG, "   | err", (u8 *)&err, 1);
         goto done;
     }
 
     if (pRdCfg->hdlCnt == 0) { /* GATT Read Using Characteristic UUID RSP */
         my_dump_str_data(DBG_GATTC_LOG, "[GATTC]<--- Read By UUID Response", 0, 0);
 
-    blt_attr_readByTypeRsp_t *rsp = (blt_attr_readByTypeRsp_t*)pAttrRspPkt;
-    u16 length = attrLen - OFFSETOF(blt_attr_readByTypeRsp_t, list); /* skip opcode && length */
-    u8 pairLen = rsp->length;
-    u8 attrDataListHdr = OFFSETOF(struct attr_data_list, value);
+        blt_attr_readByTypeRsp_t *rsp             = (blt_attr_readByTypeRsp_t *)pAttrRspPkt;
+        u16                       length          = attrLen - OFFSETOF(blt_attr_readByTypeRsp_t, list); /* skip opcode && length */
+        u8                        pairLen         = rsp->length;
+        u8                        attrDataListHdr = OFFSETOF(struct attr_data_list, value);
 
         if (pairLen < attrDataListHdr) {
-            my_dump_str_data(DBG_GATTC_LOG, "   | err", (u8*)&err, 1);
+            my_dump_str_data(DBG_GATTC_LOG, "   | err", (u8 *)&err, 1);
             goto done;
         }
 
-        u16 attrHdl = 0;
+        u16                    attrHdl = 0;
         struct attr_data_list *pAttrDataList;
 
         /* Parse values found */
-        for (pAttrDataList = rsp->list; length; length -= pairLen, \
-             pAttrDataList = (struct attr_data_list *)((u8 *)pAttrDataList + pairLen)) {
-
+        for (pAttrDataList = rsp->list; length; length -= pairLen,
+            pAttrDataList  = (struct attr_data_list *)((u8 *)pAttrDataList + pairLen)) {
             /* Attribute Handle */
             attrHdl = pAttrDataList->handle;
             /* Handle 0 is invalid */
@@ -1373,7 +1350,7 @@ static void blt_gattc_readRsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRspPkt, u
 
 
             u16 valLen = pairLen > length ? length - attrDataListHdr : pairLen - attrDataListHdr;
-            readState = GATT_RD_CMPLT;
+            readState  = GATT_RD_CMPLT;
 
             gatt_read_data_t rdData = {
                 .rdState = readState,
@@ -1408,9 +1385,9 @@ static void blt_gattc_readRsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRspPkt, u
     } else { /* GATT Read_Rsp / Read_Blob_Rsp */
 
         /* debug log used */
-        if (pRdCfg->single.offset) {  /* GATT Read Long Characteristic Values RSP */
+        if (pRdCfg->single.offset) { /* GATT Read Long Characteristic Values RSP */
             my_dump_str_data(DBG_GATTC_LOG, "[GATTC]<--- Read Blob Response", 0, 0);
-        } else { /* GATT Read Characteristic Values RSP */
+        } else {                     /* GATT Read Characteristic Values RSP */
             my_dump_str_data(DBG_GATTC_LOG, "[GATTC]<--- Read Response", 0, 0);
         }
 
@@ -1436,20 +1413,23 @@ static void blt_gattc_readRsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRspPkt, u
             .dataLen = dataLen,
         };
 
-        if(pRdCfg->single.wBuff){
+        if (pRdCfg->single.wBuff) {
             s16 leftSpace = pRdCfg->single.maxLen - pRdCfg->single.offset;
             leftSpace < 0 ? (err = GATT_ERR_DATA_LENGTH_EXCEED_MEM_RESTRICTION) : (err = 0);
-            smemcpy(pRdCfg->single.wBuff + pRdCfg->single.offset, pData, min(dataLen, leftSpace));
+            if (leftSpace > 0) {
+                memcpy(pRdCfg->single.wBuff + pRdCfg->single.offset, pData, min(dataLen, leftSpace));
+            }
         }
 
-        if(pRdCfg->single.wBuffLen)
+        if (pRdCfg->single.wBuffLen) {
             *pRdCfg->single.wBuffLen = pRdCfg->single.offset + dataLen;
+        }
 
         if (pRdCfg->func(connHandle, err, &rdData, pRdCfg) == GATT_PROC_END) {
             return;
         }
 
-        if(readState == GATT_RD_CMPLT){
+        if (readState == GATT_RD_CMPLT) {
             return;
         }
 
@@ -1473,10 +1453,6 @@ static void blt_gattc_readRsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRspPkt, u
 done:
     pRdCfg->func(connHandle, err, NULL, pRdCfg);
 }
-
-
-
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -1505,16 +1481,15 @@ ble_sts_t blc_gattc_readAttributeValue(u16 connHandle, gattc_read_cfg_t *pRdCfg)
     } else if (pRdCfg->hdlCnt == 0) { /* GATT Read Using Characteristic UUID REQ*/
         my_dump_str_data(DBG_GATTC_LOG, "[GATTC]---> Read By UUID Request", 0, 0);
         opcodeMark = ATT_OP_READ_BY_TYPE_RSP;
-        status = blc_attc_sendReadByTypeRequest (connHandle, pRdCfg->byUuid.startHdl, pRdCfg->byUuid.endHdl,
-                                                    pRdCfg->byUuid.uuid->uuidVal.u, pRdCfg->byUuid.uuid->uuidLen);
+        status     = blc_attc_sendReadByTypeRequest(connHandle, pRdCfg->byUuid.startHdl, pRdCfg->byUuid.endHdl, pRdCfg->byUuid.uuid->uuidVal.u, pRdCfg->byUuid.uuid->uuidLen);
     } else if (pRdCfg->single.offset) { /* GATT Read Long Characteristic Values REQ */
         my_dump_str_data(DBG_GATTC_LOG, "[GATTC]---> Read Blob Request", 0, 0);
         opcodeMark = ATT_OP_READ_BLOB_RSP;
-        status = blc_attc_sendReadBlobRequest(connHandle, pRdCfg->single.handle, pRdCfg->single.offset);
+        status     = blc_attc_sendReadBlobRequest(connHandle, pRdCfg->single.handle, pRdCfg->single.offset);
     } else { /* GATT Read Characteristic Values REQ */
         my_dump_str_data(DBG_GATTC_LOG, "[GATTC]---> Read Request", 0, 0);
         opcodeMark = ATT_OP_READ_RSP;
-        status = blc_attc_sendReadRequest(connHandle, pRdCfg->single.handle);
+        status     = blc_attc_sendReadRequest(connHandle, pRdCfg->single.handle);
     }
 
     if (status == BLE_SUCCESS) {
@@ -1523,23 +1498,6 @@ ble_sts_t blc_gattc_readAttributeValue(u16 connHandle, gattc_read_cfg_t *pRdCfg)
 
     return status;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -1571,7 +1529,7 @@ static void blt_gattc_writeRsp(u16 connHandle, u8 err, attr_pkt_t *pAttrRspPkt, 
     gattc_write_cfg_t *pWrCfg = userData;
 
     if (err) {
-        my_dump_str_data(DBG_GATTC_LOG, "   | err", (u8*)&err, 1);
+        my_dump_str_data(DBG_GATTC_LOG, "   | err", (u8 *)&err, 1);
     }
 
     (void)pAttrRspPkt;
@@ -1586,15 +1544,15 @@ static void blt_gattc_prepareWriteRsp(u16 connHandle, u8 err, attr_pkt_t *pAttrR
     gattc_write_cfg_t *pWrCfg = userData;
 
     if (err) {
-        my_dump_str_data(DBG_GATTC_LOG, "   | err", (u8*)&err, 1);
+        my_dump_str_data(DBG_GATTC_LOG, "   | err", (u8 *)&err, 1);
         goto done;
     }
 
-    ble_sts_t status = BLE_SUCCESS;
-    blt_attr_prepareWriteRsp_t *rsp = (blt_attr_prepareWriteRsp_t*)pAttrRspPkt;
-    u16 valLen = attrLen - sizeof(blt_attr_prepareWriteRsp_t);
+    ble_sts_t                   status = BLE_SUCCESS;
+    blt_attr_prepareWriteRsp_t *rsp    = (blt_attr_prepareWriteRsp_t *)pAttrRspPkt;
+    u16                         valLen = attrLen - sizeof(blt_attr_prepareWriteRsp_t);
 
-    if ((valLen > pWrCfg->length) || (rsp->valueOffset != pWrCfg->offset ) || (rsp->handle != pWrCfg->handle) || \
+    if ((valLen > pWrCfg->length) || (rsp->valueOffset != pWrCfg->offset) || (rsp->handle != pWrCfg->handle) ||
         memcmp(rsp->partAttrValue, pWrCfg->data, valLen) != 0) {
         my_dump_str_data(DBG_GATTC_LOG, "[GATTC]---> Cancel Write Request", 0, 0);
         status = blc_attc_sendExecuteWriteRequest(connHandle, pWrCfg->handle, ATT_EXEC_WRITE_CANCEL);
@@ -1648,7 +1606,7 @@ static ble_sts_t blt_gattc_prepareWrite(u16 connHandle, gattc_write_cfg_t *pWrCf
 
     u16 attrValLen = min(pWrCfg->length, attrValLenLimit);
 
-    status = blc_attc_sendPrepareWriteRequest (connHandle, pWrCfg->handle, pWrCfg->offset, pWrCfg->data, attrValLen);
+    status = blc_attc_sendPrepareWriteRequest(connHandle, pWrCfg->handle, pWrCfg->offset, pWrCfg->data, attrValLen);
     my_dump_str_data(DBG_GATTC_LOG, "[GATTC]---> Prepare Write Request", 0, 0);
 
     if (status == BLE_SUCCESS) {
@@ -1657,9 +1615,6 @@ static ble_sts_t blt_gattc_prepareWrite(u16 connHandle, gattc_write_cfg_t *pWrCf
 
     return status;
 }
-
-
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -1671,7 +1626,7 @@ ble_sts_t blc_gattc_writeAttributeValue(u16 connHandle, gattc_write_cfg_t *pWrCf
     /* Parameters check */
     GATTC_CHECK_PENDING;
 
-    if ((pWrCfg == NULL) || !pWrCfg->handle || \
+    if ((pWrCfg == NULL) || !pWrCfg->handle ||
         ((pWrCfg->withoutRsp == false) && pWrCfg->func == NULL)) {
         return GATT_ERR_INVALID_PARAMETER;
     }
@@ -1680,14 +1635,14 @@ ble_sts_t blc_gattc_writeAttributeValue(u16 connHandle, gattc_write_cfg_t *pWrCf
 
     gap_ms_para_t *pGap_ms_para = blc_gap_getMasterSlavePara(connHandle);
 
-    u16 attrValLen = pWrCfg->length;
+    u16 attrValLen     = pWrCfg->length;
     u16 attValLimitLen = (pGap_ms_para->effective_MTU - 3);
 
     /* If the length exceeds MTU-1, it will be truncated */
     /* Write command, not need 'pWrCfg->func'  */
-    if(pWrCfg->withoutRsp == true) {
+    if (pWrCfg->withoutRsp == true) {
         attrValLen = attrValLen > attValLimitLen ? attValLimitLen : attrValLen;
-        return blc_attc_sendWriteCommand (connHandle, pWrCfg->handle, pWrCfg->data, attrValLen);
+        return blc_attc_sendWriteCommand(connHandle, pWrCfg->handle, pWrCfg->data, attrValLen);
     }
 
     /* attr_pkt_data length < ATT_MTU -1 */
@@ -1705,16 +1660,6 @@ ble_sts_t blc_gattc_writeAttributeValue(u16 connHandle, gattc_write_cfg_t *pWrCf
     return status;
 }
 
-
-
-
-
-
-
-
-
-
-
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                  GATT_SUBSCRIBE_API FOR USERS
@@ -1722,7 +1667,8 @@ ble_sts_t blc_gattc_writeAttributeValue(u16 connHandle, gattc_write_cfg_t *pWrCf
 /////////////////////////////////////////////////////////////////////////////////////////////////
 static void blt_gattc_writeSubCccCb(u16 connHandle, u8 err, attr_pkt_t *pAttrRspPkt, u16 attrLen, void *userData)
 {
-    (void)attrLen;(void)pAttrRspPkt;
+    (void)attrLen;
+    (void)pAttrRspPkt;
     gattc_sub_ccc_cfg_t *pSubCccCfg = userData;
     my_dump_str_data(DBG_GATTC_LOG, "[GATTC]<--- Write CCC Response", 0, 0);
 
@@ -1740,7 +1686,7 @@ ble_sts_t blc_gattc_writeSubscribeCCCRequest(u16 connHandle, gattc_sub_ccc_cfg_t
 
     my_dump_str_data(DBG_GATTC_LOG, "[GATTC]---> Write CCC Request [cccHdl]", &pSubCccCfg->valueHdl, 2);
 
-    ble_sts_t status = blc_attc_sendWriteRequest(connHandle, pSubCccCfg->valueHdl, (u8*)&pSubCccCfg->value, 2);
+    ble_sts_t status = blc_attc_sendWriteRequest(connHandle, pSubCccCfg->valueHdl, (u8 *)&pSubCccCfg->value, 2);
 
     if (status == BLE_SUCCESS) {
         GATTC_SET_PENDING(connHandle, ATT_OP_WRITE_RSP, blt_gattc_writeSubCccCb, pSubCccCfg);
@@ -1751,10 +1697,11 @@ ble_sts_t blc_gattc_writeSubscribeCCCRequest(u16 connHandle, gattc_sub_ccc_cfg_t
 
 bool blc_gattc_addSubscribeCCCNode(u16 connHandle, gattc_sub_ccc_msg_t *pSubNode)
 {
-    if (blt_ll_isAclhdlInvalid(connHandle) != BLE_SUCCESS)
+    if (blt_ll_isAclhdlInvalid(connHandle) != BLE_SUCCESS) {
         return false;
+    }
 
-    struct single_list* pSubL = &gattc_subCccEntry[connHandle&0x0f];
+    struct single_list *pSubL = &gattc_subCccEntry[connHandle & 0x0f];
 
     SLIST_INSERT_NODE_HEAD(pSubL, pSubNode);
 
@@ -1763,16 +1710,16 @@ bool blc_gattc_addSubscribeCCCNode(u16 connHandle, gattc_sub_ccc_msg_t *pSubNode
 
 void blt_gattc_notification(u16 connHandle, attr_pkt_t *attr, u16 attrLen)
 {
-    struct single_list* pSubL = &gattc_subCccEntry[connHandle&0x0f];
-    blt_attr_handleValueNtf_t *pHdlValNtf = (blt_attr_handleValueNtf_t*)attr;
-    struct single_list_node *cur = NULL;
+    struct single_list        *pSubL      = &gattc_subCccEntry[connHandle & 0x0f];
+    blt_attr_handleValueNtf_t *pHdlValNtf = (blt_attr_handleValueNtf_t *)attr;
+    struct single_list_node   *cur        = NULL;
 
-    SLIST_FOREACH(cur, pSubL, next) {
-        gattc_sub_ccc_msg_t *pTmpNode = (gattc_sub_ccc_msg_t*)cur;
-        if(pHdlValNtf->handle >= pTmpNode->startHdl && pHdlValNtf->handle <= pTmpNode->endHdl)
-        {
-            if(pTmpNode->ntfOrIndFunc) {
-                pTmpNode->ntfOrIndFunc(connHandle, pHdlValNtf->handle, pHdlValNtf->value, attrLen-3);
+    SLIST_FOREACH(cur, pSubL, next)
+    {
+        gattc_sub_ccc_msg_t *pTmpNode = (gattc_sub_ccc_msg_t *)cur;
+        if (pHdlValNtf->handle >= pTmpNode->startHdl && pHdlValNtf->handle <= pTmpNode->endHdl) {
+            if (pTmpNode->ntfOrIndFunc) {
+                pTmpNode->ntfOrIndFunc(connHandle, pHdlValNtf->handle, pHdlValNtf->value, attrLen - 3);
                 break;
             }
         }
@@ -1781,13 +1728,13 @@ void blt_gattc_notification(u16 connHandle, attr_pkt_t *attr, u16 attrLen)
 
 void blt_gattc_multiNotification(u16 connHandle, attr_pkt_t *attr, u16 attrLen)
 {
-    struct single_list* pSubL = &gattc_subCccEntry[connHandle&0x0f];
-    struct single_list_node *cur = NULL;
-    blt_attr_multiHandleValueNtf_t *pMultiHdlValNtf = (blt_attr_multiHandleValueNtf_t*)attr;
+    struct single_list             *pSubL           = &gattc_subCccEntry[connHandle & 0x0f];
+    struct single_list_node        *cur             = NULL;
+    blt_attr_multiHandleValueNtf_t *pMultiHdlValNtf = (blt_attr_multiHandleValueNtf_t *)attr;
 
     struct attr_ntf_value_tuple_list *ntfValTuple = &pMultiHdlValNtf->list[0];
-    u16 attrDataLen = attrLen - 1; /* skip opcode[1B] */
-    u16 ntfValTupleLen;
+    u16                               attrDataLen = attrLen - 1; /* skip opcode[1B] */
+    u16                               ntfValTupleLen;
 
     while (attrDataLen > sizeof(struct attr_ntf_value_tuple_list)) {
         /* valid length check */
@@ -1796,11 +1743,11 @@ void blt_gattc_multiNotification(u16 connHandle, attr_pkt_t *attr, u16 attrLen)
             return;
         }
         /* process each notify value tuple */
-        SLIST_FOREACH(cur, pSubL, next) {
-            gattc_sub_ccc_msg_t *pTmpNode = (gattc_sub_ccc_msg_t*)cur;
-            if(ntfValTuple->handle >= pTmpNode->startHdl && ntfValTuple->handle <= pTmpNode->endHdl)
-            {
-                if(pTmpNode->ntfOrIndFunc) {
+        SLIST_FOREACH(cur, pSubL, next)
+        {
+            gattc_sub_ccc_msg_t *pTmpNode = (gattc_sub_ccc_msg_t *)cur;
+            if (ntfValTuple->handle >= pTmpNode->startHdl && ntfValTuple->handle <= pTmpNode->endHdl) {
+                if (pTmpNode->ntfOrIndFunc) {
                     pTmpNode->ntfOrIndFunc(connHandle, ntfValTuple->handle, ntfValTuple->value, ntfValTuple->length);
                     break;
                 }
@@ -1809,35 +1756,28 @@ void blt_gattc_multiNotification(u16 connHandle, attr_pkt_t *attr, u16 attrLen)
 
         /* get the next notify value tuple */
         attrDataLen -= ntfValTupleLen;
-        ntfValTuple = (struct attr_ntf_value_tuple_list *)((u8*)ntfValTuple + ntfValTupleLen);
+        ntfValTuple = (struct attr_ntf_value_tuple_list *)((u8 *)ntfValTuple + ntfValTupleLen);
     }
 }
 
-
 void blc_gattc_cleanAllSubscribeCCCNode(u16 connHandle)
 {
-    if (blt_ll_isAclhdlInvalid(connHandle) != BLE_SUCCESS)
-        return ;
+    if (blt_ll_isAclhdlInvalid(connHandle) != BLE_SUCCESS) {
+        return;
+    }
 
-    struct single_list* pSubL = &gattc_subCccEntry[connHandle&0x0f];
+    struct single_list *pSubL = &gattc_subCccEntry[connHandle & 0x0f];
 
     SLIST_FIRST(pSubL) = NULL;
-
 }
 
 void blc_gattc_removeSubscribeCCCNode(u16 connHandle, gattc_sub_ccc_msg_t *pSubNode)
 {
-    if (blt_ll_isAclhdlInvalid(connHandle) != BLE_SUCCESS)
-        return ;
+    if (blt_ll_isAclhdlInvalid(connHandle) != BLE_SUCCESS) {
+        return;
+    }
 
-    struct single_list* pSubL = &gattc_subCccEntry[connHandle&0x0f];
+    struct single_list *pSubL = &gattc_subCccEntry[connHandle & 0x0f];
 
     SLIST_DELETE_NODE(pSubL, pSubNode);
 }
-
-
-
-
-
-
-

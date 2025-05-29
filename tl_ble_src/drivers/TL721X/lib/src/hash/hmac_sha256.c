@@ -28,9 +28,6 @@
 #include "lib/include/hash/hmac_sha256.h"
 
 
-
-
-
 #ifdef SUPPORT_HASH_SHA256
 /**
  * @brief       init hmac-sha256
@@ -61,7 +58,6 @@ unsigned int hmac_sha256_update(HMAC_SHA256_CTX *ctx, const unsigned char *msg, 
     return hmac_update(ctx, msg, msg_bytes);
 }
 
-
 /**
  * @brief       message update done, get the hmac
  * @param[in]   ctx                    - HMAC_CTX context pointer.
@@ -77,7 +73,6 @@ unsigned int hmac_sha256_final(HMAC_SHA256_CTX *ctx, unsigned char *mac)
 {
     return hmac_final(ctx, mac);
 }
-
 
 /**
  * @brief       message update done, get the hmac
@@ -100,7 +95,7 @@ unsigned int hmac_sha256(unsigned char *key, unsigned short sp_key_idx, unsigned
 }
 
 
-#ifdef HASH_DMA_FUNCTION
+    #ifdef HASH_DMA_FUNCTION
 /**
  * @brief       init dma hmac-sha256
  * @param[in]   ctx                    - HMAC_SHA256_DMA_CTX context pointer.
@@ -110,8 +105,7 @@ unsigned int hmac_sha256(unsigned char *key, unsigned short sp_key_idx, unsigned
  * @param[in]   callback               - callback function pointer.
  * @return      0:success     other:error
  */
-unsigned int hmac_sha256_dma_init(HMAC_SHA256_DMA_CTX *ctx, const unsigned char *key, unsigned short sp_key_idx, unsigned int key_bytes,
-        HASH_CALLBACK callback)
+unsigned int hmac_sha256_dma_init(HMAC_SHA256_DMA_CTX *ctx, const unsigned char *key, unsigned short sp_key_idx, unsigned int key_bytes, HASH_CALLBACK callback)
 {
     return hmac_dma_init(ctx, HASH_SHA256, key, sp_key_idx, key_bytes, callback);
 }
@@ -146,12 +140,10 @@ unsigned int hmac_sha256_dma_update_blocks(HMAC_SHA256_DMA_CTX *ctx, unsigned in
       -# 1. please make sure the three parameters are valid, and ctx is initialized.
   @endverbatim
  */
-unsigned int hmac_sha256_dma_final(HMAC_SHA256_DMA_CTX *ctx, unsigned int *remainder_msg, unsigned int remainder_bytes,
-        unsigned int *mac)
+unsigned int hmac_sha256_dma_final(HMAC_SHA256_DMA_CTX *ctx, unsigned int *remainder_msg, unsigned int remainder_bytes, unsigned int *mac)
 {
     return hmac_dma_final(ctx, remainder_msg, remainder_bytes, mac);
 }
-
 
 /**
  * @brief       init dma hmac-sha256
@@ -164,13 +156,12 @@ unsigned int hmac_sha256_dma_final(HMAC_SHA256_DMA_CTX *ctx, unsigned int *remai
  * @param[in]   callback               - callback function pointer.
  * @return      0:success     other:error
  */
-unsigned int hmac_sha256_dma(unsigned char *key, unsigned short sp_key_idx, unsigned int key_bytes, unsigned int *msg, unsigned int msg_bytes,
-        unsigned int *mac, HASH_CALLBACK callback)
+unsigned int hmac_sha256_dma(unsigned char *key, unsigned short sp_key_idx, unsigned int key_bytes, unsigned int *msg, unsigned int msg_bytes, unsigned int *mac, HASH_CALLBACK callback)
 {
     return hmac_dma(HASH_SHA256, key, sp_key_idx, key_bytes, msg, msg_bytes, mac, callback);
 }
 
-#endif
+    #endif
 
 
 #endif

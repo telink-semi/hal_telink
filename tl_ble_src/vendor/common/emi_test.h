@@ -26,33 +26,31 @@
 #define VENDOR_COMMON_EMI_TEST_H_
 
 
-
-
 /**
  * @brief   Application EMI test enable or disable
  *          user can set it in app_config.h, default disable if user not set it
  */
 #ifndef APP_EMI_TEST_ENABLE
-#define APP_EMI_TEST_ENABLE                 0
+    #define APP_EMI_TEST_ENABLE 0
 #endif
-
 
 
 /**
  * @brief Define where the configuration data will be saved in the binary file.
  */
-#define PA_SETTING_ADDR             (0x04)
-#define GENERAL_SETTING_ADDR        (0x16)
+#define PA_SETTING_ADDR      (0x04)
+#define GENERAL_SETTING_ADDR (0x16)
 
 /**
  * @brief       Enumeration type of PA state.
  */
-typedef enum{
-    PA_SETTING_STATE_INIT = 0x01,
-    PA_SETTING_STATE_TX = 0x02,
-    PA_SETTING_STATE_RX = 0x03,
+typedef enum
+{
+    PA_SETTING_STATE_INIT   = 0x01,
+    PA_SETTING_STATE_TX     = 0x02,
+    PA_SETTING_STATE_RX     = 0x03,
     PA_SETTING_STATE_BYPASS = 0x04,
-}pa_setting_state_e;
+} pa_setting_state_e;
 
 /**
  * @brief       This function serves to execute PA operations according to the state.
@@ -60,7 +58,6 @@ typedef enum{
  * @return      none
  */
 extern void pa_operation(pa_setting_state_e state);
-
 
 
 /**
@@ -98,16 +95,6 @@ extern unsigned int read_data32(unsigned int addr);
  * @return      none
  */
 extern void pa_setting_init(unsigned int addr, unsigned char bypass_en);
-
-
-
-
-
-
-
-
-
-
 
 
 /**

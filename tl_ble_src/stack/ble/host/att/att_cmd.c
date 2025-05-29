@@ -27,8 +27,6 @@
  *******************************************************************************************************/
 #include "att_cmd.h"
 
-
-
 /**
  * Format of the ATT_ERROR_RSP PDU
  * | Parameter                          | Size (octets)     |
@@ -40,8 +38,9 @@
  */
 u16 blt_att_packageErrorRsp(u8 errOpcode, u16 errHandle, u8 errReason, attr_pkt_t *txBuf)
 {
-    if(!txBuf)
+    if (!txBuf) {
         return 0;
+    }
     u8 *buffer = &txBuf->opcode; //skip dataLen field
 
     U8_TO_STREAM(buffer, ATT_OP_ERROR_RSP);
@@ -61,16 +60,16 @@ u16 blt_att_packageErrorRsp(u8 errOpcode, u16 errHandle, u8 errReason, attr_pkt_
  */
 int blt_att_packageExchangeMtuReq(u16 mtuSize, attr_pkt_t *txBuf)
 {
-    u8 buffLen = 0;
-    u8 *buffer = &txBuf->opcode; //skip dataLen field
+    u8  buffLen = 0;
+    u8 *buffer  = &txBuf->opcode; //skip dataLen field
 
     buffer[buffLen++] = ATT_OP_EXCHANGE_MTU_REQ;
     buffer[buffLen++] = mtuSize & 0xFF;
     buffer[buffLen++] = (mtuSize & 0xFF00) >> 8;
 
-    
 
-    return buffLen;;
+    return buffLen;
+    ;
 }
 
 /**
@@ -101,10 +100,12 @@ u16 blt_att_packageExchangeMtuRsp(u16 mtu, attr_pkt_t *txBuf)
  */
 int blt_att_packageReadByTypeReq(u16 startAttHandle, u16 endAttHandle, u8 *uuid, u8 uuidLen, attr_pkt_t *txBuf)
 {
-    u8 buffLen = 0;
-    u8 *buffer = &txBuf->opcode; //skip dataLen field
+    u8  buffLen = 0;
+    u8 *buffer  = &txBuf->opcode; //skip dataLen field
 
-    if(uuidLen != 2 || uuidLen != 16) return -1;
+    if (uuidLen != 2 || uuidLen != 16) {
+        return -1;
+    }
 
     buffer[buffLen++] = ATT_OP_READ_BY_TYPE_REQ;
     buffer[buffLen++] = startAttHandle & 0xFF;
@@ -114,9 +115,9 @@ int blt_att_packageReadByTypeReq(u16 startAttHandle, u16 endAttHandle, u8 *uuid,
     memcpy(&buffer[buffLen], uuid, uuidLen);
     buffLen += uuidLen;
 
-    
 
-    return buffLen;;
+    return buffLen;
+    ;
 }
 
 /**
@@ -134,17 +135,17 @@ int blt_att_packageReadByTypeReq(u16 startAttHandle, u16 endAttHandle, u8 *uuid,
  */
 int blt_att_packageReadByTypeRsp(u8 typeLen, u8 dataLen, u8 *pData, attr_pkt_t *txBuf)
 {
-    u8 buffLen = 0;
-    u8 *buffer = &txBuf->opcode; //skip dataLen field
+    u8  buffLen = 0;
+    u8 *buffer  = &txBuf->opcode; //skip dataLen field
 
     buffer[buffLen++] = ATT_OP_READ_BY_TYPE_RSP;
-    buffer[buffLen++] = typeLen; //The size of each attribute handle value pair
+    buffer[buffLen++] = typeLen;  //The size of each attribute handle value pair
     memcpy(&buffer[buffLen], pData, dataLen);
     buffLen += dataLen;
 
-    
 
-    return buffLen;;
+    return buffLen;
+    ;
 }
 
 /**
@@ -156,21 +157,23 @@ int blt_att_packageReadByTypeRsp(u8 typeLen, u8 dataLen, u8 *pData, attr_pkt_t *
  */
 int blt_att_packageReadMultipleReq(u8 numHandles, u16 *pHandle, attr_pkt_t *txBuf)
 {
-    u8 buffLen = 0;
-    u8 *buffer = &txBuf->opcode; //skip dataLen field
+    u8  buffLen = 0;
+    u8 *buffer  = &txBuf->opcode; //skip dataLen field
 
-    if(numHandles > 7) return -1;
-
-    buffer[buffLen++] = ATT_OP_READ_MULTIPLE_REQ;
-    while(numHandles--){
-        buffer[buffLen++] = ((*pHandle) & 0x00FF);
-        buffer[buffLen++] = ((*pHandle) & 0xFF00)>>8;
-        pHandle ++;
+    if (numHandles > 7) {
+        return -1;
     }
 
-    
+    buffer[buffLen++] = ATT_OP_READ_MULTIPLE_REQ;
+    while (numHandles--) {
+        buffer[buffLen++] = ((*pHandle) & 0x00FF);
+        buffer[buffLen++] = ((*pHandle) & 0xFF00) >> 8;
+        pHandle++;
+    }
 
-    return buffLen;;
+
+    return buffLen;
+    ;
 }
 
 /**
@@ -182,21 +185,23 @@ int blt_att_packageReadMultipleReq(u8 numHandles, u16 *pHandle, attr_pkt_t *txBu
  */
 int blt_att_packageReadMultVarReq(u8 numHandles, u16 *pHandle, attr_pkt_t *txBuf)
 {
-    u8 buffLen = 0;
-    u8 *buffer = &txBuf->opcode; //skip dataLen field
+    u8  buffLen = 0;
+    u8 *buffer  = &txBuf->opcode; //skip dataLen field
 
-    if(numHandles > 10 || numHandles == 0) return -1;
-
-    buffer[buffLen++] = ATT_OP_READ_MULTIPLE_VARIABLE_REQ;
-    while(numHandles--){
-        buffer[buffLen++] = ((*pHandle) & 0x00FF);
-        buffer[buffLen++] = ((*pHandle) & 0xFF00)>>8;
-        pHandle ++;
+    if (numHandles > 10 || numHandles == 0) {
+        return -1;
     }
 
-    
+    buffer[buffLen++] = ATT_OP_READ_MULTIPLE_VARIABLE_REQ;
+    while (numHandles--) {
+        buffer[buffLen++] = ((*pHandle) & 0x00FF);
+        buffer[buffLen++] = ((*pHandle) & 0xFF00) >> 8;
+        pHandle++;
+    }
 
-    return buffLen;;
+
+    return buffLen;
+    ;
 }
 
 /**
@@ -213,21 +218,23 @@ int blt_att_packageReadMultVarReq(u8 numHandles, u16 *pHandle, attr_pkt_t *txBuf
  */
 int blt_att_packageReadMultVarRsp(u8 numVars, u16 *pVarLen, attr_pkt_t *txBuf) //TODO: package error, refer to <<Core_5.3 | Vol 3, Part F page 1442>>
 {
-    u8 buffLen = 0;
-    u8 *buffer = &txBuf->opcode; //skip dataLen field
+    u8  buffLen = 0;
+    u8 *buffer  = &txBuf->opcode;                                              //skip dataLen field
 
-    if(numVars > 10 || numVars == 0) return -1;
-
-    buffer[buffLen++] = ATT_OP_READ_MULTIPLE_VARIABLE_RSP;
-    while(numVars--){
-        buffer[buffLen++] = ((*pVarLen) & 0x00FF);
-        buffer[buffLen++] = ((*pVarLen) & 0xFF00)>>8;
-        pVarLen ++;
+    if (numVars > 10 || numVars == 0) {
+        return -1;
     }
 
-    
+    buffer[buffLen++] = ATT_OP_READ_MULTIPLE_VARIABLE_RSP;
+    while (numVars--) {
+        buffer[buffLen++] = ((*pVarLen) & 0x00FF);
+        buffer[buffLen++] = ((*pVarLen) & 0xFF00) >> 8;
+        pVarLen++;
+    }
 
-    return buffLen;;
+
+    return buffLen;
+    ;
 }
 
 /**
@@ -241,10 +248,12 @@ int blt_att_packageReadMultVarRsp(u8 numVars, u16 *pVarLen, attr_pkt_t *txBuf) /
  */
 int blt_att_packageReadByGroupTypeReq(u16 startAttHandle, u16 endAttHandle, u8 *uuid, u8 uuidLen, attr_pkt_t *txBuf)
 {
-    u8 buffLen = 0;
-    u8 *buffer = &txBuf->opcode; //skip dataLen field
+    u8  buffLen = 0;
+    u8 *buffer  = &txBuf->opcode; //skip dataLen field
 
-    if(uuidLen != 2 || uuidLen != 16) return -1;
+    if (uuidLen != 2 || uuidLen != 16) {
+        return -1;
+    }
 
     buffer[buffLen++] = ATT_OP_READ_BY_GROUP_TYPE_REQ;
     buffer[buffLen++] = startAttHandle & 0xFF;
@@ -254,9 +263,9 @@ int blt_att_packageReadByGroupTypeReq(u16 startAttHandle, u16 endAttHandle, u8 *
     memcpy(&buffer[buffLen], uuid, uuidLen);
     buffLen += uuidLen;
 
-    
 
-    return buffLen;;
+    return buffLen;
+    ;
 }
 
 /**
@@ -274,16 +283,17 @@ int blt_att_packageReadByGroupTypeReq(u16 startAttHandle, u16 endAttHandle, u8 *
  */
 int blt_att_packageReadByGroupTypeRsp(u8 typeLen, u8 *pData, u16 datalen, attr_pkt_t *txBuf)
 {
-    u8 buffLen = 0;
-    u8 *buffer = &txBuf->opcode; //skip dataLen field
+    u8  buffLen = 0;
+    u8 *buffer  = &txBuf->opcode; //skip dataLen field
 
     buffer[buffLen++] = ATT_OP_READ_BY_GROUP_TYPE_RSP;
     buffer[buffLen++] = typeLen;
     memcpy(&buffer[buffLen], pData, datalen);
     buffLen += datalen;
-    
 
-    return buffLen;;
+
+    return buffLen;
+    ;
 }
 
 /**
@@ -296,8 +306,8 @@ int blt_att_packageReadByGroupTypeRsp(u8 typeLen, u8 *pData, u16 datalen, attr_p
  */
 int blt_att_packageFindInfoReq(u16 startAttHandle, u16 endAttHandle, attr_pkt_t *txBuf)
 {
-    u8 buffLen = 0;
-    u8 *buffer = &txBuf->opcode; //skip dataLen field
+    u8  buffLen = 0;
+    u8 *buffer  = &txBuf->opcode; //skip dataLen field
 
     buffer[buffLen++] = ATT_OP_FIND_INFO_REQ;
     buffer[buffLen++] = startAttHandle & 0xFF;
@@ -305,9 +315,9 @@ int blt_att_packageFindInfoReq(u16 startAttHandle, u16 endAttHandle, attr_pkt_t 
     buffer[buffLen++] = endAttHandle & 0xFF;
     buffer[buffLen++] = (endAttHandle & 0xFF00) >> 8;
 
-    
 
-    return buffLen;;
+    return buffLen;
+    ;
 }
 
 /**
@@ -320,17 +330,17 @@ int blt_att_packageFindInfoReq(u16 startAttHandle, u16 endAttHandle, attr_pkt_t 
  */
 int blt_att_packageFindInfoRsp(u8 format, u8 dataLen, u8 *pData, attr_pkt_t *txBuf)
 {
-    u8 buffLen = 0;
-    u8 *buffer = &txBuf->opcode; //skip dataLen field
+    u8  buffLen = 0;
+    u8 *buffer  = &txBuf->opcode; //skip dataLen field
 
     buffer[buffLen++] = ATT_OP_FIND_INFO_RSP;
     buffer[buffLen++] = format;
     memcpy(&buffer[buffLen], pData, dataLen);
     buffLen += dataLen;
 
-    
 
-    return buffLen;;
+    return buffLen;
+    ;
 }
 
 /**
@@ -343,10 +353,10 @@ int blt_att_packageFindInfoRsp(u8 format, u8 dataLen, u8 *pData, attr_pkt_t *txB
  * | Attribute Type                     | 2                 |
  * | Attribute Value                    | 0 to (ATT_MTU-7)  |
  */
-int blt_att_packageFindByTypeReq(u16 startAttHdl, u16 endAttHdl, u8 *pUuid, u8* pAttrValue, int valueLen, attr_pkt_t *txBuf)
+int blt_att_packageFindByTypeReq(u16 startAttHdl, u16 endAttHdl, u8 *pUuid, u8 *pAttrValue, int valueLen, attr_pkt_t *txBuf)
 {
-    u8 buffLen = 0;
-    u8 *buffer = &txBuf->opcode; //skip dataLen field
+    u8  buffLen = 0;
+    u8 *buffer  = &txBuf->opcode; //skip dataLen field
 
     buffer[buffLen++] = ATT_OP_FIND_BY_TYPE_VALUE_REQ;
     buffer[buffLen++] = startAttHdl & 0xFF;
@@ -355,14 +365,14 @@ int blt_att_packageFindByTypeReq(u16 startAttHdl, u16 endAttHdl, u8 *pUuid, u8* 
     buffer[buffLen++] = (endAttHdl & 0xFF00) >> 8;
     memcpy(&buffer[buffLen], pUuid, 2);
     buffLen += 2;
-    if(valueLen != 0){
+    if (valueLen != 0) {
         memcpy(&buffer[buffLen], pAttrValue, valueLen);
         buffLen += valueLen;
     }
 
-    
 
-    return buffLen;;
+    return buffLen;
+    ;
 }
 
 /**
@@ -379,18 +389,20 @@ int blt_att_packageFindByTypeReq(u16 startAttHdl, u16 endAttHdl, u8 *pUuid, u8* 
  */
 int blt_att_packageFindByTypeRsp(u8 dataLen, u8 *pData, attr_pkt_t *txBuf)
 {
-    u8 buffLen = 0;
-    u8 *buffer = &txBuf->opcode; //skip dataLen field
+    u8  buffLen = 0;
+    u8 *buffer  = &txBuf->opcode; //skip dataLen field
 
-    if(dataLen < 4 || dataLen%4 != 0) return -1;
+    if (dataLen < 4 || dataLen % 4 != 0) {
+        return -1;
+    }
 
     buffer[buffLen++] = ATT_OP_FIND_BY_TYPE_VALUE_RSP;
     memcpy(&buffer[buffLen], pData, dataLen);
     buffLen += dataLen;
 
-    
 
-    return buffLen;;
+    return buffLen;
+    ;
 }
 
 /**
@@ -402,16 +414,16 @@ int blt_att_packageFindByTypeRsp(u8 dataLen, u8 *pData, attr_pkt_t *txBuf)
  */
 int blt_att_packageReadReq(u16 attHandle, attr_pkt_t *txBuf)
 {
-    u8 buffLen = 0;
-    u8 *buffer = &txBuf->opcode; //skip dataLen field
+    u8  buffLen = 0;
+    u8 *buffer  = &txBuf->opcode; //skip dataLen field
 
     buffer[buffLen++] = ATT_OP_READ_REQ;
     buffer[buffLen++] = attHandle & 0xFF;
     buffer[buffLen++] = (attHandle & 0xFF00) >> 8;
 
-    
 
-    return buffLen;;
+    return buffLen;
+    ;
 }
 
 /**
@@ -423,16 +435,16 @@ int blt_att_packageReadReq(u16 attHandle, attr_pkt_t *txBuf)
  */
 int blt_att_packageReadRsp(u8 dataLen, u8 *pData, attr_pkt_t *txBuf)
 {
-    (void)pData; //unused, remove warning
-    (void)dataLen; //unused, remove warning
-    u8 buffLen = 0;
-    u8 *buffer = &txBuf->opcode; //skip dataLen field
+    (void)pData;                  //unused, remove warning
+    (void)dataLen;                //unused, remove warning
+    u8  buffLen = 0;
+    u8 *buffer  = &txBuf->opcode; //skip dataLen field
 
     buffer[buffLen++] = ATT_OP_READ_RSP;
 
-    
 
-    return buffLen;;
+    return buffLen;
+    ;
 }
 
 /**
@@ -445,8 +457,8 @@ int blt_att_packageReadRsp(u8 dataLen, u8 *pData, attr_pkt_t *txBuf)
  */
 int blt_att_packageReadBlobReq(u16 attHandle, u16 offset, attr_pkt_t *txBuf)
 {
-    u8 buffLen = 0;
-    u8 *buffer = &txBuf->opcode; //skip dataLen field
+    u8  buffLen = 0;
+    u8 *buffer  = &txBuf->opcode; //skip dataLen field
 
     buffer[buffLen++] = ATT_OP_READ_BLOB_REQ;
     buffer[buffLen++] = attHandle & 0xFF;
@@ -454,9 +466,9 @@ int blt_att_packageReadBlobReq(u16 attHandle, u16 offset, attr_pkt_t *txBuf)
     buffer[buffLen++] = offset & 0xFF;
     buffer[buffLen++] = (offset & 0xFF00) >> 8;
 
-    
 
-    return buffLen;;
+    return buffLen;
+    ;
 }
 
 /**
@@ -468,15 +480,16 @@ int blt_att_packageReadBlobReq(u16 attHandle, u16 offset, attr_pkt_t *txBuf)
  */
 int blt_att_packageReadBlobRsp(u8 dataLen, u8 *pData, attr_pkt_t *txBuf)
 {
-    (void)dataLen; //unused, remove warning
-    (void)pData; //unused, remove warning
-    u8 buffLen = 0;
-    u8 *buffer = &txBuf->opcode; //skip dataLen field
+    (void)dataLen;                //unused, remove warning
+    (void)pData;                  //unused, remove warning
+    u8  buffLen = 0;
+    u8 *buffer  = &txBuf->opcode; //skip dataLen field
 
     buffer[buffLen++] = ATT_OP_READ_BLOB_RSP;
-    
 
-    return buffLen;;
+
+    return buffLen;
+    ;
 }
 
 /**
@@ -489,8 +502,8 @@ int blt_att_packageReadBlobRsp(u8 dataLen, u8 *pData, attr_pkt_t *txBuf)
  */
 int blc_att_prepareNotify(u16 attHandle, u16 dataLen, u8 *pData, attr_pkt_t *txBuf)
 {
-    u8 buffLen = 0;
-    u8 *buffer = &txBuf->opcode; //skip dataLen field //skip dataLen field
+    u8  buffLen = 0;
+    u8 *buffer  = &txBuf->opcode; //skip dataLen field //skip dataLen field
 
     buffer[buffLen++] = ATT_OP_HANDLE_VALUE_NTF;
     buffer[buffLen++] = attHandle & 0xFF;
@@ -498,9 +511,9 @@ int blc_att_prepareNotify(u16 attHandle, u16 dataLen, u8 *pData, attr_pkt_t *txB
     memcpy(&buffer[buffLen], pData, dataLen);
     buffLen += dataLen;
 
-    
 
-    return buffLen;;
+    return buffLen;
+    ;
 }
 
 /**
@@ -513,8 +526,8 @@ int blc_att_prepareNotify(u16 attHandle, u16 dataLen, u8 *pData, attr_pkt_t *txB
  */
 int blc_att_prepareIndicate(u16 attHandle, u16 dataLen, u8 *pData, attr_pkt_t *txBuf)
 {
-    u8 buffLen = 0;
-    u8 *buffer = &txBuf->opcode; //skip dataLen field
+    u8  buffLen = 0;
+    u8 *buffer  = &txBuf->opcode; //skip dataLen field
 
     buffer[buffLen++] = ATT_OP_HANDLE_VALUE_IND;
     buffer[buffLen++] = attHandle & 0xFF;
@@ -522,7 +535,6 @@ int blc_att_prepareIndicate(u16 attHandle, u16 dataLen, u8 *pData, attr_pkt_t *t
     memcpy(&buffer[buffLen], pData, dataLen);
     buffLen += dataLen;
 
-    
 
     return buffLen;
 }
@@ -535,11 +547,10 @@ int blc_att_prepareIndicate(u16 attHandle, u16 dataLen, u8 *pData, attr_pkt_t *t
  */
 int blc_att_prepareConfirm(attr_pkt_t *txBuf)
 {
-    u8 buffLen = 0;
-    u8 *buffer = &txBuf->opcode; //skip dataLen field
+    u8  buffLen = 0;
+    u8 *buffer  = &txBuf->opcode; //skip dataLen field
 
     buffer[buffLen++] = ATT_OP_HANDLE_VALUE_CFM;
-
 
 
     return buffLen;
@@ -555,8 +566,8 @@ int blc_att_prepareConfirm(attr_pkt_t *txBuf)
  */
 int blt_att_packageWriteReq(u16 attHandle, u16 dataLen, u8 *pData, attr_pkt_t *txBuf)
 {
-    u8 buffLen = 0;
-    u8 *buffer = &txBuf->opcode; //skip dataLen field
+    u8  buffLen = 0;
+    u8 *buffer  = &txBuf->opcode; //skip dataLen field
 
     buffer[buffLen++] = ATT_OP_WRITE_REQ;
     buffer[buffLen++] = attHandle & 0xFF;
@@ -564,9 +575,9 @@ int blt_att_packageWriteReq(u16 attHandle, u16 dataLen, u8 *pData, attr_pkt_t *t
     memcpy(&buffer[buffLen], pData, dataLen);
     buffLen += dataLen;
 
-    
 
-    return buffLen;;
+    return buffLen;
+    ;
 }
 
 /**
@@ -577,14 +588,14 @@ int blt_att_packageWriteReq(u16 attHandle, u16 dataLen, u8 *pData, attr_pkt_t *t
  */
 int blt_att_packageWriteRsp(attr_pkt_t *txBuf)
 {
-    u8 buffLen = 0;
-    u8 *buffer = &txBuf->opcode; //skip dataLen field
+    u8  buffLen = 0;
+    u8 *buffer  = &txBuf->opcode; //skip dataLen field
 
     buffer[buffLen++] = ATT_OP_WRITE_RSP;
 
-    
 
-    return buffLen;;
+    return buffLen;
+    ;
 }
 
 /**
@@ -597,8 +608,8 @@ int blt_att_packageWriteRsp(attr_pkt_t *txBuf)
  */
 int blt_att_packageWriteCmd(u16 attHandle, u16 dataLen, u8 *pData, attr_pkt_t *txBuf)
 {
-    u8 buffLen = 0;
-    u8 *buffer = &txBuf->opcode; //skip dataLen field
+    u8  buffLen = 0;
+    u8 *buffer  = &txBuf->opcode; //skip dataLen field
 
     buffer[buffLen++] = ATT_OP_WRITE_CMD;
     buffer[buffLen++] = attHandle & 0xFF;
@@ -606,9 +617,9 @@ int blt_att_packageWriteCmd(u16 attHandle, u16 dataLen, u8 *pData, attr_pkt_t *t
     memcpy(&buffer[buffLen], pData, dataLen);
     buffLen += dataLen;
 
-    
 
-    return buffLen;;
+    return buffLen;
+    ;
 }
 
 /**
@@ -622,8 +633,8 @@ int blt_att_packageWriteCmd(u16 attHandle, u16 dataLen, u8 *pData, attr_pkt_t *t
  */
 int blt_att_packagePrepareWriteReq(u16 attHandle, u16 offset, u16 dataLen, u8 *pData, attr_pkt_t *txBuf)
 {
-    u8 buffLen = 0;
-    u8 *buffer = &txBuf->opcode; //skip dataLen field
+    u8  buffLen = 0;
+    u8 *buffer  = &txBuf->opcode; //skip dataLen field
 
     buffer[buffLen++] = ATT_OP_PREPARE_WRITE_REQ;
     buffer[buffLen++] = attHandle & 0xFF;
@@ -633,9 +644,9 @@ int blt_att_packagePrepareWriteReq(u16 attHandle, u16 offset, u16 dataLen, u8 *p
     memcpy(&buffer[buffLen], pData, dataLen);
     buffLen += dataLen;
 
-    
 
-    return buffLen;;
+    return buffLen;
+    ;
 }
 
 /**
@@ -649,8 +660,8 @@ int blt_att_packagePrepareWriteReq(u16 attHandle, u16 offset, u16 dataLen, u8 *p
  */
 int blt_att_packagePrepareWriteRsp(u16 attHandle, u16 offset, u16 dataLen, u8 *pData, attr_pkt_t *txBuf)
 {
-    u8 buffLen = 0;
-    u8 *buffer = &txBuf->opcode; //skip dataLen field
+    u8  buffLen = 0;
+    u8 *buffer  = &txBuf->opcode; //skip dataLen field
 
     buffer[buffLen++] = ATT_OP_PREPARE_WRITE_RSP;
     buffer[buffLen++] = attHandle & 0xFF;
@@ -660,9 +671,9 @@ int blt_att_packagePrepareWriteRsp(u16 attHandle, u16 offset, u16 dataLen, u8 *p
     memcpy(&buffer[buffLen], pData, dataLen);
     buffLen += dataLen;
 
-    
 
-    return buffLen;;
+    return buffLen;
+    ;
 }
 
 /**
@@ -674,15 +685,15 @@ int blt_att_packagePrepareWriteRsp(u16 attHandle, u16 offset, u16 dataLen, u8 *p
  */
 int blt_att_packageExecuteWriteReq(u8 flag, attr_pkt_t *txBuf)
 {
-    u8 buffLen = 0;
-    u8 *buffer = &txBuf->opcode; //skip dataLen field
+    u8  buffLen = 0;
+    u8 *buffer  = &txBuf->opcode; //skip dataLen field
 
     buffer[buffLen++] = ATT_OP_EXECUTE_WRITE_REQ;
     buffer[buffLen++] = flag & 0xFF;
 
-    
 
-    return buffLen;;
+    return buffLen;
+    ;
 }
 
 /**
@@ -693,12 +704,12 @@ int blt_att_packageExecuteWriteReq(u8 flag, attr_pkt_t *txBuf)
  */
 int blt_att_packageExecuteWriteRsp(attr_pkt_t *txBuf)
 {
-    u8 buffLen = 0;
-    u8 *buffer = &txBuf->opcode; //skip dataLen field
+    u8  buffLen = 0;
+    u8 *buffer  = &txBuf->opcode; //skip dataLen field
 
     buffer[buffLen++] = ATT_OP_EXECUTE_WRITE_RSP;
 
-    
 
-    return buffLen;;
+    return buffLen;
+    ;
 }

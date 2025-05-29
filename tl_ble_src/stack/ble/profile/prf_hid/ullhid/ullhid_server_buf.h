@@ -23,14 +23,19 @@
  *******************************************************************************************************/
 #pragma once
 
-struct blc_ullhid_server{
-    u16 propertiesHdl;  //ULL HID properties attribute handle
-    u16 operationHdl;   //LE HID operation mode attribute handle
-    u8 mode;    // default mode or hybrid mode, if disconnect, profile will set default mode.
+struct blc_ullhid_server
+{
+    u16 propertiesHdl; //ULL HID properties attribute handle
+    u16 operationHdl;  //LE HID operation mode attribute handle
+    u8  mode;          // default mode or hybrid mode, if disconnect, profile will set default mode.
 };
 
-struct blc_ullhid_server_ctrl{
-    blc_prf_proc_t process;
+struct blc_ullhid_server_ctrl
+{
+#if ((!defined(HOST_V2_ENABLE)))
+    blc_prf_proc_t           process;
+#else
+    struct blc_prf_process   process;
+#endif
     struct blc_ullhid_server ullhidServer;
 };
-

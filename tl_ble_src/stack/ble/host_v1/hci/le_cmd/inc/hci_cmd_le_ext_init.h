@@ -1,0 +1,1 @@
+int ble_host_hci_le_ext_create_connection(const struct ble_hci_le_ext_create_conn_cp *p_create_conn);

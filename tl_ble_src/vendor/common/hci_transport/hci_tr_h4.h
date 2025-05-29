@@ -29,17 +29,17 @@
 
 #if HCI_TR_EN
 
-/*!  H4 transport buffer config macro. */        //4 dma length
-#if  (!HCI_UART_SoftwareRxDone_EN)
-#define HCI_H4_TR_RX_BUF_SIZE   (MEM_SIZE_ALIGN16(4 + HCI_TR_RX_BUF_SIZE)*2)//80 /*! The value of this size must be set according to the size of the HCI RX buffer, and at least twice the size of the HCI RX buffer.*/
-#define HCI_H4_TR_RX_BUF_NUM    4
+    /*!  H4 transport buffer config macro. */                                        //4 dma length
+    #if (!HCI_UART_SoftwareRxDone_EN)
+        #define HCI_H4_TR_RX_BUF_SIZE (MEM_SIZE_ALIGN16(4 + HCI_TR_RX_BUF_SIZE) * 2) //80 /*! The value of this size must be set according to the size of the HCI RX buffer, and at least twice the size of the HCI RX buffer.*/
+        #define HCI_H4_TR_RX_BUF_NUM  4
 
-#define HCI_H4_FLUSH_TO         1000/*! in ms*/
-#else
-#define HCI_H4_TR_RX_BUF_SIZE      2048
-#define HCI_H4_TR_RING_BUF_SIZE    4096
-#define HCI_H4_TR_FLUSH_TO         500 //unit:ms
-#endif
+        #define HCI_H4_FLUSH_TO       1000                                           /*! in ms*/
+    #else
+        #define HCI_H4_TR_RX_BUF_SIZE   2048
+        #define HCI_H4_TR_RING_BUF_SIZE 4096
+        #define HCI_H4_TR_FLUSH_TO      500 //unit:ms
+    #endif
 /**
  * @brief : H4 transport initialization.
  * @param : pFifo       Pointer point to HCI rx fifo.

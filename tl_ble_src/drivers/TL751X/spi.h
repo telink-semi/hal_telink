@@ -61,7 +61,7 @@
         - SPI as slave:Clock edge and phase mode configuration of the slave via the spi_slave_init API.
         - SPI as slave:The slave's dummy byte value via the spi_set_dummy_cnt() API.
      -# dma
-        - Initial dma burst size configuration via dma_set_spi_burst_size() API.
+        - Initial dma burst size configuration via dma_set_burst_size() API.
         - Initial spi tx dma channel via spi_set_tx_dma_config()API.
         - SPI as master:Initial spi rx dma channel via spi_set_master_rx_dma_config() API.
         - SPI as slave:Initial spi rx dma channel via spi_set_slave_rx_dma_config() API.
@@ -267,7 +267,7 @@ typedef enum{
 }spi_slave_read_cmd_e;
 
 /**
- * @brief  Define the SPI command for b91m gspi/lspi slave.
+ * @brief  Define the SPI command for Telink RISC-V MCU gspi/lspi slave.
  */
 typedef enum{
     SPI_READ_STATUS_SINGLE_CMD  = 0x05,

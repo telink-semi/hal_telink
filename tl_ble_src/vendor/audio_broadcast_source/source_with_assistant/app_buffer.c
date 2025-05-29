@@ -25,11 +25,11 @@
 
 #if (SOURCE_VERSION == SOURCE_WITH_ASSISTANT)
 
-#include "app_buffer.h"
-#include "app_config.h"
-#include "tl_common.h"
-#include "drivers.h"
-#include "stack/ble/ble.h"
+    #include "app_buffer.h"
+    #include "app_config.h"
+    #include "tl_common.h"
+    #include "drivers.h"
+    #include "stack/ble/ble.h"
 
 
 /*********************************** Extended ADV data buffer allocation, Begin ************************************/
@@ -37,7 +37,7 @@
  * @brief   Extended ADV parameters buffer, used to hold extended ADV parameters which used in SDK.
  *          ADV_SET_PARAM_LENGTH is determined by SDK, user can not change !!!
  */
-_attribute_ble_data_retention_  u8  app_extAdvSetParam_buf[ADV_SET_PARAM_LENGTH * APP_EXT_ADV_SETS_NUMBER];
+_attribute_ble_data_retention_ u8 app_extAdvSetParam_buf[ADV_SET_PARAM_LENGTH * APP_EXT_ADV_SETS_NUMBER];
 
 
 /**
@@ -45,7 +45,7 @@ _attribute_ble_data_retention_  u8  app_extAdvSetParam_buf[ADV_SET_PARAM_LENGTH 
  *          if any ADV Set use ADV data(e.g. Extended, Connectable), this buffer should be defined and initialized.
  *          if no  ADV Set use ADV data(e.g. Extended, Scannable), this buffer is not necessary.
  */
-_attribute_ble_data_retention_  u8  app_extAdvData_buf[APP_EXT_ADV_DATA_LENGTH * APP_EXT_ADV_SETS_NUMBER];
+_attribute_ble_data_retention_ u8 app_extAdvData_buf[APP_EXT_ADV_DATA_LENGTH * APP_EXT_ADV_SETS_NUMBER];
 
 
 /**
@@ -58,38 +58,29 @@ _attribute_ble_data_retention_  u8  app_extAdvData_buf[APP_EXT_ADV_DATA_LENGTH *
 /*********************************** Extended ADV data buffer allocation, End** ************************************/
 
 
-
-
-
-
 /************************* EXT ADV && PERD ADV buffer FIFO allocation, Begin *******************************/
-_attribute_ble_data_retention_  u8 app_peridAdvSet_buffer[PERD_ADV_PARAM_LENGTH * APP_PERID_ADV_SETS_NUMBER];
-_attribute_ble_data_retention_  u8 app_peridAdvData_buffer[APP_PERID_ADV_DATA_LENGTH * APP_PERID_ADV_SETS_NUMBER];
+_attribute_ble_data_retention_ u8 app_peridAdvSet_buffer[PERD_ADV_PARAM_LENGTH * APP_PERID_ADV_SETS_NUMBER];
+_attribute_ble_data_retention_ u8 app_peridAdvData_buffer[APP_PERID_ADV_DATA_LENGTH * APP_PERID_ADV_SETS_NUMBER];
 /**************************  EXT ADV && PERD ADV buffer FIFO allocation, End *******************************/
-
-
 
 
 /************************* BIS BCST TX ISO PDU buffer FIFO allocation, Begin ******************************/
 /**
  * @brief   BIS BCST TX buffer. size & number defined in app_buffer.h
  */
-_attribute_ble_data_retention_  u8  app_bisBcstTxfifo[BIS_TX_PDU_FIFO_SIZE * BIS_TX_PDU_FIFO_NUM * APP_BIS_NUM_IN_ALL_BIG_BCST] = {0};
+_attribute_ble_data_retention_ u8 app_bisBcstTxfifo[BIS_TX_PDU_FIFO_SIZE * BIS_TX_PDU_FIFO_NUM * APP_BIS_NUM_IN_ALL_BIG_BCST] = {0};
 
 /************************* BIS BCST TX ISO PDU buffer FIFO allocation, End ********************************/
 
 
-
 /************************ BIS BCST TX ISOAL SDU buffer FIFO allocation, Begin *****************************/
-_attribute_ble_data_retention_  u8  app_bis_sdu_in_fifo[BIS_SDU_IN_FIFO_SIZE * BIS_SDU_IN_FIFO_NUM * APP_BIS_NUM_IN_ALL_BIG_BCST];
+_attribute_ble_data_retention_ u8 app_bis_sdu_in_fifo[BIS_SDU_IN_FIFO_SIZE * BIS_SDU_IN_FIFO_NUM * APP_BIS_NUM_IN_ALL_BIG_BCST];
 /************************ BIS BCST TX ISOAL SDU buffer FIFO allocation, End  ******************************/
 
 
-
-
 /********************************** BIS BCST Global Data Definition, Begin ***************************************/
-_attribute_ble_data_retention_  u8  app_bigBcstParam[BIG_BCST_PARAM_LENGTH * APP_BIG_BCST_NUMBER];
-_attribute_ble_data_retention_  u8  app_bisToatlParam[BIS_PARAM_LENGTH * APP_TOTAL_BIS_NUMBER];
+_attribute_ble_data_retention_ u8 app_bigBcstParam[BIG_BCST_PARAM_LENGTH * APP_BIG_BCST_NUMBER];
+_attribute_ble_data_retention_ u8 app_bisToatlParam[BIS_PARAM_LENGTH * APP_TOTAL_BIS_NUMBER];
 /********************************** BIS BCST Global Data Definition, End  ****************************************/
 
 
@@ -99,27 +90,23 @@ _attribute_ble_data_retention_  u8  app_bisToatlParam[BIS_PARAM_LENGTH * APP_TOT
  * @brief   ACL RX buffer, shared by all connections to hold LinkLayer RF RX data.
  *          user should define and initialize this buffer if either ACL Central or ACL Peripheral is used.
  */
-_attribute_ble_data_retention_  u8  app_acl_rx_fifo[ACL_RX_FIFO_SIZE * ACL_RX_FIFO_NUM] = {0};
+_attribute_ble_data_retention_ u8 app_acl_rx_fifo[ACL_RX_FIFO_SIZE * ACL_RX_FIFO_NUM] = {0};
 
 
 /**
  * @brief   ACL Central TX buffer, shared by all central connections to hold LinkLayer RF TX data.
  *          ACL Central TX buffer should be defined only when ACl connection central role is used.
  */
-_attribute_ble_data_retention_  u8  app_acl_cen_tx_fifo[ACL_CENTRAL_TX_FIFO_SIZE * ACL_CENTRAL_TX_FIFO_NUM * ACL_CENTRAL_MAX_NUM] = {0};
+_attribute_ble_data_retention_ u8 app_acl_cen_tx_fifo[ACL_CENTRAL_TX_FIFO_SIZE * ACL_CENTRAL_TX_FIFO_NUM * ACL_CENTRAL_MAX_NUM] = {0};
 
 /******************** ACL connection LinkLayer TX & RX data FIFO allocation, End ***********************************/
-
-
-
-
 
 
 /***************** ACL connection L2CAP RX & TX data Buffer allocation, Begin **************************************/
 /**
  * @brief   L2CAP RX Data buffer for ACL Central
  */
-_attribute_ble_data_retention_  u8 app_cen_l2cap_rx_buf[ACL_CENTRAL_MAX_NUM * CENTRAL_L2CAP_BUFF_SIZE];
+_attribute_ble_data_retention_ u8 app_cen_l2cap_rx_buf[ACL_CENTRAL_MAX_NUM * CENTRAL_L2CAP_BUFF_SIZE];
 
 
 /**
@@ -127,23 +114,21 @@ _attribute_ble_data_retention_  u8 app_cen_l2cap_rx_buf[ACL_CENTRAL_MAX_NUM * CE
  *          if GATT server on ACL Central used, this buffer must be defined and initialized.
  *          if GATT server on ACL Central not used, this buffer can be saved.
  */
-_attribute_ble_data_retention_  u8 app_cen_l2cap_tx_buf[ACL_CENTRAL_MAX_NUM * CENTRAL_L2CAP_BUFF_SIZE];
+_attribute_ble_data_retention_ u8 app_cen_l2cap_tx_buf[ACL_CENTRAL_MAX_NUM * CENTRAL_L2CAP_BUFF_SIZE];
 
 
 /**
  * @brief   L2CAP RX Data buffer for ACL Peripheral
  */
-_attribute_ble_data_retention_  u8 app_per_l2cap_rx_buf[ACL_PERIPHR_MAX_NUM * PERIPHR_L2CAP_BUFF_SIZE];
+_attribute_ble_data_retention_ u8 app_per_l2cap_rx_buf[ACL_PERIPHR_MAX_NUM * PERIPHR_L2CAP_BUFF_SIZE];
 
 
 /**
  * @brief   L2CAP TX Data buffer for ACL Peripheral
  *          GATT server on ACL Peripheral use this buffer.
  */
-_attribute_ble_data_retention_  u8 app_per_l2cap_tx_buf[ACL_PERIPHR_MAX_NUM * PERIPHR_L2CAP_BUFF_SIZE];
+_attribute_ble_data_retention_ u8 app_per_l2cap_tx_buf[ACL_PERIPHR_MAX_NUM * PERIPHR_L2CAP_BUFF_SIZE];
 
 /***************** ACL connection L2CAP RX & TX data Buffer allocation, End ****************************************/
 
-#endif      //SOURCE_VERSION == SOURCE_WITH_ASSISTANT
-
-
+#endif //SOURCE_VERSION == SOURCE_WITH_ASSISTANT

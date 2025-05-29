@@ -29,7 +29,6 @@
 #include "lib/include/pke/eccp_curve.h"
 #include "lib/include/pke/ecdh.h"
 
-
 /**
  * @brief       ECDH compute key.
  * @param[in]   curve           - ecc curve struct pointer, please make sure it is valid.
@@ -40,63 +39,52 @@
  * @param[in]   KDF             - KDF function to get key.
  * @Return      0(success), other(error)
  */
-unsigned char ecdh_compute_key(eccp_curve_t *curve, unsigned char *local_prikey, unsigned char *peer_pubkey, unsigned char *key,
-        unsigned int keyByteLen, KDF_FUNC kdf)
+unsigned char ecdh_compute_key(eccp_curve_t *curve, unsigned char *local_prikey, unsigned char *peer_pubkey, unsigned char *key, unsigned int keyByteLen, KDF_FUNC kdf)
 {
-    unsigned int k[ECC_MAX_WORD_LEN] = {0};
-    unsigned int Px[ECC_MAX_WORD_LEN] = {0};
-    unsigned int Py[ECC_MAX_WORD_LEN] = {0};
-    unsigned int byteLen, wordLen;
+    unsigned int  k[ECC_MAX_WORD_LEN]  = {0};
+    unsigned int  Px[ECC_MAX_WORD_LEN] = {0};
+    unsigned int  Py[ECC_MAX_WORD_LEN] = {0};
+    unsigned int  byteLen, wordLen;
     unsigned char ret;
 
-    if(NULL == curve || NULL == local_prikey || NULL == peer_pubkey || NULL == key)
-    {
+    if (NULL == curve || NULL == local_prikey || NULL == peer_pubkey || NULL == key) {
         return ECDH_POINTOR_NULL;
     }
-    if(0 == keyByteLen)
-    {
+    if (0 == keyByteLen) {
         return ECDH_INVALID_INPUT;
     }
 
-    byteLen = (curve->eccp_n_bitLen+7)/8;
-    wordLen = (curve->eccp_n_bitLen+31)/32;
+    byteLen = (curve->eccp_n_bitLen + 7) / 8;
+    wordLen = (curve->eccp_n_bitLen + 31) / 32;
 
     //make sure private key is in [1, n-1]
     reverse_byte_array((unsigned char *)local_prikey, (unsigned char *)k, byteLen);
-    if(ismemzero4(k, wordLen))
-    {
+    if (ismemzero4(k, wordLen)) {
         return ECDH_INVALID_INPUT;
     }
-    if(big_integer_compare(k, wordLen, curve->eccp_n, wordLen) >= 0)
-    {
+    if (big_integer_compare(k, wordLen, curve->eccp_n, wordLen) >= 0) {
         return ECDH_INVALID_INPUT;
     }
 
     //check public key
     reverse_byte_array(peer_pubkey, (unsigned char *)Px, byteLen);
-    reverse_byte_array(peer_pubkey+byteLen, (unsigned char *)Py, byteLen);
+    reverse_byte_array(peer_pubkey + byteLen, (unsigned char *)Py, byteLen);
     ret = pke_eccp_point_verify(curve, Px, Py);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
     }
 
     ret = pke_eccp_point_mul(curve, k, Px, Py, Px, Py);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
     }
 
     reverse_byte_array((unsigned char *)Px, (unsigned char *)Px, byteLen);
 
-    if(kdf)
-    {
+    if (kdf) {
         kdf(Px, byteLen, key, keyByteLen);
-    }
-    else
-    {
-        if(keyByteLen > byteLen)
-        {
+    } else {
+        if (keyByteLen > byteLen) {
             keyByteLen = byteLen;
         }
         memcpy(key, Px, keyByteLen);
@@ -104,7 +92,3 @@ unsigned char ecdh_compute_key(eccp_curve_t *curve, unsigned char *local_prikey,
 
     return ECDH_SUCCESS;
 }
-
-
-
-

@@ -25,8 +25,6 @@
 #define STACK_BLE_SERVICE_OTA_OTA_SERVER_H_
 
 
-
-
 /**
  * @brief   OTA start command callback declaration
  */
@@ -44,16 +42,12 @@ typedef void (*ota_versionCb_t)(void);
 typedef void (*ota_resIndicateCb_t)(int result);
 
 
-
-
-
 /**
  * @brief      this function is used for user to initialize OTA server module.
  * @param      none
  * @return     none
  */
-void        blc_ota_initOtaServer_module(void);
-
+void blc_ota_initOtaServer_module(void);
 
 
 /**
@@ -69,7 +63,7 @@ void        blc_ota_initOtaServer_module(void);
  * @return     Status - 0x00: command succeeded;
  *                      Others: command failed, refer to definition of "ble_sts_t" to know the reason
  */
-ble_sts_t   blc_ota_setFirmwareSizeAndBootAddress(int firmware_size_k, multi_boot_addr_e boot_addr);
+ble_sts_t blc_ota_setFirmwareSizeAndBootAddress(int firmware_size_k, multi_boot_addr_e boot_addr);
 
 
 /**
@@ -78,7 +72,7 @@ ble_sts_t   blc_ota_setFirmwareSizeAndBootAddress(int firmware_size_k, multi_boo
  * @param[in]  none
  * @return     multiple boot address
  */
-u32         blc_ota_getCurrentUsedMultipleBootAddress(void);
+u32 blc_ota_getCurrentUsedMultipleBootAddress(void);
 
 
 /**
@@ -87,8 +81,7 @@ u32         blc_ota_getCurrentUsedMultipleBootAddress(void);
  * @param[in]  version_number - firmware version number
  * @return     none
  */
-void        blc_ota_setFirmwareVersionNumber(u16 version_number);
-
+void blc_ota_setFirmwareVersionNumber(u16 version_number);
 
 
 /**
@@ -98,8 +91,7 @@ void        blc_ota_setFirmwareVersionNumber(u16 version_number);
  * @param[in]  cb - callback function
  * @return     none
  */
-void        blc_ota_registerOtaStartCmdCb(ota_startCb_t cb);
-
+void blc_ota_registerOtaStartCmdCb(ota_startCb_t cb);
 
 
 /**
@@ -108,10 +100,7 @@ void        blc_ota_registerOtaStartCmdCb(ota_startCb_t cb);
  * @param[in]  cb - callback function
  * @return     none
  */
-void        blc_ota_registerOtaFirmwareVersionReqCb(ota_versionCb_t cb);
-
-
-
+void blc_ota_registerOtaFirmwareVersionReqCb(ota_versionCb_t cb);
 
 
 /**
@@ -119,9 +108,7 @@ void        blc_ota_registerOtaFirmwareVersionReqCb(ota_versionCb_t cb);
  * @param[in]  cb - callback function
  * @return     none
  */
-void        blc_ota_registerOtaResultIndicationCb(ota_resIndicateCb_t cb);
-
-
+void blc_ota_registerOtaResultIndicationCb(ota_resIndicateCb_t cb);
 
 
 /**
@@ -131,8 +118,7 @@ void        blc_ota_registerOtaResultIndicationCb(ota_resIndicateCb_t cb);
  * @return     Status - 0x00: command succeeded;
  *                      Others: command failed, refer to definition of "ble_sts_t" to know the reason
  */
-ble_sts_t   blc_ota_setOtaProcessTimeout(int timeout_second);
-
+ble_sts_t blc_ota_setOtaProcessTimeout(int timeout_second);
 
 
 /**
@@ -142,7 +128,7 @@ ble_sts_t   blc_ota_setOtaProcessTimeout(int timeout_second);
  * @return     Status - 0x00: command succeeded;
  *                      Others: command failed, refer to definition of "ble_sts_t" to know the reason
  */
-ble_sts_t   blc_ota_setOtaDataPacketTimeout(int timeout_second);
+ble_sts_t blc_ota_setOtaDataPacketTimeout(int timeout_second);
 
 
 /**
@@ -159,7 +145,7 @@ ble_sts_t   blc_ota_setOtaDataPacketTimeout(int timeout_second);
  * @return     Status - 0x00: command succeeded;
  *                      Others: command failed, refer to definition of "ble_sts_t" to know the reason
  */
-ble_sts_t   blc_ota_setOtaScheduleIndication_by_pduNum(int pdu_num);
+ble_sts_t blc_ota_setOtaScheduleIndication_by_pduNum(int pdu_num);
 
 
 /**
@@ -168,7 +154,7 @@ ble_sts_t   blc_ota_setOtaScheduleIndication_by_pduNum(int pdu_num);
  *             If not set, default value is 0 which means OTA write and notify in a same ATT handle.
  * @return     none
  */
-void        blc_ota_setAttHandleOffset(s8 attHandle_offset);
+void blc_ota_setAttHandleOffset(s8 attHandle_offset);
 
 
 /**
@@ -176,7 +162,7 @@ void        blc_ota_setAttHandleOffset(s8 attHandle_offset);
  * @param[in]  p - GATT data buffer pointer of write_req or write_cmd
  * @return     0
  */
-int otaWrite(u16 connHandle, void * p);
+int otaWrite(u16 connHandle, void *p);
 
 
 /**
@@ -184,7 +170,7 @@ int otaWrite(u16 connHandle, void * p);
  * @param[in]  none
  * @return     current running firmware start address on Flash
  */
-u32         blc_ota_getCurrentFirmwareStartAddress(void);
+u32 blc_ota_getCurrentFirmwareStartAddress(void);
 
 
 /**
@@ -195,7 +181,7 @@ u32         blc_ota_getCurrentFirmwareStartAddress(void);
  *             return 0x40000 if current running firmware start address is 0x00000
  *             return 0x00000 if current running firmware start address is 0x40000
  */
-u32         blc_ota_getNextFirmwareStartAddress(void);
+u32 blc_ota_getNextFirmwareStartAddress(void);
 
 
 /**
@@ -205,7 +191,7 @@ u32         blc_ota_getNextFirmwareStartAddress(void);
  * @param      none
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t   blc_ota_enableFirmwareEncryption(void);
+ble_sts_t blc_ota_enableFirmwareEncryption(void);
 
 
 /**
@@ -215,7 +201,7 @@ ble_sts_t   blc_ota_enableFirmwareEncryption(void);
  * @param      none
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t   blc_ota_enableSecureBoot(void);
+ble_sts_t blc_ota_enableSecureBoot(void);
 
 
 #endif /* STACK_BLE_SERVICE_OTA_OTA_SERVER_H_ */

@@ -237,7 +237,7 @@ static inline void rf_clr_irq_status(rf_irq_e status)
 {
      reg_rf_irq_status = status;
      reg_rf_ll_irq_list_h = (status>>16)&0x1f;
-     reg_rf_mdm_irq_status_clr = reg_rf_mdm_irq_status_clr;//Read operation cleanup
+     reg_rf_mdm_irq_status_clr = read_reg8(0xd4171374);//Read operation cleanup
 }
 
 
@@ -721,7 +721,7 @@ unsigned char rf_get_crc_err(void);
  *             (2)This function requires setting reset zb, rstl_bb, and reset modem.
  *                It is used to clear RF related state machines, IRQ states, and digital internal logic states.
  */
-void rf_clr_dig_logic_state(void);
+_attribute_ram_code_sec_noinline_ void rf_clr_dig_logic_state(void);
 
 /**
  * @brief      This function is used to restore the rf related registers to their default values.
@@ -729,7 +729,7 @@ void rf_clr_dig_logic_state(void);
  * @note       (1)After calling this interface, all configured interfaces of rf need to be called again.
  *             (2)After calling this interface, RF DMA configurations need to be reconfigured.
  */
-void rf_reset_register_value(void);
+_attribute_ram_code_sec_noinline_ void rf_reset_register_value(void);
 
 
 #endif

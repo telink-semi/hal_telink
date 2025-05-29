@@ -25,16 +25,12 @@
 #define CSA_H_
 
 
-
-
-
 /**
  * @brief      this function is used to initialize channel selection algorithm #2 feature
  * @param      none
  * @return     none
  */
 void blc_ll_initChannelSelectionAlgorithm_2_feature(void);
-
 
 
 #endif /* LL_CONN_CSA_H_ */

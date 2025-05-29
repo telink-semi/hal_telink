@@ -60,10 +60,11 @@
  * @param[in]  function - the function need to set.
  * @return     none.
  */
-void gpio_set_mux_function(gpio_func_pin_e pin,gpio_func_e function)
+void gpio_set_mux_function(gpio_func_pin_e pin, gpio_func_e function)
 {
-    reg_gpio_func_mux(pin)=function;
+    reg_gpio_func_mux(pin) = function;
 }
+
 /**
  * @brief      This function enable the input function of a pin.
  * @param[in]  pin - the pin needs to set the input function.
@@ -71,16 +72,13 @@ void gpio_set_mux_function(gpio_func_pin_e pin,gpio_func_e function)
  */
 void gpio_input_en(gpio_pin_e pin)
 {
-    unsigned char   bit = pin & 0xff;
+    unsigned char  bit   = pin & 0xff;
     unsigned short group = pin & 0xf00;
-    if((pin == GPIO_PB4) || (pin == GPIO_PB5) || (pin == GPIO_PB6) || (pin == GPIO_PB7))
-    {
-        analog_write_reg8(areg_gpio_pb_ie, analog_read_reg8(areg_gpio_pb_ie)|bit);
-    }else if(group == GPIO_GROUPC)
-    {
-        analog_write_reg8(areg_gpio_pc_ie, analog_read_reg8(areg_gpio_pc_ie)|bit);
-    }else
-    {
+    if ((pin == GPIO_PB4) || (pin == GPIO_PB5) || (pin == GPIO_PB6) || (pin == GPIO_PB7)) {
+        analog_write_reg8(areg_gpio_pb_ie, analog_read_reg8(areg_gpio_pb_ie) | bit);
+    } else if (group == GPIO_GROUPC) {
+        analog_write_reg8(areg_gpio_pc_ie, analog_read_reg8(areg_gpio_pc_ie) | bit);
+    } else {
         BM_SET(reg_gpio_ie(pin), bit);
     }
 }
@@ -92,16 +90,13 @@ void gpio_input_en(gpio_pin_e pin)
  */
 void gpio_input_dis(gpio_pin_e pin)
 {
-    unsigned char   bit = pin & 0xff;
+    unsigned char  bit   = pin & 0xff;
     unsigned short group = pin & 0xf00;
-    if((pin == GPIO_PB4) || (pin == GPIO_PB5) || (pin == GPIO_PB6) || (pin == GPIO_PB7))
-    {
-        analog_write_reg8(areg_gpio_pb_ie, analog_read_reg8(areg_gpio_pb_ie)&(~bit));
-    }else if(group == GPIO_GROUPC)
-    {
-        analog_write_reg8(areg_gpio_pc_ie, analog_read_reg8(areg_gpio_pc_ie)&(~bit));
-    }else
-    {
+    if ((pin == GPIO_PB4) || (pin == GPIO_PB5) || (pin == GPIO_PB6) || (pin == GPIO_PB7)) {
+        analog_write_reg8(areg_gpio_pb_ie, analog_read_reg8(areg_gpio_pb_ie) & (~bit));
+    } else if (group == GPIO_GROUPC) {
+        analog_write_reg8(areg_gpio_pc_ie, analog_read_reg8(areg_gpio_pc_ie) & (~bit));
+    } else {
         BM_CLR(reg_gpio_ie(pin), bit);
     }
 }
@@ -114,12 +109,9 @@ void gpio_input_dis(gpio_pin_e pin)
  */
 void gpio_set_input(gpio_pin_e pin, unsigned char value)
 {
-    if(value)
-    {
+    if (value) {
         gpio_input_en(pin);
-    }
-    else
-    {
+    } else {
         gpio_input_dis(pin);
     }
 }
@@ -134,71 +126,67 @@ void gpio_set_input(gpio_pin_e pin, unsigned char value)
 void gpio_shutdown(gpio_pin_e pin)
 {
     unsigned short group = pin & 0xf00;
-    unsigned char bit = pin & 0xff;
-    switch(group)
-    {
-        case GPIO_GROUPA:
-            reg_gpio_pa_ie &= (~bit);//disable input
-            reg_gpio_pa_oen |= bit;//disable output
-            reg_gpio_pa_gpio |= bit;//enable GPIO function
-            break;
-        case GPIO_GROUPB:
-            if((pin == GPIO_PB4) || (pin == GPIO_PB5) || (pin == GPIO_PB6) || (pin == GPIO_PB7))
-            {
-                analog_write_reg8(areg_gpio_pb_ie, analog_read_reg8(areg_gpio_pb_ie)&(~bit));
-            }
-            else
-            {
-                reg_gpio_pb_ie &= (~bit);
-            }
-            reg_gpio_pb_oen |= bit;
-            reg_gpio_pb_gpio |= bit;
-            break;
-        case GPIO_GROUPC:
-            analog_write_reg8(areg_gpio_pc_ie, analog_read_reg8(areg_gpio_pc_ie) & (~bit));
-            reg_gpio_pc_oen |= bit;
-            reg_gpio_pc_gpio |= bit;
-            break;
-        case GPIO_GROUPD:
-            reg_gpio_pd_ie &= (~bit);
-            reg_gpio_pd_oen |= bit;
-            reg_gpio_pd_gpio |= bit;
-            break;
-        case GPIO_GROUPE:
-            reg_gpio_pe_ie &= (~bit);
-            reg_gpio_pe_oen |= bit;
-            reg_gpio_pe_gpio |= bit;
-            break;
-        case GPIO_GROUPF:
-            reg_gpio_pf_ie &= (~bit);
-            reg_gpio_pf_oen |= bit;
-            reg_gpio_pf_gpio |= bit;
-            break;
-
-        case GPIO_ALL:
-        {
-            //disable input
-            reg_gpio_pa_ie = 0x80;//except SWS
-            reg_gpio_pb_ie &= 0xf0;
-            analog_write_reg8(areg_gpio_pb_ie, (analog_read_reg8(areg_gpio_pb_ie) & 0x0f));
-            analog_write_reg8(areg_gpio_pc_ie, 0);
-            reg_gpio_pd_ie = 0x00;
-            reg_gpio_pe_ie = 0x00;
-
-            //output disable
-            reg_gpio_pa_oen = 0xff;
-            reg_gpio_pb_oen = 0xff;
-            reg_gpio_pc_oen = 0xff;
-            reg_gpio_pd_oen = 0xff;
-            reg_gpio_pe_oen = 0xff;
-
-            //as gpio
-            reg_gpio_pa_gpio = 0x7f;//except SWS
-            reg_gpio_pb_gpio = 0xff;
-            reg_gpio_pc_gpio = 0xff;
-            reg_gpio_pd_gpio = 0xff;
-            reg_gpio_pe_gpio = 0xff;
+    unsigned char  bit   = pin & 0xff;
+    switch (group) {
+    case GPIO_GROUPA:
+        reg_gpio_pa_ie &= (~bit); //disable input
+        reg_gpio_pa_oen |= bit;   //disable output
+        reg_gpio_pa_gpio |= bit;  //enable GPIO function
+        break;
+    case GPIO_GROUPB:
+        if ((pin == GPIO_PB4) || (pin == GPIO_PB5) || (pin == GPIO_PB6) || (pin == GPIO_PB7)) {
+            analog_write_reg8(areg_gpio_pb_ie, analog_read_reg8(areg_gpio_pb_ie) & (~bit));
+        } else {
+            reg_gpio_pb_ie &= (~bit);
         }
+        reg_gpio_pb_oen |= bit;
+        reg_gpio_pb_gpio |= bit;
+        break;
+    case GPIO_GROUPC:
+        analog_write_reg8(areg_gpio_pc_ie, analog_read_reg8(areg_gpio_pc_ie) & (~bit));
+        reg_gpio_pc_oen |= bit;
+        reg_gpio_pc_gpio |= bit;
+        break;
+    case GPIO_GROUPD:
+        reg_gpio_pd_ie &= (~bit);
+        reg_gpio_pd_oen |= bit;
+        reg_gpio_pd_gpio |= bit;
+        break;
+    case GPIO_GROUPE:
+        reg_gpio_pe_ie &= (~bit);
+        reg_gpio_pe_oen |= bit;
+        reg_gpio_pe_gpio |= bit;
+        break;
+    case GPIO_GROUPF:
+        reg_gpio_pf_ie &= (~bit);
+        reg_gpio_pf_oen |= bit;
+        reg_gpio_pf_gpio |= bit;
+        break;
+
+    case GPIO_ALL:
+    {
+        //disable input
+        reg_gpio_pa_ie = 0x80; //except SWS
+        reg_gpio_pb_ie &= 0xf0;
+        analog_write_reg8(areg_gpio_pb_ie, (analog_read_reg8(areg_gpio_pb_ie) & 0x0f));
+        analog_write_reg8(areg_gpio_pc_ie, 0);
+        reg_gpio_pd_ie = 0x00;
+        reg_gpio_pe_ie = 0x00;
+
+        //output disable
+        reg_gpio_pa_oen = 0xff;
+        reg_gpio_pb_oen = 0xff;
+        reg_gpio_pc_oen = 0xff;
+        reg_gpio_pd_oen = 0xff;
+        reg_gpio_pe_oen = 0xff;
+
+        //as gpio
+        reg_gpio_pa_gpio = 0x7f; //except SWS
+        reg_gpio_pb_gpio = 0xff;
+        reg_gpio_pc_gpio = 0xff;
+        reg_gpio_pd_gpio = 0xff;
+        reg_gpio_pe_gpio = 0xff;
+    }
     }
 }
 
@@ -215,33 +203,32 @@ void gpio_shutdown(gpio_pin_e pin)
  */
 void gpio_set_irq(gpio_irq_num_e irq, gpio_pin_e pin, gpio_irq_trigger_type_e trigger_type)
 {
-     /*
+    /*
         When selecting pull-up resistance and rising edge to trigger gpio interrupt, gpio_irq_en should be placed before setting gpio_set_irq,
         otherwise an interrupt will be triggered by mistake.
      */
     gpio_irq_en(pin, irq);
-    gpio_clr_irq_status((gpio_irq_e)BIT(irq));//must clear cause to unexpected interrupt.
-    switch(trigger_type)
-    {
+    gpio_clr_irq_status((gpio_irq_e)BIT(irq)); //must clear cause to unexpected interrupt.
+    switch (trigger_type) {
     case INTR_RISING_EDGE:
         BM_CLR(reg_gpio_pol(pin), pin & 0xff);
         BM_CLR(reg_gpio_irq_level, BIT(irq));
-    break;
+        break;
     case INTR_FALLING_EDGE:
         BM_SET(reg_gpio_pol(pin), pin & 0xff);
         BM_CLR(reg_gpio_irq_level, BIT(irq));
-    break;
+        break;
     case INTR_HIGH_LEVEL:
         BM_CLR(reg_gpio_pol(pin), pin & 0xff);
         BM_SET(reg_gpio_irq_level, BIT(irq));
-    break;
+        break;
     case INTR_LOW_LEVEL:
         BM_SET(reg_gpio_pol(pin), pin & 0xff);
         BM_SET(reg_gpio_irq_level, BIT(irq));
-     break;
+        break;
     }
-    if(irq == GPIO_IRQ0){
-        reg_gpio_irq_ctrl |= FLD_GPIO_CORE_INTERRUPT_EN;//Only GPIO_IRQ0 needs to enable FLD_GPIO_CORE_INTERRUPT_EN.
+    if (irq == GPIO_IRQ0) {
+        reg_gpio_irq_ctrl |= FLD_GPIO_CORE_INTERRUPT_EN; //Only GPIO_IRQ0 needs to enable FLD_GPIO_CORE_INTERRUPT_EN.
     }
 }
 
@@ -256,34 +243,29 @@ void gpio_set_up_down_res(gpio_pin_e pin, gpio_pull_type_e up_down_res)
     unsigned char r_val = up_down_res & 0x03;
 
     unsigned char base_ana_reg = 0;
-    if((pin>>8)<5)//A-E
+    if ((pin >> 8) < 5) //A-E
     {
-         base_ana_reg = 0x17 + ((pin >> 8) << 1) + ((pin & 0xf0) ? 1 : 0 );
-    }
-    else{
+        base_ana_reg = 0x17 + ((pin >> 8) << 1) + ((pin & 0xf0) ? 1 : 0);
+    } else {
         return;
     }
     unsigned char shift_num, mask_not;
 
-    if(pin & 0x11){
-            shift_num = 0;
-            mask_not = 0xfc;
-        }
-        else if(pin & 0x22){
-            shift_num = 2;
-            mask_not = 0xf3;
-        }
-        else if(pin & 0x44){
-            shift_num = 4;
-            mask_not = 0xcf;
-        }
-        else if(pin & 0x88){
-            shift_num = 6;
-            mask_not = 0x3f;
-        }
-        else{
-            return;
-        }
+    if (pin & 0x11) {
+        shift_num = 0;
+        mask_not  = 0xfc;
+    } else if (pin & 0x22) {
+        shift_num = 2;
+        mask_not  = 0xf3;
+    } else if (pin & 0x44) {
+        shift_num = 4;
+        mask_not  = 0xcf;
+    } else if (pin & 0x88) {
+        shift_num = 6;
+        mask_not  = 0x3f;
+    } else {
+        return;
+    }
     analog_write_reg8(base_ana_reg, (analog_read_reg8(base_ana_reg) & mask_not) | (r_val << shift_num));
 }
 
@@ -295,8 +277,8 @@ void gpio_set_up_down_res(gpio_pin_e pin, gpio_pull_type_e up_down_res)
  */
 void gpio_set_probe_clk_function(gpio_func_pin_e pin, probe_clk_sel_e sel_clk)
 {
-    reg_probe_clk_sel= (reg_probe_clk_sel & 0xe0) | sel_clk;    //probe_clk_sel_e
-    gpio_set_mux_function(pin, DBG_PROBE_CLK);              //sel probe_clk function
+    reg_probe_clk_sel = (reg_probe_clk_sel & 0xe0) | sel_clk; //probe_clk_sel_e
+    gpio_set_mux_function(pin, DBG_PROBE_CLK);                //sel probe_clk function
     gpio_function_dis((gpio_pin_e)pin);
 }
 
@@ -309,7 +291,7 @@ void gpio_set_probe_clk_function(gpio_func_pin_e pin, probe_clk_sel_e sel_clk)
 _attribute_flash_code_sec_noinline_ void gpio_shutdown_flashcode_for_asm(void)
 {
     //disable input
-    reg_gpio_pa_ie = 0x80;                  //SWS
+    reg_gpio_pa_ie = 0x80; //SWS
     reg_gpio_pb_ie &= 0xf0;
 
     reg_gpio_pd_ie = 0x00;
@@ -318,21 +300,21 @@ _attribute_flash_code_sec_noinline_ void gpio_shutdown_flashcode_for_asm(void)
     reg_rst1 |= FLD_RST1_ALGM;
     reg_clk_en1 |= FLD_CLK1_ALGM_EN;
 
-    reg_ana_len = 1;
-    reg_ana_addr = 0xbd;
+    reg_ana_len     = 1;
+    reg_ana_addr    = 0xbd;
     reg_ana_data(0) = 0x00;
-    while(!(reg_ana_buf_cnt & FLD_ANA_TX_BUFCNT));
+    while (!(reg_ana_buf_cnt & FLD_ANA_TX_BUFCNT));
     reg_ana_ctrl = (FLD_ANA_CYC | FLD_ANA_RW);
-    while(reg_ana_ctrl & FLD_ANA_BUSY);
-    reg_ana_ctrl =0x00;
+    while (reg_ana_ctrl & FLD_ANA_BUSY);
+    reg_ana_ctrl = 0x00;
 
-    reg_ana_len = 1;
-    reg_ana_addr = 0xbf;
+    reg_ana_len     = 1;
+    reg_ana_addr    = 0xbf;
     reg_ana_data(0) = 0x00;
-    while(!(reg_ana_buf_cnt & FLD_ANA_TX_BUFCNT));
+    while (!(reg_ana_buf_cnt & FLD_ANA_TX_BUFCNT));
     reg_ana_ctrl = (FLD_ANA_CYC | FLD_ANA_RW);
-    while(reg_ana_ctrl & FLD_ANA_BUSY);
-    reg_ana_ctrl =0x00;
+    while (reg_ana_ctrl & FLD_ANA_BUSY);
+    reg_ana_ctrl = 0x00;
 
     reg_rst1 &= ~(FLD_RST1_ALGM);
     reg_clk_en1 &= ~(FLD_CLK1_ALGM_EN);
@@ -344,10 +326,10 @@ _attribute_flash_code_sec_noinline_ void gpio_shutdown_flashcode_for_asm(void)
  * @note       This function called by .S file to shutdown all the GPIO input which can decrease the current early.
  *             If this C function is called in the S file, it needs to be called after setting sp.
  */
-_attribute_ram_code_sec_ void gpio_shutdown_ramcode_for_asm(void)
+_attribute_ram_code_sec_optimize_o2_ void gpio_shutdown_ramcode_for_asm(void)
 {
     //disable input
-    reg_gpio_pa_ie = 0x80;                  //SWS
+    reg_gpio_pa_ie = 0x80; //SWS
     reg_gpio_pb_ie &= 0xf0;
 
     reg_gpio_pd_ie = 0x00;
@@ -356,21 +338,21 @@ _attribute_ram_code_sec_ void gpio_shutdown_ramcode_for_asm(void)
     reg_rst1 |= FLD_RST1_ALGM;
     reg_clk_en1 |= FLD_CLK1_ALGM_EN;
 
-    reg_ana_len = 1;
-    reg_ana_addr = 0xbd;
+    reg_ana_len     = 1;
+    reg_ana_addr    = 0xbd;
     reg_ana_data(0) = 0x00;
-    while(!(reg_ana_buf_cnt & FLD_ANA_TX_BUFCNT));
+    while (!(reg_ana_buf_cnt & FLD_ANA_TX_BUFCNT));
     reg_ana_ctrl = (FLD_ANA_CYC | FLD_ANA_RW);
-    while(reg_ana_ctrl & FLD_ANA_BUSY);
-    reg_ana_ctrl =0x00;
+    while (reg_ana_ctrl & FLD_ANA_BUSY);
+    reg_ana_ctrl = 0x00;
 
-    reg_ana_len = 1;
-    reg_ana_addr = 0xbf;
+    reg_ana_len     = 1;
+    reg_ana_addr    = 0xbf;
     reg_ana_data(0) = 0x00;
-    while(!(reg_ana_buf_cnt & FLD_ANA_TX_BUFCNT));
+    while (!(reg_ana_buf_cnt & FLD_ANA_TX_BUFCNT));
     reg_ana_ctrl = (FLD_ANA_CYC | FLD_ANA_RW);
-    while(reg_ana_ctrl & FLD_ANA_BUSY);
-    reg_ana_ctrl =0x00;
+    while (reg_ana_ctrl & FLD_ANA_BUSY);
+    reg_ana_ctrl = 0x00;
 
     reg_rst1 &= ~(FLD_RST1_ALGM);
     reg_clk_en1 &= ~(FLD_CLK1_ALGM_EN);
@@ -397,13 +379,13 @@ void jtag_sdp_set_pin(gpio_pin_e pin)
  */
 void jtag_set_pin_en(void)
 {
-    jtag_sdp_set_pin(GPIO_PC4);//TDI
-    gpio_set_up_down_res(GPIO_PC4,GPIO_PIN_PULLDOWN_100K);
-    jtag_sdp_set_pin(GPIO_PC5);//TDO
-    jtag_sdp_set_pin(GPIO_PC6);//TMS
-    gpio_set_up_down_res(GPIO_PC6,GPIO_PIN_PULLUP_10K);
-    jtag_sdp_set_pin(GPIO_PC7);//TCK
-    gpio_set_up_down_res(GPIO_PC7,GPIO_PIN_PULLUP_10K);
+    jtag_sdp_set_pin(GPIO_PC4); //TDI
+    gpio_set_up_down_res(GPIO_PC4, GPIO_PIN_PULLDOWN_100K);
+    jtag_sdp_set_pin(GPIO_PC5); //TDO
+    jtag_sdp_set_pin(GPIO_PC6); //TMS
+    gpio_set_up_down_res(GPIO_PC6, GPIO_PIN_PULLUP_10K);
+    jtag_sdp_set_pin(GPIO_PC7); //TCK
+    gpio_set_up_down_res(GPIO_PC7, GPIO_PIN_PULLUP_10K);
 }
 
 /**
@@ -415,12 +397,12 @@ void jtag_set_pin_en(void)
  */
 void sdp_set_pin_en(void)
 {
-    jtag_sdp_set_pin(GPIO_PC6);//TMS
-    gpio_set_up_down_res(GPIO_PC6,GPIO_PIN_PULLUP_10K);
-    jtag_sdp_set_pin(GPIO_PC7);//TCK
-    gpio_set_up_down_res(GPIO_PC7,GPIO_PIN_PULLUP_10K);
+    jtag_sdp_set_pin(GPIO_PC6); //TMS
+    gpio_set_up_down_res(GPIO_PC6, GPIO_PIN_PULLUP_10K);
+    jtag_sdp_set_pin(GPIO_PC7); //TCK
+    gpio_set_up_down_res(GPIO_PC7, GPIO_PIN_PULLUP_10K);
 }
+
 /**********************************************************************************************************************
   *                                         local function implementation                                             *
   *********************************************************************************************************************/
-

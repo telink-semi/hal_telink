@@ -28,8 +28,11 @@ SECTIONS
     . = 0x20000000; 
     PROVIDE (BIN_BEGIN = .);
     .vectors        : { KEEP(*(.vectors )) }
+    . = ALIGN(8);
+    .flash_data     : AT( ALIGN(LOADADDR (.vectors) + SIZEOF (.vectors),8)) 
+         { KEEP(*(.flash_data )) }
     . = 0x00020000;
-    .retention_reset    : AT( ALIGN(LOADADDR (.vectors) + SIZEOF (.vectors),8)) 
+    .retention_reset    : AT( ALIGN(LOADADDR (.flash_data) + SIZEOF (.flash_data),8)) 
         { KEEP(*(.retention_reset )) }
     PROVIDE (_RETENTION_RESET_VMA_START = ADDR(.retention_reset));
     PROVIDE (_RETENTION_RESET_LMA_START = LOADADDR(.retention_reset));
@@ -64,10 +67,7 @@ SECTIONS
     .text           : AT(ALIGN(LOADADDR (.ram_code) + SIZEOF (.ram_code), 8)) 
         { *(.text .stub .text.* .gnu.linkonce.t.* ) KEEP(*(.text.*personality* )) *(.gnu.warning )  }
     .rodata         : AT(ALIGN(LOADADDR (.text) + SIZEOF (.text), ALIGNOF(.rodata))) 
-        { *(.rodata .rodata.* .gnu.linkonce.r.* )
-          *(.srodata.cst16 ) *(.srodata.cst8 ) *(.srodata.cst4 ) *(.srodata.cst2 ) *(.srodata .srodata.* )
-          *(.sdata2 .sdata2.* .gnu.linkonce.s.* )
-        }
+        { *(.rodata .rodata.* .gnu.linkonce.r.* )}
     .eh_frame_hdr   : AT(ALIGN(LOADADDR (.rodata) + SIZEOF (.rodata), ALIGNOF(.eh_frame_hdr)))
         { *(.eh_frame_hdr ) }
     . = ALIGN(0x20);
@@ -81,7 +81,7 @@ SECTIONS
     PROVIDE( __global_pointer$ = . + (4K / 2) );
     .data   : AT(ALIGN(LOADADDR (.exec.itable) + SIZEOF (.exec.itable),  ALIGNOF(.data)))
         { *(.data .data.* .gnu.linkonce.d.* ) KEEP(*(.gnu.linkonce.d.*personality* )) SORT(CONSTRUCTORS) 
-          *(.sdata .sdata.* .gnu.linkonce.s.* ) 
+          *(.srodata.cst16 ) *(.srodata.cst8 ) *(.srodata.cst4 ) *(.srodata.cst2 ) *(.srodata .srodata.* ) *(.sdata .sdata.* .gnu.linkonce.s.* ) *(.sdata2 .sdata2.* .gnu.linkonce.s.* )
         }
     PROVIDE (_DATA_VMA_END = .);    
     PROVIDE (_DATA_VMA_START = ADDR(.data));
@@ -91,7 +91,11 @@ SECTIONS
     PROVIDE (_BSS_VMA_START = .);
     .sbss   (NOLOAD)    : { *(.dynsbss ) *(.sbss .sbss.* .gnu.linkonce.sb.* ) *(.scommon .scommon.* ) }
     .bss    (NOLOAD)    : { *(.dynbss ) *(.bss .bss.* .gnu.linkonce.b.* ) *(COMMON ) . = ALIGN(8); }
-    PROVIDE (_BSS_VMA_END = .);
+    /* When using the S file _FILL_STK function (which clears all the values in the stack space to 0x55), 
+     * if _BSS_VMA_END does not have four-byte alignment, there may be an out-of-bounds access beyond _STACK_TOP,
+     * resulting in a store access fault.
+     */
+    PROVIDE (_BSS_VMA_END = ((. + 3) / 4)*4);
 
     .sdk_version    : AT(LOADADDR (.data) + SIZEOF (.data))
         { KEEP(*(.sdk_version )) }

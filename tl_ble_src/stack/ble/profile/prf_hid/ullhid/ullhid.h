@@ -28,15 +28,21 @@
 // ULL-HIDS: Ultra Low Latency Human Interface Device Service
 
 /******************************* ULL-HID Common Start **********************************************************************/
-#define ULL_HID_HYBRID_MODE_ULL_REPORT_COUNT            8
+#if ((!defined(HOST_V2_ENABLE)))
+#define ULL_HID_HYBRID_MODE_ULL_REPORT_COUNT 8
+#else
+#define ULL_HID_HYBRID_MODE_ULL_REPORT_COUNT 9
+#endif
+struct hybridModeUllReport
+{
+    u8 reportID;               //0 mean the end.
 
-struct hybridModeUllReport{
-    u8 reportID;    //0 mean the end.
-    struct {        //additional_info
-        u8 reportType : 1;  //0x00:Input,   0x01:Output
+    struct
+    {                          //additional_info
+        u8 reportType     : 1; //0x00:Input,   0x01:Output
         u8 powerSavingCfm : 1;
-        u8 repetition : 1;
-        u8 rfu : 5;
+        u8 repetition     : 1;
+        u8 rfu            : 5;
     };
 };
 
@@ -47,35 +53,71 @@ struct hybridModeUllReport{
  * Available Report Intervals       boolean[16]     2
  * Hybrid Mode ULL Reports          uint16[0-16]    0 to 16
  */
+#if ((!defined(HOST_V2_ENABLE)))
+union ullhid_supp_report_intervals
+{ // supported report intervals.
 
-union ullhid_supp_report_intervals{ // supported report intervals.
-    struct {
-        u16 interval_1ms    :1;     // Bit 0: 1ms
-        u16 interval_2ms    :1;     // Bit 1: 2ms
-        u16 interval_3ms    :1;     // Bit 2: 3ms
-        u16 interval_4ms    :1;     // Bit 3: 4ms
-        u16 interval_5ms    :1;     // Bit 4: 5ms
-        u16 interval_1_25ms :1;     // Bit 5: 1.25ms
-        u16 interval_2_5ms  :1;     // Bit 6: 2.5ms
-        u16 interval_3_75ms :1;     // Bit 7: 3.75ms
-        u16 intervalRFU : 8;        // Bit 8-15: RFU
+    struct
+    {
+        u16 interval_1ms    : 1; // Bit 0: 1ms
+        u16 interval_2ms    : 1; // Bit 1: 2ms
+        u16 interval_3ms    : 1; // Bit 2: 3ms
+        u16 interval_4ms    : 1; // Bit 3: 4ms
+        u16 interval_5ms    : 1; // Bit 4: 5ms
+        u16 interval_1_25ms : 1; // Bit 5: 1.25ms
+        u16 interval_2_5ms  : 1; // Bit 6: 2.5ms
+        u16 interval_3_75ms : 1; // Bit 7: 3.75ms
+        u16 intervalRFU     : 8; // Bit 8-15: RFU
     };
+
     u16 intervals;
 };
+#else
+union ullhid_supp_report_intervals
+{ // supported report intervals.
 
+    struct
+    {
+        u16 interval_1ms    : 1; // Bit 0: 1ms
+        u16 interval_2ms    : 1; // Bit 1: 2ms
+        u16 interval_3ms    : 1; // Bit 2: 3ms
+        u16 interval_4ms    : 1; // Bit 3: 4ms
+        u16 interval_5ms    : 1; // Bit 4: 5ms
+        u16 interval_1_25ms : 1; // Bit 5: 1.25ms
+        u16 interval_2_5ms  : 1; // Bit 6: 2.5ms
+        u16 interval_3_75ms : 1; // Bit 7: 3.75ms
+        u16 interval_7_5ms  : 1; // Bit 8: 7.5ms
+        u16 intervalRFU     : 7; // Bit 8-15: RFU
+    };
+
+    u16 intervals;
+};
+#endif
 /*
  * Features Field
  */
-#define ULLHID_PROPERTIES_HEAD_SIZE             5
-struct blc_ullhid_properties_format{
-    struct {    // Features
-        u8 deviceModeChange :1;
-        u8 featureRFU   :7;
+#define ULLHID_PROPERTIES_HEAD_SIZE 5
+
+struct blc_ullhid_properties_format
+{
+    struct
+    { // Features
+        u8 deviceModeChange : 1;
+        u8 featureRFU       : 7;
     };
     union ullhid_supp_report_intervals suppInterval;
-    u8 deviceToHostMaxSduSize;
-    u8 hostToDeviceMaxSduSize;
-    struct hybridModeUllReport hybridModeReport[ULL_HID_HYBRID_MODE_ULL_REPORT_COUNT];
+#if ((!defined(HOST_V2_ENABLE)))
+    u8                                 deviceToHostMaxSduSize;
+    u8                                 hostToDeviceMaxSduSize;
+    struct hybridModeUllReport         hybridModeReport[ULL_HID_HYBRID_MODE_ULL_REPORT_COUNT];
+#else
+    u8                                 deviceToHostMaxSduSize;
+    u8 deviceToHostPerferSduSize;
+    u8                                 hostToDeviceMaxSduSize;
+    u8 hostToDevicePerferSduSize;
+    struct hybridModeUllReport         hybridModeReport[ULL_HID_HYBRID_MODE_ULL_REPORT_COUNT];
+    u8                                 reportCount;
+#endif
 } __attribute__((packed));
 
 /*
@@ -97,11 +139,10 @@ u32 blc_ullhid_convertReportIntervalBit(u16 intervalBit);
  */
 u8 blc_ullhid_convertReportInterval(u32 interval);
 
-#define ULL_HID_REPORT_TYPE_INPUT                   0x00
-#define ULL_HID_REPORT_TYPE_OUTPUT                  0x01
+#define ULL_HID_REPORT_TYPE_INPUT       0x00
+#define ULL_HID_REPORT_TYPE_OUTPUT      0x01
 
-#define CHECK_ULL_HID_REPORT_TYPE(type)             ((type) == ULL_HID_REPORT_TYPE_INPUT || (type) == ULL_HID_REPORT_TYPE_OUTPUT)
-
+#define CHECK_ULL_HID_REPORT_TYPE(type) ((type) == ULL_HID_REPORT_TYPE_INPUT || (type) == ULL_HID_REPORT_TYPE_OUTPUT)
 
 /******************************* ULL-HID Common End **********************************************************************/
 
@@ -109,29 +150,49 @@ u8 blc_ullhid_convertReportInterval(u32 interval);
 /******************************* ULL-HID Client Start **********************************************************************/
 
 //ULL-HID Client Event ID
-enum{
+enum
+{
     HID_EVT_ULLHIDC_START = HID_EVT_TYPE_ULLHID_CLIENT,
-    ULLHIDC_EVT_SELECT_HYBRID_MODE,     //refer to struct ullhidc_selectHybridModeEvt
-    ULLHIDC_EVT_SELECT_DEFAULT_MODE,        //refer to NULL.
+    ULLHIDC_EVT_SELECT_HYBRID_MODE,  //refer to struct ullhidc_selectHybridModeEvt
+    ULLHIDC_EVT_SELECT_DEFAULT_MODE, //refer to NULL.
+};
+#if ((!defined(HOST_V2_ENABLE)))
+struct ullhidc_selectHybridModeEvt
+{                                              //Event ID: ULLHIDS_EVT_SELECT_HYBRID_MODE
+    u32                        reportInterval; //unit 1us
+    u8                         reportCount;    //range 0 to 8
+    u8                         CIG_ID;
+    u8                         CIS_ID;
+    u8                         reportIndex[ULL_HID_HYBRID_MODE_ULL_REPORT_COUNT];
+    struct hybridModeUllReport reportInfo[ULL_HID_HYBRID_MODE_ULL_REPORT_COUNT];
+} __attribute__((packed));
+#else
+struct hybrid_mode_report_info
+{
+    u8 reportID;   //0 mean the end.
+    u8 reportType; //0x00:Input,   0x01:Output
+    u8 powerSavingCfm;
+    u8 repetition;
 };
 
-struct ullhidc_selectHybridModeEvt{ //Event ID: ULLHIDS_EVT_SELECT_HYBRID_MODE
-    u32 reportInterval;     //unit 1us
-    u8 reportCount;         //range 0 to 8
-    u8 CIG_ID;
-    u8 CIS_ID;
-    u8 reportIndex[ULL_HID_HYBRID_MODE_ULL_REPORT_COUNT];
-    struct hybridModeUllReport reportInfo[ULL_HID_HYBRID_MODE_ULL_REPORT_COUNT];
-}__attribute__((packed));
-
-enum{
+struct ullhidc_selectHybridModeEvt
+{                                                  //Event ID: ULLHIDS_EVT_SELECT_HYBRID_MODE
+    u32                            reportInterval; //unit 1us
+    u8 deviceToHostMaxSduSize;
+    u8 hostToDeviceMaxSduSize;
+    u8                             reportCount;    //range 0 to 8
+    struct hybrid_mode_report_info reportInfo[ULL_HID_HYBRID_MODE_ULL_REPORT_COUNT];
+} __attribute__((packed));
+#endif
+enum
+{
     ULLHID_CLIENT_ERROR_START = PRF_MODULE_ERROR,
     ULLHIDC_ERROR_NO_ULL_HID_PROPERTIES_HDL,
     ULLHIDC_ERROR_NO_LE_HID_OPERATION_MODE_HDL,
 };
 
-struct blc_ullhidc_regParam{
-
+struct blc_ullhidc_regParam
+{
 };
 
 /**
@@ -145,19 +206,38 @@ void blc_hid_registerULLHIDControlClient(const struct blc_ullhidc_regParam *para
 int blc_ullhidc_readUllhidProperties(u16 connHandle, prf_read_cb_t readCb);
 
 //ULL-HID Client Get Characteristic Value Operation API
-int blc_ullhidc_getUllhidProperties(u16 connHandle, struct blc_ullhid_properties_format* properties, u16* propertiesLen);
+int blc_ullhidc_getUllhidProperties(u16 connHandle, struct blc_ullhid_properties_format *properties, u16 *propertiesLen);
 
 //ULL-HID Client Write Characteristic Value Operation API
-int blc_ullhidc_writeLeHidOperationMode(u16 connHandle, u8* operation, u16 operationLen, prf_write_cb_t writeCb);
-
-struct ullhid_select_hybrid_param {
-    u8 CIG_ID;
-    u8 CIS_ID;
+int blc_ullhidc_writeLeHidOperationMode(u16 connHandle, u8 *operation, u16 operationLen, prf_write_cb_t writeCb);
+#if ((!defined(HOST_V2_ENABLE)))
+struct ullhid_select_hybrid_param
+{
+    u8                                 CIG_ID;
+    u8                                 CIS_ID;
     union ullhid_supp_report_intervals suppInterval;
-    u8 indicesCnt;
-    u8 indices[ULL_HID_HYBRID_MODE_ULL_REPORT_COUNT];
+    u8                                 indicesCnt;
+    u8                                 indices[ULL_HID_HYBRID_MODE_ULL_REPORT_COUNT];
 };
+#else
+struct hybrid_report_param {
+    u8 index : 3;
+    u8 rfu : 3;
+    u8 cfmEnable : 1;
+    u8 repetitionEnable : 1;
+}__attribute__((packed));
 
+struct ullhid_select_hybrid_param
+{
+    u8                                 CIG_ID;
+    u8                                 CIS_ID;
+    union ullhid_supp_report_intervals suppInterval;
+    u8 deviceToHostMaxSduSize;
+    u8 hostToDeviceMaxSduSize;
+    u8                                 indicesCnt;
+    struct hybrid_report_param         indices[ULL_HID_HYBRID_MODE_ULL_REPORT_COUNT];
+};
+#endif
 int blc_ullhidc_writeSelectHybridMode(u16 connHandle, struct ullhid_select_hybrid_param *param, prf_write_cb_t writeCb);
 int blc_ullhidc_writeSelectDefaultMode(u16 connHandle, prf_write_cb_t writeCb);
 
@@ -166,29 +246,42 @@ int blc_ullhidc_writeSelectDefaultMode(u16 connHandle, prf_write_cb_t writeCb);
 
 /******************************* ULL-HID Server Start **********************************************************************/
 //ULL-HID Server Event ID
-enum{
+enum
+{
     HID_EVT_ULLHIDS_START = HID_EVT_TYPE_ULLHID_SERVER,
-    ULLHIDS_EVT_SELECT_HYBRID_MODE,     //refer to struct ullhids_selectHybridModeEvt
-    ULLHIDS_EVT_SELECT_DEFAULT_MODE,        //refer to NULL.
+    ULLHIDS_EVT_SELECT_HYBRID_MODE,  //refer to struct ullhids_selectHybridModeEvt
+    ULLHIDS_EVT_SELECT_DEFAULT_MODE, //refer to NULL.
 };
 
-struct blc_ullhids_regParam{
+struct blc_ullhids_regParam
+{
     struct blc_ullhid_properties_format properties;
 };
 
-enum{
+enum
+{
     ULLHID_SERVER_ERROR_START = PRF_MODULE_ERROR,
     ULLHID_ERROR_DEVICE_ALREADY_MODE,
 };
-
-struct ullhids_selectHybridModeEvt{ //Event ID: ULLHIDS_EVT_SELECT_HYBRID_MODE
-    u32 reportInterval;     //unit 1us
-    u8 reportCount;         //range 0 to 8
-    u8 CIG_ID;
-    u8 CIS_ID;
+#if ((!defined(HOST_V2_ENABLE)))
+struct ullhids_selectHybridModeEvt
+{                                              //Event ID: ULLHIDS_EVT_SELECT_HYBRID_MODE
+    u32                        reportInterval; //unit 1us
+    u8                         reportCount;    //range 0 to 8
+    u8                         CIG_ID;
+    u8                         CIS_ID;
     struct hybridModeUllReport reportInfo[ULL_HID_HYBRID_MODE_ULL_REPORT_COUNT];
 };
-
+#else
+struct ullhids_selectHybridModeEvt
+{                                                  //Event ID: ULLHIDS_EVT_SELECT_HYBRID_MODE
+    u32                            reportInterval; //unit 1us
+    u8                             reportCount;    //range 0 to 8
+    u8                             CIG_ID;
+    u8                             CIS_ID;
+    struct hybrid_mode_report_info reportInfo[ULL_HID_HYBRID_MODE_ULL_REPORT_COUNT];
+};
+#endif
 /**
  * @brief       for user to register ultra low latency human interface device service control server module.
  * @param[in]   param - server initial parameter.

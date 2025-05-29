@@ -25,7 +25,6 @@
 #define TLK_MEM_H
 
 
-
 #include "common/types.h"
 #include "common/compiler.h"
 
@@ -35,7 +34,7 @@
 **************************************************************************************************/
 /*! \brief Buffer histogram stats */
 #ifndef TLK_MEM_STATS_HIST
-#define TLK_MEM_STATS_HIST                      FALSE//TRUE//
+    #define TLK_MEM_STATS_HIST FALSE //TRUE//
 #endif
 
 /**************************************************************************************************
@@ -43,14 +42,14 @@
 **************************************************************************************************/
 
 /*! \brief Length of the buffer statistics array */
-#define TLK_MEM_STATS_MAX_LEN                       512
+#define TLK_MEM_STATS_MAX_LEN 512
 
 /*! \brief Max number of pools can allocate */
-#define TLK_MEM_STATS_MAX_POOL                      32
+#define TLK_MEM_STATS_MAX_POOL 32
 
 #ifndef TLK_MEM_STATS
-/*! \brief Enable buffer allocation statistics. */
-#define TLK_MEM_STATS                           FALSE//TRUE//
+    /*! \brief Enable buffer allocation statistics. */
+    #define TLK_MEM_STATS FALSE //TRUE//
 #endif
 
 /**************************************************************************************************
@@ -59,30 +58,31 @@
 /*! \brief Mem pool descriptor structure */
 typedef struct
 {
-  u16   len;                  /*!< \brief Length of buffers in pool */
-  u8    num;                  /*!< \brief Number of buffers in pool */
+    u16 len; /*!< \brief Length of buffers in pool */
+    u8  num; /*!< \brief Number of buffers in pool */
 } __attribute__((aligned(4))) tlk_mem_pool_desc_t;
 
 /*! \brief Pool statistics */
 typedef struct
 {
-  u16   bufSize;              /*!< \brief Pool buffer size. */
-  u8    numBuf;               /*!< \brief Total number of buffers. */
-  u8    numAlloc;             /*!< \brief Number of outstanding allocations. */
-  u8    maxAlloc;             /*!< \brief High allocation watermark. */
-  u16   maxReqLen;            /*!< \brief Maximum requested buffer length. */
+    u16 bufSize;   /*!< \brief Pool buffer size. */
+    u8  numBuf;    /*!< \brief Total number of buffers. */
+    u8  numAlloc;  /*!< \brief Number of outstanding allocations. */
+    u8  maxAlloc;  /*!< \brief High allocation watermark. */
+    u16 maxReqLen; /*!< \brief Maximum requested buffer length. */
 } __attribute__((aligned(4))) tlk_mem_pool_state_t;
 
 /**
  *  @brief Definition error code of memory operation
  */
-typedef enum{
+typedef enum
+{
     TLK_MEM_SUCCESS = 0,
     TLK_MEM_NOT_ALIGNED,
     TLK_MEM_INVALID_PARAMETER,
     TLK_MEM_ALREADY_FREE,
     TLK_MEM_ALLOC_FAIL,
-    TLK_MEM_OUT_OF_MEM,//The size of HEAP_MEM_SIZE_CFG is not enough.
+    TLK_MEM_OUT_OF_MEM, //The size of HEAP_MEM_SIZE_CFG is not enough.
 } TLK_MEM_STATE_T;
 
 /**************************************************************************************************

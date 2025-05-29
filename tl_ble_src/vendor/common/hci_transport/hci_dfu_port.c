@@ -31,7 +31,7 @@
 #include "stack/ble/ble_common.h"
 
 #ifndef HCI_DFU_EN
-#define HCI_DFU_EN                  0
+    #define HCI_DFU_EN 0
 #endif
 
 #if HCI_DFU_EN
@@ -43,7 +43,7 @@
  */
 _attribute_ram_code_ void FLASH_WritePage(u32 addr, u8 *pData, u32 len)
 {
-#if 0
+    #if 0
     u32 offset = 0;
     while(len)
     {
@@ -54,9 +54,9 @@ _attribute_ram_code_ void FLASH_WritePage(u32 addr, u8 *pData, u32 len)
         offset += dataLen;
         len    -= dataLen;
     }
-#else
+    #else
     flash_write_page(addr, len, pData);
-#endif
+    #endif
 }
 
 _attribute_ram_code_ void FLASH_ReadPage(u32 addr, u8 *pData, u32 len)
@@ -76,7 +76,7 @@ void MCU_Reset(void)
 
 bool UART_IsBusy(void)
 {
-    return ext_hci_getTxCompleteDone()?false:true;
+    return ext_hci_getTxCompleteDone() ? false : true;
     //return uart_tx_is_busy();
 }
 
@@ -102,26 +102,26 @@ void Hci_SetRevision(u16 revision)
 }
 
 extern hci_fifo_t bltHci_txfifo;
+
 void Hci_SendCmdCmplEvt(u16 opcode, u8 *pParam, u32 len)
 {
     hci_fifo_t *pTxFifo = &bltHci_txfifo;
 
-    if(pTxFifo->wptr - pTxFifo->rptr >= pTxFifo->num){
+    if (pTxFifo->wptr - pTxFifo->rptr >= pTxFifo->num) {
         return;
     }
 
     u8 *pBuf = pTxFifo->p + (pTxFifo->wptr & pTxFifo->mask) * pTxFifo->size;
-    if(pBuf)
-    {
+    if (pBuf) {
         u8 *p = pBuf;
-        UINT16_TO_BSTREAM(p, 1 + HCI_EVT_HEAD_LEN + 3 + len)// 3 = HCI_EVT_TYPE + EVT_CODE + PARAM_LEN
+        UINT16_TO_BSTREAM(p, 1 + HCI_EVT_HEAD_LEN + 3 + len) // 3 = HCI_EVT_TYPE + EVT_CODE + PARAM_LEN
 
         //HCI evt packet
         UINT8_TO_BSTREAM(p, HCI_TR_TYPE_EVENT);
-        UINT8_TO_BSTREAM(p, 0x0E);   //command complete event code.
-        UINT8_TO_BSTREAM(p, 3 + len);//command complete event parameter length.
+        UINT8_TO_BSTREAM(p, 0x0E);    //command complete event code.
+        UINT8_TO_BSTREAM(p, 3 + len); //command complete event parameter length.
 
-        UINT8_TO_BSTREAM(p, 1);//Num_HCI_Command_Packets
+        UINT8_TO_BSTREAM(p, 1);       //Num_HCI_Command_Packets
         UINT16_TO_BSTREAM(p, opcode);
         memcpy(p, pParam, len);
         p += len;
@@ -139,23 +139,22 @@ void Hci_SendCmdStatusEvt(u16 opcode, u8 status)
 {
     hci_fifo_t *pTxFifo = &bltHci_txfifo;
 
-    if(pTxFifo->wptr - pTxFifo->rptr >= pTxFifo->num){
+    if (pTxFifo->wptr - pTxFifo->rptr >= pTxFifo->num) {
         return;
     }
 
     u8 *pBuf = pTxFifo->p + (pTxFifo->wptr & pTxFifo->mask) * pTxFifo->size;
-    if(pBuf)
-    {
+    if (pBuf) {
         u8 *p = pBuf;
-        UINT16_TO_BSTREAM(p, 1 + HCI_EVT_HEAD_LEN + 4)// 3 = HCI_EVT_TYPE + EVT_CODE + PARAM_LEN
+        UINT16_TO_BSTREAM(p, 1 + HCI_EVT_HEAD_LEN + 4) // 3 = HCI_EVT_TYPE + EVT_CODE + PARAM_LEN
 
         //HCI evt packet
         UINT8_TO_BSTREAM(p, HCI_TR_TYPE_EVENT);
-        UINT8_TO_BSTREAM(p, 0x0F);   //command status event code.
-        UINT8_TO_BSTREAM(p, 4);      //command status parameter length.
+        UINT8_TO_BSTREAM(p, 0x0F); //command status event code.
+        UINT8_TO_BSTREAM(p, 4);    //command status parameter length.
 
         UINT8_TO_BSTREAM(p, status);
-        UINT8_TO_BSTREAM(p, 1);//Num_HCI_Command_Packets
+        UINT8_TO_BSTREAM(p, 1);    //Num_HCI_Command_Packets
         UINT16_TO_BSTREAM(p, opcode);
 
         pTxFifo->wptr++;

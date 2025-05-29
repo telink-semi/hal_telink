@@ -29,6 +29,7 @@
 #include "gpio.h"
 #include "dma.h"
 #include "error_handler/error_handler.h"
+
 /** @page SPI
  *
  *  Introduction
@@ -71,35 +72,39 @@
  *                                           global data type                                                             *
  *********************************************************************************************************************/
 
-typedef enum{
-    SPI_RXFIFO_OR_INT_EN        =BIT(0),
-    SPI_TXFIFO_UR_INT_EN        =BIT(1),
-    SPI_RXFIFO_INT_EN           =BIT(2),
-    SPI_TXFIFO_INT_EN           =BIT(3),
-    SPI_END_INT_EN              =BIT(4),
-    SPI_SLV_CMD_EN              =BIT(5),
-}spi_irq_mask;
+typedef enum
+{
+    SPI_RXFIFO_OR_INT_EN = BIT(0),
+    SPI_TXFIFO_UR_INT_EN = BIT(1),
+    SPI_RXFIFO_INT_EN    = BIT(2),
+    SPI_TXFIFO_INT_EN    = BIT(3),
+    SPI_END_INT_EN       = BIT(4),
+    SPI_SLV_CMD_EN       = BIT(5),
+} spi_irq_mask;
 
-typedef enum{
-    SPI_RXF_OR_INT      =BIT(0),
-    SPI_TXF_UR_INT      =BIT(1),
-    SPI_RXF_INT         =BIT(2),
-    SPI_TXF_INT         =BIT(3),
-    SPI_END_INT         =BIT(4),
-    SPI_SLV_CMD_INT     =BIT(5),
-}spi_irq_status_e;
+typedef enum
+{
+    SPI_RXF_OR_INT  = BIT(0),
+    SPI_TXF_UR_INT  = BIT(1),
+    SPI_RXF_INT     = BIT(2),
+    SPI_TXF_INT     = BIT(3),
+    SPI_END_INT     = BIT(4),
+    SPI_SLV_CMD_INT = BIT(5),
+} spi_irq_status_e;
 
-typedef enum{
+typedef enum
+{
     LSPI_MODULE = 0,
-    GSPI_MODULE = 1 ,
-}spi_sel_e;
+    GSPI_MODULE = 1,
+} spi_sel_e;
 
 /**
  * @brief  Define the work mode.
  */
-typedef enum{
+typedef enum
+{
     SPI_MODE0 = 0,
-/**
+    /**
  * change enum SPI_MODE1 value to 1 from 2,
  *        enum SPI_MODE2 value to 2 from 1,
  * changed by chaofan.20210113.
@@ -107,66 +112,75 @@ typedef enum{
     SPI_MODE1,
     SPI_MODE2,
     SPI_MODE3,
-}spi_mode_type_e;
+} spi_mode_type_e;
+
 /**
  * @brief  Define the mode for SPI io mode.
  */
-typedef enum{
-    SPI_SINGLE_MODE  = 0,
-    SPI_DUAL_MODE    = 1,
-    SPI_QUAD_MODE    = 2,
-    SPI_3_LINE_MODE  = 3
-}spi_io_mode_e;
+typedef enum
+{
+    SPI_SINGLE_MODE = 0,
+    SPI_DUAL_MODE   = 1,
+    SPI_QUAD_MODE   = 2,
+    SPI_3_LINE_MODE = 3
+} spi_io_mode_e;
 
-typedef enum{
+typedef enum
+{
     SPI_NORMAL = 0,
-    SPI_3LINE = 3,
-}spi_normal_3line_mode_e;
+    SPI_3LINE  = 3,
+} spi_normal_3line_mode_e;
 
 /**
  * @brief  Define the SPI translate mode.
  */
-typedef enum{
-    SPI_MODE_WRITE_AND_READ = 0,//write and read at the same.must enable CmdEn
-    SPI_MODE_WRITE_ONLY,//write
-    SPI_MODE_READ_ONLY,// read must enable CmdEn
-    SPI_MODE_WRITE_READ,//write_ read
-    SPI_MODE_READ_WRITE,//read_write
-    SPI_MODE_WRITE_DUMMY_READ,//write_dummy_read
-    SPI_MODE_READ_DUMMY_WRITE,//read_ dummy_write must enable CmdEn
-    SPI_MODE_NONE_DATA,//must enable CmdEn
-    SPI_MODE_DUMMY_WRITE,//dummy_write
-    SPI_MODE_DUMMY_READ,//dummy_read
+typedef enum
+{
+    SPI_MODE_WRITE_AND_READ = 0, //write and read at the same.must enable CmdEn
+    SPI_MODE_WRITE_ONLY,         //write
+    SPI_MODE_READ_ONLY,          // read must enable CmdEn
+    SPI_MODE_WRITE_READ,         //write_ read
+    SPI_MODE_READ_WRITE,         //read_write
+    SPI_MODE_WRITE_DUMMY_READ,   //write_dummy_read
+    SPI_MODE_READ_DUMMY_WRITE,   //read_ dummy_write must enable CmdEn
+    SPI_MODE_NONE_DATA,          //must enable CmdEn
+    SPI_MODE_DUMMY_WRITE,        //dummy_write
+    SPI_MODE_DUMMY_READ,         //dummy_read
     SPI_MODE_RESERVED,
-}spi_tans_mode_e;
+} spi_tans_mode_e;
 
-typedef enum{
-    SPI_MODE_WR_WRITE_ONLY  = 1,//write
-    SPI_MODE_WR_DUMMY_WRITE = 8,//dummy_write
-}spi_wr_tans_mode_e;
+typedef enum
+{
+    SPI_MODE_WR_WRITE_ONLY  = 1, //write
+    SPI_MODE_WR_DUMMY_WRITE = 8, //dummy_write
+} spi_wr_tans_mode_e;
 
-typedef enum{
-    SPI_MODE_RD_READ_ONLY  = 2,//must enable CmdEn
-    SPI_MODE_RD_DUMMY_READ = 9,//dummy_read
-}spi_rd_tans_mode_e;
+typedef enum
+{
+    SPI_MODE_RD_READ_ONLY  = 2, //must enable CmdEn
+    SPI_MODE_RD_DUMMY_READ = 9, //dummy_read
+} spi_rd_tans_mode_e;
 
-typedef enum{
-    SPI_MODE_WR_RD       = 3,//must enable CmdEn
-    SPI_MODE_WR_DUMMY_RD = 5,//write_dummy_read
-}spi_wr_rd_tans_mode_e;
+typedef enum
+{
+    SPI_MODE_WR_RD       = 3, //must enable CmdEn
+    SPI_MODE_WR_DUMMY_RD = 5, //write_dummy_read
+} spi_wr_rd_tans_mode_e;
 
-typedef enum{
-    SPI_SLAVE_WRITE_DATA_CMD = 0x00,
+typedef enum
+{
+    SPI_SLAVE_WRITE_DATA_CMD      = 0x00,
     SPI_SLAVE_WRITE_DATA_DUAL_CMD = FLD_SPI_CMD_DATA_DUAL,
     SPI_SLAVE_WRITE_ADDR_DUAL_CMD = FLD_SPI_CMD_ADDR_DUAL,
 
-    SPI_SLAVE_WRITE_DATA_DUAL_4CYC_CMD = FLD_SPI_CMD_DATA_DUAL | FLD_SPI_CMD_RD_DUMMY_4CYCLE,
-    SPI_SLAVE_WRITE_ADDR_DUAL_4CYC_CMD = FLD_SPI_CMD_ADDR_DUAL | FLD_SPI_CMD_RD_DUMMY_4CYCLE,
+    SPI_SLAVE_WRITE_DATA_DUAL_4CYC_CMD         = FLD_SPI_CMD_DATA_DUAL | FLD_SPI_CMD_RD_DUMMY_4CYCLE,
+    SPI_SLAVE_WRITE_ADDR_DUAL_4CYC_CMD         = FLD_SPI_CMD_ADDR_DUAL | FLD_SPI_CMD_RD_DUMMY_4CYCLE,
     SPI_SLAVE_WRITE_DATA_AND_ADDR_DUL_4CYC_CMD = FLD_SPI_CMD_ADDR_DUAL | FLD_SPI_CMD_DATA_DUAL | FLD_SPI_CMD_RD_DUMMY_4CYCLE,
-}spi_slave_write_cmd_e;
+} spi_slave_write_cmd_e;
 
-typedef enum{
-    SPI_SLAVE_READ_DATA_CMD = FLD_SPI_CMD_RD_EN,
+typedef enum
+{
+    SPI_SLAVE_READ_DATA_CMD      = FLD_SPI_CMD_RD_EN,
     SPI_SLAVE_READ_DATA_DUAL_CMD = FLD_SPI_CMD_RD_EN | FLD_SPI_CMD_DATA_DUAL,
     SPI_SLAVE_READ_ADDR_DUAL_CMD = FLD_SPI_CMD_RD_EN | FLD_SPI_CMD_ADDR_DUAL,
 
@@ -175,126 +189,136 @@ typedef enum{
 
     SPI_SLAVE_READ_DATA_AND_ADDR_DUL_4CYC_CMD = FLD_SPI_CMD_RD_EN | FLD_SPI_CMD_ADDR_DUAL | FLD_SPI_CMD_DATA_DUAL | FLD_SPI_CMD_RD_DUMMY_4CYCLE,
 
-}spi_slave_read_cmd_e;
+} spi_slave_read_cmd_e;
 
 /**
  * @brief  Define the SPI command for b91m gspi/lspi slave.
  */
-typedef enum{
-    SPI_READ_STATUS_SINGLE_CMD  = 0x05,
-    SPI_READ_STATUS_DUAL_CMD    = 0x15,
-    SPI_READ_STATUS_QUAD_CMD    = 0x25,
-    SPI_READ_DATA_SINGLE_CMD    = 0x0B,
-    SPI_READ_DATA_DUAL_CMD      = 0x0C,
-    SPI_READ_DATA_QUAD_CMD      = 0x0E,
-    SPI_WRITE_DATA_SINGLE_CMD   = 0x51,
-    SPI_WRITE_DATA_DUAL_CMD     = 0x52,
-    SPI_WRITE_DATA_QUAD_CMD     = 0x54,
-}spi_cmd_e;
+typedef enum
+{
+    SPI_READ_STATUS_SINGLE_CMD = 0x05,
+    SPI_READ_STATUS_DUAL_CMD   = 0x15,
+    SPI_READ_STATUS_QUAD_CMD   = 0x25,
+    SPI_READ_DATA_SINGLE_CMD   = 0x0B,
+    SPI_READ_DATA_DUAL_CMD     = 0x0C,
+    SPI_READ_DATA_QUAD_CMD     = 0x0E,
+    SPI_WRITE_DATA_SINGLE_CMD  = 0x51,
+    SPI_WRITE_DATA_DUAL_CMD    = 0x52,
+    SPI_WRITE_DATA_QUAD_CMD    = 0x54,
+} spi_cmd_e;
 
 /**
  * @brief  Define the SPI write read configuration struct.
  */
-typedef struct{
-    unsigned char spi_dummy_cnt;//set dummy cnt if tans_mode have dummy .
-    unsigned char spi_cmd_en;//enable cmd phase
-    unsigned char spi_addr_en;//enable address phase
-    unsigned char spi_addr_len;//enable address phase
-    unsigned char spi_cmd_fmt_en;//if cmd_en enable cmd fmt will follow the interface (dual/quad)
-    unsigned char spi_addr_fmt_en;//if addr_en enable addr fmt will follow the interface (dual/quad)
-    spi_io_mode_e  spi_io_mode;//set spi io mode
-}spi_wr_rd_config_t;
+typedef struct
+{
+    unsigned char spi_dummy_cnt;   //set dummy cnt if tans_mode have dummy .
+    unsigned char spi_cmd_en;      //enable cmd phase
+    unsigned char spi_addr_en;     //enable address phase
+    unsigned char spi_addr_len;    //enable address phase
+    unsigned char spi_cmd_fmt_en;  //if cmd_en enable cmd fmt will follow the interface (dual/quad)
+    unsigned char spi_addr_fmt_en; //if addr_en enable addr fmt will follow the interface (dual/quad)
+    spi_io_mode_e spi_io_mode;     //set spi io mode
+} spi_wr_rd_config_t;
 
-typedef enum{
-    LSPI_CSN_PE0_PIN        = GPIO_PE0,
-    LSPI_CLK_PE1_PIN        = GPIO_PE1,
-    LSPI_MOSI_IO0_PE2_PIN   = GPIO_PE2,
-    LSPI_MISO_IO1_PE3_PIN   = GPIO_PE3,
-    LSPI_IO2_PE4_PIN        = GPIO_PE4,
-    LSPI_IO3_PE5_PIN        = GPIO_PE5,
-}lspi_pin_def_e;
+typedef enum
+{
+    LSPI_CSN_PE0_PIN      = GPIO_PE0,
+    LSPI_CLK_PE1_PIN      = GPIO_PE1,
+    LSPI_MOSI_IO0_PE2_PIN = GPIO_PE2,
+    LSPI_MISO_IO1_PE3_PIN = GPIO_PE3,
+    LSPI_IO2_PE4_PIN      = GPIO_PE4,
+    LSPI_IO3_PE5_PIN      = GPIO_PE5,
+} lspi_pin_def_e;
 
+typedef struct
+{
+    gpio_func_pin_e spi_clk_pin;
+    gpio_func_pin_e spi_csn_pin;
+    gpio_func_pin_e spi_mosi_io0_pin;
+    gpio_func_pin_e spi_miso_io1_pin;
+    gpio_func_pin_e spi_io2_pin;
+    gpio_func_pin_e spi_io3_pin;
+} gspi_pin_config_t;
 
-typedef struct{
-    gpio_func_pin_e         spi_clk_pin;
-    gpio_func_pin_e         spi_csn_pin;
-    gpio_func_pin_e     spi_mosi_io0_pin;
-    gpio_func_pin_e     spi_miso_io1_pin;
-    gpio_func_pin_e         spi_io2_pin;
-    gpio_func_pin_e         spi_io3_pin;
-}gspi_pin_config_t;
+typedef struct
+{
+    lspi_pin_def_e spi_clk_pin;
+    lspi_pin_def_e spi_csn_pin;
+    lspi_pin_def_e spi_mosi_io0_pin;
+    lspi_pin_def_e spi_miso_io1_pin;
+    lspi_pin_def_e spi_io2_pin;
+    lspi_pin_def_e spi_io3_pin;
+} lspi_pin_config_t;
 
-typedef struct{
-    lspi_pin_def_e         spi_clk_pin;
-    lspi_pin_def_e         spi_csn_pin;
-    lspi_pin_def_e     spi_mosi_io0_pin;
-    lspi_pin_def_e     spi_miso_io1_pin;
-    lspi_pin_def_e         spi_io2_pin;
-    lspi_pin_def_e         spi_io3_pin;
-}lspi_pin_config_t;
-
-typedef struct{
-    gpio_func_pin_e         gspi_clk_pin;
-    gpio_func_pin_e        gspi_csn0_pin;
-    gpio_func_pin_e        gspi_csn1_pin;
-    gpio_func_pin_e        gspi_csn2_pin;
-    gpio_func_pin_e        gspi_csn3_pin;
-    gpio_func_pin_e    gspi_mosi_io0_pin;
-    gpio_func_pin_e    gspi_miso_io1_pin;
-    gpio_func_pin_e         gspi_io2_pin;
-    gpio_func_pin_e         gspi_io3_pin;
-}gspi_xip_pin_config_t;
+typedef struct
+{
+    gpio_func_pin_e gspi_clk_pin;
+    gpio_func_pin_e gspi_csn0_pin;
+    gpio_func_pin_e gspi_csn1_pin;
+    gpio_func_pin_e gspi_csn2_pin;
+    gpio_func_pin_e gspi_csn3_pin;
+    gpio_func_pin_e gspi_mosi_io0_pin;
+    gpio_func_pin_e gspi_miso_io1_pin;
+    gpio_func_pin_e gspi_io2_pin;
+    gpio_func_pin_e gspi_io3_pin;
+} gspi_xip_pin_config_t;
 
 /**
  * @brief  Define the gspi xip enum.
  */
-typedef enum{
+typedef enum
+{
     GSPI_XIP0 = 0,
     GSPI_XIP1 = 1,
     GSPI_XIP2 = 2,
     GSPI_XIP3 = 3,
-}gspi_xip_e;
+} gspi_xip_e;
 
 /**
  * @brief  Define the gspi xip configuration struct.
  */
-#define spi_xip_addr_bytes(n) ((n)-1)
-#define spi_xip_dummy_cnt(n) ((n)-1)
-typedef struct{
+#define spi_xip_addr_bytes(n) ((n) - 1)
+#define spi_xip_dummy_cnt(n)  ((n) - 1)
+
+typedef struct
+{
     //Byte 0~3;
-    spi_io_mode_e spi_xip_rd_io_mode:2;//set spi interface mode
-    unsigned char spi_xip_rd_addr_len:2;//address byte length
-    unsigned char spi_xip_rd_addr_fmt_en:1;//if addr_en enable addr fmt will follow the interface (dual/quad)
-    unsigned char spi_xip_rd_addr_en:1;//enable address phase
-    unsigned char spi_xip_rd_cmd_fmt_en:1;//if cmd_en enable cmd fmt will follow the interface (dual/quad)
-    unsigned char spi_xip_rd_cmd_en:1;//enable cmd phase
-    unsigned char spi_xip_rd_dummy_cnt:4;//set dummy cnt if tans_mode have dummy.
-    unsigned char spi_xip_rd_transmode:4;//set read transfer mode
+    spi_io_mode_e spi_xip_rd_io_mode     : 2; //set spi interface mode
+    unsigned char spi_xip_rd_addr_len    : 2; //address byte length
+    unsigned char spi_xip_rd_addr_fmt_en : 1; //if addr_en enable addr fmt will follow the interface (dual/quad)
+    unsigned char spi_xip_rd_addr_en     : 1; //enable address phase
+    unsigned char spi_xip_rd_cmd_fmt_en  : 1; //if cmd_en enable cmd fmt will follow the interface (dual/quad)
+    unsigned char spi_xip_rd_cmd_en      : 1; //enable cmd phase
+    unsigned char spi_xip_rd_dummy_cnt   : 4; //set dummy cnt if tans_mode have dummy.
+    unsigned char spi_xip_rd_transmode   : 4; //set read transfer mode
     unsigned char reserved0;
-    unsigned char spi_xip_rd_cmd;//set read cmd
+    unsigned char spi_xip_rd_cmd;             //set read cmd
     //Byte 4~7;
-    spi_io_mode_e spi_xip_wr_io_mode:2;//set spi interface mode
-    unsigned char spi_xip_wr_addr_len:2;//address byte length
-    unsigned char spi_xip_wr_addr_fmt_en:1;//if addr_en enable addr fmt will follow the interface (dual/quad)
-    unsigned char spi_xip_wr_addr_en:1;//enable address phase
-    unsigned char spi_xip_wr_cmd_fmt_en:1;//if cmd_en enable cmd fmt will follow the interface (dual/quad)
-    unsigned char spi_xip_wr_cmd_en:1;//enable cmd phase
-    unsigned char reserved1:4;
-    unsigned char spi_xip_wr_transmode:4;//set write transfer mode
+    spi_io_mode_e spi_xip_wr_io_mode     : 2; //set spi interface mode
+    unsigned char spi_xip_wr_addr_len    : 2; //address byte length
+    unsigned char spi_xip_wr_addr_fmt_en : 1; //if addr_en enable addr fmt will follow the interface (dual/quad)
+    unsigned char spi_xip_wr_addr_en     : 1; //enable address phase
+    unsigned char spi_xip_wr_cmd_fmt_en  : 1; //if cmd_en enable cmd fmt will follow the interface (dual/quad)
+    unsigned char spi_xip_wr_cmd_en      : 1; //enable cmd phase
+    unsigned char reserved1              : 4;
+    unsigned char spi_xip_wr_transmode   : 4; //set write transfer mode
     unsigned char reserved2;
-    unsigned char xip_xip_wr_cmd;//set write cmd
-}spi_xip_config_t;
+    unsigned char xip_xip_wr_cmd;             //set write cmd
+} spi_xip_config_t;
+
 /**
  * @brief       This function set gspi xip config.
  * @param[in]   gspi_xip_n  - the gspi xip select.
  * @param[in]   config  - configuration struct of gspi xip.
  * @return      none.
  */
-static inline void gspi_set_xip_config(gspi_xip_e gspi_xip_n ,spi_xip_config_t *config)
+static inline void gspi_set_xip_config(gspi_xip_e gspi_xip_n, spi_xip_config_t *config)
 {
-    reg_gspi_rd_config(gspi_xip_n) = ((reg_gspi_rd_config(gspi_xip_n) & (~(FLD_SPI_XIP_RD_DATA_IO_MODE|FLD_SPI_XIP_RD_ADDR_LEN|FLD_SPI_XIP_RD_ADDR_FMT|FLD_SPI_XIP_RD_ADDR_EN|FLD_SPI_XIP_RD_CMD_FMT|FLD_SPI_XIP_RD_CMD_EN|FLD_SPI_XIP_RD_DUMMY_CNT|FLD_SPI_XIP_RD_TRANSMODE|FLD_SPI_XIP_RD_CMD))) | (*(unsigned int*)config));
-    reg_gspi_wr_config(gspi_xip_n) = ((reg_gspi_wr_config(gspi_xip_n) & (~(FLD_SPI_XIP_WR_DATA_IO_MODE|FLD_SPI_XIP_WR_ADDR_LEN|FLD_SPI_XIP_WR_ADDR_FMT|FLD_SPI_XIP_WR_ADDR_EN|FLD_SPI_XIP_WR_CMD_FMT|FLD_SPI_XIP_WR_CMD_EN|FLD_SPI_XIP_WR_TRANSMODE|FLD_SPI_XIP_WR_CMD))) | (*(((unsigned int*)config)+1)));
+    reg_gspi_rd_config(gspi_xip_n) = ((reg_gspi_rd_config(gspi_xip_n) & (~(FLD_SPI_XIP_RD_DATA_IO_MODE | FLD_SPI_XIP_RD_ADDR_LEN | FLD_SPI_XIP_RD_ADDR_FMT | FLD_SPI_XIP_RD_ADDR_EN | FLD_SPI_XIP_RD_CMD_FMT | FLD_SPI_XIP_RD_CMD_EN | FLD_SPI_XIP_RD_DUMMY_CNT | FLD_SPI_XIP_RD_TRANSMODE | FLD_SPI_XIP_RD_CMD))) | (*(unsigned int *)config));
+    reg_gspi_wr_config(gspi_xip_n) = ((reg_gspi_wr_config(gspi_xip_n) & (~(FLD_SPI_XIP_WR_DATA_IO_MODE | FLD_SPI_XIP_WR_ADDR_LEN | FLD_SPI_XIP_WR_ADDR_FMT | FLD_SPI_XIP_WR_ADDR_EN | FLD_SPI_XIP_WR_CMD_FMT | FLD_SPI_XIP_WR_CMD_EN | FLD_SPI_XIP_WR_TRANSMODE | FLD_SPI_XIP_WR_CMD))) | (*(((unsigned int *)config) + 1)));
 }
+
 /**
  * @brief       This function set lspi xip config.
  * @param[in]   config  - configuration of lspi xip.
@@ -302,41 +326,44 @@ static inline void gspi_set_xip_config(gspi_xip_e gspi_xip_n ,spi_xip_config_t *
  */
 static inline void lspi_set_xip_config(spi_xip_config_t *config)
 {
-    reg_lspi_rd_config = ((reg_lspi_rd_config & (~(FLD_SPI_XIP_RD_DATA_IO_MODE|FLD_SPI_XIP_RD_ADDR_LEN|FLD_SPI_XIP_RD_ADDR_FMT|FLD_SPI_XIP_RD_ADDR_EN|FLD_SPI_XIP_RD_CMD_FMT|FLD_SPI_XIP_RD_CMD_EN|FLD_SPI_XIP_RD_DUMMY_CNT|FLD_SPI_XIP_RD_TRANSMODE|FLD_SPI_XIP_RD_CMD))) | (*(unsigned int*)config));
-    reg_lspi_wr_config = ((reg_lspi_wr_config & (~(FLD_SPI_XIP_WR_DATA_IO_MODE|FLD_SPI_XIP_WR_ADDR_LEN|FLD_SPI_XIP_WR_ADDR_FMT|FLD_SPI_XIP_WR_ADDR_EN|FLD_SPI_XIP_WR_CMD_FMT|FLD_SPI_XIP_WR_CMD_EN|FLD_SPI_XIP_WR_TRANSMODE|FLD_SPI_XIP_WR_CMD))) | (*(((unsigned int*)config)+1)));
+    reg_lspi_rd_config = ((reg_lspi_rd_config & (~(FLD_SPI_XIP_RD_DATA_IO_MODE | FLD_SPI_XIP_RD_ADDR_LEN | FLD_SPI_XIP_RD_ADDR_FMT | FLD_SPI_XIP_RD_ADDR_EN | FLD_SPI_XIP_RD_CMD_FMT | FLD_SPI_XIP_RD_CMD_EN | FLD_SPI_XIP_RD_DUMMY_CNT | FLD_SPI_XIP_RD_TRANSMODE | FLD_SPI_XIP_RD_CMD))) | (*(unsigned int *)config));
+    reg_lspi_wr_config = ((reg_lspi_wr_config & (~(FLD_SPI_XIP_WR_DATA_IO_MODE | FLD_SPI_XIP_WR_ADDR_LEN | FLD_SPI_XIP_WR_ADDR_FMT | FLD_SPI_XIP_WR_ADDR_EN | FLD_SPI_XIP_WR_CMD_FMT | FLD_SPI_XIP_WR_CMD_EN | FLD_SPI_XIP_WR_TRANSMODE | FLD_SPI_XIP_WR_CMD))) | (*(((unsigned int *)config) + 1)));
 }
 
 /**
  * @brief  Define the gspi xip end address enum.
  */
-typedef enum{
+typedef enum
+{
     GSPI_XIP_16M = 0,
     GSPI_XIP_32M = 1,
     GSPI_XIP_48M = 2,
     GSPI_XIP_64M = 3,
-}gspi_xip_addr_e;
+} gspi_xip_addr_e;
 
 /**
  * @brief  Define spi api error code.
  */
-typedef enum {
-    SPI_API_ERROR_TIMEOUT_NONE                         = 0,
-    SPI_API_ERROR_TIMEOUT_TXFIFO_NUM_WORD              = 1,
-    SPI_API_ERROR_TIMEOUT_TXFIFO_FULL                  = 2,
-    SPI_API_ERROR_TIMEOUT_RXFIFO_NUM_WORD              = 3,
-    SPI_API_ERROR_TIMEOUT_RXFIFO_EMPTY                 = 4,
-    SPI_API_ERROR_TIMEOUT_BUS_BUSY                     = 5,
+typedef enum
+{
+    SPI_API_ERROR_TIMEOUT_NONE            = 0,
+    SPI_API_ERROR_TIMEOUT_TXFIFO_NUM_WORD = 1,
+    SPI_API_ERROR_TIMEOUT_TXFIFO_FULL     = 2,
+    SPI_API_ERROR_TIMEOUT_RXFIFO_NUM_WORD = 3,
+    SPI_API_ERROR_TIMEOUT_RXFIFO_EMPTY    = 4,
+    SPI_API_ERROR_TIMEOUT_BUS_BUSY        = 5,
 } spi_api_error_timeout_code_e;
 
-typedef struct {
-    unsigned int g_spi_error_timeout_us;                             //spi error timeout(us)(lspi/gspi),a large value is set by default,can set it by spi_set_error_timeout();
-    timeout_handler_fp spi_timeout_handler;                        //spi_timeout_handler(lspi/gspi);
-    volatile spi_api_error_timeout_code_e g_spi_error_timeout_code;//record spi error timeout code(lspi/gspi), can obtain the value through the spi_get_error_timeout_code() interface;
-}spi_timeout_error_t;
+typedef struct
+{
+    unsigned int                          g_spi_error_timeout_us;   //spi error timeout(us)(lspi/gspi),a large value is set by default,can set it by spi_set_error_timeout();
+    timeout_handler_fp                    spi_timeout_handler;      //spi_timeout_handler(lspi/gspi);
+    volatile spi_api_error_timeout_code_e g_spi_error_timeout_code; //record spi error timeout code(lspi/gspi), can obtain the value through the spi_get_error_timeout_code() interface;
+} spi_timeout_error_t;
 
 extern spi_timeout_error_t g_spi_timeout_error[2];
 
-#define SPI_WAIT(condition,spi_sel,g_spi_error_timeout_us,spi_timeout_handler,spi_api_error_code)                               wait_condition_fails_or_timeout_with_param(condition,(unsigned int)spi_sel,g_spi_error_timeout_us,spi_timeout_handler,(unsigned int)spi_api_error_code)
+#define SPI_WAIT(condition, spi_sel, g_spi_error_timeout_us, spi_timeout_handler, spi_api_error_code) wait_condition_fails_or_timeout_with_param(condition, (unsigned int)spi_sel, g_spi_error_timeout_us, spi_timeout_handler, (unsigned int)spi_api_error_code)
 
 /**
  * @brief       This function set gspi xip end address.
@@ -351,7 +378,7 @@ extern spi_timeout_error_t g_spi_timeout_error[2];
  */
 static inline void gspi_xip_end_addr_set(void)
 {
-    reg_gspi_xip_size = ((GSPI_XIP_64M<<6)&FLD_GSPI_XIP3_END_ADDR) | ((GSPI_XIP_48M<<4)&FLD_GSPI_XIP2_END_ADDR) | ((GSPI_XIP_32M<<2)&FLD_GSPI_XIP1_END_ADDR) | ((GSPI_XIP_16M<<0)&FLD_GSPI_XIP0_END_ADDR);
+    reg_gspi_xip_size = ((GSPI_XIP_64M << 6) & FLD_GSPI_XIP3_END_ADDR) | ((GSPI_XIP_48M << 4) & FLD_GSPI_XIP2_END_ADDR) | ((GSPI_XIP_32M << 2) & FLD_GSPI_XIP1_END_ADDR) | ((GSPI_XIP_16M << 0) & FLD_GSPI_XIP0_END_ADDR);
 }
 
 /**
@@ -364,13 +391,14 @@ static inline void lspi_reset(void)
     reg_rst0 |= FLD_RST0_LSPI;
     g_spi_timeout_error[LSPI_MODULE].g_spi_error_timeout_code = SPI_API_ERROR_TIMEOUT_NONE;
 }
+
 /**
  * @brief  This function reset GSPI module.
  * @return none
  */
 static inline void gspi_reset(void)
 {
-    reg_gspi_clk_set &= ~(FLD_GSPI_DIV_RSTN);//Disable the gspi clock before resetting the gspi. Otherwise, hardware logic errors may occur,the clock enable needs to be reconfigured.
+    reg_gspi_clk_set &= ~(FLD_GSPI_DIV_RSTN); //Disable the gspi clock before resetting the gspi. Otherwise, hardware logic errors may occur,the clock enable needs to be reconfigured.
     reg_rst1 &= (~FLD_RST1_GSPI);
     reg_rst1 |= FLD_RST1_GSPI;
     reg_gspi_clk_set |= (FLD_GSPI_DIV_RSTN);
@@ -384,13 +412,9 @@ static inline void gspi_reset(void)
  */
 static inline void spi_hw_fsm_reset(spi_sel_e spi_sel)
 {
-
-    if(spi_sel == LSPI_MODULE)
-    {
+    if (spi_sel == LSPI_MODULE) {
         lspi_reset();
-    }
-    else if(spi_sel == GSPI_MODULE)
-    {
+    } else if (spi_sel == GSPI_MODULE) {
         gspi_reset();
     }
 }
@@ -400,9 +424,9 @@ static inline void spi_hw_fsm_reset(spi_sel_e spi_sel)
  * @param[in]   spi_sel     - the spi module.
  * @return      tx_fifo     - byte number in tx_fifo.
  */
-static inline  unsigned char spi_get_txfifo_num(spi_sel_e spi_sel)
+static inline unsigned char spi_get_txfifo_num(spi_sel_e spi_sel)
 {
-   return (reg_spi_txfifo_status(spi_sel) & FLD_SPI_TXF_ENTRIES);
+    return (reg_spi_txfifo_status(spi_sel) & FLD_SPI_TXF_ENTRIES);
 }
 
 /**
@@ -412,7 +436,7 @@ static inline  unsigned char spi_get_txfifo_num(spi_sel_e spi_sel)
  */
 static inline unsigned char spi_get_rxfifo_num(spi_sel_e spi_sel)
 {
-   return reg_spi_rxfifo_status(spi_sel) & FLD_SPI_RXF_ENTRIES;
+    return reg_spi_rxfifo_status(spi_sel) & FLD_SPI_RXF_ENTRIES;
 }
 
 /**
@@ -436,6 +460,7 @@ static inline void spi_tx_cnt(spi_sel_e spi_sel, unsigned int cnt)
 {
     reg_spi_tx_cnt(spi_sel) = ((cnt - 1) & 0xffffff);
 }
+
 /**
  * @brief       This function clear tx_fifo.
  * @param[in]   spi_sel - the spi module.
@@ -444,7 +469,8 @@ static inline void spi_tx_cnt(spi_sel_e spi_sel, unsigned int cnt)
 static inline void spi_tx_fifo_clr(spi_sel_e spi_sel)
 {
     BM_SET(reg_spi_status(spi_sel), FLD_SPI_TXF_CLR_LEVEL);
-    while(FLD_SPI_TXF_CLR_LEVEL == (reg_spi_status(spi_sel) & FLD_SPI_TXF_CLR_LEVEL));
+    while (FLD_SPI_TXF_CLR_LEVEL == (reg_spi_status(spi_sel) & FLD_SPI_TXF_CLR_LEVEL))
+        ;
 }
 
 /**
@@ -455,7 +481,8 @@ static inline void spi_tx_fifo_clr(spi_sel_e spi_sel)
 static inline void spi_rx_fifo_clr(spi_sel_e spi_sel)
 {
     BM_SET(reg_spi_status(spi_sel), FLD_SPI_RXF_CLR_LEVEL);
-    while(FLD_SPI_RXF_CLR_LEVEL == (reg_spi_status(spi_sel) & FLD_SPI_RXF_CLR_LEVEL));
+    while (FLD_SPI_RXF_CLR_LEVEL == (reg_spi_status(spi_sel) & FLD_SPI_RXF_CLR_LEVEL))
+        ;
 }
 
 /**
@@ -476,7 +503,7 @@ static inline void spi_set_cmd(spi_sel_e spi_sel, unsigned char cmd)
  */
 static inline void spi_cmd_en(spi_sel_e spi_sel)
 {
-    BM_SET( reg_spi_ctrl1(spi_sel), FLD_SPI_CMD_EN);
+    BM_SET(reg_spi_ctrl1(spi_sel), FLD_SPI_CMD_EN);
 }
 
 /**
@@ -486,9 +513,9 @@ static inline void spi_cmd_en(spi_sel_e spi_sel)
  */
 static inline void spi_cmd_dis(spi_sel_e spi_sel)
 {
-
     BM_CLR(reg_spi_ctrl1(spi_sel), FLD_SPI_CMD_EN);
 }
+
 /**
  * @brief   This function servers enable cmd format,the format of cmd phase is the same as the data phase(Dual/Quad).
  * @param[in]   spi_sel     - the spi module.
@@ -496,7 +523,7 @@ static inline void spi_cmd_dis(spi_sel_e spi_sel)
  */
 static inline void spi_cmd_fmt_en(spi_sel_e spi_sel)
 {
-    BM_SET( reg_spi_ctrl1(spi_sel), FLD_SPI_CMD_FMT);
+    BM_SET(reg_spi_ctrl1(spi_sel), FLD_SPI_CMD_FMT);
 }
 
 /**
@@ -508,6 +535,7 @@ static inline void spi_cmd_fmt_dis(spi_sel_e spi_sel)
 {
     BM_CLR(reg_spi_ctrl1(spi_sel), FLD_SPI_CMD_FMT);
 }
+
 /**
  * @brief       This function servers to reply master slave is ready .
  * When slave_ready is set to 1, after the master sends a read status command to the slave,
@@ -531,6 +559,7 @@ static inline void spi_slave_ready_dis(spi_sel_e spi_sel)
 {
     BM_SET(reg_spi_status(spi_sel), FLD_SPI_CLR_SLAVE_READY);
 }
+
 /**
  * @brief       This function servers to read cmd transferred from master for slave.
  * @param[in]   spi_sel     - the spi module.
@@ -609,7 +638,6 @@ static inline void spi_3line_mode_dis(spi_sel_e spi_sel)
 static inline void spi_addr_fmt_en(spi_sel_e spi_sel)
 {
     BM_SET(reg_spi_ctrl1(spi_sel), FLD_SPI_ADDR_FMT);
-
 }
 
 /**
@@ -620,17 +648,18 @@ static inline void spi_addr_fmt_en(spi_sel_e spi_sel)
 static inline void spi_addr_fmt_dis(spi_sel_e spi_sel)
 {
     BM_CLR(reg_spi_ctrl1(spi_sel), FLD_SPI_ADDR_FMT);
-
 }
+
 /**
  * @brief       This function servers to set slave address.
  * @param[in]   addr - address of slave.
  * @return      none
  */
-static inline void spi_set_address(spi_sel_e spi_sel,unsigned int addr)
+static inline void spi_set_address(spi_sel_e spi_sel, unsigned int addr)
 {
     reg_spi_addr_word(spi_sel) = addr;
 }
+
 /**
  * @brief   This function enable address phase.
  * @param[in]   spi_sel     - the spi module.
@@ -671,8 +700,7 @@ static inline void spi_set_addr_len(spi_sel_e spi_sel, unsigned char len)
  */
 static inline bool spi_is_busy(spi_sel_e spi_sel)
 {
-    return  reg_spi_status(spi_sel) & FLD_SPI_BUSY;
-
+    return reg_spi_status(spi_sel) & FLD_SPI_BUSY;
 }
 
 /**
@@ -714,7 +742,6 @@ static inline void spi_rx_dma_dis(spi_sel_e spi_sel)
 {
     BM_CLR(reg_spi_ctrl0(spi_sel), FLD_SPI_RX_DMA_EN);
 }
-
 
 /**
  * @brief       This function servers to set xip address offset.
@@ -788,6 +815,7 @@ static inline void spi_xip_timeout_cnt(spi_sel_e spi_sel, unsigned char cnt)
 {
     reg_spi_xip_timeout_cnt(spi_sel) = cnt;
 }
+
 /**
  * @brief   This function servers to enable page mode, csn would set high level when cross the page boundary.
  * @param[in]   spi_sel     - the spi module.
@@ -797,6 +825,7 @@ static inline void spi_xip_page_mode_en(spi_sel_e spi_sel)
 {
     BM_SET(reg_spi_ctrl4(spi_sel), FLD_SPI_XIP_PAGE_MODE_EN);
 }
+
 /**
  * @brief   This function servers to disable page mode.
  * @param[in]   spi_sel     - the spi module.
@@ -806,6 +835,7 @@ static inline void spi_xip_page_mode_dis(spi_sel_e spi_sel)
 {
     BM_CLR(reg_spi_ctrl4(spi_sel), FLD_SPI_XIP_PAGE_MODE_EN);
 }
+
 /**
  * @brief       This function servers to set page_size.
  * @param[in]   spi_sel         - the spi module.
@@ -816,12 +846,14 @@ static inline void spi_xip_page_size(spi_sel_e spi_sel, unsigned char page_size_
 {
     reg_spi_xip_page_size(spi_sel) = page_size_i;
 }
+
 /**
  * @brief       This function servers to set the number of bytes to triggered the receive and transmit interrupt.
  * @param[in]   spi_sel - the spi module.
  * @return      none
  */
 void spi_rx_tx_irq_trig_cnt(spi_sel_e spi_sel);
+
 /**
  * @brief       This function servers to set the number of bytes to triggered the receive interrupt.
  * @param[in]   spi_sel - the spi module.
@@ -832,6 +864,7 @@ static inline void spi_rx_irq_trig_cnt(spi_sel_e spi_sel, unsigned char cnt)
 {
     reg_spi_rxfifo_thres(spi_sel) = ((reg_spi_rxfifo_thres(spi_sel) & (~FLD_SPI_RXF_THRES)) | (cnt & FLD_SPI_RXF_THRES));
 }
+
 /**
  * @brief       This function servers to set the number of bytes to triggered the transmit interrupt.
  * @param[in]   spi_sel - the spi module.
@@ -850,9 +883,9 @@ static inline void spi_tx_irq_trig_cnt(spi_sel_e spi_sel, unsigned char cnt)
  * @retval      non-zero      - the interrupt occurred.
  * @retval      zero  - the interrupt did not occur.
  */
-static inline unsigned char spi_get_irq_status(spi_sel_e spi_sel,spi_irq_status_e status)
+static inline unsigned char spi_get_irq_status(spi_sel_e spi_sel, spi_irq_status_e status)
 {
-    return reg_spi_int_status0(spi_sel)&status;
+    return reg_spi_int_status0(spi_sel) & status;
 }
 
 /**
@@ -874,8 +907,9 @@ static inline void spi_clr_irq_status(spi_sel_e spi_sel, spi_irq_status_e status
  */
 static inline void spi_set_irq_mask(spi_sel_e spi_sel, spi_irq_mask mask)
 {
-   BM_SET(reg_spi_ctrl0(spi_sel), mask);
+    BM_SET(reg_spi_ctrl0(spi_sel), mask);
 }
+
 /**
  * @brief       This function servers to get irq mask.
  * @param[in]   spi_sel - the spi module.
@@ -884,7 +918,7 @@ static inline void spi_set_irq_mask(spi_sel_e spi_sel, spi_irq_mask mask)
  */
 static inline unsigned char spi_get_irq_mask(spi_sel_e spi_sel, spi_irq_mask mask)
 {
-    return reg_spi_ctrl0(spi_sel)&mask;
+    return reg_spi_ctrl0(spi_sel) & mask;
 }
 
 /**
@@ -967,7 +1001,7 @@ static inline void lspi_lcd_set_irq_mask(lspi_lcd_irq_mask lcd_irq_mask)
  */
 static inline unsigned char lspi_lcd_get_irq_mask(lspi_lcd_irq_mask lcd_irq_mask)
 {
-    return reg_lspi_lcd_ctrl2&lcd_irq_mask;
+    return reg_lspi_lcd_ctrl2 & lcd_irq_mask;
 }
 
 /**
@@ -977,7 +1011,7 @@ static inline unsigned char lspi_lcd_get_irq_mask(lspi_lcd_irq_mask lcd_irq_mask
  */
 static inline unsigned char lspi_lcd_get_irq_status(lspi_lcd_irq_status_e status)
 {
-    return reg_lspi_int_status1&status;
+    return reg_lspi_int_status1 & status;
 }
 
 /**
@@ -1043,13 +1077,13 @@ static inline void lspi_lcd_2lane_dis(void)
     BM_CLR(reg_lspi_lcd_ctrl, FLD_LSPI_LCD_2LANE_EN);
 }
 
-
-typedef enum{
-    LSPI_LCD_RGB_RESERVED  = 0x00,
-    LSPI_LCD_RGB565        = 0x01,
-    LSPI_LCD_RGB666        = 0x02,
-    LSPI_LCD_RGB888        = 0x03,
-}lspi_lcd_rgb_mode_e;
+typedef enum
+{
+    LSPI_LCD_RGB_RESERVED = 0x00,
+    LSPI_LCD_RGB565       = 0x01,
+    LSPI_LCD_RGB666       = 0x02,
+    LSPI_LCD_RGB888       = 0x03,
+} lspi_lcd_rgb_mode_e;
 
 /**
  * @brief       This function servers to set lspi lcd RGB mode.
@@ -1102,7 +1136,7 @@ static inline void lspi_lcd_vfp_line_cnt(unsigned char vfp_line_cnt)
  */
 static inline void lspi_lcd_line_trig_lvl(unsigned short lcd_line_trig_lvl)
 {
-    reg_lspi_lcd_line_trig_lvl = lcd_line_trig_lvl>>2;
+    reg_lspi_lcd_line_trig_lvl = lcd_line_trig_lvl >> 2;
 }
 
 /**
@@ -1147,7 +1181,7 @@ static inline void lspi_lcd_porch_min_line_time(unsigned short porch_line_time)
  */
 static inline void lspi_lcd_set_res(unsigned short line_res, unsigned short row_res)
 {
-    reg_lspi_lcd_frame_res = (FLD_LSPI_LCD_LINE_PER_FRAME & ((unsigned int) (line_res-1))<<10) | (FLD_LSPI_LCD_PIXEL_PER_LINE & (row_res - 1));
+    reg_lspi_lcd_frame_res = (FLD_LSPI_LCD_LINE_PER_FRAME & ((unsigned int)(line_res - 1)) << 10) | (FLD_LSPI_LCD_PIXEL_PER_LINE & (row_res - 1));
 }
 
 /**
@@ -1156,7 +1190,7 @@ static inline void lspi_lcd_set_res(unsigned short line_res, unsigned short row_
  */
 static inline void lspi_lcd_set_lut(unsigned char addr, unsigned int color)
 {
-    reg_lspi_lcd_lut_data32(addr) = color&0xffffff;
+    reg_lspi_lcd_lut_data32(addr) = color & 0xffffff;
 }
 
 /**
@@ -1186,7 +1220,6 @@ static inline void lspi_lcd_set_cmd(unsigned char cmd)
     reg_lspi_lcd_cmd = cmd;
 }
 
-
 /**
  * @brief       This function servers to set the minimum time that spi cs should stay high,
  *              the minimum time needs to be met from the cs pulling up after the current packet of data is sent to the cs pulling down after the next packet of data is sent,
@@ -1196,8 +1229,9 @@ static inline void lspi_lcd_set_cmd(unsigned char cmd)
  * @note        this interface is currently used for lspi lcd function (there is a minimum limit for cs to maintain high level),
  *              normal spi peripheral communication does not need to call this interface.
  */
-static inline void spi_set_cs_high_time(spi_sel_e spi_sel,unsigned char csht){
-    reg_spi_timing(spi_sel) =  (reg_spi_timing(spi_sel) & ~FLD_SPI_CSHT)|(csht<<3);
+static inline void spi_set_cs_high_time(spi_sel_e spi_sel, unsigned char csht)
+{
+    reg_spi_timing(spi_sel) = (reg_spi_timing(spi_sel) & ~FLD_SPI_CSHT) | (csht << 3);
 }
 
 /**
@@ -1226,7 +1260,7 @@ __attribute__((weak)) void gspi_timeout_handler(unsigned int spi_error_timeout_c
  *            when timeout exits, solution:
  *            reset SPI(as master or slave) module,corresponding api:spi_hw_fsm_reset;
  */
-void spi_set_error_timeout(spi_sel_e spi_sel,unsigned int timeout_us);
+void spi_set_error_timeout(spi_sel_e spi_sel, unsigned int timeout_us);
 
 /**
  * @brief     This function serves to return the spi api error timeout code.
@@ -1240,13 +1274,13 @@ spi_api_error_timeout_code_e spi_get_error_timeout_code(spi_sel_e spi_sel);
  * @param[in]  pin  - the selected pin.
  * @return     none
  */
-void gspi_set_pin_mux(gpio_func_pin_e pin,gpio_func_e function);
+void gspi_set_pin_mux(gpio_func_pin_e pin, gpio_func_e function);
 /**
  * @brief       This function change gspi csn pin.
  * @param[in]   current_csn_pin - the current csn pin.
  * @return      none.
  */
-void gspi_change_csn_pin(gpio_func_pin_e current_csn_pin,gpio_func_pin_e next_csn_pin);
+void gspi_change_csn_pin(gpio_func_pin_e current_csn_pin, gpio_func_pin_e next_csn_pin);
 /**
  * @brief      This function selects  pin  for lspi master or slave mode.
  * @param[in]  pin  - the selected pin.
@@ -1354,7 +1388,7 @@ void spi_master_config(spi_sel_e spi_sel, spi_normal_3line_mode_e mode);
  * @param[in]   config  - the pointer of pin special config struct.
  * @return      none
  */
-void spi_master_config_plus(spi_sel_e spi_sel,spi_wr_rd_config_t *config);
+void spi_master_config_plus(spi_sel_e spi_sel, spi_wr_rd_config_t *config);
 /**
  * @brief       This function servers to set gspi pin.
  * @param[in]   gspi_pin_config - the pointer of pin config struct.
@@ -1520,7 +1554,7 @@ void spi_set_tx_dma_config(spi_sel_e spi_sel, dma_chn_e chn);
  * @param[in]   chn     - dma channel.
  * @return      none
  */
-void spi_set_master_rx_dma_config(spi_sel_e spi_sel,dma_chn_e chn);
+void spi_set_master_rx_dma_config(spi_sel_e spi_sel, dma_chn_e chn);
 
 /**
  * @brief       This function serves to set rx_dma channel and config dma rx default for spi slave.
@@ -1528,7 +1562,7 @@ void spi_set_master_rx_dma_config(spi_sel_e spi_sel,dma_chn_e chn);
  * @param[in]   chn     - dma channel.
  * @return      none
  */
-void spi_set_slave_rx_dma_config(spi_sel_e spi_sel,dma_chn_e chn);
+void spi_set_slave_rx_dma_config(spi_sel_e spi_sel, dma_chn_e chn);
 
 
 /**
@@ -1538,7 +1572,7 @@ void spi_set_slave_rx_dma_config(spi_sel_e spi_sel,dma_chn_e chn);
  * @param[in]   len         - Amount of data to be sent in bytes, range from 1 to 0xFFFFFC
  * @return      none
  * */
-_attribute_ram_code_sec_ void spi_set_tx_dma(spi_sel_e spi_sel, unsigned char* src_addr,unsigned int len);
+_attribute_ram_code_sec_ void spi_set_tx_dma(spi_sel_e spi_sel, unsigned char *src_addr, unsigned int len);
 
 /**
  * @brief      Receive an amount of data in DMA mode
@@ -1552,7 +1586,7 @@ _attribute_ram_code_sec_ void spi_set_tx_dma(spi_sel_e spi_sel, unsigned char* s
  *             4bytes (length information) + 5bytes (data) + 3bytes (the number of additional bytes to prevent out-of-bounds)
  * @return     none.
  */
-_attribute_ram_code_sec_ void spi_set_rx_dma(spi_sel_e spi_sel, unsigned char* dst_addr);
+_attribute_ram_code_sec_ void spi_set_rx_dma(spi_sel_e spi_sel, unsigned char *dst_addr);
 
 /**
  * @brief       This function serves to normal write data by dma.
@@ -1632,7 +1666,7 @@ void spi_master_write_read_dma_plus(spi_sel_e spi_sel, unsigned char cmd, unsign
  * @param[in]   led         - write/read length.
  * @return      none
  */
-void spi_master_write_read_full_duplex(spi_sel_e spi_sel,unsigned char *write_data, unsigned char *read_data, unsigned int len);
+void spi_master_write_read_full_duplex(spi_sel_e spi_sel, unsigned char *write_data, unsigned char *read_data, unsigned int len);
 /**
  * @brief       This function serves to read data in normal.
  * @param[in]   spi_sel     - the spi module.
@@ -1642,8 +1676,3 @@ void spi_master_write_read_full_duplex(spi_sel_e spi_sel,unsigned char *write_da
  */
 void spi_master_read(spi_sel_e spi_sel, unsigned char *data, unsigned int len);
 #endif
-
-
-
-
-

@@ -26,11 +26,11 @@
 #include "../bis_sink_config.h"
 #if (PRODUCT_BIS_SINK_SELECT == PRODUCT_GOOGLE_BROADCAST_SINK)
 
-#define APP_CONTROLLER_EVENT_LOG_EN                 1
+    #define APP_CONTROLLER_EVENT_LOG_EN 1
 
-#define APP_BIS_SYNC_VALUE_LOG_EN                   0
+    #define APP_BIS_SYNC_VALUE_LOG_EN   0
 
-#define APP_EVENT_LOG(fmt, ...)                     tlkapi_printf(APP_CONTROLLER_EVENT_LOG_EN, "[APP][EVT]"fmt "\n", ##__VA_ARGS__)
+    #define APP_EVENT_LOG(fmt, ...)     tlkapi_printf(APP_CONTROLLER_EVENT_LOG_EN, "[APP][EVT]" fmt "\n", ##__VA_ARGS__)
 
 /**
  * @brief       user initialization when MCU power on or wake_up from deepSleep mode
@@ -53,7 +53,7 @@ void user_init_deepRetn(void);
  * @param[in]  none.
  * @return     none.
  */
-void main_loop (void);
+void main_loop(void);
 
 
 #endif

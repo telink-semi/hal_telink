@@ -24,15 +24,13 @@
 #ifndef APP_LLMIC_H_
 #define APP_LLMIC_H_
 
-#define  LL_MIC_DEBUG_IO_400US                 GPIO_PA1
-#define  LL_MIC_DEBUG_IO_5MS                   GPIO_PA2
-#define  LL_MIC_DEBUG_IO_EXTERNAL              GPIO_PA3
+#define LL_MIC_DEBUG_IO_400US         GPIO_PA1
+#define LL_MIC_DEBUG_IO_5MS           GPIO_PA2
+#define LL_MIC_DEBUG_IO_EXTERNAL      GPIO_PA3
 
-#define  LL_MIC_DEBUG_IO_TSYNC                 GPIO_PB2
-#define  LL_MIC_DEBUG_IO_ABANDON_BLE           GPIO_PB3 //abandon
-#define  LL_MIC_DEBUG_IO_ABANDON_LLMIC         GPIO_PB4
-
-
+#define LL_MIC_DEBUG_IO_TSYNC         GPIO_PB2
+#define LL_MIC_DEBUG_IO_ABANDON_BLE   GPIO_PB3 //abandon
+#define LL_MIC_DEBUG_IO_ABANDON_LLMIC GPIO_PB4
 
 
 #endif /* APP_LLMIC_H_ */

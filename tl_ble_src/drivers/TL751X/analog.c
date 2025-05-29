@@ -57,7 +57,7 @@
  * @brief      This function serves to judge whether analog write/read is busy .
  * @return     none.
  */
-static _always_inline void analog_wait(void)
+_always_inline void analog_wait(void)
 {
     while(reg_ana_irq_sta & FLD_ANA_BUSY){}
 }
@@ -66,7 +66,7 @@ static _always_inline void analog_wait(void)
  * @brief      This function serves to judge whether analog Tx buffer is empty.
  * @return     none.
  */
-static _always_inline void analog_wait_txbuf_no_empty(void)
+_always_inline void analog_wait_txbuf_no_empty(void)
 {
     /**
         Because the logic of the current chip hardware to write the first data is:

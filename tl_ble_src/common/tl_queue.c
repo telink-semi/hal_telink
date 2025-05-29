@@ -25,9 +25,6 @@
 #include "drivers.h"
 #include "common/compiler.h"
 
-
-
-
 /*********************************************************************
  * @fn          queue_init
  * @brief       Initialize the queue
@@ -37,19 +34,19 @@
  *              Note: a small priority value has a higher priority
  * @return  Status
  */
-queue_sts_t     queue_init(queue_t *pQueue, priCmpCbFunc_t priFunc)
+queue_sts_t queue_init(queue_t *pQueue, priCmpCbFunc_t priFunc)
 {
-    #if (1) //Can be optimized
-        if(pQueue == NULL) {
-            return QUEUE_PARAM_INVALID;
-        }
-    #else
-        assert(pQueue != NULL);
-    #endif
+#if (1) //Can be optimized
+    if (pQueue == NULL) {
+        return QUEUE_PARAM_INVALID;
+    }
+#else
+    assert(pQueue != NULL);
+#endif
 
     pQueue->head = pQueue->tail = NULL;
-    pQueue->curNum = 0;
-    pQueue->priCmpCb = priFunc;
+    pQueue->curNum              = 0;
+    pQueue->priCmpCb            = priFunc;
     return QUEUE_SUCCESS;
 }
 
@@ -61,62 +58,61 @@ queue_sts_t     queue_init(queue_t *pQueue, priCmpCbFunc_t priFunc)
   * @return      Status
   */
 _attribute_ram_code_
-queue_sts_t     queue_enq(queue_t *pQueue, queue_item_t *pItem)
+    queue_sts_t
+    queue_enq(queue_t *pQueue, queue_item_t *pItem)
 {
-    #if (1) //Can be optimized
-        if(pQueue == NULL || pItem == NULL) {
-            return QUEUE_PARAM_INVALID;
-        }
-    #else
-        assert(pQueue != NULL);
-        assert(pItem != NULL);
-    #endif
+#if (1) //Can be optimized
+    if (pQueue == NULL || pItem == NULL) {
+        return QUEUE_PARAM_INVALID;
+    }
+#else
+    assert(pQueue != NULL);
+    assert(pItem != NULL);
+#endif
 
     u32 r = irq_disable();
 
     /* if the Queue was empty, then update the head */
-    if(pQueue->head == NULL) {
+    if (pQueue->head == NULL) {
         pQueue->head = pItem;
         pQueue->tail = pItem;
-        pItem->next = NULL;
+        pItem->next  = NULL;
         pQueue->curNum++;
         irq_restore(r);
         return QUEUE_SUCCESS;
     }
 
     /* if priority is not used, insert at the end as in a FIFO */
-    if(pQueue->priCmpCb == NULL) {
+    if (pQueue->priCmpCb == NULL) {
         pQueue->tail->next = pItem;
-        pItem->next = NULL;
-        pQueue->tail = pItem;
+        pItem->next        = NULL;
+        pQueue->tail       = pItem;
     }
     /* if priority callback function is used, insert at the end */
     else {
         queue_item_t *previous = NULL;
-        queue_item_t *current = pQueue->head;
+        queue_item_t *current  = pQueue->head;
 
-        while(current != NULL) {
+        while (current != NULL) {
             /* Here, a small priority value has a higher priority */
-            if(pQueue->priCmpCb((arg_t)(pItem)) < pQueue->priCmpCb((arg_t)(current))) {
+            if (pQueue->priCmpCb((arg_t)(pItem)) < pQueue->priCmpCb((arg_t)(current))) {
                 break;
-            }
-            else {
+            } else {
                 previous = current;
-                current = current->next;
+                current  = current->next;
             }
         }
 
         /* Insert between previous and current */
-        if(previous == NULL) { /* insert at the head */
+        if (previous == NULL) { /* insert at the head */
             pQueue->head = pItem;
-        }
-        else {
+        } else {
             previous->next = pItem;
         }
 
         pItem->next = current;
 
-        if(current == NULL) {
+        if (current == NULL) {
             pQueue->tail = pItem;
         }
     }
@@ -132,21 +128,20 @@ queue_sts_t     queue_enq(queue_t *pQueue, queue_item_t *pItem)
  * @param[in]   pQueue - The specified queue
  * @return      Pointer to first element in the queue
  */
-_attribute_ram_code_
-queue_item_t *  queue_deq(queue_t *pQueue)
+_attribute_ram_code_ queue_item_t *queue_deq(queue_t *pQueue)
 {
     queue_item_t *pItem = NULL;
-    u32 r = irq_disable();
+    u32           r     = irq_disable();
 
     pItem = pQueue->head;
 
-    if(pItem != NULL) {
+    if (pItem != NULL) {
         /* update the head pointer in queue */
         pQueue->head = pItem->next;
 
         /* check for empty queue */
-        if(pQueue->head == NULL){
-          pQueue->tail = NULL;
+        if (pQueue->head == NULL) {
+            pQueue->tail = NULL;
         }
         pQueue->curNum--;
     }
@@ -166,32 +161,32 @@ queue_item_t *  queue_deq(queue_t *pQueue)
   * @return      Status
   */
 //_attribute_ram_code_
-queue_sts_t     queue_insert(queue_t *pQueue, void *item, void *prev)
+queue_sts_t queue_insert(queue_t *pQueue, void *item, void *prev)
 {
-    queue_item_t *pItem = (queue_item_t*) item;
-    queue_item_t *pPrev = (queue_item_t*) prev;
-    #if (1) //Can be optimized
-        if(pQueue == NULL || pItem == NULL) {
-            return QUEUE_PARAM_INVALID;
-        }
-    #else
-        assert(pQueue != NULL);
-        assert(pItem != NULL);
-    #endif
+    queue_item_t *pItem = (queue_item_t *)item;
+    queue_item_t *pPrev = (queue_item_t *)prev;
+#if (1) //Can be optimized
+    if (pQueue == NULL || pItem == NULL) {
+        return QUEUE_PARAM_INVALID;
+    }
+#else
+    assert(pQueue != NULL);
+    assert(pItem != NULL);
+#endif
 
     u32 r = irq_disable();
 
     /* if the queue was empty or pPrev was at tail */
-    if(pQueue->head == NULL || pPrev == pQueue->tail) {
+    if (pQueue->head == NULL || pPrev == pQueue->tail) {
         queue_enq(pQueue, pItem);
         /* in the API: queue_enq, pQueue->curNum has already ++. */
     }
     /* if pPrev was empty, inserting pItem at head */
-    else if (pPrev == NULL){
+    else if (pPrev == NULL) {
         /* inserting element to head of the queue */
         pItem->next = pQueue->head;
         /* if the queue was empty, inserting new element at tail */
-        if (pQueue->head == NULL){
+        if (pQueue->head == NULL) {
             pQueue->tail = pItem;
         }
         /* update queue head */
@@ -199,7 +194,7 @@ queue_sts_t     queue_insert(queue_t *pQueue, void *item, void *prev)
         pQueue->curNum++;
     }
     /* inserting new element in middle of the queue */
-    else{
+    else {
         pItem->next = pPrev->next;
         pPrev->next = pItem;
         pQueue->curNum++;
@@ -221,34 +216,34 @@ queue_sts_t     queue_insert(queue_t *pQueue, void *item, void *prev)
   * @return      Status
   */
 //_attribute_ram_code_
-queue_sts_t     queue_remove(queue_t *pQueue, void *item, void *prev)
+queue_sts_t queue_remove(queue_t *pQueue, void *item, void *prev)
 {
-    queue_item_t *pItem = (queue_item_t*) item;
-    queue_item_t *pPrev = (queue_item_t*) prev;
-    #if (1) //Can be optimized
-        if(pQueue == NULL || pQueue->head == NULL || pItem == NULL) {
-            return QUEUE_PARAM_INVALID;
-        }
-    #else
-        assert(pQueue != NULL);
-        assert(pQueue->head != NULL);
-        assert(pItem != NULL);
-    #endif
+    queue_item_t *pItem = (queue_item_t *)item;
+    queue_item_t *pPrev = (queue_item_t *)prev;
+#if (1) //Can be optimized
+    if (pQueue == NULL || pQueue->head == NULL || pItem == NULL) {
+        return QUEUE_PARAM_INVALID;
+    }
+#else
+    assert(pQueue != NULL);
+    assert(pQueue->head != NULL);
+    assert(pItem != NULL);
+#endif
 
     u32 r = irq_disable();
 
     /* if the 1st element, remove from head of queue*/
-    if(pQueue->head == pItem) {
+    if (pQueue->head == pItem) {
         pQueue->head = pItem->next;
     }
     /* removing the element in middle of the queue */
-    else if (pPrev != NULL){
+    else if (pPrev != NULL) {
         pPrev->next = pItem->next;
     }
     /* if the removing element is last element */
-    if(pQueue->tail == pItem){
+    if (pQueue->tail == pItem) {
         /* update queue tail */
-        pQueue->tail  = pPrev;
+        pQueue->tail = pPrev;
     }
 
     pQueue->curNum--;
@@ -264,32 +259,33 @@ queue_sts_t     queue_remove(queue_t *pQueue, void *item, void *prev)
  * @return  Status
  */
 //_attribute_ram_code_
-queue_sts_t     queue_delete(queue_t *pQueue, queue_item_t *pItem) {
-    #if (1) //Can be optimized
-        if(pQueue == NULL || pItem == NULL) {
-            return QUEUE_PARAM_INVALID;
-        }
-    #else
-        assert(pQueue != NULL);
-        assert(pItem != NULL);
-    #endif
+queue_sts_t queue_delete(queue_t *pQueue, queue_item_t *pItem)
+{
+#if (1) //Can be optimized
+    if (pQueue == NULL || pItem == NULL) {
+        return QUEUE_PARAM_INVALID;
+    }
+#else
+    assert(pQueue != NULL);
+    assert(pItem != NULL);
+#endif
 
     u32 r = irq_disable();
 
     /* the queue was empty */
-    if(pQueue->head == NULL) {
+    if (pQueue->head == NULL) {
         irq_restore(r);
         return QUEUE_EMPTY;
     }
 
     /* if the 1st element, remove from head of queue*/
-    if(pQueue->head == pItem) {
+    if (pQueue->head == pItem) {
         pQueue->head = pItem->next;
 
         /* if the removing element is last element */
-        if(pQueue->tail == pItem){ //same as 'pQueue->head == NULL'
+        if (pQueue->tail == pItem) { //same as 'pQueue->head == NULL'
             /* update queue tail */
-            pQueue->tail  = NULL;
+            pQueue->tail = NULL;
         }
 
         pQueue->curNum--;
@@ -299,20 +295,20 @@ queue_sts_t     queue_delete(queue_t *pQueue, queue_item_t *pItem) {
 
     /* find the to be delete element */
     queue_item_t *previous = NULL;
-    queue_item_t *current = pQueue->head;
+    queue_item_t *current  = pQueue->head;
 
-    while(current && current != pItem) {
+    while (current && current != pItem) {
         previous = current;
-        current = current->next;
+        current  = current->next;
     }
 
     /* delete element was found in the queue */
-    if (current == pItem){
+    if (current == pItem) {
         previous->next = current->next;
         /* if the removing element is last element */
-        if(pQueue->tail == current){ //same as 'current->next == NULL'
+        if (pQueue->tail == current) { //same as 'current->next == NULL'
             /* update queue tail */
-            pQueue->tail  = previous;
+            pQueue->tail = previous;
         }
 
         pQueue->curNum--;
@@ -333,11 +329,11 @@ queue_sts_t     queue_delete(queue_t *pQueue, queue_item_t *pItem) {
  * @return      Return TRUE, if the specified queue is empty
  */
 //_attribute_ram_code_
-bool            queue_isempty(queue_t *pQueue)
+bool queue_isempty(queue_t *pQueue)
 {
     assert(pQueue != NULL);
 
-    u32 r = irq_disable();
+    u32  r     = irq_disable();
     bool empty = (pQueue->head == NULL);
     irq_restore(r);
 
@@ -351,17 +347,13 @@ bool            queue_isempty(queue_t *pQueue)
  * @return      Number of elements in queue
  */
 //_attribute_ram_code_
-u32             queue_count(queue_t *pQueue)
+u32 queue_count(queue_t *pQueue)
 {
     assert(pQueue != NULL);
 
-    u32 r = irq_disable();
+    u32 r       = irq_disable();
     u32 currNum = pQueue->curNum;
     irq_restore(r);
 
     return currNum;
 }
-
-
-
-

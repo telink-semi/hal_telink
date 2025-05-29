@@ -33,7 +33,6 @@
 #include "ota_server.h"
 
 
-
 #if 0
 unsigned long crc32_cal(unsigned long crc, unsigned char* input, unsigned long* table, int len)
 {
@@ -49,27 +48,22 @@ unsigned long crc32_cal(unsigned long crc, unsigned char* input, unsigned long* 
 #endif
 
 
-_attribute_no_inline_
-unsigned long crc32_half_cal(unsigned long crc, unsigned char* input, unsigned long* table, int len)
+_attribute_no_inline_ unsigned long crc32_half_cal(unsigned long crc, unsigned char *input, unsigned long *table, int len)
 {
-    unsigned char* pch = input;
-    for(int i=0; i<len; i++)
-    {
-        crc = (crc>>4) ^ table[(crc^*pch) & 0x0f];
+    unsigned char *pch = input;
+    for (int i = 0; i < len; i++) {
+        crc = (crc >> 4) ^ table[(crc ^ *pch) & 0x0f];
         pch++;
     }
 
     return crc;
 }
 
-
-_attribute_no_inline_
-unsigned long crc32_cal(unsigned long crc, unsigned char* input, unsigned long* table, int len)
+_attribute_no_inline_ unsigned long crc32_cal(unsigned long crc, unsigned char *input, unsigned long *table, int len)
 {
-    unsigned char* pch = input;
-    for(int i=0; i<len; i++)
-    {
-        crc = (crc>>8) ^ table[(crc^*pch) & 0xff];
+    unsigned char *pch = input;
+    for (int i = 0; i < len; i++) {
+        crc = (crc >> 8) ^ table[(crc ^ *pch) & 0xff];
         pch++;
     }
 

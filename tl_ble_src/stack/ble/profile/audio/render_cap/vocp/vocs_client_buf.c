@@ -29,16 +29,14 @@ const int gAppVocsCltInstNum = ACL_CENTRAL_MAX_NUM * APP_AUDIO_VOCS_CLIENT_MAX_I
 
 
 _attribute_ble_data_retention_
-blc_vocs_client_t gVocsClient[ACL_CENTRAL_MAX_NUM*APP_AUDIO_VOCS_CLIENT_MAX_INSTANCE_NUM];
-
-
-
+    blc_vocs_client_t gVocsClient[ACL_CENTRAL_MAX_NUM * APP_AUDIO_VOCS_CLIENT_MAX_INSTANCE_NUM];
 
 blc_vocs_client_t *blt_vocsc_getClientBuf(void)
 {
-    for(int i=0; i<gAppVocsCltInstNum; i++) {
-        if(gVocsClient[i].useFlag)
+    for (int i = 0; i < gAppVocsCltInstNum; i++) {
+        if (gVocsClient[i].useFlag) {
             continue;
+        }
         gVocsClient[i].useFlag = true;
         return &gVocsClient[i];
     }
@@ -47,9 +45,5 @@ blc_vocs_client_t *blt_vocsc_getClientBuf(void)
 
 void blt_vocsc_cleanBuf(void)
 {
-    memset(gVocsClient, 0, sizeof(blc_vocs_client_t)*gAppVocsCltInstNum);
+    memset(gVocsClient, 0, sizeof(blc_vocs_client_t) * gAppVocsCltInstNum);
 }
-
-
-
-

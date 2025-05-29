@@ -23,15 +23,15 @@
  *******************************************************************************************************/
 #pragma once
 
-#define PRODUCT_MCU_DEMO                                    0
+#define PRODUCT_MCU_DEMO 0
 
 //this product for google broadcast source.
-#define PRODUCT_GOOGLE_BROADCAST_SOURCE                     1
+#define PRODUCT_GOOGLE_BROADCAST_SOURCE 1
 
 //this product for SIG Auracast transmitter
-#define PRODUCT_SIG_AURACAST_TRANSMITTER                    2
+#define PRODUCT_SIG_AURACAST_TRANSMITTER 2
 
-#define PRODUCT_BIS_SOURCE_SELECT                           PRODUCT_SIG_AURACAST_TRANSMITTER
+#define PRODUCT_BIS_SOURCE_SELECT        PRODUCT_SIG_AURACAST_TRANSMITTER
 
-#define BLC_PM_EN                           0
-#define BLC_PM_DEEP_RETENTION_MODE_EN       0
+#define BLC_PM_EN                        0
+#define BLC_PM_DEEP_RETENTION_MODE_EN    0

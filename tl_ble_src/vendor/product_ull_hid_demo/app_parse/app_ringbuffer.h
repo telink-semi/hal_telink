@@ -1,11 +1,13 @@
 #pragma once
 
-typedef struct __attribute__((packed))  {
+typedef struct __attribute__((packed))
+{
     u16 write_index;
     u16 read_index;
     u16 size;
     u8 *buffer;
 } ring_buf_t;
+
 /**
  * @brief        ring buffer initial function.
  * @param[in]    ring_buf: ring buffer structure pointer.
@@ -30,7 +32,8 @@ u16 ring_buf_free_space(ring_buf_t *ring_buf);
  * @return        number of bytes written.
  */
 _attribute_ram_code_
-u16 ring_buf_write(ring_buf_t *ring_buf, u16 length, u8 *buffer);
+    u16
+    ring_buf_write(ring_buf_t *ring_buf, u16 length, u8 *buffer);
 
 /**
  * @brief        read data into ring buffer.
@@ -40,4 +43,3 @@ u16 ring_buf_write(ring_buf_t *ring_buf, u16 length, u8 *buffer);
  * @return        number of bytes read.
  */
 u16 ring_buf_read(ring_buf_t *ring_buf, u16 length, u8 *buffer);
-

@@ -27,10 +27,6 @@
 #include "intest_config.h"
 
 
-
-
-
-
 #if (INTER_TEST_MODE == TEST_ADV_SCAN_ONOFF)
     #include "adv_scan_onoff/app_config.h"
 #elif (INTER_TEST_MODE == TEST_HCI_ACL_MORE_DATA)
@@ -85,6 +81,10 @@
     #include "cs_acl_central_demo/app_config.h"
 #elif (INTER_TEST_MODE == TEST_CS_ACL_PERIPHERAL)
     #include "cs_acl_peripheral_demo/app_config.h"
+#elif (INTER_TEST_MODE == TEST_RAS_CLIENT)
+    #include "ras_client_test/app_config.h"
+#elif (INTER_TEST_MODE == TEST_RAS_SERVER)
+    #include "ras_server_test/app_config.h"
 #elif (INTER_TEST_MODE == TEST_CS_DRBG)
     #include "cs_drbg_demo/app_config.h"
 #elif (INTER_TEST_MODE == TEST_LE_AUDIO_SWTICH_CLIENT)
@@ -101,9 +101,10 @@
     #include "tercel_zigbee_test/app_config.h"
 #elif (INTER_TEST_MODE == TEST_DIFF_CON_DIFF_SMP_LEVEL)
     #include "Diff_connect_Diff_smp_level/app_config.h"
+#elif (INTER_TEST_MODE == TEST_HDT_SENDER)
+    #include <vendor/internal_test/hdt_sender/app_config.h>
+#elif (INTER_TEST_MODE == TEST_HDT_RECIPIENT)
+    #include <vendor/internal_test/hdt_recipient/app_config.h>
 #else
     #error "need include one app_config.h at least"
 #endif
-
-
-

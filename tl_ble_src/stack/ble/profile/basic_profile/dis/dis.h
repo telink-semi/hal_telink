@@ -33,14 +33,14 @@
 
 /******************************* DIS Client Start **********************************************************************/
 //DIS Client Event ID
-enum{
+enum
+{
     BASIC_EVT_DISC_START = BASIC_EVT_TYPE_DIS_CLIENT,
 };
 
-struct blc_disc_regParam{
-
+struct blc_disc_regParam
+{
 };
-
 
 /**
  * @brief       for user to register Device Information service control client module.
@@ -62,30 +62,35 @@ int blc_disc_readPnPID(u16 connHandle, prf_read_cb_t readCb);
 int blc_disc_readUdiForMedicalDevices(u16 connHandle, prf_read_cb_t readCb);
 
 //DIS Client Get Characteristic Value Operation API
-int blc_disc_get(u16 connHandle, u8* batteryLevel);
-int blc_disc_getManufacturerName(u16 connHandle, u8* manufacturerName, u16* manufacturerNameLen);
-int blc_disc_getModelNumber(u16 connHandle, u8* modelNumber, u16* modelNumberLen);
-int blc_disc_getSerialNumber(u16 connHandle, u8* serialNumber, u16* serialNumberLen);
-int blc_disc_getHardwareRevision(u16 connHandle, u8* hardwareRevision, u16* hardwareRevisionLen);
-int blc_disc_getFirmwareRevision(u16 connHandle, u8* firmwareRevision, u16* firmwareRevisionLen);
-int blc_disc_getSoftwareRevision(u16 connHandle, u8* softwareRevision, u16* softwareRevisionLen);
-int blc_disc_getSystemId(u16 connHandle, dis_system_id_t* systemId);
-int blc_disc_getPnPID(u16 connHandle, dis_pnp_t* PnPID);
-int blc_disc_getIEEEDataList(u16 connHandle, u8* IEEEDataList, u16* IEEEDataListLen);
-int blc_disc_getUdiForMedicalDevices(u16 connHandle, u8* udiForMedicalDevices, u16* udiForMedicalDevicesLen);
-
+int blc_disc_get(u16 connHandle, u8 *batteryLevel);
+int blc_disc_getManufacturerName(u16 connHandle, u8 *manufacturerName, u16 *manufacturerNameLen);
+int blc_disc_getModelNumber(u16 connHandle, u8 *modelNumber, u16 *modelNumberLen);
+int blc_disc_getSerialNumber(u16 connHandle, u8 *serialNumber, u16 *serialNumberLen);
+int blc_disc_getHardwareRevision(u16 connHandle, u8 *hardwareRevision, u16 *hardwareRevisionLen);
+int blc_disc_getFirmwareRevision(u16 connHandle, u8 *firmwareRevision, u16 *firmwareRevisionLen);
+int blc_disc_getSoftwareRevision(u16 connHandle, u8 *softwareRevision, u16 *softwareRevisionLen);
+#if ((!defined(HOST_V2_ENABLE)))
+int blc_disc_getSystemId(u16 connHandle, dis_system_id_t *systemId);
+int blc_disc_getPnPID(u16 connHandle, dis_pnp_t *PnPID);
+#else
+int blc_disc_getSystemId(u16 connHandle, struct dis_system_id *systemId);
+int blc_disc_getPnPID(u16 connHandle, struct dis_pnp *PnPID);
+#endif
+int blc_disc_getIEEEDataList(u16 connHandle, u8 *IEEEDataList, u16 *IEEEDataListLen);
+int blc_disc_getUdiForMedicalDevices(u16 connHandle, u8 *udiForMedicalDevices, u16 *udiForMedicalDevicesLen);
 
 /******************************* DIS Client End **********************************************************************/
 
 
 /******************************* DIS Server Start **********************************************************************/
 //DIS Server Event ID
-enum{
+enum
+{
     BASIC_EVT_DISS_START = BASIC_EVT_TYPE_DIS_SERVER,
 };
 
-struct blc_diss_regParam{
-
+struct blc_diss_regParam
+{
 };
 
 /**

@@ -26,12 +26,6 @@
 #include "stack/ble/ble.h"
 
 const blc_micss_regParam_t defaultMicpParam =
-{
-    .mute = MICS_MUTE_VALUE_NOT_MUTED,
+    {
+        .mute = MICS_MUTE_VALUE_NOT_MUTED,
 };
-
-
-
-
-
-

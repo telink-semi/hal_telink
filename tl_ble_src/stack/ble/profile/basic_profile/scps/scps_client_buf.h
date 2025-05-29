@@ -23,17 +23,34 @@
  *******************************************************************************************************/
 #pragma once
 
-struct blc_scps_client{
-    gattc_sub_ccc_msg_t ntfInput;   //For code alignment, not notify attribute handle
+#if ((!defined(HOST_V2_ENABLE)))
+struct blc_scps_client
+{
+    gattc_sub_ccc_msg_t ntfInput; //For code alignment, not notify attribute handle
     /* Characteristic value handle */
-    u16 scanIntervalWindowHdl;      /* Scan Interval Window */
-    u16 scanRefreshHdl;             /* Scan Refresh */
+    u16 scanIntervalWindowHdl; /* Scan Interval Window */
+    u16 scanRefreshHdl;        /* Scan Refresh */
 
-}__attribute__((packed));
+} __attribute__((packed));
 
-struct blc_scps_client_ctrl{
-    blc_prf_proc_t process;
-    struct blc_scps_client* pScpsClient[STACK_PRF_ACL_CENTRAL_MAX_NUM];
-}__attribute__((packed));
+struct blc_scps_client_ctrl
+{
+    blc_prf_proc_t          process;
+    struct blc_scps_client *pScpsClient[STACK_PRF_ACL_CENTRAL_MAX_NUM];
+} __attribute__((packed));
+#else
+struct blc_scps_client
+{
+    gattc_sub_ccc_msg_t ntfInput; //For code alignment, not notify attribute handle
+    /* Characteristic value handle */
+    u16 scanIntervalWindowHdl; /* Scan Interval Window */
+    u16 scanRefreshHdl;        /* Scan Refresh */
 
+};
 
+struct blc_scps_client_ctrl
+{
+    struct blc_prf_process  process;
+    struct blc_scps_client *pScpsClient[STACK_PRF_ACL_CENTRAL_MAX_NUM];
+};
+#endif

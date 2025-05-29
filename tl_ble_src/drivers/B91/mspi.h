@@ -27,30 +27,32 @@
 #include "gpio.h"
 #include "reg_include/mspi_reg.h"
 
-
 /**
  * @brief   Data line mode of mspi
  */
-typedef enum{
-    MSPI_SINGLE_LINE    = 0x00,
-    MSPI_DUAL_LINE      = 0x04,
-    MSPI_QUAD_LINE      = 0x0c,
-}mspi_data_line_e;
-
+typedef enum
+{
+    MSPI_SINGLE_LINE = 0x00,
+    MSPI_DUAL_LINE   = 0x04,
+    MSPI_QUAD_LINE   = 0x0c,
+} mspi_data_line_e;
 
 /**
   * @brief     This function servers to set the spi wait.
   * @return    none.
   */
-_attribute_ram_code_sec_ static inline void mspi_wait(void){
-    while(reg_mspi_status & FLD_MSPI_BUSY);
+_attribute_ram_code_sec_ static inline void mspi_wait(void)
+{
+    while (reg_mspi_status & FLD_MSPI_BUSY)
+        ;
 }
 
 /**
  * @brief     This function servers to enable read trigger spi.
  * @return    none.
  */
-_attribute_ram_code_sec_ static inline void mspi_fm_rd_trig_en(void){
+_attribute_ram_code_sec_ static inline void mspi_fm_rd_trig_en(void)
+{
     reg_mspi_fm |= FLD_MSPI_RD_TRIG_EN;
 }
 
@@ -58,7 +60,8 @@ _attribute_ram_code_sec_ static inline void mspi_fm_rd_trig_en(void){
  * @brief     This function servers to disable read trigger spi.
  * @return    none.
  */
-_attribute_ram_code_sec_ static inline void mspi_fm_rd_trig_dis(void){
+_attribute_ram_code_sec_ static inline void mspi_fm_rd_trig_dis(void)
+{
     reg_mspi_fm &= ~FLD_MSPI_RD_TRIG_EN;
 }
 
@@ -66,7 +69,8 @@ _attribute_ram_code_sec_ static inline void mspi_fm_rd_trig_dis(void){
  * @brief     This function is used to configure mspi to read mode.
  * @return    none.
  */
-_attribute_ram_code_sec_ static inline void mspi_fm_read_en(void){
+_attribute_ram_code_sec_ static inline void mspi_fm_read_en(void)
+{
     reg_mspi_fm |= FLD_MSPI_RD_MODE;
 }
 
@@ -74,7 +78,8 @@ _attribute_ram_code_sec_ static inline void mspi_fm_read_en(void){
  * @brief     This function is used to configure mspi to write mode.
  * @return    none.
  */
-_attribute_ram_code_sec_ static inline void mspi_fm_write_en(void){
+_attribute_ram_code_sec_ static inline void mspi_fm_write_en(void)
+{
     reg_mspi_fm &= ~FLD_MSPI_RD_MODE;
 }
 
@@ -83,7 +88,8 @@ _attribute_ram_code_sec_ static inline void mspi_fm_write_en(void){
  * @param[in] line  - several-line communication mode.
  * @return    none.
  */
-_attribute_ram_code_sec_ static inline void mspi_fm_data_line(mspi_data_line_e line){
+_attribute_ram_code_sec_ static inline void mspi_fm_data_line(mspi_data_line_e line)
+{
     reg_mspi_fm = (reg_mspi_fm & (~FLD_MSPI_DATA_LINE)) | line;
 }
 
@@ -91,7 +97,8 @@ _attribute_ram_code_sec_ static inline void mspi_fm_data_line(mspi_data_line_e l
  * @brief     This function servers to set spi interface csn signal.
  * @return    none.
  */
-_attribute_ram_code_sec_ static inline void mspi_high(void){
+_attribute_ram_code_sec_ static inline void mspi_high(void)
+{
     reg_mspi_fm |= FLD_MSPI_CSN;
 }
 
@@ -99,7 +106,8 @@ _attribute_ram_code_sec_ static inline void mspi_high(void){
  * @brief     This function servers to clear spi interface csn signal.
  * @return    none.
  */
-_attribute_ram_code_sec_ static inline void mspi_low(void){
+_attribute_ram_code_sec_ static inline void mspi_low(void)
+{
     reg_mspi_fm &= ~FLD_MSPI_CSN;
 }
 
@@ -107,7 +115,8 @@ _attribute_ram_code_sec_ static inline void mspi_low(void){
  * @brief       This function servers to gets the spi data.
  * @return      the spi data.
  */
-_attribute_ram_code_sec_ static inline unsigned char mspi_get(void){
+_attribute_ram_code_sec_ static inline unsigned char mspi_get(void)
+{
     return reg_mspi_data;
 }
 
@@ -116,7 +125,8 @@ _attribute_ram_code_sec_ static inline unsigned char mspi_get(void){
  * @param[in]   c   - the char need to be write.
  * @return      none.
  */
-_attribute_ram_code_sec_ static inline void mspi_write(unsigned char c){
+_attribute_ram_code_sec_ static inline void mspi_write(unsigned char c)
+{
     reg_mspi_data = c;
 }
 
@@ -125,7 +135,8 @@ _attribute_ram_code_sec_ static inline void mspi_write(unsigned char c){
  * @param[in]   c   - need to be write.
  * @return      none.
  */
-_attribute_ram_code_sec_ static inline void mspi_fm_write(unsigned char c){
+_attribute_ram_code_sec_ static inline void mspi_fm_write(unsigned char c)
+{
     reg_mspi_fm = c;
 }
 
@@ -133,8 +144,9 @@ _attribute_ram_code_sec_ static inline void mspi_fm_write(unsigned char c){
  * @brief       This function servers to spi read.
  * @return      read result.
  */
-_attribute_ram_code_sec_ static inline unsigned char mspi_read(void){
-    mspi_write(0);      // dummy, issue clock
+_attribute_ram_code_sec_ static inline unsigned char mspi_read(void)
+{
+    mspi_write(0); // dummy, issue clock
     mspi_wait();
     return mspi_get();
 }
@@ -145,10 +157,7 @@ _attribute_ram_code_sec_ static inline unsigned char mspi_read(void){
  */
 _attribute_ram_code_sec_ static inline void mspi_stop_xip(void)
 {
-    mspi_wait();    //wait xip busy=0
-    mspi_high();    //mspi_cn=1, stop xip read
-    while(gpio_get_level(GPIO_PF3) == 0);   //wait cn=1
+    mspi_wait(); //wait xip busy=0
+    mspi_high(); //mspi_cn=1, stop xip read
+    while (gpio_get_level(GPIO_PF3) == 0);        //wait cn=1
 }
-
-
-

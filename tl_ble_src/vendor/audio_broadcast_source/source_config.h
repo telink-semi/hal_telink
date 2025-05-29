@@ -25,12 +25,12 @@
 
 #include "config.h"
 
-#define SOURCE_ONLY_VERSION                 1
+#define SOURCE_ONLY_VERSION           1
 
-#define SOURCE_WITH_ASSISTANT               2
+#define SOURCE_WITH_ASSISTANT         2
 
-#define SOURCE_VERSION                      SOURCE_ONLY_VERSION
+#define SOURCE_VERSION                SOURCE_ONLY_VERSION
 
 
-#define BLC_PM_EN                           0
-#define BLC_PM_DEEP_RETENTION_MODE_EN       0
+#define BLC_PM_EN                     0
+#define BLC_PM_DEEP_RETENTION_MODE_EN 0

@@ -30,10 +30,7 @@ const int appAudioVcsCltInclVocsInstNum = APP_AUDIO_VCS_CLIENT_INCLUDE_VOCS_INST
 const int appAudioVcsCltInclAicsInstNum = APP_AUDIO_VCS_CLIENT_INCLUDE_AICS_INSTANCE_NUM;
 
 _attribute_ble_data_retention_
-blc_vcp_client_t gVcpVolumeCtrl[ACL_CENTRAL_MAX_NUM];
-
-
-
+    blc_vcp_client_t gVcpVolumeCtrl[ACL_CENTRAL_MAX_NUM];
 
 blc_vcp_client_t *blt_vcsc_getClientBuf(u8 instIdx)
 {
@@ -41,8 +38,3 @@ blc_vcp_client_t *blt_vcsc_getClientBuf(u8 instIdx)
 
     return &gVcpVolumeCtrl[instIdx];
 }
-
-
-
-
-

@@ -74,36 +74,36 @@ void chacha20_poly1305_set_rx_dma_channel(dma_chn_e chn)
 
 /* Initialization configuration of chacha20_poly1305 tx dma channel */
 static dma_config_t chacha20_poly1305_tx_dma_config = {
-    .dst_req_sel = DMA_REQ_CHACHA_TX,
-    .src_req_sel = 0,
-    .dst_addr_ctrl = DMA_ADDR_FIX,       // 2
-    .src_addr_ctrl = DMA_ADDR_INCREMENT, // 0
-    .dstmode = DMA_HANDSHAKE_MODE,       // handshake
-    .srcmode = DMA_NORMAL_MODE,
-    .dstwidth = DMA_CTR_WORD_WIDTH,     // must word
-    .srcwidth = DMA_CTR_WORD_WIDTH,     // must word
-    .src_burst_size = DMA_BURST_1_WORD, // must 0
-    .read_num_en = 0,
-    .priority = 0,
-    .write_num_en = 0,
-    .auto_en = 0,
+    .dst_req_sel    = DMA_REQ_CHACHA_TX,
+    .src_req_sel    = 0,
+    .dst_addr_ctrl  = DMA_ADDR_FIX,       // 2
+    .src_addr_ctrl  = DMA_ADDR_INCREMENT, // 0
+    .dstmode        = DMA_HANDSHAKE_MODE, // handshake
+    .srcmode        = DMA_NORMAL_MODE,
+    .dstwidth       = DMA_CTR_WORD_WIDTH, // must word
+    .srcwidth       = DMA_CTR_WORD_WIDTH, // must word
+    .src_burst_size = DMA_BURST_1_WORD,   // must 0
+    .read_num_en    = 0,
+    .priority       = 0,
+    .write_num_en   = 0,
+    .auto_en        = 0,
 };
 
 /* Initialization configuration of chacha20_poly1305 rx dma channel */
 static dma_config_t chacha20_poly1305_rx_dma_config = {
-    .dst_req_sel = 0,
-    .src_req_sel = DMA_REQ_CHACHA_RX, // rx req
-    .dst_addr_ctrl = DMA_ADDR_INCREMENT,
-    .src_addr_ctrl = DMA_ADDR_FIX,
-    .dstmode = DMA_NORMAL_MODE,
-    .srcmode = DMA_HANDSHAKE_MODE,
-    .dstwidth = DMA_CTR_WORD_WIDTH,     // must word
-    .srcwidth = DMA_CTR_WORD_WIDTH,     ////must word
-    .src_burst_size = DMA_BURST_1_WORD, // master rx dma support burst1(0-1 word,1-2 word,2-4 word,3-8 word).
-    .read_num_en = 0,
-    .priority = 0,
-    .write_num_en = 0,
-    .auto_en = 0, // must 0
+    .dst_req_sel    = 0,
+    .src_req_sel    = DMA_REQ_CHACHA_RX, // rx req
+    .dst_addr_ctrl  = DMA_ADDR_INCREMENT,
+    .src_addr_ctrl  = DMA_ADDR_FIX,
+    .dstmode        = DMA_NORMAL_MODE,
+    .srcmode        = DMA_HANDSHAKE_MODE,
+    .dstwidth       = DMA_CTR_WORD_WIDTH, // must word
+    .srcwidth       = DMA_CTR_WORD_WIDTH, ////must word
+    .src_burst_size = DMA_BURST_1_WORD,   // master rx dma support burst1(0-1 word,1-2 word,2-4 word,3-8 word).
+    .read_num_en    = 0,
+    .priority       = 0,
+    .write_num_en   = 0,
+    .auto_en        = 0, // must 0
 };
 
 /**

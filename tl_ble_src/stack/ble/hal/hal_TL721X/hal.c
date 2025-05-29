@@ -5,11 +5,9 @@
  *      Author: ADmin
  */
 
-#include"stack/ble/hal/hal_internal.h"
+#include "stack/ble/hal/hal_internal.h"
 
-
-_attribute_ram_code_
-void blt_hal_reset_baseband(void)
+_attribute_ram_code_ void blt_hal_reset_baseband(void)
 {
     /* process all potential TX DMA conflict */
     rf_dma_reset();
@@ -31,5 +29,11 @@ void blt_hal_reset_baseband(void)
      * To improve the initial problem(stop FSM at coded PHY may cause next near task RF status error) what we want solve,
      * we need add software timeout for every RF status while check(such as "while(!(reg_rf_irq_status & FLD_RF_IRQ_TX))")
      */
+#if HARDWARE_CHANNEL_SOUNDING_SUPPORT_EN
+    //when cs proceudre is ranging, modem can't be reset, it will affect cs phase continue between cs subevents.
+    reg_n22_rst &= ~((FLD_RST0_ZB)|((FLD_RST1_RSTL_BB)<<8));
+    reg_n22_rst |= ((FLD_RST0_ZB)|((FLD_RST1_RSTL_BB)<<8));
+#else
     rf_clr_dig_logic_state();
+#endif
 }

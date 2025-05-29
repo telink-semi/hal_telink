@@ -32,10 +32,12 @@
 #include "lib/include/pke/ecdsa.h"
 #include "lib/include/crypto_common/eccp_curve.h"
 
-
+/**
+ * @brief      set exe config
+ * @param[in]  cfg            - specific config value.
+ * @return     none
+ */
 extern void pke_set_exe_cfg(unsigned int cfg);
-
-
 
 /**
  * @brief       Generate ECDSA Signature in U32 little-endian big integer style
@@ -54,110 +56,90 @@ unsigned int ecdsa_sign_uint32(eccp_curve_t *curve, unsigned int *e, unsigned in
     unsigned int tmp1[ECCP_MAX_WORD_LEN];
     unsigned int ret;
 
-    if(NULL == curve || NULL == e || NULL == k || NULL == dA || NULL == r || NULL == s)
-    {
+    if (NULL == curve || NULL == e || NULL == k || NULL == dA || NULL == r || NULL == s) {
         return ECDSA_POINTOR_NULL;
-    }
-    else if(curve->eccp_p_bitLen > ECCP_MAX_BIT_LEN)
-    {
+    } else if (curve->eccp_p_bitLen > ECCP_MAX_BIT_LEN) {
         return ECDSA_INVALID_INPUT;
+    } else {
+        ;
     }
-    else
-    {;}
 
     nWordLen = GET_WORD_LEN(curve->eccp_n_bitLen);
     pWordLen = GET_WORD_LEN(curve->eccp_p_bitLen);
 
     //make sure k in [1, n-1]
-    if(uint32_BigNum_Check_Zero(k, nWordLen))
-    {
+    if (uint32_BigNum_Check_Zero(k, nWordLen)) {
         return ECDSA_ZERO_ALL;
-    }
-    else if(uint32_BigNumCmp(k, nWordLen, curve->eccp_n, nWordLen) >= 0)
-    {
+    } else if (uint32_BigNumCmp(k, nWordLen, curve->eccp_n, nWordLen) >= 0) {
         return ECDSA_INTEGER_TOO_BIG;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //get x1
-    ret = eccp_pointMul(curve, k, curve->eccp_Gx, curve->eccp_Gy, tmp1, NULL);  //y coordinate is not needed
-    if(PKE_SUCCESS != ret)
-    {
+    ret = eccp_pointMul(curve, k, curve->eccp_Gx, curve->eccp_Gy, tmp1, NULL); //y coordinate is not needed
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //r = x1 mod n
     ret = pke_mod(tmp1, pWordLen, curve->eccp_n, curve->eccp_n_h, curve->eccp_n_n1, nWordLen, r);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
-    }
-    else if(uint32_BigNum_Check_Zero(r, nWordLen))//make sure r is not zero
+    } else if (uint32_BigNum_Check_Zero(r, nWordLen)) //make sure r is not zero
     {
         return ECDSA_ZERO_ALL;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //tmp1 =  r*dA mod n
-    if((NULL == curve->eccp_n_h) || (NULL == curve->eccp_n_n1))
-    {
+    if ((NULL == curve->eccp_n_h) || (NULL == curve->eccp_n_n1)) {
         ret = pke_modmul(curve->eccp_n, r, dA, tmp1, nWordLen);
-    }
-    else
-    {
+    } else {
         pke_load_pre_calc_mont(curve->eccp_n_h, curve->eccp_n_n1, nWordLen);
         pke_set_exe_cfg(PKE_EXE_CFG_ALL_NON_MONT);
         ret = pke_modmul_internal(curve->eccp_n, r, dA, tmp1, nWordLen);
     }
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //tmp1 = e + r*dA mod n
     ret = pke_modadd(curve->eccp_n, e, tmp1, tmp1, nWordLen);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //s = k^(-1) mod n
     ret = pke_modinv(curve->eccp_n, k, s, nWordLen, nWordLen);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //s = (k^(-1))*(e + r*dA) mod n
     ret = pke_modmul_internal(curve->eccp_n, s, tmp1, s, nWordLen);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //make sure s is not zero
-    if(uint32_BigNum_Check_Zero(s, nWordLen))
-    {
+    if (uint32_BigNum_Check_Zero(s, nWordLen)) {
         return ECDSA_ZERO_ALL;
-    }
-    else
-    {
+    } else {
         return ECDSA_SUCCESS;
     }
 }
-
 
 /**
  * @brief       Generate ECDSA Signature in U32 little-endian big integer style
@@ -169,8 +151,7 @@ unsigned int ecdsa_sign_uint32(eccp_curve_t *curve, unsigned int *e, unsigned in
  * @param[out]  signature     - signature s.
  * @return      0:success     other:error
  */
-unsigned int ecdsa_sign(eccp_curve_t *curve, unsigned char *E, unsigned int EByteLen, unsigned char *rand_k, unsigned char *priKey,
-        unsigned char *signature)
+unsigned int ecdsa_sign(eccp_curve_t *curve, unsigned char *E, unsigned int EByteLen, unsigned char *rand_k, unsigned char *priKey, unsigned char *signature)
 {
     unsigned int tmpLen;
     unsigned int nByteLen;
@@ -179,124 +160,101 @@ unsigned int ecdsa_sign(eccp_curve_t *curve, unsigned char *E, unsigned int EByt
     unsigned int r[ECCP_MAX_WORD_LEN], s[ECCP_MAX_WORD_LEN];
     unsigned int ret;
 
-    if(NULL == curve || NULL == priKey || NULL == signature)
-    {
+    if (NULL == curve || NULL == priKey || NULL == signature) {
         return ECDSA_POINTOR_NULL;
-    }
-    else if(curve->eccp_p_bitLen > ECCP_MAX_BIT_LEN)
-    {
+    } else if (curve->eccp_p_bitLen > ECCP_MAX_BIT_LEN) {
         return ECDSA_INVALID_INPUT;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //E could be zero
-    if(NULL == E)
-    {
+    if (NULL == E) {
         EByteLen = 0;
+    } else {
+        ;
     }
-    else
-    {;}
 
     nByteLen = GET_BYTE_LEN(curve->eccp_n_bitLen);
     nWordLen = GET_WORD_LEN(curve->eccp_n_bitLen);
 
     //get integer e from hash value E(according to SEC1-V2 2009)
     uint32_clear(e, nWordLen);
-    if(curve->eccp_n_bitLen >= (EByteLen<<3)) //in this case, make E as e directly
+    if (curve->eccp_n_bitLen >= (EByteLen << 3)) //in this case, make E as e directly
     {
         reverse_byte_array((unsigned char *)E, (unsigned char *)e, EByteLen);
-    }
-    else                                      //in this case, make left eccp_n_bitLen bits of E as e
+    } else                                       //in this case, make left eccp_n_bitLen bits of E as e
     {
         reverse_byte_array((unsigned char *)E, (unsigned char *)e, nByteLen);
-        tmpLen = (curve->eccp_n_bitLen)&7;
-        if(tmpLen)
-        {
-            Big_Div2n(e, nWordLen, 8-tmpLen);
+        tmpLen = (curve->eccp_n_bitLen) & 7;
+        if (tmpLen) {
+            Big_Div2n(e, nWordLen, 8 - tmpLen);
+        } else {
+            ;
         }
-        else
-        {;}
     }
 
     //get e = e mod n, i.e., make sure e in [0, n-1]
-    if(uint32_BigNumCmp(e, nWordLen, curve->eccp_n, nWordLen) >= 0)
-    {
+    if (uint32_BigNumCmp(e, nWordLen, curve->eccp_n, nWordLen) >= 0) {
         ret = pke_sub(e, curve->eccp_n, e, nWordLen);
-        if(PKE_SUCCESS != ret)
-        {
+        if (PKE_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
+    } else {
+        ;
     }
-    else
-    {;}
 
     //make sure priKey in [1, n-1]
-    memset_(((unsigned char *)dA)+nByteLen, 0, (nWordLen<<2)-nByteLen);
+    memset_(((unsigned char *)dA) + nByteLen, 0, (nWordLen << 2) - nByteLen);
     reverse_byte_array((unsigned char *)priKey, (unsigned char *)dA, nByteLen);
-    if(uint32_BigNum_Check_Zero(dA, nWordLen))
-    {
+    if (uint32_BigNum_Check_Zero(dA, nWordLen)) {
         return ECDSA_ZERO_ALL;
-    }
-    else if(uint32_BigNumCmp(dA, nWordLen, curve->eccp_n, nWordLen) >= 0)
-    {
+    } else if (uint32_BigNumCmp(dA, nWordLen, curve->eccp_n, nWordLen) >= 0) {
         return ECDSA_INTEGER_TOO_BIG;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //get k
-    memset_(((unsigned char *)k)+nByteLen, 0, (nWordLen<<2)-nByteLen);
-    if(rand_k)
-    {
+    memset_(((unsigned char *)k) + nByteLen, 0, (nWordLen << 2) - nByteLen);
+    if (rand_k) {
         reverse_byte_array(rand_k, (unsigned char *)k, nByteLen);
-    }
-    else
-    {
+    } else {
 ECDSA_SIGN_LOOP:
 
         ret = get_rand((unsigned char *)k, nByteLen);
-        if(TRNG_SUCCESS != ret)
-        {
+        if (TRNG_SUCCESS != ret) {
             return ret;
-        }
-        else
-        {
+        } else {
             //make sure k has the same bit length as n
-            tmpLen = (curve->eccp_n_bitLen)&0x1F;
-            if(tmpLen)
-            {
-                k[nWordLen-1] &= (1<<(tmpLen))-1;
+            tmpLen = (curve->eccp_n_bitLen) & 0x1F;
+            if (tmpLen) {
+                k[nWordLen - 1] &= (1 << (tmpLen)) - 1;
+            } else {
+                ;
             }
-            else
-            {;}
         }
     }
 
     //sign
     ret = ecdsa_sign_uint32(curve, e, k, dA, r, s);
-    if((ECDSA_ZERO_ALL == ret || ECDSA_INTEGER_TOO_BIG == ret) && (NULL == rand_k))
-    {
+    if ((ECDSA_ZERO_ALL == ret || ECDSA_INTEGER_TOO_BIG == ret) && (NULL == rand_k)) {
         goto ECDSA_SIGN_LOOP;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    if(ECDSA_SUCCESS != ret)
-    {
+    if (ECDSA_SUCCESS != ret) {
         return ret;
-    }
-    else
-    {
+    } else {
         reverse_byte_array((unsigned char *)r, signature, nByteLen);
-        reverse_byte_array((unsigned char *)s, signature+nByteLen, nByteLen);
+        reverse_byte_array((unsigned char *)s, signature + nByteLen, nByteLen);
 
         return ECDSA_SUCCESS;
     }
 }
-
 
 /**
  * @brief       Generate ECDSA Signature in byte string style
@@ -319,186 +277,156 @@ unsigned int ecdsa_verify(eccp_curve_t *curve, unsigned char *E, unsigned int EB
     unsigned int tmp[ECCP_MAX_WORD_LEN], x[ECCP_MAX_WORD_LEN];
     unsigned int ret;
 
-    if(NULL == curve || NULL == pubKey || NULL == signature)
-    {
+    if (NULL == curve || NULL == pubKey || NULL == signature) {
         return ECDSA_POINTOR_NULL;
-    }
-    else if(curve->eccp_p_bitLen > ECCP_MAX_BIT_LEN)
-    {
+    } else if (curve->eccp_p_bitLen > ECCP_MAX_BIT_LEN) {
         return ECDSA_INVALID_INPUT;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //E could be zero
-    if(NULL == E)
-    {
+    if (NULL == E) {
         EByteLen = 0;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    nByteLen = GET_BYTE_LEN(curve->eccp_n_bitLen);
-    nWordLen = GET_WORD_LEN(curve->eccp_n_bitLen);
-    pByteLen = GET_BYTE_LEN(curve->eccp_p_bitLen);
-    pWordLen = GET_WORD_LEN(curve->eccp_p_bitLen);
-    maxWordLen = GET_MAX_LEN(nWordLen,pWordLen);
+    nByteLen   = GET_BYTE_LEN(curve->eccp_n_bitLen);
+    nWordLen   = GET_WORD_LEN(curve->eccp_n_bitLen);
+    pByteLen   = GET_BYTE_LEN(curve->eccp_p_bitLen);
+    pWordLen   = GET_WORD_LEN(curve->eccp_p_bitLen);
+    maxWordLen = GET_MAX_LEN(nWordLen, pWordLen);
 
     //make sure r in [1, n-1]
-    memset_(((unsigned char *)r)+nByteLen, 0, (nWordLen<<2)-nByteLen);
+    memset_(((unsigned char *)r) + nByteLen, 0, (nWordLen << 2) - nByteLen);
     reverse_byte_array(signature, (unsigned char *)r, nByteLen);
-    if(uint32_BigNum_Check_Zero(r, nWordLen))
-    {
+    if (uint32_BigNum_Check_Zero(r, nWordLen)) {
         return ECDSA_ZERO_ALL;
-    }
-    else if(uint32_BigNumCmp(r, nWordLen, curve->eccp_n, nWordLen) >= 0)
-    {
+    } else if (uint32_BigNumCmp(r, nWordLen, curve->eccp_n, nWordLen) >= 0) {
         return ECDSA_INTEGER_TOO_BIG;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //make sure s in [1, n-1]
-    memset_(((unsigned char *)s)+nByteLen, 0, (nWordLen<<2)-nByteLen);
-    reverse_byte_array(signature+nByteLen, (unsigned char *)s, nByteLen);
-    if(uint32_BigNum_Check_Zero(s, nWordLen))
-    {
+    memset_(((unsigned char *)s) + nByteLen, 0, (nWordLen << 2) - nByteLen);
+    reverse_byte_array(signature + nByteLen, (unsigned char *)s, nByteLen);
+    if (uint32_BigNum_Check_Zero(s, nWordLen)) {
         return ECDSA_ZERO_ALL;
-    }
-    else if(uint32_BigNumCmp(s, nWordLen, curve->eccp_n, nWordLen) >= 0)
-    {
+    } else if (uint32_BigNumCmp(s, nWordLen, curve->eccp_n, nWordLen) >= 0) {
         return ECDSA_INTEGER_TOO_BIG;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //tmp = s^(-1) mod n
     ret = pke_modinv(curve->eccp_n, s, tmp, nWordLen, nWordLen);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //get integer e from hash value E(according to SEC1-V2 2009)
     uint32_clear(e, nWordLen);
-    if(curve->eccp_n_bitLen >= (EByteLen<<3)) //in this case, make E as e directly
+    if (curve->eccp_n_bitLen >= (EByteLen << 3)) //in this case, make E as e directly
     {
         reverse_byte_array((unsigned char *)E, (unsigned char *)e, EByteLen);
-    }
-    else                                      //in this case, make left eccp_n_bitLen bits of E as e
+    } else                                       //in this case, make left eccp_n_bitLen bits of E as e
     {
         memcpy_(e, E, nByteLen);
         reverse_byte_array((unsigned char *)E, (unsigned char *)e, nByteLen);
-        tmpLen = (curve->eccp_n_bitLen)&7;
-        if(tmpLen)
-        {
-            Big_Div2n(e, nWordLen, 8-tmpLen);
+        tmpLen = (curve->eccp_n_bitLen) & 7;
+        if (tmpLen) {
+            Big_Div2n(e, nWordLen, 8 - tmpLen);
+        } else {
+            ;
         }
-        else
-        {;}
     }
 
     //get e = e mod n, i.e., make sure e in [0, n-1]
-    if(uint32_BigNumCmp(e, nWordLen, curve->eccp_n, nWordLen) >= 0)
-    {
+    if (uint32_BigNumCmp(e, nWordLen, curve->eccp_n, nWordLen) >= 0) {
         ret = pke_sub(e, curve->eccp_n, e, nWordLen);
-        if(PKE_SUCCESS != ret)
-        {
+        if (PKE_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
+    } else {
+        ;
     }
-    else
-    {;}
 
     //x =  e*(s^(-1)) mod n
-    if((NULL == curve->eccp_n_h) || (NULL == curve->eccp_n_n1))
-    {
+    if ((NULL == curve->eccp_n_h) || (NULL == curve->eccp_n_n1)) {
         ret = pke_modmul(curve->eccp_n, e, tmp, x, nWordLen);
-    }
-    else
-    {
+    } else {
         pke_load_pre_calc_mont(curve->eccp_n_h, curve->eccp_n_n1, nWordLen);
         pke_set_exe_cfg(PKE_EXE_CFG_ALL_NON_MONT);
         ret = pke_modmul_internal(curve->eccp_n, e, tmp, x, nWordLen);
     }
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //tmp =  r*(s^(-1)) mod n
     ret = pke_modmul_internal(curve->eccp_n, r, tmp, tmp, nWordLen);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //check public key
-    memset_(e, 0, (maxWordLen<<2)-pByteLen);
-    memset_(s, 0, (maxWordLen<<2)-pByteLen);
+    memset_(e, 0, (maxWordLen << 2) - pByteLen);
+    memset_(s, 0, (maxWordLen << 2) - pByteLen);
     reverse_byte_array(pubKey, (unsigned char *)e, pByteLen);
-    reverse_byte_array(pubKey+pByteLen, (unsigned char *)s, pByteLen);
+    reverse_byte_array(pubKey + pByteLen, (unsigned char *)s, pByteLen);
     ret = eccp_pointVerify(curve, e, s);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ret = eccp_pointMul(curve, tmp, e, s, e, s);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    if(!uint32_BigNum_Check_Zero(x, nWordLen))
-    {
+    if (!uint32_BigNum_Check_Zero(x, nWordLen)) {
         ret = eccp_pointMul(curve, x, curve->eccp_Gx, curve->eccp_Gy, x, tmp);
-        if(PKE_SUCCESS != ret)
-        {
+        if (PKE_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
 
         ret = eccp_pointAdd(curve, e, s, x, tmp, e, s);
-        if(PKE_SUCCESS != ret)
-        {
+        if (PKE_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
+    } else {
+        ;
     }
-    else
-    {;}
 
     //x = x1 mod n
     ret = pke_mod(e, pWordLen, curve->eccp_n, curve->eccp_n_h, curve->eccp_n_n1, nWordLen, tmp);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    if(uint32_BigNumCmp(tmp, nWordLen, r, nWordLen))
-    {
+    if (uint32_BigNumCmp(tmp, nWordLen, r, nWordLen)) {
         return ECDSA_VERIFY_FAILED;
-    }
-    else
-    {
+    } else {
         return ECDSA_SUCCESS;
     }
 }
-

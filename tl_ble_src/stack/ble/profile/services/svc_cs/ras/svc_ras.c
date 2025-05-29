@@ -23,52 +23,70 @@
  *******************************************************************************************************/
 #include "stack/ble/ble.h"
 
-#define RAS_START_HDL                               SERVICE_TELINK_RAS_HDL
-static const svc_ras_feature_t  rasFeatureValue ={
-        .realTimeProcedureDataSupport               = 0,
-        .getLostProcedureDataSegmentsSupport        = 1,
-        .abortOperationSupport                      = 0,
-        .filterProcedureDataSupport                 = 0,
-        .pctPahseFormatSupport                      = 0,
+#define RAS_START_HDL SERVICE_TELINK_RAS_HDL
+static svc_ras_feature_t rasFeatureValue = {
+    .realTimeProcedureDataSupport        = 1,
+    .getLostProcedureDataSegmentsSupport = 1,
+    .abortOperationSupport               = 1,
+    .filterProcedureDataSupport          = 0,
+    .pctParseFormatSupport               = 0,
 };
 static const u16 rasFeatureValueLen = sizeof(svc_ras_feature_t);
 
 static const atts_attribute_t rasList[] =
-{
-    ATTS_PRIMARY_SERVICE(serviceRangingUuid),
-    ATTS_CHAR_UUID_READ_ENTITY_NOCB(charPropRead, characteristicRasFeatureUuid, rasFeatureValue),
+    {
+        ATTS_PRIMARY_SERVICE(serviceRangingUuid),
+        ATTS_CHAR_UUID_READ_ENTITY_NOCB(charPropRead, characteristicRasFeatureUuid, rasFeatureValue),
 
-    ATTS_CHAR_UUID_NOTIF_ONLY(characteristicLiveRangingDataUuid),
-    ATTS_COMMON_CCC_DEFINE,
+        ATTS_CHAR_UUID_NOTIF_INDICATE_ONLY(characteristicRealTimeProcedureDataUuid),
+        ATTS_COMMON_CCC_DEFINE_CB,
+        //  ATTS_CHAR_UUID_NOTIF_ONLY(characteristicRealTimeProcedureDataUuid),
+        //  ATTS_COMMON_CCC_DEFINE,
 
-    ATTS_CHAR_UUID_NOTIF_ONLY(characteristicStoredRangingDataUuid),
-    ATTS_COMMON_CCC_DEFINE,
+        ATTS_CHAR_UUID_NOTIF_INDICATE_ONLY(characteristicOnDemandProcedureDataUuid),
+        ATTS_COMMON_CCC_DEFINE_CB,
+//  ATTS_CHAR_UUID_NOTIF_ONLY(characteristicOnDemandProcedureDataUuid),
+//  ATTS_COMMON_CCC_DEFINE,
 
-    ATTS_CHAR_UUID_ENCR_WRITE_NULL(charPropWriteIndicate, characteristicControlPointUuid),
-    ATTS_COMMON_CCC_DEFINE,
+#if (RAS_NOSECURITY) //begin IOP_TESTING - disable security on CP
+        ATTS_CHAR_UUID_WRITE_NULL(charPropWriteWithoutIndicate, characteristicControlPointUuid),
+#else
+        ATTS_CHAR_UUID_ENCR_WRITE_NULL(charPropWriteWithoutIndicate, characteristicControlPointUuid),
+#endif               //end IOP_TESTING - disable security on CP
+        ATTS_COMMON_CCC_DEFINE_CB,
 
-    ATTS_CHAR_UUID_NOTIF_ONLY(characteristicRangingDataReadyUuid),
-    ATTS_COMMON_CCC_DEFINE,
+        ATTS_CHAR_UUID_NOTIF_INDICATE_ONLY(characteristicRangingDataReadyUuid),
+        ATTS_COMMON_CCC_DEFINE_CB,
+        //  ATTS_CHAR_UUID_NOTIF_ONLY(characteristicRangingDataReadyUuid),
+        //  ATTS_COMMON_CCC_DEFINE,
 
-    ATTS_CHAR_UUID_NOTIF_ONLY(characteristicRangingDataOverwrittenUuid),
-    ATTS_COMMON_CCC_DEFINE,
+        ATTS_CHAR_UUID_NOTIF_INDICATE_ONLY(characteristicRangingDataOverwrittenUuid),
+        ATTS_COMMON_CCC_DEFINE_CB,
+        //  ATTS_CHAR_UUID_NOTIF_ONLY(characteristicRangingDataOverwrittenUuid),
+        //  ATTS_COMMON_CCC_DEFINE,
+#if(Google_SRS)
+        // characteristicGoogleSrsReadCapUuid,characteristicGoogleSrsSendCmdUuid
+        ATTS_CHAR_UUID_ENCR_RDWR_NULL_GL(charPropReadWrite,characteristicGoogleSrsReadCapUuid),
+        ATTS_COMMON_CCC_DEFINE_CB,
 
+        ATTS_CHAR_UUID_ENCR_RDWR_NULL_GL(charPropReadWrite,characteristicGoogleSrsSendCmdUuid),
+        ATTS_COMMON_CCC_DEFINE_CB,
+#endif
 };
 
 /* GAP group structure */
 _attribute_ble_data_retention_ static atts_group_t svcRasGroup =
-{
-    NULL,
-    rasList,
-    NULL,
-    NULL,
-    RAS_START_HDL,
-    0
-};
+    {
+        NULL,
+        rasList,
+        NULL,
+        NULL,
+        RAS_START_HDL,
+        0};
 
 void blc_svc_addRasGroup(void)
 {
-    svcRasGroup.endHandle = svcRasGroup.startHandle+ARRAY_SIZE(rasList)-1;
+    svcRasGroup.endHandle = svcRasGroup.startHandle + ARRAY_SIZE(rasList) - 1;
     blc_gatts_addAttributeServiceGroup(&svcRasGroup);
 }
 
@@ -77,8 +95,8 @@ void blc_svc_removeRasGroup(void)
     blc_gatts_removeAttributeServiceGroup(RAS_START_HDL);
 }
 
-void blc_svc_rasCbackRegister(atts_w_cb_t writeCback)
+void blc_svc_rasCbackRegister(atts_r_cb_t readCback, atts_w_cb_t writeCback)
 {
+    svcRasGroup.readCback  = readCback;
     svcRasGroup.writeCback = writeCback;
 }
-

@@ -30,18 +30,16 @@
 #include "stack/ble/ble.h"
 
 
+_attribute_ble_data_retention_ u32 gap_eventMask = GAP_EVT_MASK_DEFAULT; //11 event in core_4.2
 
-_attribute_ble_data_retention_  u32     gap_eventMask = GAP_EVT_MASK_DEFAULT;  //11 event in core_4.2
+_attribute_ble_data_retention_ gap_event_handler_t blc_gap_event_handler = NULL;
 
-_attribute_ble_data_retention_  gap_event_handler_t     blc_gap_event_handler = NULL;
-
-void    blc_gap_setEventMask(u32 evtMask)
+void blc_gap_setEventMask(u32 evtMask)
 {
     gap_eventMask = evtMask;
 }
 
-
-void blc_gap_registerHostEventHandler (gap_event_handler_t  handler)
+void blc_gap_registerHostEventHandler(gap_event_handler_t handler)
 {
     blc_gap_event_handler = handler;
 }
@@ -50,16 +48,15 @@ void blc_gap_registerHostEventHandler (gap_event_handler_t  handler)
 #if (TIFS_VARIATION_WORKAROUND_MLP_CODE_IN_RAM)
 _attribute_ram_code_
 #endif
-int blc_gap_send_event (u32 h, u8 *para, int n)
+    int
+    blc_gap_send_event(u32 h, u8 *para, int n)
 {
-    if(blt_gap_hci_event_handler)
-    {
+    if (blt_gap_hci_event_handler) {
         blt_gap_hci_event_handler(h, para, n);
     }
 
-    if (blc_gap_event_handler)
-    {
-        return blc_gap_event_handler (h, para, n);      //app_host_event_callback
+    if (blc_gap_event_handler) {
+        return blc_gap_event_handler(h, para, n); //app_host_event_callback
     }
     return 1;
 }

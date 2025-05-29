@@ -28,7 +28,8 @@
 #ifndef STACK_BLE_CONTROLLER_LL_SUBRATE_SUBRATE_STACK_H_
 #define STACK_BLE_CONTROLLER_LL_SUBRATE_SUBRATE_STACK_H_
 
-typedef struct{
+typedef struct
+{
     u8  llid;
     u8  rf_len;
     u8  opcode;
@@ -37,10 +38,10 @@ typedef struct{
     u16 max_latency;
     u16 continue_num;
     u16 timeout;
-}rf_pkt_ll_subrate_req_t;
+} rf_pkt_ll_subrate_req_t;
 
-
-typedef struct{
+typedef struct
+{
     u8  llid;
     u8  rf_len;
     u8  opcode;
@@ -49,11 +50,10 @@ typedef struct{
     u16 latency;
     u16 continue_num;
     u16 timeout;
-}rf_pkt_ll_subrate_ind_t;
+} rf_pkt_ll_subrate_ind_t;
 
-
-u32 blt_ll_subrate_getNextEvent(st_ll_conn_t* pAclConn, u16 start_inst);
+u32       blt_ll_subrate_getNextEvent(st_ll_conn_t *pAclConn, u16 start_inst);
 ble_sts_t blt_ll_initSubrateByHandle(u16 handle);
-void blt_ll_resetSubrateByHandle(u16 handle);
+void      blt_ll_resetSubrateByHandle(u16 handle);
 
 #endif /* STACK_BLE_CONTROLLER_LL_SUBRATE_SUBRATE_STACK_H_ */

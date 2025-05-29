@@ -32,14 +32,13 @@
 
 typedef unsigned int GET_RAND_WORDS(unsigned int *a, unsigned int words);
 
-
 /**
  * @brief       TRNG global interruption enable
  * @return      none
  */
 void trng_global_int_enable(void)
 {
-    TRNG_CR |= (1<<TRNG_GLOBAL_INT_OFFSET);
+    TRNG_CR |= (1 << TRNG_GLOBAL_INT_OFFSET);
 }
 
 /**
@@ -48,7 +47,7 @@ void trng_global_int_enable(void)
  */
 void trng_global_int_disable(void)
 {
-    TRNG_CR &= ~(1<<TRNG_GLOBAL_INT_OFFSET);
+    TRNG_CR &= ~(1 << TRNG_GLOBAL_INT_OFFSET);
 }
 
 /**
@@ -61,7 +60,7 @@ void trng_global_int_disable(void)
  */
 void trng_empty_read_int_enable(void)
 {
-    TRNG_CR |= (1<<TRNG_READ_EMPTY_INT_OFFSET);
+    TRNG_CR |= (1 << TRNG_READ_EMPTY_INT_OFFSET);
 }
 
 /**
@@ -70,7 +69,7 @@ void trng_empty_read_int_enable(void)
  */
 void trng_empty_read_int_disable(void)
 {
-    TRNG_CR &= ~(1<<TRNG_READ_EMPTY_INT_OFFSET);
+    TRNG_CR &= ~(1 << TRNG_READ_EMPTY_INT_OFFSET);
 }
 
 /**
@@ -83,7 +82,7 @@ void trng_empty_read_int_disable(void)
  */
 void trng_data_int_enable(void)
 {
-    TRNG_CR |= (1<<TRNG_DATA_INT_OFFSET);
+    TRNG_CR |= (1 << TRNG_DATA_INT_OFFSET);
 }
 
 /**
@@ -92,7 +91,7 @@ void trng_data_int_enable(void)
  */
 void trng_data_int_disable(void)
 {
-    TRNG_CR &= ~(1<<TRNG_DATA_INT_OFFSET);
+    TRNG_CR &= ~(1 << TRNG_DATA_INT_OFFSET);
 }
 
 /**
@@ -106,9 +105,10 @@ void trng_enable(void)
     TRNG_CR |= 1;
 
     //sleep for a while
-    i=0xFFF;
-    while(i--)
-    {;}
+    i = 0xFFF;
+    while (i--) {
+        ;
+    }
 }
 
 /**
@@ -135,15 +135,14 @@ void trng_disable(void)
  */
 unsigned int trng_ro_entropy_config(unsigned char cfg)
 {
-    if(cfg > 15)
-    {
+    if (cfg > 15) {
         return TRNG_INVALID_INPUT;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    TRNG_CR &= ~(0x0F<<TRNG_RO_ENTROPY_OFFSET);
-    TRNG_CR |=  (((unsigned int)(cfg&0x0F))<<TRNG_RO_ENTROPY_OFFSET);
+    TRNG_CR &= ~(0x0F << TRNG_RO_ENTROPY_OFFSET);
+    TRNG_CR |= (((unsigned int)(cfg & 0x0F)) << TRNG_RO_ENTROPY_OFFSET);
 
     return TRNG_SUCCESS;
 }
@@ -156,30 +155,29 @@ unsigned int trng_ro_entropy_config(unsigned char cfg)
  */
 unsigned int trng_ro_sub_entropy_config(unsigned char sn, unsigned short cfg)
 {
-    switch(sn)
-    {
-        case 0:
+    switch (sn) {
+    case 0:
         RO_SRC_EN1 &= ~0xFFFF0000;
-        RO_SRC_EN1 |= ((unsigned int)cfg)<<16;
+        RO_SRC_EN1 |= ((unsigned int)cfg) << 16;
         break;
 
-        case 1:
+    case 1:
         RO_SRC_EN1 &= ~0x0000FFFF;
         RO_SRC_EN1 |= (unsigned int)cfg;
         break;
 
-        case 2:
+    case 2:
         RO_SRC_EN2 &= ~0xFFFF0000;
-        RO_SRC_EN2 |= ((unsigned int)cfg)<<16;
+        RO_SRC_EN2 |= ((unsigned int)cfg) << 16;
         break;
 
-        case 3:
+    case 3:
         RO_SRC_EN2 &= ~0x0000FFFF;
         RO_SRC_EN2 |= (unsigned int)cfg;
         break;
 
-        default:
-            return TRNG_INVALID_INPUT;
+    default:
+        return TRNG_INVALID_INPUT;
     }
 
     return TRNG_SUCCESS;
@@ -196,12 +194,9 @@ unsigned int trng_ro_sub_entropy_config(unsigned char sn, unsigned short cfg)
  */
 void trng_set_mode(unsigned char with_post_processing)
 {
-    if(with_post_processing)
-    {
+    if (with_post_processing) {
         TRNG_MSEL |= 1;
-    }
-    else
-    {
+    } else {
         TRNG_MSEL &= (~1);
     }
 
@@ -234,12 +229,11 @@ void trng_reseed(void)
  */
 unsigned int trng_set_freq(unsigned char freq)
 {
-    if(freq > 3)
-    {
+    if (freq > 3) {
         return TRNG_INVALID_INPUT;
+    } else {
+        ;
     }
-    else
-    {;}
 
     SCLK_FREQ = freq;
 
@@ -260,22 +254,19 @@ unsigned int get_rand_uint32(unsigned int *a, unsigned int words)
 {
     unsigned int i;
 
-    while(0 == (TRNG_SR & 2))
-    {
-        if(TRNG_SR & 1)
-        {
+    while (0 == (TRNG_SR & 2)) {
+        if (TRNG_SR & 1) {
             return TRNG_HT_ERROR;
+        } else {
+            ;
         }
-        else
-        {;}
     }
 
-    for(i=0; i<words; i++)
-    {
-        *(a++) = TRNG_DR;  //printf("\r\n %08x", *(a-1));
+    for (i = 0; i < words; i++) {
+        *(a++) = TRNG_DR; //printf("\r\n %08x", *(a-1));
     }
 
-    TRNG_SR |= 2;  //clear
+    TRNG_SR |= 2;         //clear
 
     return TRNG_SUCCESS;
 }
@@ -296,22 +287,19 @@ unsigned int get_rand_uint32_with_reseed(unsigned int *a, unsigned int words)
 
     trng_reseed();
 
-    while(0 == (TRNG_SR & 2))
-    {
-        if(TRNG_SR & 1)
-        {
+    while (0 == (TRNG_SR & 2)) {
+        if (TRNG_SR & 1) {
             return TRNG_HT_ERROR;
+        } else {
+            ;
         }
-        else
-        {;}
     }
 
-    for(i=0; i<words; i++)
-    {
-        *(a++) = TRNG_DR;  //printf("\r\n %08x", *(a-1));
+    for (i = 0; i < words; i++) {
+        *(a++) = TRNG_DR; //printf("\r\n %08x", *(a-1));
     }
 
-    TRNG_SR |= 2;  //clear
+    TRNG_SR |= 2;         //clear
 
     return TRNG_SUCCESS;
 }
@@ -325,99 +313,75 @@ unsigned int get_rand_uint32_with_reseed(unsigned int *a, unsigned int words)
  */
 unsigned int get_rand_buffer(unsigned char *rand, unsigned int bytes, GET_RAND_WORDS get_rand_words)
 {
-    unsigned int i;
-    unsigned int tmp, tmp_len, rng_data;
-    unsigned int count, ret;
+    unsigned int   i;
+    unsigned int   tmp, tmp_len, rng_data;
+    unsigned int   count, ret;
     unsigned char *a = rand;
 
     //check input parameters
-    if(NULL == rand || NULL == get_rand_words)
-    {
+    if (NULL == rand || NULL == get_rand_words) {
         return TRNG_BUFFER_NULL;
-    }
-    else if(0 == bytes)
-    {
+    } else if (0 == bytes) {
         return TRNG_SUCCESS;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //make sure trng and ro are enabled
-    if(0 == (TRNG_CR & 1))
-    {
+    if (0 == (TRNG_CR & 1)) {
         return TRNG_INVALID_CONFIG;
-    }
-    else if(0 == (TRNG_CR & (0x0F<<TRNG_RO_ENTROPY_OFFSET)))
-    {
+    } else if (0 == (TRNG_CR & (0x0F << TRNG_RO_ENTROPY_OFFSET))) {
         return TRNG_INVALID_CONFIG;
+    } else {
+        ;
     }
-    else
-    {;}
 
     tmp_len = bytes;
 
     tmp = ((unsigned int)a) & 3;
-    if(tmp)
-    {
-        i = 4-tmp;
+    if (tmp) {
+        i = 4 - tmp;
 
         ret = get_rand_words(&rng_data, 1);
-        if(TRNG_SUCCESS != ret)
-        {
+        if (TRNG_SUCCESS != ret) {
             goto END;
-        }
-        else
-        {
-            if(tmp_len > i)
-            {
+        } else {
+            if (tmp_len > i) {
                 memcpy_(a, &rng_data, i);
                 a += i;
                 tmp_len -= i;
-            }
-            else
-            {
+            } else {
                 memcpy_(a, &rng_data, tmp_len);
                 goto END;
             }
         }
+    } else {
+        ;
     }
-    else
-    {;}
 
-    tmp = tmp_len/4;
-    while(tmp)
-    {
-        if(tmp>8)
-        {
+    tmp = tmp_len / 4;
+    while (tmp) {
+        if (tmp > 8) {
             count = 8;
-        }
-        else
-        {
+        } else {
             count = tmp;
         }
 
         ret = get_rand_words((unsigned int *)a, count);
-        if(TRNG_SUCCESS != ret)
-        {
+        if (TRNG_SUCCESS != ret) {
             goto END;
-        }
-        else
-        {
-            a += count<<2;
+        } else {
+            a += count << 2;
             tmp -= count;
         }
     }
 
     tmp_len = tmp_len & 3;
-    if(tmp_len)
-    {
+    if (tmp_len) {
         ret = get_rand_words(&rng_data, 1);
-        if(TRNG_SUCCESS != ret)
-        {
+        if (TRNG_SUCCESS != ret) {
             goto END;
-        }
-        else
-        {
+        } else {
             memcpy_(a, &rng_data, tmp_len);
         }
     }
@@ -426,16 +390,14 @@ unsigned int get_rand_buffer(unsigned char *rand, unsigned int bytes, GET_RAND_W
 
 END:
 
-    if(TRNG_SUCCESS != ret)
-    {
+    if (TRNG_SUCCESS != ret) {
         memset_(rand, 0, bytes);
+    } else {
+        ;
     }
-    else
-    {;}
 
 #ifdef TRNG_POKER_TEST
-    if(TRNG_SUCCESS == ret)
-    {
+    if (TRNG_SUCCESS == ret) {
         poker_test(rand, bytes);
     }
 #endif
@@ -475,18 +437,16 @@ unsigned int get_rand_internal(unsigned char *rand, unsigned int bytes)
 unsigned int get_rand(unsigned char *rand, unsigned int bytes)
 {
     //with post-processing
-    if(0 == TRNG_MSEL)
-    {
+    if (0 == TRNG_MSEL) {
         trng_disable();
         trng_set_mode(1);
         trng_enable();
+    } else {
+        ;
     }
-    else
-    {;}
 
     return get_rand_buffer(rand, bytes, get_rand_uint32_with_reseed);
 }
-
 
 /*********************************** TREO ************************************/
 /**
@@ -500,9 +460,10 @@ void tero_enable(void)
     TERO_CR |= 1;
 
     //sleep for a while
-    i=0xFFF;
-    while(i--)
-    {;}
+    i = 0xFFF;
+    while (i--) {
+        ;
+    }
 }
 
 /**
@@ -521,15 +482,14 @@ void tero_disable(void)
  */
 unsigned int tero_set_stop_threshold(unsigned char threshold_value)
 {
-    if(0 == threshold_value)
-    {
+    if (0 == threshold_value) {
         return TRNG_INVALID_INPUT;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    TERO_CR &= ~(0xFF<<TRNG_TERO_THRESHOLD_OFFSET);
-    TERO_CR |= (((unsigned int)threshold_value)<<TRNG_TERO_THRESHOLD_OFFSET);
+    TERO_CR &= ~(0xFF << TRNG_TERO_THRESHOLD_OFFSET);
+    TERO_CR |= (((unsigned int)threshold_value) << TRNG_TERO_THRESHOLD_OFFSET);
 
     return TRNG_SUCCESS;
 }
@@ -545,15 +505,14 @@ unsigned int tero_set_stop_threshold(unsigned char threshold_value)
  */
 unsigned int tero_entropy_config(unsigned char cfg)
 {
-    if(cfg > 15)
-    {
+    if (cfg > 15) {
         return TRNG_INVALID_INPUT;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    TERO_CR &= ~(0x0F<<TRNG_TERO_ENTROPY_OFFSET);
-    TERO_CR |=  (((unsigned int)(cfg&0x0F))<<TRNG_TERO_ENTROPY_OFFSET);
+    TERO_CR &= ~(0x0F << TRNG_TERO_ENTROPY_OFFSET);
+    TERO_CR |= (((unsigned int)(cfg & 0x0F)) << TRNG_TERO_ENTROPY_OFFSET);
 
     return TRNG_SUCCESS;
 }
@@ -564,7 +523,7 @@ unsigned int tero_entropy_config(unsigned char cfg)
  */
 void tero_set_output_rng(void)
 {
-    TERO_CR &= ~(1<<1);
+    TERO_CR &= ~(1 << 1);
 }
 
 /**
@@ -573,7 +532,7 @@ void tero_set_output_rng(void)
  */
 void tero_set_output_osc_times(void)
 {
-    TERO_CR |= (1<<1);
+    TERO_CR |= (1 << 1);
 }
 
 /**
@@ -583,13 +542,10 @@ void tero_set_output_osc_times(void)
  */
 void tero_set_osc_sel(unsigned char cfg)
 {
-    if(0 == cfg)
-    {
-        TERO_CR &= ~(1<<2);
-    }
-    else
-    {
-        TERO_CR |= (1<<2);
+    if (0 == cfg) {
+        TERO_CR &= ~(1 << 2);
+    } else {
+        TERO_CR |= (1 << 2);
     }
 }
 
@@ -600,8 +556,8 @@ void tero_set_osc_sel(unsigned char cfg)
  */
 void tero_set_osc_times_lower_limit(unsigned short value)
 {
-    TERO_THOLD &= ~(0xFF<<16);
-    TERO_THOLD |= ((unsigned int)value)<<16;
+    TERO_THOLD &= ~(0xFF << 16);
+    TERO_THOLD |= ((unsigned int)value) << 16;
 }
 
 /**
@@ -625,86 +581,71 @@ unsigned int get_tero_rand(unsigned char *a, unsigned int bytes)
 {
     unsigned int i;
     unsigned int tmp, rng_data;
-//  unsigned int tmp_len;
+    //  unsigned int tmp_len;
 
     //check input parameters
-    if(NULL == a)
-    {
+    if (NULL == a) {
         return TRNG_BUFFER_NULL;
-    }
-    else if(0 == bytes)
-    {
+    } else if (0 == bytes) {
         return TRNG_SUCCESS;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //make sure tero config is valid
-    if(0 == (TERO_CR & 1))
-    {
+    if (0 == (TERO_CR & 1)) {
         return TRNG_INVALID_CONFIG;
-    }
-    else if(TERO_CR & (1<<1))
-    {
+    } else if (TERO_CR & (1 << 1)) {
         return TRNG_INVALID_CONFIG;
-    }
-    else if(0 == (TERO_CR & (0x0F<<TRNG_TERO_ENTROPY_OFFSET)))
-    {
+    } else if (0 == (TERO_CR & (0x0F << TRNG_TERO_ENTROPY_OFFSET))) {
         return TRNG_INVALID_CONFIG;
+    } else {
+        ;
     }
-    else
-    {;}
 
-//  tmp_len = bytes;
+    //  tmp_len = bytes;
 
     tmp = ((unsigned int)a) & 3;
-    if(tmp)
-    {
-        i = 4-tmp;
+    if (tmp) {
+        i = 4 - tmp;
 
-        while(0 == (TERO_SR & 1))
-        {;}
-        rng_data = TERO_DR;//printf("\r\n %08x", rng_data);
-        if(bytes > i)
-        {
+        while (0 == (TERO_SR & 1)) {
+            ;
+        }
+        rng_data = TERO_DR; //printf("\r\n %08x", rng_data);
+        if (bytes > i) {
             memcpy_(a, &rng_data, i);
             a += i;
             bytes -= i;
-        }
-        else
-        {
+        } else {
             memcpy_(a, &rng_data, bytes);
             return TRNG_SUCCESS;
         }
     }
 
-    tmp = bytes/4;
-    while(tmp)
-    {
-        while(0 == (TERO_SR & 1))
-        {;}
-        *((unsigned int *)a) = TERO_DR;//printf("\r\n %08x", *((unsigned int *)a));
+    tmp = bytes / 4;
+    while (tmp) {
+        while (0 == (TERO_SR & 1)) {
+            ;
+        }
+        *((unsigned int *)a) = TERO_DR; //printf("\r\n %08x", *((unsigned int *)a));
 
         a += 4;
         tmp--;
     }
 
     bytes = bytes & 3;
-    if(bytes)
-    {
-        while(0 == (TERO_SR & 1))
-        {;}
-        rng_data = TERO_DR;//printf("\r\n %08x", rng_data);
+    if (bytes) {
+        while (0 == (TERO_SR & 1)) {
+            ;
+        }
+        rng_data = TERO_DR; //printf("\r\n %08x", rng_data);
         memcpy_(a, &rng_data, bytes);
     }
 
 #ifdef TRNG_POKER_TEST
-    poker_test(a-tmp_len, tmp_len);
+    poker_test(a - tmp_len, tmp_len);
 #endif
 
     return TRNG_SUCCESS;
 }
-
-
-
-

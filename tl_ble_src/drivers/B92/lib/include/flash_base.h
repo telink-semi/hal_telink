@@ -32,7 +32,7 @@
  * @param[in]   data_len  - the length(in byte) of content needs to read out from the page.
  * @return      none.
  */
-_attribute_ram_code_sec_noinline_ void flash_mspi_read_ram(flash_command_e cmd,unsigned long addr, unsigned char *data,unsigned long data_len);
+_attribute_ram_code_sec_noinline_ void flash_mspi_read_ram(flash_command_e cmd, unsigned long addr, unsigned char *data, unsigned long data_len);
 
 
 /**
@@ -44,7 +44,7 @@ _attribute_ram_code_sec_noinline_ void flash_mspi_read_ram(flash_command_e cmd,u
  * @return      none.
  * @return      none.
  */
-_attribute_ram_code_sec_noinline_ unsigned char flash_mspi_read_decrypt_check_ram(flash_command_e cmd,unsigned long addr, unsigned char *data,unsigned long data_len);
+_attribute_ram_code_sec_noinline_ unsigned char flash_mspi_read_decrypt_check_ram(flash_command_e cmd, unsigned long addr, unsigned char *data, unsigned long data_len);
 /**
  * @brief       This function serves to write write data to flash(include erase,write status).
  * @param[in]   cmd     - the flash cmd and mspi control.
@@ -53,7 +53,7 @@ _attribute_ram_code_sec_noinline_ unsigned char flash_mspi_read_decrypt_check_ra
  * @param[in]   data_len     - the length(in byte, must be above 0) you want to write.
  * @return      none.
  */
-_attribute_ram_code_sec_optimize_o2_ void flash_mspi_write_ram(flash_command_e cmd,unsigned long addr, unsigned char *data, unsigned long data_len);
+_attribute_ram_code_sec_optimize_o2_ void flash_mspi_write_ram(flash_command_e cmd, unsigned long addr, unsigned char *data, unsigned long data_len);
 
 /**
  * @brief       This function serves to write write data to flash(include erase,write status) in encrypt mode.
@@ -64,7 +64,7 @@ _attribute_ram_code_sec_optimize_o2_ void flash_mspi_write_ram(flash_command_e c
  * @return      none.
  * @return      none.
  */
-_attribute_ram_code_sec_noinline_ void flash_mspi_write_encrypt_ram(flash_command_e cmd,unsigned long addr, unsigned char *data, unsigned long data_len);
+_attribute_ram_code_sec_noinline_ void flash_mspi_write_encrypt_ram(flash_command_e cmd, unsigned long addr, unsigned char *data, unsigned long data_len);
 
 
 /**

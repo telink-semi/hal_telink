@@ -26,15 +26,14 @@
 
 //sdk fix service uuid handle
 
-#define SERVICE_HUMAN_INTERFACE_DEVICE_HDL              SERVICE_HID_START_HDL
-#define HID_MAX_HDL_NUM                                 0x40
+#define SERVICE_HUMAN_INTERFACE_DEVICE_HDL SERVICE_HID_START_HDL
+#define HID_MAX_HDL_NUM                    0x40
 
-#define SERVICE_ULTRA_LOW_LATENCY_HID_HDL               SERVICE_HUMAN_INTERFACE_DEVICE_HDL + HID_MAX_HDL_NUM
-#define ULL_HID_MAX_HDL_NUM                             0x08
+#define SERVICE_ULTRA_LOW_LATENCY_HID_HDL  SERVICE_HUMAN_INTERFACE_DEVICE_HDL + HID_MAX_HDL_NUM
+#define ULL_HID_MAX_HDL_NUM                0x08
 
 #include "svc_keyboard/svc_keyboard.h"
 #include "svc_mouse/svc_mouse.h"
 #include "svc_km/svc_km.h"
 #include "hid/svc_hid.h"
 #include "ull_hid/svc_ull_hid.h"
-

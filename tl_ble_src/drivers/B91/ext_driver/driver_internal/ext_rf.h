@@ -34,7 +34,7 @@
 typedef struct {
     unsigned char  rfMode_init_flag;
     unsigned char  txPower_index;
-
+    unsigned char  txPower_level;   /*!< added to be compatible with driver api */
 }ext_rf_t;
 
 extern ext_rf_t blt_extRF;
@@ -191,7 +191,8 @@ __INLINE void  rf_ble_set_rx_wait(unsigned short rx_wait_us)
 
 __INLINE void  rf_ble_set_tx_wait(unsigned short tx_wait_us)
 {
-    write_reg8(0x80140a0e, tx_wait_us);
+    tx_wait_us = (tx_wait_us>0x0fff ? 0x0fff : tx_wait_us);
+    write_reg16(0x80140a0e, tx_wait_us);
 }
 
 /**
@@ -411,7 +412,17 @@ __INLINE void zb_rt_irq_enable(void)
 
 
 #ifndef FAST_SETTLE
-#define FAST_SETTLE         0
+#define FAST_SETTLE         1
+#endif
+
+#define TX_FAST_SETTLE_LEVEL  TX_SETTLE_TIME_50US
+#define RX_FAST_SETTLE_LEVEL  RX_SETTLE_TIME_45US
+
+#define TX_FAST_SETTLE_TIME  50
+#define RX_FAST_SETTLE_TIME  45
+
+#ifndef BLE_S2_S8_NEW_PATH
+#define BLE_S2_S8_NEW_PATH      0
 #endif
 
 
@@ -426,7 +437,7 @@ __INLINE void zb_rt_irq_enable(void)
  */
 
 #if (FAST_SETTLE)
-    #define RX_SETTLE_US                    45
+    #define RX_SETTLE_US                    RX_FAST_SETTLE_TIME
 #else
     #define RX_SETTLE_US                    85
 #endif
@@ -452,7 +463,7 @@ __INLINE void zb_rt_irq_enable(void)
 //TX settle time
 
     #if (FAST_SETTLE)
-        #define         TX_STL_LEGADV_SCANRSP_REAL                  53  //can change, consider TX packet quality
+        #define         TX_STL_LEGADV_SCANRSP_REAL                  TX_FAST_SETTLE_TIME  //can change, consider TX packet quality
     #else
         #define         TX_STL_LEGADV_SCANRSP_REAL                  110 //can change, consider TX packet quality
     #endif
@@ -463,7 +474,7 @@ __INLINE void zb_rt_irq_enable(void)
 
 
     #if (FAST_SETTLE)
-        #define         TX_STL_TIFS_REAL_COMMON                     53  //can change, consider TX packet quality
+        #define         TX_STL_TIFS_REAL_COMMON                     TX_FAST_SETTLE_TIME  //can change, consider TX packet quality
     #else
         #define         TX_STL_TIFS_REAL_COMMON                     110 //can change, consider TX packet quality
     #endif
@@ -482,7 +493,7 @@ __INLINE void zb_rt_irq_enable(void)
 
 
     #if (FAST_SETTLE)
-        #define         TX_STL_ADV_REAL_COMMON                      53  //can change, consider TX packet quality
+        #define         TX_STL_ADV_REAL_COMMON                      TX_FAST_SETTLE_TIME  //can change, consider TX packet quality
     #else
         #define         TX_STL_ADV_REAL_COMMON                      110 //can change, consider TX packet quality
     #endif
@@ -519,7 +530,7 @@ __INLINE void zb_rt_irq_enable(void)
 
 
     #if (FAST_SETTLE)
-        #define     TX_STL_BTX_1ST_PKT_REAL                         53
+        #define     TX_STL_BTX_1ST_PKT_REAL                         TX_FAST_SETTLE_TIME
     #else
         /* normal mode(no fast settle): for ACL Central, tx settle real 110uS or 107uS or even 105uS, not big difference,
          * but for CIS Central, timing is very urgent considering T_MSS between two sub_event, so SiHui use 107, we keep this set
@@ -534,6 +545,18 @@ __INLINE void zb_rt_irq_enable(void)
     #error "add code here"
 #endif
 
+
+#if(1) //(LL_FEATURE_ENABLE_FRAME_SPACE_UPDATE)
+    #define         RX_PATH_DLY_EXTRA_PREAMBLE_1M                   (150 - TX_STL_AUTO_MODE_1M)
+    #define         RX_PATH_DLY_EXTRA_PREAMBLE_2M                   (150 - TX_STL_AUTO_MODE_2M)
+
+    #if(BLE_S2_S8_NEW_PATH)
+        #define         RX_PATH_DLY_EXTRA_PREAMBLE_S2               (150-TX_STL_AUTO_MODE_CODED_S2)
+        #define         RX_PATH_DLY_EXTRA_PREAMBLE_S8               (150-TX_STL_AUTO_MODE_CODED_S8)
+    #else
+        #define         RX_PATH_DLY_EXTRA_PREAMBLE_CODED            (150- TX_STL_AUTO_MODE_CODED)
+    #endif
+#endif
 
 /* AD convert delay : timing cost on RF analog to digital convert signal process:
  *                  Eagle   1M: 20uS       2M: 10uS;      500K(S2): 14uS    125K(S8):  14uS
@@ -756,34 +779,18 @@ void rf_get_dcoc_dac_val(rf_dcoc_iq_dac_t *dcoc_cal);
 
 #if FAST_SETTLE
 
-//  #define FS_TX_SAVE_US_FACT          57
-//  #define FS_TX_SAVE_US_USE           50
-//  #define FS_RX_SAVE_US_FACT          45
-
-    #define FS_TX_SAVE_US               57
-    #define FS_RX_SAVE_US               45
-
     typedef struct
     {
-        u8 LDO_CAL_TRIM;    //0xea[5:0]
-        u8 LDO_RXTXHF_TRIM; //0xee[5:0]
-        u8 LDO_RXTXLF_TRIM; //0xee[7:6]  0xed[3:0]
-        u8 LDO_PLL_TRIM;    //0xee[5:0]
-        u8 LDO_VCO_TRIM;    //0xee[7:6]  0xef[3:0]
-        u8 rsvd;
-    }Ldo_Trim;
-
-    typedef struct
-    {
+        unsigned short cal_tbl[81];
+        rf_ldo_trim_t  ldo_trim;
         unsigned char tx_fast_en;
         unsigned char rx_fast_en;
-        unsigned short cal_tbl[40];
-        rf_ldo_trim_t   ldo_trim;
-    #if (!SW_DCOC_EN)
-        rf_dcoc_cal_t   dcoc_cal;
-    #endif
     }Fast_Settle;
-    extern Fast_Settle fast_settle;
+
+    extern Fast_Settle fast_settle_1M;
+    extern Fast_Settle fast_settle_2M;
+    extern Fast_Settle fast_settle_S2;
+    extern Fast_Settle fast_settle_S8;
 
     void ble_rf_tx_fast_settle(void);
     void ble_rf_rx_fast_settle(void);

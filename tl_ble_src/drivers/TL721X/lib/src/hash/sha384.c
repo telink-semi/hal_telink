@@ -28,9 +28,6 @@
 #include "lib/include/hash/sha384.h"
 
 
-
-
-
 #ifdef SUPPORT_HASH_SHA384
 
 
@@ -92,7 +89,7 @@ unsigned int sha384(unsigned char *msg, unsigned int msg_bytes, unsigned char *d
 }
 
 
-#ifdef HASH_DMA_FUNCTION
+    #ifdef HASH_DMA_FUNCTION
 /**
  * @brief       init dma sha384
  * @param[in]   ctx           - SHA384_DMA_CTX context pointer.
@@ -103,7 +100,6 @@ unsigned int sha384_dma_init(SHA384_DMA_CTX *ctx, HASH_CALLBACK callback)
 {
     return hash_dma_init(ctx, HASH_SHA384, callback);
 }
-
 
 /**
  * @brief       SHA384_DMA_CTX context pointer
@@ -156,6 +152,6 @@ unsigned int sha384_dma(unsigned int *msg, unsigned int msg_bytes, unsigned int 
 {
     return hash_dma(HASH_SHA384, msg, msg_bytes, digest, callback);
 }
-#endif
+    #endif
 
 #endif

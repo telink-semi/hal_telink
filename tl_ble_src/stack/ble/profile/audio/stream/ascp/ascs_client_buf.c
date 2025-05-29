@@ -26,25 +26,22 @@
 #include "stack/ble/ble.h"
 
 
-const u8 gAppAscsCltSinkAseNum = APP_AUDIO_ASCS_ASE_SNK_NUM;
-const u8 gAppAscsCltSrcAseNum = APP_AUDIO_ASCS_ASE_SRC_NUM;
-const u16 gAppAscsMetadataLen = DATA_LENGTH_ALIGN4(AUDIO_MAX_METADATA_BUFF_LEN);
+const u8  gAppAscsCltSinkAseNum = APP_AUDIO_ASCS_ASE_SNK_NUM;
+const u8  gAppAscsCltSrcAseNum  = APP_AUDIO_ASCS_ASE_SRC_NUM;
+const u16 gAppAscsMetadataLen   = DATA_LENGTH_ALIGN4(AUDIO_MAX_METADATA_BUFF_LEN);
 
 _attribute_ble_data_retention_
-u8 gAscscMetadataBuff[ACL_CENTRAL_MAX_NUM*APP_AUDIO_ASCS_ASE_NUM][DATA_LENGTH_ALIGN4(AUDIO_MAX_METADATA_BUFF_LEN)];
+    u8 gAscscMetadataBuff[ACL_CENTRAL_MAX_NUM * APP_AUDIO_ASCS_ASE_NUM][DATA_LENGTH_ALIGN4(AUDIO_MAX_METADATA_BUFF_LEN)];
 
 
 _attribute_ble_data_retention_
-blt_ascsc_ase_t gAscscSinkAse[ACL_CENTRAL_MAX_NUM][APP_AUDIO_ASCS_ASE_SNK_NUM];
+    blt_ascsc_ase_t gAscscSinkAse[ACL_CENTRAL_MAX_NUM][APP_AUDIO_ASCS_ASE_SNK_NUM];
 
 _attribute_ble_data_retention_
-blt_ascsc_ase_t gAscscSrcAse[ACL_CENTRAL_MAX_NUM][APP_AUDIO_ASCS_ASE_SRC_NUM];
+    blt_ascsc_ase_t gAscscSrcAse[ACL_CENTRAL_MAX_NUM][APP_AUDIO_ASCS_ASE_SRC_NUM];
 
 _attribute_ble_data_retention_
-blc_ascs_client_t gAscsClient[ACL_CENTRAL_MAX_NUM];
-
-
-
+    blc_ascs_client_t gAscsClient[ACL_CENTRAL_MAX_NUM];
 
 blc_ascs_client_t *blt_ascsc_getClientBuf(u8 instIdx)
 {
@@ -72,9 +69,7 @@ blt_ascsc_ase_t *blt_ascsc_getSrcAseBuf(u8 aclIdx, u8 instIdx)
 u8 *blt_ascsc_getMetadataBuf(u8 aclIdx, u8 instIdx)
 {
     assert(aclIdx < gAppAudioAclCentralNum);
-    assert(instIdx < gAppAscsCltSrcAseNum+gAppAscsCltSinkAseNum);
+    assert(instIdx < gAppAscsCltSrcAseNum + gAppAscsCltSinkAseNum);
 
-    return &gAscscMetadataBuff[aclIdx+gAppAscsMetadataLen*instIdx][0];
+    return &gAscscMetadataBuff[aclIdx + gAppAscsMetadataLen * instIdx][0];
 }
-
-

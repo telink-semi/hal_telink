@@ -25,21 +25,18 @@
 #include "drivers.h"
 #include "stack/ble/ble.h"
 
-const u8 gAppPacsCltSinkPacNum = APP_AUDIO_PACS_SNK_PAC_RECORD_NUM;
-const u8 gAppPacsCltSrcPacNum = APP_AUDIO_PACS_SRC_PAC_RECORD_NUM;
+const u8  gAppPacsCltSinkPacNum = APP_AUDIO_PACS_SNK_PAC_RECORD_NUM;
+const u8  gAppPacsCltSrcPacNum  = APP_AUDIO_PACS_SRC_PAC_RECORD_NUM;
 const u16 gAppPacsCltPacMaxSize = APP_AUDIO_PACS_CLIENT_READ_PAC_MAX_SIZE;
 
 _attribute_ble_data_retention_
-blc_audio_pacRecordParamEntity_t gPacscSinkPacRcd[ACL_CENTRAL_MAX_NUM][APP_AUDIO_PACS_SNK_PAC_RECORD_NUM];
+    blc_audio_pacRecordParamEntity_t gPacscSinkPacRcd[ACL_CENTRAL_MAX_NUM][APP_AUDIO_PACS_SNK_PAC_RECORD_NUM];
 
 _attribute_ble_data_retention_
-blc_audio_pacRecordParamEntity_t gPacscSrcPacRcd[ACL_CENTRAL_MAX_NUM][APP_AUDIO_PACS_SRC_PAC_RECORD_NUM];
+    blc_audio_pacRecordParamEntity_t gPacscSrcPacRcd[ACL_CENTRAL_MAX_NUM][APP_AUDIO_PACS_SRC_PAC_RECORD_NUM];
 
 _attribute_ble_data_retention_
-blc_pacs_client_t gPacsClient[ACL_CENTRAL_MAX_NUM];
-
-
-
+    blc_pacs_client_t gPacsClient[ACL_CENTRAL_MAX_NUM];
 
 blc_pacs_client_t *blt_pacsc_getClientBuf(u8 instIdx)
 {
@@ -53,7 +50,7 @@ blt_audio_pac_record_param_t *blt_pacsc_getSinkPacBuf(u8 aclIdx, u8 instIdx)
     assert(aclIdx < gAppAudioAclCentralNum);
     assert(instIdx < gAppPacsCltSinkPacNum);
 
-    return (blt_audio_pac_record_param_t*)&gPacscSinkPacRcd[aclIdx][instIdx];
+    return (blt_audio_pac_record_param_t *)&gPacscSinkPacRcd[aclIdx][instIdx];
 }
 
 blt_audio_pac_record_param_t *blt_pacsc_getSrcPacBuf(u8 aclIdx, u8 instIdx)
@@ -61,9 +58,5 @@ blt_audio_pac_record_param_t *blt_pacsc_getSrcPacBuf(u8 aclIdx, u8 instIdx)
     assert(aclIdx < gAppAudioAclCentralNum);
     assert(instIdx < gAppPacsCltSrcPacNum);
 
-    return (blt_audio_pac_record_param_t*)&gPacscSrcPacRcd[aclIdx][instIdx];
+    return (blt_audio_pac_record_param_t *)&gPacscSrcPacRcd[aclIdx][instIdx];
 }
-
-
-
-

@@ -26,53 +26,54 @@
 
 #if (UNICAST_CLIENT_SELECT == UNICAST_CLIENT_CODEC)
 
-#define APP_AUDIO_INPUT_BUFFER_SIZE                 2048
-#define APP_AUDIO_INPUT_FRAME_SAMPLE_MAX             480
-#define APP_AUDIO_INPUT_FRAME_ENCODE_BYTES_MAX       155
+    #define APP_AUDIO_INPUT_BUFFER_SIZE             2048
+    #define APP_AUDIO_INPUT_FRAME_SAMPLE_MAX        480
+    #define APP_AUDIO_INPUT_FRAME_ENCODE_BYTES_MAX  155
 
-#define APP_AUDIO_OUTPUT_BUFFER_SIZE                2048
-#define APP_AUDIO_OUTPUT_FRAME_SAMPLE_MAX            160
-#define APP_AUDIO_OUTPUT_FRAME_ENCODE_BYTES_MAX       40
+    #define APP_AUDIO_OUTPUT_BUFFER_SIZE            2048
+    #define APP_AUDIO_OUTPUT_FRAME_SAMPLE_MAX       160
+    #define APP_AUDIO_OUTPUT_FRAME_ENCODE_BYTES_MAX 40
 
 
-/**
+    /**
  *  @brief  list node
  */
-#if(APP_AUDIO_SCENE == APP_SCENE_TWS)
+    #if (APP_AUDIO_SCENE == APP_SCENE_TWS)
 struct list_node_t
 {
-    u32     renderPoint;
-    u16     buffer[2*APP_AUDIO_OUTPUT_FRAME_SAMPLE_MAX];
+    u32                 renderPoint;
+    u16                 buffer[2 * APP_AUDIO_OUTPUT_FRAME_SAMPLE_MAX];
     struct list_node_t *next;
 };
-#elif(APP_AUDIO_SCENE == APP_SCENE_HEADSET)
+    #elif (APP_AUDIO_SCENE == APP_SCENE_HEADSET)
 struct list_node_t
 {
-    u32     renderPoint;
-    u16     buffer[APP_AUDIO_OUTPUT_FRAME_SAMPLE_MAX];
+    u32                 renderPoint;
+    u16                 buffer[APP_AUDIO_OUTPUT_FRAME_SAMPLE_MAX];
     struct list_node_t *next;
 };
-#endif
+    #endif
 
 /**
  *  @brief  app render point buffers
  */
 typedef struct
 {
-    u32     renderPoint;
-    u16     buffer[APP_AUDIO_OUTPUT_FRAME_SAMPLE_MAX];
-}audio_pkt_t;
+    u32 renderPoint;
+    u16 buffer[APP_AUDIO_OUTPUT_FRAME_SAMPLE_MAX];
+} audio_pkt_t;
 
 /**
  *  @brief  app codec concerned parameters
  */
-typedef struct{
-    u8   cC;       //channel counts
-    u16  fSample;  //sample each frame
-    u16  fOctets;  //octets each frame
-    u16  frameUs;  //time each frame,us conut
-    u8   rsvd;
-}app_codec_desc_t;
+typedef struct
+{
+    u8  cC;      //channel counts
+    u16 fSample; //sample each frame
+    u16 fOctets; //octets each frame
+    u16 frameUs; //time each frame,us conut
+    u8  rsvd;
+} app_codec_desc_t;
 
 /**
  * @brief      Codec init function.

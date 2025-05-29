@@ -26,9 +26,11 @@
 #include "reg_include/register.h"
 #include "compiler.h"
 #include "gpio.h"
-typedef enum{
+
+typedef enum
+{
     SWM_PC0 = GPIO_PC0,
-}swm_pin_e;
+} swm_pin_e;
 
 /**
  * @brief     This function resets the SWIRE module.
@@ -36,8 +38,8 @@ typedef enum{
  */
 static inline void swire_reset(void)
 {
-     reg_rst0 &= (~FLD_RST0_SWIRE);
-     reg_rst0 |= (FLD_RST0_SWIRE);
+    reg_rst0 &= (~FLD_RST0_SWIRE);
+    reg_rst0 |= (FLD_RST0_SWIRE);
 }
 /**
  * @brief     This function is used to wait for the completion of writing.
@@ -50,6 +52,7 @@ static inline void swire_wait_wr_done(void)
  */
     while (reg_swire_ctl & FLD_SWIRE_WR);
 }
+
 /**
  * @brief     This function is used to write cmd.
  * @param[in] cmd   - cmd value.
@@ -58,9 +61,10 @@ static inline void swire_wait_wr_done(void)
 static inline void swire_master_write_cmd(unsigned char cmd)
 {
     reg_swire_data = cmd;
-    reg_swire_ctl = (FLD_SWIRE_CMD | FLD_SWIRE_WR );
+    reg_swire_ctl  = (FLD_SWIRE_CMD | FLD_SWIRE_WR);
     swire_wait_wr_done();
 }
+
 /**
  * @brief     This function is used to write data.
  * @param[in] data  - data value.
@@ -69,9 +73,10 @@ static inline void swire_master_write_cmd(unsigned char cmd)
 static inline void swire_master_write_data(unsigned char data)
 {
     reg_swire_data = data;
-    reg_swire_ctl =  FLD_SWIRE_WR ;
+    reg_swire_ctl  = FLD_SWIRE_WR;
     swire_wait_wr_done();
 }
+
 /**
  * @brief     This function is to disable fifo mode.
  *            The default is this mode. When multi-byte reads and writes, the address will automatically increase by 1.
@@ -82,8 +87,8 @@ static inline void swire_master_write_data(unsigned char data)
 static inline void swire_fifo_mode_dis(void)
 {
     BM_CLR(reg_swire_id, FLD_SWIRE_FIFO_MODE);
-
 }
+
 /**
  * @brief     This function is to enable fifo mode.
  *            When multi-byte read and write, the address will not be automatically incremented by 1,
@@ -94,8 +99,8 @@ static inline void swire_fifo_mode_dis(void)
 static inline void swire_fifo_mode_en(void)
 {
     BM_SET(reg_swire_id, FLD_SWIRE_FIFO_MODE);
-
 }
+
 /**
  * @brief     This function is to send a specific timing to reset the status of the slave device.
  *            When the master device connects the DP pin of the slave device, this function must be called first,
@@ -106,7 +111,7 @@ static inline void swire_fifo_mode_en(void)
  * @param[in] dp_through_swire_en - If the master is connected to the DP pin of the slave device, this parameter needs to be set to 1.
  * @return    none.
  */
-void swire_sync (swm_pin_e gpio_swm,unsigned char dp_through_swire_en);
+void swire_sync(swm_pin_e gpio_swm, unsigned char dp_through_swire_en);
 /**
  * @brief     This function is to set GPIO_PC0 as the swm function.
  * @param[in] gpio_swm - the swm pin needs to enable.
@@ -152,7 +157,7 @@ void swire_set_slave_id(unsigned char id);
  * @return    none.
  */
 
-void swire_master_write(unsigned char slave_id,unsigned char *addr, unsigned char addr_len,unsigned char *data,unsigned int data_len);
+void swire_master_write(unsigned char slave_id, unsigned char *addr, unsigned char addr_len, unsigned char *data, unsigned int data_len);
 /**
  * @brief      This function is used by the master device to read data to the slave device.
  *             The swire protocol is to send the address first and then wait to read the data returned by the slave.
@@ -167,7 +172,7 @@ void swire_master_write(unsigned char slave_id,unsigned char *addr, unsigned cha
  * @param[in]  data_len  - data length.
  * @return     0:read timeout  1:read success.
  */
-unsigned char  swire_master_read (unsigned char slave_id,unsigned char *addr, unsigned char addr_len,unsigned char *data,unsigned int data_len);
+unsigned char swire_master_read(unsigned char slave_id, unsigned char *addr, unsigned char addr_len, unsigned char *data, unsigned int data_len);
 
 /*
  * @brief      This function is used to set swire read timeout tick.
@@ -183,7 +188,7 @@ unsigned char  swire_master_read (unsigned char slave_id,unsigned char *addr, un
  * @param[in]  slave_clk_hz   - swire slave  clock,unit is HZ.
  * @return     none.
  */
-void swire_read_set_timeout_tick(unsigned int master_clk_hz,unsigned int slave_clk_hz);
+void swire_read_set_timeout_tick(unsigned int master_clk_hz, unsigned int slave_clk_hz);
 
 /*
  * @brief      This function is used to get swire read timeout tick.

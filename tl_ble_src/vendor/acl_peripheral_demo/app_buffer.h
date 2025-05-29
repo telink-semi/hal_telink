@@ -28,7 +28,6 @@
 #include "app_config.h"
 
 
-
 /********************* ACL connection LinkLayer TX & RX data FIFO allocation, Begin ************************************************/
 /**
  * @brief   connMaxRxOctets
@@ -37,7 +36,7 @@
  * 1. should be in range of 27 ~ 251
  * 2. for CIS peripheral, receive ll_cis_req(36Byte), must be equal to or greater than 36
  */
-#define ACL_CONN_MAX_RX_OCTETS          27  //user set value
+#define ACL_CONN_MAX_RX_OCTETS 27 //user set value
 
 
 /**
@@ -51,9 +50,8 @@
  * 1. should be in range of 27 ~ 251
  * 2. for CIS central, send ll_cis_req(36Byte), ACL_CENTRAL_MAX_TX_OCTETS must be equal to or greater than 36
  */
-#define ACL_CENTRAL_MAX_TX_OCTETS       27  //user set value
-#define ACL_PERIPHR_MAX_TX_OCTETS       27  //user set value
-
+#define ACL_CENTRAL_MAX_TX_OCTETS 27 //user set value
+#define ACL_PERIPHR_MAX_TX_OCTETS 27 //user set value
 
 
 /**
@@ -66,8 +64,8 @@
  * 1. must be: 2^n, (power of 2)
  * 2. at least 4; recommended value: 4, 8, 16
  */
-#define ACL_RX_FIFO_SIZE                CAL_LL_ACL_RX_FIFO_SIZE(ACL_CONN_MAX_RX_OCTETS)  //user can not change !!!
-#define ACL_RX_FIFO_NUM                 8   //user set value
+#define ACL_RX_FIFO_SIZE CAL_LL_ACL_RX_FIFO_SIZE(ACL_CONN_MAX_RX_OCTETS) //user can not change !!!
+#define ACL_RX_FIFO_NUM  8                                               //user set value
 
 
 /**
@@ -86,20 +84,13 @@
  * 1. (ACL_xxx_TX_FIFO_SIZE * (ACL_xxx_TX_FIFO_NUM - 1)) must be less than 4096 (4K)
  *    so when ACL TX FIFO size equal to or bigger than 256, ACL TX FIFO number can only be 9(can not use 17 or 33), cause 256*(17-1)=4096
  */
-#define ACL_PERIPHR_TX_FIFO_SIZE        CAL_LL_ACL_TX_FIFO_SIZE(ACL_PERIPHR_MAX_TX_OCTETS) //user can not change !!!
-#define ACL_PERIPHR_TX_FIFO_NUM         9   //user set value
+#define ACL_PERIPHR_TX_FIFO_SIZE CAL_LL_ACL_TX_FIFO_SIZE(ACL_PERIPHR_MAX_TX_OCTETS) //user can not change !!!
+#define ACL_PERIPHR_TX_FIFO_NUM  9                                                  //user set value
 
 
-
-
-extern  u8  app_acl_rx_fifo[];
-extern  u8  app_acl_per_tx_fifo[];
+extern u8 app_acl_rx_fifo[];
+extern u8 app_acl_per_tx_fifo[];
 /******************** ACL connection LinkLayer TX & RX data FIFO allocation, End ***************************************************/
-
-
-
-
-
 
 
 /***************** ACL connection L2CAP RX & TX data Buffer allocation, Begin **************************************/
@@ -116,18 +107,15 @@ extern  u8  app_acl_per_tx_fifo[];
  * CENTRAL_L2CAP_BUFF_SIZE & PERIPHR_L2CAP_BUFF_SIZE
  * 1. must use CAL_L2CAP_BUFF_SIZE to calculate, user can not change !!!
  */
-#define PERIPHR_ATT_RX_MTU              23  //user set value
+#define PERIPHR_ATT_RX_MTU      23                                      //user set value
 
 
-#define PERIPHR_L2CAP_BUFF_SIZE         CAL_L2CAP_BUFF_SIZE(PERIPHR_ATT_RX_MTU) //user can not change !!!
+#define PERIPHR_L2CAP_BUFF_SIZE CAL_L2CAP_BUFF_SIZE(PERIPHR_ATT_RX_MTU) //user can not change !!!
 
 
-extern  u8 app_per_l2cap_rx_buf[]; //ACL Peripheral L2cap RX data buffer
-extern  u8 app_per_l2cap_tx_buf[]; //ACL Peripheral L2cap TX data buffer
+extern u8 app_per_l2cap_rx_buf[];                                       //ACL Peripheral L2cap RX data buffer
+extern u8 app_per_l2cap_tx_buf[];                                       //ACL Peripheral L2cap TX data buffer
 /***************** ACL connection L2CAP RX & TX data Buffer allocation, End ****************************************/
-
-
-
 
 
 #endif /* APP_BUFFER_H_ */

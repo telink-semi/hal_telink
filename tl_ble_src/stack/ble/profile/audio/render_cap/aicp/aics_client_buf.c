@@ -26,11 +26,10 @@
 #include "stack/ble/ble.h"
 
 
-const int gAppAicsCltInstNum = ACL_CENTRAL_MAX_NUM*APP_AUDIO_AICS_CLIENT_MAX_INSTANCE_NUM;
+const int gAppAicsCltInstNum = ACL_CENTRAL_MAX_NUM * APP_AUDIO_AICS_CLIENT_MAX_INSTANCE_NUM;
 
 _attribute_ble_data_retention_
-blc_aics_client_t gAicsClient[ACL_CENTRAL_MAX_NUM*APP_AUDIO_AICS_CLIENT_MAX_INSTANCE_NUM];
-
+    blc_aics_client_t gAicsClient[ACL_CENTRAL_MAX_NUM * APP_AUDIO_AICS_CLIENT_MAX_INSTANCE_NUM];
 
 /**
  * @brief       aics get client control buffer.
@@ -39,20 +38,22 @@ blc_aics_client_t gAicsClient[ACL_CENTRAL_MAX_NUM*APP_AUDIO_AICS_CLIENT_MAX_INST
  */
 blc_aics_client_t *blt_aicsc_getClientControlBuffer(u16 connHandle, u16 startHandle, u16 endHandle)
 {
-    for(int i=0; i<gAppAicsCltInstNum; i++) {
-        if(gAicsClient[i].connHandle == connHandle &&
+    for (int i = 0; i < gAppAicsCltInstNum; i++) {
+        if (gAicsClient[i].connHandle == connHandle &&
             gAicsClient[i].ntfInput.startHdl == startHandle &&
-            gAicsClient[i].ntfInput.endHdl == endHandle)
+            gAicsClient[i].ntfInput.endHdl == endHandle) {
             return &gAicsClient[i];
+        }
     }
 
-    for(int i=0; i<gAppAicsCltInstNum; i++) {
-        if(gAicsClient[i].useFlag)
+    for (int i = 0; i < gAppAicsCltInstNum; i++) {
+        if (gAicsClient[i].useFlag) {
             continue;
-        gAicsClient[i].useFlag = true;
-        gAicsClient[i].connHandle = connHandle;
+        }
+        gAicsClient[i].useFlag           = true;
+        gAicsClient[i].connHandle        = connHandle;
         gAicsClient[i].ntfInput.startHdl = startHandle;
-        gAicsClient[i].ntfInput.endHdl = endHandle;
+        gAicsClient[i].ntfInput.endHdl   = endHandle;
         return &gAicsClient[i];
     }
     return NULL;
@@ -65,9 +66,5 @@ blc_aics_client_t *blt_aicsc_getClientControlBuffer(u16 connHandle, u16 startHan
  */
 void blt_aicsc_cleanAllClientControlBuffer(void)
 {
-    memset(gAicsClient, 0, sizeof(blc_aics_client_t)*gAppAicsCltInstNum);
+    memset(gAicsClient, 0, sizeof(blc_aics_client_t) * gAppAicsCltInstNum);
 }
-
-
-
-

@@ -25,30 +25,27 @@
 #define VENDOR_COMMON_TLKAPI_DEBUG_H_
 
 
-
 /**
  * @brief   Telink debug log enable or disable
  *          user can set it in app_config.h, default disable if user not set it
  */
 #ifndef TLKAPI_DEBUG_ENABLE
-#define TLKAPI_DEBUG_ENABLE                         0
+    #define TLKAPI_DEBUG_ENABLE 0
 #endif
-
 
 
 /**
  * @brief   Telink debug log channel select
  *          user can select one type in app_config.h
  */
-#define TLKAPI_DEBUG_CHANNEL_UDB                    1   //USB Dump
-#define TLKAPI_DEBUG_CHANNEL_GSUART                 2   //GPIO simulate UART
-#define TLKAPI_DEBUG_CHANNEL_UART                   3   //hardware UART
+#define TLKAPI_DEBUG_CHANNEL_UDB    1 //USB Dump
+#define TLKAPI_DEBUG_CHANNEL_GSUART 2 //GPIO simulate UART
+#define TLKAPI_DEBUG_CHANNEL_UART   3 //hardware UART
 
 /* if user enable debug log but not select log channel, will use "GPIO simulate UART" as default */
 #ifndef TLKAPI_DEBUG_CHANNEL
-#define TLKAPI_DEBUG_CHANNEL                        TLKAPI_DEBUG_CHANNEL_GSUART
+    #define TLKAPI_DEBUG_CHANNEL TLKAPI_DEBUG_CHANNEL_GSUART
 #endif
-
 
 
 #if (TLKAPI_DEBUG_CHANNEL == TLKAPI_DEBUG_CHANNEL_GSUART)
@@ -57,12 +54,12 @@
      */
     /* default GPIO, user can change it in app_config.h */
     #ifndef TLKAPI_DEBUG_GPIO_PIN
-    #define TLKAPI_DEBUG_GPIO_PIN               GPIO_PD4
+        #define TLKAPI_DEBUG_GPIO_PIN GPIO_PD4
     #endif
 
     /* default UART baudrate, user can change it in app_config.h */
     #ifndef TLKAPI_DEBUG_GSUART_BAUDRATE
-    #define TLKAPI_DEBUG_GSUART_BAUDRATE        1000000
+        #define TLKAPI_DEBUG_GSUART_BAUDRATE 1000000
     #endif
 #elif (TLKAPI_DEBUG_CHANNEL == TLKAPI_DEBUG_CHANNEL_UART)
     /**
@@ -75,47 +72,44 @@
  * @brief   default log FIFO size, user can change it in app_config.h
  */
 #ifndef TLKAPI_DEBUG_FIFO_SIZE
-#define TLKAPI_DEBUG_FIFO_SIZE                      288
+    #define TLKAPI_DEBUG_FIFO_SIZE 288
 #endif
 
 /**
  * @brief   default log FIFO number, user can change it in app_config.h
  */
 #ifndef TLKAPI_DEBUG_FIFO_NUM
-#define TLKAPI_DEBUG_FIFO_NUM                       16
+    #define TLKAPI_DEBUG_FIFO_NUM 16
 #endif
 
 
-
 #ifndef APP_REAL_TIME_PRINTF
-#define APP_REAL_TIME_PRINTF                        0
+    #define APP_REAL_TIME_PRINTF 0
 #endif
 
 
 /* internal special UART tool with high efficiency, but not publicly release
  * so only for internal debug, customer never change this macro */
 #ifndef TLKAPI_USE_INTERNAL_SPECIAL_UART_TOOL
-#define TLKAPI_USE_INTERNAL_SPECIAL_UART_TOOL       0
+    #define TLKAPI_USE_INTERNAL_SPECIAL_UART_TOOL 0
 #endif
-
 
 
 /**
  * @brief   Debug log control data structure, user do not need to pay attention to these
  */
-typedef struct{
-    u8  dbg_en;
-    u8  dbg_chn;
-    u8  uartSendIsBusy;
-    u8  fifo_format_len;
+typedef struct
+{
+    u8 dbg_en;
+    u8 dbg_chn;
+    u8 uartSendIsBusy;
+    u8 fifo_format_len;
 
     u16 usb_id;
     u16 fifo_data_len;
-}tlk_dbg_t;
+} tlk_dbg_t;
+
 extern tlk_dbg_t tlkDbgCtl;
-
-
-
 
 
 /**
@@ -123,7 +117,7 @@ extern tlk_dbg_t tlkDbgCtl;
  * @param[in]   none
  * @return      none
  */
-int  tlkapi_debug_init(void);
+int tlkapi_debug_init(void);
 
 
 /**
@@ -131,7 +125,7 @@ int  tlkapi_debug_init(void);
  * @param[in]   none
  * @return      none
  */
-int  tlkapi_debug_deepRetn_init(void);
+int tlkapi_debug_deepRetn_init(void);
 
 
 /**
@@ -160,18 +154,12 @@ bool tlkapi_debug_isBusy(void);
 void tlkapi_debug_customize_usb_id(u16 cus_usb_id);
 
 
-
-
-
-
-
 /**
  * @brief   user do not need to pay attention to three APIs below, and do not use them in application.
  */
-void tlkapi_send_str_data (char *str, u8 *pData, u32 data_len);
+void tlkapi_send_str_data(char *str, u8 *pData, u32 data_len);
 void tlkapi_send_str_u8s(char *str, int size, ...);
 void tlkapi_send_str_u32s(char *str, int size, ...);
-
 
 
 /**
@@ -183,7 +171,10 @@ void tlkapi_send_str_u32s(char *str, int size, ...);
  * @param[in]   len - length of data
  * @return      1: send to FIFO success; 0: send to FIFO fail
  */
-#define tlkapi_send_string_data(en, str, pData, len)        if(en){tlkapi_send_str_data(str,(u8*)(u32)(pData), len);}
+#define tlkapi_send_string_data(en, str, pData, len)        \
+    if (en) {                                               \
+        tlkapi_send_str_data(str, (u8 *)(u32)(pData), len); \
+    }
 
 
 /**
@@ -195,7 +186,10 @@ void tlkapi_send_str_u32s(char *str, int size, ...);
  * @param[in]   data_len - length of data
  * @return      1: send to FIFO success; 0: send to FIFO fail
  */
-#define tlkapi_send_string_u32s(en, str, ...)               if(en){tlkapi_send_str_u32s(str, COUNT_ARGS(__VA_ARGS__), ##__VA_ARGS__);}
+#define tlkapi_send_string_u32s(en, str, ...)                              \
+    if (en) {                                                              \
+        tlkapi_send_str_u32s(str, COUNT_ARGS(__VA_ARGS__), ##__VA_ARGS__); \
+    }
 
 
 /**
@@ -207,10 +201,10 @@ void tlkapi_send_str_u32s(char *str, int size, ...);
  * @param[in]   data_len - length of data
  * @return      1: send to FIFO success; 0: send to FIFO fail
  */
-#define tlkapi_send_string_u8s(en, str, ...)                if(en){tlkapi_send_str_u8s(str, COUNT_ARGS(__VA_ARGS__), ##__VA_ARGS__);}
-
-
-
+#define tlkapi_send_string_u8s(en, str, ...)                              \
+    if (en) {                                                             \
+        tlkapi_send_str_u8s(str, COUNT_ARGS(__VA_ARGS__), ##__VA_ARGS__); \
+    }
 
 
 /**
@@ -219,7 +213,7 @@ void tlkapi_send_str_u32s(char *str, int size, ...);
  * @param[in]   fmt - please refer to standard C function "printf"
  * @return      none
  */
-int  tlk_printf(const char *fmt, ...);
+int tlk_printf(const char *fmt, ...);
 
 /**
  * @brief       Send debug log to log FIFO, string only mode
@@ -228,25 +222,24 @@ int  tlk_printf(const char *fmt, ...);
  * @param[in]   fmt - please refer to standard C function "printf"
  * @return      none
  */
-#define tlkapi_printf(en, fmt, ...)                         if(en){tlk_printf(fmt, ##__VA_ARGS__);}
-
-
-
-
-
-
-
+#define tlkapi_printf(en, fmt, ...)     \
+    if (en) {                           \
+        tlk_printf(fmt, ##__VA_ARGS__); \
+    }
 
 
 /* remove later */
 #ifndef APP_LOG_EN
-#define APP_LOG_EN                                  0
+    #define APP_LOG_EN 0
 #endif
 
 
-#define BLT_APP_LOG(fmt, ...)                           if(APP_LOG_EN) tlkapi_printf(1, "[APP]"fmt "\n", ##__VA_ARGS__);
-#define BLT_APP_STR_LOG                                 if(APP_LOG_EN) tlkapi_send_str_data
-
+#define BLT_APP_LOG(fmt, ...) \
+    if (APP_LOG_EN)           \
+        tlkapi_printf(1, "[APP]" fmt "\n", ##__VA_ARGS__);
+#define BLT_APP_STR_LOG \
+    if (APP_LOG_EN)     \
+    tlkapi_send_str_data
 
 
 #endif /* VENDOR_COMMON_TLKAPI_DEBUG_H_ */

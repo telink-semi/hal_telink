@@ -24,56 +24,54 @@
 #ifndef SMP_STORAGE_H_
 #define SMP_STORAGE_H_
 
-
 /**
  * @brief   strategy for how to deal with new paring device when bonding device number reach maximum number(set by API "blc_smp_setBondingDeviceMaxNumber")
  */
-typedef enum {
+typedef enum
+{
     NEW_DEVICE_OVERWRITE_OLD_WITH_PAIRING_ORDER = 0,
 
-    NEW_DEVICE_REJECT_WHEN_PER_MAX_BONDING_NUM  = 4,        //When peripheral reach it's max bonding centrals, it reject new pair req.
-//  NEW_DEVICE_REJECT_WHEN_CEN_MAX_BONDING_NUM  = 5,        //Not supported now.
-}dev_exceed_max_strategy_t;
+    NEW_DEVICE_REJECT_WHEN_PER_MAX_BONDING_NUM = 4, //When peripheral reach it's max bonding centrals, it reject new pair req.
+    //  NEW_DEVICE_REJECT_WHEN_CEN_MAX_BONDING_NUM  = 5,        //Not supported now.
+} dev_exceed_max_strategy_t;
 
 /*
- * smp parameter need save to flash.
+ * @brief   smp parameter need save to flash.
  */
-typedef struct {
+typedef struct
+{
     //0x00
-    u8      flag;
-    u8      role_dev_idx;  //[7]:1 for ACL Central, 0 for ACL Peripheral;   [2:0] ACL Peripheral device index
+    u8 flag;
+    u8 role_dev_idx; //[7]:1 for ACL Central, 0 for ACL Peripheral;   [2:0] ACL Peripheral device index
 
     // peer_addr_type & peer_addr must be together(SiHui 20200916), cause using flash read packed "type&address" in code
-    u8      peer_addr_type;  //address used in link layer connection
-    u8      peer_addr[6];
+    u8 peer_addr_type;  //address used in link layer connection
+    u8 peer_addr[6];
 
-    u8      peer_id_adrType; //peer identity address information in key distribution, used to identify
-    u8      peer_id_addr[6];
+    u8 peer_id_adrType; //peer identity address information in key distribution, used to identify
+    u8 peer_id_addr[6];
 
     //0x10
-    u8      local_peer_ltk[16];   //ACL Peripheral: local_ltk; ACL Central: peer_ltk
+    u8 local_peer_ltk[16]; //ACL Peripheral: local_ltk; ACL Central: peer_ltk
 
     //0x20
-    u8      encrypt_key_size;
-    u8      local_id_adrType;
-    u8      local_id_addr[6];
+    u8 encrypt_key_size;
+    u8 local_id_adrType;
+    u8 local_id_addr[6];
 
-    u8      random[8];  //8
+    u8 random[8]; //8
 
 
     //0x30
-    u8      peer_irk[16];
+    u8 peer_irk[16];
 
     //0x40
-    u8      local_irk[16];        // local_csrk can be generated based on this key, to save flash area (delete this note at last, customers can not see it)
+    u8 local_irk[16]; // local_csrk can be generated based on this key, to save flash area (delete this note at last, customers can not see it)
 
     //0x50
-    u16     ediv;       //2
-    u8      rsvd[14];   //14  peer_csrk info address if needed(delete this note at last, customers can not see it)
-}smp_param_save_t;
-
-
-
+    u16 ediv;     //2
+    u8  rsvd[14]; //14  peer_csrk info address if needed(delete this note at last, customers can not see it)
+} smp_param_save_t;
 
 /**
  * @brief      This function is used to configure the bonding storage address and size.
@@ -81,7 +79,7 @@ typedef struct {
  * @param[in]  size_byte - SMP bonding storage size(e.g.: 2*4096).
  * @return     none.
  */
-void            blc_smp_configPairingSecurityInfoStorageAddressAndSize (int address, int size_byte);  //address and size must be 4K aligned
+void blc_smp_configPairingSecurityInfoStorageAddressAndSize(int address, int size_byte); //address and size must be 4K aligned
 
 
 /**
@@ -90,7 +88,7 @@ void            blc_smp_configPairingSecurityInfoStorageAddressAndSize (int addr
  * @param[in]  per_max_bondNum - The number of ACL Peripheral devices that can be bound.
  * @return     ble_sts_t.
  */
-ble_sts_t       blc_smp_setBondingDeviceMaxNumber ( int cen_max_bonNum, int per_max_bondNum);
+ble_sts_t blc_smp_setBondingDeviceMaxNumber(int cen_max_bonNum, int per_max_bondNum);
 
 
 /**
@@ -98,7 +96,7 @@ ble_sts_t       blc_smp_setBondingDeviceMaxNumber ( int cen_max_bonNum, int per_
  * @param[in]  none.
  * @return     The starting address of the current binding information storage area.
  */
-u32             blc_smp_getBondingInfoCurStartAddr(void);
+u32 blc_smp_getBondingInfoCurStartAddr(void);
 
 
 /**
@@ -109,7 +107,7 @@ u32             blc_smp_getBondingInfoCurStartAddr(void);
  * @return     0: Failed to get binding information;
  *             others: FLASH address of the information area.
  */
-u32             blc_smp_searchBondingPeripheralDevice_by_PeerMacAddress( u8 peer_addr_type, u8* peer_addr);
+u32 blc_smp_searchBondingPeripheralDevice_by_PeerMacAddress(u8 peer_addr_type, u8 *peer_addr);
 
 
 /**
@@ -119,7 +117,7 @@ u32             blc_smp_searchBondingPeripheralDevice_by_PeerMacAddress( u8 peer
  * @return     0: Failed to delete binding information;
  *             others: FLASH address of the deleted information area.
  */
-int             blc_smp_deleteBondingPeripheralInfo_by_PeerMacAddress(u8 peer_addr_type, u8* peer_addr);
+int blc_smp_deleteBondingPeripheralInfo_by_PeerMacAddress(u8 peer_addr_type, u8 *peer_addr);
 
 
 /**
@@ -127,7 +125,7 @@ int             blc_smp_deleteBondingPeripheralInfo_by_PeerMacAddress(u8 peer_ad
  * @param[in]  strategy - The strategy. Refer to the structure 'dev_exceed_max_strategy_t'.
  * @return     none.
  */
-void            blc_smp_setDevExceedMaxStrategy(dev_exceed_max_strategy_t strategy);
+void blc_smp_setDevExceedMaxStrategy(dev_exceed_max_strategy_t strategy);
 
 
 /**
@@ -135,7 +133,7 @@ void            blc_smp_setDevExceedMaxStrategy(dev_exceed_max_strategy_t strate
  * @param[in]  none.
  * @return     none.
  */
-void            blc_smp_eraseAllBondingInfo(void);
+void blc_smp_eraseAllBondingInfo(void);
 
 
 /**
@@ -144,7 +142,7 @@ void            blc_smp_eraseAllBondingInfo(void);
  * @return     0: The warning threshold is not reached.
  *             1: The warning threshold is reached..
  */
-bool            blc_smp_isBondingInfoStorageLowAlarmed(void);
+bool blc_smp_isBondingInfoStorageLowAlarmed(void);
 
 
 /**
@@ -166,7 +164,7 @@ bool            blc_smp_isBondingInfoStorageLowAlarmed(void);
  * @param[out] smp_param_load - bonding information.
  * @return     0: Failed to find the binding information; others: FLASH address of the bonding information area.
  */
-u32             blc_smp_loadBondingInfoByAddr(u8 isCentral, u8 perDevIdx, u8 addr_type, u8* addr, smp_param_save_t* smp_param_load);
+u32 blc_smp_loadBondingInfoByAddr(u8 isCentral, u8 perDevIdx, u8 addr_type, u8 *addr, smp_param_save_t *smp_param_load);
 
 
 /**
@@ -185,7 +183,7 @@ u32             blc_smp_loadBondingInfoByAddr(u8 isCentral, u8 perDevIdx, u8 add
  *                        if user set a value not equal to 0, SDK code will change it to 0 automatically to avoid error.
  * @return     0: The number of bound devices is 0; others: Number of bound devices.
  */
-u8              blc_smp_param_getCurrentBondingDeviceNumber(u8 isCentral, u8 perDevIdx);
+u16 blc_smp_param_getCurrentBondingDeviceNumber(u8 isCentral, u8 perDevIdx);
 
 
 /**
@@ -206,7 +204,7 @@ u8              blc_smp_param_getCurrentBondingDeviceNumber(u8 isCentral, u8 per
  * @param[out] smp_param_load - bonding information.
  * @return     0: Failed to find the binding information; others: FLASH address of the bonding information area.
  */
-u32             blc_smp_loadBondingInfoFromFlashByIndex(u8 isCentral, u8 perDevIdx, u8 index, smp_param_save_t* smp_param_load);
+u32 blc_smp_loadBondingInfoFromFlashByIndex(u8 isCentral, u8 perDevIdx, u16 index, smp_param_save_t *smp_param_load);
 
 
 #endif /* SMP_STORAGE_H_ */

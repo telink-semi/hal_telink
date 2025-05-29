@@ -24,13 +24,14 @@
 #ifndef ACL_CONN_H_
 #define ACL_CONN_H_
 
-
+#define blc_ll_getCurrentMasterRoleNumber   blc_ll_getCurrentCentralRoleNumber
+#define blc_ll_getCurrentSlaveRoleNumber    blc_ll_getCurrentPeripheralRoleNumber
 /**
  * @brief      This function is used to get the current number of ACL connections.
  * @param[in]  none.
  * @return     The number of currently connected ACLs.
  */
-int         blc_ll_getCurrentConnectionNumber(void);   //master + slave connection number
+int blc_ll_getCurrentConnectionNumber(void); //master + slave connection number
 
 
 /**
@@ -38,7 +39,7 @@ int         blc_ll_getCurrentConnectionNumber(void);   //master + slave connecti
  * @param[in]  none.
  * @return     Maximum number of connections that can be supported.
  */
-int         blc_ll_getSupportedMaxConnNumber(void);
+int blc_ll_getSupportedMaxConnNumber(void);
 
 
 /**
@@ -46,7 +47,7 @@ int         blc_ll_getSupportedMaxConnNumber(void);
  * @param[in]  none.
  * @return     The number of currently connected master ACLs.
  */
-int         blc_ll_getCurrentMasterRoleNumber(void);   //master role number
+int blc_ll_getCurrentCentralRoleNumber(void); //master role number
 
 
 /**
@@ -54,7 +55,7 @@ int         blc_ll_getCurrentMasterRoleNumber(void);   //master role number
  * @param[in]  none.
  * @return     The number of currently connected slave ACLs.
  */
-int         blc_ll_getCurrentSlaveRoleNumber(void);    //slave  role number
+int blc_ll_getCurrentPeripheralRoleNumber(void); //slave  role number
 
 
 /**
@@ -64,7 +65,7 @@ int         blc_ll_getCurrentSlaveRoleNumber(void);    //slave  role number
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_setMaxConnectionNumber(int max_master_num, int max_slave_num);
+ble_sts_t blc_ll_setMaxConnectionNumber(int max_master_num, int max_slave_num);
 
 
 /**
@@ -72,7 +73,7 @@ ble_sts_t   blc_ll_setMaxConnectionNumber(int max_master_num, int max_slave_num)
  * @param[in]  connHandle - ACL connection handle.
  * @return     available TX FIFO numbers
  */
-u8          blc_ll_getTxFifoNumber (u16 connHandle);
+u8 blc_ll_getTxFifoNumber(u16 connHandle);
 
 
 /**
@@ -82,7 +83,7 @@ u8          blc_ll_getTxFifoNumber (u16 connHandle);
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_disconnect (u16 connHandle, u8 reason);
+ble_sts_t blc_ll_disconnect(u16 connHandle, u8 reason);
 
 
 /**
@@ -91,7 +92,7 @@ ble_sts_t   blc_ll_disconnect (u16 connHandle, u8 reason);
  * @param[in]  reason - Reason for disconnection..
  * @return     The connection establishment time point corresponding to the current ACL connection handle: Based on 16M system clock ticks.
  */
-u32         blc_ll_getConnectionStartTick(u16 connHandle);
+u32 blc_ll_getConnectionStartTick(u16 connHandle);
 
 
 /**
@@ -100,7 +101,7 @@ u32         blc_ll_getConnectionStartTick(u16 connHandle);
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_readRemoteVersion(u16 connHandle);
+ble_sts_t blc_ll_readRemoteVersion(u16 connHandle);
 
 
 /**
@@ -108,8 +109,7 @@ ble_sts_t   blc_ll_readRemoteVersion(u16 connHandle);
  * @param      none
  * @return     none
  */
-void        blc_ll_initAclConnection_module(void);
-
+void blc_ll_initAclConnection_module(void);
 
 
 /**
@@ -121,7 +121,7 @@ void        blc_ll_initAclConnection_module(void);
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_initAclConnRxFifo(u8 *pRxbuf, int fifo_size, int fifo_number);
+ble_sts_t blc_ll_initAclConnRxFifo(u8 *pRxbuf, int fifo_size, int fifo_number);
 
 
 /**
@@ -132,7 +132,7 @@ ble_sts_t   blc_ll_initAclConnRxFifo(u8 *pRxbuf, int fifo_size, int fifo_number)
  * @return     status, 0x00:  succeed, no buffer error
  *                     other: buffer error code
  */
-ble_sts_t   blc_ll_initAclConnCacheTxFifo(u8 *pTxbuf, int fifo_size, int fifo_number);
+ble_sts_t blc_ll_initAclConnCacheTxFifo(u8 *pTxbuf, int fifo_size, int fifo_number);
 
 /**
  * @brief      check ACL whether is in establish state.
@@ -140,7 +140,7 @@ ble_sts_t   blc_ll_initAclConnCacheTxFifo(u8 *pTxbuf, int fifo_size, int fifo_nu
  * @return     status, 0:  connection not established(disconnection or connection complete but not established)
  *                     1:  connection established state
  */
-bool        blc_ll_isAclConnEstablished(u16 connHandle);
+bool blc_ll_isAclConnEstablished(u16 connHandle);
 
 
 /**
@@ -151,7 +151,7 @@ bool        blc_ll_isAclConnEstablished(u16 connHandle);
  * @return     status, 0x00 :  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_setAclConnMaxOctetsNumber(u8 maxRxOct, u8 maxTxOct_master, u8 maxTxOct_slave);
+ble_sts_t blc_ll_setAclConnMaxOctetsNumber(u8 maxRxOct, u8 maxTxOct_master, u8 maxTxOct_slave);
 
 
 /**
@@ -160,7 +160,7 @@ ble_sts_t   blc_ll_setAclConnMaxOctetsNumber(u8 maxRxOct, u8 maxTxOct_master, u8
  * @param[in]   auto_dle_en - 1: auto exchange data length by stack; 0: user send length request on application layer
  * @return      none
  */
-void        blc_ll_setAutoExchangeDataLengthEnable(int auto_dle_en);
+void blc_ll_setAutoExchangeDataLengthEnable(int auto_dle_en);
 
 
 /**
@@ -168,7 +168,7 @@ void        blc_ll_setAutoExchangeDataLengthEnable(int auto_dle_en);
  * @param[in]   time_ms - pending timing, unit: ms
  * @return      none
  */
-void        blc_ll_setDataLengthReqSendingTime_after_connCreate(int time_ms);
+void blc_ll_setDataLengthReqSendingTime_after_connCreate(int time_ms);
 
 
 /**
@@ -181,9 +181,7 @@ void        blc_ll_setDataLengthReqSendingTime_after_connCreate(int time_ms);
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_setPhy ( u16 connHandle,                 le_phy_prefer_mask_t all_phys,
-                            le_phy_prefer_type_t tx_phys,   le_phy_prefer_type_t rx_phys,
-                            le_ci_prefer_t phy_options);
+ble_sts_t blc_ll_setPhy(u16 connHandle, le_phy_prefer_mask_t all_phys, le_phy_prefer_type_t tx_phys, le_phy_prefer_type_t rx_phys, le_phy_option_prefer_t phy_options);
 
 
 /**
@@ -192,7 +190,7 @@ ble_sts_t   blc_ll_setPhy ( u16 connHandle,                 le_phy_prefer_mask_t
  * @return      status, 0x00:  succeed
  *                      other: failed
  */
-ble_sts_t   blc_ll_setDefaultConnCodingIndication(le_ci_prefer_t prefer_CI);
+ble_sts_t blc_ll_setDefaultConnCodingIndication(le_ci_prefer_t prefer_CI);
 
 
 /**
@@ -211,7 +209,7 @@ ble_sts_t   blc_ll_setDefaultConnCodingIndication(le_ci_prefer_t prefer_CI);
  * @return      status, 0x00:  succeed
  *                      other: failed
  */
-ble_sts_t   blc_ll_setDefaultPhy(le_phy_prefer_mask_t all_phys, le_phy_prefer_type_t tx_phys, le_phy_prefer_type_t rx_phys);
+ble_sts_t blc_ll_setDefaultPhy(le_phy_prefer_mask_t all_phys, le_phy_prefer_type_t tx_phys, le_phy_prefer_type_t rx_phys);
 
 
 /**
@@ -226,7 +224,7 @@ ble_sts_t   blc_ll_setDefaultPhy(le_phy_prefer_mask_t all_phys, le_phy_prefer_ty
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_readPhy( u16 connHandle, hci_le_readPhyCmd_retParam_t *para);
+ble_sts_t blc_ll_readPhy(u16 connHandle, hci_le_readPhyCmd_retParam_t *para);
 
 
 /**
@@ -234,14 +232,14 @@ ble_sts_t   blc_ll_readPhy( u16 connHandle, hci_le_readPhyCmd_retParam_t *para);
  * @param[in]  connHandle - ACL connection handle.
  * @return     The value of latest average RSSI.
  */
-u8          blc_ll_getAclLatestAvgRSSI(u16 connHandle);
+u8 blc_ll_getAclLatestAvgRSSI(u16 connHandle);
 
 /**
  * @brief      This function is used to obtain the latest RSSI of ACL connections.
  * @param[in]  connHandle - ACL connection handle.
  * @return     The value of latest average RSSI.
  */
-u8          blc_ll_getAclLatestRSSI(u16 connHandle);
+u8 blc_ll_getAclLatestRSSI(u16 connHandle);
 
 /**
  * @brief      for user to read current ACL connection interval
@@ -249,7 +247,7 @@ u8          blc_ll_getAclLatestRSSI(u16 connHandle);
  * @return     0    :  connHandle invalid, not match a connection
  *             other:  connection interval, unit: 1.25mS
  */
-u16         blc_ll_getAclConnectionInterval(u16 connHandle);
+u16 blc_ll_getAclConnectionInterval(u16 connHandle);
 
 
 /**
@@ -258,7 +256,7 @@ u16         blc_ll_getAclConnectionInterval(u16 connHandle);
  * @return     0    :  connHandle invalid, not match a connection
  *             other:  connection latency
  */
-u16         blc_ll_getAclConnectionLatency(u16 connHandle);
+u16 blc_ll_getAclConnectionLatency(u16 connHandle);
 
 
 /**
@@ -267,9 +265,7 @@ u16         blc_ll_getAclConnectionLatency(u16 connHandle);
  * @return     0    :  connHandle invalid, not match a connection
  *             other:  connection supervision timeout, unit: 10 mS
  */
-u16         blc_ll_getAclConnectionTimeout(u16 connHandle);
-
-
+u16 blc_ll_getAclConnectionTimeout(u16 connHandle);
 
 
 /**
@@ -278,10 +274,10 @@ u16         blc_ll_getAclConnectionTimeout(u16 connHandle);
  * @param[in]  connHandle - ACL connection handle.
  * @return     none.
  */
-void        blc_ll_dataLenAutoExgDisable(u16 connHandle);
+void blc_ll_dataLenAutoExgDisable(u16 connHandle);
 
-ble_sts_t   blc_hci_readSuggestedDefaultTxDataLength (u8 *tx, u8 *txtime);
-ble_sts_t   blc_hci_writeSuggestedDefaultTxDataLength (u16 tx, u16 txtime);
-ble_sts_t   blc_hci_readMaximumDataLength(hci_le_readMaxDataLengthCmd_retParam_t  *para);
+ble_sts_t blc_hci_readSuggestedDefaultTxDataLength(u8 *tx, u8 *txtime);
+ble_sts_t blc_hci_writeSuggestedDefaultTxDataLength(u16 tx, u16 txtime);
+ble_sts_t blc_hci_readMaximumDataLength(hci_le_readMaxDataLengthCmd_retParam_t *para);
 
 #endif /* ACL_CONN_H_ */

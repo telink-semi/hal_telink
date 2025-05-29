@@ -273,11 +273,7 @@ static _always_inline int tick1_out_range_of_tick2(unsigned int tick1, unsigned 
  */
 #define DEEP_ANA_REG0                       PM_ANA_REG_POWER_ON_CLR_BUF0 //initial value =0x00  [Bit0][Bit1] is already occupied. The customer cannot change!
 #define DEEP_ANA_REG1                       PM_ANA_REG_POWER_ON_CLR_BUF1 //initial value =0x00
-#define DEEP_ANA_REG2                       PM_ANA_REG_POWER_ON_CLR_BUF2 //initial value =0x00
-#define DEEP_ANA_REG3                       PM_ANA_REG_POWER_ON_CLR_BUF3 //initial value =0x00
-#define DEEP_ANA_REG4                       PM_ANA_REG_POWER_ON_CLR_BUF4 //initial value =0x00
-#define DEEP_ANA_REG5                       PM_ANA_REG_POWER_ON_CLR_BUF5 //initial value =0x00
-#define DEEP_ANA_REG6                       PM_ANA_REG_POWER_ON_CLR_BUF6 //initial value =0x0f
+#define DEEP_ANA_REG2                       PM_ANA_REG_POWER_ON_CLR_BUF2 //initial value =0xff
 
 /**
  * @brief these analog register can store data in deepsleep mode or deepsleep with SRAM retention mode.
@@ -335,7 +331,7 @@ extern pm_clock_drift_t pmbcd;
  * @param[in]   rc32_cnt    - 32k count
  * @return      none.
  */
-_attribute_ram_code_com_sec_noinline_ void pm_ble_cal_32k_rc_offset (int offset_tick, int rc32_cnt);
+_attribute_ram_code_sec_noinline_ void pm_ble_cal_32k_rc_offset (int offset_tick, int rc32_cnt);
 
 /**
  * @brief       This function reset calibrates the value
@@ -357,7 +353,7 @@ void mcu_oscillator_crystal_calibration(void);
 typedef int (*suspend_handler_t)(void);
 typedef void (*check_32k_clk_handler_t)(void);
 typedef unsigned int (*pm_get_32k_clk_handler_t)(void);
-typedef unsigned int (*pm_tim_recover_handler_t)(void);
+typedef void (*pm_tim_recover_handler_t)(void);
 
 extern  suspend_handler_t           func_before_suspend;
 extern  check_32k_clk_handler_t     pm_check_32k_clk_stable;

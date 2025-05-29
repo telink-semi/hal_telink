@@ -38,6 +38,10 @@
 #include "common/usb_dbg/myudb.h"
 #include "common/sdk_version.h"
 
+#if (defined(MCU_CORE_N22_ENABLE) || defined(MCU_CORE_D25F_ENABLE))
+#include "common/fifo.h"
+#endif
+
 #include "vendor/common/user_config.h"
 #include "vendor/common/app_common.h"
 #include "vendor/common/ble_flash.h"

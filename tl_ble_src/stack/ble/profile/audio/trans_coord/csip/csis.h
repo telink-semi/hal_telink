@@ -26,19 +26,19 @@
 #include "csis_client_buf.h"
 #include "csis_server_buf.h"
 
-
 /******************************* CSIS Common Start **********************************************************************/
 
-typedef enum{
+typedef enum
+{
     BLC_CSIS_UNLOCKED = 0x01,
-    BLC_CSIS_LOCKED = 0x02,
+    BLC_CSIS_LOCKED   = 0x02,
 } blc_csis_memberLockState_enum;
 
-typedef enum{
+typedef enum
+{
     BLT_CSIS_ENCRYPTED_SIRK = 0x00,
     BLT_CSIS_PLAIN_TEXT_SIRK,
 } blc_csis_sirk_type_enum;
-
 
 /**
  * @brief       This function is used to generate RSI based on SIRK.
@@ -59,16 +59,14 @@ bool blc_csis_resolveRSI(const u8 sirk[16], u8 rsi[6]);
 /******************************* CSIS Common End **********************************************************************/
 
 
-
-
 /******************************* CSIS Client Start **********************************************************************/
 
 //CSIS Client Event ID
-typedef enum{
+typedef enum
+{
     AUDIO_EVT_CSISC_START = AUDIO_EVT_TYPE_CSISC,
     //NONE:
 } audio_csisc_evt_enum;
-
 
 /**
  * @brief       This function serves to register CSIS Client function
@@ -96,18 +94,16 @@ int blc_csisc_writeLock(u16 connHandle, u8 lock, prf_write_cb_t writeCb);
 /******************************* CSIS Client End **********************************************************************/
 
 
-
-
 /******************************* CSIS Server Start **********************************************************************/
 
 extern const blc_csiss_regParam_t defaultCsipSetMemberParam;
 
 //CSIS Server Event ID
-typedef enum{
+typedef enum
+{
     AUDIO_EVT_CSISS_START = AUDIO_EVT_TYPE_CSISS,
     //NONE:
 } audio_csiss_evt_enum;
-
 
 /**
  * @brief       This function serves to register CSIS Server function

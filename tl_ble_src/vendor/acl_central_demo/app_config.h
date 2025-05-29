@@ -27,17 +27,16 @@
 #include "config.h"
 
 
-
-#define ACL_CENTRAL_MAX_NUM                         4 // ACL central maximum number
-#define ACL_PERIPHR_MAX_NUM                         0 // ACL peripheral maximum number
+#define ACL_CENTRAL_MAX_NUM 4 // ACL central maximum number
+#define ACL_PERIPHR_MAX_NUM 0 // ACL peripheral maximum number
 
 
 ///////////////////////// Feature Configuration////////////////////////////////////////////////
-#define ACL_PERIPHR_SMP_ENABLE                      0   //1 for smp,  0 no security
-#define ACL_CENTRAL_SMP_ENABLE                      1   //1 for smp,  0 no security
-#define ACL_CENTRAL_SIMPLE_SDP_ENABLE               1   //simple service discovery for ACL central
+#define ACL_PERIPHR_SMP_ENABLE        0 //1 for smp,  0 no security
+#define ACL_CENTRAL_SMP_ENABLE        1 //1 for smp,  0 no security
+#define ACL_CENTRAL_SIMPLE_SDP_ENABLE 1 //simple service discovery for ACL central
 
-#define BATT_CHECK_ENABLE                           0
+#define BATT_CHECK_ENABLE             0
 
 
 /* Flash Protection:
@@ -49,18 +48,18 @@
  *    be directly used on user's mass production application without any change. User should refer to sample code, understand the
  *    principles and methods, then change and implement a more appropriate mechanism according to their application if needed.
  */
-#define APP_FLASH_PROTECTION_ENABLE                 1
+#define APP_FLASH_PROTECTION_ENABLE 1
 
 
 /////////////////////// Board Select Configuration ///////////////////////////////
 #if (MCU_CORE_TYPE == MCU_CORE_B91)
-    #define BOARD_SELECT                                BOARD_951X_EVK_C1T213A20
+    #define BOARD_SELECT BOARD_951X_EVK_C1T213A20
 #elif (MCU_CORE_TYPE == MCU_CORE_B92)
-    #define BOARD_SELECT                                BOARD_952X_EVK_C1T266A20
+    #define BOARD_SELECT BOARD_952X_EVK_C1T266A20
 #elif (MCU_CORE_TYPE == MCU_CORE_TL721X)
-    #define BOARD_SELECT                                BOARD_721X_EVK_C1T315A20
+    #define BOARD_SELECT BOARD_721X_EVK_C1T315A20
 #elif (MCU_CORE_TYPE == MCU_CORE_TL321X)
-    #define BOARD_SELECT                                BOARD_321X_EVK_C1T331A20 //BOARD_321X_EVK_C1T335A20
+    #define BOARD_SELECT BOARD_321X_EVK_C1T331A20 //BOARD_321X_EVK_C1T335A20
 #endif
 
 
@@ -68,28 +67,26 @@
 
 
 ///////////////////////// DEBUG  Configuration ////////////////////////////////////////////////
-#define DEBUG_GPIO_ENABLE                       0
+#define DEBUG_GPIO_ENABLE     0
 
-#define TLKAPI_DEBUG_ENABLE                         1
-#define TLKAPI_DEBUG_CHANNEL                        TLKAPI_DEBUG_CHANNEL_GSUART
+#define TLKAPI_DEBUG_ENABLE   1
+#define TLKAPI_DEBUG_CHANNEL  TLKAPI_DEBUG_CHANNEL_GSUART
 
-#define APP_LOG_EN                                  1
-#define APP_CONTR_EVT_LOG_EN                        1   //controller event
-#define APP_HOST_EVT_LOG_EN                         1
-#define APP_SMP_LOG_EN                              0
-#define APP_SIMPLE_SDP_LOG_EN                       0
-#define APP_PAIR_LOG_EN                             1
-#define APP_KEY_LOG_EN                              1
+#define APP_LOG_EN            1
+#define APP_CONTR_EVT_LOG_EN  1 //controller event
+#define APP_HOST_EVT_LOG_EN   1
+#define APP_SMP_LOG_EN        0
+#define APP_SIMPLE_SDP_LOG_EN 0
+#define APP_PAIR_LOG_EN       1
+#define APP_KEY_LOG_EN        1
 
-#define JTAG_DEBUG_DISABLE                          1  //if use JTAG, change this
+#define JTAG_DEBUG_DISABLE    1 //if use JTAG, change this
 
 
 /////////////////// DEEP SAVE FLG //////////////////////////////////
-#define USED_DEEP_ANA_REG                   PM_ANA_REG_POWER_ON_CLR_BUF1 //u8,can save 8 bit info when deep
-#define LOW_BATT_FLG                        BIT(0) //if 1: low battery
-#define CONN_DEEP_FLG                       BIT(1) //if 1: conn deep, 0: adv deep
-
-
+#define USED_DEEP_ANA_REG PM_ANA_REG_POWER_ON_CLR_BUF1 //u8,can save 8 bit info when deep
+#define LOW_BATT_FLG      BIT(0)                       //if 1: low battery
+#define CONN_DEEP_FLG     BIT(1)                       //if 1: conn deep, 0: adv deep
 
 
 #include "../common/default_config.h"

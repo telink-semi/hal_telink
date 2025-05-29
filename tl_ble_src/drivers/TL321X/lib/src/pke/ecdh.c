@@ -31,12 +31,8 @@
 
 #ifdef SUPPORT_ECDH
 
-#include "lib/include/pke/ecdh.h"
-#include "lib/include/crypto_common/utility.h"
-
-
-
-
+    #include "lib/include/pke/ecdh.h"
+    #include "lib/include/crypto_common/utility.h"
 
 /**
  * @brief       ECDH compute key
@@ -48,8 +44,7 @@
  * @param[in]   kdf             - KDF function to get key.
  * @return      ECDH_SUCCESS(success)     other:error
  */
-unsigned int ecdh_compute_key(eccp_curve_t *curve, unsigned char *local_prikey, unsigned char *peer_pubkey, unsigned char *key,
-        unsigned int keyByteLen, KDF_FUNC kdf)
+unsigned int ecdh_compute_key(eccp_curve_t *curve, unsigned char *local_prikey, unsigned char *peer_pubkey, unsigned char *key, unsigned int keyByteLen, KDF_FUNC kdf)
 {
     unsigned int k[ECCP_MAX_WORD_LEN];
     unsigned int Px[ECCP_MAX_WORD_LEN];
@@ -57,16 +52,13 @@ unsigned int ecdh_compute_key(eccp_curve_t *curve, unsigned char *local_prikey, 
     unsigned int pByteLen, pWordLen, nByteLen, nWordLen;
     unsigned int ret;
 
-    if((NULL == curve) || (NULL == local_prikey) || (NULL == peer_pubkey) || (NULL == key))
-    {
+    if ((NULL == curve) || (NULL == local_prikey) || (NULL == peer_pubkey) || (NULL == key)) {
         return ECDH_POINTOR_NULL;
-    }
-    else if(0u == keyByteLen)
-    {
+    } else if (0u == keyByteLen) {
         return ECDH_INVALID_INPUT;
+    } else {
+        ;
     }
-    else
-    {;}
 
     pByteLen = GET_BYTE_LEN(curve->eccp_p_bitLen);
     pWordLen = GET_WORD_LEN(curve->eccp_p_bitLen);
@@ -76,50 +68,42 @@ unsigned int ecdh_compute_key(eccp_curve_t *curve, unsigned char *local_prikey, 
     //make sure private key is in [1, n-1]
     k[nWordLen - 1] = 0u;
     reverse_byte_array((unsigned char *)local_prikey, (unsigned char *)k, nByteLen);
-    ret = uint32_integer_check(k, curve->eccp_n, nWordLen, ECDH_ZERO_ALL, ECDH_INTEGER_TOO_BIG,
-            ECDH_SUCCESS);
-    if(ECDH_SUCCESS != ret)
-    {
+    ret = uint32_integer_check(k, curve->eccp_n, nWordLen, ECDH_ZERO_ALL, ECDH_INTEGER_TOO_BIG, ECDH_SUCCESS);
+    if (ECDH_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //check public key
     Px[pWordLen - 1] = 0u;
     Py[pWordLen - 1] = 0u;
     reverse_byte_array(peer_pubkey, (unsigned char *)Px, pByteLen);
-    reverse_byte_array(peer_pubkey+pByteLen, (unsigned char *)Py, pByteLen);
+    reverse_byte_array(peer_pubkey + pByteLen, (unsigned char *)Py, pByteLen);
     ret = eccp_pointVerify(curve, Px, Py);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ret = eccp_pointMul(curve, k, Px, Py, Px, NULL);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     reverse_byte_array((unsigned char *)Px, (unsigned char *)Px, pByteLen);
 
-    if(NULL != kdf)
-    {
+    if (NULL != kdf) {
         kdf(Px, pByteLen, key, keyByteLen);
-    }
-    else
-    {
-        if(keyByteLen > pByteLen)
-        {
+    } else {
+        if (keyByteLen > pByteLen) {
             keyByteLen = pByteLen;
+        } else {
+            ;
         }
-        else
-        {;}
 
         memcpy_(key, (unsigned char *)Px, keyByteLen);
     }
@@ -128,4 +112,3 @@ unsigned int ecdh_compute_key(eccp_curve_t *curve, unsigned char *local_prikey, 
 }
 
 #endif
-

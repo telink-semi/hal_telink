@@ -26,46 +26,45 @@
 
 #if (INTER_TEST_MODE == TEST_USB_PPM_ASRC)
 
-#define APP_AUDIO_INPUT_BUFFER_SIZE                 2048
-#define APP_AUDIO_INPUT_FRAME_SAMPLE_MAX             480
-#define APP_AUDIO_INPUT_FRAME_ENCODE_BYTES_MAX       155
+    #define APP_AUDIO_INPUT_BUFFER_SIZE             2048
+    #define APP_AUDIO_INPUT_FRAME_SAMPLE_MAX        480
+    #define APP_AUDIO_INPUT_FRAME_ENCODE_BYTES_MAX  155
 
-#define APP_AUDIO_OUTPUT_BUFFER_SIZE                2048
-#define APP_AUDIO_OUTPUT_FRAME_SAMPLE_MAX            160
-#define APP_AUDIO_OUTPUT_FRAME_ENCODE_BYTES_MAX       40
+    #define APP_AUDIO_OUTPUT_BUFFER_SIZE            2048
+    #define APP_AUDIO_OUTPUT_FRAME_SAMPLE_MAX       160
+    #define APP_AUDIO_OUTPUT_FRAME_ENCODE_BYTES_MAX 40
 
-#define DMIC_IN_PINGPONG_SIZE            960
-#define USB_OUT_PINGPONG_SIZE            1920
+    #define DMIC_IN_PINGPONG_SIZE                   960
+    #define USB_OUT_PINGPONG_SIZE                   1920
 
-#define BLC_CODEC_MIC_DMA                DMA2
-#define BLC_CODEC_SPK_DMA                DMA3
+    #define BLC_CODEC_MIC_DMA                       DMA2
+    #define BLC_CODEC_SPK_DMA                       DMA3
 
-#define MIC_BUFF_IDX                     0
-#define SPK_BUFF_IDX                     1
+    #define MIC_BUFF_IDX                            0
+    #define SPK_BUFF_IDX                            1
 
 extern volatile signed short app_dmic_in_pingpong[];
-extern volatile u32 iso_in_irq_stick;
-extern volatile u8 iso_in_permiteFlag;
-
+extern volatile u32          iso_in_irq_stick;
+extern volatile u8           iso_in_permiteFlag;
 
 struct list_node_t
 {
-    u32     renderPoint;
-    u16     buffer[APP_AUDIO_OUTPUT_FRAME_SAMPLE_MAX];
+    u32                 renderPoint;
+    u16                 buffer[APP_AUDIO_OUTPUT_FRAME_SAMPLE_MAX];
     struct list_node_t *next;
 };
 
 typedef struct
 {
-    u32     renderPoint;
-    u16     buffer[APP_AUDIO_OUTPUT_FRAME_SAMPLE_MAX];
-}audio_pkt_t;
+    u32 renderPoint;
+    u16 buffer[APP_AUDIO_OUTPUT_FRAME_SAMPLE_MAX];
+} audio_pkt_t;
 
 void app_codec_init();
 
 void app_codec_handler();
 
-void app_usb_irq_proc (void);
+void app_usb_irq_proc(void);
 
 #endif
 

@@ -37,11 +37,12 @@ _attribute_ram_code_ void rf_irq_handler(void)
 {
     DBG_CHN14_HIGH;
 
-    blc_sdk_irq_handler ();
+    blc_sdk_irq_handler();
 
     DBG_CHN14_LOW;
 }
 PLIC_ISR_REGISTER(rf_irq_handler, IRQ_ZB_RT)
+
 /**
  * @brief       System timer interrupt handler.
  * @param[in]   none
@@ -51,18 +52,53 @@ _attribute_ram_code_ void stimer_irq_handler(void)
 {
     DBG_CHN15_HIGH;
 
-    blc_sdk_irq_handler ();
+    blc_sdk_irq_handler();
 
     DBG_CHN15_LOW;
 }
 PLIC_ISR_REGISTER(stimer_irq_handler, IRQ_SYSTIMER)
 
 /**
+ * @brief      application system initialization
+ * @param[in]  none.
+ * @return     none.
+ */
+__INLINE void blc_app_system_init(void)
+{
+#if (MCU_CORE_TYPE == MCU_CORE_B91)
+    sys_init(DCDC_1P4_LDO_1P8, VBAT_MAX_VALUE_GREATER_THAN_3V6, INTERNAL_CAP_XTAL24M);
+    gpio_set_up_down_res(GPIO_SWS, GPIO_PIN_PULLUP_1M);
+    wd_stop();
+    CCLK_48M_HCLK_48M_PCLK_24M;
+#elif (MCU_CORE_TYPE == MCU_CORE_B92)
+    sys_init(DCDC_1P4_LDO_2P0, VBAT_MAX_VALUE_GREATER_THAN_3V6, GPIO_VOLTAGE_3V3, INTERNAL_CAP_XTAL24M);
+    pm_update_status_info(1);
+    gpio_set_up_down_res(GPIO_SWS, GPIO_PIN_PULLUP_1M);
+    wd_32k_stop();
+    CCLK_48M_HCLK_48M_PCLK_24M;
+#elif (MCU_CORE_TYPE == MCU_CORE_TL721X)
+    sys_init(DCDC_0P94_DCDC_1P8, VBAT_MAX_VALUE_GREATER_THAN_3V6, INTERNAL_CAP_XTAL24M);
+    pm_update_status_info(1);
+    gpio_set_up_down_res(GPIO_SWS, GPIO_PIN_PULLUP_1M);
+    wd_32k_stop();
+    wd_stop();
+    PLL_240M_CCLK_48M_HCLK_48M_PCLK_48M_MSPI_48M;
+#elif (MCU_CORE_TYPE == MCU_CORE_TL321X)
+    sys_init(DCDC_1P25_LDO_1P8, VBAT_MAX_VALUE_GREATER_THAN_3V6, INTERNAL_CAP_XTAL24M);
+    pm_update_status_info(1);
+    gpio_set_up_down_res(GPIO_SWS, GPIO_PIN_PULLUP_1M);
+    wd_32k_stop();
+    wd_stop();
+    PLL_192M_CCLK_48M_HCLK_24M_PCLK_24M_MSPI_48M;
+#endif
+}
+
+/**
  * @brief       This is main function
  * @param[in]   none
  * @return      none
  */
-_attribute_ram_code_ int main(void)
+int main(void)
 {
 #if HCI_DFU_EN
     blc_ota_setFirmwareSizeAndBootAddress(DFU_NEW_FW_MAX_SIZE, DFU_NEW_FW_ADDR_BASE);
@@ -74,66 +110,31 @@ _attribute_ram_code_ int main(void)
        (2). For B91 only: even no power management */
     blc_pm_select_internal_32k_crystal();
 
-    #if (MCU_CORE_TYPE == MCU_CORE_B91)
-        sys_init(DCDC_1P4_LDO_1P8, VBAT_MAX_VALUE_GREATER_THAN_3V6,INTERNAL_CAP_XTAL24M);
-        CCLK_32M_HCLK_32M_PCLK_16M;
-    #elif (MCU_CORE_TYPE == MCU_CORE_B92)
-        sys_init(DCDC_1P4_LDO_2P0, VBAT_MAX_VALUE_GREATER_THAN_3V6, GPIO_VOLTAGE_3V3, INTERNAL_CAP_XTAL24M);
-        wd_32k_stop();
-        CCLK_32M_HCLK_32M_PCLK_16M;
-    #elif (MCU_CORE_TYPE == MCU_CORE_TL751X)
-        sys_init(VBAT_MAX_VALUE_GREATER_THAN_3V6);
-        wd_32k_stop();
-        wd_stop();
-        #if (ONCA_CHIP_VESION == ONCA_CHIP_A0)
-        pm_set_avdd1(PM_AVDD1_VOLTAGE_1V050);
-        pm_set_dvdd2(PM_DVDD2_VOLTAGE_0V750);
-        pm_set_avdd2(PM_AVDD2_VOLTAGE_2V346);
-        pm_set_dvdd1(PM_DVDD1_VOLTAGE_0V725);
-        #endif
-        CCLK_96M_HCLK_96M_PCLK_24M_MSPI_48M;
-    #elif (MCU_CORE_TYPE == MCU_CORE_TL721X)
-        sys_init(DCDC_0P94_DCDC_1P8,VBAT_MAX_VALUE_GREATER_THAN_3V6,INTERNAL_CAP_XTAL24M);
-        pm_update_status_info(1);
-        gpio_set_up_down_res(GPIO_SWS, GPIO_PIN_PULLUP_1M);
-        wd_32k_stop();
-        wd_stop();
-        PLL_240M_CCLK_48M_HCLK_48M_PCLK_48M_MSPI_48M;
-    #elif(MCU_CORE_TYPE == MCU_CORE_TL321X)
-        sys_init(DCDC_1P25_LDO_1P8, VBAT_MAX_VALUE_GREATER_THAN_3V6, INTERNAL_CAP_XTAL24M);
-        pm_update_status_info(1);
-        gpio_set_up_down_res(GPIO_SWS, GPIO_PIN_PULLUP_1M);
-        wd_32k_stop();
-        wd_stop();
-        PLL_192M_CCLK_48M_HCLK_24M_PCLK_24M_MSPI_48M;
-    #endif
+    blc_app_system_init();
 
     /* detect if MCU is wake_up from deep retention mode */
-    int deepRetWakeUp = pm_is_MCU_deepRetentionWakeup();  //MCU deep retention wakeUp
+    int deepRetWakeUp = pm_is_MCU_deepRetentionWakeup(); //MCU deep retention wakeUp
 
 
     rf_drv_ble_init();
 
     gpio_init(!deepRetWakeUp);
 
-    if( deepRetWakeUp ){ //MCU wake_up from deepSleep retention mode
-        user_init_deepRetn ();
-    }
-    else{ //MCU power_on or wake_up from deepSleep mode
+    if (deepRetWakeUp) { //MCU wake_up from deepSleep retention mode
+        user_init_deepRetn();
+    } else {             //MCU power_on or wake_up from deepSleep mode
         user_init_normal();
     }
 
     irq_enable();
 
-    while(1)
-    {
-        main_loop ();
+    while (1) {
+        main_loop();
         static u32 tickLoop = 1;
-        if(tickLoop && clock_time_exceed(tickLoop, 500000)){
+        if (tickLoop && clock_time_exceed(tickLoop, 500000)) {
             tickLoop = clock_time();
             gpio_toggle(GPIO_LED_BLUE);
         }
     }
     return 0;
 }
-

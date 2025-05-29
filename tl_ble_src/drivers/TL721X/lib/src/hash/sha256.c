@@ -28,9 +28,6 @@
 #include "lib/include/hash/sha256.h"
 
 
-
-
-
 #ifdef SUPPORT_HASH_SHA256
 
 
@@ -43,7 +40,6 @@ unsigned int sha256_init(SHA256_CTX *ctx)
 {
     return hash_init(ctx, HASH_SHA256);
 }
-
 
 /**
  * @brief       sha256 update message
@@ -61,7 +57,6 @@ unsigned int sha256_update(SHA256_CTX *ctx, const unsigned char *msg, unsigned i
     return hash_update(ctx, msg, msg_bytes);
 }
 
-
 /**
  * @brief       message update done, get the sha256 digest
  * @param[in]   ctx               - SHA256_CTX context pointer.
@@ -76,7 +71,6 @@ unsigned int sha256_final(SHA256_CTX *ctx, unsigned char *digest)
 {
     return hash_final(ctx, digest);
 }
-
 
 /**
  * @brief       input whole message and get its sha256 digest
@@ -95,7 +89,7 @@ unsigned int sha256(unsigned char *msg, unsigned int msg_bytes, unsigned char *d
 }
 
 
-#ifdef HASH_DMA_FUNCTION
+    #ifdef HASH_DMA_FUNCTION
 /**
  * @brief       init dma sha256
  * @param[in]   ctx           - SHA256_DMA_CTX context pointer.
@@ -106,7 +100,6 @@ unsigned int sha256_dma_init(SHA256_DMA_CTX *ctx, HASH_CALLBACK callback)
 {
     return hash_dma_init(ctx, HASH_SHA256, callback);
 }
-
 
 /**
  * @brief       dma sha256 update some message blocks
@@ -124,7 +117,6 @@ unsigned int sha256_dma_update_blocks(SHA256_DMA_CTX *ctx, unsigned int *msg, un
 {
     return hash_dma_update_blocks(ctx, msg, msg_words);
 }
-
 
 /**
  * @brief       dma sha256 final(input the remainder message and get the digest)
@@ -144,7 +136,6 @@ unsigned int sha256_dma_final(SHA256_DMA_CTX *ctx, unsigned int *remainder_msg, 
     return hash_dma_final(ctx, remainder_msg, remainder_bytes, digest);
 }
 
-
 /**
  * @brief       dma sha256 digest calculate
  * @param[in]   msg           - message.
@@ -161,6 +152,6 @@ unsigned int sha256_dma(unsigned int *msg, unsigned int msg_bytes, unsigned int 
 {
     return hash_dma(HASH_SHA256, msg, msg_bytes, digest, callback);
 }
-#endif
+    #endif
 
 #endif

@@ -23,10 +23,10 @@
  *******************************************************************************************************/
 #pragma once
 
-
 /******************************* MICS Common Start **********************************************************************/
 
-typedef enum{
+typedef enum
+{
     MICS_MUTE_VALUE_NOT_MUTED = 0x00,
     MICS_MUTE_VALUE_MUTED,
     MICS_MUTE_VALUE_DISABLED,
@@ -39,20 +39,19 @@ typedef enum{
 #include "mics_client_buf.h"
 #include "mics_server_buf.h"
 
-
-
 /******************************* MICS Client Start **********************************************************************/
 
 //MICS Client Event ID
-typedef enum{
+typedef enum
+{
     AUDIO_EVT_MICSC_START = AUDIO_EVT_TYPE_MICSC,
-    AUDIO_EVT_MICSC_CHANGE_MUTE,    //refer to 'blc_micsc_muteChangeEvt_t'
+    AUDIO_EVT_MICSC_CHANGE_MUTE, //refer to 'blc_micsc_muteChangeEvt_t'
 } audio_micsc_evt_enum;
 
-typedef struct{ //Event ID: AUDIO_EVT_MICSC_CHANGE_MUTE
+typedef struct
+{            //Event ID: AUDIO_EVT_MICSC_CHANGE_MUTE
     u8 mute; //blc_mics_mute_value_enum
 } blc_micsc_muteChangeEvt_t;
-
 
 /**
  * @brief       This function serves to register MICP Client function
@@ -66,7 +65,7 @@ void blc_audio_registerMICSControlClient(const blc_micsc_regParam_t *param);
 int blc_micsc_readMute(u16 connHandle, prf_read_cb_t readCb);
 
 //PACS Client Get Characteristic Value Operation API
-int blc_micsc_getMute(u16 connHandle, u8* mute);
+int blc_micsc_getMute(u16 connHandle, u8 *mute);
 
 //PACS Client Write Characteristic Value Operation API
 int blc_micsc_writeMute(u16 connHandle, blc_mics_mute_value_enum mute, prf_write_cb_t writeCb);
@@ -74,18 +73,17 @@ int blc_micsc_writeMute(u16 connHandle, blc_mics_mute_value_enum mute, prf_write
 /******************************* MICS Client End **********************************************************************/
 
 
-
-
 /******************************* MICS Server Start **********************************************************************/
 
 //MICS Server Event ID
-typedef enum{
+typedef enum
+{
     AUDIO_EVT_MICSS_START = AUDIO_EVT_TYPE_MICSS,
-    AUDIO_EVT_MICSS_CHANGE_MUTE,    //refer to 'blc_micss_muteChangeEvt_t'
+    AUDIO_EVT_MICSS_CHANGE_MUTE, //refer to 'blc_micss_muteChangeEvt_t'
 } audio_micss_evt_enum;
 
-
-typedef struct{ //Event ID: AUDIO_EVT_MICSS_CHANGE_MUTE
+typedef struct
+{            //Event ID: AUDIO_EVT_MICSS_CHANGE_MUTE
     u8 mute; //blc_mics_mute_value_enum
 } blc_micss_muteChangeEvt_t;
 

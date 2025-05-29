@@ -64,7 +64,7 @@
 #define reg_spi_cmd(i)      REG_ADDR8(LSPI_BASE_ADDR+0x04+(i)*BASE_ADDR_DIFF)
 
 /**
- * When only B91m spi slave is used as slave, the command read from SPI Command is parsed by bit.
+ * When only Telink RISC-V MCU spi slave is used as slave, the command read from SPI Command is parsed by bit.
  */
 enum{
     FLD_SPI_CMD_RESERVED                =BIT(0),

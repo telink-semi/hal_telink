@@ -30,10 +30,6 @@
 #include "tl_common.h"
 #include "drivers.h"
 
-
-
-
-
 #if (STACK_IRQ_CODE_IN_SRAM_DUE_TO_FLASH_OPERATION_V2)
 _attribute_ram_code_sec_
 #endif
@@ -52,11 +48,10 @@ _attribute_ram_code_sec_
 __attribute__((noinline)) void tlk_mem_cpy(void *pd, const void *ps, unsigned int len)
 {
     const char *pi = ps;
-    char *po = pd;
+    char       *po = pd;
     while (len-- > 0) {
         *po++ = *pi++;
     }
-
 }
 
 
@@ -68,8 +63,8 @@ __attribute__((noinline)) int tlk_mem_cmp(const void *m1, const void *m2, unsign
     const char *st1 = m1;
     const char *st2 = m2;
 
-    while(len--){
-        if(*st1 != *st2){
+    while (len--) {
+        if (*st1 != *st2) {
             return 1; //return (*st1 - *st2)
         }
         st1++;
@@ -86,7 +81,7 @@ __attribute__((noinline)) void tlk_mem_set4(void *dest, int val, unsigned int le
 {
     unsigned int *ptr = dest;
     len >>= 2;
-    while(len--){
+    while (len--) {
         *(ptr++) = val;
     }
 }
@@ -98,7 +93,7 @@ _attribute_ram_code_sec_
 __attribute__((noinline)) void tlk_mem_cpy4(void *pd, const void *ps, unsigned int len)
 {
     const int *pi = ps;
-    int *po = pd;
+    int       *po = pd;
     len >>= 2;
     while (len--) {
         *po++ = *pi++;
@@ -113,8 +108,8 @@ __attribute__((noinline)) int tlk_mem_cmp4(const void *m1, const void *m2, unsig
     const int *st1 = m1;
     const int *st2 = m2;
     len >>= 2;
-    while(len--){
-        if(*st1 != *st2){
+    while (len--) {
+        if (*st1 != *st2) {
             return 1; //return (*st1 - *st2)
         }
         st1++;
@@ -129,9 +124,9 @@ _attribute_ram_code_sec_
 int tlk_strlen(const char *str)
 {
     int count = 0;
-    while(*str != '\0'){
-        count ++;
-        str ++;
+    while (*str != '\0') {
+        count++;
+        str++;
         //if(count > 0x3FF) break;
     }
 
@@ -145,28 +140,33 @@ int tlk_strlen(const char *str)
 //https://elixir.bootlin.com/linux/v5.7-rc4/source/lib
 _attribute_ram_code_ long long __lshrdi3(long long u, int b)
 {
-    union {
-        struct {
+    union
+    {
+        struct
+        {
             int low, high; //little-endian, TLK used,  int high, low; //big-endian
-        }s;
+        } s;
+
         long long ll;
     } uu, w;
+
     int bm;
 
-    if (b == 0)
+    if (b == 0) {
         return u;
+    }
 
     uu.ll = u;
-    bm = 32 - b;
+    bm    = 32 - b;
 
     if (bm <= 0) {
         w.s.high = 0;
-        w.s.low = (unsigned int) uu.s.high >> -bm;
+        w.s.low  = (unsigned int)uu.s.high >> -bm;
     } else {
-        unsigned int carries = (unsigned int) uu.s.high << bm;
+        unsigned int carries = (unsigned int)uu.s.high << bm;
 
-        w.s.high = (unsigned int) uu.s.high >> b;
-        w.s.low = ((unsigned int) uu.s.low >> b) | carries;
+        w.s.high = (unsigned int)uu.s.high >> b;
+        w.s.low  = ((unsigned int)uu.s.low >> b) | carries;
     }
 
     return w.ll;
@@ -174,31 +174,33 @@ _attribute_ram_code_ long long __lshrdi3(long long u, int b)
 
 _attribute_ram_code_ long long __ashldi3(long long u, int b)
 {
-    union {
-        struct {
+    union
+    {
+        struct
+        {
             int low, high; //little-endian, TLK used,  int high, low; //big-endian
-        }s;
+        } s;
+
         long long ll;
     } uu, w;
 
     int bm;
 
-    if(b == 0){
+    if (b == 0) {
         return u;
     }
 
     uu.ll = u;
-    bm = 32 - b;
+    bm    = 32 - b;
 
-    if(bm <= 0){
-        w.s.low = 0;
-        w.s.high = (unsigned int) uu.s.low << -bm;
-    }
-    else{
-        unsigned int carries = (unsigned int) uu.s.low >> bm;
+    if (bm <= 0) {
+        w.s.low  = 0;
+        w.s.high = (unsigned int)uu.s.low << -bm;
+    } else {
+        unsigned int carries = (unsigned int)uu.s.low >> bm;
 
-        w.s.low = (unsigned int) uu.s.low << b;
-        w.s.high = ((unsigned int) uu.s.high << b) | carries;
+        w.s.low  = (unsigned int)uu.s.low << b;
+        w.s.high = ((unsigned int)uu.s.high << b) | carries;
     }
 
     return w.ll;
@@ -206,36 +208,31 @@ _attribute_ram_code_ long long __ashldi3(long long u, int b)
 #endif
 
 
-
-
-_attribute_ble_data_retention_  unsigned short      crc16_poly[2] = {0, 0xa001}; //0x8005 <==> 0xa001
+_attribute_ble_data_retention_ unsigned short crc16_poly[2] = {0, 0xa001}; //0x8005 <==> 0xa001
 
 _attribute_no_inline_  //for big OTA PDU, CRC calculate should be quick
 unsigned short blt_Crc16ComputeInternal(unsigned char *pD, int len)
 {
     unsigned short crc = 0xffff;
     //unsigned char ds;
-    int i,j;
+    int i, j;
 
-    for(j=len; j>0; j--)
-    {
+    for (j = len; j > 0; j--) {
         unsigned char ds = *pD++;
-        for(i=0; i<8; i++)
-        {
-            crc = (crc >> 1) ^ crc16_poly[(crc ^ ds ) & 1];
-            ds = ds >> 1;
+        for (i = 0; i < 8; i++) {
+            crc = (crc >> 1) ^ crc16_poly[(crc ^ ds) & 1];
+            ds  = ds >> 1;
         }
     }
 
-     return crc;
+    return crc;
 }
-
 
 unsigned char blc_get_sdk_version(unsigned char *pbuf, unsigned char number)
 {
     //The parameter "number" is not used now, it is left here because there was it and has been released.
     //In future, this "number" can be used for a specific purpose, such as if (number == 12) {do something, or return a vendor version}
-    (void)number;   //clean warning
+    (void)number; //clean warning
 
     //  struct version_format{
     //      char    CERTIFICATION_MARK;         //BLE 5.<certification_mark>
@@ -250,16 +247,67 @@ unsigned char blc_get_sdk_version(unsigned char *pbuf, unsigned char number)
     //      char    hour;
     //      char    minute;
     //  };
-    u8  version[] = {CERTIFICATION_MARK, SOFT_STRUCTURE, MAJOR_VERSION, MINOR_VERSION, PATCH_NUM, CUSTOM_MAJOR_VERSION, CUSTOM_MINOR_VERSION,
-            __DATE__[0], __DATE__[1], __DATE__[2],                      //Month
-            (( __DATE__[4] - 0x30 ) << 4) | (__DATE__[5] - 0x30),       //Date
-            (( __DATE__[9] - 0x30 ) << 4) | (__DATE__[10] - 0x30),      //Year
-            (( __TIME__[0] - 0x30 ) << 4) | (__TIME__[1] - 0x30),       //Hour
-            (( __TIME__[3] - 0x30 ) << 4) | (__TIME__[4] - 0x30),       //Minute
-            };
+    u8 version[] = {
+        CERTIFICATION_MARK,
+        SOFT_STRUCTURE,
+        MAJOR_VERSION,
+        MINOR_VERSION,
+        PATCH_NUM,
+        CUSTOM_MAJOR_VERSION,
+        CUSTOM_MINOR_VERSION,
+        __DATE__[0],
+        __DATE__[1],
+        __DATE__[2],                                         //Month
+        ((__DATE__[4] - 0x30) << 4) | (__DATE__[5] - 0x30),  //Date
+        ((__DATE__[9] - 0x30) << 4) | (__DATE__[10] - 0x30), //Year
+        ((__TIME__[0] - 0x30) << 4) | (__TIME__[1] - 0x30),  //Hour
+        ((__TIME__[3] - 0x30) << 4) | (__TIME__[4] - 0x30),  //Minute
+    };
 
-    memcpy(pbuf,version,sizeof(version));
+    memcpy(pbuf, version, sizeof(version));
 
     return sizeof(version);
 }
 
+#include "git_info_stack.h"
+
+unsigned char blc_get_lib_info(unsigned char *pbuf, unsigned char pbuf_size)
+{
+    if (pbuf == NULL) {
+        return 0;
+    }
+
+    const char branch[]      = GIT_BRANCH;
+    const char commitID[]    = GIT_COMMIT_ID;
+    const char log[]         = GIT_LOG_TIME;
+    const char build[]       = BUILD_TIME;
+    const char required_size = sizeof(branch) + sizeof(commitID) + sizeof(log) + sizeof(build) + 8; //  /r/n*3 = 8
+    if (required_size > pbuf_size) {
+        return 0;                                                                                   // Buffer is too small
+    }
+    char *current_pos = (char *)pbuf;
+    current_pos       = strncpy(current_pos, branch, strlen(branch));
+    current_pos += strlen(branch);
+
+    strcpy(current_pos, "\r\n");
+    current_pos += 2;
+
+    current_pos = strncpy(current_pos, commitID, strlen(commitID));
+    current_pos += strlen(commitID);
+
+    strcpy(current_pos, "\r\n");
+    current_pos += 2;
+
+    current_pos = strncpy(current_pos, log, strlen(log));
+    current_pos += strlen(log);
+
+    strcpy(current_pos, "\r\n");
+    current_pos += 2;
+
+    current_pos = strncpy(current_pos, build, strlen(build));
+    current_pos += strlen(build);
+
+    strcpy(current_pos, "\r\n");
+
+    return required_size;
+}

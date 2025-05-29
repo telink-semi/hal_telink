@@ -25,42 +25,42 @@
 #define APP_CODEC_H_
 
 #if (UNICAST_SERVER_SELECT == UNICAST_SERVER_ASYNC)
-#define APP_AUDIO_OUTPUT_BUFFER_SIZE                 1200
-#define APP_AUDIO_INPUT_BUFFER_SIZE                  1200
-#define APP_AUDIO_SUPPORT_MAX_FRAME_SAMPLE           480
-#define APP_AUDIO_SUPPORT_MAX_ENCODE_FRAME_BYTES     155
-
+    #define APP_AUDIO_OUTPUT_BUFFER_SIZE             1200
+    #define APP_AUDIO_INPUT_BUFFER_SIZE              1200
+    #define APP_AUDIO_SUPPORT_MAX_FRAME_SAMPLE       480
+    #define APP_AUDIO_SUPPORT_MAX_ENCODE_FRAME_BYTES 155
 
 /**
  *  @brief  app render point buffers
  */
 typedef struct
 {
-    u32     renderPoint;
-    u32     pkt_seq_num;
-    u16     buffer[APP_AUDIO_SUPPORT_MAX_FRAME_SAMPLE];
-}audio_pkt_t;
+    u32 renderPoint;
+    u32 pkt_seq_num;
+    u16 buffer[APP_AUDIO_SUPPORT_MAX_FRAME_SAMPLE];
+} audio_pkt_t;
 
 /**
  *  @brief  list node
  */
 struct list_node_t
 {
-    u32     renderPoint;
-    u32     pkt_seq_num;
-    u16     buffer[APP_AUDIO_SUPPORT_MAX_FRAME_SAMPLE];
+    u32                 renderPoint;
+    u32                 pkt_seq_num;
+    u16                 buffer[APP_AUDIO_SUPPORT_MAX_FRAME_SAMPLE];
     struct list_node_t *next;
 };
 
 /**
  *  @brief  app codec concerned parameters
  */
-typedef struct{
-    u8   cC;       //channel counts
-    u16  fSample;  //sample each frame
-    u16  fOctets;  //octets each frame
-    u16  frameUs;  //time each frame,us conut
-}app_codec_desc_t;
+typedef struct
+{
+    u8  cC;      //channel counts
+    u16 fSample; //sample each frame
+    u16 fOctets; //octets each frame
+    u16 frameUs; //time each frame,us conut
+} app_codec_desc_t;
 
 /**
  * @brief      Codec init function.

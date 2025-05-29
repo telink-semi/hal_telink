@@ -21,14 +21,13 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-#include"tlk_buffer.h"
+#include "tlk_buffer.h"
 
 tlk_buffer_t tlkBuffer[TLK_BUFFER_MAX];
 
-tlk_buffer_sts_e tlk_buffer_init(u8 *pBuffer, u16 buffLen,tlk_buffer_e index)
+tlk_buffer_sts_e tlk_buffer_init(u8 *pBuffer, u16 buffLen, tlk_buffer_e index)
 {
-    if(buffLen==0 || pBuffer == NULL)
-    {
+    if (buffLen == 0 || pBuffer == NULL) {
         return TLK_BUFFER_PARAMETER_ERROR;
     }
     tlkBuffer[index].buffer    = pBuffer;
@@ -36,61 +35,50 @@ tlk_buffer_sts_e tlk_buffer_init(u8 *pBuffer, u16 buffLen,tlk_buffer_e index)
     return TLK_BUFFER_SUCCESS;
 }
 
-
 _attribute_ram_code_ tlk_buffer_sts_e tlk_buffer_clear(tlk_buffer_e index)
 {
-    if(tlkBuffer[index].bufferLen==0 || tlkBuffer[index].buffer == NULL)
-    {
+    if (tlkBuffer[index].bufferLen == 0 || tlkBuffer[index].buffer == NULL) {
         return TLK_BUFFER_NO_INIT;
     }
     tlkBuffer[index].bufferROffset = 0;
     tlkBuffer[index].bufferWOffset = 0;
-    for(u32 i=0;i<tlkBuffer[index].bufferLen;i++)
-    {
-        *(tlkBuffer[index].buffer+i) = 0;
+    for (u32 i = 0; i < tlkBuffer[index].bufferLen; i++) {
+        *(tlkBuffer[index].buffer + i) = 0;
     }
     return TLK_BUFFER_SUCCESS;
 }
 
-_attribute_ram_code_ tlk_buffer_sts_e tlk_buffer_write(u8 *pData, u16 dataLen,tlk_buffer_e index)
+_attribute_ram_code_ tlk_buffer_sts_e tlk_buffer_write(u8 *pData, u16 dataLen, tlk_buffer_e index)
 {
     u32 wptr;
     u16 offset;
-    u8 *pBuffer = (u8*)tlkBuffer[index].buffer;
+    u8 *pBuffer = (u8 *)tlkBuffer[index].buffer;
 
-    if(tlkBuffer[index].bufferLen == 0 || tlkBuffer[index].buffer == NULL)
-    {
-         return TLK_BUFFER_NO_INIT;
+    if (tlkBuffer[index].bufferLen == 0 || tlkBuffer[index].buffer == NULL) {
+        return TLK_BUFFER_NO_INIT;
     }
-    if(pData == NULL || dataLen == 0 || (dataLen & 0x01) != 0)//2byte a frame
+    if (pData == NULL || dataLen == 0 || (dataLen & 0x01) != 0) //2byte a frame
     {
-         return TLK_BUFFER_PARAMETER_ERROR;
+        return TLK_BUFFER_PARAMETER_ERROR;
     }
 
     wptr = tlkBuffer[index].bufferWOffset;
 
-    if(wptr+dataLen >  tlkBuffer[index].bufferLen)
-    {
-        offset = tlkBuffer[index].bufferLen-wptr;
-    }
-    else
-    {
+    if (wptr + dataLen > tlkBuffer[index].bufferLen) {
+        offset = tlkBuffer[index].bufferLen - wptr;
+    } else {
         offset = dataLen;
     }
-    for(int i=0; i<offset; i++)
-    {
-        *(pBuffer+wptr+i) = *(pData+i);
+    for (int i = 0; i < offset; i++) {
+        *(pBuffer + wptr + i) = *(pData + i);
     }
-    if(offset < dataLen)
-    {
-        for(int i=0; i<dataLen-offset; i++)
-        {
-            *(pBuffer+i) = *(pData+offset+i);
+    if (offset < dataLen) {
+        for (int i = 0; i < dataLen - offset; i++) {
+            *(pBuffer + i) = *(pData + offset + i);
         }
     }
     wptr += dataLen;
-    if(wptr >= tlkBuffer[index].bufferLen)
-    {
+    if (wptr >= tlkBuffer[index].bufferLen) {
         wptr -= tlkBuffer[index].bufferLen;
     }
     tlkBuffer[index].bufferWOffset = wptr;
@@ -98,60 +86,48 @@ _attribute_ram_code_ tlk_buffer_sts_e tlk_buffer_write(u8 *pData, u16 dataLen,tl
     return TLK_BUFFER_SUCCESS;
 }
 
-_attribute_ram_code_ tlk_buffer_sts_e tlk_buffer_read(u8 *pData, u16 dataLen,tlk_buffer_e index)
+_attribute_ram_code_ tlk_buffer_sts_e tlk_buffer_read(u8 *pData, u16 dataLen, tlk_buffer_e index)
 {
     u32 wptr;
     u32 rptr;
     u32 usbDataLen;
     u32 offset;
 
-    if(tlkBuffer[index].bufferLen == 0 || tlkBuffer[index].buffer == NULL)
-    {
-         return TLK_BUFFER_NO_INIT;
+    if (tlkBuffer[index].bufferLen == 0 || tlkBuffer[index].buffer == NULL) {
+        return TLK_BUFFER_NO_INIT;
     }
-    if(pData == NULL || dataLen == 0 || (dataLen & 0x01) != 0)//at least 2byte a frame
+    if (pData == NULL || dataLen == 0 || (dataLen & 0x01) != 0) //at least 2byte a frame
     {
-         return TLK_BUFFER_PARAMETER_ERROR;
+        return TLK_BUFFER_PARAMETER_ERROR;
     }
 
     rptr = tlkBuffer[index].bufferROffset;
     wptr = tlkBuffer[index].bufferWOffset;
 
-    if(wptr >= rptr)
-    {
-        usbDataLen = wptr-rptr;
-    }
-    else
-    {
-        usbDataLen = tlkBuffer[index].bufferLen+wptr-rptr;
+    if (wptr >= rptr) {
+        usbDataLen = wptr - rptr;
+    } else {
+        usbDataLen = tlkBuffer[index].bufferLen + wptr - rptr;
     }
 
-    if(usbDataLen<dataLen)
-    {
-        return TLK_BUFFER_DATA_INSUFFICIENT;//data length not enough
+    if (usbDataLen < dataLen) {
+        return TLK_BUFFER_DATA_INSUFFICIENT; //data length not enough
     }
 
-    if(dataLen+rptr>=tlkBuffer[index].bufferLen)
-    {
-        offset = tlkBuffer[index].bufferLen-rptr;
-        tlkBuffer[index].bufferROffset = dataLen+rptr-tlkBuffer[index].bufferLen;
-    }
-    else
-    {
+    if (dataLen + rptr >= tlkBuffer[index].bufferLen) {
+        offset                         = tlkBuffer[index].bufferLen - rptr;
+        tlkBuffer[index].bufferROffset = dataLen + rptr - tlkBuffer[index].bufferLen;
+    } else {
         offset = dataLen;
         tlkBuffer[index].bufferROffset += dataLen;
     }
-    for(u32 i=0; i<offset; i++)
-    {
-        *(pData+i) = *(tlkBuffer[index].buffer+rptr+i);
+    for (u32 i = 0; i < offset; i++) {
+        *(pData + i) = *(tlkBuffer[index].buffer + rptr + i);
     }
-    if(offset < dataLen)
-    {
-        for(u32 i=0; i<dataLen-offset; i++)
-        {
-            *(pData+offset+i) = *(tlkBuffer[index].buffer+i);
+    if (offset < dataLen) {
+        for (u32 i = 0; i < dataLen - offset; i++) {
+            *(pData + offset + i) = *(tlkBuffer[index].buffer + i);
         }
     }
     return TLK_BUFFER_SUCCESS;
 }
-

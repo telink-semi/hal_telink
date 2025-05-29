@@ -26,26 +26,24 @@
 #define ECDH_H
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
-
 
 
 #include "pke.h"
 
+    //ECDH return code
+    enum ECDH_RET_CODE
+    {
+        ECDH_SUCCESS      = PKE_SUCCESS,
+        ECDH_POINTOR_NULL = PKE_SUCCESS + 0x60,
+        ECDH_INVALID_INPUT,
+    };
 
-//ECDH return code
-enum ECDH_RET_CODE
-{
-    ECDH_SUCCESS = PKE_SUCCESS,
-    ECDH_POINTOR_NULL = PKE_SUCCESS+0x60,
-    ECDH_INVALID_INPUT,
-};
+    //APIs
 
-
-//APIs
-
-/**
+    /**
  * @brief       ECDH compute key.
  * @param[in]   curve           - eccp curve struct pointer.
  * @param[in]   local_prikey    - local private key, big-endian.
@@ -55,8 +53,7 @@ enum ECDH_RET_CODE
  * @param[in]   KDF             - KDF function to get key.
  * @Return      0(success), other(error).
  */
-unsigned int ecdh_compute_key(eccp_curve_t *curve, unsigned char *local_prikey, unsigned char *peer_pubkey, unsigned char *key,
-        unsigned int keyByteLen, KDF_FUNC kdf);
+    unsigned int ecdh_compute_key(eccp_curve_t *curve, unsigned char *local_prikey, unsigned char *peer_pubkey, unsigned char *key, unsigned int keyByteLen, KDF_FUNC kdf);
 
 
 #ifdef __cplusplus

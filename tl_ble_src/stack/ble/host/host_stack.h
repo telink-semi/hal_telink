@@ -31,64 +31,61 @@
 #include "tl_common.h"
 #include "drivers.h"
 
+#ifdef MCU_CORE_D25F_ENABLE
+// todo: xh
+// todo: remove later qihang.mou
+#include "stack/ble/host_v1/host_internal.h"
+#endif
 
-
-
-_attribute_aligned_(4)
-typedef struct {
-
-
+_attribute_aligned_(4) typedef struct
+{
     u32 host_init_err;
 
 } host_param_t;
-extern host_param_t  blhPara;
 
+extern host_param_t blhPara;
 
+_attribute_aligned_(4) typedef struct __attribute__((packed))
+{
+    u16 l2cap_connParaUpdateReq_minInterval;
+    u16 l2cap_connParaUpdateReq_maxInterval;
+    u16 l2cap_connParaUpdateReq_latency;
+    u16 l2cap_connParaUpdateReq_timeout;
 
-_attribute_aligned_(4)
-typedef struct __attribute__((packed))  {
-    u16     l2cap_connParaUpdateReq_minInterval;
-    u16     l2cap_connParaUpdateReq_maxInterval;
-    u16     l2cap_connParaUpdateReq_latency;
-    u16     l2cap_connParaUpdateReq_timeout;
-
-    u32     l2cap_connParaUpReq_pending;  //must "u32"
-//  u8      u8_rsvd[3];
-
-
+    u32 l2cap_connParaUpReq_pending; //must "u32"
+    //  u8      u8_rsvd[3];
 
 
 } host_acl_ms_t;
+
 extern host_acl_ms_t blhAclms[];
 
-_attribute_aligned_(4)
-typedef struct {
+_attribute_aligned_(4) typedef struct
+{
     u32 rsvd;
 
 } host_acl_m_t;
+
 extern host_acl_m_t blhAclm[];
 
-
-_attribute_aligned_(4)
-typedef struct {
+_attribute_aligned_(4) typedef struct
+{
     u32 rsvd;
 
 } host_acl_s_t;
+
 extern host_acl_s_t blhAcls[];
 
 
+#define BLT_HOST_DBUG(en, fmt, ...) \
+    if (DBG_HOST_LOG)               \
+        tlkapi_printf(en, "[HOST]" fmt "\n", ##__VA_ARGS__);
 
+void blt_host_init(void *base, u32 size);
 
-
-
-
-#define BLT_HOST_DBUG(en, fmt, ...)             if(DBG_HOST_LOG)    tlkapi_printf(en, "[HOST]" fmt "\n", ##__VA_ARGS__);
-
-void blt_host_init(void);
-
-void* blt_host_mallocAclConn(void* head, u16 connHandle, u16 scid, u16 len);
-void* blt_host_getAclConn(void* head, u16 connHandle, u16 scid);
-void blt_host_freeAclConn(void* head, void* node);
+void *blt_host_mallocAclConn(void *head, u16 connHandle, u16 scid, u16 len);
+void *blt_host_getAclConn(void *head, u16 connHandle, u16 scid);
+void  blt_host_freeAclConn(void *head, void *node);
 
 
 #endif /* STACK_BLE_HOST_HOST_STACK_H_ */

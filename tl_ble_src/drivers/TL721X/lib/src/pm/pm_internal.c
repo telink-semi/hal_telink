@@ -38,23 +38,23 @@
 #include "watchdog.h"
 
 
-#define PM_IRQ_STATUS_MAX_CLR_TIMES     3
+#define PM_IRQ_STATUS_MAX_CLR_TIMES 3
 
 
-extern unsigned char pll_vco_itrim;
+extern unsigned char          pll_vco_itrim;
 extern volatile unsigned char g_pm_system_reboot_event;
 
-_attribute_data_retention_sec_ unsigned int g_pm_xtal_stable_loopnum = 10;
-_attribute_data_retention_sec_ pm_cal_vdd0p94_t g_pm_cal_vdd0p94_info = {TRIM_VDD0P94_TO_0P963V, TRIM_VDD0P94_TO_0P963V, TRIM_VDD0P94_TO_1P078V, TRIM_VDD0P94_TO_1P078V};
-_attribute_data_retention_sec_ unsigned char g_pm_cal_vddo1p8_info = TRIM_VDDO1P8_TO_1P832V;
-_attribute_data_retention_sec_ pm_cal_0p94v_e g_pm_vdd0p94_level = CAL_0P94V_TO_0P95V;
+_attribute_data_retention_sec_ unsigned int     g_pm_xtal_stable_loopnum = 10;
+_attribute_data_retention_sec_ pm_cal_vdd0p94_t g_pm_cal_vdd0p94_info    = {TRIM_VDD0P94_TO_0P963V, TRIM_VDD0P94_TO_0P963V, TRIM_VDD0P94_TO_1P078V, TRIM_VDD0P94_TO_1P078V};
+_attribute_data_retention_sec_ unsigned char    g_pm_cal_vddo1p8_info    = TRIM_VDDO1P8_TO_1P832V;
+_attribute_data_retention_sec_ pm_cal_0p94v_e   g_pm_vdd0p94_level       = CAL_0P94V_TO_0P95V;
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
 volatile unsigned char debug_ana_reg64_value[3];
-volatile unsigned int debug_ana_32k_tick_cur[3];
-volatile unsigned int debug_ana_32k_tick_set[3];
-volatile unsigned char debug_wakeup_src_clr_err=0;
-volatile unsigned char debug_xtal_num=0;
+volatile unsigned int  debug_ana_32k_tick_cur[3];
+volatile unsigned int  debug_ana_32k_tick_set[3];
+volatile unsigned char debug_wakeup_src_clr_err = 0;
+volatile unsigned char debug_xtal_num           = 0;
 #endif
 
 /**
@@ -62,17 +62,15 @@ volatile unsigned char debug_xtal_num=0;
  *              [DRIV-1966]The power consumption of PLL is 260uA in LDO mode and 100uA in DCDC mode.
  * @return      none.
  */
-_attribute_ram_code_com_sec_optimize_o2_noinline_ void pm_bbpll_power_up(void)
+_attribute_ram_code_sec_optimize_o2_noinline_ void pm_bbpll_power_up(void)
 {
-    analog_write_reg8(areg_aon_0x06, analog_read_reg8(areg_aon_0x06) & (~FLD_PD_BBPLL_LDO));//power up pll
+    analog_write_reg8(areg_aon_0x06, analog_read_reg8(areg_aon_0x06) & (~FLD_PD_BBPLL_LDO)); //power up pll
 
     /*
-        trim bit for VCO ibias: from default 101 to 100
-        To some extent, it can solve the problem of PLL lock loss. Issue(TER-111)
-        The final plan needs further testing to determine.
-        (add by jilong.liu, confirmed by yangya 20241223)
+        trim bit for VCO ibias: from default 101 to 010. Issue(TER-111)
+        (add by jilong.liu, confirmed by yangya 20250107)
     */
-    analog_write_reg8(areg_0x84, (analog_read_reg8(areg_0x84) & 0x1f) | 0x80);//solve pll issue
+    analog_write_reg8(areg_0x84, (analog_read_reg8(areg_0x84) & 0x1f) | 0x40);//the central value of VCO
 
     pm_wait_bbpll_done();
 }
@@ -81,13 +79,13 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ void pm_bbpll_power_up(void)
  * @brief       this function servers to wait BBPLL clock lock.
  * @return      none.
  */
-_attribute_ram_code_com_sec_optimize_o2_noinline_ void pm_wait_bbpll_done(void)
+_attribute_ram_code_sec_optimize_o2_noinline_ void pm_wait_bbpll_done(void)
 {
     analog_write_reg8(areg_0x85, analog_read_reg8(areg_0x85) | FLD_LOCK_DET_SIG_ENABLE);
     analog_write_reg8(areg_0x86, analog_read_reg8(areg_0x86) | FLD_LOCK_DET_SIG_RESET);
 
     /*
-        Tercel A0 version PLL has a issue(TER-9) that pll cannot get ready signal so here need a vco trim process.
+        tl721x A0 version PLL has a issue(TER-9) that pll cannot get ready signal so here need a vco trim process.
         A1 version has fixed this issue.
     */
     if (g_chip_version == CHIP_VERSION_A0) {
@@ -98,11 +96,11 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ void pm_wait_bbpll_done(void)
         * In this case, it is necessary to try adjusting the trim value until a stable PLL signal is obtained.
         * Note: If the obtained gear value here is relatively marginal, it may still affect the stability of PLL
         * in the case of large temperature changes in the future.
-        * The Tercel chip select 240MHz as PLL frequency, so the start point vco is 101(5).
+        * The tl721x chip select 240MHz as PLL frequency, so the start point vco is 101(5).
         * (add by jilong.liu, confirmed by yangya 20240130)
         */
         for (unsigned char vco_trim = pll_vco_itrim; vco_trim > 0; vco_trim--) {
-            core_cclk_delay_tick((unsigned long long)(sys_clk.cclk * 20));//20us, wait vco ibias trim stable
+            core_cclk_delay_tick((unsigned long long)(sys_clk.cclk * 20)); //20us, wait vco ibias trim stable
             for (unsigned char i = 0; i < 3; i++) {
                 if (FLD_BBPLL_LOCK_DETECTOR == (analog_read_reg8(areg_0x88) & FLD_BBPLL_LOCK_DETECTOR)) {
                     trim_ok = 1;
@@ -119,10 +117,17 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ void pm_wait_bbpll_done(void)
             The current temporary solution is while(0 == trim_ok) to make it easier to identify issues.
             If this solution is really adopted in the follow-up, will change it to system reboot.
         */
-        while(0 == trim_ok);
+        while (0 == trim_ok);
     } else {
-        unsigned char pll_ok = 0;
-        unsigned long long start = rdmcycle();
+        unsigned char pll_ok = 0, trim_time = 0;
+        /*
+         * afe0p8v_reg04<7:5>(bbpll_240M_vco_itrim<2:0>) trim bit for VCO ibias:
+         * The results show that the central value of VCO is 2(0x40).
+         * If the central value cannot get PLL ready, try to diverge the values towards both ends in sequence.
+         * (add by jilong.liu, confirmed by yangya at 20250107)
+         */
+        unsigned char pll_vco_value[4] = {0x60, 0x20, 0x80, 0x00};
+        unsigned long long start0 = rdmcycle(), start1 = rdmcycle();
         /*
         * The standard for judging the stability of PLL is that the ready flag bit read three times in a row is 1.
         * (add by jilong.liu, confirmed by wenfeng.lou 20241203)
@@ -133,9 +138,22 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ void pm_wait_bbpll_done(void)
             } else {
                 pll_ok = 0;
             }
-            //increase timeout to 10ms in case.
-            if(core_cclk_time_exceed(start, 1000 * 10))
+            /*
+             * Each vco value check for 200us, if the PLL still not stable after completing one round trim, 
+             * reset the vco value to the central value and repeat the trim process until it stabilizes or 10ms times out.
+             */
+            if(core_cclk_time_exceed(start0, 200))
             {
+                if (trim_time < 4) {
+                    analog_write_reg8(areg_0x84, (analog_read_reg8(areg_0x84) & 0x1f) | pll_vco_value[trim_time++]);
+                } else {
+                    analog_write_reg8(areg_0x84, (analog_read_reg8(areg_0x84) & 0x1f) | 0x40);//the central value of VCO
+                    trim_time = 0;
+                }
+                start0 = rdmcycle();
+            }
+            //increase timeout to 10ms in case.
+            if (core_cclk_time_exceed(start1, 1000 * 10)) {
                 drv_timeout_handler(DRV_API_ERROR_TIMEOUT_PLL_DONE);
             }
         }
@@ -159,7 +177,7 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ void pm_wait_bbpll_done(void)
  * @attention   This function can only be called with the 24M clock configuration
  * @return      none.
  */
-_attribute_ram_code_com_sec_optimize_o2_noinline_ void pm_wait_xtal_ready(unsigned char all_ramcode_en)
+_attribute_ram_code_sec_optimize_o2_noinline_ void pm_wait_xtal_ready(unsigned char all_ramcode_en)
 {
     //When adding this feature to each chip, it is important to note the following:
     //1.The percentage deviation of high and low temperatures for 24M RC, according to Eagle's test results, is:
@@ -184,14 +202,13 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ void pm_wait_xtal_ready(unsign
 
     reg_system_ctrl |= FLD_SYSTEM_TIMER_EN;
 
-    //The method to determine xtal stability here is to use the RC counting method. 
+    //The method to determine xtal stability here is to use the RC counting method.
     //After the RC delay of 40us, check whether the stimer count value exceeds 20us(i.e. more than 50% of the rc count value)
     //which is considered to have successfully started vibration.
-    //The setting of 10 times is to cover crystal oscillators with poor quality and slow onset as much as possible. 
+    //The setting of 10 times is to cover crystal oscillators with poor quality and slow onset as much as possible.
     //Currently, no worse situation has been encountered in use, so the maximum value is set to 10 times.
     //(added by jilong.liu, confirmed by wenfeng.lou at 20240410)
-    for(j = 0; j < g_pm_xtal_stable_loopnum; j++)
-    {
+    for (j = 0; j < g_pm_xtal_stable_loopnum; j++) {
 #if PM_XTAL_READY_DEBUG
         gpio_toggle(GPIO_PB4);
 #endif
@@ -200,24 +217,22 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ void pm_wait_xtal_ready(unsign
         //Note: Ensure that the current clock is 24M RC, otherwise the nop running time will not be 40us, resulting in a later calculation error and system reboot.
         //(add by weihua.zhang, confirmed by peng.sun 20230609)
         core_cclk_delay_tick((unsigned long long)(sys_clk.cclk * 40));
-        if(stimer_get_tick() - t0 > SYSTEM_TIMER_TICK_1US * 20)
-        {
+        if (stimer_get_tick() - t0 > SYSTEM_TIMER_TICK_1US * 20) {
             break;
         }
     }
 
 #if PM_XTAL_ONCE_DEBUG
-    if(j > 0)
-    {
-        while(1){}
+    if (j > 0) {
+        while (1) {
+        }
     }
 #endif
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     debug_xtal_num = j;
 #endif
 
-    if(j == g_pm_xtal_stable_loopnum)
-    {
+    if (j == g_pm_xtal_stable_loopnum) {
         //Use pm_get_sw_reboot_event() to check whether there has been a reset caused by the instability of the crystal oscillator.
         //If it is 1, it has occurred.
         pm_sys_reboot_with_reason(XTAL_UNSTABLE, all_ramcode_en);
@@ -229,91 +244,82 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ void pm_wait_xtal_ready(unsign
  * @brief       this function serves to clear all irq status.
  * @return      Indicates whether clearing irq status was successful.
  */
-_attribute_ram_code_com_sec_optimize_o2_noinline_ unsigned char pm_clr_all_irq_status(void)
+_attribute_ram_code_sec_optimize_o2_noinline_ unsigned char pm_clr_all_irq_status(void)
 {
     unsigned char j, ana_reg64 = 0xff;
-    for(j = 0; j < PM_IRQ_STATUS_MAX_CLR_TIMES; j++)
-    {
+    for (j = 0; j < PM_IRQ_STATUS_MAX_CLR_TIMES; j++) {
         pm_clr_irq_status(FLD_WAKEUP_STATUS_ALL);
         ana_reg64 = pm_get_wakeup_src();
-        if((ana_reg64 & WAKEUP_STATUS_INUSE_ALL) == 0x00){
+        if ((ana_reg64 & WAKEUP_STATUS_INUSE_ALL) == 0x00) {
             break;
-        }else{
-#if(PM_DEBUG)
-            debug_wakeup_src_clr_err = 1;
-            debug_ana_reg64_value[j] = ana_reg64;
+        } else {
+#if (PM_DEBUG)
+            debug_wakeup_src_clr_err  = 1;
+            debug_ana_reg64_value[j]  = ana_reg64;
             debug_ana_32k_tick_cur[j] = analog_read_reg32(0x60);
             debug_ana_32k_tick_set[j] = analog_read_reg32(0x65);
 #endif
         }
     }
-    if(j == PM_IRQ_STATUS_MAX_CLR_TIMES)
-    {
+    if (j == PM_IRQ_STATUS_MAX_CLR_TIMES) {
         return 0;
-    }else{
+    } else {
         return 1;
     }
 }
-
 
 /**
  * @brief       This function serves to recover system timer.
  *              The code is placed in the ram code section, in order to shorten the time.
  * @return      none.
  */
-_attribute_ram_code_com_sec_optimize_o2_noinline_ void pm_stimer_recover(void)
+_attribute_ram_code_sec_optimize_o2_noinline_ void pm_stimer_recover(void)
 {
 #if SYS_TIMER_AUTO_MODE
     stimer_enable(STIMER_AUTO_MODE_W_AND_NXT_32K_START, 0);
     unsigned int now_tick_32k = clock_get_32k_tick();
-    if(CLK_32K_RC == g_clk_32k_src)
-    {
-        if(g_pm_long_suspend){
+    if (CLK_32K_RC == g_clk_32k_src) {
+        if (g_pm_long_suspend) {
             g_pm_tick_cur = g_pm_tick_cur + (unsigned int)(now_tick_32k + 1 - g_pm_tick_32k_cur) / g_track_32kcnt * g_pm_tick_32k_calib;
-        }else{
+        } else {
             g_pm_tick_cur = g_pm_tick_cur + (unsigned int)(now_tick_32k + 1 - g_pm_tick_32k_cur) * g_pm_tick_32k_calib / g_track_32kcnt;
         }
-    }
-    else
-    {
-#if(STIMER_CLOCK == STIMER_CLOCK_16M)
-        if(g_pm_long_suspend){
+    } else {
+    #if (STIMER_CLOCK == STIMER_CLOCK_16M)
+        if (g_pm_long_suspend) {
             g_pm_tick_cur = g_pm_tick_cur + (unsigned int)(now_tick_32k + 1 - g_pm_tick_32k_cur) / 32 * CRYSTAL32768_TICK_PER_32CYCLE;
-        }else{
+        } else {
             g_pm_tick_cur = g_pm_tick_cur + (unsigned int)(now_tick_32k + 1 - g_pm_tick_32k_cur) * CRYSTAL32768_TICK_PER_32CYCLE / 32;
         }
-#elif(STIMER_CLOCK == STIMER_CLOCK_24M)
-        if(g_pm_long_suspend){
+    #elif (STIMER_CLOCK == STIMER_CLOCK_24M)
+        if (g_pm_long_suspend) {
             g_pm_tick_cur = g_pm_tick_cur + (unsigned int)(now_tick_32k + 1 - g_pm_tick_32k_cur) / 64 * CRYSTAL32768_TICK_PER_64CYCLE;
-        }else{
+        } else {
             g_pm_tick_cur = g_pm_tick_cur + (unsigned int)(now_tick_32k + 1 - g_pm_tick_32k_cur) * CRYSTAL32768_TICK_PER_64CYCLE / 64;
         }
-#endif
+    #endif
     }
     stimer_enable(STIMER_AUTO_MODE_W_AND_NXT_32K_DONE, g_pm_tick_cur + 1);
-    stimer_32k_tracking_enable();           //enable 32k cal
+    stimer_32k_tracking_enable(); //enable 32k cal
 
 #else
-    #error -- only for internal testing.
+    #error-- only for internal testing.
     unsigned int now_tick_32k = clock_get_32k_tick();
-    if(CLK_32K_RC == g_clk_32k_src)
-    {
-        if(g_pm_long_suspend){
+    if (CLK_32K_RC == g_clk_32k_src) {
+        if (g_pm_long_suspend) {
             g_pm_tick_cur = g_pm_tick_cur + (unsigned int)(now_tick_32k - g_pm_tick_32k_cur) / g_track_32kcnt * g_pm_tick_32k_calib;
-        }else{
+        } else {
             g_pm_tick_cur = g_pm_tick_cur + (unsigned int)(now_tick_32k - g_pm_tick_32k_cur) * g_pm_tick_32k_calib / g_track_32kcnt;
         }
-    }
-    else
-    {
-        if(g_pm_long_suspend){
+    } else {
+        if (g_pm_long_suspend) {
             g_pm_tick_cur = g_pm_tick_cur + (unsigned int)(now_tick_32k - g_pm_tick_32k_cur) / 64 * CRYSTAL32768_TICK_PER_64CYCLE;
-        }else{
+        } else {
             g_pm_tick_cur = g_pm_tick_cur + (unsigned int)(now_tick_32k - g_pm_tick_32k_cur) * CRYSTAL32768_TICK_PER_64CYCLE / 64;
         }
     }
     stimer_enable(STIMER_MANUAL_MODE, g_pm_tick_cur + 20 * SYSTEM_TIMER_TICK_1US);
-    stimer_32k_tracking_enable();   //enable 32k cal
+    stimer_32k_tracking_enable(); //enable 32k cal
 #endif
 }
 
@@ -321,9 +327,9 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ void pm_stimer_recover(void)
  * @brief      This function serves to get vdd0p94 and vddo1p8 current value from analog register.
  * @return     none.
  */
-_attribute_ram_code_com_sec_optimize_o2_noinline_ void pm_update_vdd0p94_level(void)
+_attribute_ram_code_sec_optimize_o2_noinline_ void pm_update_vdd0p94_level(void)
 {
-    unsigned char vdd0p94_ldo_value = analog_read_reg8(0x09) & 0x0f;
+    unsigned char vdd0p94_ldo_value  = analog_read_reg8(0x09) & 0x0f;
     unsigned char vdd0p94_dcdc_value = (analog_read_reg8(0x0c) & 0xf0) >> 4;
 
     if ((vdd0p94_ldo_value == g_pm_cal_vdd0p94_info.ldo_0p95v) && (vdd0p94_dcdc_value == g_pm_cal_vdd0p94_info.dcdc_0p95v)) {
@@ -343,9 +349,9 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ void pm_update_vdd0p94_level(v
 void pm_update_vdd0p94_vddo1p8_cal_value(unsigned char *vdd0p94_value, unsigned char vddo1p8_value)
 {
     g_pm_cal_vdd0p94_info.dcdc_0p95v = vdd0p94_value[0];
-    g_pm_cal_vdd0p94_info.ldo_0p95v = vdd0p94_value[1];
+    g_pm_cal_vdd0p94_info.ldo_0p95v  = vdd0p94_value[1];
     g_pm_cal_vdd0p94_info.dcdc_1p05v = vdd0p94_value[2];
-    g_pm_cal_vdd0p94_info.ldo_1p05v = vdd0p94_value[3];
+    g_pm_cal_vdd0p94_info.ldo_1p05v  = vdd0p94_value[3];
 
     g_pm_cal_vddo1p8_info = vddo1p8_value;
 }

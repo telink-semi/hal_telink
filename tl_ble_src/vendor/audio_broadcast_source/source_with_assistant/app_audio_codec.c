@@ -24,13 +24,13 @@
 #include "../source_config.h"
 #if (SOURCE_VERSION == SOURCE_WITH_ASSISTANT)
 
-#include "app_config.h"
-#include "app_audio.h"
-#include "stack/ble/ble.h"
-#include "vendor/common/tlk_api/tlk_codec.h"
-#if APP_AUDIO_INPUT_MODE <= APP_AUDIO_INPUT_CODEC_ENDING
+    #include "app_config.h"
+    #include "app_audio.h"
+    #include "stack/ble/ble.h"
+    #include "vendor/common/tlk_api/tlk_codec.h"
+    #if APP_AUDIO_INPUT_MODE <= APP_AUDIO_INPUT_CODEC_ENDING
 
-unsigned short gAppAudioBuffer[APP_AUDIO_FRAME_BYTES *2];
+unsigned short gAppAudioBuffer[APP_AUDIO_FRAME_BYTES * 2];
 
 /**
  * @brief       audio initial codec function
@@ -41,16 +41,14 @@ void app_audio_initCodec(void)
 {
     blc_audio_codecSpecCfgParam_t *codecCfg = &bisSource.BASE.BIG_param[0].codecCfg;
 
-    if(APP_AUDIO_INPUT_MODE <= APP_AUDIO_INPUT_CODEC_ENDING)
-    {
+    if (APP_AUDIO_INPUT_MODE <= APP_AUDIO_INPUT_CODEC_ENDING) {
         tlk_codec_init();
 
-#if(APP_AUDIO_INPUT_MODE == APP_AUDIO_INPUT_AMIC)
-        tlk_codec_config(TLK_CODEC_INPUT, codecCfg->samplingFreq, TLK_CODEC_2_CHANNEL, TLK_CODEC_MIC, (u8*)gAppAudioBuffer, sizeof(gAppAudioBuffer));
-#elif(APP_AUDIO_INPUT_MODE == APP_AUDIO_INPUT_LINEIN)
-        tlk_codec_config(TLK_CODEC_INPUT, codecCfg->samplingFreq, TLK_CODEC_2_CHANNEL, TLK_CODEC_LINE, (u8*)gAppAudioBuffer, sizeof(gAppAudioBuffer));
-#endif
-
+        #if (APP_AUDIO_INPUT_MODE == APP_AUDIO_INPUT_AMIC)
+        tlk_codec_config(TLK_CODEC_INPUT, codecCfg->samplingFreq, TLK_CODEC_2_CHANNEL, TLK_CODEC_MIC, (u8 *)gAppAudioBuffer, sizeof(gAppAudioBuffer));
+        #elif (APP_AUDIO_INPUT_MODE == APP_AUDIO_INPUT_LINEIN)
+        tlk_codec_config(TLK_CODEC_INPUT, codecCfg->samplingFreq, TLK_CODEC_2_CHANNEL, TLK_CODEC_LINE, (u8 *)gAppAudioBuffer, sizeof(gAppAudioBuffer));
+        #endif
     }
 }
 
@@ -69,16 +67,14 @@ void app_audio_cleanCodecRxBuffer(void)
  * @param[in]   none
  * @return      none
  */
-void app_audio_getCodecData(u16* pcm)
+void app_audio_getCodecData(u16 *pcm)
 {
-    if(tlk_codec_input_dataPop((u8*)pcm, 4*codecFrameDataLen) != TLK_CODEC_SUCCESS)
-    {
-        memset(pcm, 0, 4*codecFrameDataLen);
+    if (tlk_codec_input_dataPop((u8 *)pcm, 4 * codecFrameDataLen) != TLK_CODEC_SUCCESS) {
+        memset(pcm, 0, 4 * codecFrameDataLen);
     }
 }
 
 
-#endif
+    #endif
 
-#endif      //SOURCE_VERSION == SOURCE_WITH_ASSISTANT
-
+#endif //SOURCE_VERSION == SOURCE_WITH_ASSISTANT

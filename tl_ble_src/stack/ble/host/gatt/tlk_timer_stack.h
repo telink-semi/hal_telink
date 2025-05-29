@@ -1,5 +1,5 @@
 /********************************************************************************************************
- * @file    tlk_timer.h
+ * @file    tlk_timer_stack.h
  *
  * @brief   This is the header file for BLE SDK
  *
@@ -24,29 +24,31 @@
 #pragma once
 
 
-#define     MAINLOOP_ENTRY                          0
-#define     CALLBACK_ENTRY                          1
+#define MAINLOOP_ENTRY 0
+#define CALLBACK_ENTRY 1
 
-enum{
-    APP_SOFT_TIMER_RET_STATUS_SUCCESS    = 0,
+enum
+{
+    APP_SOFT_TIMER_RET_STATUS_SUCCESS = 0,
     APP_SOFT_TIMER_RET_STATUS_PARAM_CHECK_FAILED,
 };
 
-typedef int (*softTimeoutCallback_t)(void* arg);
+typedef int (*softTimeoutCallback_t)(void *arg);
 
-struct soft_timer {
-    struct soft_timer* next;
+struct soft_timer
+{
+    struct soft_timer    *next;
     softTimeoutCallback_t cb;
-    int timer;                  //unit ms.
-    void* arg;
-}__attribute__((packed));
+    int                   timer; //unit ms.
+    void                 *arg;
+} __attribute__((packed));
 
-#define SOFT_TIMER_CONFIG(pTimer, func, timerMs, argv)  \
-    (pTimer)->cb = func;    \
-    (pTimer)->timer = timerMs;  \
-    (pTimer)->arg = argv
+#define SOFT_TIMER_CONFIG(pTimer, func, timerMs, argv) \
+    (pTimer)->cb    = func;                            \
+    (pTimer)->timer = timerMs;                         \
+    (pTimer)->arg   = argv
 
 void soft_timer_initial(void);
-int soft_timer_add(struct soft_timer* pTimer);
-int soft_timer_delete(struct soft_timer* pTimer);
+int  soft_timer_add(struct soft_timer *pTimer);
+int  soft_timer_delete(struct soft_timer *pTimer);
 void soft_timer_process(int type);

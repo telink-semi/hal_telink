@@ -48,20 +48,18 @@
 
 /** Sniffer sub node: monitor LE central devices
  *  Transport use CANFD or UART. */
-#define MONITOR_CENTRAL                                 1
+#define MONITOR_CENTRAL 1
 /** Sniffer sub node: monitor LE central and peripheral devices
  *  Transport use CANFD or UART. */
-#define MONITOR_CENTRAL_PERIPHERAL                      2
+#define MONITOR_CENTRAL_PERIPHERAL 2
 /** Sniffer sub node: monitor LE advertising
  *  Transport use CANFD or UART. */
-#define OBSERVER                                        3
+#define OBSERVER                      3
+
+#define MONITOR_CS_CENTRAL_PERIPHERAL 4
 
 /** Sniffer sub node select */
-#define MONITOR_ROLE_SELECT                             MONITOR_CENTRAL_PERIPHERAL
-
-
-
-
+#define MONITOR_ROLE_SELECT MONITOR_CS_CENTRAL_PERIPHERAL
 
 
 #if (MONITOR_ROLE_SELECT == MONITOR_CENTRAL)
@@ -70,37 +68,49 @@
     #include "monitor_central_peripheral/app_config.h"
 #elif (MONITOR_ROLE_SELECT == OBSERVER)
     #include "observer/app_config.h"
+#elif (MONITOR_ROLE_SELECT == MONITOR_CS_CENTRAL_PERIPHERAL)
+    #include "monitor_cs_cent_perif/app_config.h"
 #else
     #error "monitor role select error!!!"
 #endif
 
 
-
-
-
-
-
-
 /** Sniffer Feature Configuration */
-#define LL_RSSI_SNIFFER_SLAVE_ENABLE                1
-#define LL_RSSI_SNIFFER_MASTER_ENABLE               1
-#define DRV_RSSI_SNIFFER_MODE_ENABLE                1
-#define SCAN_EN_MORE_STRATEGY                       1
+#define LL_RSSI_SNIFFER_SLAVE_ENABLE  1
+#define LL_RSSI_SNIFFER_MASTER_ENABLE 1
+#define DRV_RSSI_SNIFFER_MODE_ENABLE  1
+#define SCAN_EN_MORE_STRATEGY         1
 
 /* Attention: */
-#define APP_EXCEPTION_STUCK_EN                      0 //It can be used for debugging during the development stage and must be turned off for mass production
+//#define APP_EXCEPTION_STUCK_EN 1 //release SDK remove!!!
+#define APP_EXCEPTION_STUCK_EN 0 //It can be used for debugging during the development stage and must be turned off for mass production
 #if (APP_EXCEPTION_STUCK_EN != 0)
     #error "APP_EXCEPTION_STUCK_EN must be turned off for mass production"
 #endif
 
-
-#define REMOTE_DEVICE_MAX_NUM                       8
-#define REMOTE_DEVICE_MAX_MASK                      0x07    // Note: 8(0~7) => 0x07
+#define REMOTE_DEVICE_MAX_NUM  8
+#define REMOTE_DEVICE_MAX_MASK 0x07 //Note: 8(0~7) => 0x07
 #if (REMOTE_DEVICE_MAX_NUM != 8)
     #error "REMOTE_DEVICE_MAX_NUM can not be changed"
 #endif
 #if (REMOTE_DEVICE_MAX_MASK != 0x07)
     #error "REMOTE_DEVICE_MAX_MASK can not be changed"
 #endif
+
+#define LOCAL_ALL_SNIFFER_INDEX 0xFE //Note: Used for general purpose commands, does not distinguish the INDEX of sub node.
+#define LOCAL_SNIFFER_NUM_MAX   6    //Note: The maximum number of sub nodes is 6.
+
+/* CAN-ID */
+#define MAIN_NODE_TO_SUB_NODE_SYNC_SID   0x731
+#define SUB_NODE_TO_MAIN_NODE_RSP_SID    0x737
+#define SUB_NODE_TO_MAIN_NODE_DATA_SID_0 0x751
+#define SUB_NODE_TO_MAIN_NODE_DATA_SID_1 0x752
+#define SUB_NODE_TO_MAIN_NODE_DATA_SID_2 0x753
+#define SUB_NODE_TO_MAIN_NODE_DATA_SID_3 0x754
+#define SUB_NODE_TO_MAIN_NODE_DATA_SID_4 0x755
+#define SUB_NODE_TO_MAIN_NODE_DATA_SID_5 0x756
+#define ECU_TO_MAIN_NODE_REQ_SID         0x767
+#define MAIN_NODE_TO_ECU_REPORT_SID      0x777
+
 
 #endif /* SUB_NODE_CONFIG_H_ */

@@ -26,23 +26,17 @@
 #include "stack/ble/ble.h"
 
 
-
-
 const u8 gAppBasssRecvStateCnt = APP_AUDIO_BASS_SERVER_RECV_STATE_CNT;
 
 const blc_adv_broadcastId_t advDefBroadcastId = {
-    .ltv.len = sizeof(blc_adv_broadcastId_t) -1,
-    .ltv.type = DT_SERVICE_DATA_16BIT_UUID,
-    .baasUuid = SERVICE_UUID_BROADCAST_AUDIO_ANNOUNCEMENT,
+    .ltv.len     = sizeof(blc_adv_broadcastId_t) - 1,
+    .ltv.type    = DT_SERVICE_DATA_16BIT_UUID,
+    .baasUuid    = SERVICE_UUID_BROADCAST_AUDIO_ANNOUNCEMENT,
     .broadcastId = {U24_TO_BYTES(DEFAULT_BROADCAST_ID)},
 };
 
 const blc_adv_broadcastSink_t advDefBroadcastSink = {
-    .ltv.len = sizeof(blc_adv_broadcastSink_t) -1,
+    .ltv.len  = sizeof(blc_adv_broadcastSink_t) - 1,
     .ltv.type = DT_SERVICE_DATA_16BIT_UUID,
     .bassUuid = SERVICE_UUID_BROADCAST_AUDIO_SCAN,
 };
-
-
-
-

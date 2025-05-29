@@ -24,14 +24,15 @@
 #include "../source_config.h"
 #if (SOURCE_VERSION == SOURCE_WITH_ASSISTANT)
 
-#define MAX_LINK_NUM                            ACL_CENTRAL_MAX_NUM
-#define MAX_SOURCE_INFO_NUM                     10
-#define MAX_SINK_INFO_NUM                       5
+    #define MAX_LINK_NUM               ACL_CENTRAL_MAX_NUM
+    #define MAX_SOURCE_INFO_NUM        10
+    #define MAX_SINK_INFO_NUM          5
 
-#define CONNECT_SINK_NO_HAD_SOURCE              1
-#define CONNECT_SINK_HAD_SOURCE                 2
+    #define CONNECT_SINK_NO_HAD_SOURCE 1
+    #define CONNECT_SINK_HAD_SOURCE    2
 
-typedef enum{
+typedef enum
+{
     SINK_STATE_DISCONNECT = 0,
     SINK_STATE_CONNECT,
     SINK_STATE_ADD_SOURCE,
@@ -42,71 +43,79 @@ typedef enum{
     SINK_STATE_NO_SOURCE,
 } sink_state_enum;
 
-typedef struct{
-    u8 isUsed;
+typedef struct
+{
+    u8  isUsed;
     u16 connHandle;
-    u8 addrType;
-    u8 address[6];
-    struct {
-        bool PACS_server    :1;
-        bool BASS_server    :1;
-        bool VCS_server     :1;
-        bool Vocs_server    :1;
+    u8  addrType;
+    u8  address[6];
 
-        bool sdp_over       :1;
+    struct
+    {
+        bool PACS_server : 1;
+        bool BASS_server : 1;
+        bool VCS_server  : 1;
+        bool Vocs_server : 1;
+
+        bool sdp_over : 1;
     };
-    sink_state_enum sinkState;  //Sync BIS or no Sync BIS
-    u8 remoteSourceId;
-    int sourceIndex;
-    int bisSync;
-    u8 pastFlag;
-    char broadcastCode[17];
-    char deviceName[50];
+
+    sink_state_enum sinkState; //Sync BIS or no Sync BIS
+    u8              remoteSourceId;
+    int             sourceIndex;
+    int             bisSync;
+    u8              pastFlag;
+    char            broadcastCode[17];
+    char            deviceName[50];
 } connect_info_t;
 
-typedef struct {
-    u8 connCnt;
+typedef struct
+{
+    u8             connCnt;
     connect_info_t conn[MAX_LINK_NUM];
 } app_connect_info_t;
 
-typedef struct{
-    u8 addrType;
-    u8 address[6];
+typedef struct
+{
+    u8   addrType;
+    u8   address[6];
     char deviceName[50];
 } sink_info_t;
 
-typedef struct{
-    u8  advAddrType;
-    u8  advAddr[6];
-    u8  advSID;
+typedef struct
+{
+    u8 advAddrType;
+    u8 advAddr[6];
+    u8 advSID;
     u8 broadcastId[3];
 
     u8 usedFlag;
     u8 enc;
 
-    u8 bisCnt;
-    u8 bisIndex[2];
+    u8            bisCnt;
+    u8            bisIndex[2];
     bisSyncInfo_t bisInfo[2];
 
     char completeName[50];
     char broadcastName[50];
 
-}source_info_t;
+} source_info_t;
 
-typedef struct {
-    u8 completeNameLen;
+typedef struct
+{
+    u8   completeNameLen;
     char completeName[50];
-    u8 broadcastNameLen;
+    u8   broadcastNameLen;
     char broadcastName[50];
 
     blc_audio_source_head_t head;
-}SourceInfo_t;
-
+} SourceInfo_t;
 
 /**
  *  @brief  app audio event callback parameter
  */
-typedef struct{
+typedef struct
+{
     audio_event_enum id;
     int (*evtCb)(u16 connHandle, u8 *pData, u16 dataLen);
 } app_audio_evtCb_t;
@@ -116,7 +125,7 @@ void app_assistant_init(void);
 void app_assistant_handler(void);
 
 extern const char locationStr[32][30];
-extern bool muteFlag;
+extern bool       muteFlag;
 
 /**
  * @brief       app display all source information to uart/usb-cdc.
@@ -194,5 +203,5 @@ u16 app_audio_getConnHandle(u8 index);
  * @param[in]   connHandle: ACL connect handle.
  * @return      connect information point/NULL.
  */
-connect_info_t * app_audio_getConn(u16 connHandle);
+connect_info_t *app_audio_getConn(u16 connHandle);
 #endif //SOURCE_VERSION == SOURCE_WITH_ASSISTANT

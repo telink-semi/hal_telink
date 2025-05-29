@@ -41,4 +41,4 @@ void app_audio_ui_init(void);
  */
 void app_audio_ui_loop(void);
 
-#endif  //SOURCE_VERSION == SOURCE_WITH_ASSISTANT
+#endif //SOURCE_VERSION == SOURCE_WITH_ASSISTANT

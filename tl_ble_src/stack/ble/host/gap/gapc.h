@@ -23,22 +23,24 @@
  *******************************************************************************************************/
 #pragma once
 
-#define BLT_GAPC_DEBUG(fmt, ...)                BLT_HOST_DBUG(DBG_GAPC_LOG, "[GAPC]"fmt, ##__VA_ARGS__)
+#define BLT_GAPC_DEBUG(fmt, ...)   BLT_HOST_DBUG(DBG_GAPC_LOG, "[GAPC]" fmt, ##__VA_ARGS__)
 
-#define GAPC_DISCOVERY_MAX_NUM              2
-#define GAPC_DISC_MAX_ATTR_INFO             2
-#define GAPC_DISC_MAX_INCLUDE_INFO          3
+#define GAPC_DISCOVERY_MAX_NUM     2
+#define GAPC_DISC_MAX_ATTR_INFO    2
+#define GAPC_DISC_MAX_INCLUDE_INFO 3
 
-typedef enum{
-    GAPC_CHAR_FIND_DESCRIPTOR = BIT(2),
-    GAPC_CHAR_SUBSCRIBE_CCC_NOTIFY = BITS(0, 2),
+typedef enum
+{
+    GAPC_CHAR_FIND_DESCRIPTOR        = BIT(2),
+    GAPC_CHAR_SUBSCRIBE_CCC_NOTIFY   = BITS(0, 2),
     GAPC_CHAR_SUBSCRIBE_CCC_INDICATE = BITS(1, 2),
-    GAPC_CHAR_SUBSCRIBE_CCC_ALL = BITS(0, 1, 2),
-    GAPC_CHAR_READ_CHARACTER_VALUE = BIT(3),
+    GAPC_CHAR_SUBSCRIBE_CCC_ALL      = BITS(0, 1, 2),
+    GAPC_CHAR_READ_CHARACTER_VALUE   = BIT(3),
 } blc_gapc_char_setting_enum;
 
-typedef struct{
-    u8 properties;  //supported CHAR_PROP_READ, CHAR_PROP_NOTIFY, CHAR_PROP_INDICATE
+typedef struct __attribute__((packed))
+{
+    u8  properties; //supported CHAR_PROP_READ, CHAR_PROP_NOTIFY, CHAR_PROP_INDICATE
     u16 valueHandle;
     u16 cccHandle;
 } blc_gapc_charInfo_t;
@@ -69,13 +71,13 @@ typedef void (*gapc_foundChar_fun_t)(u16 connHandle, u8 serviceCount, u8 propert
  * @param properties --- characteristic properties. reference ATT_READ_BY_TYPE_RSP.
  * @param valueHandle --- characteristic value handle.
  */
-typedef void (*gapc_foundUnknownChar_func_t)(u16 connHandle, uuid_t* uuid, u8 properties, u16 valueHandle);
+typedef void (*gapc_foundUnknownChar_func_t)(u16 connHandle, uuid_t *uuid, u8 properties, u16 valueHandle);
 /*
  * @param connHandle --- acl connection handle.
  * @param uuid --- characteristic Descriptors uuid. reference ATT_FIND_INFORMATION_RSP.
  * @param attrHandle --- characteristic Descriptors attribute handle.
  */
-typedef void (*gapc_foundCharDesc_func_t)(u16 connHandle, uuid_t* uuid, u16 attrHandle);
+typedef void (*gapc_foundCharDesc_func_t)(u16 connHandle, uuid_t *uuid, u16 attrHandle);
 /*
  * @param connHandle --- acl connection handle.
  * @param attrHandle --- read characteristic value attribute handle.
@@ -87,7 +89,7 @@ typedef void (*gapc_foundCharDesc_func_t)(u16 connHandle, uuid_t* uuid, u16 attr
  * use read/readLen/readMaxSize, gap layer will write characteristic value to read.
  * use rdCbFunc:GAP layer will GATT layer callback pass to higher level.
  */
-typedef void (*gapc_startReadChar_func_t)(u16 connHandle, u16 attrHandle, u8** read, u16** readLen, u16* readMaxSize, gapc_read_func_t *rdCbFunc);
+typedef void (*gapc_startReadChar_func_t)(u16 connHandle, u16 attrHandle, u8 **read, u16 **readLen, u16 *readMaxSize, gapc_read_func_t *rdCbFunc);
 /*
  * @param connHandle --- acl connection handle.
  * @param cccHandle --- CCC value handle.
@@ -107,13 +109,13 @@ typedef bool (*gapc_foundInclude_func_t)(u16 connHandle, u16 startHandle, u16 en
  * @param startHandle --- found include uuid start attribute handle.
  * @param endHandle --- found include uuid end attribute handle.
  */
-typedef void (*gapc_foundUnknownInclude_func_t)(u16 connHandle, uuid_t* uuid, u16 startHandle, u16 endHandle);
+typedef void (*gapc_foundUnknownInclude_func_t)(u16 connHandle, uuid_t *uuid, u16 startHandle, u16 endHandle);
 /*
  * @param connHandle --- acl connection handle.
  * @param charInfo --- get characteristic information point.
  * @return [0, 1] --- the size that charInfo.
  */
-typedef int (*gapc_getCharInfo_fun_t)(u16 connHandle, blc_gapc_charInfo_t* charInfo);
+typedef int (*gapc_getCharInfo_fun_t)(u16 connHandle, blc_gapc_charInfo_t *charInfo);
 
 /*
  * @param connHandle --- acl connection handle.
@@ -132,27 +134,33 @@ typedef bool (*gapc_reconnIncl_fun_t)(u16 connHandle, int count);
  */
 typedef bool (*gapc_reconnService_fun_t)(u16 connHandle, int count);
 
-typedef struct{
+typedef struct __attribute__((packed))
+{
     //service uuid.
     uuid_t uuid;
     //found service uuid callback function.
     gapc_foundService_func_t sfun;
 } blc_gapc_discService_t;
 
-typedef struct{
-    union {
+typedef struct __attribute__((packed))
+{
+    union
+    {
         u8 setting; //blc_gapc_char_setting_enum
-        struct {
+
+        struct
+        {
             //Automatically subscribe to the notify property, if had.
-            bool subscribeNtf   :1;
+            bool subscribeNtf : 1;
             //Automatically subscribe to the indicate property, if had.
-            bool subscribeInd   :1;
+            bool subscribeInd : 1;
             //found Descriptors, if had.
-            bool findDecs       :1;
+            bool findDecs : 1;
             //Automatically read characteristic value, if had read property.
-            bool readValue      :1;
+            bool readValue : 1;
         };
     };
+
     //characteristic uuid.
     uuid_t uuid;
     //found characteristic uuid callback function.
@@ -165,7 +173,8 @@ typedef struct{
     gapc_startReadChar_func_t rfun;
 } blc_gapc_discChar_t;
 
-typedef struct{
+typedef struct __attribute__((packed))
+{
     //supported characteristic uuid size.
     u8 size;
     //discovery characteristic uuid table.
@@ -174,7 +183,8 @@ typedef struct{
     gapc_foundUnknownChar_func_t ufun;
 } blc_gapc_discCharTable_t;
 
-typedef struct{
+typedef struct __attribute__((packed))
+{
     //discovery include service uuid.
     uuid_t uuid;
     //include characteristic uuid table.
@@ -183,7 +193,8 @@ typedef struct{
     gapc_foundInclude_func_t ifun;
 } blc_gapc_discInclude_t;
 
-typedef struct{
+typedef struct __attribute__((packed))
+{
     //supported discovery include uuid size.
     u8 size;
     //include discovery information table.
@@ -192,36 +203,41 @@ typedef struct{
     gapc_foundUnknownInclude_func_t uifun;
 } blc_gapc_discIncludeTable_t;
 
-typedef struct{
+typedef struct __attribute__((packed))
+{
     //discovery service uuid maximum count.
-    u8 maxServiceCount;
-    const blc_gapc_discService_t *service;
+    u8                                maxServiceCount;
+    const blc_gapc_discService_t     *service;
     const blc_gapc_discIncludeTable_t includeTable;
-    const blc_gapc_discCharTable_t characteristicTable;
+    const blc_gapc_discCharTable_t    characteristicTable;
 } blc_gapc_discList_t;
 
-typedef struct{
+typedef struct __attribute__((packed))
+{
     //get characteristic information callback function.
     gapc_getCharInfo_fun_t ifun;
     //want read characteristic value callback function.
     gapc_startReadChar_func_t rfun;
 } blc_gapc_reconnChar_t;
 
-typedef struct{
+typedef struct __attribute__((packed))
+{
     //supported reconnect characteristic size.
     u8 size;
     //reconnect characteristic list.
     const blc_gapc_reconnChar_t *characteristic;
 } blc_gapc_reconnCharTable_t;
 
-typedef struct{
+typedef struct __attribute__((packed))
+{
     //gapc reconnect include characteristic callback function. if not set, default 1.
     gapc_reconnIncl_fun_t reifun;
     // reconnect include characteristic table list.
     const blc_gapc_reconnCharTable_t charTb;
 } blc_gapc_reconnInclTable_t;
 
-typedef struct{
+typedef struct __attribute__((packed))
+{
     const uuid_t serviceUuid;
     //gapc reconnect service characteristic callback function. if not set, default 1.
     gapc_reconnService_fun_t resfun;
@@ -236,10 +252,11 @@ typedef struct{
 
 } blc_gapc_reconnList_t;
 
-typedef void (*gapc_write_func_t)(u16 connHandle, u8 err, void* data);
+typedef void (*gapc_write_func_t)(u16 connHandle, u8 err, void *data);
 
 /** @brief GAP Write procedure parameters configuration */
-typedef struct gapc_write_cfg {
+typedef struct __attribute__((packed))
+{
     /** Response callback */
     gapc_write_func_t func;
     /** Attribute handle */
@@ -251,11 +268,12 @@ typedef struct gapc_write_cfg {
     /** If true use Write command procedure. */
     bool withoutRsp;
     /** response callback input data*/
-    void* cbData;
+    void *cbData;
 } gapc_write_cfg_t;
 
 /** @brief GAP read procedure parameters configuration */
-typedef struct gapc_read_cfg {
+typedef struct  __attribute__((packed))
+{
     /** Response callback */
     gapc_read_func_t func;
     /** Attribute handle */
@@ -295,7 +313,7 @@ ble_sts_t blc_gapc_registerReconnectService(u16 connHandle, const blc_gapc_recon
  * @param[in] connHandle --- acl connection handle.
  * return NULL --- no discovery,
  */
-const uuid_t* blc_gapc_getDiscoveryServiceUUID(u16 connHandle);
+const uuid_t *blc_gapc_getDiscoveryServiceUUID(u16 connHandle);
 
 /**
  * @brief gap client write characteristic value.

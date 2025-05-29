@@ -28,33 +28,34 @@
 //broadcast sink extend advertising parameter
 #define BROADCAST_SINK_LOCATION         (BLC_AUDIO_LOCATION_FLAG_FL | BLC_AUDIO_LOCATION_FLAG_FR)
 
-#define APP_AUDIO_FRAME_BYTES           960     //max 48KHz
+#define APP_AUDIO_FRAME_BYTES           960 //max 48KHz
 
-#define APP_SINK_RECV_SPEAK_FRAME_COUNT         8
-
+#define APP_SINK_RECV_SPEAK_FRAME_COUNT 8
 
 /**
  *  @brief  app sink sync BIS information parameter
  */
-typedef struct{
-    u16 bisHandle;
-    u16 codecFrameSize;
-    u8 lc3Count;
-    u8 lc3Index[2];
-    u8 allocation;      //only support FL/FR
-    void* popSdu;
+typedef struct
+{
+    u16   bisHandle;
+    u16   codecFrameSize;
+    u8    lc3Count;
+    u8    lc3Index[2];
+    u8    allocation; //only support FL/FR
+    void *popSdu;
 } appSinkSyncBisInfo_t;
 
 /**
  *  @brief  app sink information parameter
  */
-typedef struct{
-    u8 bigSyncState;
-    u8 bisSyncNum;
-    u16 frameDataLen;
-    u32 presentationDelay;      //unit us
-    u32 syncLocation;
-    appSinkSyncBisInfo_t bisInfo[2];    //only supported sync 2 bis
+typedef struct
+{
+    u8                   bigSyncState;
+    u8                   bisSyncNum;
+    u16                  frameDataLen;
+    u32                  presentationDelay; //unit us
+    u32                  syncLocation;
+    appSinkSyncBisInfo_t bisInfo[2];        //only supported sync 2 bis
 
     u8 spkState;
 } appSinkInfo_t;
@@ -62,7 +63,8 @@ typedef struct{
 /**
  *  @brief  app sink sync receive speak parameter
  */
-typedef struct{
+typedef struct
+{
     u32 seqNum;
     u32 renderPoint;
     u16 rxBuff[APP_AUDIO_FRAME_BYTES];
@@ -89,7 +91,7 @@ void app_codec_setBigSyncState(u8 syncState, u8 numBis, u16 bisHandles[0]);
  * @param[in]   codecEvt: broadcast sink initial codec event.
  * @return      none
  */
-void app_codec_setBigInformation(blc_bapbs_bisSinkInitCodecEvt_t* codecEvt);
+void app_codec_setBigInformation(blc_bapbs_bisSinkInitCodecEvt_t *codecEvt);
 
 /**
  * @brief       broadcast sink audio receive BIS SDU Handler.

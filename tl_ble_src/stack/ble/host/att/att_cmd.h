@@ -21,7 +21,7 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-#pragma  once
+#pragma once
 
 #include "att.h"
 
@@ -88,7 +88,7 @@ int blt_att_packageFindInfoRsp(u8 format, u8 dataLen, u8 *pData, attr_pkt_t *txB
  * | Attribute Type                     | 2                 |
  * | Attribute Value                    | 0 to (ATT_MTU-7)  |
  */
-int blt_att_packageFindByTypeReq(u16 startAttHandle, u16 endAttHandle, u8 *pUuid, u8* pAttrValue, int valueLen, attr_pkt_t *txBuf);
+int blt_att_packageFindByTypeReq(u16 startAttHandle, u16 endAttHandle, u8 *pUuid, u8 *pAttrValue, int valueLen, attr_pkt_t *txBuf);
 
 /**
  * Format of ATT_FIND_BY_TYPE_VALUE_RSP PDU
@@ -348,5 +348,3 @@ int blc_att_prepareConfirm(attr_pkt_t *txBuf);
  *      |          2         |          2         |   Value Length   |
  */
 int blc_att_prepareMultNotify(attr_pkt_t *txBuf);
-
-

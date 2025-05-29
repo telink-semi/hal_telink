@@ -24,115 +24,114 @@
 #include "stack/ble/ble.h"
 
 #ifndef LE_AUDIO_PACS_SINK_PAC
-#define LE_AUDIO_PACS_SINK_PAC                      1
+    #define LE_AUDIO_PACS_SINK_PAC 1
 #endif
 
 #ifndef LE_AUDIO_PACS_SINK_AUDIO_LOCATIONS
-#define LE_AUDIO_PACS_SINK_AUDIO_LOCATIONS          1
+    #define LE_AUDIO_PACS_SINK_AUDIO_LOCATIONS 1
 #endif
 
 #ifndef LE_AUDIO_PACS_SOURCE_PAC
-#define LE_AUDIO_PACS_SOURCE_PAC                    1
+    #define LE_AUDIO_PACS_SOURCE_PAC 1
 #endif
 
 #ifndef LE_AUDIO_PACS_SOURCE_AUDIO_LOCATIONS
-#define LE_AUDIO_PACS_SOURCE_AUDIO_LOCATIONS        1
+    #define LE_AUDIO_PACS_SOURCE_AUDIO_LOCATIONS 1
 #endif
 
-#define LE_AUDIO_PACS_PAC_MAX_SIZE                  512
+#define LE_AUDIO_PACS_PAC_MAX_SIZE 512
 
-#define PACS_START_HDL                          SERVICE_PUBLISHED_AUDIO_CAPABILITIES_HDL
+#define PACS_START_HDL             SERVICE_PUBLISHED_AUDIO_CAPABILITIES_HDL
 
-#define AUDIO_LOCATION_FIX_SIZE                 4
-#define AUDIO_CONTEXTS_FIX_SIZE                 4
+#define AUDIO_LOCATION_FIX_SIZE    4
+#define AUDIO_CONTEXTS_FIX_SIZE    4
 
 const u16 gPacMaxSize = LE_AUDIO_PACS_PAC_MAX_SIZE;
 
 #if LE_AUDIO_PACS_SINK_PAC
 _attribute_ble_data_retention_
-u8 pacsSinkPACValue[LE_AUDIO_PACS_PAC_MAX_SIZE];
+    u8 pacsSinkPACValue[LE_AUDIO_PACS_PAC_MAX_SIZE];
 _attribute_ble_data_retention_
-u16 pacsSinkPACValueLen;
+    u16 pacsSinkPACValueLen;
 #endif
 
 #if LE_AUDIO_PACS_SINK_AUDIO_LOCATIONS
 _attribute_ble_data_retention_
-u8 pacsSinkAudioLocationsValue[AUDIO_LOCATION_FIX_SIZE];
+    u8           pacsSinkAudioLocationsValue[AUDIO_LOCATION_FIX_SIZE];
 static const u16 pacsSinkAudioLocationsValueLen = AUDIO_LOCATION_FIX_SIZE;
 #endif
 
 #if LE_AUDIO_PACS_SOURCE_PAC
 _attribute_ble_data_retention_
-u8 pacsSourcePACValue[LE_AUDIO_PACS_PAC_MAX_SIZE];
+    u8 pacsSourcePACValue[LE_AUDIO_PACS_PAC_MAX_SIZE];
 _attribute_ble_data_retention_
-u16 pacsSourcePACValueLen;
+    u16 pacsSourcePACValueLen;
 #endif
 
 #if LE_AUDIO_PACS_SOURCE_AUDIO_LOCATIONS
 _attribute_ble_data_retention_
-u8 pacsSourceAudioLocationsValue[AUDIO_LOCATION_FIX_SIZE];
+    u8           pacsSourceAudioLocationsValue[AUDIO_LOCATION_FIX_SIZE];
 static const u16 pacsSourceAudioLocationsValueLen = AUDIO_LOCATION_FIX_SIZE;
 #endif
 
 _attribute_ble_data_retention_
-u8 pacsAvailableAudioContextsValue[AUDIO_CONTEXTS_FIX_SIZE];
+    u8           pacsAvailableAudioContextsValue[AUDIO_CONTEXTS_FIX_SIZE];
 static const u16 pacsAvailableAudioContextsValueLen = AUDIO_CONTEXTS_FIX_SIZE;
 
 _attribute_ble_data_retention_
-u8 pacsSupportedAudioContextsValue[AUDIO_CONTEXTS_FIX_SIZE];
+    u8           pacsSupportedAudioContextsValue[AUDIO_CONTEXTS_FIX_SIZE];
 static const u16 pacsSupportedAudioContextsValueLen = AUDIO_CONTEXTS_FIX_SIZE;
 
 /*
  * @brief the structure for default PACS service List.
  */
 static const atts_attribute_t pacsList[] =
-{
-    ATTS_PRIMARY_SERVICE(servicePublishedAudioCapabilitiesUuid),
+    {
+        ATTS_PRIMARY_SERVICE(servicePublishedAudioCapabilitiesUuid),
 #if LE_AUDIO_PACS_SINK_PAC
-    //Sink PAC
-    ATTS_CHAR_UUID_ENCR_READ_POINT_NOCB(charPropReadNotfiy, characteristicSinkPacUuid, pacsSinkPACValue),
-    ATTS_COMMON_CCC_DEFINE,
+        //Sink PAC
+        ATTS_CHAR_UUID_ENCR_READ_POINT_NOCB(charPropReadNotfiy, characteristicSinkPacUuid, pacsSinkPACValue),
+        ATTS_COMMON_CCC_DEFINE,
 #endif
 
 #if LE_AUDIO_PACS_SINK_AUDIO_LOCATIONS
-    //Sink Audio Locations
-    ATTS_CHAR_UUID_ENCR_RDWR_POINT_WCB(charPropReadWriteNotify, characteristicSinkAudioLocationsUuid, pacsSinkAudioLocationsValue),
-    ATTS_COMMON_CCC_DEFINE,
+        //Sink Audio Locations
+        ATTS_CHAR_UUID_ENCR_RDWR_POINT_WCB(charPropReadWriteNotify, characteristicSinkAudioLocationsUuid, pacsSinkAudioLocationsValue),
+        ATTS_COMMON_CCC_DEFINE,
 #endif
 
 #if LE_AUDIO_PACS_SOURCE_PAC
-    //Source PAC
-    ATTS_CHAR_UUID_ENCR_READ_POINT_NOCB(charPropReadNotfiy, characteristicSourcePacUuid, pacsSourcePACValue),
-    ATTS_COMMON_CCC_DEFINE,
+        //Source PAC
+        ATTS_CHAR_UUID_ENCR_READ_POINT_NOCB(charPropReadNotfiy, characteristicSourcePacUuid, pacsSourcePACValue),
+        ATTS_COMMON_CCC_DEFINE,
 #endif
 
 #if LE_AUDIO_PACS_SOURCE_AUDIO_LOCATIONS
-    //Source Audio Locations
-    ATTS_CHAR_UUID_ENCR_RDWR_POINT_WCB(charPropReadWriteNotify, characteristicSourceAudioLocationsUuid, pacsSourceAudioLocationsValue),
-    ATTS_COMMON_CCC_DEFINE,
+        //Source Audio Locations
+        ATTS_CHAR_UUID_ENCR_RDWR_POINT_WCB(charPropReadWriteNotify, characteristicSourceAudioLocationsUuid, pacsSourceAudioLocationsValue),
+        ATTS_COMMON_CCC_DEFINE,
 #endif
 
-    //Available Audio Contexts
-    ATTS_CHAR_UUID_ENCR_READ_POINT_NOCB(charPropReadNotfiy, characteristicAvailableAudioContextsUuid, pacsAvailableAudioContextsValue),
-    ATTS_COMMON_CCC_DEFINE,
+        //Available Audio Contexts
+        ATTS_CHAR_UUID_ENCR_READ_POINT_NOCB(charPropReadNotfiy, characteristicAvailableAudioContextsUuid, pacsAvailableAudioContextsValue),
+        ATTS_COMMON_CCC_DEFINE,
 
-    //Supported Audio Contexts
-    ATTS_CHAR_UUID_ENCR_READ_POINT_NOCB(charPropReadNotfiy, characteristicSupportedAudioContextsUuid, pacsSupportedAudioContextsValue),
-    ATTS_COMMON_CCC_DEFINE,
+        //Supported Audio Contexts
+        ATTS_CHAR_UUID_ENCR_READ_POINT_NOCB(charPropReadNotfiy, characteristicSupportedAudioContextsUuid, pacsSupportedAudioContextsValue),
+        ATTS_COMMON_CCC_DEFINE,
 };
 
 /*
  * @brief the structure for default PACS service group.
  */
-_attribute_ble_data_retention_
-static atts_group_t svcPacsGroup =
-{
-    NULL,
-    pacsList,
-    NULL,
-    NULL,
-    PACS_START_HDL,
-    0,
+_attribute_ble_data_retention_ static atts_group_t svcPacsGroup =
+    {
+        NULL,
+        pacsList,
+        NULL,
+        NULL,
+        PACS_START_HDL,
+        0,
 };
 
 /**
@@ -164,18 +163,18 @@ void blc_svc_removePacsGroup(void)
  */
 void blc_svc_pacsCbackRegister(atts_r_cb_t readCback, atts_w_cb_t writeCback)
 {
-    svcPacsGroup.readCback = readCback;
+    svcPacsGroup.readCback  = readCback;
     svcPacsGroup.writeCback = writeCback;
 }
 
 #if !(LE_AUDIO_PACS_SINK_PAC || LE_AUDIO_PACS_SOURCE_PAC)
-#error "pacs:Mandatory to support at least one of the Sink PAC or Source PAC characteristic"
+    #error "pacs:Mandatory to support at least one of the Sink PAC or Source PAC characteristic"
 #endif
 
 #if !LE_AUDIO_PACS_SINK_PAC && LE_AUDIO_PACS_SINK_AUDIO_LOCATIONS
-#error "pacs:Optional to support if the Sink PAC characteristic is supported, otherwise Excluded"
+    #error "pacs:Optional to support if the Sink PAC characteristic is supported, otherwise Excluded"
 #endif
 
 #if !LE_AUDIO_PACS_SOURCE_PAC && LE_AUDIO_PACS_SOURCE_AUDIO_LOCATIONS
-#error "pacs:Optional to support if the Source PAC characteristic is supported, otherwise Excluded"
+    #error "pacs:Optional to support if the Source PAC characteristic is supported, otherwise Excluded"
 #endif

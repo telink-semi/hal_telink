@@ -27,41 +27,31 @@
  *******************************************************************************************************/
 #include "lib/include/pke/pke_common.h"
 
-
-
-
-
-
-
-
 /**
  * @brief       load input operand to baseaddr
  * @param[out]  baseaddr     - destination data
  * @param[in]   data         - source data
- * @param[in]   wordlen      - word length of data
+ * @param[in]   wordLen      - word length of data
  * @return      0:success     other:error
  */
-void pke_load_operand(unsigned int *baseaddr, const unsigned int *data, unsigned int wordLen)
+void pke_load_operand(unsigned int *baseaddr, unsigned int *data, unsigned int wordLen)
 {
     unsigned int i;
 
-    if(baseaddr != data)
-    {
-        for (i = 0; i < wordLen; i++)
-        {
-            *((volatile unsigned int *)(baseaddr+i)) = data[i];
+    if (baseaddr != data) {
+        for (i = 0; i < wordLen; i++) {
+            *((volatile unsigned int *)(baseaddr + i)) = data[i];
         }
+    } else {
+        ;
     }
-    else
-    {;}
 }
-
 
 /**
  * @brief       get result operand from baseaddr
  * @param[out]  baseaddr     - source data
  * @param[in]   data         - destination data
- * @param[in]   wordlen      - word length of data
+ * @param[in]   wordLen      - word length of data
  * @return      0:success     other:error
  * @note
   @verbatim
@@ -72,17 +62,14 @@ void pke_read_operand(unsigned int *baseaddr, unsigned int *data, unsigned int w
 {
     unsigned int i;
 
-    if(baseaddr != data)
-    {
-        for (i = 0; i < wordLen; i++)
-        {
-            data[i] = *((volatile unsigned int *)(baseaddr+i));
+    if (baseaddr != data) {
+        for (i = 0; i < wordLen; i++) {
+            data[i] = *((volatile unsigned int *)(baseaddr + i));
         }
+    } else {
+        ;
     }
-    else
-    {;}
 }
-
 
 /**
  * @brief       load input operand(U8 big-endian) to baseaddr
@@ -91,42 +78,37 @@ void pke_read_operand(unsigned int *baseaddr, unsigned int *data, unsigned int w
  * @param[in]   byteLen      - byte length of data
  * @return      0:success     other:error
  */
-void pke_load_operand_U8(unsigned int *baseaddr, const unsigned char *data, unsigned int byteLen)
+void pke_load_operand_U8(unsigned int *baseaddr, unsigned char *data, unsigned int byteLen)
 {
     unsigned int t, i;
 
-    if((unsigned char *)baseaddr != data)
-    {
-        for(data+=(byteLen-1); byteLen>3; byteLen-=4)
-        {
-            t  = (unsigned int)(*data);
-            t |= ((unsigned int)(*(data-1)))<<8;
-            t |= ((unsigned int)(*(data-2)))<<16;
-            t |= ((unsigned int)(*(data-3)))<<24;
+    if ((unsigned char *)baseaddr != data) {
+        for (data += (byteLen - 1); byteLen > 3; byteLen -= 4) {
+            t = (unsigned int)(*data);
+            t |= ((unsigned int)(*(data - 1))) << 8;
+            t |= ((unsigned int)(*(data - 2))) << 16;
+            t |= ((unsigned int)(*(data - 3))) << 24;
 
             *((volatile unsigned int *)(baseaddr++)) = t;
 
             data -= 4;
         }
 
-        if(byteLen)
-        {
+        if (byteLen) {
             t = 0;
-            for(i=0; i < byteLen; i++)
-            {
-                t |= ((unsigned int)(*data))<<(i<<3);
+            for (i = 0; i < byteLen; i++) {
+                t |= ((unsigned int)(*data)) << (i << 3);
                 data--;
             }
 
             *((volatile unsigned int *)(baseaddr)) = t;
+        } else {
+            ;
         }
-        else
-        {;}
+    } else {
+        ;
     }
-    else
-    {;}
 }
-
 
 /**
  * @brief       get result operand(U8 big-endian) from baseaddr
@@ -139,35 +121,30 @@ void pke_read_operand_U8(unsigned int *baseaddr, unsigned char *data, unsigned i
 {
     unsigned int t, i;
 
-    if(baseaddr != (unsigned int *)data)
-    {
-        for (data+=(byteLen-1); byteLen>3; byteLen-=4)
-        {
+    if (baseaddr != (unsigned int *)data) {
+        for (data += (byteLen - 1); byteLen > 3; byteLen -= 4) {
             t = *((volatile unsigned int *)(baseaddr++));
 
-            *data     = (t)&0xFF;
-            *(data-1) = (t>>8)&0xFF;
-            *(data-2) = (t>>16)&0xFF;
-            *(data-3) = (t>>24)&0xFF;
+            *data       = (t) & 0xFF;
+            *(data - 1) = (t >> 8) & 0xFF;
+            *(data - 2) = (t >> 16) & 0xFF;
+            *(data - 3) = (t >> 24) & 0xFF;
 
             data -= 4;
         }
 
-        if(byteLen)
-        {
+        if (byteLen) {
             t = *((volatile unsigned int *)(baseaddr));
 
-            for(i=0; i < byteLen; i++)
-            {
-                *data = (t>>(i<<3))&0xFF;
+            for (i = 0; i < byteLen; i++) {
+                *data = (t >> (i << 3)) & 0xFF;
                 data--;
             }
         }
+    } else {
+        ;
     }
-    else
-    {;}
 }
-
 
 /**
  * @brief       set operand with an unsigned int value
@@ -184,11 +161,9 @@ void pke_set_operand_uint32_value(unsigned int *baseaddr, unsigned int wordLen, 
 {
     unsigned int i = wordLen;
 
-    while(i>1)
-    {
-        *((volatile unsigned int *)(baseaddr+(--i))) = 0;  //baseaddr[--i] = 0;
+    while (i > 1) {
+        *((volatile unsigned int *)(baseaddr + (--i))) = 0; //baseaddr[--i] = 0;
     }
 
-    *((volatile unsigned int *)(baseaddr)) = b;            //baseaddr[0] = b;
+    *((volatile unsigned int *)(baseaddr)) = b;             //baseaddr[0] = b;
 }
-

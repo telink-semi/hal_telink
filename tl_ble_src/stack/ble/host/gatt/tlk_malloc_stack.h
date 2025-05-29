@@ -31,51 +31,53 @@
  */
 struct free_arena_header;
 
-struct arena_header {
-    unsigned short type;
-    unsigned short size;
+struct arena_header
+{
+    unsigned short            type;
+    unsigned short            size;
     struct free_arena_header *next, *prev;
 };
 
 #ifdef DEBUG_MALLOC
-#define ARENA_TYPE_USED 0x64e69c70
-#define ARENA_TYPE_FREE 0x012d610a
-#define ARENA_TYPE_HEAD 0x971676b5
-#define ARENA_TYPE_DEAD 0xeeeeeeee
+    #define ARENA_TYPE_USED 0x64e69c70
+    #define ARENA_TYPE_FREE 0x012d610a
+    #define ARENA_TYPE_HEAD 0x971676b5
+    #define ARENA_TYPE_DEAD 0xeeeeeeee
 #else
-#define ARENA_TYPE_USED 0
-#define ARENA_TYPE_FREE 1
-#define ARENA_TYPE_HEAD 2
+    #define ARENA_TYPE_USED 0
+    #define ARENA_TYPE_FREE 1
+    #define ARENA_TYPE_HEAD 2
 #endif
 
 
-#define ARENA_SIZE_MASK (~(sizeof(struct arena_header)-1))
+#define ARENA_SIZE_MASK (~(sizeof(struct arena_header) - 1))
 
 /*
  * This structure should be no more than twice the size of the
  * previous structure.
  */
-struct free_arena_header {
-    struct arena_header a;
+struct free_arena_header
+{
+    struct arena_header       a;
     struct free_arena_header *next_free, *prev_free;
 };
 
-struct mem_arena_header {
+struct mem_arena_header
+{
     struct free_arena_header a;
-    unsigned char *sbrkBase;
-    unsigned char *sbrkLimit;
-    unsigned char *brk;
+    unsigned char           *sbrkBase;
+    unsigned char           *sbrkLimit;
+    unsigned char           *brk;
 };
 
-void tlk_initialRetentionBuffer(void* base, size_t size);
-void tlk_initialNonRetentionBuffer(void* base, size_t size);
-void* malloc_reten(size_t size);
-void free_reten(void* ptr);
-void* realloc_reten(void* ptr, size_t size);
-void* malloc_nonreten(size_t size);
-void free_nonreten(void* ptr);
-void* realloc_nonreten(void* ptr, size_t size);
+void  tlk_initialRetentionBuffer(void *base, size_t size);
+void  tlk_initialNonRetentionBuffer(void *base, size_t size);
+void *malloc_reten(size_t size);
+void  free_reten(void *ptr);
+void *realloc_reten(void *ptr, size_t size);
+void *malloc_nonreten(size_t size);
+void  free_nonreten(void *ptr);
+void *realloc_nonreten(void *ptr, size_t size);
 
-#define MALLOC_RETEN_TYPE(num, type)        (type*)malloc_reten((num) * sizeof(type))
-#define MALLOC_NONRETEN_TEYP(num, type)     (type*)malloc_nonreten((num) * sizeof(type))
-
+#define MALLOC_RETEN_TYPE(num, type)    (type *)malloc_reten((num) * sizeof(type))
+#define MALLOC_NONRETEN_TEYP(num, type) (type *)malloc_nonreten((num) * sizeof(type))

@@ -32,20 +32,19 @@
 #include "types.h"
 #include "watchdog.h" //BLE SDK use
 
-_attribute_data_retention_sec_ flash_handler_t flash_read_page = flash_dread;
+_attribute_data_retention_sec_ flash_handler_t flash_read_page  = flash_dread;
 _attribute_data_retention_sec_ flash_handler_t flash_write_page = flash_page_program;
 /*
  * note:flash_write_page_encrypt and flash_read_page_decrypt_check should be used in combination,and the check read address is corresponding to the encrypted write.
  */
-_attribute_data_retention_sec_ flash_handler_t flash_write_page_encrypt = flash_page_program_encrypt;
+_attribute_data_retention_sec_ flash_handler_t            flash_write_page_encrypt      = flash_page_program_encrypt;
 _attribute_data_retention_sec_ flash_read_check_handler_t flash_read_page_decrypt_check = flash_dread_decrypt_check;
 
 
-
 _attribute_data_retention_sec_ preempt_config_t s_flash_preempt_config =
-{
-    .preempt_en =0,
-    .threshold  =1,
+    {
+        .preempt_en = 0,
+        .threshold  = 1,
 };
 
 /*******************************************************************************************************************
@@ -65,12 +64,11 @@ _attribute_data_retention_sec_ preempt_config_t s_flash_preempt_config =
  *                  - In other cases(preempt_en = 0 or plic_preempt_feature_en = 0), global interrupts (including machine timer and software interrupt) will be turned off during the execution of the flash functions and will be restored when the flash functions exits.
  *              -# If the flash operation may be interrupted by an interrupt, it is necessary to ensure that the interrupt handling function and the function it calls must be in the RAM code. 
  */
-void flash_plic_preempt_config(unsigned char preempt_en,unsigned char threshold)
+void flash_plic_preempt_config(unsigned char preempt_en, unsigned char threshold)
 {
-    s_flash_preempt_config.preempt_en=preempt_en;
-    s_flash_preempt_config.threshold=threshold;
+    s_flash_preempt_config.preempt_en = preempt_en;
+    s_flash_preempt_config.threshold  = threshold;
 }
-
 
 /**
  * @brief       This function serves to erase a sector.
@@ -93,7 +91,7 @@ _attribute_text_sec_ void flash_erase_sector(unsigned long addr)
 {
     wd_clear(); //BLE SDK use: clear watch dog
     DISABLE_BTB;
-    flash_mspi_write_ram(FLASH_SECT_ERASE_CMD, addr,NULL,0);
+    flash_mspi_write_ram(FLASH_SECT_ERASE_CMD, addr, NULL, 0);
     ENABLE_BTB;
 }
 
@@ -117,7 +115,7 @@ _attribute_text_sec_ void flash_erase_sector(unsigned long addr)
 _attribute_text_sec_ void flash_dread(unsigned long addr, unsigned long len, unsigned char *buf)
 {
     DISABLE_BTB;
-    flash_mspi_read_ram(FLASH_DREAD_CMD,addr, buf,len);
+    flash_mspi_read_ram(FLASH_DREAD_CMD, addr, buf, len);
     ENABLE_BTB;
 }
 
@@ -141,7 +139,7 @@ _attribute_text_sec_ void flash_dread(unsigned long addr, unsigned long len, uns
 _attribute_text_sec_ void flash_4read(unsigned long addr, unsigned long len, unsigned char *buf)
 {
     DISABLE_BTB;
-    flash_mspi_read_ram(FLASH_X4READ_CMD, addr,  buf,len);
+    flash_mspi_read_ram(FLASH_X4READ_CMD, addr, buf, len);
     ENABLE_BTB;
 }
 
@@ -162,14 +160,15 @@ _attribute_text_sec_ void flash_4read(unsigned long addr, unsigned long len, uns
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-_attribute_text_sec_ unsigned char flash_dread_decrypt_check(unsigned long addr,unsigned long plain_len,unsigned char* plain_buf)
+_attribute_text_sec_ unsigned char flash_dread_decrypt_check(unsigned long addr, unsigned long plain_len, unsigned char *plain_buf)
 {
-    unsigned char check_data=0;
-     DISABLE_BTB;
-     check_data = flash_mspi_read_decrypt_check_ram(FLASH_DREAD_CMD,addr,plain_buf,plain_len);
-     ENABLE_BTB;
-     return check_data;
+    unsigned char check_data = 0;
+    DISABLE_BTB;
+    check_data = flash_mspi_read_decrypt_check_ram(FLASH_DREAD_CMD, addr, plain_buf, plain_len);
+    ENABLE_BTB;
+    return check_data;
 }
+
 /**
  * @brief       This function serves to decrypt the read data from the flash at the specified address and compare it with the plain text in 4*IO read mode.
  * @param[in]   addr            - the start address of the page.
@@ -187,16 +186,14 @@ _attribute_text_sec_ unsigned char flash_dread_decrypt_check(unsigned long addr,
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-_attribute_text_sec_ unsigned char flash_4read_decrypt_check(unsigned long addr,unsigned long plain_len,unsigned char* plain_buf)
+_attribute_text_sec_ unsigned char flash_4read_decrypt_check(unsigned long addr, unsigned long plain_len, unsigned char *plain_buf)
 {
-    unsigned char check_data=0;
-     DISABLE_BTB;
-     check_data = flash_mspi_read_decrypt_check_ram(FLASH_X4READ_CMD,addr,plain_buf,plain_len);
-     ENABLE_BTB;
-     return check_data;
+    unsigned char check_data = 0;
+    DISABLE_BTB;
+    check_data = flash_mspi_read_decrypt_check_ram(FLASH_X4READ_CMD, addr, plain_buf, plain_len);
+    ENABLE_BTB;
+    return check_data;
 }
-
-
 
 /**
  * @brief       This function writes the buffer's content to the flash.
@@ -208,13 +205,13 @@ _attribute_text_sec_ unsigned char flash_4read_decrypt_check(unsigned long addr,
  */
 _attribute_text_sec_ static void flash_write(unsigned long addr, unsigned long len, unsigned char *buf, flash_command_e cmd)
 {
-    unsigned int ns = PAGE_SIZE - (addr & (PAGE_SIZE-1));
-    int nw = 0;
+    unsigned int ns = PAGE_SIZE - (addr & (PAGE_SIZE - 1));
+    int          nw = 0;
 
-    while(len > 0){
+    while (len > 0) {
         nw = len > ns ? ns : len;
         DISABLE_BTB;
-        flash_mspi_write_ram(cmd,addr,buf, nw);
+        flash_mspi_write_ram(cmd, addr, buf, nw);
         ENABLE_BTB;
         ns = PAGE_SIZE;
         addr += nw;
@@ -287,13 +284,13 @@ _attribute_text_sec_ void flash_quad_page_program(unsigned long addr, unsigned l
  */
 _attribute_text_sec_ static void flash_write_encrypt(unsigned long addr, unsigned long len, unsigned char *buf, flash_command_e cmd)
 {
-    unsigned int ns = PAGE_SIZE - (addr & (PAGE_SIZE-1));
-    int nw = 0;
+    unsigned int ns = PAGE_SIZE - (addr & (PAGE_SIZE - 1));
+    int          nw = 0;
 
-    while(len > 0){
+    while (len > 0) {
         nw = len > ns ? ns : len;
         DISABLE_BTB;
-        flash_mspi_write_encrypt_ram(cmd,addr,buf, nw);
+        flash_mspi_write_encrypt_ram(cmd, addr, buf, nw);
         ENABLE_BTB;
         ns = PAGE_SIZE;
         addr += nw;
@@ -370,11 +367,11 @@ _attribute_text_sec_ void flash_quad_page_program_encrypt(unsigned long addr, un
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-_attribute_text_sec_  unsigned char flash_read_status(flash_command_e cmd)
+_attribute_text_sec_ unsigned char flash_read_status(flash_command_e cmd)
 {
     unsigned char status = 0;
     DISABLE_BTB;
-    flash_mspi_read_ram(cmd,0,&status,1);
+    flash_mspi_read_ram(cmd, 0, &status, 1);
     ENABLE_BTB;
     return status;
 }
@@ -394,24 +391,22 @@ _attribute_text_sec_  unsigned char flash_read_status(flash_command_e cmd)
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-_attribute_text_sec_ void flash_write_status(flash_status_typedef_e type , unsigned short data)
+_attribute_text_sec_ void flash_write_status(flash_status_typedef_e type, unsigned short data)
 {
-
     unsigned char buf[2];
 
     buf[0] = data;
-    buf[1] = data>>8;
+    buf[1] = data >> 8;
     DISABLE_BTB;
-    if(type == FLASH_TYPE_8BIT_STATUS){
-        flash_mspi_write_ram(FLASH_WRITE_STATUS_CMD_LOWBYTE,0,buf, 1);
-    }else if(type == FLASH_TYPE_16BIT_STATUS_ONE_CMD){
-        flash_mspi_write_ram(FLASH_WRITE_STATUS_CMD_LOWBYTE,0,buf,2 );
-    }else if(type == FLASH_TYPE_16BIT_STATUS_TWO_CMD){
-        flash_mspi_write_ram(FLASH_WRITE_STATUS_CMD_LOWBYTE,0, (unsigned char *)&buf[0],  1);
-        flash_mspi_write_ram(FLASH_WRITE_STATUS_CMD_HIGHBYTE,0, (unsigned char *)&buf[1],1);
+    if (type == FLASH_TYPE_8BIT_STATUS) {
+        flash_mspi_write_ram(FLASH_WRITE_STATUS_CMD_LOWBYTE, 0, buf, 1);
+    } else if (type == FLASH_TYPE_16BIT_STATUS_ONE_CMD) {
+        flash_mspi_write_ram(FLASH_WRITE_STATUS_CMD_LOWBYTE, 0, buf, 2);
+    } else if (type == FLASH_TYPE_16BIT_STATUS_TWO_CMD) {
+        flash_mspi_write_ram(FLASH_WRITE_STATUS_CMD_LOWBYTE, 0, (unsigned char *)&buf[0], 1);
+        flash_mspi_write_ram(FLASH_WRITE_STATUS_CMD_HIGHBYTE, 0, (unsigned char *)&buf[1], 1);
     }
     ENABLE_BTB;
-
 }
 
 /**
@@ -430,10 +425,10 @@ _attribute_text_sec_ void flash_write_status(flash_status_typedef_e type , unsig
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-_attribute_text_sec_ void flash_read_otp(unsigned long addr, unsigned long len, unsigned char* buf)
+_attribute_text_sec_ void flash_read_otp(unsigned long addr, unsigned long len, unsigned char *buf)
 {
     DISABLE_BTB;
-    flash_mspi_read_ram(FLASH_READ_SECURITY_REGISTERS_CMD,addr, buf, len);
+    flash_mspi_read_ram(FLASH_READ_SECURITY_REGISTERS_CMD, addr, buf, len);
     ENABLE_BTB;
 }
 
@@ -456,12 +451,12 @@ _attribute_text_sec_ void flash_read_otp(unsigned long addr, unsigned long len, 
 _attribute_text_sec_ void flash_write_otp(unsigned long addr, unsigned long len, unsigned char *buf)
 {
     unsigned int ns = PAGE_SIZE_OTP - (addr & (PAGE_SIZE_OTP - 1));
-    int nw = 0;
+    int          nw = 0;
 
-    while(len > 0){
+    while (len > 0) {
         nw = len > ns ? ns : len;
         DISABLE_BTB;
-        flash_mspi_write_ram(FLASH_WRITE_SECURITY_REGISTERS_CMD,addr,buf,nw);
+        flash_mspi_write_ram(FLASH_WRITE_SECURITY_REGISTERS_CMD, addr, buf, nw);
         ENABLE_BTB;
         ns = PAGE_SIZE_OTP;
         addr += nw;
@@ -488,7 +483,7 @@ _attribute_text_sec_ void flash_write_otp(unsigned long addr, unsigned long len,
 _attribute_text_sec_ void flash_erase_otp(unsigned long addr)
 {
     DISABLE_BTB;
-    flash_mspi_write_ram(FLASH_ERASE_SECURITY_REGISTERS_CMD,addr,  NULL,0 );
+    flash_mspi_write_ram(FLASH_ERASE_SECURITY_REGISTERS_CMD, addr, NULL, 0);
     ENABLE_BTB;
 }
 
@@ -511,11 +506,10 @@ _attribute_text_sec_ unsigned int flash_read_mid(void)
 {
     unsigned int flash_mid = 0;
     DISABLE_BTB;
-    flash_mspi_read_ram(FLASH_GET_JEDEC_ID,0, (unsigned char *)&flash_mid, 3);
+    flash_mspi_read_ram(FLASH_GET_JEDEC_ID, 0, (unsigned char *)&flash_mid, 3);
     ENABLE_BTB;
     return flash_mid;
 }
-
 
 /**
  * @brief       This function serves to read UID of flash.Before reading UID of flash, you must read MID of flash.
@@ -533,19 +527,14 @@ _attribute_text_sec_ unsigned int flash_read_mid(void)
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-_attribute_text_sec_ void flash_read_uid(unsigned char idcmd,unsigned char *buf)
+_attribute_text_sec_ void flash_read_uid(unsigned char idcmd, unsigned char *buf)
 {
     DISABLE_BTB;
-    if(idcmd==((FLASH_READ_UID_CMD_GD_PUYA_ZB_TH>>16)&0xff))
-    {
-        flash_mspi_read_ram(FLASH_READ_UID_CMD_GD_PUYA_ZB_TH ,0, buf,16);
+    if (idcmd == ((FLASH_READ_UID_CMD_GD_PUYA_ZB_TH >> 24) & 0xff)) {
+        flash_mspi_read_ram(FLASH_READ_UID_CMD_GD_PUYA_ZB_TH, 0, buf, 16);
     }
     ENABLE_BTB;
 }
-
-
-
-
 
 /**
  * @brief       This function is used to update the configuration parameters of xip(eXecute In Place),
@@ -556,22 +545,22 @@ _attribute_text_sec_ void flash_read_uid(unsigned char idcmd,unsigned char *buf)
  */
 _attribute_ram_code_sec_noinline_ void flash_set_xip_config_sram(flash_command_e config)
 {
-    unsigned int r=plic_enter_critical_sec(s_flash_preempt_config.preempt_en,s_flash_preempt_config.threshold);
+    unsigned int r = plic_enter_critical_sec(s_flash_preempt_config.preempt_en, s_flash_preempt_config.threshold);
 
     mspi_stop_xip();
     reg_mspi_xip_config = config;
     CLOCK_DLY_5_CYC;
 
     mspi_set_xip_en();
-    plic_exit_critical_sec(s_flash_preempt_config.preempt_en,r);
+    plic_exit_critical_sec(s_flash_preempt_config.preempt_en, r);
 }
+
 _attribute_text_sec_ void flash_set_xip_config(flash_command_e config)
 {
     DISABLE_BTB;
     flash_set_xip_config_sram(config);
     ENABLE_BTB;
 }
-
 
 /**
  * @brief       This function is used to write the configure of the flash,P25Q16SU/P25Q32SU/P25Q128L uses this function.
@@ -589,10 +578,10 @@ _attribute_text_sec_ void flash_set_xip_config(flash_command_e config)
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-_attribute_text_sec_ void flash_write_config(flash_command_e cmd,unsigned char data)
+_attribute_text_sec_ void flash_write_config(flash_command_e cmd, unsigned char data)
 {
     DISABLE_BTB;
-    flash_mspi_write_ram(cmd,0, &data, 1);
+    flash_mspi_write_ram(cmd, 0, &data, 1);
     ENABLE_BTB;
 }
 
@@ -609,14 +598,15 @@ _attribute_text_sec_ void flash_write_config(flash_command_e cmd,unsigned char d
  *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
  *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
  */
-_attribute_text_sec_ unsigned char  flash_read_config(void)
+_attribute_text_sec_ unsigned char flash_read_config(void)
 {
-    unsigned char config=0;
+    unsigned char config = 0;
     DISABLE_BTB;
-    flash_mspi_read_ram(FLASH_READ_CONFIGURE_CMD,0, &config,1);
+    flash_mspi_read_ram(FLASH_READ_CONFIGURE_CMD, 0, &config, 1);
     ENABLE_BTB;
     return config;
 }
+
 /********************************************************************************************************
  *                                  secondary calling function,
  *  there is no need to add an circumvention solution to solve the problem of access flash conflicts.
@@ -629,8 +619,7 @@ _attribute_text_sec_ unsigned char  flash_read_config(void)
  */
 unsigned int flash_get_vendor(unsigned int flash_mid)
 {
-    switch(flash_mid&0x0000ffff)
-    {
+    switch (flash_mid & 0x0000ffff) {
     case 0x0000325E:
         return FLASH_ETOX_ZB;
     case 0x000060C8:
@@ -653,7 +642,7 @@ unsigned int flash_get_vendor(unsigned int flash_mid)
  * @param[in]   flash_mid - MID of the flash(4 bytes).
  * @return      flash capacity.
  */
-flash_capacity_e  flash_get_capacity(unsigned int flash_mid)
+flash_capacity_e flash_get_capacity(unsigned int flash_mid)
 {
-    return (flash_mid&0x00ff0000)>>16;
+    return (flash_mid & 0x00ff0000) >> 16;
 }

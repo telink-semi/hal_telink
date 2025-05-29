@@ -31,13 +31,10 @@
 
 #if (defined(SUPPORT_RSASSA_PSS) || defined(SUPPORT_RSAES_OAEP))
 
-#include "lib/include/pke/rsa.h"
-#include "lib/include/hash/hash_kdf.h"
-#include "lib/include/crypto_common/utility.h"
-#include "lib/include/trng/trng.h"
-
-
-
+    #include "lib/include/pke/rsa.h"
+    #include "lib/include/hash/hash_kdf.h"
+    #include "lib/include/crypto_common/utility.h"
+    #include "lib/include/trng/trng.h"
 
 /**
  * @brief       RSA PKCS#1_v2.2 MGF1(a mask generation function based on a hash function)
@@ -54,27 +51,22 @@
       -# 1.out = mask XOR in, if in is NULL, out is mask directly.
   @endverbatim
  */
-unsigned int rsa_pkcs1_mgf1_with_xor_in(HASH_ALG hash_alg, unsigned char *seed, unsigned int seed_bytes, unsigned char *in,
-        unsigned char *out, unsigned int mask_bytes)
+unsigned int rsa_pkcs1_mgf1_with_xor_in(HASH_ALG hash_alg, unsigned char *seed, unsigned int seed_bytes, unsigned char *in, unsigned char *out, unsigned int mask_bytes)
 {
-    unsigned char counter[4] = {0,0,0,0};
-    unsigned int ret;
-    HASH_NODE hash_node[2] = 
-    {
-        {seed, seed_bytes},
-        {counter, 4},
+    unsigned char counter[4] = {0, 0, 0, 0};
+    unsigned int  ret;
+    HASH_NODE     hash_node[2] =
+        {
+            {seed,    seed_bytes},
+            {counter, 4         },
     };
 
     ret = ansi_x9_63_kdf_node_with_xor_in(hash_alg, hash_node, 2, counter, in, out, mask_bytes, 1);
-    if(HASH_SUCCESS == ret)
-    {
+    if (HASH_SUCCESS == ret) {
         return RSA_SUCCESS;
-    }
-    else
-    {
+    } else {
         return ret;
     }
 }
 
 #endif
-

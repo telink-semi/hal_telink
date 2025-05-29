@@ -23,31 +23,32 @@
  *******************************************************************************************************/
 #pragma once
 
-
-typedef struct{
+typedef struct
+{
     /* Characteristic value handle */
-    u16 inputStateHdl; /* Audio Input State */
-    u16 gainPropeHdl;  /* Gain Setting Properties */
-    u16 inputTypeHdl;  /* Audio Input Type */
-    u16 inputStatusHdl;/* Audio Input Status */
-    u16 inputCtrlHdl;  /* Audio Input Control Point */
-    u16 inputDescHdl;  /* Audio Input Description */
+    u16 inputStateHdl;  /* Audio Input State */
+    u16 gainPropeHdl;   /* Gain Setting Properties */
+    u16 inputTypeHdl;   /* Audio Input Type */
+    u16 inputStatusHdl; /* Audio Input Status */
+    u16 inputCtrlHdl;   /* Audio Input Control Point */
+    u16 inputDescHdl;   /* Audio Input Description */
 
-}blc_aics_server_t;
+} blc_aics_server_t;
 
-typedef struct{
+typedef struct
+{
     /* Audio Input State */
-    s8 gainSetting;         // Gain_Setting range(-128 to 127)
+    s8 gainSetting; // Gain_Setting range(-128 to 127)
     u8 mute;        // mute blc_aics_mute_value_enum
     u8 gainMode;    //blc_aics_gain_mode_value_enum
 
     /* Gain Setting Properties */
-    u8 units;       //Gain Setting Units, 0.1dB
-    s8 minGain;     //Gain Setting Minimum >= -128
-    s8 maxGain;     //Gain Setting Maximum <= 127, -128<=minGain<maxGain<=127
+    u8 units;   //Gain Setting Units, 0.1dB
+    s8 minGain; //Gain Setting Minimum >= -128
+    s8 maxGain; //Gain Setting Maximum <= 127, -128<=minGain<maxGain<=127
 
     /* Audio Input Type */
-    u8 inputType;   //blc_aics_audio_input_type_def_enum
+    u8 inputType; //blc_aics_audio_input_type_def_enum
 
     /* Audio Input Status */
     u8 inputStatus; //blc_aics_audio_input_status_enum
@@ -55,5 +56,3 @@ typedef struct{
     /* Audio Input Description */
     char *desc;
 } blc_aicss_regParam_t;
-
-

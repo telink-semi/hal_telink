@@ -26,17 +26,11 @@
 #include "stack/ble/ble.h"
 
 
-
-
-
 const int gAppMicsCltInclAicsInstNum = APP_AUDIO_MICS_CLIENT_INCLUDE_AICS_INSTANCE_NUM;
 
 
 _attribute_ble_data_retention_
-blc_micp_client_t gMicpClient[ACL_CENTRAL_MAX_NUM];
-
-
-
+    blc_micp_client_t gMicpClient[ACL_CENTRAL_MAX_NUM];
 
 blc_micp_client_t *blt_micsc_getClientBuf(u8 instIdx)
 {
@@ -44,7 +38,3 @@ blc_micp_client_t *blt_micsc_getClientBuf(u8 instIdx)
 
     return &gMicpClient[instIdx];
 }
-
-
-
-

@@ -265,6 +265,11 @@
 #define reg_gpio_pj5_fs             REG_ADDR8(GPIO_BASE_ADDR+0x103)
 
 #define reg_gpio_pana_in            REG_ADDR8(GPIO_BASE_ADDR+0xa0)
+#define areg_gpio_pana_setting      0x13d
+#define areg_gpio_pana_pu           0x13e
+#define areg_gpio_pana_out_set      0x13f
+#define areg_gpio_pana_out_clear    0x140
+#define areg_gpio_pana_out_toggle   0x141
 
 #define reg_gpio_in(i)              REG_ADDR8(GPIO_BASE_ADDR+((i>>8)<<4))
 #define reg_gpio_ie(i)              REG_ADDR8(GPIO_BASE_ADDR+0x01+((i>>8)<<4))

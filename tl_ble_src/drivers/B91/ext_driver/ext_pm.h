@@ -123,6 +123,7 @@ __INLINE int pm_is_deepPadWakeup(void)
     return g_pm_status_info.is_pad_wakeup;
 }
 
+
 /**
  * @brief      This function serves to get the status of mcu.
  * @param[in]  none.
@@ -132,6 +133,8 @@ __INLINE int pm_get_mcu_status(void)
 {
     return g_pm_status_info.mcu_status;
 }
+
+
 #define cpu_set_gpio_wakeup             pm_set_gpio_wakeup
 
 #endif /* DRIVERS_B91_DRIVER_EXT_EXT_PM_H_ */

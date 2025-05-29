@@ -26,8 +26,8 @@
 
 #include "assistant_config.h"
 
-#define TLKAPI_DEBUG_FIFO_SIZE                      144
-#define TLKAPI_DEBUG_FIFO_NUM                       32
+#define TLKAPI_DEBUG_FIFO_SIZE 144
+#define TLKAPI_DEBUG_FIFO_NUM  32
 
 #if (ASSISTANT_VERSION == UNIVERSAL_VERSION)
     #include "universal_version/app_config.h"

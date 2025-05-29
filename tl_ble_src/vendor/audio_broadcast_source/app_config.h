@@ -26,8 +26,8 @@
 
 #include "source_config.h"
 
-#define TLKAPI_DEBUG_FIFO_SIZE                      144
-#define TLKAPI_DEBUG_FIFO_NUM                       32
+#define TLKAPI_DEBUG_FIFO_SIZE 144
+#define TLKAPI_DEBUG_FIFO_NUM  32
 
 
 #if (SOURCE_VERSION == SOURCE_ONLY_VERSION)

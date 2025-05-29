@@ -23,42 +23,39 @@
  *******************************************************************************************************/
 #include "stack/ble/ble.h"
 
-#define ULL_HID_START_HDL                               SERVICE_ULTRA_LOW_LATENCY_HID_HDL
+#define ULL_HID_START_HDL                  SERVICE_ULTRA_LOW_LATENCY_HID_HDL
 
-#define ULL_HID_PROPERTIES_FORMAT_MAX_SIZE              21
+#define ULL_HID_PROPERTIES_FORMAT_MAX_SIZE 21
 
-_attribute_ble_data_retention_
-static u8 ullhidProperties[ULL_HID_PROPERTIES_FORMAT_MAX_SIZE];
-_attribute_ble_data_retention_
-static u16 ullhidPropertiesLen = 0;
+_attribute_ble_data_retention_ static u8  ullhidProperties[ULL_HID_PROPERTIES_FORMAT_MAX_SIZE];
+_attribute_ble_data_retention_ static u16 ullhidPropertiesLen = 0;
 
 /*
  * @brief the structure for default ULL-HID service List.
  */
 static const atts_attribute_t ullhidList[] =
-{
-    ATTS_PRIMARY_SERVICE(serviceUllhidUuid),
+    {
+        ATTS_PRIMARY_SERVICE(serviceUllhidUuid),
 
-    //ULL HID Properties
-    ATTS_CHAR_UUID_READ_POINT_NOCB(charPropRead, characteristicUllHidPropertiesUuid, ullhidProperties),
+        //ULL HID Properties
+        ATTS_CHAR_UUID_READ_POINT_NOCB(charPropRead, characteristicUllHidPropertiesUuid, ullhidProperties),
 
-    //LE HID Operation
-    ATTS_CHAR_UUID_WRITE_NULL(charPropWriteIndicate, characteristicLeHidOperationModeUuid),
-    ATTS_COMMON_CCC_DEFINE,
+        //LE HID Operation
+        ATTS_CHAR_UUID_WRITE_NULL(charPropWriteIndicate, characteristicLeHidOperationModeUuid),
+        ATTS_COMMON_CCC_DEFINE,
 };
 
 /*
  * @brief the structure for default ULL-HID service group.
  */
-_attribute_ble_data_retention_
-static atts_group_t svcUllhidGroup =
-{
-    NULL,
-    ullhidList,
-    NULL,
-    NULL,
-    ULL_HID_START_HDL,
-    0,
+_attribute_ble_data_retention_ static atts_group_t svcUllhidGroup =
+    {
+        NULL,
+        ullhidList,
+        NULL,
+        NULL,
+        ULL_HID_START_HDL,
+        0,
 };
 
 /**
@@ -68,7 +65,7 @@ static atts_group_t svcUllhidGroup =
  */
 void blc_svc_addUllhidGroup(void)
 {
-    svcUllhidGroup.endHandle = svcUllhidGroup.startHandle+ARRAY_SIZE(ullhidList)-1;
+    svcUllhidGroup.endHandle = svcUllhidGroup.startHandle + ARRAY_SIZE(ullhidList) - 1;
     blc_gatts_addAttributeServiceGroup(&svcUllhidGroup);
 }
 

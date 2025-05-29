@@ -199,85 +199,28 @@ void ble_rf_reset_baseband(void)
     reg_rst3 |= (FLD_RST3_ZB);                // clr baseband
 }
 
-
-__INLINE void ble_rf_set_chn(signed char chn)
-{
-    unsigned int freq_low;
-    unsigned int freq_high;
-    unsigned int chnl_freq;
-    unsigned char ctrim;
-    unsigned int freq;
-
-    freq = 2400+chn;
-    if(freq >= 2550){
-        ctrim = 0;
-    }
-    else if(freq >= 2520){
-        ctrim = 1;
-    }
-    else if(freq >= 2495){
-        ctrim = 2;
-    }
-    else if(freq >= 2465){
-        ctrim = 3;
-    }
-    else if(freq >= 2435){
-        ctrim = 4;
-    }
-    else if(freq >= 2405){
-        ctrim = 5;
-    }
-    else if(freq >= 2380){
-        ctrim = 6;
-    }
-    else{
-        ctrim = 7;
-    }
-
-    extern unsigned char  g_single_tong_freqoffset;
-    chnl_freq = freq*2 + g_single_tong_freqoffset;
-    freq_low  = (chnl_freq & 0x7f);
-    freq_high = ((chnl_freq>>7)&0x3f);
-
-    write_reg8(0x140e44,  (read_reg8(0x140e44) | 0x01 ));
-    write_reg8(0x140e44,  (read_reg8(0x140e44) & 0x01) | freq_low << 1);
-    write_reg8(0x140e45,  (read_reg8(0x140e45) & 0xc0) | freq_high);
-    write_reg8(0x140e29,  (read_reg8(0x140e29) & 0x3f) | (ctrim<<5) );  //FE_CTRIM
-}
-
-
 _attribute_ram_code_ //must be RamCode
 void rf_set_ble_channel (signed char chn_num)
 {
-#if FAST_SETTLE
-    unsigned char ble_chn = chn_num;
-#endif
+    signed char ble_chn_num = 0;
     write_reg8 (0x14080d, chn_num);
     if (chn_num < 11)
-        chn_num += 2;
+        ble_chn_num = chn_num + 2;
+
     else if (chn_num < 37)
-        chn_num += 3;
+        ble_chn_num = chn_num + 3;
+
     else if (chn_num == 37)
-        chn_num = 1;
+        ble_chn_num = 1;
+
     else if (chn_num == 38)
-        chn_num = 13;
+        ble_chn_num = 13;
+
     else if (chn_num == 39)
-        chn_num = 40;
-#if 0 //optimize by SiHui, save some Ramcode: ble channel only use 0 ~ 39, so here bigger value not necessary
-    else if (chn_num < 51)
-        chn_num = chn_num;
-    else if(chn_num <= 61)
-        chn_num = -61 + chn_num;
-#endif
+        ble_chn_num = 40;
 
-    chn_num = chn_num << 1;
-    ble_rf_set_chn(chn_num);
-
-    #if FAST_SETTLE
-        if(fast_settle.tx_fast_en){
-            set_rf_hpmc_cal_val(fast_settle.cal_tbl[ble_chn]);
-        }
-    #endif
+    ble_chn_num = ble_chn_num << 1;
+    rf_set_chn(ble_chn_num);
 }
 
 
@@ -464,243 +407,9 @@ u32 rf_cal_rfLenFromDmaLen(u32 dma_len){
 
 #if (FAST_SETTLE)
 
-_attribute_data_retention_ Fast_Settle fast_settle;
-
-/* close hpmc(53us), ldotrim(4.5us),save 58us
- * 0x140e84:[0] tx ldo trim
- *          [1] tx fcal
- *          [2] tx hpmc
- *          [3] tx dcoc
- */
-_attribute_ram_code_
-void ble_rf_tx_fast_settle()
-{
-    //close hpmc and ldo trim
-    write_reg8(RADIOADDR+0x84,(read_reg8(RADIOADDR+0x84)&0xf0)|0x0a); //1010
-
-    write_reg8(RADIOADDR+0x96,0x00);    //0
-    write_reg8(RADIOADDR+0x97,0x08);    //8us
-    write_reg8(RADIOADDR+0x98,0x30);    //48us
-    write_reg8(RADIOADDR+0x99,0x31);    //48.5us
-    write_reg8(RADIOADDR+0x9a,0x33);    //51us
-    write_reg8(RADIOADDR+0x9b,0x30);    //0x6a
-
-
-    // only close hpmc
-//  write_reg8(RADIOADDR+0x84,(read_reg8(RADIOADDR+0x84)&0xf8)|0x0b); //1011
-//
-//  write_reg8(RADIOADDR+0x96,0x00);    //0
-//  write_reg8(RADIOADDR+0x97,0x0d);    //13us
-//  write_reg8(RADIOADDR+0x98,0x35);    //53us
-//  write_reg8(RADIOADDR+0x99,0x36);    //53.5us
-//  write_reg8(RADIOADDR+0x9a,0x38);    //55.5us
-//  write_reg8(RADIOADDR+0x9b,0x35);    //53us
-
-    // only ldo trim
-//  write_reg8(RADIOADDR+0x84,(read_reg8(RADIOADDR+0x84)&0xf8)|0x0e); //1110
-//
-//  write_reg8(RADIOADDR+0x96,0x00);    //0
-//  write_reg8(RADIOADDR+0x97,0x08);    //8us
-//  write_reg8(RADIOADDR+0x98,0x65);    //48us
-//  write_reg8(RADIOADDR+0x99,0x66);    //48.5us
-//  write_reg8(RADIOADDR+0x9a,0x68);    //51us
-//  write_reg8(RADIOADDR+0x9b,0x65);    //0x6a
-
-    // all open,
-//  write_reg8(RADIOADDR+0x84,(read_reg8(RADIOADDR+0x84)&0xf8)|0x0f); //1111
-//
-//  write_reg8(RADIOADDR+0x96,0x00);    //0
-//  write_reg8(RADIOADDR+0x97,0x0d);    //8us
-//  write_reg8(RADIOADDR+0x98,0x6a);    //48us
-//  write_reg8(RADIOADDR+0x99,0x6b);    //48.5us
-//  write_reg8(RADIOADDR+0x9a,0x6d);    //51us
-//  write_reg8(RADIOADDR+0x9b,0x6a);    //0x6a
-
-
-}
-
-/* close dcoc(40us), ldotrim(4.5us),save 45us
- * 0x140e84:[4] rx ldo trim
- *          [5] rx fcal
- *          [6] rx rccal
- *          [7] rx dcoc
- */
-
-_attribute_ram_code_
-void ble_rf_rx_fast_settle()
-{
-    write_reg8(RADIOADDR+0x84,(read_reg8(RADIOADDR+0x84)&0x0f)|0x60);
-
-    write_reg8(RADIOADDR+0x9c,0x00);    //0us
-    write_reg8(RADIOADDR+0x9d,0x08);    //8us
-    write_reg8(RADIOADDR+0x9e,0x08);    //8us
-    write_reg8(RADIOADDR+0x9f,0x1b);    //34us
-    write_reg8(RADIOADDR+0xa0,0x25);    //37us
-    write_reg8(RADIOADDR+0xa1,0x25);    //37us
-
-    //write_reg8(RADIOADDR+0xd0,read_reg8(RADIOADDR+0xd0)|0x01);
-}
-
-_attribute_ram_code_
-unsigned short get_rf_hpmc_cal_val()
-{
-    unsigned short cali;
-    unsigned short r;
-    cali = read_reg16(RADIOADDR+0xfe);  //140efe<0:10>
-    r = (cali<<1)& 0x0ffe;      //to 140ef6 <1:11>  0000 1111 1111 1110
-    return r;
-}
-
-
-_attribute_ram_code_
-void set_rf_hpmc_cal_val(unsigned short value)
-{
-    unsigned short tmp = read_reg16(RADIOADDR+0xf6);
-    tmp = (tmp & 0xf001) | value | 0x0001;  //bit<1:11> 1111 0000 0000 0001
-    write_reg16(RADIOADDR+0xf6,tmp);
-}
-
-/**
- *  @brief      this function serve to enable the tx timing sequence adjusted.
- *  @param[in]  none
- *  @return     none
-*/
-void ble_rf_tx_fast_settle_en(void)
-{
-    write_reg8(RADIOADDR+0x29,read_reg8(RADIOADDR+0x29)|0x10);  //140e29 <4>
-}
-
-/**
- *  @brief      this function serve to disable the tx timing sequence adjusted.
- *  @param[in]  none
- *  @return     none
-*/
-void ble_rf_tx_fast_settle_dis(void)
-{
-    write_reg8(RADIOADDR+0x29,read_reg8(RADIOADDR+0x29)&0xef);  //140e29 <4>
-}
-
-/**
- *  @brief      this function serve to enable the rx timing sequence adjusted.
- *  @param[in]  none
- *  @return     none
-*/
-void ble_rf_rx_fast_settle_en(void)
-{
-    write_reg8(RADIOADDR+0x29,read_reg8(RADIOADDR+0x29)|0x08);  //140e29 <3>
-}
-
-/**
- *  @brief      this function serve to disable the rx timing sequence adjusted.
- *  @param[in]  none
- *  @return     none
-*/
-void ble_rf_rx_fast_settle_dis(void)
-{
-    write_reg8(RADIOADDR+0x29,read_reg8(RADIOADDR+0x29)&0xf7);  //140e29 <3>
-}
-
-u8 ble_is_rf_tx_fast_settle_en()
-{
-    return fast_settle.tx_fast_en;
-}
-
-u8 ble_is_rf_rx_fast_settle_en()
-{
-    return fast_settle.rx_fast_en;
-}
-
-/*
- *  LDOT_RDBK1      0xea        0x00
- *                  LDOT_LDO_CAL_TRIM   [5:0]   0x00
- *  LDOT_RDBK2_0    0xec        0xc0
- *                  LDOT_LDO_RXTXHF_TRIM    [5:0]   0x00
- *                  LDOT_LDO_RXTXLF_TRIM_L  [7:6]   0x3
- *  LDOT_RDBK2_1    0xed        0x05
- *                  LDOT_LDO_RXTXLF_TRIM_H  [3:0]   0x5
- *  LDOT_RDBK3_0    0xee        0x00
- *                  LDOT_LDO_PLL_TRIM   [5:0]   0x00
- *                  LDOT_LDO_VCO_TRIM_L [7:6]   0x0
- *  LDOT_RDBK3_1    0xef        0x00
- *                  LDOT_LDO_VCO_TRIM_H [3:0]   0x0
- */
-void get_ldo_trim_val(u8* p)
-{
-    u8  tmp_val;
-    *p++ = read_reg8(RADIOADDR+0xea) & 0x3f;                        //LDO_CAL_TRIM 0xea[5:0]
-    tmp_val = read_reg8(RADIOADDR+0xec);
-    *p++ = tmp_val & 0x3f;                                          //LDO_RXTXHF_TRIM 0xec[5:0]
-    *p++ = (tmp_val & 0xc0)>>6 | (read_reg8(RADIOADDR+0xed)&0x0f)<<2 ;  //LDO_RXTXLF_TRIM 0xec[7:6]  0xed[3:0]
-    tmp_val = read_reg8(RADIOADDR+0xee);
-    *p++ = tmp_val & 0x3f;                                          //LDO_PLL_TRIM 0xee[5:0]
-    *p++ = (tmp_val & 0xc0)>>6 | (read_reg8(RADIOADDR+0xef)&0x0f)<<2;   //LDO_VCO_TRIM 0xee[7:6]  0xef[3:0]
-}
-
-/*
- *  LDOT_DBG1   0xe2        0x40
- *              LDOT_LDO_CAL_BYPASS [0] 0x0
- *              LDOT_LDO_CAL_TRIM_OVERWRITE [6:1]   0x20
- *  LDOT_DBG2_0 0xe4        0x80
- *              LDOT_LDO_RXTXHF_BYPASS  [0] 0x0
- *              LDOT_LDO_RXTXLF_BYPASS  [1] 0x0
- *              LDOT_LDO_RXTXHF_TRIM_OVERWRITE  [7:2]   0x20
- *  LDOT_DBG2_1 0xe5        0x20
- *              LDOT_LDO_RXTXLF_TRIM_OVERWRITE  [5:0]   0x20
- *  LDOT_DBG3_0 0xe6        0x80
- *              LDOT_LDO_PLL_BYPASS [0] 0x0
- *              LDOT_LDO_VCO_BYPASS [1] 0x0
- *              LDOT_LDO_PLL_TRIM_OVERWRITE [7:2]   0x20
- *  LDOT_DBG3_1 0xe7        0x20
- *              LDOT_LDO_VCO_TRIM_OVERWRITE [5:0]   0x20
- */
-void set_ldo_trim_val(u8* p)
-{
-    write_reg8(RADIOADDR+0xe2 ,(*p++ << 1) | 0x01);
-    write_reg8(RADIOADDR+0xe4 ,(*p++ << 2) | 0x03);
-    write_reg8(RADIOADDR+0xe5 , *p++);
-    write_reg8(RADIOADDR+0xe6 ,(*p++ << 2) | 0x03);
-    write_reg8(RADIOADDR+0xe7 , *p);
-}
-
-#if 0
-/*need to use :
- * PA0,PA1,PA2
- * PB1,PB7,
- * PC0,PC1,PC2,PC3,PC4
- */
-
-void bb_dbg_setting(void)
-{
-    unsigned int GPIO_BASE = APBADDR + 0x300;
-
-    sub_wr(GPIO_BASE+0x55, 0, 7, 4); //dbg_sel_bt1-4 = 0
-    sub_wr(GPIO_BASE+0x54, 3, 2, 1); //dbg_sel_bb_h/l = 1
-    sub_wr(GPIO_BASE+0x54, 0 ,5, 5); //dbg_axon_bb_sel = 0
-
-    sub_wr(GPIO_BASE+0x0e, 0, 1, 1); //pb_io[1]
-    sub_wr(GPIO_BASE+0x32, 3, 3, 2); //pb[1] tx_data_o
-    sub_wr(GPIO_BASE+0x06, 0, 2, 2); //pa_io[2]
-    sub_wr(GPIO_BASE+0x30, 3, 5, 4); //pa[2] rx_en_o
-    sub_wr(GPIO_BASE+0x06, 0, 1, 1); //pa_io[1]
-    sub_wr(GPIO_BASE+0x30, 3, 3, 2); //pa[1] tx_on_o
-    sub_wr(GPIO_BASE+0x06, 0, 0, 0); //pa_io[0]
-    sub_wr(GPIO_BASE+0x30, 3, 1, 0); //pa[0] tx_en_o
-
-//  sub_wr(GPIO_BASE+0x16, 0, 1, 1); //pc_io[1]
-//  sub_wr(GPIO_BASE+0x34, 3, 1, 0); //pc[1] ll_ss[2]
-//  sub_wr(GPIO_BASE+0x16, 0, 0, 0); //pc_io[0]
-//  sub_wr(GPIO_BASE+0x34, 3, 3, 2); //pc[0] ll_ss[1]
-//  sub_wr(GPIO_BASE+0x0e, 0, 7, 7); //pb_io[7]
-//  sub_wr(GPIO_BASE+0x33, 3, 7, 6); //pb[7] ll_ss[0]
-//  sub_wr(GPIO_BASE+0x55, 1, 0, 0); //r_pfs[8]=1
-//
-//  sub_wr(GPIO_BASE+0x16, 0, 4, 4); //pc_io[4]
-//  sub_wr(GPIO_BASE+0x34, 3, 5, 4); //pc[4], rx_ss[2]
-//  sub_wr(GPIO_BASE+0x16, 0, 3, 3); //pc_io[3]
-//  sub_wr(GPIO_BASE+0x34, 3, 7, 6); //pc[3], rx_ss[1]
-//  sub_wr(GPIO_BASE+0x16, 0, 2, 2); //pc_io[2]
-//  sub_wr(GPIO_BASE+0x35, 3, 1, 0); //pc[2], rx_ss[0]
-}
-#endif
+_attribute_data_retention_ Fast_Settle fast_settle_1M;
+_attribute_data_retention_ Fast_Settle fast_settle_2M;
+_attribute_data_retention_ Fast_Settle fast_settle_S2;
+_attribute_data_retention_ Fast_Settle fast_settle_S8;
 
 #endif //end of FAST_SETTLE

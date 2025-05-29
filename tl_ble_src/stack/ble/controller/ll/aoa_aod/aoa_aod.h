@@ -30,7 +30,7 @@
  * @param      none
  * @return     none
  */
-void        blc_ll_initAoaAod_module(void);
+void blc_ll_initAoaAod_module(void);
 
 
-#endif  /* AOA_AOD_H_ */
+#endif /* AOA_AOD_H_ */

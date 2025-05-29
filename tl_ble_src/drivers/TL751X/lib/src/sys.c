@@ -40,7 +40,8 @@ unsigned int g_chip_version=0;
 
 extern void pm_update_status_info(void);
 extern void clock_baseband_pll_config(sys_bbpll_clk_e clk);
-
+unsigned char g_n22_clk_reg =0;
+unsigned char g_dsp_clk_reg=0;
 /**
  * @brief      This function reboot mcu.
  * @return     none
@@ -164,9 +165,12 @@ void sys_init(vbat_type_e vbat_v)
         stimer_32k_tracking_enable();   //enable 32k cal
 #endif
     }
-
-    extern void cpu_wakeup_no_deepretn_back_init(void);
-    cpu_wakeup_no_deepretn_back_init();
+#if PM_IS_TUNE_RAM_VOL
+    analog_write_reg8(0x22, (analog_read_reg8(0x22) & 0xf8) | AVDD2_VOL_CONFG);
+#endif
+//the default value of RAM's EMA register (EMA setting for 2P) doesn't match the RAM Spec, 2P is only used by SDIO, and is in a non-operational state at power-on, so can directly write the register to change it.
+    reg_soc_2p_reg_cfg0 = 0x2c;
+    reg_soc_2p_reg_cfg1 =0x03;
 }
 
 /**
@@ -193,11 +197,12 @@ void sys_set_vbat_type(vbat_type_e vbat_v)
 
 /**
  * @brief       This function serves to initialize dsp core system.
+ * @param[in]  addr - start up address
  * @return      none
  * @note        Only after calling this function can other DSP related functions be called. 
  *              Otherwise, other DSP function settings will not take effect.
  */
-void sys_dsp_init(void)
+void sys_dsp_init(unsigned int addr)
 {
     pm_set_dig_module_power_switch(FLD_PD_DSP_EN, PM_POWER_UP);
 
@@ -214,6 +219,12 @@ void sys_dsp_init(void)
     */
     delay_us(2);//3 * 1/24M + 1 * 1/1.5M = 0.667us
 
+    /*
+        If dsp_clk is enabled first and then set the dsp_reset_vector, when running flash code there will be an uncertain time for the dsp_reset_vector setting, 
+        which will cause the setting dsp_set_vector be invalid after an interval of more than 5 cycles.
+        So the right way should be set the dsp_set_vector before enable the dsp_clk.
+    */
+    reg_dsp_reset_vector = addr;
     reg_dsp_rst0 |= FLD_DSP_EN;
     reg_dsp_clken0 |= FLD_DSP_CLK_EN;
 }
@@ -229,11 +240,12 @@ void sys_dsp_start(void)
 
 /**
  * @brief      This function serves to initialize n22 core system.
+ * @param[in]  addr - start up address
  * @return     none
  * @note        Only after calling this function can other N22 related functions be called. 
  *              Otherwise, other N22 function settings will not take effect.
  */
-void sys_n22_init(void)
+void sys_n22_init(unsigned int addr)
 {
     /* 
      * The N22 module power source is also from module ZB(baseband), so need to power it up here. 
@@ -241,9 +253,14 @@ void sys_n22_init(void)
      */
     pm_set_dig_module_power_switch(FLD_PD_ZB_EN, PM_POWER_UP);
 
+    /*
+        AHB1 is the bus of the N22 subsystem. If not set, the entire AHB1 sussystem cannot function properly,
+        including baseband, SC_BB, N22, ILM and DLM of N22 which cannot be accessed.
+    */
     reg_rst4 |= FLD_RST4_AHB1;
     reg_clk_en4 |= FLD_CLK4_HCLK1_EN;
 
+    reg_n22_rst_vector = addr;
     reg_n22_rst0 |= FLD_RST0_N22_LM;
     reg_n22_clk_en0 |= FLD_CLK0_N22_LM_EN;  
 }
@@ -256,6 +273,129 @@ void sys_n22_start(void)
 {
     reg_n22_rst0 |= FLD_RST0_N22_CORE;
     reg_n22_clk_en0 |= FLD_CLK0_N22_CORE_EN;
+}
+
+/**
+ * @brief       This function serves to stall n22 by dis n22 core/ram clock.
+ * @return      none
+ */
+void sys_n22_clk_dis(void){
+    reg_n22_clk_en0 &= ~FLD_CLK0_N22_CORE_EN;
+    reg_n22_clk_en0 &= ~FLD_CLK0_N22_LM_EN;
+}
+
+/**
+ * @brief       This function serves to start n22.
+ * @return      none
+ */
+void sys_n22_clk_en(void){
+      reg_n22_clk_en0 |= FLD_CLK0_N22_LM_EN;
+      reg_n22_clk_en0 |= FLD_CLK0_N22_CORE_EN;
+}
+
+/**
+ * @brief       This function serves to save n22 clk reg.
+ * @return      none
+ */
+void sys_n22_clk_reg_save(void){
+    g_n22_clk_reg= reg_n22_clk_en0&(FLD_CLK0_N22_LM_EN|FLD_CLK0_N22_CORE_EN);
+}
+
+/**
+ * @brief       This function serves to restore n22 clk reg.
+ * @return      none
+ */
+void sys_n22_clk_reg_restore(void){
+   if(g_n22_clk_reg){
+       g_n22_clk_reg=0;
+       sys_n22_clk_en();
+   }
+}
+
+/**
+ * @brief       This function serves to stall dsp by dis dsp clock.
+ * @return      none
+ */
+void sys_dsp_clk_dis(void){
+    reg_dsp_clken0 &= ~FLD_DSP_CLK_EN;
+}
+
+/**
+ * @brief       This function serves to start dsp.
+ * @return      none
+ */
+void sys_dsp_clk_en(void){
+    reg_dsp_clken0 |= FLD_DSP_CLK_EN;
+}
+
+/**
+ * @brief       This function serves to save dsp clk reg.
+ * @return      none
+ */
+void sys_dsp_clk_reg_save(void){
+    g_dsp_clk_reg = reg_dsp_clken0&FLD_DSP_CLK_EN;
+}
+
+/**
+ * @brief       This function serves to restore dsp clk reg.
+ * @return      none
+ */
+void sys_dsp_clk_reg_restore(void){
+   if(g_dsp_clk_reg){
+       g_dsp_clk_reg=0;
+       sys_dsp_clk_en();
+   }
+}
+
+/**
+ * @brief       This function serves to judge whether the module power on.
+ * @module      - pm_pd_module_e
+ * @return      1: power down   0:power on.
+ */
+_Bool pm_dig_module_is_power_on(pm_pd_module_e module){
+     return (analog_read_reg8(areg_aon_0x7d)&module);
+
+}
+
+/**
+ * @brief       This function serves to judge whether n22 reg write or read.
+ * @return      none
+ */
+unsigned char sys_n22_is_reg_rw_permitted(void){
+    return ((reg_rst4&FLD_RST4_AHB1)&&(reg_clk_en4&FLD_CLK4_HCLK1_EN));
+}
+
+/**
+ * @brief       This function serves to judge whether dsp reg write or read.
+ * @return      none
+ */
+unsigned char sys_dsp_is_reg_rw_permitted(void){
+    return ((reg_clk_en4&FLD_CLK4_DSP_EN)&&(reg_rst4&FLD_RST4_DSP));
+}
+
+/**
+ * @brief       This function serves to judge whether dsp/n22 is init.
+ * @param[in]   core  - sys_core_e(n22/dsp)
+ * @return      0: is init   1/2: no init
+ */
+unsigned int sys_core_is_initialized(sys_core_e core){
+
+    if(core ==N22){
+        int power_status = analog_read_reg8(areg_aon_0x7d)&FLD_PD_ZB_EN;
+        int accessible  =  ((reg_rst4&FLD_RST4_AHB1)&&(reg_clk_en4&FLD_CLK4_HCLK1_EN));
+        return (power_status == PM_POWER_UP && accessible) ? 0 :
+               (power_status != PM_POWER_UP && !accessible) ? 1 :
+               2;
+    }else if(core == DSP){
+        int power_status = analog_read_reg8(areg_aon_0x7d)&FLD_PD_DSP_EN;
+        int accessible  = ((reg_clk_en4&FLD_CLK4_DSP_EN)&&(reg_rst4&FLD_RST4_DSP));
+        return (power_status == PM_POWER_UP && accessible) ? 0 :
+               (power_status != PM_POWER_UP && !accessible) ? 1 :
+               2;
+    }else{
+         return 3;
+    }
+
 }
 
 /**********************************************************************************************************************

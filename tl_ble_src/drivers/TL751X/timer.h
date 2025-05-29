@@ -195,7 +195,7 @@ static inline void timer_set_cap_tick(timer_type_e type, unsigned int cap_tick)
 void timer_start(timer_type_e type);
 
 /**
- * @brief     set mode, initial tick and capture of timer.
+ * @brief     set mode timer.
  * @param[in] type - select the timer to start.
  * @param[in] mode - select mode for timer.
  * @return    none
@@ -219,7 +219,6 @@ void timer_gpio_init(timer_type_e type, gpio_pin_e pin, gpio_pol_e pol );
  * @return    none
  */
 void timer_stop(timer_type_e type);
-
 
 
 #endif /* TIMER_H_ */

@@ -24,15 +24,15 @@
 #include "../sink_config.h"
 #if (SINK_VERSION == SINK_WITH_ASSISTANT_VERSION)
 
-#include "tl_common.h"
-#include "drivers.h"
-#include "stack/ble/ble.h"
+    #include "tl_common.h"
+    #include "drivers.h"
+    #include "stack/ble/ble.h"
 
-#include "app.h"
-#include "app_audio.h"
-#include "app_buffer.h"
-#include "app_config.h"
-#include "app_ui.h"
+    #include "app.h"
+    #include "app_audio.h"
+    #include "app_buffer.h"
+    #include "app_config.h"
+    #include "app_ui.h"
 
 /**
  * @brief      BLE controller event handler call-back.
@@ -42,7 +42,7 @@
  * @return
  */
 
-int app_controller_event_callback (u32 h, u8 *p, int n)
+int app_controller_event_callback(u32 h, u8 *p, int n)
 {
     app_audio_controllerEventCallBack(h, p, n);
     return 0;
@@ -71,33 +71,32 @@ int app_host_event_callback(u32 h, u8 *para, int n)
  */
 _attribute_no_inline_ void user_init_normal(void)
 {
-
-//////////////////////////// basic hardware Initialization  Begin //////////////////////////////////
+    //////////////////////////// basic hardware Initialization  Begin //////////////////////////////////
     /* random number generator must be initiated here( in the beginning of user_init_normal).
      * When deepSleep retention wakeUp, no need initialize again */
     random_generator_init();
 
     #if (TLKAPI_DEBUG_ENABLE)
-        tlkapi_debug_init();
-        blc_debug_enableStackLog(STK_LOG_NONE);
+    tlkapi_debug_init();
+    blc_debug_enableStackLog(STK_LOG_NONE);
     #endif
 
     blc_readFlashSize_autoConfigCustomFlashSector();
 
     /* attention that this function must be called after "blc readFlashSize_autoConfigCustomFlashSector" !!!*/
     blc_app_loadCustomizedParameters_normal();
-//////////////////////////// basic hardware Initialization  End /////////////////////////////////
+    //////////////////////////// basic hardware Initialization  End /////////////////////////////////
 
 
-   //////////////////////////// BLE stack Initialization  Begin //////////////////////////////////
-    u8  mac_public[6];
-    u8  mac_random_static[6];
-    
+    //////////////////////////// BLE stack Initialization  Begin //////////////////////////////////
+    u8 mac_public[6];
+    u8 mac_random_static[6];
+
     blc_initMacAddress(flash_sector_mac_address, mac_public, mac_random_static);
 
     //////////// LinkLayer Initialization  Begin /////////////////////////
-    blc_ll_initBasicMCU();                  //mandatory
-    blc_ll_initStandby_module(mac_public);  //mandatory
+    blc_ll_initBasicMCU();                 //mandatory
+    blc_ll_initStandby_module(mac_public); //mandatory
 
 
     blc_ll_initAclConnection_module();
@@ -132,7 +131,7 @@ _attribute_no_inline_ void user_init_normal(void)
     blc_ll_InitBisParametersBuffer(app_bisToatlParam, APP_BIS_NUM_IN_ALL_BIG_BCST, APP_BIS_NUM_IN_ALL_BIG_SYNC);
 
     /* BIS RX buffer init */
-    blc_ll_initBisRxFifo(app_bisSyncRxfifo, BIS_RX_PDU_FIFO_SIZE, BIS_RX_PDU_FIFO_NUM, APP_BIS_NUM_IN_ALL_BIG_SYNC);//APP_BIG_SYNC_NUMBER
+    blc_ll_initBisRxFifo(app_bisSyncRxfifo, BIS_RX_PDU_FIFO_SIZE, BIS_RX_PDU_FIFO_NUM, APP_BIS_NUM_IN_ALL_BIG_SYNC); //APP_BIG_SYNC_NUMBER
 
     /* IAL SDU buff init */
     blc_ll_initBisSyncSduOutBuffer(app_bis_sdu_out_fifo, BIS_SDU_OUT_FIFO_SIZE, BIS_SDU_OUT_FIFO_NUM);
@@ -142,40 +141,32 @@ _attribute_no_inline_ void user_init_normal(void)
     //////////// HCI Initialization  Begin /////////////////////////
     blc_hci_registerControllerEventHandler(app_controller_event_callback); //controller hci event to host all processed in this func
 
-    blc_hci_registerControllerDataHandler (blc_l2cap_pktHandler_5_3);
+    blc_hci_registerControllerDataHandler(blc_l2cap_pktHandler_5_3);
 
     blc_hci_setEventMask_cmd(HCI_EVT_MASK_DISCONNECTION_COMPLETE);
 
     //bluetooth low energy(LE) event
-    blc_hci_le_setEventMask_cmd(  HCI_LE_EVT_MASK_EXTENDED_ADVERTISING_REPORT
-                                | HCI_LE_EVT_MASK_PERIODIC_ADVERTISING_SYNC_ESTABLISHED
-                                | HCI_LE_EVT_MASK_PERIODIC_ADVERTISING_REPORT
-                                | HCI_LE_EVT_MASK_PERIODIC_ADVERTISING_SYNC_LOST
-                                | HCI_LE_EVT_MASK_BIG_SYNC_ESTABLISHED
-                                | HCI_LE_EVT_MASK_BIG_SYNC_LOST
-                                | HCI_LE_EVT_MASK_PERIODIC_ADVERTISING_SYNC_TRANSFER_RECEIVED
-                                | HCI_LE_EVT_MASK_ENHANCED_CONNECTION_COMPLETE
-                                | HCI_LE_EVT_MASK_CONNECTION_COMPLETE
-                                | HCI_LE_EVT_MASK_TERMINATE_BIG_COMPLETE);
+    blc_hci_le_setEventMask_cmd(HCI_LE_EVT_MASK_EXTENDED_ADVERTISING_REPORT | HCI_LE_EVT_MASK_PERIODIC_ADVERTISING_SYNC_ESTABLISHED | HCI_LE_EVT_MASK_PERIODIC_ADVERTISING_REPORT | HCI_LE_EVT_MASK_PERIODIC_ADVERTISING_SYNC_LOST | HCI_LE_EVT_MASK_BIG_SYNC_ESTABLISHED | HCI_LE_EVT_MASK_BIG_SYNC_LOST | HCI_LE_EVT_MASK_PERIODIC_ADVERTISING_SYNC_TRANSFER_RECEIVED | HCI_LE_EVT_MASK_ENHANCED_CONNECTION_COMPLETE | HCI_LE_EVT_MASK_CONNECTION_COMPLETE | HCI_LE_EVT_MASK_TERMINATE_BIG_COMPLETE);
 
-    blc_hci_le_setEventMask_2_cmd(  HCI_LE_EVT_MASK_2_BIGINFO_ADVERTISING_REPORT );
+    blc_hci_le_setEventMask_2_cmd(HCI_LE_EVT_MASK_2_BIGINFO_ADVERTISING_REPORT);
     //////////// HCI Initialization  End /////////////////////////
 
     u8 error_code = blc_contr_checkControllerInitialization();
-    if(error_code != INIT_SUCCESS){
+    if (error_code != INIT_SUCCESS) {
         /* It's recommended that user set some UI alarm to know the exact error, e.g. LED shine, print log */
         write_log32(0x88880000 | error_code);
-        #if(UI_LED_ENABLE)
-            gpio_write(GPIO_LED_RED, LED_ON_LEVEL);
-        #endif
-        #if (TLKAPI_DEBUG_ENABLE)
-            tlkapi_printf(APP_LOG_EN, "Controller Init ERROR:0x%x", error_code);
-            while(1){
-                tlkapi_debug_handler();
-            }
-        #else
-            while(1);
-        #endif
+    #if (UI_LED_ENABLE)
+        gpio_write(GPIO_LED_RED, LED_ON_LEVEL);
+    #endif
+    #if (TLKAPI_DEBUG_ENABLE)
+        tlkapi_printf(APP_LOG_EN, "Controller Init ERROR:0x%x", error_code);
+        while (1) {
+            tlkapi_debug_handler();
+        }
+    #else
+        while (1)
+            ;
+    #endif
     }
 
     //////////// Host Initialization  Begin /////////////////////////
@@ -188,37 +179,34 @@ _attribute_no_inline_ void user_init_normal(void)
     blc_att_setPeripheralRxMtuSize(PERIPHR_ATT_RX_MTU);
 
     /* SMP Initialization */
-#if (ACL_PERIPHR_SMP_ENABLE || ACL_CENTRAL_SMP_ENABLE)
-    
-    blc_smp_configPairingSecurityInfoStorageAddressAndSize(flash_sector_smp_storage, FLASH_SMP_PAIRING_MAX_SIZE);
-#endif
+    #if (ACL_PERIPHR_SMP_ENABLE || ACL_CENTRAL_SMP_ENABLE)
 
-#if (ACL_PERIPHR_SMP_ENABLE)  //Slave SMP Enable
+    blc_smp_configPairingSecurityInfoStorageAddressAndSize(flash_sector_smp_storage, FLASH_SMP_PAIRING_MAX_SIZE);
+    #endif
+
+    #if (ACL_PERIPHR_SMP_ENABLE) //Slave SMP Enable
     blc_smp_setSecurityLevel_periphr(Unauthenticated_Pairing_with_Encryption);
     blc_smp_smpParamInit();
-#else
+    #else
     blc_smp_setSecurityLevel(No_Security);
-#endif
-
+    #endif
 
 
     //host(GAP/SMP/GATT/ATT) event process: register host event callback and set event mask
-    blc_gap_registerHostEventHandler( app_host_event_callback );
-    blc_gap_setEventMask( GAP_EVT_MASK_SMP_PAIRING_BEGIN            |
-                          GAP_EVT_MASK_SMP_PAIRING_SUCCESS          |
-                          GAP_EVT_MASK_SMP_PAIRING_FAIL             |
-                          GAP_EVT_MASK_SMP_SECURITY_PROCESS_DONE    |
-                          GAP_EVT_MASK_SMP_TK_NUMERIC_COMPARE);
+    blc_gap_registerHostEventHandler(app_host_event_callback);
+    blc_gap_setEventMask(GAP_EVT_MASK_SMP_PAIRING_BEGIN |
+                         GAP_EVT_MASK_SMP_PAIRING_SUCCESS |
+                         GAP_EVT_MASK_SMP_PAIRING_FAIL |
+                         GAP_EVT_MASK_SMP_SECURITY_PROCESS_DONE |
+                         GAP_EVT_MASK_SMP_TK_NUMERIC_COMPARE);
     //////////// Host Initialization  End /////////////////////////
     app_audio_init();
 
     tlkapi_printf(APP_LOG_EN, "user_init end");
-#if UI_9517C
+    #if UI_9517C
     gpio_write(TL_SHDN_GPIO, 1);
-#endif
+    #endif
 }
-
-
 
 /**
  * @brief       user initialization when MCU wake_up from deepSleep_retention mode
@@ -227,9 +215,7 @@ _attribute_no_inline_ void user_init_normal(void)
  */
 void user_init_deepRetn(void)
 {
-
 }
-
 
 /////////////////////////////////////////////////////////////////////
 // main loop flow
@@ -240,15 +226,15 @@ void user_init_deepRetn(void)
  * @param[in]  none.
  * @return     none.
  */
-_attribute_no_inline_ void main_loop (void)
+_attribute_no_inline_ void main_loop(void)
 {
     static u32 tick = 1;
-    if(clock_time_exceed(tick, 500*1000)){
+    if (clock_time_exceed(tick, 500 * 1000)) {
         tick = clock_time();
         gpio_toggle(GPIO_LED_WHITE);
-        #if(UI_9517C)
+    #if (UI_9517C)
         gpio_toggle(GPIO_LED_WHITE_9517C);
-        #endif
+    #endif
     }
 
     ////////////////////////////////////// BLE entry /////////////////////////////////
@@ -257,16 +243,15 @@ _attribute_no_inline_ void main_loop (void)
 
     ////////////////////////////////////// Debug entry /////////////////////////////////
     #if (TLKAPI_DEBUG_ENABLE)
-        tlkapi_debug_handler();
+    tlkapi_debug_handler();
     #endif
 
     ////////////////////////////////////// UI entry /////////////////////////////////
     #if (UI_KEYBOARD_ENABLE)
-        proc_keyboard (0, 0, 0);
+    proc_keyboard(0, 0, 0);
     #endif
 
     app_audio_handler();
 }
 
-#endif      //SINK_VERSION == SINK_WITH_ASSISTANT_VERSION
-
+#endif //SINK_VERSION == SINK_WITH_ASSISTANT_VERSION

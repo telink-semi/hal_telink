@@ -29,13 +29,13 @@
 
 #if (FEATURE_TEST_MODE == TEST_L2CAP_COC)
 
-#define CREATE_COC_CONNECT_ACL_COUNT            2
-#define COC_CID_COUNT                           15
-#define COC_MTU_SIZE                            1000
+    #define CREATE_COC_CONNECT_ACL_COUNT 2
+    #define COC_CID_COUNT                15
+    #define COC_MTU_SIZE                 1000
 
 void app_l2cap_coc_init(void);
 
-int app_host_coc_event_callback (u32 h, u8 *para, int n);
+int  app_host_coc_event_callback(u32 h, u8 *para, int n);
 void app_createLeCreditBasedConnect(void);
 void app_createCreditBasedConnect(void);
 void app_sendCocData(void);

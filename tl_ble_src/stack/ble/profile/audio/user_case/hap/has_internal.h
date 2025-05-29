@@ -23,19 +23,21 @@
  *******************************************************************************************************/
 #pragma once
 
-#define BLT_HAS_LOG(fmt, ...)           BLC_AUDIO_PRF_DBG(DBG_PRF_MASK_HAS_LOG, "[HAS]"fmt, ##__VA_ARGS__)
+#define BLT_HAS_LOG(fmt, ...) BLC_AUDIO_PRF_DBG(DBG_PRF_MASK_HAS_LOG, "[HAS]" fmt, ##__VA_ARGS__)
 
 /*
  * HAS: ATT handle information: 6byte
  */
-typedef struct {
+typedef struct
+{
     u16 baseHandle;
-    u8 endHdl;
-    u8 haFeatHdl;
-    u8 haPresetCtrlPntHdl;
-    u8 activePresetIdxHdl;
+    u8  endHdl;
+    u8  haFeatHdl;
+    u8  haPresetCtrlPntHdl;
+    u8  activePresetIdxHdl;
 } blt_has_att_hdl_t;
 
-typedef struct {
+typedef struct
+{
     blt_has_att_hdl_t att;
 } blt_has_nv_info_t;

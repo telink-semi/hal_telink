@@ -30,16 +30,15 @@
 
 #if HCI_TR_EN
 
-#define HCI_Tr_H5TimerEnable()    hciH5TrCb.flushTimer = clock_time()|1
-#define HCI_Tr_H5TimerDisable()   hciH5TrCb.flushTimer = 0
-#define HCI_Tr_H5FlushHandler()   \
-do{\
-    if(hciH5TrCb.flushTimer && clock_time_exceed(hciH5TrCb.flushTimer, HCI_H5_FLUSH_TO*1000))\
-    {\
-        hciH5TrCb.flushTimer = 0;\
-        hciH5TrCb.backupCnt = 0;\
-    }\
-}while(0)
+    #define HCI_Tr_H5TimerEnable()  hciH5TrCb.flushTimer = clock_time() | 1
+    #define HCI_Tr_H5TimerDisable() hciH5TrCb.flushTimer = 0
+    #define HCI_Tr_H5FlushHandler()                                                                        \
+        do {                                                                                               \
+            if (hciH5TrCb.flushTimer && clock_time_exceed(hciH5TrCb.flushTimer, HCI_H5_FLUSH_TO * 1000)) { \
+                hciH5TrCb.flushTimer = 0;                                                                  \
+                hciH5TrCb.backupCnt  = 0;                                                                  \
+            }                                                                                              \
+        } while (0)
 
 /*! Backup buffer define. */
 static u8 h5TrBackupBuf[HCI_H5_TR_RX_BUF_SIZE];
@@ -58,22 +57,25 @@ static hci_fifo_t h5TrRxFifo = {
 };
 
 /*! HCI H5 transport main control block. */
-typedef struct{
-    hci_fifo_t            *pRxFifo;
-    HciH5PacketHandler_t   HCI_Tr_SlipHandler;
-    u8                    *pBackupBuf;
-    u32                    flushTimer;
-    u8                     backupCnt;
-    u8                     align[3];
-}HciH5TrCb_t;
+typedef struct
+{
+    hci_fifo_t          *pRxFifo;
+    HciH5PacketHandler_t HCI_Tr_SlipHandler;
+    u8                  *pBackupBuf;
+    u32                  flushTimer;
+    u8                   backupCnt;
+    u8                   align[3];
+} HciH5TrCb_t;
 
 static HciH5TrCb_t hciH5TrCb;
 
 void HCI_Tr_DefaultSlipHandler(u8 *pPacket, u32 len)
 {
 }
-void HCI_Tr_H5UartRxIRQHandler(unsigned int * param);
-ext_hci_InitTypeDef  hci_h5_uart;
+
+void                HCI_Tr_H5UartRxIRQHandler(unsigned int *param);
+ext_hci_InitTypeDef hci_h5_uart;
+
 /**
  * @brief : H5 protocol initialization.
  * @param : none.
@@ -90,18 +92,17 @@ void HCI_Tr_H5Init(void)
 
     //UART HARDWARE INIT
     memset(&hci_h5_uart, 0, sizeof(ext_hci_InitTypeDef));
-    hci_h5_uart.baudrate  = HCI_TR_BAUDRATE;
-    hci_h5_uart.tx_Pin = HCI_TR_TX_PIN;      //
-    hci_h5_uart.rx_Pin = HCI_TR_RX_PIN;      //
-    hci_h5_uart.HwFlowCtl = 0;
-    hci_h5_uart.cts_Pin = 0;
-    hci_h5_uart.rts_Pin = 0;
+    hci_h5_uart.baudrate       = HCI_TR_BAUDRATE;
+    hci_h5_uart.tx_Pin         = HCI_TR_TX_PIN; //
+    hci_h5_uart.rx_Pin         = HCI_TR_RX_PIN; //
+    hci_h5_uart.HwFlowCtl      = 0;
+    hci_h5_uart.cts_Pin        = 0;
+    hci_h5_uart.rts_Pin        = 0;
     hci_h5_uart.RxCpltCallback = HCI_Tr_H5UartRxIRQHandler;
     hci_h5_uart.TxCpltCallback = NULL;
     ext_hci_uartInit(&hci_h5_uart);
 
     ext_hci_uartReceData((hciH5TrCb.pRxFifo->p + 4), hciH5TrCb.pRxFifo->size - 4);
-
 }
 
 /**
@@ -119,16 +120,13 @@ void HCI_Tr_H5RegisterSlipHandler(HciH5PacketHandler_t func)
 static u8 *HCI_Tr_H5FindSlipHeadFlag(u8 *pPacket, u32 len)
 {
     u8 *pBuf = pPacket;
-    while(len)
-    {
-        if(len >= 2)
-        {
-            if(pBuf[0] == 0xC0 && pBuf[1] != 0xC0){
+    while (len) {
+        if (len >= 2) {
+            if (pBuf[0] == 0xC0 && pBuf[1] != 0xC0) {
                 return pBuf;
             }
-        }
-        else{
-            if(pBuf[0] == 0xC0){
+        } else {
+            if (pBuf[0] == 0xC0) {
                 return pBuf;
             }
         }
@@ -148,26 +146,24 @@ static u8 *HCI_Tr_H5FindSlipHeadFlag(u8 *pPacket, u32 len)
 static u8 *HCI_Tr_H5FindSlipFlag(u8 *pPacket, u32 len)
 {
     u8 *pBuf = pPacket;
-    while(len)
-    {
+    while (len) {
         u8 slipFlag = pBuf[0];
-        if(slipFlag != 0xC0){
+        if (slipFlag != 0xC0) {
             pBuf++;
             len--;
             continue;
         }
-        return pBuf;// pointer point to 0xC0
+        return pBuf; // pointer point to 0xC0
     }
     return NULL;
 }
 
 int HCI_Tr_H5BackupHandler(u8 *pPacket, u32 len)
 {
-    u8 *pBuf = hciH5TrCb.pBackupBuf;
+    u8 *pBuf      = hciH5TrCb.pBackupBuf;
     u16 backupLen = hciH5TrCb.backupCnt;
 
-    if(backupLen == 0)
-    {
+    if (backupLen == 0) {
         ASSERT(len < HCI_H5_TR_RX_BUF_SIZE, HCI_TR_ERR_TR_BACKUP_BUF);
 
         memcpy(pBuf, pPacket, len);
@@ -180,33 +176,29 @@ int HCI_Tr_H5BackupHandler(u8 *pPacket, u32 len)
     }
 
     u16 cnt = 0;
-    while(len)
-    {
-        if(*pPacket == 0xC0)
-        {
-            ASSERT(hciH5TrCb.backupCnt+1 < HCI_H5_TR_RX_BUF_SIZE, HCI_TR_ERR_TR_BACKUP_BUF);
+    while (len) {
+        if (*pPacket == 0xC0) {
+            ASSERT(hciH5TrCb.backupCnt + 1 < HCI_H5_TR_RX_BUF_SIZE, HCI_TR_ERR_TR_BACKUP_BUF);
 
-            if(hciH5TrCb.backupCnt+1 > HCI_H5_TR_RX_BUF_SIZE){
+            if (hciH5TrCb.backupCnt + 1 > HCI_H5_TR_RX_BUF_SIZE) {
                 //cnt++;
                 hciH5TrCb.backupCnt = 0;
                 HCI_Tr_H5TimerDisable();
-                return cnt;//discard
+                return cnt; //discard
             }
 
-            if(hciH5TrCb.backupCnt == 1){
+            if (hciH5TrCb.backupCnt == 1) {
                 cnt++;
                 pPacket++;
                 len--;
                 continue;
-            }
-            else
-            {
-                ASSERT(hciH5TrCb.backupCnt+1 < HCI_H5_TR_RX_BUF_SIZE, HCI_TR_ERR_TR_BACKUP_BUF);
-                if(hciH5TrCb.backupCnt+1 > HCI_H5_TR_RX_BUF_SIZE){
+            } else {
+                ASSERT(hciH5TrCb.backupCnt + 1 < HCI_H5_TR_RX_BUF_SIZE, HCI_TR_ERR_TR_BACKUP_BUF);
+                if (hciH5TrCb.backupCnt + 1 > HCI_H5_TR_RX_BUF_SIZE) {
                     //cnt++;
                     hciH5TrCb.backupCnt = 0;
                     HCI_Tr_H5TimerDisable();
-                    return cnt;//discard
+                    return cnt; //discard
                 }
 
                 memcpy(pBuf + hciH5TrCb.backupCnt, pPacket, 1);
@@ -222,18 +214,16 @@ int HCI_Tr_H5BackupHandler(u8 *pPacket, u32 len)
                 HCI_Tr_H5TimerDisable();
             }
             return cnt;
-        }
-        else
-        {
-            ASSERT(hciH5TrCb.backupCnt+1 < HCI_H5_TR_RX_BUF_SIZE, HCI_TR_ERR_TR_BACKUP_BUF);
-            if(hciH5TrCb.backupCnt+1 > HCI_H5_TR_RX_BUF_SIZE){
+        } else {
+            ASSERT(hciH5TrCb.backupCnt + 1 < HCI_H5_TR_RX_BUF_SIZE, HCI_TR_ERR_TR_BACKUP_BUF);
+            if (hciH5TrCb.backupCnt + 1 > HCI_H5_TR_RX_BUF_SIZE) {
                 //cnt++;
                 hciH5TrCb.backupCnt = 0;
                 HCI_Tr_H5TimerDisable();
-                return cnt;//discard
+                return cnt;                                 //discard
             }
 
-            memcpy(pBuf + hciH5TrCb.backupCnt, pPacket, 1);//TODO: Check len
+            memcpy(pBuf + hciH5TrCb.backupCnt, pPacket, 1); //TODO: Check len
             hciH5TrCb.backupCnt += 1;
             cnt++;
             HCI_Tr_H5TimerEnable();
@@ -257,45 +247,42 @@ void HCI_Tr_H5RxHandler(void)
     HCI_Tr_H5FlushHandler();
 
     hci_fifo_t *pFifo = hciH5TrCb.pRxFifo;
-    if(pFifo->wptr == pFifo->rptr){
+    if (pFifo->wptr == pFifo->rptr) {
         return;
     }
 
-    while(pFifo->wptr != pFifo->rptr)
-    {
+    while (pFifo->wptr != pFifo->rptr) {
         u8 *pPacket = pFifo->p + (pFifo->rptr & pFifo->mask) * pFifo->size;
-        u32 len = 0;
+        u32 len     = 0;
         BSTREAM_TO_UINT32(len, pPacket);
 
         TR_TRACK_INFO("UART data: ");
         HCI_TRACK_DATA(pPacket, len);
 
-        while(len)
-        {
-            if(hciH5TrCb.backupCnt){
+        while (len) {
+            if (hciH5TrCb.backupCnt) {
                 u8 res = HCI_Tr_H5BackupHandler(pPacket, len);
                 len -= res;
                 pPacket += res;
             }
 
-            u8 *pBuf = NULL;
+            u8 *pBuf  = NULL;
             u8 *pBuf2 = NULL;
-            pBuf = HCI_Tr_H5FindSlipHeadFlag(pPacket, len);
+            pBuf      = HCI_Tr_H5FindSlipHeadFlag(pPacket, len);
             len -= (pBuf - pPacket);
             pPacket = pBuf;
 
-            if(pBuf)
-            {
-                u16 tmpLen = pBuf+1 - pPacket;
-                pBuf2 = HCI_Tr_H5FindSlipFlag(pBuf+1, len - tmpLen);
-                if(pBuf2 == NULL || len == 1){
+            if (pBuf) {
+                u16 tmpLen = pBuf + 1 - pPacket;
+                pBuf2      = HCI_Tr_H5FindSlipFlag(pBuf + 1, len - tmpLen);
+                if (pBuf2 == NULL || len == 1) {
                     HCI_Tr_H5BackupHandler(pBuf, len - (pBuf - pPacket));
                     len = 0;
                     break;
                 }
 
                 u16 slipLen = pBuf2 + 1 - pBuf;
-                if(slipLen < 6){
+                if (slipLen < 6) {
                     pPacket += slipLen;
                     len -= slipLen;
                     continue;
@@ -307,8 +294,7 @@ void HCI_Tr_H5RxHandler(void)
                 hciH5TrCb.HCI_Tr_SlipHandler(pBuf, slipLen);
                 pPacket += slipLen;
                 len -= slipLen;
-            }
-            else{
+            } else {
                 len = 0;
                 break;
             }
@@ -323,30 +309,26 @@ void HCI_Tr_H5RxHandler(void)
  * @param : none.
  * @param : none.
  */
-_attribute_ram_code_
-void HCI_Tr_H5UartRxIRQHandler(unsigned int * param)
+_attribute_ram_code_ void HCI_Tr_H5UartRxIRQHandler(unsigned int *param)
 {
-    (void)* param;
+    (void)*param;
     /* Get the length of Rx data */
-    u32 rxLen = 0;
+    u32         rxLen   = 0;
     hci_fifo_t *pRxFifo = hciH5TrCb.pRxFifo;
-    u8 *p = pRxFifo->p + (pRxFifo->wptr & pRxFifo->mask) * pRxFifo->size;
+    u8         *p       = pRxFifo->p + (pRxFifo->wptr & pRxFifo->mask) * pRxFifo->size;
 
-    if((u8)(pRxFifo->wptr - pRxFifo->rptr) >= pRxFifo->num){
-        ext_hci_uartReceData((p+4), pRxFifo->size - 4);//[!!important]
+    if ((u8)(pRxFifo->wptr - pRxFifo->rptr) >= pRxFifo->num) {
+        ext_hci_uartReceData((p + 4), pRxFifo->size - 4); //[!!important]
         tlkapi_send_string_data(DBG_HCI_TR, "[I] UART Rx overflow", 0, 0);
 
-        return; //have no memory.
+        return;                                           //have no memory.
     }
-    BSTREAM_TO_UINT32(rxLen,p);
-    if(rxLen)
-    {
+    BSTREAM_TO_UINT32(rxLen, p);
+    if (rxLen) {
         pRxFifo->wptr++;
         p = pRxFifo->p + (pRxFifo->wptr & pRxFifo->mask) * pRxFifo->size;
-
     }
-    ext_hci_uartReceData( (p+4), pRxFifo->size - 4);//[!!important]
-
+    ext_hci_uartReceData((p + 4), pRxFifo->size - 4); //[!!important]
 }
 
-#endif /* End of HCI_TR_EN */
+#endif                                                /* End of HCI_TR_EN */

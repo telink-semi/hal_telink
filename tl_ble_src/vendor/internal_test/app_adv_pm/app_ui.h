@@ -26,7 +26,7 @@
 
 #if (INTER_TEST_MODE == TEST_ADV_PM_MANAGE)
 
-extern int  key_not_released;
+extern int key_not_released;
 
 
 /**
@@ -36,7 +36,7 @@ extern int  key_not_released;
  * @param[in]  n    - the length of event parameter.
  * @return     none.
  */
-void proc_keyboard (u8 e, u8 *p, int n);
+void proc_keyboard(u8 e, u8 *p, int n);
 
 /**
  * @brief      callback function of LinkLayer Event "BLT_EV_FLAG_SUSPEND_ENTER"
@@ -45,8 +45,7 @@ void proc_keyboard (u8 e, u8 *p, int n);
  * @param[in]  n - data length of event
  * @return     none
  */
-void  app_set_kb_wakeup (u8 e, u8 *p, int n);
-
+void app_set_kb_wakeup(u8 e, u8 *p, int n);
 
 
 /**

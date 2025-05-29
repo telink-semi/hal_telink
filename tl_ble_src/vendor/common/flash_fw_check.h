@@ -34,8 +34,7 @@
  * @return      0 - CRC is check success
  *              1 - CRC is check fail
  */
-bool flash_fw_check( u32 crc_init_value );
-
+bool flash_fw_check(u32 crc_init_value);
 
 
 #endif

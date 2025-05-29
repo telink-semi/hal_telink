@@ -27,7 +27,7 @@
 #include "../intest_config.h"
 #if (INTER_TEST_MODE == TEST_ULL_HID_HOST)
 
-#define ULL_CIS_LOG(fmt, ...)           tlkapi_printf(APP_ULL_HID_LOG_EN, "[ULL-CIS]"fmt"\n", ##__VA_ARGS__)
+    #define ULL_CIS_LOG(fmt, ...) tlkapi_printf(APP_ULL_HID_LOG_EN, "[ULL-CIS]" fmt "\n", ##__VA_ARGS__)
 
 
 /**
@@ -39,5 +39,4 @@ void app_initial_ull_cis_host(void);
 
 void app_ullhid_initCigParam(void);
 
-#endif  //INTER_TEST_MODE == TEST_ULL_HID_HOST
-
+#endif //INTER_TEST_MODE == TEST_ULL_HID_HOST

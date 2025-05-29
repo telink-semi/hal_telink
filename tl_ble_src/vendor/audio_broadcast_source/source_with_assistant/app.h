@@ -25,9 +25,9 @@
 
 #if (SOURCE_VERSION == SOURCE_WITH_ASSISTANT)
 
-#pragma once
+    #pragma once
 
-#include "app_config.h"
+    #include "app_config.h"
 
 
 /**
@@ -51,6 +51,6 @@ void user_init_deepRetn(void);
  * @param[in]  none.
  * @return     none.
  */
-void main_loop (void);
+void main_loop(void);
 
-#endif      //SOURCE_VERSION == SOURCE_WITH_ASSISTANT
+#endif //SOURCE_VERSION == SOURCE_WITH_ASSISTANT

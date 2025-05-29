@@ -24,21 +24,16 @@
 #ifndef ADV_H_
 #define ADV_H_
 
-
-
 /**
  *  @brief  Definition for ADV maximum random delay time
  */
-typedef enum{
-      MAX_DELAY_10MS    = 512,
-      MAX_DELAY_5MS     = 256,
-      MAX_DELAY_2P5MS   = 128,
-      MAX_DELAY_0MS     = 0,
-}adv_max_delay_t;
-
-
-
-
+typedef enum
+{
+    MAX_DELAY_10MS  = 512,
+    MAX_DELAY_5MS   = 256,
+    MAX_DELAY_2P5MS = 128,
+    MAX_DELAY_0MS   = 0,
+} adv_max_delay_t;
 
 /**
  * @brief   Set Advertising Interval maximum random delay time. If not set, default value is 10mS according to BLE SPEC.
@@ -48,11 +43,7 @@ typedef enum{
  *
  * @return  None
  */
-void        blc_ll_setMaxAdvDelay_for_AdvEvent(adv_max_delay_t max_delay);
-
-
-
-
+void blc_ll_setMaxAdvDelay_for_AdvEvent(adv_max_delay_t max_delay);
 
 
 #endif /* ADV_H_ */

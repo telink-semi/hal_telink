@@ -29,29 +29,37 @@
 #include "lib/include/pm/pm.h"
 
 static unsigned char audio_codec_rate[AUDIO_RATE_SIZE + 0x03] = {
-    0x06, /*8k*/              // 12Mhz/1500=8K
-    0x19, /*11.0259k*/        // 12Mhz/1088=11.0259K
-    0x08, /*12k*/             // 12Mhz/1000=12K
-    0x0a, /*16k*/             // 12Mhz/750=16K
-    0x1b, /*22.0588k*/        // 12Mhz/544=22.0588K
-    0x1c, /*24k*/             // 12Mhz/500=24K
-    0x0c, /*32k*/             // 12Mhz/375=32K
-    0x11, /*44.118k_clk6mhz*/ // 12Mhz/272=44.118K
-    0x00,                     // 48k_clk6mhz
-    0x0d,                     // 32k_clk2mhz
-    0x1f,                     // 44.118k_clk3mhz
-    0x1e};                    // 48k_clk3mhz
+    0x06,
+    /*8k*/              // 12Mhz/1500=8K
+    0x19,
+    /*11.0259k*/        // 12Mhz/1088=11.0259K
+    0x08,
+    /*12k*/             // 12Mhz/1000=12K
+    0x0a,
+    /*16k*/             // 12Mhz/750=16K
+    0x1b,
+    /*22.0588k*/        // 12Mhz/544=22.0588K
+    0x1c,
+    /*24k*/             // 12Mhz/500=24K
+    0x0c,
+    /*32k*/             // 12Mhz/375=32K
+    0x11,
+    /*44.118k_clk6mhz*/ // 12Mhz/272=44.118K
+    0x00,               // 48k_clk6mhz
+    0x0d,               // 32k_clk2mhz
+    0x1f,               // 44.118k_clk3mhz
+    0x1e};              // 48k_clk3mhz
 
 static unsigned int audio_stream_output_stereo_step[AUDIO_RATE_SIZE] = {
-    0x00831001, /*8k*/
-    0x00b4a001, /*11.0259k*/
-    0x00c4a001, /*12k*/
-    0x01062001, /*16k*/
-    0x01696001, /*22.0588k*/
-    0x01893001, /*24k*/
-    0x020c5001, /*32k*/
-    0x02d28001, /*44.1k*/
-    0x03127001, /*48k*/
+    0x00831001,         /*8k*/
+    0x00b4a001,         /*11.0259k*/
+    0x00c4a001,         /*12k*/
+    0x01062001,         /*16k*/
+    0x01696001,         /*22.0588k*/
+    0x01893001,         /*24k*/
+    0x020c5001,         /*32k*/
+    0x02d28001,         /*44.1k*/
+    0x03127001,         /*48k*/
 };
 
 static unsigned int audio_stream_output_mono_step[AUDIO_RATE_SIZE] = {
@@ -80,124 +88,126 @@ unsigned int audio_sample_rate_value[AUDIO_ASCL_RATE_SIZE] = {
     192000, /*192k*/
 };
 
-unsigned char audio_rx_dma_chn;
-unsigned char audio_tx_dma_chn;
-unsigned char audio_rx_fifo_chn;
-unsigned char audio_tx_fifo_chn;
+unsigned char      audio_rx_dma_chn;
+unsigned char      audio_tx_dma_chn;
+unsigned char      audio_rx_fifo_chn;
+unsigned char      audio_tx_fifo_chn;
 dma_chain_config_t g_audio_tx_dma_list_cfg[0x03];
 dma_chain_config_t g_audio_rx_dma_list_cfg[0x03];
 
 audio_i2s_invert_config_t audio_i2s_invert_config[0x03] =
     {
         {
-            .i2s_lr_clk_invert_select = I2S_LR_CLK_INVERT_DIS,
-            .i2s_data_invert_select = I2S_DATA_INVERT_DIS,
-        },
+         .i2s_lr_clk_invert_select = I2S_LR_CLK_INVERT_DIS,
+         .i2s_data_invert_select   = I2S_DATA_INVERT_DIS,
+         },
         {
-            .i2s_lr_clk_invert_select = I2S_LR_CLK_INVERT_DIS,
-            .i2s_data_invert_select = I2S_DATA_INVERT_DIS,
-        },
+         .i2s_lr_clk_invert_select = I2S_LR_CLK_INVERT_DIS,
+         .i2s_data_invert_select   = I2S_DATA_INVERT_DIS,
+         },
         {
-            .i2s_lr_clk_invert_select = I2S_LR_CLK_INVERT_DIS,
-            .i2s_data_invert_select = I2S_DATA_INVERT_DIS,
-        },
+         .i2s_lr_clk_invert_select = I2S_LR_CLK_INVERT_DIS,
+         .i2s_data_invert_select   = I2S_DATA_INVERT_DIS,
+         },
 };
 
 dma_config_t audio_dma_rx_config[3] =
     {
         {
-            .dst_req_sel = 0,
-            .src_req_sel = DMA_REQ_AUDIO0_RX, // l_rx req.
-            .dst_addr_ctrl = DMA_ADDR_INCREMENT,
-            .src_addr_ctrl = DMA_ADDR_FIX,
-            .dstmode = DMA_NORMAL_MODE,
-            .srcmode = DMA_HANDSHAKE_MODE,
-            .dstwidth = DMA_CTR_WORD_WIDTH, // must word.
-            .srcwidth = DMA_CTR_WORD_WIDTH, // must word.
-            .src_burst_size = 0,            // must 0.
-            .read_num_en = 0,
-            .priority = 0,
-            .write_num_en = 0,
-            .auto_en = 0, // must 0.
+         .dst_req_sel    = 0,
+         .src_req_sel    = DMA_REQ_AUDIO0_RX, // l_rx req.
+            .dst_addr_ctrl  = DMA_ADDR_INCREMENT,
+         .src_addr_ctrl  = DMA_ADDR_FIX,
+         .dstmode        = DMA_NORMAL_MODE,
+         .srcmode        = DMA_HANDSHAKE_MODE,
+         .dstwidth       = DMA_CTR_WORD_WIDTH, // must word.
+            .srcwidth       = DMA_CTR_WORD_WIDTH, // must word.
+            .src_burst_size = 0, // must 0.
+            .read_num_en    = 0,
+         .priority       = 0,
+         .write_num_en   = 0,
+         .auto_en        = 0, // must 0.
         },
         {
-            .dst_req_sel = 0,
-            .src_req_sel = DMA_REQ_AUDIO1_RX, // r_rx req.
-            .dst_addr_ctrl = DMA_ADDR_INCREMENT,
-            .src_addr_ctrl = DMA_ADDR_FIX,
-            .dstmode = DMA_NORMAL_MODE,
-            .srcmode = DMA_HANDSHAKE_MODE,
-            .dstwidth = DMA_CTR_WORD_WIDTH, // must word.
-            .srcwidth = DMA_CTR_WORD_WIDTH, // must word.
-            .src_burst_size = 0,            // must 0.
-            .read_num_en = 0,
-            .priority = 0,
-            .write_num_en = 0,
-            .auto_en = 0, // must 0
+         .dst_req_sel    = 0,
+         .src_req_sel    = DMA_REQ_AUDIO1_RX,                 // r_rx req.
+            .dst_addr_ctrl  = DMA_ADDR_INCREMENT,
+         .src_addr_ctrl  = DMA_ADDR_FIX,
+         .dstmode        = DMA_NORMAL_MODE,
+         .srcmode        = DMA_HANDSHAKE_MODE,
+         .dstwidth       = DMA_CTR_WORD_WIDTH, // must word.
+            .srcwidth       = DMA_CTR_WORD_WIDTH,                                                  // must word.
+            .src_burst_size = 0,                                 // must 0.
+            .read_num_en    = 0,
+         .priority       = 0,
+         .write_num_en   = 0,
+         .auto_en        = 0, // must 0
         },
         {
-            .dst_req_sel = 0,
-            .src_req_sel = DMA_REQ_AUDIO2_RX, // r_rx req.
-            .dst_addr_ctrl = DMA_ADDR_INCREMENT,
-            .src_addr_ctrl = DMA_ADDR_FIX,
-            .dstmode = DMA_NORMAL_MODE,
-            .srcmode = DMA_HANDSHAKE_MODE,
-            .dstwidth = DMA_CTR_WORD_WIDTH, // must word.
-            .srcwidth = DMA_CTR_WORD_WIDTH, // must word.
-            .src_burst_size = 0,            // must 0.
-            .read_num_en = 0,
-            .priority = 0,
-            .write_num_en = 0,
-            .auto_en = 0, // must 0.
-        }};
+         .dst_req_sel    = 0,
+         .src_req_sel    = DMA_REQ_AUDIO2_RX,                                    // r_rx req.
+            .dst_addr_ctrl  = DMA_ADDR_INCREMENT,
+         .src_addr_ctrl  = DMA_ADDR_FIX,
+         .dstmode        = DMA_NORMAL_MODE,
+         .srcmode        = DMA_HANDSHAKE_MODE,
+         .dstwidth       = DMA_CTR_WORD_WIDTH,    // must word.
+            .srcwidth       = DMA_CTR_WORD_WIDTH,                                                  // must word.
+            .src_burst_size = 0,                                                                                  // must 0.
+            .read_num_en    = 0,
+         .priority       = 0,
+         .write_num_en   = 0,
+         .auto_en        = 0, // must 0.
+        }
+};
 
 dma_config_t audio_dma_tx_config[3] =
     {
         {
-            .dst_req_sel = DMA_REQ_AUDIO0_TX, // tx req.
-            .src_req_sel = 0,
-            .dst_addr_ctrl = DMA_ADDR_FIX,
-            .src_addr_ctrl = DMA_ADDR_INCREMENT, // increment.
-            .dstmode = DMA_HANDSHAKE_MODE,       // handshake.
-            .srcmode = DMA_NORMAL_MODE,
-            .dstwidth = DMA_CTR_WORD_WIDTH, // must word.
-            .srcwidth = DMA_CTR_WORD_WIDTH, // must word.
-            .src_burst_size = 0,            // must 0.
-            .read_num_en = 0,
-            .priority = 0,
-            .write_num_en = 0,
-            .auto_en = 0, // must 0.
+         .dst_req_sel    = DMA_REQ_AUDIO0_TX, // tx req.
+            .src_req_sel    = 0,
+         .dst_addr_ctrl  = DMA_ADDR_FIX,
+         .src_addr_ctrl  = DMA_ADDR_INCREMENT,                                // increment.
+            .dstmode        = DMA_HANDSHAKE_MODE, // handshake.
+            .srcmode        = DMA_NORMAL_MODE,
+         .dstwidth       = DMA_CTR_WORD_WIDTH,                                                                                                // must word.
+            .srcwidth       = DMA_CTR_WORD_WIDTH,                                               // must word.
+            .src_burst_size = 0, // must 0.
+            .read_num_en    = 0,
+         .priority       = 0,
+         .write_num_en   = 0,
+         .auto_en        = 0, // must 0.
         },
         {
-            .dst_req_sel = DMA_REQ_AUDIO1_TX, // tx req.
-            .src_req_sel = 0,
-            .dst_addr_ctrl = DMA_ADDR_FIX,
-            .src_addr_ctrl = DMA_ADDR_INCREMENT, // increment.
-            .dstmode = DMA_HANDSHAKE_MODE,       // handshake.
-            .srcmode = DMA_NORMAL_MODE,
-            .dstwidth = DMA_CTR_WORD_WIDTH, // must word.
-            .srcwidth = DMA_CTR_WORD_WIDTH, // must word.
-            .src_burst_size = 0,            // must 0.
-            .read_num_en = 0,
-            .priority = 0,
-            .write_num_en = 0,
-            .auto_en = 0, // must 0.
+         .dst_req_sel    = DMA_REQ_AUDIO1_TX,                                    // tx req.
+            .src_req_sel    = 0,
+         .dst_addr_ctrl  = DMA_ADDR_FIX,
+         .src_addr_ctrl  = DMA_ADDR_INCREMENT,                                      // increment.
+            .dstmode        = DMA_HANDSHAKE_MODE,                                                  // handshake.
+            .srcmode        = DMA_NORMAL_MODE,
+         .dstwidth       = DMA_CTR_WORD_WIDTH, // must word.
+            .srcwidth       = DMA_CTR_WORD_WIDTH,                                                                                                // must word.
+            .src_burst_size = 0,                                 // must 0.
+            .read_num_en    = 0,
+         .priority       = 0,
+         .write_num_en   = 0,
+         .auto_en        = 0, // must 0.
         },
         {
-            .dst_req_sel = DMA_REQ_AUDIO2_TX, // tx req.
-            .src_req_sel = 0,
-            .dst_addr_ctrl = DMA_ADDR_FIX,
-            .src_addr_ctrl = DMA_ADDR_INCREMENT, // increment.
-            .dstmode = DMA_HANDSHAKE_MODE,       // handshake.
-            .srcmode = DMA_NORMAL_MODE,
-            .dstwidth = DMA_CTR_WORD_WIDTH, // must word.
-            .srcwidth = DMA_CTR_WORD_WIDTH, // must word.
-            .src_burst_size = 0,            // must 0.
-            .read_num_en = 0,
-            .priority = 0,
-            .write_num_en = 0,
-            .auto_en = 0, // must 0.
-        }};
+         .dst_req_sel    = DMA_REQ_AUDIO2_TX,        // tx req.
+            .src_req_sel    = 0,
+         .dst_addr_ctrl  = DMA_ADDR_FIX,
+         .src_addr_ctrl  = DMA_ADDR_INCREMENT, // increment.
+            .dstmode        = DMA_HANDSHAKE_MODE,                                                        // handshake.
+            .srcmode        = DMA_NORMAL_MODE,
+         .dstwidth       = DMA_CTR_WORD_WIDTH,                                               // must word.
+            .srcwidth       = DMA_CTR_WORD_WIDTH, // must word.
+            .src_burst_size = 0,                                                                                  // must 0.
+            .read_num_en    = 0,
+         .priority       = 0,
+         .write_num_en   = 0,
+         .auto_en        = 0, // must 0.
+        }
+};
 
 /**
  * @brief     This function configures amic bias pin.
@@ -226,8 +236,7 @@ void audio_set_stream0_dmic_pin(gpio_func_pin_e dmic0_data, gpio_func_pin_e dmic
     gpio_function_dis((gpio_pin_e)dmic0_data);
     gpio_set_mux_function(dmic0_clk1, DMIC0_CLK);
     gpio_function_dis((gpio_pin_e)dmic0_clk1);
-    if (dmic0_clk2 != GPIO_NONE_PIN)
-    {
+    if (dmic0_clk2 != GPIO_NONE_PIN) {
         gpio_set_mux_function(dmic0_clk2, DMIC0_CLK);
         gpio_function_dis((gpio_pin_e)dmic0_clk2);
     }
@@ -240,26 +249,22 @@ void audio_set_stream0_dmic_pin(gpio_func_pin_e dmic0_data, gpio_func_pin_e dmic
  */
 void audio_set_sdm_pin(sdm_pin_config_t *config)
 {
-    if (config->sdm0_p_pin != GPIO_NONE_PIN)
-    {
+    if (config->sdm0_p_pin != GPIO_NONE_PIN) {
         gpio_set_mux_function(config->sdm0_p_pin, SDM0_P);
         gpio_function_dis((gpio_pin_e)config->sdm0_p_pin);
     }
 
-    if (config->sdm0_n_pin != GPIO_NONE_PIN)
-    {
+    if (config->sdm0_n_pin != GPIO_NONE_PIN) {
         gpio_set_mux_function(config->sdm0_n_pin, SDM0_N);
         gpio_function_dis((gpio_pin_e)config->sdm0_n_pin);
     }
 
-    if (config->sdm1_p_pin != GPIO_NONE_PIN)
-    {
+    if (config->sdm1_p_pin != GPIO_NONE_PIN) {
         gpio_set_mux_function(config->sdm1_p_pin, SDM1_P);
         gpio_function_dis((gpio_pin_e)config->sdm1_p_pin);
     }
 
-    if (config->sdm1_n_pin != GPIO_NONE_PIN)
-    {
+    if (config->sdm1_n_pin != GPIO_NONE_PIN) {
         gpio_set_mux_function(config->sdm1_n_pin, SDM1_N);
         gpio_function_dis((gpio_pin_e)config->sdm1_n_pin);
     }
@@ -272,26 +277,23 @@ void audio_set_sdm_pin(sdm_pin_config_t *config)
  */
 void audio_unset_sdm_pin(sdm_pin_config_t *config)
 {
-    if (config->sdm0_p_pin != GPIO_NONE_PIN)
-    {
+    if (config->sdm0_p_pin != GPIO_NONE_PIN) {
         gpio_function_en((gpio_pin_e)config->sdm0_p_pin);
     }
 
-    if (config->sdm0_n_pin != GPIO_NONE_PIN)
-    {
+    if (config->sdm0_n_pin != GPIO_NONE_PIN) {
         gpio_function_en((gpio_pin_e)config->sdm0_n_pin);
     }
 
-    if (config->sdm1_p_pin != GPIO_NONE_PIN)
-    {
+    if (config->sdm1_p_pin != GPIO_NONE_PIN) {
         gpio_function_en((gpio_pin_e)config->sdm1_p_pin);
     }
 
-    if (config->sdm1_n_pin != GPIO_NONE_PIN)
-    {
+    if (config->sdm1_n_pin != GPIO_NONE_PIN) {
         gpio_function_en((gpio_pin_e)config->sdm1_n_pin);
     }
 }
+
 /**
  * @brief     This function configures i2s pin.
  * @param[in] i2s_select       - channel select
@@ -300,69 +302,58 @@ void audio_unset_sdm_pin(sdm_pin_config_t *config)
  */
 void i2s_set_pin(audio_i2s_select_e i2s_select, i2s_pin_config_t *config)
 {
-    if (i2s_select <= I2S1)
-    {
+    if (i2s_select <= I2S1) {
         gpio_input_en((gpio_pin_e)config->bclk_pin);
         gpio_set_mux_function(config->bclk_pin, I2S0_BCK_IO + (i2s_select) * 6);
         gpio_function_dis((gpio_pin_e)config->bclk_pin);
 
-        if (config->adc_lr_clk_pin != GPIO_NONE_PIN)
-        {
+        if (config->adc_lr_clk_pin != GPIO_NONE_PIN) {
             gpio_input_en((gpio_pin_e)config->adc_lr_clk_pin);
             gpio_set_mux_function(config->adc_lr_clk_pin, I2S0_LR0_IO + (i2s_select) * 6);
             gpio_function_dis((gpio_pin_e)config->adc_lr_clk_pin);
         }
 
-        if (config->dac_lr_clk_pin != GPIO_NONE_PIN)
-        {
+        if (config->dac_lr_clk_pin != GPIO_NONE_PIN) {
             gpio_input_en((gpio_pin_e)config->dac_lr_clk_pin);
             gpio_set_mux_function(config->dac_lr_clk_pin, I2S0_LR1_IO + (i2s_select) * 6);
             gpio_function_dis((gpio_pin_e)config->dac_lr_clk_pin);
         }
 
-        if (config->adc_dat_pin != GPIO_NONE_PIN)
-        {
+        if (config->adc_dat_pin != GPIO_NONE_PIN) {
             gpio_input_en((gpio_pin_e)config->adc_dat_pin);
             gpio_set_mux_function(config->adc_dat_pin, I2S0_DAT0_IO + (i2s_select) * 6);
             gpio_function_dis((gpio_pin_e)config->adc_dat_pin);
         }
 
-        if (config->dac_dat_pin != GPIO_NONE_PIN)
-        {
+        if (config->dac_dat_pin != GPIO_NONE_PIN) {
             gpio_input_en((gpio_pin_e)config->dac_dat_pin);
             gpio_set_mux_function(config->dac_dat_pin, I2S0_DAT1_IO + (i2s_select) * 6);
             gpio_function_dis((gpio_pin_e)config->dac_dat_pin);
         }
-    }
-    else
-    {
+    } else {
         gpio_input_en((gpio_pin_e)config->bclk_pin);
         gpio_set_mux_function((gpio_func_pin_e)config->bclk_pin, I2S2_BCK_IO);
         gpio_function_dis((gpio_pin_e)config->bclk_pin);
 
-        if (config->adc_lr_clk_pin != GPIO_NONE_PIN)
-        {
+        if (config->adc_lr_clk_pin != GPIO_NONE_PIN) {
             gpio_input_en((gpio_pin_e)config->adc_lr_clk_pin);
             gpio_set_mux_function((gpio_func_pin_e)config->adc_lr_clk_pin, I2S2_LR0_IO);
             gpio_function_dis((gpio_pin_e)config->adc_lr_clk_pin);
         }
 
-        if (config->dac_lr_clk_pin != GPIO_NONE_PIN)
-        {
+        if (config->dac_lr_clk_pin != GPIO_NONE_PIN) {
             gpio_input_en((gpio_pin_e)config->dac_lr_clk_pin);
             gpio_set_mux_function((gpio_func_pin_e)config->dac_lr_clk_pin, I2S2_LR1_IO);
             gpio_function_dis((gpio_pin_e)config->dac_lr_clk_pin);
         }
 
-        if (config->adc_dat_pin != GPIO_NONE_PIN)
-        {
+        if (config->adc_dat_pin != GPIO_NONE_PIN) {
             gpio_input_en((gpio_pin_e)config->adc_dat_pin);
             gpio_set_mux_function((gpio_func_pin_e)config->adc_dat_pin, I2S2_DAT0_IO);
             gpio_function_dis((gpio_pin_e)config->adc_dat_pin);
         }
 
-        if (config->dac_dat_pin != GPIO_NONE_PIN)
-        {
+        if (config->dac_dat_pin != GPIO_NONE_PIN) {
             gpio_input_en((gpio_pin_e)config->dac_dat_pin);
             gpio_set_mux_function((gpio_func_pin_e)config->dac_dat_pin, I2S2_DAT1_IO);
             gpio_function_dis((gpio_pin_e)config->dac_dat_pin);
@@ -398,11 +389,11 @@ void audio_rx_dma_config(dma_chn_e chn, unsigned short *dst_addr, unsigned int d
  */
 void audio_rx_dma_add_list_element(dma_chain_config_t *config_addr, dma_chain_config_t *llpointer, unsigned short *dst_addr, unsigned int data_len)
 {
-    config_addr->dma_chain_ctl = reg_dma_ctrl(audio_rx_dma_chn) | BIT(0);
+    config_addr->dma_chain_ctl      = reg_dma_ctrl(audio_rx_dma_chn) | BIT(0);
     config_addr->dma_chain_src_addr = REG_AUDIO_FIFO_ADDR(audio_rx_fifo_chn);
     config_addr->dma_chain_dst_addr = (unsigned int)dst_addr;
     config_addr->dma_chain_data_len = dma_cal_size(data_len, DMA_WORD_WIDTH);
-    config_addr->dma_chain_llp_ptr = (unsigned int)llpointer;
+    config_addr->dma_chain_llp_ptr  = (unsigned int)llpointer;
 }
 
 /**
@@ -449,11 +440,11 @@ void audio_tx_dma_config(dma_chn_e chn, unsigned short *src_addr, unsigned int d
  */
 void audio_tx_dma_add_list_element(dma_chain_config_t *config_addr, dma_chain_config_t *llpointer, unsigned short *src_addr, unsigned int data_len)
 {
-    config_addr->dma_chain_ctl = reg_dma_ctrl(audio_tx_dma_chn) | BIT(0);
+    config_addr->dma_chain_ctl      = reg_dma_ctrl(audio_tx_dma_chn) | BIT(0);
     config_addr->dma_chain_src_addr = (unsigned int)src_addr;
     config_addr->dma_chain_dst_addr = REG_AUDIO_FIFO_ADDR(audio_tx_fifo_chn);
     config_addr->dma_chain_data_len = dma_cal_size(data_len, DMA_WORD_WIDTH);
-    config_addr->dma_chain_llp_ptr = (unsigned int)llpointer;
+    config_addr->dma_chain_llp_ptr  = (unsigned int)llpointer;
 }
 
 /**
@@ -530,7 +521,7 @@ void audio_set_audio_clk(unsigned short div_numerator, unsigned short div_denomi
 {
     clock_bbpll_config(PLL_CLK);
     reg_dmic_step = (div_numerator & FLD_DMIC_STEP) | FLD_DMIC_SEL;
-    reg_dmic_mod = div_denominator;
+    reg_dmic_mod  = div_denominator;
 }
 
 /**
@@ -568,12 +559,9 @@ void audio_codec_init(void)
  */
 void audio_reset_audio_clk(unsigned short div_numerator, unsigned short div_denominator, codec_clk_usb_mode_e clk_usb_mode, audio_sample_rate_e rate)
 {
-    if (clk_usb_mode == CLK_USB_MODE_OFF)
-    {
-         reg_codec_clkcfg &= ~FLD_CLK_USB;
-    }
-    else
-    {
+    if (clk_usb_mode == CLK_USB_MODE_OFF) {
+        reg_codec_clkcfg &= ~FLD_CLK_USB;
+    } else {
         reg_codec_clkcfg |= FLD_CLK_USB;
     }
     audio_set_audio_clk(div_numerator, div_denominator); // audio clk=240M*(div_numerator/div_denominator)
@@ -618,30 +606,21 @@ void audio_codec_adc_power_down(void)
  */
 void audio_codec_set_adc_vmid(power_switch_e en)
 {
-    if (en)
-    {
-        if(g_chip_version == CHIP_VERSION_A1)
-        {
+    if (en) {
+        if (g_chip_version == CHIP_VERSION_A1) {
             /***enable vmid voltage***/
             analog_write_reg8(areg_0x8f, (analog_read_reg8(areg_0x8f) & (~FLD_AUDIO_VMID_PD)));
-        }
-        else
-        {
+        } else {
             /***enable vmid voltage***/
             analog_write_reg8(areg_0x8f, (analog_read_reg8(areg_0x8f) | FLD_AUDIO_VMID_PD));
         }
         /***keep 0.9v vmid***/
         analog_write_reg8(areg_0x8e, (analog_read_reg8(areg_0x8e) | FLD_AUDIO_PD_ENABLE_0R6));
-    }
-    else
-    {
-        if(g_chip_version == CHIP_VERSION_A1)
-        {
+    } else {
+        if (g_chip_version == CHIP_VERSION_A1) {
             /***disable vmid voltage***/
             analog_write_reg8(areg_0x8f, (analog_read_reg8(areg_0x8f) | FLD_AUDIO_VMID_PD));
-        }
-        else
-        {
+        } else {
             /***disable vmid voltage***/
             analog_write_reg8(areg_0x8f, (analog_read_reg8(areg_0x8f) & (~FLD_AUDIO_VMID_PD)));
         }
@@ -665,8 +644,7 @@ void audio_set_codec_stream0_input_mode(audio_codec_input_mode_e input_mode)
  */
 void audio_set_codec_stream0_path(audio_chn_sel_e che_en)
 {
-    reg_codec_cfg = (reg_codec_cfg & (~(FLD_L_CH_EN | FLD_R_CH_EN))) | MASK_VAL(FLD_L_CH_EN, (che_en & CHANNEL_LEFT) ? (0x01) : (0x00),
-                                                                                FLD_R_CH_EN, (che_en & CHANNEL_RIGHT) ? (0x01) : (0x00));
+    reg_codec_cfg = (reg_codec_cfg & (~(FLD_L_CH_EN | FLD_R_CH_EN))) | MASK_VAL(FLD_L_CH_EN, (che_en & CHANNEL_LEFT) ? (0x01) : (0x00), FLD_R_CH_EN, (che_en & CHANNEL_RIGHT) ? (0x01) : (0x00));
 }
 
 /**
@@ -677,16 +655,14 @@ void audio_set_codec_stream0_path(audio_chn_sel_e che_en)
  */
 void audio_set_codec_stream0_sample_rate(codec_stream0_input_src_e source, audio_sample_rate_e rate)
 {
-    if (source & BIT(3))
-    {
+    if (source & BIT(3)) {
         /* When the sampling rate is greater than or equal to 32K there is a data channel reversal problem,
         * so reg_codec_cfg bit[5] need to be configured to adjust the direction.
         * Moreover, this bit is also recommended to be configured for scenarios with less than 32k sampling rate,
         * and in this case, the direction will not be flipped.
         */
         reg_codec_cfg |= FLD_R_NEG;
-        if (rate >= AUDIO_32K)
-        {
+        if (rate >= AUDIO_32K) {
             rate += 3;
         }
     }
@@ -701,8 +677,7 @@ void audio_set_codec_stream0_sample_rate(codec_stream0_input_src_e source, audio
  */
 void audio_codec_stream0_input_config(codec_stream0_input_src_e source, audio_sample_rate_e rate)
 {
-    if (!(source & BIT(3)))
-    {
+    if (!(source & BIT(3))) {
         audio_codec_set_adc_clock();
         audio_codec_adc_power_on();
     }
@@ -724,12 +699,9 @@ void audio_codec_stream0_input_config(codec_stream0_input_src_e source, audio_sa
  */
 void audio_set_codec_fifo_mono_channel(audio_fifo_chn_e fifo_chn, audio_chn_sel_e chn)
 {
-    if (chn & CHANNEL_LEFT)
-    {
+    if (chn & CHANNEL_LEFT) {
         reg_mono_rxfifo_sel(0x00) = (reg_mono_rxfifo_sel(0x00) & (~FLD_DECL_RXFIFO_SEL)) | MASK_VAL(FLD_DECL_RXFIFO_SEL, fifo_chn);
-    }
-    else if (chn & CHANNEL_RIGHT)
-    {
+    } else if (chn & CHANNEL_RIGHT) {
         reg_mono_rxfifo_sel(0x00) = (reg_mono_rxfifo_sel(0x00) & (~FLD_DECR_RXFIFO_SEL)) | MASK_VAL(FLD_DECR_RXFIFO_SEL, fifo_chn);
     }
 }
@@ -743,14 +715,11 @@ void audio_set_codec_fifo_mono_channel(audio_fifo_chn_e fifo_chn, audio_chn_sel_
  */
 void audio_set_stream0_fifo_input_mode(audio_fifo_chn_e fifo_chn, audio_channel_select_e ain_mode, audio_codec_wl_mode_e data_width)
 {
-
-    if (ain_mode == AUDIO_STEREO)
-    {
+    if (ain_mode == AUDIO_STEREO) {
         ain_mode += 1;
     }
 
-    switch (fifo_chn)
-    {
+    switch (fifo_chn) {
     case FIFO0:
         reg_dec_ain_mode = (reg_dec_ain_mode & (~FLD_DEC_AIN0_MODE)) | MASK_VAL(FLD_DEC_AIN0_MODE, ain_mode + data_width);
         break;
@@ -775,12 +744,9 @@ void audio_set_stream0_fifo_input_mode(audio_fifo_chn_e fifo_chn, audio_channel_
 void audio_codec_set_stream0_fifo_input_mode(audio_fifo_chn_e fifo_chn, codec_stream0_input_src_e source, audio_codec_wl_mode_e data_width)
 {
     unsigned char ain_mode = 0;
-    if ((source & CHANNEL_STEREO) == CHANNEL_STEREO)
-    {
+    if ((source & CHANNEL_STEREO) == CHANNEL_STEREO) {
         ain_mode = AUDIO_STEREO;
-    }
-    else
-    {
+    } else {
         ain_mode = AUDIO_MONO;
         audio_set_codec_fifo_mono_channel(fifo_chn, source & 3);
     }
@@ -795,16 +761,11 @@ void audio_codec_set_stream0_fifo_input_mode(audio_fifo_chn_e fifo_chn, codec_st
  */
 void audio_data_fifo_input_path_sel(audio_fifo_chn_e fifo_chn, audio_mux_ain_e ain_sel)
 {
-    if (FIFO0 == fifo_chn)
-    {
+    if (FIFO0 == fifo_chn) {
         reg_fifoin0_sel = (reg_fifoin0_sel & (~FLD_AIN0_SEL)) | ain_sel;
-    }
-    else if (FIFO1 == fifo_chn)
-    {
+    } else if (FIFO1 == fifo_chn) {
         reg_fifoin12_sel = (reg_fifoin12_sel & (~FLD_AIN1_SEL)) | ain_sel;
-    }
-    else
-    {
+    } else {
         reg_fifoin12_sel = (reg_fifoin12_sel & (~FLD_AIN2_SEL)) | (ain_sel << 4);
     }
 }
@@ -831,8 +792,7 @@ void audio_set_stream_output_sample_rate(audio_stream_output_src_e output_src, a
 void audio_set_sdm_path(audio_stream_output_src_e chn)
 {
     unsigned char value = 0x00;
-    if (chn == SDM_MONO)
-    {
+    if (chn == SDM_MONO) {
         value = 0x01;
     }
     reg_aud_en = (reg_aud_en & (~FLD_MONO)) | MASK_VAL(FLD_MONO, value);
@@ -924,12 +884,9 @@ void audio_codec_stream_output_init(audio_codec_output_t *audio_stream_output)
  */
 void audio_set_ascl_tune_step(audio_ascl_select_e ascl_select, unsigned int value)
 {
-    if (ascl_select != ASCL0)
-    {
+    if (ascl_select != ASCL0) {
         reg_step_tune_12(ascl_select) = value;
-    }
-    else
-    {
+    } else {
         reg_step_tune_0 = value;
     }
 }
@@ -942,25 +899,16 @@ void audio_set_ascl_tune_step(audio_ascl_select_e ascl_select, unsigned int valu
  */
 void audio_set_ascl_channel(audio_ascl_select_e ascl_select, audio_channel_select_e chn)
 {
-    if (ascl_select != ASCL0)
-    {
-        if (chn == AUDIO_MONO)
-        {
+    if (ascl_select != ASCL0) {
+        if (chn == AUDIO_MONO) {
             BM_SET(reg_ascl_config(ascl_select), FLD_MONO_12);
-        }
-        else
-        {
+        } else {
             BM_CLR(reg_ascl_config(ascl_select), FLD_MONO_12);
         }
-    }
-    else
-    {
-        if (chn == AUDIO_MONO)
-        {
+    } else {
+        if (chn == AUDIO_MONO) {
             BM_SET(reg_aud_en, FLD_MONO);
-        }
-        else
-        {
+        } else {
             BM_CLR(reg_aud_en, FLD_MONO);
         }
     }
@@ -979,8 +927,7 @@ void audio_ascl_set_conversion_sample_rate(audio_ascl_select_e ascl_select, audi
     unsigned int step = 0;
 
     step = 0x80000 / audio_sample_rate_value[sample_rate_out] * audio_sample_rate_value[sample_rate_in];
-    if (chn == AUDIO_MONO)
-    {
+    if (chn == AUDIO_MONO) {
         step <<= 1;
     }
     step = (step << 12) | 0x01;
@@ -998,19 +945,13 @@ void audio_ascl_set_conversion_sample_rate(audio_ascl_select_e ascl_select, audi
  */
 void audio_sdm_dither_control_left(audio_stream_output_dither_control_e dither_control_src, unsigned short config_value)
 {
-    if (dither_control_src == DC_CONSTANT)
-    {
+    if (dither_control_src == DC_CONSTANT) {
         audio_sdm_dc_constant_left_en();
         audio_sdm_set_dc_constant_value_left(config_value);
-    }
-    else
-    {
-        if (dither_control_src == PN_SEQUENCE)
-        {
+    } else {
+        if (dither_control_src == PN_SEQUENCE) {
             audio_sdm_pn_sequence_left_en();
-        }
-        else if (dither_control_src == PN_SEQUENCE_SHAPPING)
-        {
+        } else if (dither_control_src == PN_SEQUENCE_SHAPPING) {
             audio_sdm_pn_sequence_with_shapping_left_en();
         }
         audio_sdm_set_pn_sequence_bit_num_left(config_value);
@@ -1027,19 +968,13 @@ void audio_sdm_dither_control_left(audio_stream_output_dither_control_e dither_c
  */
 void audio_sdm_dither_control_right(audio_stream_output_dither_control_e dither_control_src, unsigned short config_value)
 {
-    if (dither_control_src == DC_CONSTANT)
-    {
+    if (dither_control_src == DC_CONSTANT) {
         audio_sdm_dc_constant_right_en();
         audio_sdm_set_dc_constant_value_right(config_value);
-    }
-    else
-    {
-        if (dither_control_src == PN_SEQUENCE)
-        {
+    } else {
+        if (dither_control_src == PN_SEQUENCE) {
             audio_sdm_pn_sequence_right_en();
-        }
-        else if (dither_control_src == PN_SEQUENCE_SHAPPING)
-        {
+        } else if (dither_control_src == PN_SEQUENCE_SHAPPING) {
             audio_sdm_pn_sequence_with_shapping_right_en();
         }
         audio_sdm_set_pn_sequence_bit_num_right(config_value);
@@ -1054,12 +989,9 @@ void audio_sdm_dither_control_right(audio_stream_output_dither_control_e dither_
  */
 void audio_set_ascl_format(audio_ascl_select_e ascl_select, ascl_mode_select_e ascl_mode)
 {
-    if (ascl_select != ASCL0)
-    {
+    if (ascl_select != ASCL0) {
         reg_ascl_config(ascl_select) = ((reg_ascl_config(ascl_select) & (~FLD_ASCL_FORMAT_SEL_12)) | MASK_VAL(FLD_ASCL_FORMAT_SEL_12, ascl_mode));
-    }
-    else
-    {
+    } else {
         reg_aud_en = ((reg_aud_en & (~FLD_ASCL_FORMAT_SEL)) | MASK_VAL(FLD_ASCL_FORMAT_SEL, ascl_mode));
     }
 }
@@ -1089,12 +1021,9 @@ void audio_set_codec_clk_as_mclk(gpio_func_pin_e mclk_pin)
 void audio_set_i2s_clk_as_mclk(audio_i2s_select_e i2s_select, gpio_func_pin_e mclk_pin, unsigned short div_numerator, unsigned short div_denominator)
 {
     audio_set_i2s_clk(i2s_select, div_numerator, div_denominator);
-    if (i2s_select <= I2S1)
-    {
+    if (i2s_select <= I2S1) {
         gpio_set_mux_function(mclk_pin, I2S0_CLK + (i2s_select) * 6);
-    }
-    else
-    {
+    } else {
         gpio_set_mux_function(mclk_pin, I2S2_CLK);
     }
     gpio_function_dis((gpio_pin_e)mclk_pin);
@@ -1124,7 +1053,7 @@ void audio_set_debug_clk_as_mclk(audio_clk_dbg_e clk)
  * @return    none
  * @attention The default is from pll 240M(default). If the pll is changed, the clk will be changed accordingly.
  */
-_attribute_ram_code_com_sec_noinline_ void audio_set_i2s_clock(audio_i2s_select_e i2s_select, unsigned short *i2s_clk_config)
+_attribute_ram_code_sec_noinline_ void audio_set_i2s_clock(audio_i2s_select_e i2s_select, unsigned short *i2s_clk_config)
 {
     audio_set_i2s_clk(i2s_select, i2s_clk_config[0], i2s_clk_config[1]);
     audio_set_i2s_bclk(i2s_select, i2s_clk_config[2]);
@@ -1178,15 +1107,11 @@ void audio_i2s_clk_en(audio_i2s_select_e i2s_select)
  */
 void audio_i2s_config(audio_i2s_select_e i2s_select, i2s_mode_select_e i2s_format, audio_i2s_wl_mode_e wl, i2s_m_s_mode_e m_s, audio_i2s_invert_config_t *i2s_config_t)
 {
+    reg_i2s_cfg1(i2s_select) = (reg_i2s_cfg1(i2s_select) & (~(FLD_I2S_ADC_DCI_MS | FLD_I2S_DAC_DCI_MS | FLD_I2S_ADC_FRM_LOOP))) | MASK_VAL(FLD_I2S_ADC_DCI_MS, m_s, FLD_I2S_DAC_DCI_MS, m_s);
 
-    reg_i2s_cfg1(i2s_select) = (reg_i2s_cfg1(i2s_select) & (~(FLD_I2S_ADC_DCI_MS | FLD_I2S_DAC_DCI_MS | FLD_I2S_ADC_FRM_LOOP))) | MASK_VAL(FLD_I2S_ADC_DCI_MS, m_s,
-                                                                                                                                           FLD_I2S_DAC_DCI_MS, m_s);
+    reg_i2s_cfg2(i2s_select) = (reg_i2s_cfg2(i2s_select) & (~(FLD_I2S_WL | I2S_FORMAT | FLD_I2S_ADC_MBCLK_LOOP | FLD_I2S_DAC_MBCLK_LOOP))) | MASK_VAL(FLD_I2S_WL, wl, I2S_FORMAT, i2s_format);
 
-    reg_i2s_cfg2(i2s_select) = (reg_i2s_cfg2(i2s_select) & (~(FLD_I2S_WL | I2S_FORMAT | FLD_I2S_ADC_MBCLK_LOOP | FLD_I2S_DAC_MBCLK_LOOP))) | MASK_VAL(FLD_I2S_WL, wl,
-                                                                                                                                                      I2S_FORMAT, i2s_format);
-
-    reg_i2s_cfg3(i2s_select) = (reg_i2s_cfg3(i2s_select) & (~(FLD_I2S_LRP | FLD_I2S_LRSWAP | FLD_I2S_DAC_FRM_LOOP))) | MASK_VAL(FLD_I2S_LRP, i2s_config_t->i2s_lr_clk_invert_select,
-                                                                                                                                FLD_I2S_LRSWAP, i2s_config_t->i2s_data_invert_select);
+    reg_i2s_cfg3(i2s_select) = (reg_i2s_cfg3(i2s_select) & (~(FLD_I2S_LRP | FLD_I2S_LRSWAP | FLD_I2S_DAC_FRM_LOOP))) | MASK_VAL(FLD_I2S_LRP, i2s_config_t->i2s_lr_clk_invert_select, FLD_I2S_LRSWAP, i2s_config_t->i2s_data_invert_select);
 }
 
 /**
@@ -1197,8 +1122,7 @@ void audio_i2s_config(audio_i2s_select_e i2s_select, i2s_mode_select_e i2s_forma
 void audio_i2s_config_init(audio_i2s_config_t *i2s_config)
 {
     i2s_set_pin(i2s_config->i2s_select, i2s_config->pin_config);
-    if (i2s_config->master_slave_mode == I2S_AS_MASTER_EN)
-    {
+    if (i2s_config->master_slave_mode == I2S_AS_MASTER_EN) {
         audio_set_i2s_clock(i2s_config->i2s_select, i2s_config->sample_rate);
     }
     audio_i2s_config(i2s_config->i2s_select, i2s_config->i2s_mode, i2s_config->data_width, i2s_config->master_slave_mode, &audio_i2s_invert_config[i2s_config->i2s_select]);
@@ -1213,10 +1137,8 @@ void audio_i2s_config_init(audio_i2s_config_t *i2s_config)
  */
 void audio_set_i2s_fifo_mono_channel(audio_i2s_select_e i2s_select, audio_fifo_chn_e fifo_chn, audio_chn_sel_e chn)
 {
-    if ((i2s_select == I2S0) || (i2s_select == I2S1))
-    {
-        switch (chn)
-        {
+    if ((i2s_select == I2S0) || (i2s_select == I2S1)) {
+        switch (chn) {
         case CHANNEL_LEFT:
             reg_mono_rxfifo_sel(i2s_select) = (reg_mono_rxfifo_sel(i2s_select) & (~FLD_I2S01_MONOL_RXFIFO_SEL)) | MASK_VAL(FLD_I2S01_MONOL_RXFIFO_SEL, fifo_chn);
             break;
@@ -1226,11 +1148,8 @@ void audio_set_i2s_fifo_mono_channel(audio_i2s_select_e i2s_select, audio_fifo_c
         default:
             break;
         }
-    }
-    else
-    {
-        switch (chn)
-        {
+    } else {
+        switch (chn) {
         case CHANNEL_LEFT:
             reg_mono_rxfifo_sel(i2s_select) = (reg_mono_rxfifo_sel(i2s_select) & (~FLD_I2S2_MONOL_RXFIFO_SEL)) | MASK_VAL(FLD_I2S2_MONOL_RXFIFO_SEL, fifo_chn);
             break;
@@ -1253,14 +1172,11 @@ void audio_set_i2s_fifo_mono_channel(audio_i2s_select_e i2s_select, audio_fifo_c
  */
 void audio_set_i2s_fifo_input_mode(audio_i2s_select_e i2s_select, audio_fifo_chn_e fifo_chn, audio_channel_select_e ain_mode, audio_i2s_fifo_wl_e data_width)
 {
-
-    if (ain_mode == AUDIO_STEREO)
-    {
+    if (ain_mode == AUDIO_STEREO) {
         ain_mode += 1;
     }
 
-    switch (fifo_chn)
-    {
+    switch (fifo_chn) {
     case FIFO0:
         reg_i2s_ain_mode(i2s_select) = (reg_i2s_ain_mode(i2s_select) & (~FLD_I2S_AIN0_MODE)) | MASK_VAL(FLD_I2S_AIN0_MODE, ain_mode + data_width);
         break;
@@ -1286,22 +1202,16 @@ void audio_set_i2s_fifo_input_mode(audio_i2s_select_e i2s_select, audio_fifo_chn
 void audio_set_i2s_input_chn_wl(audio_fifo_chn_e fifo_chn, audio_i2s_select_e i2s_select, audio_i2s_wl_mode_e data_mode, i2s_chn_select_e ch)
 {
     audio_channel_select_e chn_mode;
-    audio_i2s_wl_mode_e ain_mode;
+    audio_i2s_wl_mode_e    ain_mode;
 
-    if (ch != I2S_CHANNEL_STEREO)
-    {
+    if (ch != I2S_CHANNEL_STEREO) {
         chn_mode = AUDIO_MONO;
-    }
-    else
-    {
+    } else {
         chn_mode = AUDIO_STEREO;
     }
-    if (data_mode != I2S_BIT_16_DATA)
-    {
+    if (data_mode != I2S_BIT_16_DATA) {
         ain_mode = (audio_i2s_wl_mode_e)BIT_20_24_DATA;
-    }
-    else
-    {
+    } else {
         ain_mode = (audio_i2s_wl_mode_e)BIT_16_DATA;
     }
 
@@ -1315,8 +1225,7 @@ void audio_set_i2s_input_chn_wl(audio_fifo_chn_e fifo_chn, audio_i2s_select_e i2
  */
 void audio_i2s_input_init(audio_i2s_input_output_t *audio_i2s_input)
 {
-    if (audio_i2s_input->i2s_ch_sel != I2S_CHANNEL_STEREO)
-    {
+    if (audio_i2s_input->i2s_ch_sel != I2S_CHANNEL_STEREO) {
         audio_set_i2s_fifo_mono_channel(audio_i2s_input->i2s_select, audio_i2s_input->fifo_chn, (audio_chn_sel_e)audio_i2s_input->i2s_ch_sel);
     }
     audio_rxfifo_en(audio_i2s_input->fifo_chn);
@@ -1335,13 +1244,11 @@ void audio_i2s_input_init(audio_i2s_input_output_t *audio_i2s_input)
  */
 void audio_set_i2s_fifo_output_mode(audio_fifo_chn_e fifo_chn, audio_channel_select_e ain_mode, audio_i2s_fifo_wl_e data_width)
 {
-    if (ain_mode == AUDIO_STEREO)
-    {
+    if (ain_mode == AUDIO_STEREO) {
         ain_mode += 1;
     }
 
-    switch (fifo_chn)
-    {
+    switch (fifo_chn) {
     case FIFO0:
         reg_i2s_aout_mode = (reg_i2s_aout_mode & (~FLD_I2S0_AOUT_MODE)) | MASK_VAL(FLD_I2S0_AOUT_MODE, ain_mode + data_width);
         break;
@@ -1366,22 +1273,16 @@ void audio_set_i2s_fifo_output_mode(audio_fifo_chn_e fifo_chn, audio_channel_sel
 void audio_set_i2s_output_chn_wl(audio_fifo_chn_e fifo_chn, audio_i2s_wl_mode_e data_mode, i2s_chn_select_e ch)
 {
     audio_channel_select_e chn_mode;
-    audio_i2s_wl_mode_e ain_mode;
+    audio_i2s_wl_mode_e    ain_mode;
 
-    if (ch != I2S_CHANNEL_STEREO)
-    {
+    if (ch != I2S_CHANNEL_STEREO) {
         chn_mode = AUDIO_MONO;
-    }
-    else
-    {
+    } else {
         chn_mode = AUDIO_STEREO;
     }
-    if (data_mode != I2S_BIT_16_DATA)
-    {
+    if (data_mode != I2S_BIT_16_DATA) {
         ain_mode = (audio_i2s_wl_mode_e)BIT_20_24_DATA;
-    }
-    else
-    {
+    } else {
         ain_mode = (audio_i2s_wl_mode_e)BIT_16_DATA;
     }
 
@@ -1407,8 +1308,7 @@ void audio_i2s_output_init(audio_i2s_input_output_t *audio_i2s_output)
  */
 void audio_i2s2_tdm_config_init(audio_i2s2_tdm_config_t *tdm_config)
 {
-    reg_i2s2_tdm_cfg = (reg_i2s2_tdm_cfg & (~(FLD_I2S2_TDM_MODE | FLD_I2S_TDM_SLOT))) | MASK_VAL(FLD_I2S2_TDM_MODE, tdm_config->tdm_mode,
-                                                                                                 FLD_I2S_TDM_SLOT, tdm_config->slot_num);
+    reg_i2s2_tdm_cfg = (reg_i2s2_tdm_cfg & (~(FLD_I2S2_TDM_MODE | FLD_I2S_TDM_SLOT))) | MASK_VAL(FLD_I2S2_TDM_MODE, tdm_config->tdm_mode, FLD_I2S_TDM_SLOT, tdm_config->slot_num);
 }
 
 /**
@@ -1420,12 +1320,9 @@ void audio_set_i2s2_tdm_input_fifo_width(audio_i2s_wl_mode_e data_width)
 {
     audio_i2s_fifo_wl_e tdm_data_width;
 
-    if (data_width != I2S_BIT_16_DATA)
-    {
+    if (data_width != I2S_BIT_16_DATA) {
         tdm_data_width = BIT_20_24_DATA;
-    }
-    else
-    {
+    } else {
         tdm_data_width = BIT_16_DATA;
     }
     reg_i2s2_tdm_mode_sel = (reg_i2s2_tdm_mode_sel & (~FLD_I2S2_TDM_AIN_MODE)) | MASK_VAL(FLD_I2S2_TDM_AIN_MODE, BIT(tdm_data_width));
@@ -1462,12 +1359,9 @@ void audio_set_i2s2_tdm_output_fifo_width(audio_i2s_wl_mode_e data_width)
 {
     audio_i2s_fifo_wl_e tdm_data_width;
 
-    if (data_width != I2S_BIT_16_DATA)
-    {
+    if (data_width != I2S_BIT_16_DATA) {
         tdm_data_width = BIT_20_24_DATA;
-    }
-    else
-    {
+    } else {
         tdm_data_width = BIT_16_DATA;
     }
     reg_i2s2_tdm_mode_sel = (reg_i2s2_tdm_mode_sel & (~FLD_I2S2_TDM_AOUT_MODE)) | MASK_VAL(FLD_I2S2_TDM_AOUT_MODE, BIT(tdm_data_width));
@@ -1504,16 +1398,11 @@ void audio_set_i2s_ascl_en(audio_i2s_select_e i2s_select)
 {
     audio_ascl_select_e ascl_select;
 
-    if (i2s_select == I2S0)
-    {
+    if (i2s_select == I2S0) {
         ascl_select = ASCL0;
-    }
-    else if (i2s_select == I2S1)
-    {
+    } else if (i2s_select == I2S1) {
         ascl_select = ASCL1;
-    }
-    else
-    {
+    } else {
         ascl_select = ASCL2;
     }
 
@@ -1533,13 +1422,11 @@ void audio_set_i2s_align_data_width(i2s_align_mode_select_e i2s_align_mode_selec
 {
     audio_i2s_fifo_wl_e fifo_wl_mode = BIT_16_DATA;
 
-    if (audio_channel_select == AUDIO_STEREO)
-    {
+    if (audio_channel_select == AUDIO_STEREO) {
         audio_channel_select += 1;
     }
 
-    if (audio_i2s_wl_mode != I2S_BIT_16_DATA)
-    {
+    if (audio_i2s_wl_mode != I2S_BIT_16_DATA) {
         fifo_wl_mode = BIT_20_24_DATA;
     }
 
@@ -1556,16 +1443,11 @@ void audio_set_i2s_align_mode(i2s_align_mode_select_e mode)
 {
     unsigned char i2s_align_mode;
 
-    if (mode == I2S0_I2S1_ALIGN)
-    {
+    if (mode == I2S0_I2S1_ALIGN) {
         i2s_align_mode = BIT(0) | BIT(1);
-    }
-    else if (mode == I2S1_I2S2_ALIGN)
-    {
+    } else if (mode == I2S1_I2S2_ALIGN) {
         i2s_align_mode = BIT(1) | BIT(2);
-    }
-    else
-    {
+    } else {
         i2s_align_mode = BIT(0) | BIT(1) | BIT(2);
     }
 

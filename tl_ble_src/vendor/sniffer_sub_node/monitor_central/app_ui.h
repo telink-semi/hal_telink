@@ -24,8 +24,8 @@
 #ifndef APP_UI_H_
 #define APP_UI_H_
 
-#if (MONITOR_ROLE_SELECT==MONITOR_CENTRAL)
-extern int  key_not_released;
+#if (MONITOR_ROLE_SELECT == MONITOR_CENTRAL)
+extern int key_not_released;
 
 
 /**
@@ -35,18 +35,16 @@ extern int  key_not_released;
  * @param[in]  n    - the length of event parameter.
  * @return     none.
  */
-void proc_keyboard (u8 e, u8 *p, int n);
+void proc_keyboard(u8 e, u8 *p, int n);
 
 /**
- * @brief      callback function of LinkLayer Event "BLT_EV_FLAG_SUSPEND_ENTER"
+ * @brief      user set keyboard wakeup
  * @param[in]  e - LinkLayer Event type
  * @param[in]  p - data pointer of event
  * @param[in]  n - data length of event
  * @return     none
  */
-void  app_set_kb_wakeup (u8 e, u8 *p, int n);
-
-
+void app_set_kb_wakeup(u8 e, u8 *p, int n);
 
 /**
  * @brief      keyboard initialization
@@ -54,5 +52,7 @@ void  app_set_kb_wakeup (u8 e, u8 *p, int n);
  * @return     none.
  */
 void keyboard_init(void);
+
 #endif
+
 #endif /* APP_UI_H_ */

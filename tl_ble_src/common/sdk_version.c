@@ -30,12 +30,10 @@
  */
 volatile __attribute__((section(".sdk_version"))) unsigned char sdk_version[] = {SDK_VERSION(SDK_VERSION_NUM)};
 
-#if(PATCH_NUM)
+#if (PATCH_NUM)
 volatile __attribute__((section(".sdk_version"))) unsigned char patch_version[] = {PATCH_VERSION(PATCH_NUM)};
 #endif
 
-#if(CUSTOM_MAJOR_VERSION||CUSTOM_MINOR_VERSION)
+#if (CUSTOM_MAJOR_VERSION || CUSTOM_MINOR_VERSION)
 volatile __attribute__((section(".sdk_version"))) unsigned char custom_version[] = {CUSTOM_VERSION(CUSTOM_VERSION_NUM)};
 #endif
-
-

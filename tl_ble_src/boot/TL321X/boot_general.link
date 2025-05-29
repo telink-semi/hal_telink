@@ -25,6 +25,7 @@
 ENTRY(_RESET_ENTRY)
 SECTIONS
 {
+    NDS_SAG_LMA_FLASH = 0x20000000 ;
     . = 0x20000000; 
     PROVIDE (BIN_BEGIN = .);
     .vectors        : { KEEP(*(.vectors )) }
@@ -45,7 +46,7 @@ SECTIONS
     
     . = ALIGN(8);
     .ram_code   : AT( ALIGN(LOADADDR (.retention_data) + SIZEOF (.retention_data),8)) 
-        { KEEP(*(.ram_code )) }
+        { KEEP(*(.ram_code )) KEEP(*libgcc.a:save-restore.o) KEEP(*(.exec.itable)) }
     PROVIDE (_RAMCODE_VMA_END = .);
     PROVIDE (_RAMCODE_VMA_START = ADDR(.ram_code));
     PROVIDE (_RAMCODE_LMA_START = LOADADDR(.ram_code));
@@ -71,13 +72,16 @@ SECTIONS
     . = ALIGN(0x20);
     .eh_frame   : AT(ALIGN(LOADADDR (.eh_frame_hdr) + SIZEOF (.eh_frame_hdr), 32))
         { KEEP(*(.eh_frame )) }
-        
-    .exec.itable    : AT(ALIGN(LOADADDR (.eh_frame) + SIZEOF (.eh_frame), ALIGNOF(.exec.itable)))
-        { KEEP(*(.exec.itable)) }
-                
+
     . = 0x00080000;
+
     PROVIDE( __global_pointer$ = . + (4K / 2) );
-    .data   : AT(ALIGN(LOADADDR (.exec.itable) + SIZEOF (.exec.itable),  ALIGNOF(.data)))
+    .rf_certification_cfg : AT(ALIGN(LOADADDR(.eh_frame) + SIZEOF(.eh_frame), ALIGNOF(.rf_certification_cfg)))
+        { KEEP(*(.rf_certification_cfg)) }
+    PROVIDE (_RF_CERTIFICATION_CFG_ADDR_OFFSET = LOADADDR(.rf_certification_cfg) - BIN_BEGIN);
+    
+    . = ALIGN(8);
+    .data   : AT(ALIGN(LOADADDR (.rf_certification_cfg) + SIZEOF (.rf_certification_cfg),  ALIGNOF(.data)))
         { *(.data .data.* .gnu.linkonce.d.* ) KEEP(*(.gnu.linkonce.d.*personality* )) SORT(CONSTRUCTORS) 
           *(.srodata.cst16 ) *(.srodata.cst8 ) *(.srodata.cst4 ) *(.srodata.cst2 ) *(.srodata .srodata.* ) *(.sdata .sdata.* .gnu.linkonce.s.* ) *(.sdata2 .sdata2.* .gnu.linkonce.s.* )
         }

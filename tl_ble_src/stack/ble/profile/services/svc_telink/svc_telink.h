@@ -24,7 +24,12 @@
 #pragma once
 
 //OTA
-#define SERVICE_TELINK_OTA_HDL                          SERVICE_TELINK_PRIVATE_START_HDL
-#define OTA_MAX_HDL_NUM                                 0x10
+#define SERVICE_TELINK_OTA_HDL SERVICE_TELINK_PRIVATE_START_HDL
+#define OTA_MAX_HDL_NUM        0x10
+
+//SPP
+#define SERVICE_TELINK_SPP_HDL SERVICE_TELINK_OTA_HDL + OTA_MAX_HDL_NUM
+#define SPP_MAX_HDL_NUM        0x10
 
 #include "svc_ota.h"
+#include "svc_spp.h"

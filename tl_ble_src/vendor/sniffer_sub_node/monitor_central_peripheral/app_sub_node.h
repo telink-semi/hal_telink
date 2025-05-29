@@ -54,55 +54,56 @@
 #if (MONITOR_ROLE_SELECT == MONITOR_CENTRAL_PERIPHERAL)
 
 
-#if (APP_TRANSPORT_UART_ENABLE)
-extern u32 my_spp_rx_fifo_tick_record[];
+    #if (APP_TRANSPORT_UART_ENABLE)
+extern u32       my_spp_rx_fifo_tick_record[];
 extern my_fifo_t spp_rx_fifo;
-#endif
+    #endif
 
 
-#define         SNIFFER_CMD_SYNC_REQ            0xF9    //for STANDARD MODE
-#define         SNIFFER_CMD_RSSI                0xFA
-#define         SNIFFER_CMD_SYNC_RSP            0xFB
+    #define SNIFFER_CMD_SYNC_REQ          0xF9 //for STANDARD MODE
+    #define SNIFFER_CMD_RSSI              0xFA
+    #define SNIFFER_CMD_SYNC_RSP          0xFB
 
-#define         SNIFFER_CMD_RSSI_DATA_LEN       6   // spp_sniffer_cmd_rssi_tx_t
-#define         SNIFFER_CMD_SYNC_RSP_DATA_LEN   5   // spp_sniffer_cmd_sync_rsp_tx_t
+    #define SNIFFER_CMD_RSSI_DATA_LEN     6 // spp_sniffer_cmd_rssi_tx_t
+    #define SNIFFER_CMD_SYNC_RSP_DATA_LEN 5 // spp_sniffer_cmd_sync_rsp_tx_t
 
-
-typedef struct __attribute__((packed)) {
-    u16     cmdId;
-    u16     dataLen;
-    u32     transmit_time;  //unit: (1/24) us
-    u8      syncHandle;
-    u8      rsvd1[3];
-    u32     expectTime_time;//unit: (1/24) us
-    u8      rsvd2[12];
-    u32     sync_timeout;   //unit: (1/24) us
-    u8      rsvd3[8];
-    u8      checksum;
+typedef struct __attribute__((packed))
+{
+    u16 cmdId;
+    u16 dataLen;
+    u32 transmit_time;   //unit: (1/24) us
+    u8  syncHandle;
+    u8  rsvd1[3];
+    u32 expectTime_time; //unit: (1/24) us
+    u8  rsvd2[12];
+    u32 sync_timeout;    //unit: (1/24) us
+    u8  rsvd3[8];
+    u8  checksum;
 } spp_sub_node_cmd_sync_req_rx_t;
 
-typedef struct __attribute__((packed)) {
-    u32     dmaLen;
-    u16     cmdId;
-    u16     dataLen;
-    u8      snifferIndex;
-    u16     snifferHandle;
-    u8      rssi;
-    u8      snifferChannel  :6;
-    u8      deviceType      :2;
-    u8      checksum;
+typedef struct __attribute__((packed))
+{
+    u32 dmaLen;
+    u16 cmdId;
+    u16 dataLen;
+    u8  snifferIndex;
+    u16 snifferHandle;
+    u8  rssi;
+    u8  snifferChannel : 6;
+    u8  deviceType     : 2;
+    u8  checksum;
 } spp_sub_node_cmd_rssi_tx_t;
 
-typedef struct __attribute__((packed)) {
-    u32     dmaLen;
-    u16     cmdId;
-    u16     dataLen;
-    u8      snifferIndex;
-    u16     snifferHandle;
-    u8      status;
-    u8      checksum;
+typedef struct __attribute__((packed))
+{
+    u32 dmaLen;
+    u16 cmdId;
+    u16 dataLen;
+    u8  snifferIndex;
+    u16 snifferHandle;
+    u8  status;
+    u8  checksum;
 } spp_sub_node_cmd_sync_rsp_tx_t;
-
 
 /**
  * @brief      Process received data by CAN or UART.

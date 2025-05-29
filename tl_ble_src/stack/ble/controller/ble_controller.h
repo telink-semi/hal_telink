@@ -25,7 +25,6 @@
 #define BLE_CONTROLLER_H_
 
 
-
 #include "stack/ble/ble_common.h"
 #include "stack/ble/ble_format.h"
 
@@ -38,6 +37,7 @@
 #include "stack/ble/controller/ll/ll.h"
 #include "stack/ble/controller/ll/ll_pm.h"
 
+#include "stack/ble/controller/ll/fsu/ll_fsu.h"
 #include "stack/ble/controller/ll/acl_conn/acl_conn.h"
 #include "stack/ble/controller/ll/acl_conn/acl_peripheral.h"
 #include "stack/ble/controller/ll/acl_conn/acl_central.h"
@@ -55,6 +55,7 @@
 #include "stack/ble/controller/ll/scan/scan.h"
 #include "stack/ble/controller/ll/scan/leg_scan.h"
 #include "stack/ble/controller/ll/scan/ext_scan.h"
+#include "stack/ble/controller/ll/scan/mon_adv.h"
 
 
 #include "stack/ble/controller/ll/init/init.h"
@@ -78,7 +79,8 @@
 #include "stack/ble/controller/ll/iso/cis_central.h"
 #include "stack/ble/controller/ll/iso/cis_peripheral.h"
 #include "stack/ble/controller/ll/aoa_aod/aoa_aod.h"
-#include "stack/ble/controller/ll/chn_sound/chn_sound.h"
+#include "stack/ble/controller/ll/chn_sound/cs.h"
+#include "stack/ble/controller/ll/chn_sound/cs_test_cmd/cs_test_cmd.h"
 
 
 #include "stack/ble/controller/whitelist/whitelist.h"
@@ -87,7 +89,7 @@
 #include "stack/ble/controller/csa/csa.h"
 #include "stack/ble/controller/phy/phy.h"
 #include "stack/ble/controller/phy/phy_test.h"
-
+#include "stack/ble/controller/phy/hdt_phy_test.h"
 
 #include "stack/ble/controller/ll/subrate/subrate.h"
 
@@ -99,6 +101,7 @@
 
 #include "algorithm/algorithm.h"
 
+#include "stack/ble/controller/ll/hdt/hdt.h"
 /*********************************************************/
 //Remove when file merge to SDK //
 #include "stack/ble/ble_config.h"
@@ -121,15 +124,16 @@
 #include "stack/ble/controller/phy/phy_stack.h"
 #include "stack/ble/hci/hci_stack.h"
 #include "stack/ble/controller/ll/subrate/subrate_stack.h"
-#include "stack/ble/controller/ll/chn_sound/chn_sound_stack.h"
+#include "stack/ble/controller/ll/chn_sound/cs_stack.h"
+#include "stack/ble/controller/ll/chn_sound/cs_drbg/cs_drbg_stack.h"
+#include "stack/ble/controller/ll/chn_sound/cs_sniffer/cs_sniffer_stack.h"
 #include "stack/ble/controller/ll/acl_conn/acl_sniffer/acl_sniffer_stack.h"
 #include "stack/ble/hal/hal_internal.h"
-
-#include "stack/ble/controller/cs_drbg/drbg_stack.h"
 
 #include "stack/ble/device/device_stack.h"
 #include "stack/ble/darwin/darwin_stack.h"
 
+#include "stack/ble/controller/ll/hdt/hdt_stack.h"
 /*********************************************************/
 
 #endif /* BLE_H_ */

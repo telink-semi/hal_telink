@@ -47,8 +47,7 @@ void user_init_deepRetn(void);
  * @param[in]  none.
  * @return     none.
  */
-void main_loop (void);
-
+void main_loop(void);
 
 
 #endif

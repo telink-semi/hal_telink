@@ -22,37 +22,37 @@
  *
  *******************************************************************************************************/
 #if (PRODUCT_CIS_SOURCE_SELECT == PRODUCT_KMLEA_DONGLE)
-#ifndef VENDOR_AUDIO_UNICAST_CLIENT_APP_CODEC_H_
-#define VENDOR_AUDIO_UNICAST_CLIENT_APP_CODEC_H_
+    #ifndef VENDOR_AUDIO_UNICAST_CLIENT_APP_CODEC_H_
+        #define VENDOR_AUDIO_UNICAST_CLIENT_APP_CODEC_H_
 
-#define APP_AUDIO_INPUT_BUFFER_SIZE                 2048
-#define APP_AUDIO_INPUT_FRAME_SAMPLE_MAX             480
-#define APP_AUDIO_INPUT_FRAME_ENCODE_BYTES_MAX       155
+        #define APP_AUDIO_INPUT_BUFFER_SIZE             2048
+        #define APP_AUDIO_INPUT_FRAME_SAMPLE_MAX        480
+        #define APP_AUDIO_INPUT_FRAME_ENCODE_BYTES_MAX  155
 
-#define APP_AUDIO_OUTPUT_BUFFER_SIZE                2048
-#define APP_AUDIO_OUTPUT_FRAME_SAMPLE_MAX            160
-#define APP_AUDIO_OUTPUT_FRAME_ENCODE_BYTES_MAX       40
+        #define APP_AUDIO_OUTPUT_BUFFER_SIZE            2048
+        #define APP_AUDIO_OUTPUT_FRAME_SAMPLE_MAX       160
+        #define APP_AUDIO_OUTPUT_FRAME_ENCODE_BYTES_MAX 40
 
 struct list_node_t
 {
-    u32     renderPoint;
-    u16     buffer[APP_AUDIO_OUTPUT_FRAME_SAMPLE_MAX];
+    u32                 renderPoint;
+    u16                 buffer[APP_AUDIO_OUTPUT_FRAME_SAMPLE_MAX];
     struct list_node_t *next;
 };
 
 typedef struct
 {
-    u32     renderPoint;
-    u16     buffer[APP_AUDIO_OUTPUT_FRAME_SAMPLE_MAX];
-}audio_pkt_t;
+    u32 renderPoint;
+    u16 buffer[APP_AUDIO_OUTPUT_FRAME_SAMPLE_MAX];
+} audio_pkt_t;
 
 void app_codec_init();
 
 void app_codec_handler();
 
-void app_usb_irq_proc (void);
+void app_usb_irq_proc(void);
 
 
-#endif //end of (PRODUCT_CIS_SOURCE_SELECT == ...)
+    #endif //end of (PRODUCT_CIS_SOURCE_SELECT == ...)
 
-#endif /* VENDOR_AUDIO_UNICAST_CLIENT_APP_CODEC_H_ */
+#endif     /* VENDOR_AUDIO_UNICAST_CLIENT_APP_CODEC_H_ */

@@ -35,42 +35,105 @@
 
 #if 1
 
- char *Ed25519_sign_string = "SigEd25519 no Ed25519 collisions";
+char *Ed25519_sign_string = "SigEd25519 no Ed25519 collisions";
 
 
 //Curve25519 parameters
-unsigned int  curve25519_p[8]    = {0xFFFFFFED,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0x7FFFFFFF,};
-unsigned int  curve25519_p_h[8]  = {0x000005A4,0,0,0,0,0,0,0,};
-unsigned int  curve25519_p_n0[1] = {0x286BCA1B};
-unsigned int  curve25519_n[]     = {0x5CF5D3ED,0x5812631A,0xA2F79CD6,0x14DEF9DE,0x00000000,0x00000000,0x00000000,0x10000000,};
-unsigned int  curve25519_n_h[8]  = {0x449C0F01,0xA40611E3,0x68859347,0xD00E1BA7,0x17F5BE65,0xCEEC73D2,0x7C309A3D,0x0399411B,};
-unsigned int  curve25519_n_n0[1] = {0x12547E1B};
+unsigned int curve25519_p[8] = {
+    0xFFFFFFED,
+    0xFFFFFFFF,
+    0xFFFFFFFF,
+    0xFFFFFFFF,
+    0xFFFFFFFF,
+    0xFFFFFFFF,
+    0xFFFFFFFF,
+    0x7FFFFFFF,
+};
+unsigned int curve25519_p_h[8] = {
+    0x000005A4,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+};
+unsigned int curve25519_p_n0[1] = {0x286BCA1B};
+unsigned int curve25519_n[]     = {
+    0x5CF5D3ED,
+    0x5812631A,
+    0xA2F79CD6,
+    0x14DEF9DE,
+    0x00000000,
+    0x00000000,
+    0x00000000,
+    0x10000000,
+};
+unsigned int curve25519_n_h[8] = {
+    0x449C0F01,
+    0xA40611E3,
+    0x68859347,
+    0xD00E1BA7,
+    0x17F5BE65,
+    0xCEEC73D2,
+    0x7C309A3D,
+    0x0399411B,
+};
+unsigned int curve25519_n_n0[1] = {0x12547E1B};
 
 
 //unsigned int  ed25519_p       = {0xFFFFFFED,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0x7FFFFFFF,};
 //unsigned int  ed25519_p_h     = {0x000005A4,0,0,0,0,0,0,0,};
 //unsigned int  ed25519_p_n0    = {0x286BCA1B};
-unsigned int  ed25519_d[]       = {0x135978A3,0x75EB4DCA,0x4141D8AB,0x00700A4D,0x7779E898,0x8CC74079,0x2B6FFE73,0x52036CEE,};
-unsigned int  ed25519_Gx[]      = {0x8F25D51A,0xC9562D60,0x9525A7B2,0x692CC760,0xFDD6DC5C,0xC0A4E231,0xCD6E53FE,0x216936D3,};
-unsigned int  ed25519_Gy[]      = {0x66666658,0x66666666,0x66666666,0x66666666,0x66666666,0x66666666,0x66666666,0x66666666,};
+unsigned int ed25519_d[] = {
+    0x135978A3,
+    0x75EB4DCA,
+    0x4141D8AB,
+    0x00700A4D,
+    0x7779E898,
+    0x8CC74079,
+    0x2B6FFE73,
+    0x52036CEE,
+};
+unsigned int ed25519_Gx[] = {
+    0x8F25D51A,
+    0xC9562D60,
+    0x9525A7B2,
+    0x692CC760,
+    0xFDD6DC5C,
+    0xC0A4E231,
+    0xCD6E53FE,
+    0x216936D3,
+};
+unsigned int ed25519_Gy[] = {
+    0x66666658,
+    0x66666666,
+    0x66666666,
+    0x66666666,
+    0x66666666,
+    0x66666666,
+    0x66666666,
+    0x66666666,
+};
 //unsigned int  ed25519_n[]     = {0x5CF5D3ED,0x5812631A,0xA2F79CD6,0x14DEF9DE,0x00000000,0x00000000,0x00000000,0x10000000,};
 //unsigned int  ed25519_n_h[]   = {0x449C0F01,0xA40611E3,0x68859347,0xD00E1BA7,0x17F5BE65,0xCEEC73D2,0x7C309A3D,0x0399411B,};
 //unsigned int  ed25519_n_n0[1] = {0x12547E1B};
 
 edward_curve_t ed25519[1] = {
     {
-        255,
-        (unsigned int *)curve25519_p,
-        (unsigned int *)curve25519_p_h,
-        (unsigned int *)curve25519_p_n0,
-        (unsigned int *)ed25519_d,
-        (unsigned int *)ed25519_Gx,
-        (unsigned int *)ed25519_Gy,
-        (unsigned int *)curve25519_n,
-        (unsigned int *)curve25519_n_h,
-        (unsigned int *)curve25519_n_n0,
-        NULL,
-    },
+     255,
+     (unsigned int *)curve25519_p,
+     (unsigned int *)curve25519_p_h,
+     (unsigned int *)curve25519_p_n0,
+     (unsigned int *)ed25519_d,
+     (unsigned int *)ed25519_Gx,
+     (unsigned int *)ed25519_Gy,
+     (unsigned int *)curve25519_n,
+     (unsigned int *)curve25519_n_h,
+     (unsigned int *)curve25519_n_n0,
+     NULL,
+     },
 };
 
 /**
@@ -88,8 +151,7 @@ static void pke_set_operand_uint32_value(unsigned int *a, unsigned int aWordLen,
 {
     unsigned int i = aWordLen;
 
-    while(i>1)
-    {
+    while (i > 1) {
         a[--i] = 0;
     }
 
@@ -103,18 +165,17 @@ static void pke_set_operand_uint32_value(unsigned int *a, unsigned int aWordLen,
  * @param[in]  bytes            - byte length of k and out
  * @return     none
  */
-void x25519_decode_scalar( unsigned char *k, unsigned char *out, unsigned int bytes)
+void x25519_decode_scalar(unsigned char *k, unsigned char *out, unsigned int bytes)
 {
-    if(k != out)
-    {
+    if (k != out) {
         memcpy_(out, (void *)k, bytes);
+    } else {
+        ;
     }
-    else
-    {;}
 
-    out[0] &= 0xF8;            //clear lowest 3 bits
-    out[bytes - 1] &= 0x7F;    //clear highest 1 bit
-    out[bytes - 1] |= 0x40;    //set second highest bit as 1
+    out[0] &= 0xF8;         //clear lowest 3 bits
+    out[bytes - 1] &= 0x7F; //clear highest 1 bit
+    out[bytes - 1] |= 0x40; //set second highest bit as 1
 }
 
 /**
@@ -134,20 +195,16 @@ void x25519_decode_scalar( unsigned char *k, unsigned char *out, unsigned int by
       -# 4. k could be zero here.
   @endverbatim
  */
-unsigned int ed25519_pointMul_s(edward_curve_t *curve, unsigned int *k, unsigned int *Px, unsigned int *Py,
-        unsigned int *Qx, unsigned int *Qy)
+unsigned int ed25519_pointMul_s(edward_curve_t *curve, unsigned int *k, unsigned int *Px, unsigned int *Py, unsigned int *Qx, unsigned int *Qy)
 {
     unsigned int wordLen = GET_WORD_LEN(curve->p_bitLen);
 
-    if(uint32_BigNum_Check_Zero(k, wordLen))
-    {
+    if (uint32_BigNum_Check_Zero(k, wordLen)) {
         uint32_clear(Qx, wordLen);
         pke_set_operand_uint32_value(Qy, wordLen, 1);
 
         return PKE_SUCCESS;
-    }
-    else
-    {
+    } else {
         return ed25519_pointMul(curve, k, Px, Py, Qx, Qy);
     }
 }
@@ -163,40 +220,36 @@ unsigned int ed25519_get_pubkey_from_prikey(unsigned char prikey[32], unsigned c
     unsigned int h[16];
     unsigned int ret;
 
-    if(NULL == prikey || NULL == pubkey)
-    {
+    if (NULL == prikey || NULL == pubkey) {
         return EdDSA_POINTOR_NULL;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ret = hash(HASH_SHA512, prikey, 32, (unsigned char *)h);
-    if(HASH_SUCCESS != ret)
-    {
+    if (HASH_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //decode to get the scalar
     x25519_decode_scalar((unsigned char *)h, (unsigned char *)h, Ed25519_BYTE_LEN);
 
-    ret = ed25519_pointMul_s((edward_curve_t *)ed25519, h, ed25519->Gx, ed25519->Gy, h, h+8);
-    if(PKE_SUCCESS != ret)
-    {
+    ret = ed25519_pointMul_s((edward_curve_t *)ed25519, h, ed25519->Gx, ed25519->Gy, h, h + 8);
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //encode pubkey
-    memcpy_(pubkey, h+8, Ed25519_BYTE_LEN);
-    if(h[0]&1)
-    {
-        pubkey[Ed25519_BYTE_LEN-1] |= 0x80;
+    memcpy_(pubkey, h + 8, Ed25519_BYTE_LEN);
+    if (h[0] & 1) {
+        pubkey[Ed25519_BYTE_LEN - 1] |= 0x80;
+    } else {
+        ;
     }
-    else
-    {;}
 
     return EdDSA_SUCCESS;
 }
@@ -211,20 +264,16 @@ unsigned int ed25519_getkey(unsigned char prikey[32], unsigned char pubkey[32])
 {
     unsigned int ret;
 
-    if(NULL == prikey || NULL == pubkey)
-    {
+    if (NULL == prikey || NULL == pubkey) {
         return EdDSA_POINTOR_NULL;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ret = get_rand(prikey, Ed25519_BYTE_LEN);
-    if(TRNG_SUCCESS != ret)
-    {
+    if (TRNG_SUCCESS != ret) {
         return ret;
-    }
-    else
-    {
+    } else {
         return ed25519_get_pubkey_from_prikey(prikey, pubkey);
     }
 }
@@ -249,372 +298,318 @@ unsigned int ed25519_getkey(unsigned char prikey[32], unsigned char pubkey[32])
       -# 5. if mode is Ed25519_PH, ctx length is from 0 to 255, default length is 0, thus ctx could be empty
   @endverbatim
  */
-unsigned int ed25519_sign(Ed25519_MODE mode, unsigned char prikey[32], unsigned char pubkey[32], unsigned char *ctx, unsigned char ctxByteLen,
-        unsigned char *M, unsigned int MByteLen, unsigned char RS[64])
+unsigned int ed25519_sign(Ed25519_MODE mode, unsigned char prikey[32], unsigned char pubkey[32], unsigned char *ctx, unsigned char ctxByteLen, unsigned char *M, unsigned int MByteLen, unsigned char RS[64])
 {
-    unsigned int h[16];
-    unsigned int *s = h;
+    unsigned int   h[16];
+    unsigned int  *s      = h;
     unsigned char *prefix = (unsigned char *)(h + Ed25519_WORD_LEN);
 
-    unsigned int *r = h+Ed25519_WORD_LEN;
-    unsigned int k[Ed25519_WORD_LEN<<1];
-    unsigned int PH_M[Ed25519_WORD_LEN<<1];
+    unsigned int *r = h + Ed25519_WORD_LEN;
+    unsigned int  k[Ed25519_WORD_LEN << 1];
+    unsigned int  PH_M[Ed25519_WORD_LEN << 1];
 
-    HASH_CTX sha512_ctx[1];
-    unsigned int ret;
+    HASH_CTX      sha512_ctx[1];
+    unsigned int  ret;
     unsigned char phflag, tmp;
 
-    if(mode > Ed25519_PH)
-    {
+    if (mode > Ed25519_PH) {
         return EdDSA_INVALID_INPUT;
-    }
-    else if(NULL == prikey || NULL == RS)
-    {
+    } else if (NULL == prikey || NULL == RS) {
         return EdDSA_POINTOR_NULL;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //M could be empty, so M could be NUll, MByteLen could be 0, no need to check them
-    if(NULL == M)
-    {
+    if (NULL == M) {
         MByteLen = 0;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    if(Ed25519_CTX == mode)             //in this case ctx can not be empty
+    if (Ed25519_CTX == mode) //in this case ctx can not be empty
     {
-        if(NULL == ctx || 0 == ctxByteLen)
-        {
+        if (NULL == ctx || 0 == ctxByteLen) {
             return EdDSA_INVALID_INPUT;
+        } else {
+            ;
         }
-        else
-        {;}
-    }
-    else if(Ed25519_PH == mode)         //in this case ctx could be empty
+    } else if (Ed25519_PH == mode) //in this case ctx could be empty
     {
-        if(NULL == ctx)
-        {
+        if (NULL == ctx) {
             ctxByteLen = 0;
+        } else {
+            ;
         }
-        else
-        {;}
+    } else //Ed25519_DEFAULT mode, ctx is useless
+    {
+        ;
     }
-    else                                //Ed25519_DEFAULT mode, ctx is useless
-    {;}
 
     /*************** get private scalar s and prefix ***************/
     ret = hash(HASH_SHA512, prikey, Ed25519_BYTE_LEN, (unsigned char *)h);
-    if(HASH_SUCCESS != ret)
-    {
+    if (HASH_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //decode to get the scalar s
     x25519_decode_scalar((unsigned char *)h, (unsigned char *)h, Ed25519_BYTE_LEN);
 
     /************************* set flag F **************************/
-    if(Ed25519_CTX == mode)
-    {
+    if (Ed25519_CTX == mode) {
         phflag = 0;
-    }
-    else if(Ed25519_PH == mode)
-    {
+    } else if (Ed25519_PH == mode) {
         phflag = 1;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //PH_M
-    if(Ed25519_PH == mode)
-    {
+    if (Ed25519_PH == mode) {
         ret = hash(HASH_SHA512, M, MByteLen, (unsigned char *)PH_M);
-        if(HASH_SUCCESS != ret)
-        {
+        if (HASH_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
+    } else {
+        ;
     }
-    else
-    {;}
 
     /******* get k = SHA-512(dom2(F, C) || prefix || PH(M)) ********/
     ret = hash_init(sha512_ctx, HASH_SHA512);
-    if(HASH_SUCCESS != ret)
-    {
+    if (HASH_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //dom2(phflag, ctx)
-    if(Ed25519_DEFAULT != mode)
-    {
+    if (Ed25519_DEFAULT != mode) {
         tmp = strlen(Ed25519_sign_string);
         ret = hash_update(sha512_ctx, (unsigned char *)Ed25519_sign_string, tmp);
-        if(HASH_SUCCESS != ret)
-        {
+        if (HASH_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
 
         ret = hash_update(sha512_ctx, (unsigned char *)&phflag, 1);
-        if(HASH_SUCCESS != ret)
-        {
+        if (HASH_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
 
         ret = hash_update(sha512_ctx, (unsigned char *)&ctxByteLen, 1);
-        if(HASH_SUCCESS != ret)
-        {
+        if (HASH_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
 
         ret = hash_update(sha512_ctx, ctx, ctxByteLen);
-        if(HASH_SUCCESS != ret)
-        {
+        if (HASH_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
+    } else {
+        ;
     }
-    else
-    {;}
 
     //prefix
     ret = hash_update(sha512_ctx, prefix, Ed25519_BYTE_LEN);
-    if(HASH_SUCCESS != ret)
-    {
+    if (HASH_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //PH(M)
-    if(Ed25519_PH == mode)
-    {
+    if (Ed25519_PH == mode) {
         ret = hash_update(sha512_ctx, (unsigned char *)PH_M, 64);
-    }
-    else
-    {
+    } else {
         ret = hash_update(sha512_ctx, M, MByteLen);
     }
-    if(HASH_SUCCESS != ret)
-    {
+    if (HASH_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ret = hash_final(sha512_ctx, (unsigned char *)k);
-    if(HASH_SUCCESS != ret)
-    {
+    if (HASH_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     /************************ get R = [r]B *************************/
     //r = k mod n
-    ret = pke_mod(k+Ed25519_WORD_LEN-1, Ed25519_WORD_LEN+1, ed25519->n, ed25519->n_h, ed25519->n_n0,
-                  Ed25519_WORD_LEN, h+Ed25519_WORD_LEN);
-    if(PKE_SUCCESS != ret)
-    {
+    ret = pke_mod(k + Ed25519_WORD_LEN - 1, Ed25519_WORD_LEN + 1, ed25519->n, ed25519->n_h, ed25519->n_n0, Ed25519_WORD_LEN, h + Ed25519_WORD_LEN);
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    uint32_copy(k+Ed25519_WORD_LEN-1, h+Ed25519_WORD_LEN, Ed25519_WORD_LEN);
-    ret = pke_mod(k, (Ed25519_WORD_LEN<<1)-1, ed25519->n, ed25519->n_h, ed25519->n_n0, Ed25519_WORD_LEN, r);
-    if(PKE_SUCCESS != ret)
-    {
+    uint32_copy(k + Ed25519_WORD_LEN - 1, h + Ed25519_WORD_LEN, Ed25519_WORD_LEN);
+    ret = pke_mod(k, (Ed25519_WORD_LEN << 1) - 1, ed25519->n, ed25519->n_h, ed25519->n_n0, Ed25519_WORD_LEN, r);
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    ret = ed25519_pointMul_s((edward_curve_t *)ed25519, r, ed25519->Gx, ed25519->Gy, k, k+Ed25519_WORD_LEN);
-    if(PKE_SUCCESS != ret)
-    {
+    ret = ed25519_pointMul_s((edward_curve_t *)ed25519, r, ed25519->Gx, ed25519->Gy, k, k + Ed25519_WORD_LEN);
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    memcpy_(RS, k+Ed25519_WORD_LEN, Ed25519_BYTE_LEN);
-    if(k[0] & 1)
-    {
-        RS[Ed25519_BYTE_LEN-1] |= 0x80;
+    memcpy_(RS, k + Ed25519_WORD_LEN, Ed25519_BYTE_LEN);
+    if (k[0] & 1) {
+        RS[Ed25519_BYTE_LEN - 1] |= 0x80;
+    } else {
+        ;
     }
-    else
-    {;}
 
     /******* get k = SHA-512(dom2(F, C) || R || A || PH(M)) ********/
     ret = hash_init(sha512_ctx, HASH_SHA512);
-    if(HASH_SUCCESS != ret)
-    {
+    if (HASH_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //dom2(phflag, ctx)
-    if(Ed25519_DEFAULT != mode)
-    {
+    if (Ed25519_DEFAULT != mode) {
         tmp = strlen(Ed25519_sign_string);
         ret = hash_update(sha512_ctx, (unsigned char *)Ed25519_sign_string, tmp);
-        if(HASH_SUCCESS != ret)
-        {
+        if (HASH_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
 
         ret = hash_update(sha512_ctx, (unsigned char *)&phflag, 1);
-        if(HASH_SUCCESS != ret)
-        {
+        if (HASH_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
 
         ret = hash_update(sha512_ctx, (unsigned char *)&ctxByteLen, 1);
-        if(HASH_SUCCESS != ret)
-        {
+        if (HASH_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
 
         ret = hash_update(sha512_ctx, ctx, ctxByteLen);
-        if(HASH_SUCCESS != ret)
-        {
+        if (HASH_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
+    } else {
+        ;
     }
-    else
-    {;}
 
     //R
     ret = hash_update(sha512_ctx, RS, Ed25519_BYTE_LEN);
-    if(HASH_SUCCESS != ret)
-    {
+    if (HASH_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //pubkey(A)
-    if(NULL == pubkey)
-    {
-        ret = ed25519_pointMul_s((edward_curve_t *)ed25519, s, ed25519->Gx, ed25519->Gy, k, k+Ed25519_WORD_LEN);
-        if(PKE_SUCCESS != ret)
-        {
+    if (NULL == pubkey) {
+        ret = ed25519_pointMul_s((edward_curve_t *)ed25519, s, ed25519->Gx, ed25519->Gy, k, k + Ed25519_WORD_LEN);
+        if (PKE_SUCCESS != ret) {
             return ret;
+        } else if (k[0] & 1) {
+            k[(Ed25519_WORD_LEN << 1) - 1] |= 0x80000000;
+        } else {
+            ;
         }
-        else if(k[0] & 1)
-        {
-            k[(Ed25519_WORD_LEN<<1)-1] |= 0x80000000;
-        }
-        else
-        {;}
 
-        ret = hash_update(sha512_ctx, (unsigned char *)(k+Ed25519_WORD_LEN), Ed25519_BYTE_LEN);
-    }
-    else
-    {
+        ret = hash_update(sha512_ctx, (unsigned char *)(k + Ed25519_WORD_LEN), Ed25519_BYTE_LEN);
+    } else {
         ret = hash_update(sha512_ctx, pubkey, Ed25519_BYTE_LEN);
     }
-    if(HASH_SUCCESS != ret)
-    {
+    if (HASH_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //PH(M)
-    if(Ed25519_PH == mode)
-    {
+    if (Ed25519_PH == mode) {
         ret = hash_update(sha512_ctx, (unsigned char *)PH_M, 64);
-    }
-    else
-    {
+    } else {
         ret = hash_update(sha512_ctx, M, MByteLen);
     }
-    if(HASH_SUCCESS != ret)
-    {
+    if (HASH_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ret = hash_final(sha512_ctx, (unsigned char *)k);
-    if(HASH_SUCCESS != ret)
-    {
+    if (HASH_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     /***************** get S = (r + k * s) mod n *******************/
     //PH_M = k mod n
-    ret = pke_mod(k+Ed25519_WORD_LEN-1, Ed25519_WORD_LEN+1, ed25519->n, ed25519->n_h, ed25519->n_n0, Ed25519_WORD_LEN, PH_M);
-    if(PKE_SUCCESS != ret)
-    {
+    ret = pke_mod(k + Ed25519_WORD_LEN - 1, Ed25519_WORD_LEN + 1, ed25519->n, ed25519->n_h, ed25519->n_n0, Ed25519_WORD_LEN, PH_M);
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    uint32_copy(k+Ed25519_WORD_LEN-1, PH_M, Ed25519_WORD_LEN);
-    ret = pke_mod(k, (Ed25519_WORD_LEN<<1)-1, ed25519->n, ed25519->n_h, ed25519->n_n0, Ed25519_WORD_LEN, PH_M);
-    if(PKE_SUCCESS != ret)
-    {
+    uint32_copy(k + Ed25519_WORD_LEN - 1, PH_M, Ed25519_WORD_LEN);
+    ret = pke_mod(k, (Ed25519_WORD_LEN << 1) - 1, ed25519->n, ed25519->n_h, ed25519->n_n0, Ed25519_WORD_LEN, PH_M);
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //k = s mod n
     ret = pke_mod(s, Ed25519_WORD_LEN, ed25519->n, ed25519->n_h, ed25519->n_n0, Ed25519_WORD_LEN, k);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //k = k*s
     ret = pke_modmul(ed25519->n, PH_M, k, k, Ed25519_WORD_LEN);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //k = (r+k*s)mod n
     ret = pke_modadd(ed25519->n, k, r, k, Ed25519_WORD_LEN);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    memcpy_(RS+Ed25519_BYTE_LEN, k, Ed25519_BYTE_LEN);
+    memcpy_(RS + Ed25519_BYTE_LEN, k, Ed25519_BYTE_LEN);
 
     return EdDSA_SUCCESS;
 }
@@ -637,257 +632,219 @@ unsigned int ed25519_sign(Ed25519_MODE mode, unsigned char prikey[32], unsigned 
       -# 4. if mode is Ed25519_PH, ctx length is from 0 to 255, default length is 0, thus ctx could be empty
   @endverbatim
  */
-unsigned int ed25519_verify(Ed25519_MODE mode, unsigned char pubkey[32], unsigned char *ctx, unsigned char ctxByteLen, unsigned char *M,
-        unsigned int MByteLen, unsigned char RS[64])
+unsigned int ed25519_verify(Ed25519_MODE mode, unsigned char pubkey[32], unsigned char *ctx, unsigned char ctxByteLen, unsigned char *M, unsigned int MByteLen, unsigned char RS[64])
 {
-    unsigned int k[Ed25519_WORD_LEN<<1];
+    unsigned int k[Ed25519_WORD_LEN << 1];
     unsigned int S[Ed25519_WORD_LEN];
-    unsigned int PH_M[Ed25519_WORD_LEN<<1];
+    unsigned int PH_M[Ed25519_WORD_LEN << 1];
 
-    unsigned int pub_x[Ed25519_WORD_LEN], *pub_y=S;
-    unsigned int *x=PH_M, *y=PH_M+Ed25519_WORD_LEN;
+    unsigned int  pub_x[Ed25519_WORD_LEN], *pub_y = S;
+    unsigned int *x = PH_M, *y = PH_M + Ed25519_WORD_LEN;
 
-    HASH_CTX sha512_ctx[1];
-    unsigned int ret;
+    HASH_CTX      sha512_ctx[1];
+    unsigned int  ret;
     unsigned char phflag, tmp;
 
-    if(mode > Ed25519_PH)
-    {
+    if (mode > Ed25519_PH) {
         return EdDSA_INVALID_INPUT;
-    }
-    else if(NULL == pubkey || NULL == RS)
-    {
+    } else if (NULL == pubkey || NULL == RS) {
         return EdDSA_POINTOR_NULL;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //M could be empty, so M could be NUll, MByteLen could be 0, no need to check them
-    if(NULL == M)
-    {
+    if (NULL == M) {
         MByteLen = 0;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    if(Ed25519_CTX == mode)             //in this case ctx can not be empty
+    if (Ed25519_CTX == mode) //in this case ctx can not be empty
     {
-        if(NULL == ctx || 0 == ctxByteLen)
-        {
+        if (NULL == ctx || 0 == ctxByteLen) {
             return EdDSA_INVALID_INPUT;
+        } else {
+            ;
         }
-        else
-        {;}
-    }
-    else if(Ed25519_PH == mode)         //in this case ctx could be empty
+    } else if (Ed25519_PH == mode) //in this case ctx could be empty
     {
-        if(NULL == ctx)
-        {
+        if (NULL == ctx) {
             ctxByteLen = 0;
+        } else {
+            ;
         }
-        else
-        {;}
+    } else //Ed25519_DEFAULT mode, ctx is useless
+    {
+        ;
     }
-    else                                //Ed25519_DEFAULT mode, ctx is useless
-    {;}
 
     //get S (S should be less than order of the base point)
-    memcpy_(S, RS+Ed25519_BYTE_LEN, Ed25519_BYTE_LEN);
-    if(uint32_BigNumCmp(S, Ed25519_WORD_LEN, ed25519->n, Ed25519_WORD_LEN) >= 0)
-    {
+    memcpy_(S, RS + Ed25519_BYTE_LEN, Ed25519_BYTE_LEN);
+    if (uint32_BigNumCmp(S, Ed25519_WORD_LEN, ed25519->n, Ed25519_WORD_LEN) >= 0) {
         return EdDSA_INVALID_INPUT;
+    } else {
+        ;
     }
-    else
-    {;}
 
     /************************* set flag F **************************/
-    if(Ed25519_CTX == mode)
-    {
+    if (Ed25519_CTX == mode) {
         phflag = 0;
-    }
-    else if(Ed25519_PH == mode)
-    {
+    } else if (Ed25519_PH == mode) {
         phflag = 1;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //PH_M
-    if(Ed25519_PH == mode)
-    {
+    if (Ed25519_PH == mode) {
         ret = hash(HASH_SHA512, M, MByteLen, (unsigned char *)PH_M);
-        if(HASH_SUCCESS != ret)
-        {
+        if (HASH_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
+    } else {
+        ;
     }
-    else
-    {;}
 
     /******* get k = SHA-512(dom2(F, C) || R || A || PH(M)) ********/
     ret = hash_init(sha512_ctx, HASH_SHA512);
-    if(HASH_SUCCESS != ret)
-    {
+    if (HASH_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //dom2(phflag, ctx)
-    if(Ed25519_DEFAULT != mode)
-    {
+    if (Ed25519_DEFAULT != mode) {
         tmp = strlen(Ed25519_sign_string);
         ret = hash_update(sha512_ctx, (unsigned char *)Ed25519_sign_string, tmp);
-        if(HASH_SUCCESS != ret)
-        {
+        if (HASH_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
 
         ret = hash_update(sha512_ctx, (unsigned char *)&phflag, 1);
-        if(HASH_SUCCESS != ret)
-        {
+        if (HASH_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
 
         ret = hash_update(sha512_ctx, (unsigned char *)&ctxByteLen, 1);
-        if(HASH_SUCCESS != ret)
-        {
+        if (HASH_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
 
         ret = hash_update(sha512_ctx, ctx, ctxByteLen);
-        if(HASH_SUCCESS != ret)
-        {
+        if (HASH_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
+    } else {
+        ;
     }
-    else
-    {;}
 
     //R
     ret = hash_update(sha512_ctx, RS, Ed25519_BYTE_LEN);
-    if(HASH_SUCCESS != ret)
-    {
+    if (HASH_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //pubkey(A)
     ret = hash_update(sha512_ctx, pubkey, Ed25519_BYTE_LEN);
-    if(HASH_SUCCESS != ret)
-    {
+    if (HASH_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //PH(M)
-    if(Ed25519_PH == mode)
-    {
+    if (Ed25519_PH == mode) {
         ret = hash_update(sha512_ctx, (unsigned char *)PH_M, 64);
-    }
-    else
-    {
+    } else {
         ret = hash_update(sha512_ctx, M, MByteLen);
     }
-    if(HASH_SUCCESS != ret)
-    {
+    if (HASH_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ret = hash_final(sha512_ctx, (unsigned char *)k);
-    if(HASH_SUCCESS != ret)
-    {
+    if (HASH_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //k = k mod n
-    ret = pke_mod(k+Ed25519_WORD_LEN-1, Ed25519_WORD_LEN+1, ed25519->n, ed25519->n_h, ed25519->n_n0, Ed25519_WORD_LEN, x);
-    if(PKE_SUCCESS != ret)
-    {
+    ret = pke_mod(k + Ed25519_WORD_LEN - 1, Ed25519_WORD_LEN + 1, ed25519->n, ed25519->n_h, ed25519->n_n0, Ed25519_WORD_LEN, x);
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    uint32_copy(k+Ed25519_WORD_LEN-1, x, Ed25519_WORD_LEN);
-    ret = pke_mod(k, (Ed25519_WORD_LEN<<1)-1, ed25519->n, ed25519->n_h, ed25519->n_n0, Ed25519_WORD_LEN, x);
-    if(PKE_SUCCESS != ret)
-    {
+    uint32_copy(k + Ed25519_WORD_LEN - 1, x, Ed25519_WORD_LEN);
+    ret = pke_mod(k, (Ed25519_WORD_LEN << 1) - 1, ed25519->n, ed25519->n_h, ed25519->n_n0, Ed25519_WORD_LEN, x);
+    if (PKE_SUCCESS != ret) {
         return ret;
-    }
-    else
-    {
+    } else {
         uint32_copy(k, x, Ed25519_WORD_LEN);
     }
 
     //get [S]B
     ret = ed25519_pointMul_s((edward_curve_t *)ed25519, S, ed25519->Gx, ed25519->Gy, x, y);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //get [k]A'
-    ret = ed25519_decode_point((unsigned char *)pubkey, (unsigned char *)pub_x,(unsigned char *)pub_y);
-    if(PKE_SUCCESS != ret)
-    {
+    ret = ed25519_decode_point((unsigned char *)pubkey, (unsigned char *)pub_x, (unsigned char *)pub_y);
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ret = ed25519_pointMul_s((edward_curve_t *)ed25519, k, pub_x, pub_y, pub_x, pub_y);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //get R
-    ret = ed25519_decode_point((unsigned char *)RS, (unsigned char *)k,(unsigned char *)(k+Ed25519_WORD_LEN));
-    if(PKE_SUCCESS != ret)
-    {
+    ret = ed25519_decode_point((unsigned char *)RS, (unsigned char *)k, (unsigned char *)(k + Ed25519_WORD_LEN));
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //R + [k]A'
-    ret = ed25519_pointAdd((edward_curve_t *)ed25519, k, k+Ed25519_WORD_LEN, pub_x, pub_y, k, k+Ed25519_WORD_LEN);
-    if(PKE_SUCCESS != ret)
-    {
+    ret = ed25519_pointAdd((edward_curve_t *)ed25519, k, k + Ed25519_WORD_LEN, pub_x, pub_y, k, k + Ed25519_WORD_LEN);
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //check whether [S]B = R + [k]A��
-    if(uint32_BigNumCmp(k, Ed25519_WORD_LEN, x, Ed25519_WORD_LEN) ||
-       uint32_BigNumCmp(k+Ed25519_WORD_LEN, Ed25519_WORD_LEN, y, Ed25519_WORD_LEN))
-    {
+    if (uint32_BigNumCmp(k, Ed25519_WORD_LEN, x, Ed25519_WORD_LEN) ||
+        uint32_BigNumCmp(k + Ed25519_WORD_LEN, Ed25519_WORD_LEN, y, Ed25519_WORD_LEN)) {
         return EdDSA_VERIFY_FAIL;
-    }
-    else
-    {
+    } else {
         return EdDSA_SUCCESS;
     }
 }

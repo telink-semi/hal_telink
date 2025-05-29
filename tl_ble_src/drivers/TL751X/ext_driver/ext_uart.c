@@ -50,12 +50,12 @@ void uart_debug_init(void)
 
     uart_set_irq_mask(DEBUG_UART_CHANNEL, UART_TXDONE_MASK);
     if (DEBUG_UART_CHANNEL == UART0){
-        plic_interrupt_enable(IRQ19_UART0);
-        plic_set_priority(IRQ19_UART0, 2);
+        plic_interrupt_enable(IRQ_UART0);
+        plic_set_priority(IRQ_UART0, 2);
     }
     else if (DEBUG_UART_CHANNEL == UART1){
-        plic_interrupt_enable(IRQ18_UART1);
-        plic_set_priority(IRQ18_UART1, 2);
+        plic_interrupt_enable(IRQ_UART1);
+        plic_set_priority(IRQ_UART1, 2);
     }
 
     lp_uart_init = 1;

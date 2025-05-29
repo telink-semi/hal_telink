@@ -528,8 +528,8 @@ void adc_set_dma_config(dma_chn_e chn)
  *                            otherwise there may be an out-of-bounds problem.
  * @param[in] data_byte_len - Amount of data to be sampled in bytes, the maximum value can be up to 0xFFFFFC.
  * @note      The depth of SAR_ADC_FIFO is 8 words, and its characteristic is store first, fetch first.
- *            When all three channels are working at the same time, the order of storing adc channel data into SAR_ADC_FIFO is M、L、R,
- *            so the arrangement after dma handling is also M、L、R.
+ *            When all three channels are working at the same time, the order of storing adc channel data into SAR_ADC_FIFO is M: L: R,
+ *            so the arrangement after dma handling is also M: L: R.
  * @return    none
  */
 static void adc_start_sample_dma(unsigned short *adc_data_buf,unsigned int data_byte_len)

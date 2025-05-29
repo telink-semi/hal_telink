@@ -24,7 +24,7 @@
 #pragma once
 
 //CS
-#define SERVICE_TELINK_RAS_HDL                          SERVICE_CHANNEL_SOUNDING_START_HDL
-#define TELINK_RAS_MAX_HDL_NUM                          0x20
+#define SERVICE_TELINK_RAS_HDL SERVICE_CHANNEL_SOUNDING_START_HDL
+#define TELINK_RAS_MAX_HDL_NUM 0x20
 
 #include "ras/svc_ras.h"

@@ -26,8 +26,7 @@
 #include "stack/ble/ble.h"
 
 
-#define RAM_CHECK_SIZE          4
-
+#define RAM_CHECK_SIZE 4
 
 /**
  * @brief       This is detect callback function
@@ -46,15 +45,13 @@ _attribute_ram_code_ void app_detect_callback(u32 de_evt)
  * @return      result: 0 - Success
  *                      1 - error
  */
-_attribute_ram_code_ u32 app_detect_data(u32* vma_start, u32* vma_end, u32* lma_start)
+_attribute_ram_code_ u32 app_detect_data(u32 *vma_start, u32 *vma_end, u32 *lma_start)
 {
-    for(u32 read_count = 0; read_count < (u32)(vma_end - vma_start); read_count += RAM_CHECK_SIZE)
-    {
-        u32 flash_4_byte = *(volatile u32*)(lma_start + read_count);//get flash value
-        u32 ramcode_4_byte = *(volatile u32*)(vma_start + read_count);//get ramcode value
+    for (u32 read_count = 0; read_count < (u32)(vma_end - vma_start); read_count += RAM_CHECK_SIZE) {
+        u32 flash_4_byte   = *(volatile u32 *)(lma_start + read_count); //get flash value
+        u32 ramcode_4_byte = *(volatile u32 *)(vma_start + read_count); //get ramcode value
 
-        if(flash_4_byte != ramcode_4_byte)
-        {
+        if (flash_4_byte != ramcode_4_byte) {
             return 1;
         }
     }
@@ -76,8 +73,7 @@ _attribute_ram_code_ void app_detect_init(void)
     err_ramcode |= app_detect_data(&_RAMCODE_VMA_START, &_RAMCODE_VMA_END, &_RAMCODE_LMA_START);
     err_ramcode |= app_detect_data(&_RETENTION_RESET_VMA_START, &_RETENTION_RESET_VMA_END, &_RETENTION_RESET_LMA_START);
 
-    if(err_ramcode){
+    if (err_ramcode) {
         app_detect_callback(1);
     }
 }
-

@@ -33,43 +33,47 @@
 #if (INTER_TEST_MODE == TEST_LE_AUDIO_SWTICH_CLIENT)
 
 
-#if (UI_KEYBOARD_ENABLE)
+    #if (UI_KEYBOARD_ENABLE)
 
 int central_pairing_enable = 0;
-u16 central_unpair_enable = 0;
+u16 central_unpair_enable  = 0;
 
-u16 central_disconnect_connhandle;   //mark the central connection which is in un_pair disconnection flow
+u16 central_disconnect_connhandle; //mark the central connection which is in un_pair disconnection flow
 
-_attribute_ble_data_retention_  int     key_not_released;
-_attribute_ble_data_retention_  int     key_type;
-_attribute_ble_data_retention_  int     key_toggle_cnt;
+_attribute_ble_data_retention_ int key_not_released;
+_attribute_ble_data_retention_ int key_type;
+_attribute_ble_data_retention_ int key_toggle_cnt;
 
-#define CONSUMER_KEY                1
-#define KEYBOARD_KEY                2
-#define PAIR_UNPAIR_KEY             3
+        #define CONSUMER_KEY    1
+        #define KEYBOARD_KEY    2
+        #define PAIR_UNPAIR_KEY 3
 
 extern app_ctrl_t appCtrl;
 
-#if (MCU_CORE_TYPE == MCU_CORE_B91 && HARDWARE_TYPE == TLSR9518DONGLE)
-#define MAX_BTN_SIZE            2
-#define BTN_VALID_LEVEL         0
+        #if (MCU_CORE_TYPE == MCU_CORE_B91 && HARDWARE_TYPE == TLSR9518DONGLE)
+            #define MAX_BTN_SIZE    2
+            #define BTN_VALID_LEVEL 0
 u32 ctrl_btn[MAX_BTN_SIZE] = {SW2_GPIO, SW7_GPIO};
-u8 btn_map[MAX_BTN_SIZE] = {BTN_PAIR, BTN_UNPAIR};
+u8  btn_map[MAX_BTN_SIZE]  = {BTN_PAIR, BTN_UNPAIR};
 
-typedef struct __attribute__((packed)) {
-    u8  cnt;                //count button num
-    u8  btn_press;
-    u8  keycode[MAX_BTN_SIZE];
-}vc_data_t;
+typedef struct __attribute__((packed))
+{
+    u8 cnt; //count button num
+    u8 btn_press;
+    u8 keycode[MAX_BTN_SIZE];
+} vc_data_t;
+
 vc_data_t vc_event;
 
-typedef struct __attribute__((packed)) {
-    u8  btn_history[4];     //vc history btn save
-    u8  btn_filter_last;
-    u8  btn_not_release;
-    u8  btn_new;            //new btn  flag
-}btn_status_t;
-btn_status_t    btn_status;
+typedef struct __attribute__((packed))
+{
+    u8 btn_history[4]; //vc history btn save
+    u8 btn_filter_last;
+    u8 btn_not_release;
+    u8 btn_new;        //new btn  flag
+} btn_status_t;
+
+btn_status_t btn_status;
 
 /**
  * @brief      the function server to debounce the key
@@ -81,17 +85,13 @@ u8 btn_debounce_filter(u8 *btn_v)
 {
     u8 change = 0;
 
-    for(int i=3; i>0; i--)
-    {
-        btn_status.btn_history[i] = btn_status.btn_history[i-1];
+    for (int i = 3; i > 0; i--) {
+        btn_status.btn_history[i] = btn_status.btn_history[i - 1];
     }
     btn_status.btn_history[0] = *btn_v;
 
-    if(  btn_status.btn_history[0] == btn_status.btn_history[1]\
-      && btn_status.btn_history[1] == btn_status.btn_history[2]\
-      && btn_status.btn_history[0] != btn_status.btn_filter_last)
-    {
-        change = 1;
+    if (btn_status.btn_history[0] == btn_status.btn_history[1] && btn_status.btn_history[1] == btn_status.btn_history[2] && btn_status.btn_history[0] != btn_status.btn_filter_last) {
+        change                     = 1;
         btn_status.btn_filter_last = btn_status.btn_history[0];
     }
 
@@ -107,24 +107,19 @@ u8 btn_debounce_filter(u8 *btn_v)
 u8 vc_detect_button(int read_key)
 {
     u8 btn_changed, i;
-    memset(&vc_event,0,sizeof(vc_data_t));          //clear vc_event
+    memset(&vc_event, 0, sizeof(vc_data_t)); //clear vc_event
     //vc_event.btn_press = 0;
-    for(i=0; i<MAX_BTN_SIZE; i++)
-    {
-        if(BTN_VALID_LEVEL != !gpio_read(ctrl_btn[i]))
-        {
+    for (i = 0; i < MAX_BTN_SIZE; i++) {
+        if (BTN_VALID_LEVEL != !gpio_read(ctrl_btn[i])) {
             vc_event.btn_press |= BIT(i);
         }
     }
 
     btn_changed = btn_debounce_filter(&vc_event.btn_press);
 
-    if(btn_changed && read_key)
-    {
-        for(i=0; i<MAX_BTN_SIZE; i++)
-        {
-            if(vc_event.btn_press & BIT(i))
-            {
+    if (btn_changed && read_key) {
+        for (i = 0; i < MAX_BTN_SIZE; i++) {
+            if (vc_event.btn_press & BIT(i)) {
                 vc_event.keycode[vc_event.cnt++] = btn_map[i];
             }
         }
@@ -139,70 +134,52 @@ u8 vc_detect_button(int read_key)
  * @param[in]   none
  * @return      none
  */
-void proc_button (void)
+void proc_button(void)
 {
-    int det_key = vc_detect_button (1);
-    if (det_key)  //key change: press or release
+    int det_key = vc_detect_button(1);
+    if (det_key) //key change: press or release
     {
-
-
         u8 key0 = vc_event.keycode[0];
-//      u8 key1 = vc_event.keycode[1];
+        //      u8 key1 = vc_event.keycode[1];
 
-        if(vc_event.cnt == 2)  //two key press
+        if (vc_event.cnt == 2)        //two key press
         {
-
-        }
-        else if(vc_event.cnt == 1) //one key press
+        } else if (vc_event.cnt == 1) //one key press
         {
-            if(key0 == BTN_PAIR)
-            {
+            if (key0 == BTN_PAIR) {
                 central_pairing_enable = 1;
-                tlkapi_printf(APP_LOG_EN,"UI: Pair begin");
-            }
-            else if(key0 == BTN_UNPAIR)
-            {
+                tlkapi_printf(APP_LOG_EN, "UI: Pair begin");
+            } else if (key0 == BTN_UNPAIR) {
                 /*Here is just Telink Demonstration effect. Cause the demo board has limited key to use, only one "un_pair" key is
                  available. When "un_pair" key pressed, we will choose and un_pair one device in connection state */
-                if(acl_conn_central_num)
-                { //at least 1 central connection exist
+                if (acl_conn_central_num) {                                         //at least 1 central connection exist
 
-                    if(!central_disconnect_connhandle && !central_unpair_enable)
-                    {  //if one central un_pair disconnection flow not finish, here new un_pair not accepted
+                    if (!central_disconnect_connhandle && !central_unpair_enable) { //if one central un_pair disconnection flow not finish, here new un_pair not accepted
 
                         /* choose one central connection to disconnect */
-                        for(int i=0; i < ACL_CENTRAL_MAX_NUM; i++)
-                        { //peripheral index is from 0 to "ACL_CENTRAL_MAX_NUM - 1"
-                            if(conn_dev_list[i].conn_state)
-                            {
-                                central_unpair_enable = conn_dev_list[i].conn_handle;  //mark connHandle on central_unpair_enable
-                                tlkapi_printf(APP_LOG_EN,"[0x%x] UI: Unpair", central_unpair_enable);
+                        for (int i = 0; i < ACL_CENTRAL_MAX_NUM; i++) {               //peripheral index is from 0 to "ACL_CENTRAL_MAX_NUM - 1"
+                            if (conn_dev_list[i].conn_state) {
+                                central_unpair_enable = conn_dev_list[i].conn_handle; //mark connHandle on central_unpair_enable
+                                tlkapi_printf(APP_LOG_EN, "[0x%x] UI: Unpair", central_unpair_enable);
                                 break;
                             }
                         }
                     }
                 }
             }
-        }
-        else
-        {
-            if(central_pairing_enable)
-            {
+        } else {
+            if (central_pairing_enable) {
                 central_pairing_enable = 0;
-                tlkapi_printf(APP_LOG_EN,"UI: Pair end", 0, 0);
+                tlkapi_printf(APP_LOG_EN, "UI: Pair end", 0, 0);
             }
 
-            if(central_unpair_enable)
-            {
+            if (central_unpair_enable) {
                 central_unpair_enable = 0;
             }
         }
-
     }
 }
-#else
-
-
+        #else
 
 
 /**
@@ -212,81 +189,58 @@ void proc_button (void)
  */
 void key_change_proc(void)
 {
-
     u8 key0 = kb_event.keycode[0];
 
     key_not_released = 1;
-    if (kb_event.cnt == 2)   //two key press
+    if (kb_event.cnt == 2)     //two key press
     {
-
-    }
-    else if(kb_event.cnt == 1)
-    {
-        if(key0 >= CR_VOL_UP )  //volume up/down
+    } else if (kb_event.cnt == 1) {
+        if (key0 >= CR_VOL_UP) //volume up/down
         {
-            if(key0 == CR_VOL_UP)
-            {
-                u8 volumeTogg = ++key_toggle_cnt%1;
-                if(volumeTogg)
-                {
-                    tlkapi_printf(APP_LOG_EN,"UI: volume up");
-                    for(u8 i=0;i<appCtrl.acl_max_num;i++)
-                    {
+            if (key0 == CR_VOL_UP) {
+                u8 volumeTogg = ++key_toggle_cnt % 1;
+                if (volumeTogg) {
+                    tlkapi_printf(APP_LOG_EN, "UI: volume up");
+                    for (u8 i = 0; i < appCtrl.acl_max_num; i++) {
                         blc_vcsc_writeRelativeVolUp(appCtrl.aclParam[i].acl_handle);
                     }
-                }
-                else
-                {
-                    tlkapi_printf(APP_LOG_EN,"UI: volume down");
-                    for(u8 i=0;i<appCtrl.acl_max_num;i++)
-                    {
+                } else {
+                    tlkapi_printf(APP_LOG_EN, "UI: volume down");
+                    for (u8 i = 0; i < appCtrl.acl_max_num; i++) {
                         blc_vcsc_writeRelativeVolDown(appCtrl.aclParam[i].acl_handle);
                     }
                 }
-            }
-            else if(key0 == CR_VOL_DN)
-            {
-                u8 muteTogg = ++key_toggle_cnt%1;
-                if(muteTogg) {
-                    tlkapi_printf(APP_LOG_EN,"UI: mute");
-                    for(u8 i=0;i<appCtrl.acl_max_num;i++)
-                    {
+            } else if (key0 == CR_VOL_DN) {
+                u8 muteTogg = ++key_toggle_cnt % 1;
+                if (muteTogg) {
+                    tlkapi_printf(APP_LOG_EN, "UI: mute");
+                    for (u8 i = 0; i < appCtrl.acl_max_num; i++) {
                         blc_vcsc_writeMute(appCtrl.aclParam[i].acl_handle);
                     }
 
-                }else{
-                    tlkapi_printf(APP_LOG_EN,"UI: unmute");
-                    for(u8 i=0;i<appCtrl.acl_max_num;i++)
-                    {
+                } else {
+                    tlkapi_printf(APP_LOG_EN, "UI: unmute");
+                    for (u8 i = 0; i < appCtrl.acl_max_num; i++) {
                         blc_vcsc_writeUnmute(appCtrl.aclParam[i].acl_handle);
                     }
                 }
             }
-        }
-        else
-        {
-            if(key0 == BTN_PAIR)
-            {
+        } else {
+            if (key0 == BTN_PAIR) {
                 central_pairing_enable = 1;
-                tlkapi_printf(APP_LOG_EN,"UI: Pair begin");
-            }
-            else if(key0 == BTN_UNPAIR)
-            {
+                tlkapi_printf(APP_LOG_EN, "UI: Pair begin");
+            } else if (key0 == BTN_UNPAIR) {
                 /*Here is just Telink Demonstration effect. Cause the demo board has limited key to use, only one "un_pair" key is
                  available. When "un_pair" key pressed, we will choose and un_pair one device in connection state */
-                if(acl_conn_central_num)
-                { //at least 1 central connection exist
+                if (acl_conn_central_num) {                                         //at least 1 central connection exist
 
-                    if(!central_disconnect_connhandle && !central_unpair_enable)
-                    {  //if one central un_pair disconnection flow not finish, here new un_pair not accepted
+                    if (!central_disconnect_connhandle && !central_unpair_enable) { //if one central un_pair disconnection flow not finish, here new un_pair not accepted
 
                         /* choose one central connection to disconnect */
-                        for(int i=0; i < ACL_CENTRAL_MAX_NUM; i++)
-                        { //peripheral index is from 0 to "ACL_CENTRAL_MAX_NUM - 1"
-                            if(conn_dev_list[i].conn_state)
-                            {
-                                central_unpair_enable = conn_dev_list[i].conn_handle;  //mark connHandle on central_unpair_enable
-                                tlkapi_printf(APP_LOG_EN,"[0x%x] UI: Unpair", central_unpair_enable);
+                        for (int i = 0; i < ACL_CENTRAL_MAX_NUM; i++) {               //peripheral index is from 0 to "ACL_CENTRAL_MAX_NUM - 1"
+                            if (conn_dev_list[i].conn_state) {
+                                central_unpair_enable = conn_dev_list[i].conn_handle; //mark connHandle on central_unpair_enable
+                                tlkapi_printf(APP_LOG_EN, "[0x%x] UI: Unpair", central_unpair_enable);
                                 break;
                             }
                         }
@@ -294,25 +248,22 @@ void key_change_proc(void)
                 }
             }
         }
-    }
-    else   //kb_event.cnt == 0,  key release
+    } else //kb_event.cnt == 0,  key release
     {
-        if(central_pairing_enable)
-        {
+        if (central_pairing_enable) {
             central_pairing_enable = 0;
-            tlkapi_printf(APP_LOG_EN,"UI: Pair end", 0, 0);
+            tlkapi_printf(APP_LOG_EN, "UI: Pair end", 0, 0);
         }
 
-        if(central_unpair_enable)
-        {
+        if (central_unpair_enable) {
             central_unpair_enable = 0;
         }
         key_not_released = 0;
     }
 }
-#endif//end of #if (MCU_CORE_TYPE == MCU_CORE_B91 && HARDWARE_TYPE == TLSR9518DONGLE)
+        #endif //end of #if (MCU_CORE_TYPE == MCU_CORE_B91 && HARDWARE_TYPE == TLSR9518DONGLE)
 
-_attribute_ble_data_retention_      static u32 keyScanTick = 0;
+_attribute_ble_data_retention_ static u32 keyScanTick = 0;
 
 /**
  * @brief      keyboard task handler
@@ -321,30 +272,25 @@ _attribute_ble_data_retention_      static u32 keyScanTick = 0;
  * @param[in]  n    - the length of event parameter.
  * @return     none.
  */
-void proc_keyboard (u8 e, u8 *p, int n)
+void proc_keyboard(u8 e, u8 *p, int n)
 {
-    if(clock_time_exceed(keyScanTick, 10 * 1000))
-    {  //keyScan interval: 10mS
+    if (clock_time_exceed(keyScanTick, 10 * 1000)) { //keyScan interval: 10mS
         keyScanTick = clock_time();
-    }
-    else
-    {
+    } else {
         return;
     }
 
-#if (MCU_CORE_TYPE == MCU_CORE_B91 && HARDWARE_TYPE == TLSR9518DONGLE)
+        #if (MCU_CORE_TYPE == MCU_CORE_B91 && HARDWARE_TYPE == TLSR9518DONGLE)
     proc_button();
-#else
+        #else
     kb_event.keycode[0] = 0;
-    int det_key = kb_scan_key (0, 1);
+    int det_key         = kb_scan_key(0, 1);
 
-    if (det_key)
-    {
+    if (det_key) {
         key_change_proc();
     }
-#endif
+        #endif
 }
-
 
 /**
  * @brief   BLE Unpair handle for central
@@ -354,18 +300,14 @@ void proc_keyboard (u8 e, u8 *p, int n)
 void proc_central_role_unpair(void)
 {
     //terminate and un_pair process, Telink demonstration effect: triggered by "un_pair" key press
-    if(central_unpair_enable)
-    {
-        for(u8 i =0;i<ACL_CENTRAL_MAX_NUM;i++)
-        {
-            if(conn_dev_list[i].conn_state)
-            {
-                if(blc_ll_disconnect(conn_dev_list[i].conn_handle, HCI_ERR_REMOTE_USER_TERM_CONN) == BLE_SUCCESS)
-                {
-                    dev_char_info_t* dev_char_info = dev_char_info_search_by_connhandle(conn_dev_list[i].conn_handle); //connHandle has marked on on central_unpair_enable
-                    #if (ACL_CENTRAL_SMP_ENABLE)
+    if (central_unpair_enable) {
+        for (u8 i = 0; i < ACL_CENTRAL_MAX_NUM; i++) {
+            if (conn_dev_list[i].conn_state) {
+                if (blc_ll_disconnect(conn_dev_list[i].conn_handle, HCI_ERR_REMOTE_USER_TERM_CONN) == BLE_SUCCESS) {
+                    dev_char_info_t *dev_char_info = dev_char_info_search_by_connhandle(conn_dev_list[i].conn_handle); //connHandle has marked on on central_unpair_enable
+        #if (ACL_CENTRAL_SMP_ENABLE)
                     blc_smp_deleteBondingPeripheralInfo_by_PeerMacAddress(dev_char_info->peer_adrType, dev_char_info->peer_addr);
-                    #endif
+        #endif
                 }
             }
         }
@@ -373,6 +315,6 @@ void proc_central_role_unpair(void)
 }
 
 
-#endif   //end of UI_KEYBOARD_ENABLE
+    #endif //end of UI_KEYBOARD_ENABLE
 
 #endif

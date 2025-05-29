@@ -24,8 +24,6 @@
 #ifndef DRIVERS_TL751X_EXT_MISC_H_
 #define DRIVERS_TL751X_EXT_MISC_H_
 
-#include "nds_intrinsic.h"
-
 #include "types.h"
 #include "../compatibility_pack/cmpt.h"
 #include "../analog.h"

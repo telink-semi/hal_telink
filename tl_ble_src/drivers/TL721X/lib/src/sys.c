@@ -38,35 +38,35 @@
 #include "lib/include/rf/rf_common.h"
 
 
-unsigned int g_chip_version = 0;
-_attribute_data_retention_sec_  unsigned char           g_pm_vbat_v;
+unsigned int                                 g_chip_version = 0;
+_attribute_data_retention_sec_ unsigned char g_pm_vbat_v;
 
 //Protection Code checking related macro
-#define SDK_VERSION_DRIVER        0
-#define SDK_VERSION_IGNORE        0xff // Used for internal debugging, ignoring SDK version restrictions.
+#define SDK_VERSION_DRIVER 0
+#define SDK_VERSION_IGNORE 0xff // Used for internal debugging, ignoring SDK version restrictions.
 
 /*note:When releasing externally, this macro may need to be modified.
        Special: The rule for the driver is that all chips are available,
        so this macro can be left unchanged when the driver is released externally*/
-#define SDK_VERSION_SELECT        SDK_VERSION_IGNORE
+#define SDK_VERSION_SELECT SDK_VERSION_IGNORE
 
 /**
  * @brief      This function reboot mcu.
  * @return     none
  */
-_attribute_ram_code_com_sec_noinline_ void sys_reboot_ram(void)
+_attribute_ram_code_sec_noinline_ void sys_reboot_ram(void)
 {
-    core_interrupt_disable();   //It must be inlined to ensure that the text segment cannot be entered.
+    core_interrupt_disable(); //It must be inlined to ensure that the text segment cannot be entered.
     mspi_stop_xip();
     sys_reset_all();
-    while(1);
+    while (1);
 }
 
 /**
  * @brief      This function reboot mcu.
  * @return     none
  */
-_attribute_text_sec_ void protected_sys_reboot(void)
+_attribute_text_sec_ void sys_reboot(void)
 {
     //To prevent reboot when the mcu is prefetching, the flash receives an incorrect command, resulting in an exception of the flash.
     DISABLE_BTB;
@@ -79,10 +79,9 @@ _attribute_text_sec_ void protected_sys_reboot(void)
  * @return    none.
  * @note      This function can only used when cclk is 24M RC cause the function execution process will power down the 24M crystal.
  */
-_attribute_ram_code_com_sec_optimize_o2_noinline_ void crystal_manual_settle(void)
+_attribute_ram_code_sec_optimize_o2_noinline_ void crystal_manual_settle(void)
 {
-    if((g_chip_version != CHIP_VERSION_A0)&&(g_chip_version != CHIP_VERSION_A1))
-    {
+    if ((g_chip_version != CHIP_VERSION_A0) && (g_chip_version != CHIP_VERSION_A1)) {
         /*
         *       bit                      default value               note
         * ---------------------------------------------------------------------------
@@ -91,12 +90,12 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ void crystal_manual_settle(voi
         * is lower than the previous version, and some A2 chips do not work RF due to low crystal ldo trim voltage.So modify this configuration 
         * on the A2 version of the chip to resolve the RF anomaly.Add by zhiwei,confirmed by wenfeng.20241206
         */
-        analog_write_reg8(0x8b,analog_read_reg8(0x8b)|0x30);
+        analog_write_reg8(0x8b, analog_read_reg8(0x8b) | 0x30);
     }
-    analog_write_reg8(0x65, analog_read_reg8(0x65) | 0x40);//0x65<6>: write 1 to reset xtal quick start cnt
+    analog_write_reg8(0x65, analog_read_reg8(0x65) | 0x40); //0x65<6>: write 1 to reset xtal quick start cnt
 
-    unsigned char ana_05 = analog_read_reg8(0x05);//0x05<3>: 24M_xtl_pd
-    analog_write_reg8(0x05, ana_05 | 0x08);     //<3>1b'1: Power down 24MHz XTL oscillator
+    unsigned char ana_05 = analog_read_reg8(0x05);          //0x05<3>: 24M_xtl_pd
+    analog_write_reg8(0x05, ana_05 | 0x08);                 //<3>1b'1: Power down 24MHz XTL oscillator
 
 #if PM_MANUAL_SETTLE_DEBUG
     core_cclk_delay_tick((unsigned long long)(sys_clk.cclk * 400000));
@@ -106,7 +105,7 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ void crystal_manual_settle(voi
     gpio_set_high_level(GPIO_PB4);
 #endif
 
-    analog_write_reg8(0x05, ana_05 & 0xf7);     //<3>1b'0: Power up 24MHz XTL oscillator        
+    analog_write_reg8(0x05, ana_05 & 0xf7); //<3>1b'0: Power up 24MHz XTL oscillator
 }
 
 /**
@@ -124,7 +123,7 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ void crystal_manual_settle(voi
 /**< BLE USED *****/
 #include "ext_driver/driver_internal/ext_lib.h"
 /**< BLE USED END */
-_attribute_ram_code_com_sec_noinline_ void sys_init(power_mode_e power_mode, vbat_type_e vbat_v, cap_typedef_e cap)
+_attribute_ram_code_sec_noinline_ void sys_init(power_mode_e power_mode, vbat_type_e vbat_v, cap_typedef_e cap)
 {
 #if 0
     /*
@@ -146,11 +145,11 @@ _attribute_ram_code_com_sec_noinline_ void sys_init(power_mode_e power_mode, vba
      * uart0, uart1, uart2, pwm, timer.
      * among them, the uart, pwm, and timer modules do not have appropriate positions to enable them in the module interface, so they are also enabled here.
      */
-    reg_rst      =  0x92390ed4;             //reset_0_dft:  0x96388080 -> 0x92380e80 -> 0x92390ed4
-    reg_clk_en   =  0x12312ef4;             //clken_0_dft:  0x1630a0a0 -> 0x12302ea0 -> 0x12312ef4
+    reg_rst    = 0x92390ed4;   //reset_0_dft:  0x96388080 -> 0x92380e80 -> 0x92390ed4
+    reg_clk_en = 0x12312ef4;   //clken_0_dft:  0x1630a0a0 -> 0x12302ea0 -> 0x12312ef4
 
-    reg_rst_1    =  0x00000204;             //reset_1_dft:  0x00000004 -> 0x00000000 -> 0x00000204
-    reg_clk_en_1 =  0x00000244;             //clken_1_dft:  0x00000044 -> 0x000000c0 -> 0x00000244
+    reg_rst_1    = 0x00000204; //reset_1_dft:  0x00000004 -> 0x00000000 -> 0x00000204
+    reg_clk_en_1 = 0x00000244; //clken_1_dft:  0x00000044 -> 0x000000c0 -> 0x00000244
 #endif
 
     /*
@@ -166,12 +165,9 @@ _attribute_ram_code_com_sec_noinline_ void sys_init(power_mode_e power_mode, vba
 
     //If the crystal oscillator uses an external capacitor, the internal capacitor must be turned off at the very beginning,
     //otherwise it will affect the start-up.(add by bingyu.li, confirmed by wenfeng.lou 20240621)
-    if(cap != INTERNAL_CAP_XTAL24M)
-    {
+    if (cap != INTERNAL_CAP_XTAL24M) {
         rf_turn_off_internal_cap();
-    }
-    else
-    {
+    } else {
         /*
          * Updating the crystal internal capacitance value to adjust RF frequency offset.
          * This should be done before crystal_manual_settle().(added by chenxi, confirmed by wenfeng. 20240627)
@@ -184,8 +180,7 @@ _attribute_ram_code_com_sec_noinline_ void sys_init(power_mode_e power_mode, vba
     //which saves the time of configuring registers during initialization.
     g_chip_version = read_reg8(0x14083d);
 
-    if(g_chip_version == CHIP_VERSION_A1)
-    {
+    if (g_chip_version == CHIP_VERSION_A1) {
         /*
          * Increase the current of the crystal oscillator to avoid the poor product failure to vibrate.
          * This should better be operate as soon as possible and must be done before the crystal_manual_settle.
@@ -210,7 +205,7 @@ _attribute_ram_code_com_sec_noinline_ void sys_init(power_mode_e power_mode, vba
      * If back from deep sleep, the calibration value need to read but not need to set cause they are all maintained.
      * For other case(power on or reboot), it's necessary to both read and set calibration value for both LDO and DCDC mode.
      */
-    if(!(g_areg_aon_7f & FLD_BOOTFROMBROM)){
+    if (!(g_areg_aon_7f & FLD_BOOTFROMBROM)) {
         g_pm_status_info.mcu_status = MCU_DEEPRET_BACK;
     } else {
         //read from otp
@@ -250,13 +245,14 @@ _attribute_ram_code_com_sec_noinline_ void sys_init(power_mode_e power_mode, vba
      */
     analog_write_reg8(areg_aon_0x06, (analog_read_reg8(areg_aon_0x06) | FLD_PD_SPD_LDO | FLD_PD_DIG_RET_LDO | FLD_PD_VBAT_SW) & ~(vbat_v));
 
-    g_pm_status_info.wakeup_src = pm_get_wakeup_src();
+    g_pm_status_info.wakeup_src    = pm_get_wakeup_src();
     g_pm_status_info.is_pad_wakeup = (g_pm_status_info.wakeup_src & BIT(0));
-
+#if GENERATE_LIB_FOR_GOOGLE //ble use
+    pm_update_boot_info();
+#endif
     g_pm_vbat_v = vbat_v >> 3;
 
-    if(g_chip_version == CHIP_VERSION_A1)
-    {
+    if (g_chip_version == CHIP_VERSION_A1) {
         /*
          *                      poweron_dft:    0x01 -> 0x03.
          *      bit                     note
@@ -266,8 +262,7 @@ _attribute_ram_code_com_sec_noinline_ void sys_init(power_mode_e power_mode, vba
          */
         analog_write_reg8(areg_0x8f, analog_read_reg8(areg_0x8f) | FLD_AUDIO_VMID_PD);
 
-        if(g_pm_status_info.mcu_status != MCU_STATUS_DEEPRET_BACK)
-        {
+        if (g_pm_status_info.mcu_status != MCU_STATUS_DEEPRET_BACK) {
             /*
             * A1 version add 0x13<3> as bb power switch to fix the ISSUE(TER-32).
             * vdd_bb was powered by dig_ldo/spd_ldo instead dcore_ldo, so here need to power it up first.
@@ -288,8 +283,7 @@ _attribute_ram_code_com_sec_noinline_ void sys_init(power_mode_e power_mode, vba
      * According to the result of temperature drift test, Haitao Wenfeng suggests to adjust Bandgap voltage trimming to the maximum, to 111 (binary).
      * (add by bolong.zhang, confirmed haitao 20241219)
      */
-    if(g_pm_status_info.mcu_status != MCU_STATUS_DEEPRET_BACK)
-    {
+    if (g_pm_status_info.mcu_status != MCU_STATUS_DEEPRET_BACK) {
         analog_write_reg8(areg_aon_0x00, (analog_read_reg8(areg_aon_0x00) & (~FLD_BG_TRIM_3V)) | 0x0e);
     }
 #if PM_XTAL_READY_TIME
@@ -300,8 +294,7 @@ _attribute_ram_code_com_sec_noinline_ void sys_init(power_mode_e power_mode, vba
     //(add by bingyu.li, confirmed by wenfeng.lou 20230531)
     pm_wait_xtal_ready(0x00);
 
-    if(g_pm_status_info.mcu_status == MCU_STATUS_DEEPRET_BACK)
-    {
+    if (g_pm_status_info.mcu_status == MCU_STATUS_DEEPRET_BACK) {
         /**< BLE USED *****/
         #if 0
             pm_stimer_recover();
@@ -309,15 +302,15 @@ _attribute_ram_code_com_sec_noinline_ void sys_init(power_mode_e power_mode, vba
             ext_pm_tim_recover();
         #endif
         /**< BLE USED END */
-    }else{
+    } else {
         //update vdd0p94 level when power on or wakeup from deep sleep
         pm_update_vdd0p94_level();
 #if SYS_TIMER_AUTO_MODE
         stimer_enable(STIMER_AUTO_MODE_W_TRIG, 0x01);
-        stimer_32k_tracking_enable();   //enable 32k cal
+        stimer_32k_tracking_enable(); //enable 32k cal
 #else
         stimer_enable(STIMER_MANUAL_MODE, 0x01);
-        stimer_32k_tracking_enable();   //enable 32k cal
+        stimer_32k_tracking_enable(); //enable 32k cal
 #endif
         /**< BLE USED *****/
         extern void cpu_wakeup_no_deepretn_back_init(void);
@@ -325,7 +318,7 @@ _attribute_ram_code_com_sec_noinline_ void sys_init(power_mode_e power_mode, vba
 
         //check protection code
         extern void efuse_check_protection_code(void);
-        efuse_check_protection_code();//BLE use //2024.12.19 new method not provide. later to add.
+        efuse_check_protection_code();//BLE use
 
         //check protection code
         #if (SDK_VERSION_SELECT != SDK_VERSION_IGNORE)
@@ -344,10 +337,6 @@ _attribute_ram_code_com_sec_noinline_ void sys_init(power_mode_e power_mode, vba
     reg_clk_en1 |= FLD_CLK1_PKE_EN;
     /**< BLE USED END */
 
-//check protection code
-#if (SDK_VERSION_SELECT != SDK_VERSION_IGNORE)
-    otp_check_protection_code(SDK_VERSION_SELECT);//0:driver sdk  0xff:sdk_version_ignore
-#endif
 }
 
 /**********************************************************************************************************************

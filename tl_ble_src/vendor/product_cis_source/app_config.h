@@ -32,4 +32,3 @@
     #include "kmlea_dongle/app_config.h"
 
 #endif
-

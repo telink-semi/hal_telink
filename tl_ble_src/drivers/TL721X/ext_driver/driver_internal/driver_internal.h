@@ -27,8 +27,7 @@
  *******************************************************************************************************/
 #ifndef DRIVERS_TL721X_EXT_DRIVER_DRIVER_LIB_DRIVER_LIB_H_
 #define DRIVERS_TL721X_EXT_DRIVER_DRIVER_LIB_DRIVER_LIB_H_
-
-
+#include "ext_hadm_rf.h"
 #include "ext_rf.h"
 //#include "ext_aes.h"
 #include "ext_lib.h"

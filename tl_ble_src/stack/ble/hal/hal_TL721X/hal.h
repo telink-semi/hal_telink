@@ -26,46 +26,56 @@
 
 /* MCU market positioning suport LE Audio*/
 #ifndef MARKET_POSITIONING_LE_AUDIO_SUPPORT_EN
-#define MARKET_POSITIONING_LE_AUDIO_SUPPORT_EN                   0
+    #define MARKET_POSITIONING_LE_AUDIO_SUPPORT_EN 0
 #endif
 
 /* MCU hardware support Channel Sounding */
-#define HARDWARE_CHANNEL_SOUNDING_SUPPORT_EN                        0
+#define HARDWARE_CHANNEL_SOUNDING_SUPPORT_EN 1
 
-#define AES_CCM_DEC_US                                          200//TODO:need test
+#define AES_CCM_DEC_US          200 //TODO:need test
 
-#define TNOP                                                    __asm__("nop")
-
-
-#define PPM_IDX_LONG_SLEEP_MIN                                  4
+#define TNOP                    __asm__("nop")
 
 
-#define PPM_IDX_SHORT_SLEEP_MIN                                 5   //500 ppm 
-#define PPM_IDX_MAX                                             10  //1000 ppm
+#define PPM_IDX_LONG_SLEEP_MIN  4
+
+
+#define PPM_IDX_SHORT_SLEEP_MIN 5  //500 ppm
+#define PPM_IDX_MAX             10 //1000 ppm
 
 
 //for aes module in ceva IP ,such as B91 and B92,aes module must switch address when use in BLE,other IC no need care.
-#define HAL_CEVA_AES_ADDRESS_SWITCH                                 do{}while(0)
+#define HAL_CEVA_AES_ADDRESS_SWITCH \
+    do {                            \
+    } while (0)
 
 //different IC ,its rf dma tx/rx wptr/rptr maybe different,use macro instead of register.
-#define HAL_REG_RF_DMA_FIFO_TX_RPTR                            (reg_rf_dma_tx_rptr(0))
+#define HAL_REG_RF_DMA_FIFO_TX_RPTR (reg_rf_dma_tx_rptr(0))
 
-#define HAL_REG_RF_DMA_FIFO_TX_WPTR                            (reg_rf_dma_tx_wptr(0))
+#define HAL_REG_RF_DMA_FIFO_TX_WPTR (reg_rf_dma_tx_wptr(0))
 
-#define FLD_DMA_RPTR_MASK                                       FLD_BB_DMA_RPTR_MASK
-#define FLD_DMA_RPTR_SET                                        FLD_BB_DMA_RPTR_SET
-#define FLD_DMA_RPTR_NEXT                                       FLD_BB_DMA_RPTR_NEXT
-#define FLD_DMA_RPTR_CLR                                        FLD_BB_DMA_RPTR_CLR
+#define FLD_DMA_RPTR_MASK           FLD_BB_DMA_RPTR_MASK
+#define FLD_DMA_RPTR_SET            FLD_BB_DMA_RPTR_SET
+#define FLD_DMA_RPTR_NEXT           FLD_BB_DMA_RPTR_NEXT
+#define FLD_DMA_RPTR_CLR            FLD_BB_DMA_RPTR_CLR
 
-#define FLD_DMA_WPTR_MASK                                       FLD_BB_DMA_WPTR_MASK
+#define FLD_DMA_WPTR_MASK           FLD_BB_DMA_WPTR_MASK
 
 //different IC,its rf irq mask number and irq mask register maybe different,use macro instead of register set rf irq mask in ble stack.
-#define HAL_BLE_STACK_RF_IRQ_MASK_SET                               do{RF_CLEAR_ALL_IRQ_MASK;reg_rf_irq_mask = FLD_RF_IRQ_RX | FLD_RF_IRQ_TX | BLMS_FLG_RF_CONN_DONE;}while(0)
+#define HAL_BLE_STACK_RF_IRQ_MASK_SET                                            \
+    do {                                                                         \
+        RF_CLEAR_ALL_IRQ_MASK;                                                   \
+        reg_rf_irq_mask = FLD_RF_IRQ_RX | FLD_RF_IRQ_TX | BLMS_FLG_RF_CONN_DONE; \
+    } while (0)
 
-#define HAL_BLE_STACK_RF_IRQ_MASK_CLEAR                             do{RF_CLEAR_ALL_IRQ_MASK;}while(0)
+#define HAL_BLE_STACK_RF_IRQ_MASK_CLEAR \
+    do {                                \
+        RF_CLEAR_ALL_IRQ_MASK;          \
+    } while (0)
 
 
-#define HAL_GET_RF_NESN                                         ((reg_rf_ll_pid_h & FLD_RF_NESN)>>4)
+#define HAL_GET_RF_NESN ((reg_rf_ll_pid_h & FLD_RF_NESN) >> 4)
+
 /**
  * @brief       This function serves to get the timestamp in 24M system timer.
  * @param[in]   none.
@@ -75,9 +85,12 @@ static inline unsigned int hal_rf_get_rx_timestamp(void)
 {
     unsigned int curStimerTick  = reg_system_tick;
     unsigned int curBBTimerTick = reg_bb_timer_tick;
-    return (curStimerTick - (curBBTimerTick-reg_rf_timestamp)*3);
+    return (curStimerTick - (curBBTimerTick - reg_rf_timestamp) * 3);
 }
 
-#define HAL_SKE_ENABLE                                              do{ske_dig_en();}while(0)
+#define HAL_SKE_ENABLE \
+    do {               \
+        ske_dig_en();  \
+    } while (0)
 
 #endif /* STACK_HAL_HAL_TL721X_HAL_H_ */

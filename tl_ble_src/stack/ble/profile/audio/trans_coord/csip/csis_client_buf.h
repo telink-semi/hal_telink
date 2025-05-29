@@ -25,27 +25,29 @@
 
 #include "stack/ble/profile/services/svc_audio/csis/svc_csis.h"
 
-typedef struct {
+typedef struct
+{
     gattc_sub_ccc_msg_t ntfInput;
 
     /* Characteristic value handle */
-    u16 setIdentityResolvingKeyHdl;     /* set Identity Resolving Key */
-    u16 coordinatedSetSizeHdl;          /* Coordinated Set Size */
-    u16 setMemberLockHdl;               /* SetMember Lock */
-    u16 setMemberRankHdl;               /* SetMember Rank */
+    u16 setIdentityResolvingKeyHdl; /* set Identity Resolving Key */
+    u16 coordinatedSetSizeHdl;      /* Coordinated Set Size */
+    u16 setMemberLockHdl;           /* SetMember Lock */
+    u16 setMemberRankHdl;           /* SetMember Rank */
 
     svc_csis_SIRK_t sirk;
-    u8 coordinatedSetSize;
-    u8 lock;
-    u8 rank;
+    u8              coordinatedSetSize;
+    u8              lock;
+    u8              rank;
 
 } blc_csis_client_t;
 
-typedef struct blc_csis_client_ctrl{
-    blc_prf_proc_t process;
+typedef struct blc_csis_client_ctrl
+{
+    blc_prf_proc_t     process;
     blc_csis_client_t *pCsisClient[STACK_PRF_ACL_CENTRAL_MAX_NUM];
 } blc_csis_client_ctrl_t;
 
-typedef struct{
-
+typedef struct
+{
 } blc_csisc_regParam_t;

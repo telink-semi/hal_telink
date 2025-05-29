@@ -26,22 +26,22 @@
 #include "../ull_hid_config.h"
 #if (ULL_HID_DEMO_SLECT == ULL_HID_DEVICE)
 
-#define ACL_CENTRAL_MAX_NUM                         0 // ACL central maximum number
-#define ACL_PERIPHR_MAX_NUM                         1 // ACL peripheral maximum number
+    #define ACL_CENTRAL_MAX_NUM 0 // ACL central maximum number
+    #define ACL_PERIPHR_MAX_NUM 1 // ACL peripheral maximum number
 
-///////////////////////// Feature Configuration////////////////////////////////////////////////
-#define ACL_PERIPHR_SMP_ENABLE                      1   //1 for smp,  0 no security
-#define BLE_APP_PM_ENABLE                           0
-#define ADV_USE_EXT_MODE                            1  //1: ext_adv;  0: leg_adv
+    ///////////////////////// Feature Configuration////////////////////////////////////////////////
+    #define ACL_PERIPHR_SMP_ENABLE 1 //1 for smp,  0 no security
+    #define BLE_APP_PM_ENABLE      0
+    #define ADV_USE_EXT_MODE       1 //1: ext_adv;  0: leg_adv
 
-///////////////////////// UI Configuration ////////////////////////////////////////////////////
-#define UI_LED_ENABLE                               1
-#define UI_KEYBOARD_ENABLE                          1
+    ///////////////////////// UI Configuration ////////////////////////////////////////////////////
+    #define UI_LED_ENABLE                     1
+    #define UI_KEYBOARD_ENABLE                1
 
-#define APP_LOG_EN                                  0
+    #define APP_LOG_EN                        0
 
-#define SVC_DEFAULT_KEYBOARD_MOUSE_ENABEL           1
+    #define SVC_DEFAULT_KEYBOARD_MOUSE_ENABEL 1
 
-#include "../common/default_config.h"
+    #include "../common/default_config.h"
 
-#endif    //INTER_TEST_MODE == TEST_ULL_HID_DEVICE
+#endif //INTER_TEST_MODE == TEST_ULL_HID_DEVICE

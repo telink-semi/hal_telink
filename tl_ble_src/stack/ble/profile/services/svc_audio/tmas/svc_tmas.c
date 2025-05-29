@@ -23,35 +23,33 @@
  *******************************************************************************************************/
 #include "stack/ble/ble.h"
 
-#define TMAS_START_HDL                  SERVICE_TELEPHONE_AND_MEDIA_AUDIO_HFL
+#define TMAS_START_HDL SERVICE_TELEPHONE_AND_MEDIA_AUDIO_HFL
 
-_attribute_ble_data_retention_
-static u16 tmasTmapRoleValue = DEFAULT_TMAP_ROLE;
-static const u16 tmasTmapRoleValueLen = sizeof(tmasTmapRoleValue);
+_attribute_ble_data_retention_ static u16 tmasTmapRoleValue    = DEFAULT_TMAP_ROLE;
+static const u16                          tmasTmapRoleValueLen = sizeof(tmasTmapRoleValue);
 
 /*
  * @brief the structure for default TMAS service List.
  */
 static const atts_attribute_t tmasList[] =
-{
-    ATTS_PRIMARY_SERVICE(serviceTelephonyAndMediaAudioUuid),
+    {
+        ATTS_PRIMARY_SERVICE(serviceTelephonyAndMediaAudioUuid),
 
-    //TMAP Role
-    ATTS_CHAR_UUID_ENCR_READ_ENTITY_NOCB(charPropRead, characteristicTmapRoleUuid, tmasTmapRoleValue),
+        //TMAP Role
+        ATTS_CHAR_UUID_ENCR_READ_ENTITY_NOCB(charPropRead, characteristicTmapRoleUuid, tmasTmapRoleValue),
 };
 
 /*
  * @brief the structure for default TMAS service group.
  */
-_attribute_ble_data_retention_
-static atts_group_t svcTmasGroup =
-{
-    NULL,
-    tmasList,
-    NULL,
-    NULL,
-    TMAS_START_HDL,
-    0,
+_attribute_ble_data_retention_ static atts_group_t svcTmasGroup =
+    {
+        NULL,
+        tmasList,
+        NULL,
+        NULL,
+        TMAS_START_HDL,
+        0,
 };
 
 /**
@@ -61,7 +59,7 @@ static atts_group_t svcTmasGroup =
  */
 void blc_svc_addTmasGroup(void)
 {
-    svcTmasGroup.endHandle = svcTmasGroup.startHandle+ARRAY_SIZE(tmasList)-1;
+    svcTmasGroup.endHandle = svcTmasGroup.startHandle + ARRAY_SIZE(tmasList) - 1;
     blc_gatts_addAttributeServiceGroup(&svcTmasGroup);
 }
 

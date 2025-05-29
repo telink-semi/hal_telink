@@ -28,9 +28,6 @@
 #include "lib/include/hash/hmac_md5.h"
 
 
-
-
-
 #ifdef SUPPORT_HASH_MD5
 
 
@@ -46,7 +43,6 @@ unsigned int hmac_md5_init(HMAC_MD5_CTX *ctx, unsigned char *key, unsigned short
 {
     return hmac_init(ctx, HASH_MD5, key, sp_key_idx, key_bytes);
 }
-
 
 /**
  * @brief       hmac-md5 update message
@@ -64,7 +60,6 @@ unsigned int hmac_md5_update(HMAC_MD5_CTX *ctx, const unsigned char *msg, unsign
     return hmac_update(ctx, msg, msg_bytes);
 }
 
-
 /**
  * @brief       message update done, get the hmac
  * @param[in]   ctx           - HMAC_CTX context pointer.
@@ -80,7 +75,6 @@ unsigned int hmac_md5_final(HMAC_MD5_CTX *ctx, unsigned char *mac)
 {
     return hmac_final(ctx, mac);
 }
-
 
 /**
  * @brief       input key and whole message, get the hmac
@@ -102,7 +96,7 @@ unsigned int hmac_md5(unsigned char *key, unsigned short sp_key_idx, unsigned in
 }
 
 
-#ifdef HASH_DMA_FUNCTION
+    #ifdef HASH_DMA_FUNCTION
 /**
  * @brief       input key and whole message, get the hmac
  * @param[in]   ctx             - HMAC_MD5_DMA_CTX context pointer.
@@ -112,12 +106,10 @@ unsigned int hmac_md5(unsigned char *key, unsigned short sp_key_idx, unsigned in
  * @param[in]   callback        - callback function pointer.
  * @return      0:success     other:error
  */
-unsigned int hmac_md5_dma_init(HMAC_MD5_DMA_CTX *ctx, const unsigned char *key, unsigned short sp_key_idx, unsigned int key_bytes,
-        HASH_CALLBACK callback)
+unsigned int hmac_md5_dma_init(HMAC_MD5_DMA_CTX *ctx, const unsigned char *key, unsigned short sp_key_idx, unsigned int key_bytes, HASH_CALLBACK callback)
 {
     return hmac_dma_init(ctx, HASH_MD5, key, sp_key_idx, key_bytes, callback);
 }
-
 
 /**
  * @brief       dma hmac-md5 update message
@@ -134,7 +126,6 @@ unsigned int hmac_md5_dma_update_blocks(HMAC_MD5_DMA_CTX *ctx, unsigned int *msg
 {
     return hmac_dma_update_blocks(ctx, msg, msg_words);
 }
-
 
 /**
  * @brief       dma hmac-md5 message update done, get the hmac
@@ -154,7 +145,6 @@ unsigned int hmac_md5_dma_final(HMAC_MD5_DMA_CTX *ctx, unsigned int *remainder_m
     return hmac_dma_final(ctx, remainder_msg, remainder_bytes, mac);
 }
 
-
 /**
  * @brief       dma hmac-md5 input key and message, get the hmac
  * @param[in]   key               - key.
@@ -166,13 +156,12 @@ unsigned int hmac_md5_dma_final(HMAC_MD5_DMA_CTX *ctx, unsigned int *remainder_m
  * @param[in]   callback          - callback function pointer.
  * @return      0:success     other:error
  */
-unsigned int hmac_md5_dma(unsigned char *key, unsigned short sp_key_idx, unsigned int key_bytes, unsigned int *msg, unsigned int msg_bytes, unsigned int *mac,
-        HASH_CALLBACK callback)
+unsigned int hmac_md5_dma(unsigned char *key, unsigned short sp_key_idx, unsigned int key_bytes, unsigned int *msg, unsigned int msg_bytes, unsigned int *mac, HASH_CALLBACK callback)
 {
     return hmac_dma(HASH_MD5, key, sp_key_idx, key_bytes, msg, msg_bytes, mac, callback);
 }
 
-#endif
+    #endif
 
 
 #endif

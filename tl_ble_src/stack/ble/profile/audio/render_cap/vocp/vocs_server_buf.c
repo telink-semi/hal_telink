@@ -30,8 +30,7 @@ const int gAppVocsSvrInstNum = APP_AUDIO_VOCS_SERVER_MAX_INSTANCE_NUM;
 
 
 _attribute_ble_data_retention_
-blc_vocs_server_t vocs_server[APP_AUDIO_VOCS_SERVER_MAX_INSTANCE_NUM];
-
+    blc_vocs_server_t vocs_server[APP_AUDIO_VOCS_SERVER_MAX_INSTANCE_NUM];
 
 blc_vocs_server_t *blt_vocss_getServerBuf(u8 instIdx)
 {
@@ -39,5 +38,3 @@ blc_vocs_server_t *blt_vocss_getServerBuf(u8 instIdx)
 
     return &vocs_server[instIdx];
 }
-
-

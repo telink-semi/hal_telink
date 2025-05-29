@@ -61,7 +61,7 @@
  *                                         global constants                                                           *
  *********************************************************************************************************************/
 
-#define AES_MAX_CNT   4
+#define AES_MAX_CNT 4
 
 /**********************************************************************************************************************
  *                                           global macro                                                             *
@@ -73,16 +73,18 @@
 /**
  * @brief AES mode.
  */
-typedef enum{
-    AES_ENCRYPT_MODE    =  0,
-    AES_DECRYPT_MODE    =  2,
-}aes_mode_e;
+typedef enum
+{
+    AES_ENCRYPT_MODE = 0,
+    AES_DECRYPT_MODE = 2,
+} aes_mode_e;
 
 // aes api error code
-typedef enum {
-    AES_API_ERROR_TIMEOUT_NONE               = 0x00,
-    AES_API_ERROR_TIMEOUT_ENCRYPT            = 0x01,
-    AES_API_ERROR_TIMEOUT_DECRYPT            = 0x02,
+typedef enum
+{
+    AES_API_ERROR_TIMEOUT_NONE    = 0x00,
+    AES_API_ERROR_TIMEOUT_ENCRYPT = 0x01,
+    AES_API_ERROR_TIMEOUT_DECRYPT = 0x02,
 } aes_api_error_code_e;
 
 /**
@@ -101,9 +103,9 @@ extern unsigned int g_aes_error_timeout_us;
  * @brief     This function serves to aes finite state machine reset(the configuration register is still there and does not need to be reconfigured).
  * @return    none.
  */
- void aes_hw_fsm_reset(void);
+void aes_hw_fsm_reset(void);
 
- /**
+/**
   * @brief     This function serves to set the aes timeout(us).
   * @param[in] timeout_us - the timeout(us).
   * @return    none.
@@ -133,7 +135,7 @@ __attribute__((weak)) void aes_timeout_handler(unsigned int aes_error_timeout_co
  * @return     1: operation successful;
  *             DRV_API_TIMEOUT: timeout exit(g_aes_error_timeout_us refer to the note for aes_set_error_timeout,the solution processing is already done in aes_timeout_handler, so just re-invoke the interface);
  */
-int aes_encrypt(unsigned char *key, unsigned char* plaintext, unsigned char *result);
+int aes_encrypt(unsigned char *key, unsigned char *plaintext, unsigned char *result);
 
 /**
  * @brief      This function servers to perform aes_128 encryption for 16-Byte input data with specific 16-Byte key when BT is connected.
@@ -143,7 +145,7 @@ int aes_encrypt(unsigned char *key, unsigned char* plaintext, unsigned char *res
  * @return     DRV_API_TIMEOUT: timeout exit(g_aes_error_timeout_us refer to the note for aes_set_error_timeout,the solution processing is already done in aes_timeout_handler, so just re-invoke the interface);
  * @note       Invoking this interface avoids the risk of AES conflicts when BT is connected.
  */
-int aes_encrypt_bt_en(unsigned char* key, unsigned char* plaintext, unsigned char *result);
+int aes_encrypt_bt_en(unsigned char *key, unsigned char *plaintext, unsigned char *result);
 
 /**
  * @brief      This function servers to perform aes_128 decryption for 16-Byte input data with specific 16-Byte key.
@@ -153,7 +155,7 @@ int aes_encrypt_bt_en(unsigned char* key, unsigned char* plaintext, unsigned cha
  * @return     1: operation successful;
  *             DRV_API_TIMEOUT: timeout exit(g_aes_error_timeout_us refer to the note for aes_set_error_timeout,the solution processing is already done in aes_timeout_handler, so just re-invoke the interface);
  */
-int aes_decrypt(unsigned char *key, unsigned char* decrypttext, unsigned char *result);
+int aes_decrypt(unsigned char *key, unsigned char *decrypttext, unsigned char *result);
 
 /**
  * @brief      This function servers to perform aes_128 decryption for 16-Byte input data with specific 16-Byte key when BT is connected.
@@ -163,7 +165,7 @@ int aes_decrypt(unsigned char *key, unsigned char* decrypttext, unsigned char *r
  * @return     DRV_API_TIMEOUT: timeout exit(g_aes_error_timeout_us refer to the note for aes_set_error_timeout,the solution processing is already done in aes_timeout_handler, so just re-invoke the interface);
  * @note       Invoking this interface avoids the risk of AES conflicts when BT is connected.
  */
-int aes_decrypt_bt_en(unsigned char* key, unsigned char* plaintext, unsigned char *result);
+int aes_decrypt_bt_en(unsigned char *key, unsigned char *plaintext, unsigned char *result);
 
 /**
  * @brief     This function refer to set the em base address.
@@ -183,7 +185,7 @@ void aes_set_em_base_addr(unsigned int addr);
  * @return    none.
  * @note      The AES module register must be used by word and the key and data lengths must be 16 bytes.
  */
-void aes_set_key_data(unsigned char *key, unsigned char* data);
+void aes_set_key_data(unsigned char *key, unsigned char *data);
 
 /**
  * @brief      This function refer to encrypt/decrypt to get result. AES module register must be used by word.

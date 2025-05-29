@@ -25,8 +25,8 @@
 #define GATT_H_
 
 /* GATT data handle call-back. */
-typedef int (*gatt_handler_t) (u16 conn, u8 * p);
-extern  gatt_handler_t  gatt_data_handler;
+typedef int (*gatt_handler_t)(u16 conn, u8 *p);
+extern gatt_handler_t gatt_data_handler;
 
 
 /**
@@ -34,7 +34,7 @@ extern  gatt_handler_t  gatt_data_handler;
  * @param[in]   handler  -
  * @return      none.
  */
-void        blc_gatt_register_data_handler(gatt_handler_t handler);
+void blc_gatt_register_data_handler(gatt_handler_t handler);
 
 /**
  * @brief       Send ATT Value Notify.
@@ -44,7 +44,7 @@ void        blc_gatt_register_data_handler(gatt_handler_t handler);
  * @param[in]   len          - the length of data.
  * @return      none.
  */
-ble_sts_t   blc_gatt_pushHandleValueNotify  (u16 connHandle, u16 attHandle, u8 *p, int len);
+ble_sts_t blc_gatt_pushHandleValueNotify(u16 connHandle, u16 attHandle, u8 *p, int len);
 
 /**
  * @brief       Send ATT Indicate.
@@ -54,7 +54,7 @@ ble_sts_t   blc_gatt_pushHandleValueNotify  (u16 connHandle, u16 attHandle, u8 *
  * @param[in]   len          - the length of data.
  * @return      none.
  */
-ble_sts_t   blc_gatt_pushHandleValueIndicate(u16 connHandle, u16 attHandle, u8 *p, int len);
+ble_sts_t blc_gatt_pushHandleValueIndicate(u16 connHandle, u16 attHandle, u8 *p, int len);
 
 /**
  * @brief       Send ATT Prepare Write Request.
@@ -65,7 +65,7 @@ ble_sts_t   blc_gatt_pushHandleValueIndicate(u16 connHandle, u16 attHandle, u8 *
  * @param[in]   len          - the length of data, it should be <= ATT_MTU-5.
  * @return      ble_sts_t.
  */
-ble_sts_t   blc_gatt_pushPrepareWriteRequest (u16 connHandle, u16 attHandle, u16 offset, u8 *p, int len);
+ble_sts_t blc_gatt_pushPrepareWriteRequest(u16 connHandle, u16 attHandle, u16 offset, u8 *p, int len);
 
 /**
  * @brief       Send ATT Execute Write Request.
@@ -74,7 +74,7 @@ ble_sts_t   blc_gatt_pushPrepareWriteRequest (u16 connHandle, u16 attHandle, u16
  *                           - 0x01: Immediately write all pending prepared values
  * @return      ble_sts_t.
  */
-ble_sts_t   blc_gatt_pushExecuteWriteRequest (u16 connHandle, u8 flags);
+ble_sts_t blc_gatt_pushExecuteWriteRequest(u16 connHandle, u8 flags);
 
 /**
  * @brief       Send ATT Write Command.
@@ -84,7 +84,7 @@ ble_sts_t   blc_gatt_pushExecuteWriteRequest (u16 connHandle, u8 flags);
  * @param[in]   len          - the length of data.
  * @return      none.
  */
-ble_sts_t   blc_gatt_pushWriteCommand (u16 connHandle, u16 attHandle, u8 *p, int len);
+ble_sts_t blc_gatt_pushWriteCommand(u16 connHandle, u16 attHandle, u8 *p, int len);
 
 /**
  * @brief       Send ATT Write Request.
@@ -94,7 +94,7 @@ ble_sts_t   blc_gatt_pushWriteCommand (u16 connHandle, u16 attHandle, u8 *p, int
  * @param[in]   len          - the length of data.
  * @return      none.
  */
-ble_sts_t   blc_gatt_pushWriteRequest (u16 connHandle, u16 attHandle, u8 *p, int len);
+ble_sts_t blc_gatt_pushWriteRequest(u16 connHandle, u16 attHandle, u8 *p, int len);
 
 /**
  * @brief       Send ATT Find Info Request.
@@ -103,7 +103,7 @@ ble_sts_t   blc_gatt_pushWriteRequest (u16 connHandle, u16 attHandle, u8 *p, int
  * @param[in]   end_attHandle      - the end of ATT handle.
  * @return      none.
  */
-ble_sts_t   blc_gatt_pushFindInformationRequest(u16 connHandle, u16 start_attHandle, u16 end_attHandle);
+ble_sts_t blc_gatt_pushFindInformationRequest(u16 connHandle, u16 start_attHandle, u16 end_attHandle);
 
 /**
  * @brief       Send ATT Find By Type Value Request.
@@ -115,8 +115,7 @@ ble_sts_t   blc_gatt_pushFindInformationRequest(u16 connHandle, u16 start_attHan
  * @param[in]   len                - the length of value.
  * @return      none.
  */
-ble_sts_t   blc_gatt_pushFindByTypeValueRequest(u16 connHandle, u16 start_attHandle, u16 end_attHandle,
-                                                u16 uuid, u8 *attr_value, int len);
+ble_sts_t blc_gatt_pushFindByTypeValueRequest(u16 connHandle, u16 start_attHandle, u16 end_attHandle, u16 uuid, u8 *attr_value, int len);
 /**
  * @brief       Send ATT Read By Type Request.
  * @param[in]   connHandle         - connection handle.
@@ -126,7 +125,7 @@ ble_sts_t   blc_gatt_pushFindByTypeValueRequest(u16 connHandle, u16 start_attHan
  * @param[in]   uuid_len           - the length of attribute type.
  * @return      none.
  */
-ble_sts_t   blc_gatt_pushReadByTypeRequest(u16 connHandle, u16 start_attHandle, u16 end_attHandle, u8 *uuid, int uuid_len);
+ble_sts_t blc_gatt_pushReadByTypeRequest(u16 connHandle, u16 start_attHandle, u16 end_attHandle, u8 *uuid, int uuid_len);
 
 /**
  * @brief       Send ATT Read Request.
@@ -134,7 +133,7 @@ ble_sts_t   blc_gatt_pushReadByTypeRequest(u16 connHandle, u16 start_attHandle, 
  * @param[in]   attHandle          - ATT handle.
  * @return      none.
  */
-ble_sts_t   blc_gatt_pushReadRequest(u16 connHandle, u16 attHandle);
+ble_sts_t blc_gatt_pushReadRequest(u16 connHandle, u16 attHandle);
 
 /**
  * @brief       Send ATT Read Blob Request.
@@ -143,7 +142,7 @@ ble_sts_t   blc_gatt_pushReadRequest(u16 connHandle, u16 attHandle);
  * @param[in]   offset             - ATT value offset.
  * @return      none.
  */
-ble_sts_t   blc_gatt_pushReadBlobRequest(u16 connHandle, u16 attHandle, u16 offset);
+ble_sts_t blc_gatt_pushReadBlobRequest(u16 connHandle, u16 attHandle, u16 offset);
 
 /**
  * @brief       Send ATT Read By Group Type Request.
@@ -154,8 +153,7 @@ ble_sts_t   blc_gatt_pushReadBlobRequest(u16 connHandle, u16 attHandle, u16 offs
  * @param[in]   uuid_len           - the length of attribute type.
  * @return      none.
  */
-ble_sts_t   blc_gatt_pushReadByGroupTypeRequest(u16 connHandle, u16 start_attHandle, u16 end_attHandle,
-                                                u8 *uuid, int uuid_len);
+ble_sts_t blc_gatt_pushReadByGroupTypeRequest(u16 connHandle, u16 start_attHandle, u16 end_attHandle, u8 *uuid, int uuid_len);
 
 /**
  * @brief       Send ATT Err Response.
@@ -165,7 +163,7 @@ ble_sts_t   blc_gatt_pushReadByGroupTypeRequest(u16 connHandle, u16 start_attHan
  * @param[in]   ErrorCode
  * @return      ble_sts_t.
  */
-ble_sts_t   blc_gatt_pushErrResponse(u16 connHandle, u8 reqOpcode, u16 attHdlInErr, u8 ErrorCode);
+ble_sts_t blc_gatt_pushErrResponse(u16 connHandle, u8 reqOpcode, u16 attHdlInErr, u8 ErrorCode);
 
 /**
  * @brief       Send ATT handle value confirm.

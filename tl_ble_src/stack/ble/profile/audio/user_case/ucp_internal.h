@@ -23,6 +23,4 @@
  *******************************************************************************************************/
 #pragma once
 
-#define BLT_UCP_LOG(fmt, ...)           BLC_AUDIO_PRF_DBG(DBG_PRF_MASK_UCP_LOG, "[UCP]"fmt, ##__VA_ARGS__)
-
-
+#define BLT_UCP_LOG(fmt, ...) BLC_AUDIO_PRF_DBG(DBG_PRF_MASK_UCP_LOG, "[UCP]" fmt, ##__VA_ARGS__)

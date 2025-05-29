@@ -26,12 +26,12 @@
 #include "config.h"
 
 //unicast server base version
-#define UNICAST_SERVER_BASE                             1
+#define UNICAST_SERVER_BASE 1
 
 //unicast server with async_lea
-#define UNICAST_SERVER_ASYNC                            2
+#define UNICAST_SERVER_ASYNC          2
 
-#define UNICAST_SERVER_SELECT                           UNICAST_SERVER_BASE
+#define UNICAST_SERVER_SELECT         UNICAST_SERVER_BASE
 
-#define BLC_PM_EN                           0
-#define BLC_PM_DEEP_RETENTION_MODE_EN       0
+#define BLC_PM_EN                     0
+#define BLC_PM_DEEP_RETENTION_MODE_EN 0

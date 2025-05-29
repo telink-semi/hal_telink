@@ -32,16 +32,16 @@
 
 #if (INTER_TEST_MODE == TEST_CIS_AUDIO_SERVER)
 
-#if (UI_KEYBOARD_ENABLE)
+    #if (UI_KEYBOARD_ENABLE)
 
-_attribute_ble_data_retention_  int     key_not_released;
-_attribute_ble_data_retention_  int     key_type;
-_attribute_ble_data_retention_  int     key_toggle_cnt;
-_attribute_ble_data_retention_  u8      volSetting;
+_attribute_ble_data_retention_ int key_not_released;
+_attribute_ble_data_retention_ int key_type;
+_attribute_ble_data_retention_ int key_toggle_cnt;
+_attribute_ble_data_retention_ u8  volSetting;
 
-#define CONSUMER_KEY                1
-#define KEYBOARD_KEY                2
-#define PAIR_UNPAIR_KEY             3
+        #define CONSUMER_KEY    1
+        #define KEYBOARD_KEY    2
+        #define PAIR_UNPAIR_KEY 3
 
 extern app_audio_ctrl_t appCtrl;
 
@@ -55,13 +55,10 @@ void key_change_proc(void)
     u8 key0 = kb_event.keycode[0];
 
     key_not_released = 1;
-    if (kb_event.cnt == 2)   //two key press
+    if (kb_event.cnt == 2)     //two key press
     {
-
-    }
-    else if(kb_event.cnt == 1)
-    {
-        if(key0 >= CR_VOL_UP )  //volume up/down
+    } else if (kb_event.cnt == 1) {
+        if (key0 >= CR_VOL_UP) //volume up/down
         {
             key_type = CONSUMER_KEY;
             u16 consumer_key;
@@ -69,91 +66,84 @@ void key_change_proc(void)
             u8 mediaState;
             blc_gmcsc_getMediaState(appCtrl.aclHandle, &mediaState);
 
-            if(key0 == CR_VOL_UP)
-            { //volume up
+            if (key0 == CR_VOL_UP) { //volume up
                 BLT_APP_LOG("UI: volume up (mediaState:0x%x)", mediaState);
 
                 switch (mediaState) {
-                    case GMCS_MEDIA_STATE_INACTIVE:
-                    case GMCS_MEDIA_STATE_PAUSED:
-                        blc_gmcsc_writeStartPlayingCurrentTrack(appCtrl.aclHandle);
-                        BLT_APP_LOG("UI:Start Media Play[aclHdl:0x%x]", appCtrl.aclHandle);
-                        break;
-                    case GMCS_MEDIA_STATE_PLAYING:
-                        blc_gmcsc_writePauseCurrentTrack(appCtrl.aclHandle);
-                        BLT_APP_LOG("UI:Pause Media Play[aclHdl:0x%x]", appCtrl.aclHandle);
-                        break;
-                    case GMCS_MEDIA_STATE_SEEKING:
-                        break;
-                    default:
-                        break;
+                case GMCS_MEDIA_STATE_INACTIVE:
+                case GMCS_MEDIA_STATE_PAUSED:
+                    blc_gmcsc_writeStartPlayingCurrentTrack(appCtrl.aclHandle);
+                    BLT_APP_LOG("UI:Start Media Play[aclHdl:0x%x]", appCtrl.aclHandle);
+                    break;
+                case GMCS_MEDIA_STATE_PLAYING:
+                    blc_gmcsc_writePauseCurrentTrack(appCtrl.aclHandle);
+                    BLT_APP_LOG("UI:Pause Media Play[aclHdl:0x%x]", appCtrl.aclHandle);
+                    break;
+                case GMCS_MEDIA_STATE_SEEKING:
+                    break;
+                default:
+                    break;
                 }
-            }
-            else if(key0 == CR_VOL_DN)
-            { //volume down
+            } else if (key0 == CR_VOL_DN) { //volume down
                 BLT_APP_LOG("UI: volume down (mediaState:0x%x)", mediaState);
 
                 switch (mediaState) {
-                    case GMCS_MEDIA_STATE_PLAYING:
-                    {
-                        if(++key_toggle_cnt&1){
-                            blc_gmcsc_writeNextTrack(appCtrl.aclHandle);
-                            BLT_APP_LOG("UI:Next Track[aclHdl:0x%x]", appCtrl.aclHandle);
-                        } else{
-                            blc_gmcsc_writePreviousTrack(appCtrl.aclHandle);
-                            BLT_APP_LOG("UI:Previous Track[aclHdl:0x%x]", appCtrl.aclHandle);
-                        }
+                case GMCS_MEDIA_STATE_PLAYING:
+                {
+                    if (++key_toggle_cnt & 1) {
+                        blc_gmcsc_writeNextTrack(appCtrl.aclHandle);
+                        BLT_APP_LOG("UI:Next Track[aclHdl:0x%x]", appCtrl.aclHandle);
+                    } else {
+                        blc_gmcsc_writePreviousTrack(appCtrl.aclHandle);
+                        BLT_APP_LOG("UI:Previous Track[aclHdl:0x%x]", appCtrl.aclHandle);
                     }
-                        break;
-                    case GMCS_MEDIA_STATE_INACTIVE:
-                    case GMCS_MEDIA_STATE_PAUSED:
-                    case GMCS_MEDIA_STATE_SEEKING:
-                        break;
-                    default:
-                        break;
+                } break;
+                case GMCS_MEDIA_STATE_INACTIVE:
+                case GMCS_MEDIA_STATE_PAUSED:
+                case GMCS_MEDIA_STATE_SEEKING:
+                    break;
+                default:
+                    break;
                 }
             }
-        }
-        else
-        {
+        } else {
             key_type = PAIR_UNPAIR_KEY;
 
-            if(key0 == BTN_PAIR)   //Manual pair triggered by Key Press
+            if (key0 == BTN_PAIR) //Manual pair triggered by Key Press
             {
                 BLT_APP_LOG("UI: Manual pair");
 
-                u8 callIndex, state, callFlags, callMembersCnt;
+                u8                    callIndex, state, callFlags, callMembersCnt;
                 blc_gtbs_call_state_t calls[STACK_AUDIO_CALL_MEMBERS_MAX_NUM];
                 blc_gtbsc_getCallState(appCtrl.aclHandle, &callMembersCnt, calls);
 
-                for(int i = 0; i < callMembersCnt; i++){
+                for (int i = 0; i < callMembersCnt; i++) {
                     callIndex = calls[i].callIndex;
-                    state = calls[i].state;
+                    state     = calls[i].state;
                     callFlags = calls[i].callFlags;
                     (void)callFlags;
                     BLT_APP_LOG("UI: [%d] Call State:0x%x", i, state);
 
                     switch (state) {
-                        case GTBS_CALL_STATE_INCOMING:
-                            blc_gtbsc_writeAcceptIncomingCall(appCtrl.aclHandle, callIndex);
-                            BLT_APP_LOG("UI:Accept Call: Call_Index:0x%x", callIndex);
-                            break;
-                        case GTBS_CALL_STATE_DIALING:
-                        case GTBS_CALL_STATE_ALERTING:
-                        case GTBS_CALL_STATE_ACTIVE:
-                            blc_gtbsc_writeTerminateCall(appCtrl.aclHandle, callIndex);
-                            BLT_APP_LOG("UI:Terminate Call: Call_Index:0x%x", callIndex);
-                            break;
-                        case GTBS_CALL_STATE_LOCALLY_HELD:
-                        case GTBS_CALL_STATE_REMOTELY_HELD:
-                        case GTBS_CALL_STATE_LOCALLY_AND_REMOTELY_HELD:
-                            break;
-                        default:
-                            break;
+                    case GTBS_CALL_STATE_INCOMING:
+                        blc_gtbsc_writeAcceptIncomingCall(appCtrl.aclHandle, callIndex);
+                        BLT_APP_LOG("UI:Accept Call: Call_Index:0x%x", callIndex);
+                        break;
+                    case GTBS_CALL_STATE_DIALING:
+                    case GTBS_CALL_STATE_ALERTING:
+                    case GTBS_CALL_STATE_ACTIVE:
+                        blc_gtbsc_writeTerminateCall(appCtrl.aclHandle, callIndex);
+                        BLT_APP_LOG("UI:Terminate Call: Call_Index:0x%x", callIndex);
+                        break;
+                    case GTBS_CALL_STATE_LOCALLY_HELD:
+                    case GTBS_CALL_STATE_REMOTELY_HELD:
+                    case GTBS_CALL_STATE_LOCALLY_AND_REMOTELY_HELD:
+                        break;
+                    default:
+                        break;
                     }
                 }
-            }
-            else if(key0 == BTN_UNPAIR) //Manual un_pair triggered by Key Press
+            } else if (key0 == BTN_UNPAIR) //Manual un_pair triggered by Key Press
             {
                 BLT_APP_LOG("UI: Manual unpair");
                 volSetting += 10;
@@ -161,38 +151,28 @@ void key_change_proc(void)
                 BLT_APP_LOG("UI:Volume Setting NTF[aclHdl:0x%x]", appCtrl.aclHandle);
 
 
-                if(volSetting == 50){
+                if (volSetting == 50) {
                     blc_vcss_updateMuteState(appCtrl.aclHandle, 1);
                     BLT_APP_LOG("UI:Mute State NTF[aclHdl:0x%x]", appCtrl.aclHandle);
-                }else if(volSetting == 60){
+                } else if (volSetting == 60) {
                     blc_vcss_updateMuteState(appCtrl.aclHandle, 0);
                     BLT_APP_LOG("UI:Mute State NTF[aclHdl:0x%x]", appCtrl.aclHandle);
                 }
             }
         }
-    }
-    else   //kb_event.cnt == 0,  key release
+    } else //kb_event.cnt == 0,  key release
     {
         key_not_released = 0;
-        if(key_type == CONSUMER_KEY)
-        {
+        if (key_type == CONSUMER_KEY) {
             u16 consumer_key = 0;
             (void)consumer_key;
-        }
-        else if(key_type == KEYBOARD_KEY)
-        {
-
-        }
-        else if(key_type == PAIR_UNPAIR_KEY)
-        {
-
+        } else if (key_type == KEYBOARD_KEY) {
+        } else if (key_type == PAIR_UNPAIR_KEY) {
         }
     }
 }
 
-
-
-_attribute_ble_data_retention_      static u32 keyScanTick = 0;
+_attribute_ble_data_retention_ static u32 keyScanTick = 0;
 
 /**
  * @brief      keyboard task handler
@@ -201,29 +181,23 @@ _attribute_ble_data_retention_      static u32 keyScanTick = 0;
  * @param[in]  n    - the length of event parameter.
  * @return     none.
  */
-void proc_keyboard (u8 e, u8 *p, int n)
+void proc_keyboard(u8 e, u8 *p, int n)
 {
-    if(clock_time_exceed(keyScanTick, 10 * 1000))
-    {  //keyScan interval: 10mS
+    if (clock_time_exceed(keyScanTick, 10 * 1000)) { //keyScan interval: 10mS
         keyScanTick = clock_time();
-    }
-    else
-    {
+    } else {
         return;
     }
 
     kb_event.keycode[0] = 0;
-    int det_key = kb_scan_key (0, 1);
+    int det_key         = kb_scan_key(0, 1);
 
-    if (det_key)
-    {
+    if (det_key) {
         key_change_proc();
     }
 }
 
 
+    #endif //end of UI_KEYBOARD_ENABLE
 
-
-#endif   //end of UI_KEYBOARD_ENABLE
-
-#endif /* INTER_TEST_MODE */
+#endif     /* INTER_TEST_MODE */

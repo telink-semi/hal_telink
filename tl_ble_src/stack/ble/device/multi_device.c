@@ -38,51 +38,43 @@
 // MLD: multiple local device
 
 
+_attribute_data_retention_ _attribute_aligned_(4) loc_dev_mng_t mlDevMng; //multiple local device manage
 
-
-_attribute_data_retention_  _attribute_aligned_(4) loc_dev_mng_t  mlDevMng;  //multiple local device manage
-
-
-void        blc_ll_setMultipleLocalDeviceEnable (multi_dev_en_t enable)
+void blc_ll_setMultipleLocalDeviceEnable(multi_dev_en_t enable)
 {
     mlDevMng.mldev_en = enable;
 }
 
-
-
-ble_sts_t       blc_ll_setLocalDeviceIndexAndIdentityAddress(loc_dev_idx_t dev_idx,  u8 id_adrType, u8 *id_addr)
+ble_sts_t blc_ll_setLocalDeviceIndexAndIdentityAddress(loc_dev_idx_t dev_idx, u8 id_adrType, u8 *id_addr)
 {
-    if (blmsParam.max_slave_num > LOCAL_DEVICE_NUM_MAX){
+    if (blmsParam.max_slave_num > LOCAL_DEVICE_NUM_MAX) {
         return LL_ERR_INVALID_PARAMETER;
     }
 
-    if(dev_idx >= LOCAL_DEVICE_NUM_MAX){
+    if (dev_idx >= LOCAL_DEVICE_NUM_MAX) {
         return LL_ERR_INVALID_PARAMETER;
     }
 
-    if(id_adrType != BLE_ADDR_PUBLIC && id_adrType != BLE_ADDR_RANDOM){
+    if (id_adrType != BLE_ADDR_PUBLIC && id_adrType != BLE_ADDR_RANDOM) {
         return LL_ERR_INVALID_PARAMETER;
     }
 
 
-    mlDevMng.dev_mac[dev_idx].set = 1;
+    mlDevMng.dev_mac[dev_idx].set  = 1;
     mlDevMng.dev_mac[dev_idx].type = id_adrType;
     smemcpy(mlDevMng.dev_mac[dev_idx].address, id_addr, BLE_ADDR_LEN);
 
     return BLE_SUCCESS;
-
 }
 
-
-ble_sts_t       blc_ll_setCurrentLocalDevice_by_index(loc_dev_idx_t dev_idx)
+ble_sts_t blc_ll_setCurrentLocalDevice_by_index(loc_dev_idx_t dev_idx)
 {
-
-    if(dev_idx >= LOCAL_DEVICE_NUM_MAX){
+    if (dev_idx >= LOCAL_DEVICE_NUM_MAX) {
         return LL_ERR_INVALID_PARAMETER;
     }
 
 
-    if(!mlDevMng.dev_mac[dev_idx].set){
+    if (!mlDevMng.dev_mac[dev_idx].set) {
         return LL_ERR_INVALID_PARAMETER;
     }
 

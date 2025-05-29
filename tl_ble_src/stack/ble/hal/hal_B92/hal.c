@@ -5,16 +5,14 @@
  *      Author: ADmin
  */
 
-#include"stack/ble/hal/hal_internal.h"
+#include "stack/ble/hal/hal_internal.h"
 
-
-_attribute_ram_code_
-void blt_hal_reset_baseband(void)
+_attribute_ram_code_ void blt_hal_reset_baseband(void)
 {
     /* process all potential TX DMA conflict */
-    dma_chn_dis(DMA0);  /* reset RF TX DMA channels */
+    dma_chn_dis(DMA0); /* reset RF TX DMA channels */
 
-    /*
+/*
      * Temporarily solve extended adv can not exit from while (!HAL_GET_RF_TX_IRQ)
      * need to find the root cause. todo by QiuWei. Reproducing step has been recorded.
      * situation 1: two extended adv sets. one is primary 1M and aux adv 1M, another is primary S8 and aux adv S8.
@@ -31,7 +29,7 @@ void blt_hal_reset_baseband(void)
      * To improve the initial problem(stop FSM at coded PHY may cause next near task RF status error) what we want solve,
      * we need add software timeout for every RF status while check(such as "while(!(reg_rf_irq_status & FLD_RF_IRQ_TX))")
      */
-    #if (!MCU_RESET_BASEBAND_LEAD_TO_RF_REGISTER_LOSS)
-        ble_rf_reset_baseband();
-    #endif
+#if (!MCU_RESET_BASEBAND_LEAD_TO_RF_REGISTER_LOSS)
+    ble_rf_reset_baseband();
+#endif
 }

@@ -24,14 +24,14 @@
 #include "../bis_source_config.h"
 
 #if (PRODUCT_BIS_SOURCE_SELECT == PRODUCT_SIG_AURACAST_TRANSMITTER)
-#include "tl_common.h"
-#include "drivers.h"
-#include "stack/ble/ble.h"
-#include "app.h"
-#include "app_audio.h"
-#include "app_config.h"
+    #include "tl_common.h"
+    #include "drivers.h"
+    #include "stack/ble/ble.h"
+    #include "app.h"
+    #include "app_audio.h"
+    #include "app_config.h"
 
-u8  mac_public[6];
+u8 mac_public[6];
 
 ///////////////////////////////////////////
 /**
@@ -41,36 +41,35 @@ u8  mac_public[6];
  */
 _attribute_no_inline_ void user_init_normal(void)
 {
-
-//////////////////////////// basic hardware Initialization  Begin //////////////////////////////////
+    //////////////////////////// basic hardware Initialization  Begin //////////////////////////////////
     /* random number generator must be initiated here( in the beginning of user_init_normal).
      * When deepSleep retention wakeUp, no need initialize again */
     random_generator_init();
 
     #if (TLKAPI_DEBUG_ENABLE)
-        tlkapi_debug_init();
-        blc_debug_enableStackLog(STK_LOG_NONE);
+    tlkapi_debug_init();
+    blc_debug_enableStackLog(STK_LOG_NONE);
     #endif
 
     blc_readFlashSize_autoConfigCustomFlashSector();
 
     /* attention that this function must be called after "blc readFlashSize_autoConfigCustomFlashSector" !!!*/
     blc_app_loadCustomizedParameters_normal();
-//////////////////////////// basic hardware Initialization  End /////////////////////////////////
+    //////////////////////////// basic hardware Initialization  End /////////////////////////////////
 
 
     //////////// BLE stack Initialization  Begin /////////////////////////
 
 
-    u8  mac_random_static[6];
-    
+    u8 mac_random_static[6];
+
     blc_initMacAddress(flash_sector_mac_address, mac_public, mac_random_static);
 
 
     //////////// LinkLayer Initialization  Begin /////////////////////////
     blc_ll_initBasicMCU();
 
-    blc_ll_initStandby_module(mac_public);                         //mandatory
+    blc_ll_initStandby_module(mac_public); //mandatory
 
     rf_set_power_level_index(RF_POWER_P9dBm);
 
@@ -79,26 +78,25 @@ _attribute_no_inline_ void user_init_normal(void)
     bool audioInit = app_audio_init();
 
     u8 error_code = blc_contr_checkControllerInitialization();
-    if(error_code != INIT_SUCCESS || !audioInit){
+    if (error_code != INIT_SUCCESS || !audioInit) {
         /* It's recommended that user set some UI alarm to know the exact error, e.g. LED shine, print log */
         write_log32(0x88880000 | error_code);
-        #if(UI_LED_ENABLE)
-            gpio_write(GPIO_LED_RED, LED_ON_LEVEL);
-        #endif
-        #if (TLKAPI_DEBUG_ENABLE)
-            tlkapi_printf(APP_LOG_EN, "[APP][INI] Controller INIT ERROR, %d\r\n", error_code);
-            while(1){
-                tlkapi_debug_handler();
-            }
-        #else
-            while(1);
-        #endif
+    #if (UI_LED_ENABLE)
+        gpio_write(GPIO_LED_RED, LED_ON_LEVEL);
+    #endif
+    #if (TLKAPI_DEBUG_ENABLE)
+        tlkapi_printf(APP_LOG_EN, "[APP][INI] Controller INIT ERROR, %d\r\n", error_code);
+        while (1) {
+            tlkapi_debug_handler();
+        }
+    #else
+        while (1)
+            ;
+    #endif
     }
 
     tlkapi_printf(APP_LOG_EN, "[APP][INT]audio broadcast source initial\r\n");
 }
-
-
 
 /**
  * @brief       user initialization when MCU wake_up from deepSleep_retention mode
@@ -107,9 +105,7 @@ _attribute_no_inline_ void user_init_normal(void)
  */
 void user_init_deepRetn(void)
 {
-
 }
-
 
 /////////////////////////////////////////////////////////////////////
 // main loop flow
@@ -120,29 +116,26 @@ void user_init_deepRetn(void)
  * @param[in]  none.
  * @return     none.
  */
-_attribute_no_inline_ void main_loop (void)
+_attribute_no_inline_ void main_loop(void)
 {
-
     ////////////////////////////////////// BLE entry /////////////////////////////////
     blc_sdk_main_loop();
 
-#if (UI_LED_ENABLE)
-    static u32 tick=0;
-    if(clock_time_exceed(tick, 500*1000))
-    {
+    #if (UI_LED_ENABLE)
+    static u32 tick = 0;
+    if (clock_time_exceed(tick, 500 * 1000)) {
         tick = clock_time();
         gpio_toggle(GPIO_LED_GREEN);
     }
-#endif
+    #endif
 
     ////////////////////////////////////// Debug entry /////////////////////////////////
     #if (TLKAPI_DEBUG_ENABLE)
-        tlkapi_debug_handler();
+    tlkapi_debug_handler();
     #endif
 
     ////////////////////////////////////// Broadcast Source Audio entry /////////////////////////////////
     app_audio_handler();
 }
 
-#endif      //PRODUCT_BIS_SOURCE_SELECT == PRODUCT_SIG_AURACAST_TRANSMITTER
-
+#endif //PRODUCT_BIS_SOURCE_SELECT == PRODUCT_SIG_AURACAST_TRANSMITTER

@@ -28,7 +28,7 @@
 
 
 #ifndef APP_EXCEPTION_STUCK_EN
-#define APP_EXCEPTION_STUCK_EN          0
+    #define APP_EXCEPTION_STUCK_EN 0
 #endif
 
 
@@ -38,28 +38,44 @@ static void app_debug_trap(unsigned int err_code)
 
     tlkapi_send_string_u32s(APP_LOG_EN, "[APP][MEM] memory operation length error", err_code);
 
-    #if (APP_EXCEPTION_STUCK_EN) //user determine if using while(1) code stuck to check the error
+#if (APP_EXCEPTION_STUCK_EN) //user determine if using while(1) code stuck to check the error
+    #if (UI_LED_ENABLE)
         #ifdef GPIO_LED_RED
-            gpio_write(GPIO_LED_RED, LED_ON_LEVEL);
+    gpio_write(GPIO_LED_RED, LED_ON_LEVEL);
         #endif
 
-        while(1){
-            #if (TLKAPI_DEBUG_ENABLE)
-                tlkapi_debug_handler();
-            #endif
-        }
-    #else
-        //user can decide what to do
+        #ifdef GPIO_LED_WHITE
+    gpio_write(GPIO_LED_WHITE, !LED_ON_LEVEL);
+        #endif
+
+        #ifdef GPIO_LED_BLUE
+    gpio_write(GPIO_LED_BLUE, !LED_ON_LEVEL);
+        #endif
+
+        #ifdef GPIO_LED_GREEN
+    gpio_write(GPIO_LED_GREEN, !LED_ON_LEVEL);
+        #endif
     #endif
 
+    while (1) {
+    #if (TLKAPI_DEBUG_ENABLE)
+        tlkapi_debug_handler();
+    #endif
+    }
+#else
+    //user can decide what to do
+#endif
 }
 
 void blc_app_memory_set(void *pd, int val, unsigned int len, unsigned int dst_max_len, unsigned int error_code)
 {
-    if(len > dst_max_len){
+    if (len > dst_max_len) {
+        tlkapi_send_string_u32s(APP_LOG_EN, "[APP][MEM] app_memory_set length error", len, dst_max_len);
         app_debug_trap(error_code);
 
-        //len = dst_max_len; //user can decide if changing actual length to maximum length
+        #if (APP_EXCEPTION_STUCK_EN == 0)
+            len = dst_max_len; //user can decide if changing actual length to maximum length
+        #endif
     }
 
     memset(pd, val, len);
@@ -67,11 +83,37 @@ void blc_app_memory_set(void *pd, int val, unsigned int len, unsigned int dst_ma
 
 void blc_app_memory_copy(void *pd, const void *ps, unsigned int len, unsigned int dst_max_len, unsigned int error_code)
 {
-    if(len > dst_max_len){
+    if (len > dst_max_len) {
+        tlkapi_send_string_u32s(APP_LOG_EN, "[APP][MEM] app_memory_copy length error", len, dst_max_len);
         app_debug_trap(error_code);
 
-        //len = dst_max_len; //user can decide if changing actual length to maximum length
+        #if (APP_EXCEPTION_STUCK_EN == 0)
+            len = dst_max_len; //user can decide if changing actual length to maximum length
+        #endif
     }
 
     memcpy(pd, ps, len);
+}
+
+void app_start_reboot(void)
+{
+    volatile unsigned int app_delay_cnt = 0;
+
+    while (1) {
+        #if (TLKAPI_DEBUG_ENABLE)
+            tlkapi_debug_handler();
+
+            #if (TLKAPI_DEBUG_CHANNEL == TLKAPI_DEBUG_CHANNEL_UART)
+                extern void tlkapi_uart_irq_handler(void);
+                tlkapi_uart_irq_handler();
+            #endif
+        #endif
+
+        app_delay_cnt++;
+        if(app_delay_cnt > BIT(19)){
+            break;
+        }
+    }
+
+    start_reboot();
 }

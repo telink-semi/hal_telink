@@ -22,20 +22,26 @@
  *
  *******************************************************************************************************/
 #pragma once
-
-typedef enum {
+#if (defined(HOST_V2_ENABLE))
+#include "stack/ble/host_v1/services/svc_cs/ras/svc_ras.h"
+#endif
+/**
+ * @brief currently set data exchange mechanism - bases on ondemand / realtime ccc configuration
+ */
+typedef enum
+{
     PROC_DATA_EXCHG_NULL,
     PROC_DATA_EXCHG_LOCAL,
-    PROC_DATA_EXCHG_REAL_TIME,
-    PROC_DATA_EXCHG_ON_DEMAND,
-    PROC_DATA_EXCHG_REAL_TIME_AND_ON_DEMAND,
-} procedure_data_exchange_mechanism_e;
+    PROC_DATA_EXCHG_REALTIME_NOTIFICATIONS,
+    PROC_DATA_EXCHG_ONDEMAND_NOTIFICATIONS,
+    PROC_DATA_EXCHG_REALTIME_INDICATIONS,
+    PROC_DATA_EXCHG_ONDEMAND_INDICATIONS,
+} blc_rass_procedure_data_exchange_mechanism_enum;
 
 /**
  * @brief the data structure of register RAS server parameter.
  */
-typedef struct __attribute__((packed)) {
-    int procDataExchgMechanism;
+typedef struct __attribute__((packed))
+{
     svc_ras_feature_t ras_feature;
 } blc_rass_regParam_t;
-

@@ -26,21 +26,23 @@
 #include "stack/ble/profile/services/svc_adv.h"
 
 #ifndef DEFAULT_BROADCAST_NAME
-#define DEFAULT_BROADCAST_NAME                      "B91M_BROADCAST_NAME"
+    #define DEFAULT_BROADCAST_NAME "B91M_BROADCAST_NAME"
 #endif
 
-typedef struct{
+typedef struct
+{
     blc_adv_ltv_t ltv;
-    u8 bcastName[32];
+    u8            bcastName[32];
 } blc_adv_broadcastName_t;
 
-typedef struct{
+typedef struct
+{
     blc_adv_ltv_t ltv;
-    u16 pbasUuid;
-    u8 feature;
-    u8 metadataLen;
-    u8 metadata[0];
+    u16           pbasUuid;
+    u8            feature;
+    u8            metadataLen;
+    u8            metadata[0];
 } blc_adv_pbpFeature_t;
 
 extern const blc_adv_broadcastName_t advDefBcastName;
-extern blc_adv_pbpFeature_t advDefPbpFeature;
+extern blc_adv_pbpFeature_t          advDefPbpFeature;

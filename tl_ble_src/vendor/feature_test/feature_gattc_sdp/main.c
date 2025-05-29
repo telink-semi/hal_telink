@@ -26,6 +26,7 @@
 #include "stack/ble/ble.h"
 #include "app_config.h"
 #include "app.h"
+#include "../feature_common.h"
 
 #if (FEATURE_TEST_MODE == TEST_GATTC_SDP)
 
@@ -37,11 +38,10 @@
  */
 _attribute_ram_code_ void rf_irq_handler(void)
 {
-
-    blc_sdk_irq_handler ();
-
+    blc_sdk_irq_handler();
 }
 PLIC_ISR_REGISTER(rf_irq_handler, IRQ_ZB_RT)
+
 /**
  * @brief       System timer interrupt handler.
  * @param[in]   none
@@ -49,11 +49,10 @@ PLIC_ISR_REGISTER(rf_irq_handler, IRQ_ZB_RT)
  */
 _attribute_ram_code_ void stimer_irq_handler(void)
 {
-
-    blc_sdk_irq_handler ();
-
+    blc_sdk_irq_handler();
 }
 PLIC_ISR_REGISTER(stimer_irq_handler, IRQ_SYSTIMER)
+
 /**
  * @brief       This is main function
  * @param[in]   none
@@ -66,30 +65,26 @@ _attribute_ram_code_ int main(void)
        (2). For B91 only: even no power management */
     blc_pm_select_internal_32k_crystal();
 
-    sys_init(DCDC_1P4_LDO_1P8, VBAT_MAX_VALUE_GREATER_THAN_3V6,INTERNAL_CAP_XTAL24M);
+    blc_app_system_init();
 
     /* detect if MCU is wake_up from deep retention mode */
-    int deepRetWakeUp = pm_is_MCU_deepRetentionWakeup();  //MCU deep retention wakeUp
-
-    CCLK_32M_HCLK_32M_PCLK_16M;
+    int deepRetWakeUp = pm_is_MCU_deepRetentionWakeup(); //MCU deep retention wakeUp
 
     rf_drv_ble_init();
 
     gpio_init(!deepRetWakeUp);
 
-    if( deepRetWakeUp ){ //MCU wake_up from deepSleep retention mode
-        user_init_deepRetn ();
-    }
-    else{ //MCU power_on or wake_up from deepSleep mode
+    if (deepRetWakeUp) { //MCU wake_up from deepSleep retention mode
+        user_init_deepRetn();
+    } else {             //MCU power_on or wake_up from deepSleep mode
         user_init_normal();
     }
 
 
     irq_enable();
 
-    while(1)
-    {
-        main_loop ();
+    while (1) {
+        main_loop();
     }
     return 0;
 }

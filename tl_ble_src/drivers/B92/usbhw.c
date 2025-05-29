@@ -22,13 +22,15 @@
  *
  *******************************************************************************************************/
 #include "usbhw.h"
+
 /**
  * @brief      This function disables the manual interrupt
  *             (Endpoint8 is the alias of endpoint0)
  * @param[in]  m - the irq mode needs to set
  * @return     none
  */
-void usbhw_disable_manual_interrupt(int m) {
+void usbhw_disable_manual_interrupt(int m)
+{
     BM_SET(reg_ctrl_ep_irq_mode, m);
 }
 
@@ -37,11 +39,10 @@ void usbhw_disable_manual_interrupt(int m) {
  * @param[in]  m - the irq mode needs to set
  * @return     none
  */
-void usbhw_enable_manual_interrupt(int m) {
+void usbhw_enable_manual_interrupt(int m)
+{
     BM_CLR(reg_ctrl_ep_irq_mode, m);
 }
-
-
 
 /**
  * @brief      This function sends a bulk of data to host via the specified endpoint
@@ -50,12 +51,13 @@ void usbhw_enable_manual_interrupt(int m) {
  * @param[in]  len - length in byte of the data need to send
  * @return     none
  */
-void usbhw_write_ep(unsigned int ep, unsigned char * data, int len) {
+void usbhw_write_ep(unsigned int ep, unsigned char *data, int len)
+{
     usbhw_reset_ep_ptr(ep);
-    for(int i = 0; i < (len); ++i){
+    for (int i = 0; i < (len); ++i) {
         reg_usb_ep_dat(ep) = data[i];
     }
-    usbhw_data_ep_ack(ep);  // ACK
+    usbhw_data_ep_ack(ep); // ACK
 }
 
 /**
@@ -64,7 +66,8 @@ void usbhw_write_ep(unsigned int ep, unsigned char * data, int len) {
  * @param[in]  v - the two bytes data need to send
  * @return     none
  */
-void usbhw_write_ctrl_ep_u16(unsigned short v){
+void usbhw_write_ctrl_ep_u16(unsigned short v)
+{
     usbhw_write_ctrl_ep_data(v & 0xff);
     usbhw_write_ctrl_ep_data(v >> 8);
 }
@@ -74,7 +77,8 @@ void usbhw_write_ctrl_ep_u16(unsigned short v){
  * @param   none
  * @return  the two bytes data read from the control endpoint
  */
-unsigned short usbhw_read_ctrl_ep_u16(void){
+unsigned short usbhw_read_ctrl_ep_u16(void)
+{
     unsigned short v = usbhw_read_ctrl_ep_data();
     return (usbhw_read_ctrl_ep_data() << 8) | v;
 }
@@ -86,12 +90,9 @@ unsigned short usbhw_read_ctrl_ep_u16(void){
  */
 void dp_through_swire_en(bool dp_through_swire)
 {
-    if (dp_through_swire)
-    {
-        write_reg8(0x100c01, (read_reg8(0x100c01) | BIT(7))); // BIT(7) = 1 : swire_usb_en
-    }
-    else
-    {
+    if (dp_through_swire) {
+        write_reg8(0x100c01, (read_reg8(0x100c01) | BIT(7)));  // BIT(7) = 1 : swire_usb_en
+    } else {
         write_reg8(0x100c01, (read_reg8(0x100c01) & ~BIT(7))); // BIT(7) = 0 : swire_usb_dis
     }
 }
@@ -110,7 +111,7 @@ void usb_set_pin(bool dp_through_swire)
     gpio_function_dis(GPIO_PA5);
     reg_gpio_func_mux(GPIO_PA6) = reg_gpio_func_mux(GPIO_PA6) & (~BIT_RNG(0, 5));
     gpio_function_dis(GPIO_PA6);
-    gpio_input_en(GPIO_PA5 | GPIO_PA6); // DP/DM must set input enable
+    gpio_input_en((gpio_pin_e)(GPIO_PA5 | GPIO_PA6)); // DP/DM must set input enable
     usb_dp_pullup_en(1);
     /*                                      Note
      * If you want to enable the dp_through_swire function, there are the following considerations:
@@ -119,5 +120,3 @@ void usb_set_pin(bool dp_through_swire)
      */
     dp_through_swire_en(dp_through_swire);
 }
-
-

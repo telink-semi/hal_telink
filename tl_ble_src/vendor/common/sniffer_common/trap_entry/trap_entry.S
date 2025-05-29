@@ -25,9 +25,9 @@
 #include "trap_entry.h"
 
 
-#if (__PROJECT_SNIF_MAIN_NODE__ || __PROJECT_SNIF_SUB_NODE__)
+#if (__PROJECT_SNIF_MAIN_NODE__ || __PROJECT_SNIF_SUB_NODE__ || __PROJECT_SNIF_FOB_NODE__)
 
-#if !FREERTOS_ENABLE
+#if (!FREERTOS_ENABLE)
 
 /* * !!!NOTE!!!
  * TAKE CARE TO INCLUDE THE CORRECT cpuport.h HEADER FILE FOR THE CHIP IN USE.
@@ -266,4 +266,4 @@ trap_entry:
 
 #endif
 
-#endif /* the end of #if (__PROJECT_SNIF_MAIN_NODE__ || __PROJECT_SNIF_SUB_NODE__) */
+#endif /* the end of #if (__PROJECT_SNIF_MAIN_NODE__ || __PROJECT_SNIF_SUB_NODE__ || __PROJECT_SNIF_FOB_NODE__) */

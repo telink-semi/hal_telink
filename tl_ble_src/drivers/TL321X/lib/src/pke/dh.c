@@ -31,9 +31,8 @@
 
 #ifdef SUPPORT_DH
 
-#include "lib/include/pke/dh.h"
-#include "lib/include/crypto_common/utility.h"
-
+    #include "lib/include/pke/dh.h"
+    #include "lib/include/crypto_common/utility.h"
 
 /**
  * @brief       DH compute key
@@ -48,7 +47,7 @@
       -# 2. peer_pubkey and key occupy (dh_para->p_bits+7)/8 bytes.
    @endverbatim
  */
-unsigned int dh_compute_key( DH_PARA *dh_para, unsigned char *local_prikey, unsigned char *peer_pubkey, unsigned char *key)
+unsigned int dh_compute_key(DH_PARA *dh_para, unsigned char *local_prikey, unsigned char *peer_pubkey, unsigned char *key)
 {
     unsigned int tmp[DH_MAX_WORD_LEN];
     unsigned int prikey[DH_MAX_WORD_LEN];
@@ -56,12 +55,11 @@ unsigned int dh_compute_key( DH_PARA *dh_para, unsigned char *local_prikey, unsi
     unsigned int step_bytes, pByteLen, qByteLen, pWordLen, qWordLen;
     unsigned int ret;
 
-    if((NULL == dh_para) || (NULL == local_prikey) || (NULL == peer_pubkey) || (NULL == key))
-    {
+    if ((NULL == dh_para) || (NULL == local_prikey) || (NULL == peer_pubkey) || (NULL == key)) {
         return DH_POINTER_NULL;
+    } else {
+        ;
     }
-    else
-    {;}
 
     pByteLen = GET_BYTE_LEN(dh_para->p_bits);
     qByteLen = GET_BYTE_LEN(dh_para->q_bits);
@@ -76,16 +74,13 @@ unsigned int dh_compute_key( DH_PARA *dh_para, unsigned char *local_prikey, unsi
     tmp[0u] -= 1u;
 
     //make sure private key is in [2, q-2]
-    if(get_valid_bits(prikey, qWordLen) <= 1)
-    {
+    if (get_valid_bits(prikey, qWordLen) <= 1) {
         return DH_INVALID_INPUT;
-    }
-    else if(uint32_BigNumCmp(prikey, qWordLen, tmp, qWordLen) >= 0)
-    {
+    } else if (uint32_BigNumCmp(prikey, qWordLen, tmp, qWordLen) >= 0) {
         return DH_INVALID_INPUT;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //get tmp = p-1
     uint32_copy(tmp, dh_para->p, pWordLen);
@@ -96,21 +91,19 @@ unsigned int dh_compute_key( DH_PARA *dh_para, unsigned char *local_prikey, unsi
 
     //check public key
     ret = dh_check_public_key(dh_para, tmp, pubkey);
-    if(PKE_SUCCESS != ret)
-    {
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     step_bytes = pke_get_operand_bytes();
-    ret = pke_modexp((unsigned int *)(rPKE_B(3u,step_bytes)), prikey, pubkey, tmp, pWordLen, qWordLen);
-    if(PKE_SUCCESS != ret)
-    {
+    ret        = pke_modexp((unsigned int *)(rPKE_B(3u, step_bytes)), prikey, pubkey, tmp, pWordLen, qWordLen);
+    if (PKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     reverse_byte_array((unsigned char *)tmp, (unsigned char *)key, pByteLen);
 
@@ -118,4 +111,3 @@ unsigned int dh_compute_key( DH_PARA *dh_para, unsigned char *local_prikey, unsi
 }
 
 #endif
-

@@ -24,48 +24,50 @@
 #include "../sink_config.h"
 #if (SINK_VERSION == SINK_WITH_ASSISTANT_VERSION)
 
-#include "app_config.h"
+    #include "app_config.h"
 
-#include "tl_common.h"
-#include "drivers.h"
-#include "stack/ble/ble.h"
+    #include "tl_common.h"
+    #include "drivers.h"
+    #include "stack/ble/ble.h"
 
-#include "app_buffer.h"
-#include "app_audio.h"
-#include "app.h"
-#include "../app_ctrl_audio.h"
+    #include "app_buffer.h"
+    #include "app_audio.h"
+    #include "app.h"
+    #include "../app_ctrl_audio.h"
 
-#define TELINK_COMPANY_ID                       0x0211
-#define TELINK_BCAST_SOURCE_NUM                 (10)
-#define DEFAULT_BROADCAST_CODE                  "Telink"
+    #define TELINK_COMPANY_ID              0x0211
+    #define TELINK_BCAST_SOURCE_NUM        (10)
+    #define DEFAULT_BROADCAST_CODE         "Telink"
 
 
-#define FILTER_USE_ADDRESS                      BIT(0)
-#define FILTER_USE_BROADCAST_NAME               BIT(1)
-#define FILTER_USE_TELINK_VID                   BIT(2)
-#define FILTER_USE_ALL_TYPE                     0xFFFFFFFF
+    #define FILTER_USE_ADDRESS             BIT(0)
+    #define FILTER_USE_BROADCAST_NAME      BIT(1)
+    #define FILTER_USE_TELINK_VID          BIT(2)
+    #define FILTER_USE_ALL_TYPE            0xFFFFFFFF
 
-#define ASSISTANT_FILTER_SOURCE_METHOD          FILTER_USE_TELINK_VID
+    #define ASSISTANT_FILTER_SOURCE_METHOD FILTER_USE_TELINK_VID
 
-#if ASSISTANT_FILTER_SOURCE_METHOD&FILTER_USE_ADDRESS
+    #if ASSISTANT_FILTER_SOURCE_METHOD & FILTER_USE_ADDRESS
 
-#endif
+    #endif
 
 /**
  *  @brief  broadcast source information.
  */
-typedef struct {
+typedef struct
+{
     bool used;
-    u8 addrType;
-    u8 addr[6];
-    u8 advSid;
-    u8 configuration;
+    u8   addrType;
+    u8   addr[6];
+    u8   advSid;
+    u8   configuration;
 } telink_bcast_source_t;
 
 /**
  *  @brief  application user state enumerate.
  */
-typedef enum {
+typedef enum
+{
     APP_STATE_IDLE,
     APP_STATE_SYNCING,
     APP_STATE_SYNCED,
@@ -75,7 +77,8 @@ typedef enum {
 /**
  *  @brief  periodic advertise sync state enumerate.
  */
-typedef enum {
+typedef enum
+{
     PA_SYNC_STATE_IDLE,
     PA_SYNC_STATE_CREATE,
     PA_SYNC_STATE_EST,
@@ -87,7 +90,8 @@ typedef enum {
 /**
  *  @brief  BIG sync state enumerate.
  */
-typedef enum {
+typedef enum
+{
     BIG_SYNC_STATE_IDLE,
     BIG_SYNC_STATE_CREATE,
     BIG_SYNC_STATE_EST,
@@ -95,24 +99,24 @@ typedef enum {
     BIG_SYNC_STATE_TERMINATING,
 } big_sync_state_t;
 
-
-telink_bcast_source_t telinkBcastSources[TELINK_BCAST_SOURCE_NUM];
-u8 recvBcstSourceNum = 0;
+telink_bcast_source_t  telinkBcastSources[TELINK_BCAST_SOURCE_NUM];
+u8                     recvBcstSourceNum = 0;
 telink_bcast_source_t *currectSource_Idx = NULL;
-telink_bcast_source_t *nextSource_Idx = NULL;
+telink_bcast_source_t *nextSource_Idx    = NULL;
 
-typedef struct{
-    app_state_t appState;
-    u16 paSyncHandle;
-    pa_sync_state_t paState;
+typedef struct
+{
+    app_state_t      appState;
+    u16              paSyncHandle;
+    pa_sync_state_t  paState;
     big_sync_state_t bigState;
-}app_all_state_t;
+} app_all_state_t;
 
 app_all_state_t allState = {
-    .appState = APP_STATE_IDLE,
+    .appState     = APP_STATE_IDLE,
     .paSyncHandle = 0x0000,
-    .paState = PA_SYNC_STATE_IDLE,
-    .bigState = BIG_SYNC_STATE_IDLE,
+    .paState      = PA_SYNC_STATE_IDLE,
+    .bigState     = BIG_SYNC_STATE_IDLE,
 };
 
 /**
@@ -123,12 +127,9 @@ app_all_state_t allState = {
 void app_audio_init(void)
 {
     app_codec_init();
-    blc_ll_setExtScanParam( OWN_ADDRESS_PUBLIC, SCAN_FP_ALLOW_ADV_ANY, SCAN_PHY_1M,
-                            SCAN_TYPE_PASSIVE,  SCAN_INTERVAL_100MS,   SCAN_INTERVAL_100MS,
-                            0,                  0,                     0);
+    blc_ll_setExtScanParam(OWN_ADDRESS_PUBLIC, SCAN_FP_ALLOW_ADV_ANY, SCAN_PHY_1M, SCAN_TYPE_PASSIVE, SCAN_INTERVAL_100MS, SCAN_INTERVAL_100MS, 0, 0, 0);
 
-    blc_ll_setExtScanEnable( BLC_SCAN_ENABLE, DUP_FILTER_DISABLE, SCAN_DURATION_CONTINUOUS, SCAN_WINDOW_CONTINUOUS);
-
+    blc_ll_setExtScanEnable(BLC_SCAN_ENABLE, DUP_FILTER_DISABLE, SCAN_DURATION_CONTINUOUS, SCAN_WINDOW_CONTINUOUS);
 }
 
 /**
@@ -213,8 +214,7 @@ static const char *app_audio_getBigSyncStateString(big_sync_state_t state)
  */
 static void app_audio_printAllState(void)
 {
-    tlkapi_printf(APP_LOG_EN, "State: APP: %s PA: %s BIG: %s", app_audio_getAppStateString(allState.appState),
-            app_audio_getPaSyncStateString(allState.paState), app_audio_getBigSyncStateString(allState.bigState));
+    tlkapi_printf(APP_LOG_EN, "State: APP: %s PA: %s BIG: %s", app_audio_getAppStateString(allState.appState), app_audio_getPaSyncStateString(allState.paState), app_audio_getBigSyncStateString(allState.bigState));
 }
 
 /**
@@ -228,25 +228,23 @@ static void app_audio_updateAppState(app_state_t state)
 
     app_audio_printAllState();
 
-#if(UI_LED_ENABLE)
+    #if (UI_LED_ENABLE)
     if (allState.appState == APP_STATE_SYNCED) {
         gpio_write(GPIO_LED_GREEN, 1);
-#if(UI_9517C)
+        #if (UI_9517C)
         gpio_write(GPIO_LED_GREEN_9517C, 1);
-#endif
+        #endif
     } else {
         gpio_write(GPIO_LED_GREEN, 0);
-#if(UI_9517C)
+        #if (UI_9517C)
         gpio_write(GPIO_LED_GREEN_9517C, 0);
-#endif
+        #endif
     }
-#endif
+    #endif
 
-    if(allState.appState != APP_STATE_SYNCED)
-    {
+    if (allState.appState != APP_STATE_SYNCED) {
         app_codec_setBigSyncState(BIG_LOST, 0, NULL);
     }
-
 }
 
 /**
@@ -257,7 +255,7 @@ static void app_audio_updateAppState(app_state_t state)
  */
 static void app_audio_updatePaSyncState(pa_sync_state_t state, u16 syncHandle)
 {
-    allState.paState = state;
+    allState.paState      = state;
     allState.paSyncHandle = syncHandle;
     app_audio_printAllState();
 }
@@ -282,7 +280,7 @@ static void app_audio_updateBigSyncState(big_sync_state_t state)
 static void app_audio_stateChangeProcess(void)
 {
     app_state_t prev_app_state;
-    u8 status;
+    u8          status;
 
     do {
         prev_app_state = allState.appState;
@@ -290,7 +288,7 @@ static void app_audio_stateChangeProcess(void)
         if (nextSource_Idx) {
             if (allState.appState == APP_STATE_IDLE) {
                 currectSource_Idx = nextSource_Idx;
-                nextSource_Idx = NULL;
+                nextSource_Idx    = NULL;
                 app_audio_updateAppState(APP_STATE_SYNCING);
             } else if (allState.appState == APP_STATE_SYNCING || allState.appState == APP_STATE_SYNCED) {
                 app_audio_updateAppState(APP_STATE_TERMINATING);
@@ -302,14 +300,14 @@ static void app_audio_stateChangeProcess(void)
             if (allState.paState == PA_SYNC_STATE_IDLE) {
                 // Create PA sync
                 status = blc_ll_periodicAdvertisingCreateSync(SYNC_ADV_SPECIFY | REPORTING_INITIALLY_EN,
-                                                                 currectSource_Idx->advSid,
-                                                                 currectSource_Idx->addrType,
-                                                                 currectSource_Idx->addr,
-                                                                 0, SYNC_TIMEOUT_2S, 0);
+                                                              currectSource_Idx->advSid,
+                                                              currectSource_Idx->addrType,
+                                                              currectSource_Idx->addr,
+                                                              0,
+                                                              SYNC_TIMEOUT_2S,
+                                                              0);
                 app_audio_updatePaSyncState(status == BLE_SUCCESS ? PA_SYNC_STATE_CREATE : PA_SYNC_STATE_IDLE, 0x0000);
-                tlkapi_printf(APP_LOG_EN, "start create PDA sync, SID is %d, addr Type is %d address is %s, result is %d",
-                        currectSource_Idx->advSid, currectSource_Idx->addrType, addr_to_str(currectSource_Idx->addr),
-                        status);
+                tlkapi_printf(APP_LOG_EN, "start create PDA sync, SID is %d, addr Type is %d address is %s, result is %d", currectSource_Idx->advSid, currectSource_Idx->addrType, addr_to_str(currectSource_Idx->addr), status);
                 if (allState.paState == PA_SYNC_STATE_IDLE) {
                     app_audio_updateAppState(APP_STATE_TERMINATING);
                 } else {
@@ -370,7 +368,6 @@ static void app_audio_stateChangeProcess(void)
     } while (allState.appState != prev_app_state);
 }
 
-
 /**
  * @brief       BLE controller event LE extend advertising report callback.
  * @param[in]   p       Pointer point to event parameter buffer.
@@ -381,10 +378,9 @@ static bool isTelinkSourceCapable(u8 *configuration, u8 *advData, u32 len)
 {
     u8 adLen;
 
-    u8* buff = blc_adv_getManufacturerDataInformationByCompanyId(advData, len, TELINK_COMPANY_ID, &adLen);
+    u8 *buff = blc_adv_getManufacturerDataInformationByCompanyId(advData, len, TELINK_COMPANY_ID, &adLen);
 
-    if(buff && adLen == 1)
-    {
+    if (buff && adLen == 1) {
         *configuration = *buff;
         return true;
     }
@@ -402,7 +398,9 @@ static bool isTelinkSourceCapable(u8 *configuration, u8 *advData, u32 len)
  */
 static bool app_audio_checkBroadcastSourceExist(u8 addr[6], u8 addr_type, u8 advSid)
 {
-    if(recvBcstSourceNum >= TELINK_BCAST_SOURCE_NUM)    return true;
+    if (recvBcstSourceNum >= TELINK_BCAST_SOURCE_NUM) {
+        return true;
+    }
 
     for (size_t i = 0; i < TELINK_BCAST_SOURCE_NUM; i++) {
         if (telinkBcastSources[i].used && telinkBcastSources[i].addrType == addr_type &&
@@ -425,8 +423,8 @@ static void app_audio_addNewBroadcastSource(u8 addr[6], u8 addr_type, u8 advSid)
 {
     for (size_t i = 0; i < ARRAY_SIZE(telinkBcastSources); i++) {
         if (!telinkBcastSources[i].used) {
-            telinkBcastSources[i].used = true;
-            telinkBcastSources[i].advSid = advSid;
+            telinkBcastSources[i].used     = true;
+            telinkBcastSources[i].advSid   = advSid;
             telinkBcastSources[i].addrType = addr_type;
             memcpy(telinkBcastSources[i].addr, addr, sizeof(telinkBcastSources[i].addr));
             recvBcstSourceNum++;
@@ -444,10 +442,10 @@ static void app_audio_addNewBroadcastSource(u8 addr[6], u8 addr_type, u8 advSid)
 static void app_audio_leExtendAdvReport(u8 *p, int n)
 {
     hci_le_extAdvReportEvt_t *pExtAdvRpt = (hci_le_extAdvReportEvt_t *)p;
-    u8 broadcastId[3];
-    u8 configuration;
-    int offset = 0;
-    u8 *pAdvData;
+    u8                        broadcastId[3];
+    u8                        configuration;
+    int                       offset = 0;
+    u8                       *pAdvData;
 
     extAdvEvt_info_t *pExtAdv = NULL;
 
@@ -472,26 +470,23 @@ static void app_audio_leExtendAdvReport(u8 *p, int n)
             continue;
         }
 
-    #if(UI_LED_ENABLE)
+    #if (UI_LED_ENABLE)
         // Indicate that at least one device has been found
         gpio_write(GPIO_LED_BLUE, 1);
-        #if(UI_9517C)
-            gpio_write(GPIO_LED_BLUE_9517C, 1);
+        #if (UI_9517C)
+        gpio_write(GPIO_LED_BLUE_9517C, 1);
         #endif
     #endif
 
         app_audio_addNewBroadcastSource(pExtAdv->address, pExtAdv->address_type, pExtAdv->advertising_sid);
         tlkapi_printf(APP_LOG_EN, "[APP]Added Device Address is %s", addr_to_str(pExtAdv->address));
-#if APP_LOG_EN
-        u8 completeNameLen = 0;
-        u8* completeName = blc_adv_getCompleteNameInformation(pAdvData, pExtAdv->data_length, &completeNameLen);
-        u8 bcstNameLen = 0;
-        u8* bcstName = blc_adv_getBroadcastNameInformation(pAdvData, pExtAdv->data_length, &bcstNameLen);
-        tlkapi_printf(APP_LOG_EN, "[APP]Complete name is %.*s, Broadcast Name is %.*s",
-                completeNameLen, completeName, bcstNameLen, bcstName
-                );
-#endif
-
+    #if APP_LOG_EN
+        u8  completeNameLen = 0;
+        u8 *completeName    = blc_adv_getCompleteNameInformation(pAdvData, pExtAdv->data_length, &completeNameLen);
+        u8  bcstNameLen     = 0;
+        u8 *bcstName        = blc_adv_getBroadcastNameInformation(pAdvData, pExtAdv->data_length, &bcstNameLen);
+        tlkapi_printf(APP_LOG_EN, "[APP]Complete name is %.*s, Broadcast Name is %.*s", completeNameLen, completeName, bcstNameLen, bcstName);
+    #endif
     }
 }
 
@@ -503,16 +498,13 @@ static void app_audio_leExtendAdvReport(u8 *p, int n)
  */
 static void app_audio_periodicAdvSyncEst(u8 *p, int n)
 {
-    hci_le_periodicAdvSyncEstablishedEvt_t *pEvt = (hci_le_periodicAdvSyncEstablishedEvt_t*) p;
+    hci_le_periodicAdvSyncEstablishedEvt_t *pEvt = (hci_le_periodicAdvSyncEstablishedEvt_t *)p;
 
     tlkapi_printf(APP_LOG_EN, "PDA sync established status is %x, handle is %x", pEvt->status, pEvt->syncHandle);
 
-    if(pEvt->status == BLE_SUCCESS)
-    {
+    if (pEvt->status == BLE_SUCCESS) {
         app_audio_updatePaSyncState(PA_SYNC_STATE_EST, 0x0000);
-    }
-    else
-    {
+    } else {
         app_audio_updatePaSyncState(PA_SYNC_STATE_FAILED, 0x0000);
     }
     app_audio_stateChangeProcess();
@@ -526,7 +518,9 @@ static void app_audio_periodicAdvSyncEst(u8 *p, int n)
  */
 static void app_audio_periodicAdvReport(u8 *p, int n)
 {
-    if(allState.paState == PA_SYNC_STATE_RECV_BASE)     return ;
+    if (allState.paState == PA_SYNC_STATE_RECV_BASE) {
+        return;
+    }
 
     //TODO: recombination BASE.
 
@@ -534,31 +528,31 @@ static void app_audio_periodicAdvReport(u8 *p, int n)
 
     //TODO: Generate an initial codec event based on the BASE field.
 
-    u8 codecEvtBuf[sizeof(blc_bapbs_bisSinkInitCodecEvt_t)+2*sizeof(bisSyncInfo_t)];
+    u8 codecEvtBuf[sizeof(blc_bapbs_bisSinkInitCodecEvt_t) + 2 * sizeof(bisSyncInfo_t)];
 
-    blc_bapbs_bisSinkInitCodecEvt_t* codecEvt = (blc_bapbs_bisSinkInitCodecEvt_t*)codecEvtBuf;
+    blc_bapbs_bisSinkInitCodecEvt_t *codecEvt = (blc_bapbs_bisSinkInitCodecEvt_t *)codecEvtBuf;
 
-    codecEvt->presentationDelay = 20000;
-    codecEvt->bisNum = 2;
-    codecEvt->bisInfo[0].CodecId.id = 0x06;
-    codecEvt->bisInfo[0].CodecId.companyID = 0x00;
-    codecEvt->bisInfo[0].CodecId.vendorID = 0x00;
-    codecEvt->bisInfo[0].codecCfg.frequency = 8;
-    codecEvt->bisInfo[0].codecCfg.duration = 1;
-    codecEvt->bisInfo[0].codecCfg.allocation = 0x01;
-    codecEvt->bisInfo[0].codecCfg.frameOcts = 100;
+    codecEvt->presentationDelay                        = 20000;
+    codecEvt->bisNum                                   = 2;
+    codecEvt->bisInfo[0].CodecId.id                    = 0x06;
+    codecEvt->bisInfo[0].CodecId.companyID             = 0x00;
+    codecEvt->bisInfo[0].CodecId.vendorID              = 0x00;
+    codecEvt->bisInfo[0].codecCfg.frequency            = 8;
+    codecEvt->bisInfo[0].codecCfg.duration             = 1;
+    codecEvt->bisInfo[0].codecCfg.allocation           = 0x01;
+    codecEvt->bisInfo[0].codecCfg.frameOcts            = 100;
     codecEvt->bisInfo[0].codecCfg.codecFrameBlksPerSDU = 1;
-    codecEvt->bisInfo[0].metadata = NULL;
+    codecEvt->bisInfo[0].metadata                      = NULL;
 
-    codecEvt->bisInfo[1].CodecId.id = 0x06;
-    codecEvt->bisInfo[1].CodecId.companyID = 0x00;
-    codecEvt->bisInfo[1].CodecId.vendorID = 0x00;
-    codecEvt->bisInfo[1].codecCfg.frequency = 8;
-    codecEvt->bisInfo[1].codecCfg.duration = 1;
-    codecEvt->bisInfo[1].codecCfg.allocation = 0x02;
-    codecEvt->bisInfo[1].codecCfg.frameOcts = 100;
+    codecEvt->bisInfo[1].CodecId.id                    = 0x06;
+    codecEvt->bisInfo[1].CodecId.companyID             = 0x00;
+    codecEvt->bisInfo[1].CodecId.vendorID              = 0x00;
+    codecEvt->bisInfo[1].codecCfg.frequency            = 8;
+    codecEvt->bisInfo[1].codecCfg.duration             = 1;
+    codecEvt->bisInfo[1].codecCfg.allocation           = 0x02;
+    codecEvt->bisInfo[1].codecCfg.frameOcts            = 100;
     codecEvt->bisInfo[1].codecCfg.codecFrameBlksPerSDU = 1;
-    codecEvt->bisInfo[1].metadata = NULL;
+    codecEvt->bisInfo[1].metadata                      = NULL;
     app_codec_setBigInformation(codecEvt);
 
     app_audio_updatePaSyncState(PA_SYNC_STATE_RECV_BASE, pEvt->syncHandle);
@@ -573,49 +567,47 @@ static void app_audio_periodicAdvReport(u8 *p, int n)
  */
 static void app_audio_biginfoAdvReport(u8 *p, int n)
 {
-    if(allState.paState != PA_SYNC_STATE_RECV_BASE)         return ;    //need receive complete BASE value.
+    if (allState.paState != PA_SYNC_STATE_RECV_BASE) {
+        return; //need receive complete BASE value.
+    }
 
-    if(allState.bigState != BIG_SYNC_STATE_IDLE)            return ;
+    if (allState.bigState != BIG_SYNC_STATE_IDLE) {
+        return;
+    }
 
     hci_le_bigInfoAdvReportEvt_t *pEvt = (hci_le_bigInfoAdvReportEvt_t *)p;
 
     u8 bigSyncParamBuf[sizeof(hci_le_bigCreateSyncParams_t) + 32] = {0};
 
-    hci_le_bigCreateSyncParams_t *pBigCreateSyncParam = (hci_le_bigCreateSyncParams_t*)bigSyncParamBuf;
+    hci_le_bigCreateSyncParams_t *pBigCreateSyncParam = (hci_le_bigCreateSyncParams_t *)bigSyncParamBuf;
 
-    pBigCreateSyncParam->big_handle         = BIG_HANDLE_0;              /* Used to identify the BIG */
-    pBigCreateSyncParam->sync_handle        = pEvt->syncHandle;            /* Identifier of the periodic advertising train */
-    pBigCreateSyncParam->enc                = pEvt->enc;                     /* Encryption flag */
+    pBigCreateSyncParam->big_handle  = BIG_HANDLE_0;     /* Used to identify the BIG */
+    pBigCreateSyncParam->sync_handle = pEvt->syncHandle; /* Identifier of the periodic advertising train */
+    pBigCreateSyncParam->enc         = pEvt->enc;        /* Encryption flag */
 
-    if(pEvt->enc)
-    {
-        strncpy((char*)pBigCreateSyncParam->broadcast_code, DEFAULT_BROADCAST_CODE, 16);
-    }
-    else
-    {
+    if (pEvt->enc) {
+        strncpy((char *)pBigCreateSyncParam->broadcast_code, DEFAULT_BROADCAST_CODE, 16);
+    } else {
         memset(pBigCreateSyncParam->broadcast_code, 0, 16);
     }
 
-    pBigCreateSyncParam->mse                = pEvt->nse;                     /* The Controller can schedule reception of any number of subevents up to NSE */
-    pBigCreateSyncParam->big_sync_timeout   = 10*pEvt->IsoItvl*1250/10000; /* Synchronization timeout for the BIG */
+    pBigCreateSyncParam->mse              = pEvt->nse;                         /* The Controller can schedule reception of any number of subevents up to NSE */
+    pBigCreateSyncParam->big_sync_timeout = 10 * pEvt->IsoItvl * 1250 / 10000; /* Synchronization timeout for the BIG */
 
-    tlkapi_printf(APP_LOG_EN, "start create big sync, NSE is %d, BIS number is %d, Encrypt state is %s",
-            pEvt->nse, pEvt->numBis, pEvt->enc? "Encrypted": "unencrypted");
+    tlkapi_printf(APP_LOG_EN, "start create big sync, NSE is %d, BIS number is %d, Encrypt state is %s", pEvt->nse, pEvt->numBis, pEvt->enc ? "Encrypted" : "unencrypted");
 
-    pBigCreateSyncParam->num_bis            = pEvt->numBis;
+    pBigCreateSyncParam->num_bis = pEvt->numBis;
 
-    for(int i=0; i<pEvt->numBis; i++)
-    {
-        pBigCreateSyncParam->bis[i] = i+1;
+    for (int i = 0; i < pEvt->numBis; i++) {
+        pBigCreateSyncParam->bis[i] = i + 1;
     }
     ble_sts_t state = blc_hci_le_bigCreateSync(pBigCreateSyncParam);
 
     tlkapi_printf(APP_LOG_EN, "create BIG Sync state is %02x", state);
 
-    if(state == BLE_SUCCESS){
+    if (state == BLE_SUCCESS) {
         app_audio_updateBigSyncState(BIG_SYNC_STATE_CREATE);
-    }
-    else{
+    } else {
         app_audio_updateBigSyncState(BIG_SYNC_STATE_FAILED);
     }
     app_audio_stateChangeProcess();
@@ -629,12 +621,11 @@ static void app_audio_biginfoAdvReport(u8 *p, int n)
  */
 static void app_audio_bigSyncEst(u8 *p, int n)
 {
-    hci_le_bigSyncEstablishedEvt_t *pEvt = (hci_le_bigSyncEstablishedEvt_t*) p;
+    hci_le_bigSyncEstablishedEvt_t *pEvt = (hci_le_bigSyncEstablishedEvt_t *)p;
 
     tlkapi_printf(APP_LOG_EN, "BIG sync established status: %02X", pEvt->status);
 
     if (pEvt->status == BLE_SUCCESS) {
-
         app_codec_setBigSyncState(BIG_SYNCED, pEvt->numBis, pEvt->bisHandles);
         app_audio_updateBigSyncState(BIG_SYNC_STATE_EST);
 
@@ -693,14 +684,14 @@ static void app_audio_periodicAdvSyncLost(u8 *p, int n)
 }
 
 static const app_audio_controllerEvtCb_t sinkCb[] = {
-    {HCI_SUB_EVT_LE_EXTENDED_ADVERTISING_REPORT, app_audio_leExtendAdvReport},
-    {HCI_SUB_EVT_LE_PERIODIC_ADVERTISING_SYNC_ESTABLISHED, app_audio_periodicAdvSyncEst},
-    {HCI_SUB_EVT_LE_PERIODIC_ADVERTISING_REPORT, app_audio_periodicAdvReport},
-    {HCI_SUB_EVT_LE_BIGINFO_ADVERTISING_REPORT, app_audio_biginfoAdvReport},
-    {HCI_SUB_EVT_LE_BIG_SYNC_ESTABLISHED, app_audio_bigSyncEst},
-    {HCI_SUB_EVT_LE_TERMINATE_BIG_COMPLETE, app_audio_terminateBigComplete},
-    {HCI_SUB_EVT_LE_PERIODIC_ADVERTISING_SYNC_LOST, app_audio_periodicAdvSyncLost},
-    {HCI_SUB_EVT_LE_BIG_SYNC_LOST, app_audio_bigSyncLost},
+    {HCI_SUB_EVT_LE_EXTENDED_ADVERTISING_REPORT,           app_audio_leExtendAdvReport   },
+    {HCI_SUB_EVT_LE_PERIODIC_ADVERTISING_SYNC_ESTABLISHED, app_audio_periodicAdvSyncEst  },
+    {HCI_SUB_EVT_LE_PERIODIC_ADVERTISING_REPORT,           app_audio_periodicAdvReport   },
+    {HCI_SUB_EVT_LE_BIGINFO_ADVERTISING_REPORT,            app_audio_biginfoAdvReport    },
+    {HCI_SUB_EVT_LE_BIG_SYNC_ESTABLISHED,                  app_audio_bigSyncEst          },
+    {HCI_SUB_EVT_LE_TERMINATE_BIG_COMPLETE,                app_audio_terminateBigComplete},
+    {HCI_SUB_EVT_LE_PERIODIC_ADVERTISING_SYNC_LOST,        app_audio_periodicAdvSyncLost },
+    {HCI_SUB_EVT_LE_BIG_SYNC_LOST,                         app_audio_bigSyncLost         },
 };
 
 /**
@@ -712,12 +703,10 @@ static const app_audio_controllerEvtCb_t sinkCb[] = {
  */
 int app_audio_controllerEventCallBack(u32 h, u8 *p, int n)
 {
-
-    if ((h&HCI_FLAG_EVENT_BT_STD) && ((h&0xff) == HCI_EVT_LE_META)) {
+    if ((h & HCI_FLAG_EVENT_BT_STD) && ((h & 0xff) == HCI_EVT_LE_META)) {
         u8 subEvt_code = p[0];
-        for(int i=0; i < ARRAY_SIZE(sinkCb); i++)
-        {
-            if(sinkCb[i].evtCode == subEvt_code) {
+        for (int i = 0; i < ARRAY_SIZE(sinkCb); i++) {
+            if (sinkCb[i].evtCode == subEvt_code) {
                 sinkCb[i].evtCb(p, n);
                 break;
             }
@@ -804,4 +793,4 @@ void app_audio_handler(void)
     app_audio_receiveHandler();
 }
 
-#endif      //SINK_VERSION == SINK_WITH_ASSISTANT_VERSION
+#endif //SINK_VERSION == SINK_WITH_ASSISTANT_VERSION

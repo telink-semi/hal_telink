@@ -25,7 +25,6 @@
 #include "drivers.h"
 #include "stack/ble/ble.h"
 
-
 void blc_basic_registerDISControlServer(const struct blc_diss_regParam *param)
 {
     (void)param;

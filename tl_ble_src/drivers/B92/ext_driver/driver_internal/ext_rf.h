@@ -34,7 +34,17 @@
 /******************************* ext_rf start ******************************************************************/
 
 #ifndef FAST_SETTLE
-#define FAST_SETTLE         0
+#define FAST_SETTLE         1
+#endif
+
+#define TX_FAST_SETTLE_LEVEL  TX_SETTLE_TIME_50US
+#define RX_FAST_SETTLE_LEVEL  RX_SETTLE_TIME_45US
+
+#define TX_FAST_SETTLE_TIME  50
+#define RX_FAST_SETTLE_TIME  45
+
+#ifndef BLE_S2_S8_NEW_PATH
+#define BLE_S2_S8_NEW_PATH      0
 #endif
 
 #if SW_DCOC_EN
@@ -168,7 +178,7 @@ enum
 
 typedef struct {
     unsigned char  txPower_index;
-
+    unsigned char  txPower_level;   /*!< added to be compatible with driver api */
 }ext_rf_t;
 
 extern ext_rf_t blt_extRF;
@@ -236,7 +246,8 @@ __INLINE void  rf_ble_set_rx_wait(unsigned short rx_wait_us)
 
 __INLINE void  rf_ble_set_tx_wait(unsigned short tx_wait_us)
 {
-    write_reg8(0x17020e, tx_wait_us);
+    tx_wait_us = (tx_wait_us>0x0fff ? 0x0fff : tx_wait_us);
+    write_reg16(0x17020e, tx_wait_us);
 }
 
 /**
@@ -466,7 +477,7 @@ __INLINE void zb_rt_irq_enable(void)
  */
 
 #if (FAST_SETTLE)
-    #define RX_SETTLE_US                    45
+    #define RX_SETTLE_US                    RX_FAST_SETTLE_TIME
 #else
     #define RX_SETTLE_US                    85
 #endif
@@ -487,7 +498,7 @@ __INLINE void zb_rt_irq_enable(void)
 #if RF_RX_SHORT_MODE_EN//open rx dly
 
     #if (FAST_SETTLE)
-        #define         TX_STL_LEGADV_SCANRSP_REAL                  53  //can change, consider TX packet quality
+        #define         TX_STL_LEGADV_SCANRSP_REAL                  TX_FAST_SETTLE_TIME  //can change, consider TX packet quality
     #else
         #define         TX_STL_LEGADV_SCANRSP_REAL                  110 //can change, consider TX packet quality
     #endif
@@ -495,7 +506,7 @@ __INLINE void zb_rt_irq_enable(void)
 
 
     #if (FAST_SETTLE)
-        #define         TX_STL_TIFS_REAL_COMMON                     53  //can change, consider TX packet quality
+        #define         TX_STL_TIFS_REAL_COMMON                     TX_FAST_SETTLE_TIME  //can change, consider TX packet quality
     #else
         #define         TX_STL_TIFS_REAL_COMMON                     110 //can change, consider TX packet quality
     #endif
@@ -511,7 +522,7 @@ __INLINE void zb_rt_irq_enable(void)
 
 
     #if (FAST_SETTLE)
-        #define         TX_STL_ADV_REAL_COMMON                      53  //can change, consider TX packet quality
+        #define         TX_STL_ADV_REAL_COMMON                      TX_FAST_SETTLE_TIME  //can change, consider TX packet quality
     #else
         #define         TX_STL_ADV_REAL_COMMON                      110 //can change, consider TX packet quality
     #endif
@@ -542,7 +553,7 @@ __INLINE void zb_rt_irq_enable(void)
 
 
     #if (FAST_SETTLE)
-        #define     TX_STL_BTX_1ST_PKT_REAL                         53 //110 - 57 = 53
+        #define     TX_STL_BTX_1ST_PKT_REAL                         TX_FAST_SETTLE_TIME //110 - 57 = 53
     #else
         /* normal mode(no fast settle): for ACL Central, tx settle real 110uS or 107uS or even 105uS, not big difference,
          * but for CIS Central, timing is very urgent considering T_MSS between two sub_event, so SiHui use 107, we keep this set
@@ -557,6 +568,18 @@ __INLINE void zb_rt_irq_enable(void)
     #error "add code here, TX settle time"
 #endif
 
+
+#if(1) //(LL_FEATURE_ENABLE_FRAME_SPACE_UPDATE)
+    #define         RX_PATH_DLY_EXTRA_PREAMBLE_1M                   (150 - TX_STL_AUTO_MODE_1M)
+    #define         RX_PATH_DLY_EXTRA_PREAMBLE_2M                   (150 - TX_STL_AUTO_MODE_2M)
+
+    #if(BLE_S2_S8_NEW_PATH)
+        #define         RX_PATH_DLY_EXTRA_PREAMBLE_S2               (150-TX_STL_AUTO_MODE_CODED_S2)
+        #define         RX_PATH_DLY_EXTRA_PREAMBLE_S8               (150-TX_STL_AUTO_MODE_CODED_S8)
+    #else
+        #define         RX_PATH_DLY_EXTRA_PREAMBLE_CODED            (150- TX_STL_AUTO_MODE_CODED)
+    #endif
+#endif
 
 /* AD convert delay : timing cost on RF analog to digital convert signal process:
  *                  Eagle   1M: 20uS       2M: 10uS;      500K(S2): 14uS    125K(S8):  14uS
@@ -787,194 +810,19 @@ __INLINE void rf_ble_set_coded_phy_s8(void)
 
 
 #if FAST_SETTLE
-    typedef struct __attribute__((packed))
+    typedef struct
     {
-        u8 LDO_CAL_TRIM;    //0xea[5:0]
-        u8 LDO_RXTXHF_TRIM; //0xee[5:0]
-        u8 LDO_RXTXLF_TRIM; //0xee[7:6]  0xed[3:0]
-        u8 LDO_PLL_TRIM;    //0xee[5:0]
-        u8 LDO_VCO_TRIM;    //0xee[7:6]  0xef[3:0]
-        u8 rsvd;
-    }Ldo_Trim;
-
-    typedef struct __attribute__((packed))
-    {
+        unsigned short cal_tbl[81];
+        rf_ldo_trim_t   ldo_trim;
+        rf_rccal_cal_t  rccal_cal;
         unsigned char tx_fast_en;
         unsigned char rx_fast_en;
-        unsigned short cal_tbl[40];
-        rf_ldo_trim_t   ldo_trim;
-#if (!SW_DCOC_EN)
-        rf_dcoc_cal_t   dcoc_cal;
-#endif
     }Fast_Settle;
-    extern Fast_Settle fast_settle;
 
-    void ble_rf_tx_fast_settle(void);
-    void ble_rf_rx_fast_settle(void);
-    unsigned short get_rf_hpmc_cal_val(void);
-    void set_rf_hpmc_cal_val(unsigned short value);
-    unsigned char ble_is_rf_tx_fast_settle_en(void);
-    unsigned char ble_is_rf_rx_fast_settle_en(void);
-    void get_ldo_trim_val(u8* p);
-    void set_ldo_trim_val(u8* p);
-    void set_ldo_trim_on(void);
-
-    /**
-     *  @brief      this function serve to enable the tx timing sequence adjusted.
-     *  @param[in]  none
-     *  @return     none
-    */
-    void ble_rf_tx_fast_settle_en(void);
-
-    /**
-     *  @brief      this function serve to disable the tx timing sequence adjusted.
-     *  @param[in]  none
-     *  @return     none
-    */
-    void ble_rf_tx_fast_settle_dis(void);
-
-
-    /**
-     *  @brief      this function serve to enable the rx timing sequence adjusted.
-     *  @param[in]  none
-     *  @return     none
-    */
-    void ble_rf_rx_fast_settle_en(void);
-
-
-    /**
-     *  @brief      this function serve to disable the rx timing sequence adjusted.
-     *  @param[in]  none
-     *  @return     none
-    */
-    void ble_rf_rx_fast_settle_dis(void);
-
-
-
-#endif
-
-#define     reg_rf_ll_irq_list_h        REG_ADDR8(REG_BB_LL_BASE_ADDR+0x4d)
-
-#ifndef HADM_PHASE_CONTINUITY
-    #define HADM_PHASE_CONTINUITY           1
-#endif
-/**
- * @brief   Enumerated variables for HADM's settle sequence mode on or off.
- */
-typedef enum
-{
-    RF_HADM_SETTLE_SEQ_OFF,//Turns off the settle timing in HADM mode and reverts to the normal settle sequence.
-    RF_HADM_SETTLE_SEQ_ON  //Enable settle sequence for use in HADM mode.
-}rf_hadm_settle_seq_mode_e;
-
-/**
- * @brief   Select how you want to start IQ sampling.
- */
-typedef enum
-{
-    RF_HADM_IQ_SAMPLE_SYNC_MODE,
-    RF_HADM_IQ_SAMPLE_RXEN_MODE
-}rf_hadm_iq_sample_mode_e;
-
-/**
- * @brief   Select whether the antenna clock is normally open or turned on when the antenna is switched.
- */
-typedef enum
-{
-    RF_HADM_ANT_CLK_ALWAYS_ON_MODE,
-    RF_HADM_ANT_CLK_SWITCH_ON_MODE
-}rf_hadm_ant_clk_mode_e;
-/**
- * @brief       This function is used to get the value of the agc gain latch.
- * @return      Returns the value of gain latch.
- */
-__INLINE unsigned char rf_get_gain_lat_value(void)
-{
-    return ((reg_rf_max_match1>>4)&0x07);
-}
-
-/**
- *  @brief  tx related calibration value in hadm function.
- */
-typedef struct __attribute__((packed))  {
-    unsigned short    tx_hpmc;
-    rf_ldo_trim_t ldo_trim;
-}rf_cs_tx_cali_t;
-
-/**
- *  @brief  rx related calibration value in hadm function.
- */
-typedef struct __attribute__((packed)) {
-    rf_ldo_trim_t   ldo_trim;
-#if (!SW_DCOC_EN)
-    rf_dcoc_cal_t   dcoc_cal;
-#endif
-    rf_rccal_cal_t  rccal_cal;
-}rf_cs_rx_cali_t;
-
-/**
- * @brief   Define function to set tx channel or rx channel.
- */
-typedef enum
-{
-    TX_CHANNEL      = 0,
-    RX_CHANNEL      = 1,
-}rf_trx_chn_e;
-
-
-/**
- * @brief       This function is mainly used to get the timestamp information in the process of sending
- *              and receiving packets; in the packet receiving stage, this register stores the sync moment
- *              timestamp, and this information remains unchanged until the next sending and receiving packets.
- *              In the send packet stage, the register stores the timestamp value of the tx_on moment, which
- *              remains unchanged until the next send/receive packet.
- * @return      TX:timestamp value of the tx_on moment.
- *              RX:timestamp value of the sync moment.
- */
-__INLINE unsigned int rf_hadm_get_timestamp(void)
-{
-    return reg_rf_timestamp;
-}
-
-/**
- * @brief       This function is mainly used to get the timestamp of the moment when tx_en is pulled up from the registers.
- * @return      The timestamp of the moment when tx_en is pulled up.
- */
-__INLINE unsigned int rf_hadm_get_tx_pos_timestamp(void)
-{
-    return reg_rf_tr_turnaround_pos_time;
-}
-
-#if (HADM_PHASE_CONTINUITY)
-    extern _attribute_data_retention_ rf_cs_tx_cali_t tx_cs_cali;
-    extern _attribute_data_retention_ rf_cs_rx_cali_t rx_cs_cali;
-    extern _attribute_data_retention_ unsigned char cs_phase_continuity_flag;
-
-    void ble_rf_cs_phase_continuity_en(void);
-    void ble_rf_cs_phase_continuity_dis(unsigned char phase_en);
-    //void ble_rf_cs_restore_cali_auto_run(void);
-    void ble_rf_cs_restore_cali_auto_run(unsigned char phase_en);
-    void ble_rf_manual_fcal_start(void);
-    void ble_rf_manual_fcal_done(void);
-    void ble_rf_cs_get_rx_cali_value(rf_cs_rx_cali_t *rx_cali);
-    void ble_rf_cs_get_tx_cali_value(rf_cs_tx_cali_t *tx_cali);
-    void ble_rf_get_ldo_trim_val(rf_ldo_trim_t *ldo_trim);
-#if (!SW_DCOC_EN)
-    void ble_rf_get_dcoc_cal_val(rf_dcoc_cal_t *dcoc_cal);
-    void ble_rf_set_dcoc_cal_val(rf_dcoc_cal_t dcoc_cal);
-    void ble_rf_dis_dcoc_trim(void);
-#endif
-    void ble_rf_get_rccal_cal_val(rf_rccal_cal_t *rccal_cal);
-    void ble_rf_lna_pup(void);
-    void ble_rf_cs_set_rx_cali_value(rf_cs_rx_cali_t *rx_cali);
-    void ble_rf_cs_set_tx_cali_value(rf_cs_tx_cali_t *tx_cali);
-    void ble_rf_dis_fcal_trim(void);
-    void ble_rf_set_ldo_trim_val(rf_ldo_trim_t ldo_trim);
-    void ble_rf_dis_ldo_trim(void);
-    void ble_rf_dis_rccal_trim(void);
-    void ble_rf_set_rccal_cal_val(rf_rccal_cal_t rccal_cal);
-    void ble_rf_dis_hpmc_trim(void);
-    void ble_rf_cs_settle_sequence_mode(rf_hadm_settle_seq_mode_e on_off);
+    extern Fast_Settle fast_settle_1M;
+    extern Fast_Settle fast_settle_2M;
+    extern Fast_Settle fast_settle_S2;
+    extern Fast_Settle fast_settle_S8;
 #endif
 
 __INLINE u8 rf_ble_get_tx_pwr_idx(s8 rfTxPower)
@@ -1026,35 +874,6 @@ __INLINE s8 rf_ble_get_tx_pwr_level(rf_power_level_index_e rfPwrLvlIdx)
 
     return rfTxPower;
 }
-
-void ble_rf_channel_sounding_init(void);
-
-void ble_rf_channel_sounding_deinit(void);
-
-void ble_rf_tx_channel_sounding_mode_en(void);
-
-void ble_rf_tx_channel_sounding_mode_dis(void);
-
-void ble_rf_rx_channel_sounding_mode_en(unsigned char interval, rf_iq_data_mode_e suppmode);
-
-void ble_rf_rx_channel_sounding_mode_dis(void);
-
-void ble_rf_channel_sounding_iq_sample_config(unsigned short sample_num, unsigned char start_point, rf_hadm_iq_sample_mode_e sample_mode);
-
-void ble_rf_set_manual_tx_mode(void);
-
-void ble_rf_set_tx_modulation_index(rf_mi_value_e mi_value);
-
-void ble_rf_set_power_level_singletone(rf_power_level_e level);
-
-void ble_rf_set_power_off_singletone(void);
-
-void ble_rf_set_cs_channel(signed char chn);
-
-void ble_rf_agc_disable(void);
-
-void ble_rf_agc_enable(void);
-
 /******************************* ext_rf end ********************************************************************/
 
 

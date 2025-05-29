@@ -25,14 +25,14 @@
 
 #if (PRODUCT_BIS_SOURCE_SELECT == PRODUCT_SIG_AURACAST_TRANSMITTER)
 
-#include "tl_common.h"
-#include "drivers.h"
-#include "stack/ble/ble.h"
+    #include "tl_common.h"
+    #include "drivers.h"
+    #include "stack/ble/ble.h"
 
-#include "app_parse_char.h"
-#include "app_audio.h"
+    #include "app_parse_char.h"
+    #include "app_audio.h"
 
-extern u8  mac_public[6];
+extern u8                     mac_public[6];
 extern app_auracastCfgParam_t auracastCfg;
 
 void app_source_show_param(char *argv[], int argc, void *user_data)
@@ -42,18 +42,14 @@ void app_source_show_param(char *argv[], int argc, void *user_data)
     app_parse_printf("complete name is %s.\r\n", DEFAULT_DEV_NAME);
     app_parse_printf("broadcast ID is 0x%02x%02x%02x.\r\n", auracastCfg.broadcastID[2], auracastCfg.broadcastID[1], auracastCfg.broadcastID[0]);
     app_parse_printf("broadcast name is %.*s.\r\n", auracastCfg.broadcastNameLen, auracastCfg.broadcastName);
-    app_parse_printf("BIG is %s.\r\n", auracastCfg.encryptionFlag? "Encrypted": "Unencrypted");
-    if(auracastCfg.encryptionFlag)
-    {
+    app_parse_printf("BIG is %s.\r\n", auracastCfg.encryptionFlag ? "Encrypted" : "Unencrypted");
+    if (auracastCfg.encryptionFlag) {
         app_parse_printf("broadcast code is %s.\r\n", auracastCfg.broadcastCode);
         app_parse_printf("broadcast code ASCII is %s.\r\n", hex_to_str(auracastCfg.broadcastCode, 16));
     }
-    if(auracastCfg.audioMode == 2)
-    {
+    if (auracastCfg.audioMode == 2) {
         app_parse_printf("current audio mode is stereo.\r\n");
-    }
-    else
-    {
+    } else {
         app_parse_printf("current audio mode is mono.\r\n");
     }
 }
@@ -73,35 +69,26 @@ void app_source_set_param(char *argv[], int argc, void *user_data)
     }
 
     if (!strcasecmp("Broadcast-name", argv[0])) {
-        if(argc == 2 && app_audio_setBroadcastName(argv[1], strlen(argv[1])))
-        {
+        if (argc == 2 && app_audio_setBroadcastName(argv[1], strlen(argv[1]))) {
             app_parse_printf("set Broadcast name successful, new name is %.*s", auracastCfg.broadcastNameLen, auracastCfg.broadcastName);
-        }
-        else
-        {
+        } else {
             app_parse_printf("set Broadcast-name <name>, name length must less than 32 bytes.\r\n");
         }
-    } else if(!strcasecmp("Broadcast-ID", argv[0])) {
-        if(argc == 2)
-        {
+    } else if (!strcasecmp("Broadcast-ID", argv[0])) {
+        if (argc == 2) {
             int bcstId = app_parse_str2n(argv[1]);
             app_audio_setBroadcastID(bcstId);
 
             app_parse_printf("new broadcast ID is 0x%02x%02x%02x.\r\n", auracastCfg.broadcastID[2], auracastCfg.broadcastID[1], auracastCfg.broadcastID[0]);
-        }
-        else
-        {
+        } else {
             app_parse_printf("set Broadcast-ID <id>, id is 24bit value.\r\n");
         }
-    } else if(!strcasecmp("broadcast-code", argv[0])) {
-        if(argc == 2)
-        {
+    } else if (!strcasecmp("broadcast-code", argv[0])) {
+        if (argc == 2) {
             app_audio_setBroadcastCode(argv[1]);
             app_parse_printf("open broadcast encrypted, broadcast code is %s.\r\n", auracastCfg.broadcastCode);
             app_parse_printf("broadcast code ASCII is %s.\r\n", hex_to_str(auracastCfg.broadcastCode, 16));
-        }
-        else
-        {
+        } else {
             app_parse_printf("set broadcast-code <code>, name length must less than 17 bytes.\r\n");
         }
     }
@@ -141,16 +128,14 @@ void app_audio_bcast(char *argv[], int argc, void *user_data)
         }
         app_audio_closeEncryptBig();
         app_parse_printf("close broadcast encrypted.\r\n");
-    } else if(!strcasecmp("stereo", argv[0]))
-    {
+    } else if (!strcasecmp("stereo", argv[0])) {
         if (app_audio_getBroadcastState() != APP_AUDIO_BRODCAST_SOURCE_STATE_IDLE) {
             app_parse_printf("broadcasting active\r\n");
             return;
         }
         app_audio_setStereoAudio();
         app_parse_printf("audio mode is stereo.\r\n");
-    } else if(!strcasecmp("mono", argv[0]))
-    {
+    } else if (!strcasecmp("mono", argv[0])) {
         if (app_audio_getBroadcastState() != APP_AUDIO_BRODCAST_SOURCE_STATE_IDLE) {
             app_parse_printf("broadcasting active\r\n");
             return;
@@ -162,11 +147,10 @@ void app_audio_bcast(char *argv[], int argc, void *user_data)
 }
 
 static const parse_fun_list_t sourceParse[] = {
-    {"show", app_source_show_param},
-    {"set", app_source_set_param},
-    {"bcast", app_audio_bcast},
+    {"show",  app_source_show_param},
+    {"set",   app_source_set_param },
+    {"bcast", app_audio_bcast      },
 };
-
 
 static void app_audio_ui_bcast_state_changed(app_audio_brodcast_state_enum state)
 {
@@ -211,6 +195,4 @@ void app_audio_ui_loop(void)
     app_parse_loop();
 }
 
-#endif  //PRODUCT_BIS_SOURCE_SELECT == PRODUCT_SIG_AURACAST_TRANSMITTER
-
-
+#endif //PRODUCT_BIS_SOURCE_SELECT == PRODUCT_SIG_AURACAST_TRANSMITTER

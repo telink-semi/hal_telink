@@ -26,29 +26,22 @@
 #include "stack/ble/ble.h"
 
 
-
-
 const u8 gAppBasscRecvStateNum = APP_AUDIO_BASS_CLIENT_RECV_STATE_CNT;
 
 const u8 gAppBasscRecvStateMaxSize = APP_AUDIO_BASS_RECV_STATE_MAX_SIZE;
 
 _attribute_ble_data_retention_
-blc_bassc_recvStateParamEntity_t gBassCRecvState[ACL_CENTRAL_MAX_NUM * APP_AUDIO_BASS_CLIENT_RECV_STATE_CNT];
+    blc_bassc_recvStateParamEntity_t gBassCRecvState[ACL_CENTRAL_MAX_NUM * APP_AUDIO_BASS_CLIENT_RECV_STATE_CNT];
 
 _attribute_ble_data_retention_
-blc_bass_client_t gBassClient[ACL_CENTRAL_MAX_NUM];
+    blc_bass_client_t gBassClient[ACL_CENTRAL_MAX_NUM];
 
-
-blc_bass_client_t* blc_bassc_getClientBuf(u8 index)
+blc_bass_client_t *blc_bassc_getClientBuf(u8 index)
 {
     return &gBassClient[index];
 }
 
-blc_bassc_recv_state_param_t* blc_bassc_getRecvStateBuf(u8 index)
+blc_bassc_recv_state_param_t *blc_bassc_getRecvStateBuf(u8 index)
 {
-    return (blc_bassc_recv_state_param_t*)&gBassCRecvState[index];
+    return (blc_bassc_recv_state_param_t *)&gBassCRecvState[index];
 }
-
-
-
-

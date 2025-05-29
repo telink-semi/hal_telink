@@ -37,22 +37,18 @@
  */
 void app_volume_event_callback(u16 connHandle, int evtID, u8 *pData, u16 dataLen)
 {
-    switch(evtID)
+    switch (evtID) {
+    case AUDIO_EVT_VCSS_CHANGED_VOLUME_STATE:
     {
-        case AUDIO_EVT_VCSS_CHANGED_VOLUME_STATE:
-        {
-            blc_vcss_volumeStateChangeEvt_t* pEvt = (blc_vcss_volumeStateChangeEvt_t*)pData;
-            if(pEvt->mute)
-            {
-                //codec mute
-                tlkapi_printf(APP_LOG_EN,"volume mute");
-            }
-            else
-            {
-                //dac configure volume
-                tlkapi_printf(APP_LOG_EN,"volume setting %d",pEvt->volumeSetting);
-            }
+        blc_vcss_volumeStateChangeEvt_t *pEvt = (blc_vcss_volumeStateChangeEvt_t *)pData;
+        if (pEvt->mute) {
+            //codec mute
+            tlkapi_printf(APP_LOG_EN, "volume mute");
+        } else {
+            //dac configure volume
+            tlkapi_printf(APP_LOG_EN, "volume setting %d", pEvt->volumeSetting);
         }
+    }
     }
 }
 #endif

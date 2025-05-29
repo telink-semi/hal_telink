@@ -25,4 +25,3 @@
 
 #include "ots_client_buf.h"
 #include "ots_server_buf.h"
-

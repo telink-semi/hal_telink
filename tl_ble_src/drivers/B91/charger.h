@@ -47,84 +47,83 @@
 #include "reg_include/soc.h"
 #include "reg_include/charger_reg.h"
 
+typedef enum
+{
+    CHARGER_CC_CURRENT_23p01mA = 0x00,
+    CHARGER_CC_CURRENT_28p02mA = 0x01,
+    CHARGER_CC_CURRENT_32p89mA = 0x02,
+    CHARGER_CC_CURRENT_37p69mA = 0x03,
+    CHARGER_CC_CURRENT_42p04mA = 0x04,
+    CHARGER_CC_CURRENT_47p04mA = 0x05,
+    CHARGER_CC_CURRENT_52p03mA = 0x06,
+    CHARGER_CC_CURRENT_57p02mA = 0x07,
+    CHARGER_CC_CURRENT_62p00mA = 0x08,
+    CHARGER_CC_CURRENT_66p09mA = 0x09,
+    CHARGER_CC_CURRENT_72p00mA = 0x0a,
+    CHARGER_CC_CURRENT_76p70mA = 0x0b,
+    CHARGER_CC_CURRENT_81p05mA = 0x0c,
+    CHARGER_CC_CURRENT_86p06mA = 0x0d,
+    CHARGER_CC_CURRENT_91p07mA = 0x0e,
+    CHARGER_CC_CURRENT_96p03mA = 0x0f,
+} charger_cc_current_e;
 
-typedef enum{
-    CHARGER_CC_CURRENT_23p01mA  =0x00,
-    CHARGER_CC_CURRENT_28p02mA  =0x01,
-    CHARGER_CC_CURRENT_32p89mA  =0x02,
-    CHARGER_CC_CURRENT_37p69mA  =0x03,
-    CHARGER_CC_CURRENT_42p04mA  =0x04,
-    CHARGER_CC_CURRENT_47p04mA  =0x05,
-    CHARGER_CC_CURRENT_52p03mA  =0x06,
-    CHARGER_CC_CURRENT_57p02mA  =0x07,
-    CHARGER_CC_CURRENT_62p00mA  =0x08,
-    CHARGER_CC_CURRENT_66p09mA  =0x09,
-    CHARGER_CC_CURRENT_72p00mA  =0x0a,
-    CHARGER_CC_CURRENT_76p70mA  =0x0b,
-    CHARGER_CC_CURRENT_81p05mA  =0x0c,
-    CHARGER_CC_CURRENT_86p06mA  =0x0d,
-    CHARGER_CC_CURRENT_91p07mA  =0x0e,
-    CHARGER_CC_CURRENT_96p03mA  =0x0f,
-}charger_cc_current_e;
+typedef enum
+{
+    CHARGER_TC_CURRENT_1p57mA = 0x00,
+    CHARGER_TC_CURRENT_2p06mA = 0x01,
+    CHARGER_TC_CURRENT_2p46mA = 0x02,
+    CHARGER_TC_CURRENT_2p93mA = 0x03,
+    CHARGER_TC_CURRENT_3p41mA = 0x04,
+    CHARGER_TC_CURRENT_3p88mA = 0x05,
+    CHARGER_TC_CURRENT_4p36mA = 0x06,
+    CHARGER_TC_CURRENT_4p84mA = 0x07,
+    CHARGER_TC_CURRENT_5p32mA = 0x08,
+    CHARGER_TC_CURRENT_5p80mA = 0x09,
+    CHARGER_TC_CURRENT_6p27mA = 0x0a,
+    CHARGER_TC_CURRENT_6p75mA = 0x0b,
+    CHARGER_TC_CURRENT_7p23mA = 0x0c,
+    CHARGER_TC_CURRENT_7p70mA = 0x0d,
+    CHARGER_TC_CURRENT_8p17mA = 0x0e,
+    CHARGER_TC_CURRENT_8p66mA = 0x0f,
+} charger_tc_current_e;
 
+typedef enum
+{
+    CHARGER_CV_VOLTAGE_3p980V = 0x00,
+    CHARGER_CV_VOLTAGE_3p999V = 0x10,
+    CHARGER_CV_VOLTAGE_4p018V = 0x20,
+    CHARGER_CV_VOLTAGE_4p035V = 0x30,
+    CHARGER_CV_VOLTAGE_4p054V = 0x40,
+    CHARGER_CV_VOLTAGE_4p072V = 0x50,
+    CHARGER_CV_VOLTAGE_4p090V = 0x60,
+    CHARGER_CV_VOLTAGE_4p108V = 0x70,
+    CHARGER_CV_VOLTAGE_4p127V = 0x80,
+    CHARGER_CV_VOLTAGE_4p145V = 0x90,
+    CHARGER_CV_VOLTAGE_4p163V = 0xa0,
+    CHARGER_CV_VOLTAGE_4p181V = 0xb0,
+    CHARGER_CV_VOLTAGE_4p199V = 0xc0,
+    CHARGER_CV_VOLTAGE_4p218V = 0xd0,
+    CHARGER_CV_VOLTAGE_4p236V = 0xe0,
+    CHARGER_CV_VOLTAGE_4p254V = 0xf0,
+} charger_cv_voltage_e;
 
-typedef enum{
-    CHARGER_TC_CURRENT_1p57mA  =0x00,
-    CHARGER_TC_CURRENT_2p06mA  =0x01,
-    CHARGER_TC_CURRENT_2p46mA  =0x02,
-    CHARGER_TC_CURRENT_2p93mA  =0x03,
-    CHARGER_TC_CURRENT_3p41mA  =0x04,
-    CHARGER_TC_CURRENT_3p88mA  =0x05,
-    CHARGER_TC_CURRENT_4p36mA  =0x06,
-    CHARGER_TC_CURRENT_4p84mA  =0x07,
-    CHARGER_TC_CURRENT_5p32mA  =0x08,
-    CHARGER_TC_CURRENT_5p80mA  =0x09,
-    CHARGER_TC_CURRENT_6p27mA  =0x0a,
-    CHARGER_TC_CURRENT_6p75mA  =0x0b,
-    CHARGER_TC_CURRENT_7p23mA  =0x0c,
-    CHARGER_TC_CURRENT_7p70mA  =0x0d,
-    CHARGER_TC_CURRENT_8p17mA  =0x0e,
-    CHARGER_TC_CURRENT_8p66mA  =0x0f,
-}charger_tc_current_e;
-
-
-typedef enum{
-    CHARGER_CV_VOLTAGE_3p980V  =0x00,
-    CHARGER_CV_VOLTAGE_3p999V  =0x10,
-    CHARGER_CV_VOLTAGE_4p018V  =0x20,
-    CHARGER_CV_VOLTAGE_4p035V  =0x30,
-    CHARGER_CV_VOLTAGE_4p054V  =0x40,
-    CHARGER_CV_VOLTAGE_4p072V  =0x50,
-    CHARGER_CV_VOLTAGE_4p090V  =0x60,
-    CHARGER_CV_VOLTAGE_4p108V  =0x70,
-    CHARGER_CV_VOLTAGE_4p127V  =0x80,
-    CHARGER_CV_VOLTAGE_4p145V  =0x90,
-    CHARGER_CV_VOLTAGE_4p163V  =0xa0,
-    CHARGER_CV_VOLTAGE_4p181V  =0xb0,
-    CHARGER_CV_VOLTAGE_4p199V  =0xc0,
-    CHARGER_CV_VOLTAGE_4p218V  =0xd0,
-    CHARGER_CV_VOLTAGE_4p236V  =0xe0,
-    CHARGER_CV_VOLTAGE_4p254V  =0xf0,
-}charger_cv_voltage_e;
-
-
-typedef enum{
+typedef enum
+{
     MANUAL_SHUT_DOWM = 0xb0, /**< automatic mode has its own shutdown mode, which refers to the shutdown mode in manual mode */
-    MANUAL_TC = 0xc0,        /**< Pre-charging(TC):the charger is in tc mode and can be manually adjusted current for charging,voltage keeps rising */
-    MANUAL_CC = 0xd0,        /**< Constant current charging(CC):the charger is in cc mode and can be manually adjusted for charging,voltage keeps rising */
-    MANUAL_CV = 0xe0,        /**< Constant voltage charging(CV):the charger switches to cv mode, keeping the charging voltage constant and gradually decreasing the charging current in the process */
-    AUTO_MODE = 0x40,        /**< the charger core is controlled by a state machine during automatic charging */
-}charger_mode_e;
+    MANUAL_TC        = 0xc0, /**< Pre-charging(TC):the charger is in tc mode and can be manually adjusted current for charging,voltage keeps rising */
+    MANUAL_CC        = 0xd0, /**< Constant current charging(CC):the charger is in cc mode and can be manually adjusted for charging,voltage keeps rising */
+    MANUAL_CV        = 0xe0, /**< Constant voltage charging(CV):the charger switches to cv mode, keeping the charging voltage constant and gradually decreasing the charging current in the process */
+    AUTO_MODE        = 0x40, /**< the charger core is controlled by a state machine during automatic charging */
+} charger_mode_e;
 
-
-typedef enum{
-    CHARGER_STATUS_TC = 0x47,
-    CHARGER_STATUS_CC = 0x46,
-    CHARGER_STATUS_CV = 0x4a,
+typedef enum
+{
+    CHARGER_STATUS_TC    = 0x47,
+    CHARGER_STATUS_CC    = 0x46,
+    CHARGER_STATUS_CV    = 0x4a,
     CHARGER_STATUS_STDBY = 0x60,
     CHARGER_STATUS_ERROR = 0x50,
-}charger_status_e;
-
+} charger_status_e;
 
 /**
  * @brief      The function of this API is to set charger mode.

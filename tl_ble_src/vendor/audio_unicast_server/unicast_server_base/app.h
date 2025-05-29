@@ -47,10 +47,9 @@ void user_init_deepRetn(void);
  * @param[in]  none.
  * @return     none.
  */
-void main_loop (void);
+void main_loop(void);
 
-_attribute_ram_code_
-void tlk_eq_proc(signed short *ps, signed short *pd, unsigned int nsample);
+_attribute_ram_code_ void tlk_eq_proc(signed short *ps, signed short *pd, unsigned int nsample);
 
 #endif
 #endif

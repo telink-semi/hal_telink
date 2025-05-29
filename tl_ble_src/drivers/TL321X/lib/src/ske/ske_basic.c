@@ -33,12 +33,10 @@
 #include "driver.h"
 
 
-
 //ske_lp register pointer
-static volatile ske_lp_reg_t * const g_ske_lp_reg = (ske_lp_reg_t *)(SKE_LP_BASE_ADDR);
+static volatile ske_lp_reg_t *const g_ske_lp_reg = (ske_lp_reg_t *)(SKE_LP_BASE_ADDR);
 
-
- /**
+/**
   * @brief          get ske IP version.
   * @return         ske IP version
   */
@@ -46,7 +44,6 @@ unsigned int ske_lp_get_version(void)
 {
     return g_ske_lp_reg->ske_version;
 }
-
 
 /**
  * @brief       set ske_lp to be CPU mode.
@@ -58,8 +55,8 @@ unsigned int ske_lp_get_version(void)
  */
 void ske_lp_set_cpu_mode(void)
 {
-    volatile unsigned int flag = (((unsigned int)1)<<SKE_LP_UP_CFG_OFFSET);
-    volatile unsigned int mask = ~(((unsigned int)1)<<SKE_LP_DMA_OFFSET);
+    volatile unsigned int flag = (((unsigned int)1) << SKE_LP_UP_CFG_OFFSET);
+    volatile unsigned int mask = ~(((unsigned int)1) << SKE_LP_DMA_OFFSET);
 
     g_ske_lp_reg->cfg &= mask;
     g_ske_lp_reg->cfg |= flag;
@@ -75,7 +72,7 @@ void ske_lp_set_cpu_mode(void)
  */
 void ske_lp_set_dma_mode(void)
 {
-    volatile unsigned int flag = (((unsigned int)1)<<SKE_LP_DMA_OFFSET);;
+    volatile unsigned int flag = (((unsigned int)1) << SKE_LP_DMA_OFFSET);
 
     g_ske_lp_reg->cfg |= flag;
 }
@@ -90,17 +87,16 @@ void ske_lp_set_dma_mode(void)
  */
 void ske_lp_set_endian_uint32(void)
 {
-    volatile unsigned int mask = ~(((unsigned int)3)<<SKE_LP_REVERSE_BYTE_ORDER_IN_WORD_OFFSET);
+    volatile unsigned int mask = ~(((unsigned int)3) << SKE_LP_REVERSE_BYTE_ORDER_IN_WORD_OFFSET);
 #ifdef SKE_LP_REVERSE_BYTE_ORDER_IN_WORD
-    volatile unsigned int flag = (((unsigned int)2)<<SKE_LP_REVERSE_BYTE_ORDER_IN_WORD_OFFSET);
+    volatile unsigned int flag = (((unsigned int)2) << SKE_LP_REVERSE_BYTE_ORDER_IN_WORD_OFFSET);
 #endif
 
-    g_ske_lp_reg->cfg &= mask;    //clear bit[25:24], and now requires CPU is big-endian
+    g_ske_lp_reg->cfg &= mask; //clear bit[25:24], and now requires CPU is big-endian
 #ifdef SKE_LP_REVERSE_BYTE_ORDER_IN_WORD
-    g_ske_lp_reg->cfg |= flag;    //requires CPU is little-endian, input and output reversed by hardware----ske IP
+    g_ske_lp_reg->cfg |= flag; //requires CPU is little-endian, input and output reversed by hardware----ske IP
 #endif
 }
-
 
 /**
  * @brief       set the ske_lp endian.
@@ -113,12 +109,11 @@ void ske_lp_set_endian_uint32(void)
  */
 void ske_lp_set_crypto(SKE_CRYPTO crypto)
 {
-    volatile unsigned int mask = ~(((unsigned int)1)<<SKE_LP_CRYPTO_OFFSET);
+    volatile unsigned int mask = ~(((unsigned int)1) << SKE_LP_CRYPTO_OFFSET);
 
     g_ske_lp_reg->cfg &= mask;
     g_ske_lp_reg->cfg |= (((unsigned int)crypto) << SKE_LP_CRYPTO_OFFSET);
 }
-
 
 /**
  * @brief       set ske_lp alg.
@@ -132,10 +127,9 @@ void ske_lp_set_crypto(SKE_CRYPTO crypto)
 void ske_lp_set_alg(SKE_ALG ske_alg)
 {
     volatile unsigned int mask = ~(0x0000000F);
-    unsigned int cfg;
+    unsigned int          cfg;
 
-    switch(ske_alg)
-    {
+    switch (ske_alg) {
 #ifdef SUPPORT_SKE_DES
     case SKE_ALG_DES:
         cfg = 3;
@@ -167,11 +161,11 @@ void ske_lp_set_alg(SKE_ALG ske_alg)
 #endif
 
     default:
-        cfg = 2;  //default alg SM4
+        cfg = 2;               //default alg SM4
     }
 
-    g_ske_lp_reg->cfg &= mask;      // clear bit[3:0]
-    g_ske_lp_reg->cfg |= cfg;       // set ske_lp alg cfg
+    g_ske_lp_reg->cfg &= mask; // clear bit[3:0]
+    g_ske_lp_reg->cfg |= cfg;  // set ske_lp alg cfg
 }
 
 /**
@@ -187,10 +181,10 @@ void ske_lp_set_alg(SKE_ALG ske_alg)
 void ske_lp_set_mode(SKE_MODE mode)
 {
     volatile unsigned int mask = ~(0x0000000F << SKE_LP_MODE_OFFSET);
-    unsigned int cfg = g_ske_lp_reg->cfg;
+    unsigned int          cfg  = g_ske_lp_reg->cfg;
 
-    cfg &= mask;                                                    //clear bit [31:28]
-    cfg |= (((unsigned int)mode) << SKE_LP_MODE_OFFSET);            //set mode
+    cfg &= mask;                                         //clear bit [31:28]
+    cfg |= (((unsigned int)mode) << SKE_LP_MODE_OFFSET); //set mode
     g_ske_lp_reg->cfg = cfg;
 }
 
@@ -205,15 +199,12 @@ void ske_lp_set_mode(SKE_MODE mode)
  */
 void ske_lp_set_last_block(unsigned int is_last_block)
 {
-    volatile unsigned int flag = (((unsigned int)1)<<SKE_LP_LAST_DATA_OFFSET);
-    volatile unsigned int mask = ~(((unsigned int)1)<<SKE_LP_LAST_DATA_OFFSET);
+    volatile unsigned int flag = (((unsigned int)1) << SKE_LP_LAST_DATA_OFFSET);
+    volatile unsigned int mask = ~(((unsigned int)1) << SKE_LP_LAST_DATA_OFFSET);
 
-    if(is_last_block)
-    {
+    if (is_last_block) {
         g_ske_lp_reg->m_din_cr |= flag;
-    }
-    else
-    {
+    } else {
         g_ske_lp_reg->m_din_cr &= mask;
     }
 }
@@ -246,9 +237,10 @@ void ske_lp_start(void)
 {
     volatile unsigned int start_flag = 1;
 
+    while (1 == (g_ske_lp_reg->sr1 & start_flag));
+
     g_ske_lp_reg->ctrl |= start_flag;
 }
-
 
 /**
  * @brief       wait till ske_lp calculating is done.
@@ -258,16 +250,18 @@ void ske_lp_start(void)
 unsigned int ske_lp_wait_till_done(void)
 {
     volatile unsigned int finish_flag = 1;
-    volatile unsigned int clear_flag = 0;
+    volatile unsigned int clear_flag  = 0;
 
 #if 0
     while((g_ske_lp_reg->sr2 & finish_flag) == 0)
 #else
-    while(((g_ske_lp_reg->sr2 & finish_flag) == 0) || ((g_ske_lp_reg->sr1 & finish_flag) == 1))
+    while (((g_ske_lp_reg->sr2 & finish_flag) == 0) || ((g_ske_lp_reg->sr1 & finish_flag) == 1))
 #endif
-    {;}
+    {
+        ;
+    }
 
-    g_ske_lp_reg->sr2 = clear_flag;  //write 0 to clear
+    g_ske_lp_reg->sr2 = clear_flag; //write 0 to clear
 
 #if 0
     while((g_ske_lp_reg->ctrl & finish_flag) == 1)
@@ -276,7 +270,6 @@ unsigned int ske_lp_wait_till_done(void)
 
     return SKE_SUCCESS;
 }
-
 
 /**
  * @brief       set ske_lp key.
@@ -293,17 +286,15 @@ unsigned int ske_lp_wait_till_done(void)
 void ske_lp_set_key_uint32(unsigned int *key, unsigned int idx, unsigned int key_words)
 {
     volatile unsigned int *key_reg = g_ske_lp_reg->key1;
-    unsigned int i;
+    unsigned int           i;
 
-    if(idx <= 2) //avoid idx unused warnning
+    if (idx <= 2)                //avoid idx unused warnning
     {
-        for(i = 0; i < key_words; i++)
-        {
-            key_reg[i] = key[i];//printf("\r\nkey %08x", key_reg[i]);
+        for (i = 0; i < key_words; i++) {
+            key_reg[i] = key[i]; //printf("\r\nkey %08x", key_reg[i]);
         }
     }
 }
-
 
 /**
  * @brief       set ske_lp iv.
@@ -320,21 +311,20 @@ void ske_lp_set_iv_uint32(unsigned int *iv, unsigned int block_words)
 #if 1
     unsigned int i;
 
-    for(i = 0; i < block_words; i++)
-    {
+    for (i = 0; i < block_words; i++) {
         g_ske_lp_reg->iv[i] = iv[i];
     }
 #else
     g_ske_lp_reg->iv[0] = iv[0];
     g_ske_lp_reg->iv[1] = iv[1];
 
-    if(4 == block_words)      //for AES/SM4
+    if (4 == block_words) //for AES/SM4
     {
         g_ske_lp_reg->iv[2] = iv[2];
         g_ske_lp_reg->iv[3] = iv[3];
+    } else {
+        ;
     }
-    else
-    {;}
 #endif
 }
 
@@ -351,8 +341,8 @@ void ske_lp_set_iv_uint32(unsigned int *iv, unsigned int block_words)
  */
 void ske_lp_set_aad_len_uint32(unsigned int aad_bytes)
 {
-    g_ske_lp_reg->ske_a_len_l = ((aad_bytes)<<3)&0xFFFFFFFF;
-    g_ske_lp_reg->ske_a_len_h = aad_bytes>>(32-3);
+    g_ske_lp_reg->ske_a_len_l = ((aad_bytes) << 3) & 0xFFFFFFFF;
+    g_ske_lp_reg->ske_a_len_h = aad_bytes >> (32 - 3);
 }
 #endif
 
@@ -369,8 +359,8 @@ void ske_lp_set_aad_len_uint32(unsigned int aad_bytes)
  */
 void ske_lp_set_c_len_uint32(unsigned int c_bytes)
 {
-    g_ske_lp_reg->ske_c_len_l = ((c_bytes)<<3)&0xFFFFFFFF;
-    g_ske_lp_reg->ske_c_len_h = c_bytes>>(32-3);
+    g_ske_lp_reg->ske_c_len_l = ((c_bytes) << 3) & 0xFFFFFFFF;
+    g_ske_lp_reg->ske_c_len_h = c_bytes >> (32 - 3);
 }
 #endif
 
@@ -397,16 +387,15 @@ void ske_lp_simple_set_input_block(unsigned int *in, unsigned int block_words)
     g_ske_lp_reg->m_din[0] = in[0];
     g_ske_lp_reg->m_din[1] = in[1];
 
-    if(4 == block_words)      //for AES/SM4
+    if (4 == block_words) //for AES/SM4
     {
         g_ske_lp_reg->m_din[2] = in[2];
         g_ske_lp_reg->m_din[3] = in[3];
+    } else {
+        ;
     }
-    else
-    {;}
 #endif
 }
-
 
 /**
  * @brief       output one block.
@@ -427,13 +416,13 @@ void ske_lp_simple_get_output_block(unsigned int *out, unsigned int block_words)
     out[0] = g_ske_lp_reg->m_dout[0];
     out[1] = g_ske_lp_reg->m_dout[1];
 
-    if(4 == block_words)      //for AES/SM4
+    if (4 == block_words) //for AES/SM4
     {
         out[2] = g_ske_lp_reg->m_dout[2];
         out[3] = g_ske_lp_reg->m_dout[3];
+    } else {
+        ;
     }
-    else
-    {;}
 #endif
 }
 
@@ -448,9 +437,9 @@ void ske_lp_simple_get_output_block(unsigned int *out, unsigned int block_words)
  */
 unsigned int ske_lp_expand_key(unsigned int dma_en)
 {
-    volatile unsigned int mask = ~(((unsigned int)1)<<SKE_LP_UP_CFG_OFFSET);
-    volatile unsigned int flag = (((unsigned int)1)<<SKE_LP_UP_CFG_OFFSET);
-    unsigned int ret;
+    volatile unsigned int mask = ~(((unsigned int)1) << SKE_LP_UP_CFG_OFFSET);
+    volatile unsigned int flag = (((unsigned int)1) << SKE_LP_UP_CFG_OFFSET);
+    unsigned int          ret;
 
     //update cfg
     g_ske_lp_reg->cfg |= flag;
@@ -459,20 +448,18 @@ unsigned int ske_lp_expand_key(unsigned int dma_en)
     ske_lp_start();
 
     ret = ske_lp_wait_till_done();
-    if(SKE_SUCCESS != ret)
-    {
+    if (SKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //not update cfg
-    if (SKE_LP_DMA_ENABLE == dma_en)
-    {
+    if (SKE_LP_DMA_ENABLE == dma_en) {
         ske_lp_set_dma_mode();
+    } else {
+        ;
     }
-    else
-    {;}
 
     g_ske_lp_reg->cfg &= mask;
 
@@ -492,16 +479,14 @@ unsigned int ske_lp_expand_key(unsigned int dma_en)
       -# 2.please make sure key/in/out address is word aligned.
   @endverbatim
  */
+ _attribute_ram_code_   /*!< BLE SDK USED */
 unsigned int ske_lp_aes128_ecb_one_block(SKE_CRYPTO crypto, unsigned int *key, unsigned int *in, unsigned int *out)
 {
     //set
-    if(SKE_CRYPTO_ENCRYPT == crypto)
-    {
-        g_ske_lp_reg->cfg = 0x10001001U;//AES128/ECB/ENC
-    }
-    else
-    {
-        g_ske_lp_reg->cfg = 0x10001801U;//AES128/ECB/DEC
+    if (SKE_CRYPTO_ENCRYPT == crypto) {
+        g_ske_lp_reg->cfg = 0x10001001U; //AES128/ECB/ENC
+    } else {
+        g_ske_lp_reg->cfg = 0x10001801U; //AES128/ECB/DEC
     }
 
     //set key
@@ -514,8 +499,8 @@ unsigned int ske_lp_aes128_ecb_one_block(SKE_CRYPTO crypto, unsigned int *key, u
     g_ske_lp_reg->ctrl |= 1U;
 
     //wait done
-    while(((g_ske_lp_reg->sr2 & 1U) == 0U) || ((g_ske_lp_reg->sr1 & 1U) == 1U))
-    {}
+    while (((g_ske_lp_reg->sr2 & 1U) == 0U) || ((g_ske_lp_reg->sr1 & 1U) == 1U)) {
+    }
 
     //clear sr
     g_ske_lp_reg->sr2 = 0U;
@@ -533,8 +518,9 @@ unsigned int ske_lp_aes128_ecb_one_block(SKE_CRYPTO crypto, unsigned int *key, u
     g_ske_lp_reg->ctrl |= 1;
 
     //wait done
-    while(((g_ske_lp_reg->sr2 & 1U) == 0) || ((g_ske_lp_reg->sr1 & 1U) == 1))
-    {;}
+    while (((g_ske_lp_reg->sr2 & 1U) == 0) || ((g_ske_lp_reg->sr1 & 1U) == 1)) {
+        ;
+    }
 
     //clear sr
     g_ske_lp_reg->sr2 = 0U;
@@ -548,7 +534,6 @@ unsigned int ske_lp_aes128_ecb_one_block(SKE_CRYPTO crypto, unsigned int *key, u
     return SKE_SUCCESS;
 }
 
-
 /************************* DMA *************************/
 
 #ifdef SKE_LP_DMA_FUNCTION
@@ -560,27 +545,24 @@ unsigned int ske_lp_aes128_ecb_one_block(SKE_CRYPTO crypto, unsigned int *key, u
 unsigned int ske_lp_dma_calc_wait_till_done(SKE_CALLBACK callback)
 {
     volatile unsigned int finish_flag = 1;
-    volatile unsigned int clear_flag = 0;
+    volatile unsigned int clear_flag  = 0;
 
-#ifdef SUPPORT_SKE_IRQ
+    #ifdef SUPPORT_SKE_IRQ
     volatile unsigned int flag_irq = (((unsigned int)1) << SKE_LP_IRQ_OFFSET);
 
-    if(ske_lp_reg->cfg & flag_irq)
-    {
+    if (ske_lp_reg->cfg & flag_irq) {
         return SKE_SUCCESS;
+    } else {
+        ;
     }
-    else
-    {;}
-#endif
+    #endif
 
-    while(!(g_ske_lp_reg->sr2 & finish_flag))
-    {
-        if(callback)
-        {
+    while (!(g_ske_lp_reg->sr2 & finish_flag)) {
+        if (callback) {
             callback();
+        } else {
+            ;
         }
-        else
-        {;}
     }
 
     g_ske_lp_reg->sr2 = clear_flag;
@@ -603,31 +585,27 @@ unsigned int ske_lp_dma_calc_wait_till_done(SKE_CALLBACK callback)
       -# 2.it could be without output, namely, out can be NULL, out_words can be 0(for input AAD, or CBC_MAC/CMAC mode).
   @endverbatim
  */
-unsigned int ske_lp_dma_operate(SKE_CTX *ctx, unsigned int *in, unsigned int *out, unsigned int in_words, unsigned int out_words,
-        SKE_CALLBACK callback)
+unsigned int ske_lp_dma_operate(SKE_CTX *ctx, unsigned int *in, unsigned int *out, unsigned int in_words, unsigned int out_words, SKE_CALLBACK callback)
 {
-    if(NULL == ctx) //avoid unused warnning
+    if (NULL == ctx) //avoid unused warnning
     {
         return SKE_BUFFER_NULL;
     }
-    if(NULL == in)
-    {
+    if (NULL == in) {
         return SKE_BUFFER_NULL;
-    }
-    else if (0 == in_words)
-    {
+    } else if (0 == in_words) {
         return SKE_SUCCESS;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //src & dst addr
     g_ske_lp_reg->dma_sa_l = (unsigned int)in;
     g_ske_lp_reg->dma_da_l = (unsigned int)out;
 
     //data word length
-    g_ske_lp_reg->dma_rlen = in_words<<2;
-    g_ske_lp_reg->dma_wlen = out_words<<2;
+    g_ske_lp_reg->dma_rlen = in_words << 2;
+    g_ske_lp_reg->dma_wlen = out_words << 2;
 
     ske_tx_dma(ske_get_tx_dma_channel(), (unsigned int)in, in_words << 2);
     ske_rx_dma(ske_get_rx_dma_channel(), (unsigned int)out, out_words << 2);
@@ -636,7 +614,6 @@ unsigned int ske_lp_dma_operate(SKE_CTX *ctx, unsigned int *in, unsigned int *ou
 
     return ske_lp_dma_calc_wait_till_done(callback);
 }
-
 
 /**
  * @brief       clear the last (16-bytes) of the block in(16 bytes).
@@ -652,22 +629,20 @@ void clear_block_tail(unsigned int in[4], unsigned int bytes)
 {
     unsigned int i;
 
-    i = bytes/4;
+    i = bytes / 4;
     bytes &= 3;
 
-    if(bytes)
-    {
-#ifdef SKE_LP_CPU_BIG_ENDIAN
-        in[i] &= 0xFFFFFFFF<<(32-bytes*8);
-#else
-        in[i] &= (1<<(bytes*8)) - 1;
-#endif
+    if (bytes) {
+    #ifdef SKE_LP_CPU_BIG_ENDIAN
+        in[i] &= 0xFFFFFFFF << (32 - bytes * 8);
+    #else
+        in[i] &= (1 << (bytes * 8)) - 1;
+    #endif
         i++;
     }
 
-    while(i < 4)
-    {
-        in[i++]=0;
+    while (i < 4) {
+        in[i++] = 0;
     }
 }
 #endif
@@ -691,24 +666,17 @@ unsigned int ske_lp_update_blocks_no_output(SKE_CTX *ctx, unsigned char *in, uns
     unsigned int i;
     unsigned int ret;
 
-    if(((unsigned int)in) & 3)
-    {
+    if (((unsigned int)in) & 3) {
         in_word_align = 0;
-    }
-    else
-    {
+    } else {
         in_word_align = 1;
     }
 
     //input one block ---> calculating ---> output one block
-    for (i = 0; i < bytes; i += ctx->block_bytes)
-    {
-        if(in_word_align)
-        {
+    for (i = 0; i < bytes; i += ctx->block_bytes) {
+        if (in_word_align) {
             ske_lp_simple_set_input_block((unsigned int *)in, ctx->block_words);
-        }
-        else
-        {
+        } else {
             memcpy_(tmp_in, in, ctx->block_bytes);
             ske_lp_simple_set_input_block((unsigned int *)tmp_in, ctx->block_words);
         }
@@ -716,12 +684,11 @@ unsigned int ske_lp_update_blocks_no_output(SKE_CTX *ctx, unsigned char *in, uns
         ske_lp_start();
 
         ret = ske_lp_wait_till_done();
-        if(SKE_SUCCESS != ret)
-        {
+        if (SKE_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
 
         in += ctx->block_bytes;
     }
@@ -745,35 +712,27 @@ unsigned int ske_lp_update_blocks_internal(SKE_CTX *ctx, unsigned char *in, unsi
 {
     unsigned int in_word_align, out_word_align;
     unsigned int tmp_in[4];
-    unsigned int i, round = bytes/ctx->block_bytes;
+    unsigned int i, round = bytes / ctx->block_bytes;
     unsigned int block_bytes = ctx->block_bytes;
     unsigned int ret;
 
-    if(((unsigned int)in) & 3)
-    {
+    if (((unsigned int)in) & 3) {
         in_word_align = 0;
-    }
-    else
-    {
+    } else {
         in_word_align = 1;
     }
 
-    if(((unsigned int)out) & 3)
-    {
+    if (((unsigned int)out) & 3) {
         out_word_align = 0;
-    }
-    else
-    {
+    } else {
         out_word_align = 1;
     }
 
-    if(in_word_align && out_word_align)
-    {
+    if (in_word_align && out_word_align) {
 #if 1
-        if(block_bytes == 16)       //for AES/SM4
+        if (block_bytes == 16) //for AES/SM4
         {
-            for (i = 0 ; i < round; i++)
-            {
+            for (i = 0; i < round; i++) {
                 //ske_lp_simple_set_input_block((unsigned int *)in, ctx->block_words);
                 g_ske_lp_reg->m_din[0] = ((unsigned int *)in)[0];
                 g_ske_lp_reg->m_din[1] = ((unsigned int *)in)[1];
@@ -783,12 +742,11 @@ unsigned int ske_lp_update_blocks_internal(SKE_CTX *ctx, unsigned char *in, unsi
                 ske_lp_start();
 
                 ret = ske_lp_wait_till_done();
-                if(SKE_SUCCESS != ret)
-                {
+                if (SKE_SUCCESS != ret) {
                     return ret;
+                } else {
+                    ;
                 }
-                else
-                {;}
 
                 //ske_lp_simple_get_output_block((unsigned int *)out, ctx->block_words);
                 ((unsigned int *)out)[0] = g_ske_lp_reg->m_dout[0];
@@ -799,11 +757,9 @@ unsigned int ske_lp_update_blocks_internal(SKE_CTX *ctx, unsigned char *in, unsi
                 in += block_bytes;
                 out += block_bytes;
             }
-        }
-        else                        //for DES/3DES
+        } else //for DES/3DES
         {
-            for (i = 0; i < round; i++)
-            {
+            for (i = 0; i < round; i++) {
                 //ske_lp_simple_set_input_block((unsigned int *)in, ctx->block_words);
                 g_ske_lp_reg->m_din[0] = ((unsigned int *)in)[0];
                 g_ske_lp_reg->m_din[1] = ((unsigned int *)in)[1];
@@ -811,12 +767,11 @@ unsigned int ske_lp_update_blocks_internal(SKE_CTX *ctx, unsigned char *in, unsi
                 ske_lp_start();
 
                 ret = ske_lp_wait_till_done();
-                if(SKE_SUCCESS != ret)
-                {
+                if (SKE_SUCCESS != ret) {
                     return ret;
+                } else {
+                    ;
                 }
-                else
-                {;}
 
                 //ske_lp_simple_get_output_block((unsigned int *)out, ctx->block_words);
                 ((unsigned int *)out)[0] = g_ske_lp_reg->m_dout[0];
@@ -827,37 +782,29 @@ unsigned int ske_lp_update_blocks_internal(SKE_CTX *ctx, unsigned char *in, unsi
             }
         }
 #else
-        for (i = 0 ; i < round; i++)
-        {
-            ske_lp_simple_set_input_block((unsigned int *)in, ctx->block_words);//print_buf_U32((unsigned int *)in_tmp, ctx->block_words, "in");
+        for (i = 0; i < round; i++) {
+            ske_lp_simple_set_input_block((unsigned int *)in, ctx->block_words); //print_buf_U32((unsigned int *)in_tmp, ctx->block_words, "in");
 
             ske_lp_start();
 
             ret = ske_lp_wait_till_done();
-            if(SKE_SUCCESS != ret)
-            {
+            if (SKE_SUCCESS != ret) {
                 return ret;
+            } else {
+                ;
             }
-            else
-            {;}
 
-            ske_lp_simple_get_output_block((unsigned int *)out, ctx->block_words);//print_buf_U32((unsigned int *)out_tmp, ctx->block_words, "out");
+            ske_lp_simple_get_output_block((unsigned int *)out, ctx->block_words); //print_buf_U32((unsigned int *)out_tmp, ctx->block_words, "out");
 
             in += block_bytes;
             out += block_bytes;
         }
 #endif
-    }
-    else
-    {
-        for (i = 0; i < round; i++)
-        {
-            if(in_word_align)
-            {
+    } else {
+        for (i = 0; i < round; i++) {
+            if (in_word_align) {
                 ske_lp_simple_set_input_block((unsigned int *)in, ctx->block_words);
-            }
-            else
-            {
+            } else {
                 memcpy_(tmp_in, in, block_bytes);
                 ske_lp_simple_set_input_block((unsigned int *)tmp_in, ctx->block_words);
             }
@@ -865,19 +812,15 @@ unsigned int ske_lp_update_blocks_internal(SKE_CTX *ctx, unsigned char *in, unsi
             ske_lp_start();
 
             ret = ske_lp_wait_till_done();
-            if(SKE_SUCCESS != ret)
-            {
+            if (SKE_SUCCESS != ret) {
                 return ret;
+            } else {
+                ;
             }
-            else
-            {;}
 
-            if(out_word_align)
-            {
+            if (out_word_align) {
                 ske_lp_simple_get_output_block((unsigned int *)out, ctx->block_words);
-            }
-            else
-            {
+            } else {
                 ske_lp_simple_get_output_block((unsigned int *)tmp_in, ctx->block_words);
                 memcpy_(out, tmp_in, block_bytes);
             }
@@ -906,13 +849,11 @@ unsigned int ske_lp_update_blocks_internal(SKE_CTX *ctx, unsigned char *in, unsi
 unsigned int ske_lp_gmac_update_blocks_internal(unsigned char *in, unsigned int bytes)
 {
     unsigned int tmp[4];
-    unsigned int i, round = bytes/16;
+    unsigned int i, round = bytes / 16;
     unsigned int ret;
 
-    if(0 ==(((unsigned int)in)&3))
-    {
-        for (i = 0; i < round; i++)
-        {
+    if (0 == (((unsigned int)in) & 3)) {
+        for (i = 0; i < round; i++) {
             //ske_lp_simple_set_input_block((unsigned int *)in, ctx->block_words);
             g_ske_lp_reg->m_din[0] = ((unsigned int *)in)[0];
             g_ske_lp_reg->m_din[1] = ((unsigned int *)in)[1];
@@ -922,40 +863,35 @@ unsigned int ske_lp_gmac_update_blocks_internal(unsigned char *in, unsigned int 
             ske_lp_start();
 
             ret = ske_lp_wait_till_done();
-            if(SKE_SUCCESS != ret)
-            {
+            if (SKE_SUCCESS != ret) {
                 return ret;
+            } else {
+                ;
             }
-            else
-            {;}
 
-//          *tmp = g_ske_lp_reg->m_dout[0];
-//          *tmp = g_ske_lp_reg->m_dout[1];
-//          *tmp = g_ske_lp_reg->m_dout[2];
-//          *tmp = g_ske_lp_reg->m_dout[3];
+            //          *tmp = g_ske_lp_reg->m_dout[0];
+            //          *tmp = g_ske_lp_reg->m_dout[1];
+            //          *tmp = g_ske_lp_reg->m_dout[2];
+            //          *tmp = g_ske_lp_reg->m_dout[3];
 
             in += 16;
         }
-    }
-    else
-    {
+    } else {
         //input one block ---> calculating ---> output one block
-        for (i = 0; i < round; i++)
-        {
+        for (i = 0; i < round; i++) {
             memcpy_(tmp, in, 16);
             ske_lp_simple_set_input_block((unsigned int *)tmp, 4);
 
             ske_lp_start();
 
             ret = ske_lp_wait_till_done();
-            if(SKE_SUCCESS != ret)
-            {
+            if (SKE_SUCCESS != ret) {
                 return ret;
+            } else {
+                ;
             }
-            else
-            {;}
 
-//          ske_lp_simple_get_output_block((unsigned int *)tmp, 4);
+            //          ske_lp_simple_get_output_block((unsigned int *)tmp, 4);
 
             in += 16;
         }
@@ -986,10 +922,10 @@ unsigned int tdes_ecb_update_one_block(unsigned int is_EEE, unsigned int key[6],
     unsigned int ret;
 
     /***************** round 1 *****************/
-    ske_lp_set_cpu_mode();//to update cfg
+    ske_lp_set_cpu_mode(); //to update cfg
     ske_lp_set_crypto(crypto);
 
-    ske_lp_set_key_uint32((SKE_CRYPTO_ENCRYPT == crypto)?key:key+4, 1, 2);
+    ske_lp_set_key_uint32((SKE_CRYPTO_ENCRYPT == crypto) ? key : key + 4, 1, 2);
     ske_lp_expand_key(SKE_LP_DMA_DISABLE);
 
     g_ske_lp_reg->m_din[0] = in[0];
@@ -997,23 +933,21 @@ unsigned int tdes_ecb_update_one_block(unsigned int is_EEE, unsigned int key[6],
 
     ske_lp_start();
     ret = ske_lp_wait_till_done();
-    if(SKE_SUCCESS != ret)
-    {
+    if (SKE_SUCCESS != ret) {
         goto END;
+    } else {
+        ;
     }
-    else
-    {;}
 
     /***************** round 2 *****************/
-    ske_lp_set_cpu_mode();//to update cfg
-    if(!is_EEE)
-    {
-        ske_lp_set_crypto((SKE_CRYPTO_ENCRYPT == crypto)?SKE_CRYPTO_DECRYPT:SKE_CRYPTO_ENCRYPT);
+    ske_lp_set_cpu_mode(); //to update cfg
+    if (!is_EEE) {
+        ske_lp_set_crypto((SKE_CRYPTO_ENCRYPT == crypto) ? SKE_CRYPTO_DECRYPT : SKE_CRYPTO_ENCRYPT);
+    } else {
+        ;
     }
-    else
-    {;}
 
-    ske_lp_set_key_uint32(key+2, 1, 2);
+    ske_lp_set_key_uint32(key + 2, 1, 2);
     ske_lp_expand_key(SKE_LP_DMA_DISABLE);
 
     g_ske_lp_reg->m_din[0] = g_ske_lp_reg->m_dout[0];
@@ -1021,23 +955,21 @@ unsigned int tdes_ecb_update_one_block(unsigned int is_EEE, unsigned int key[6],
 
     ske_lp_start();
     ret = ske_lp_wait_till_done();
-    if(SKE_SUCCESS != ret)
-    {
+    if (SKE_SUCCESS != ret) {
         goto END;
+    } else {
+        ;
     }
-    else
-    {;}
 
     /***************** round 3 *****************/
-    ske_lp_set_cpu_mode();//to update cfg
-    if(!is_EEE)
-    {
+    ske_lp_set_cpu_mode(); //to update cfg
+    if (!is_EEE) {
         ske_lp_set_crypto(crypto);
+    } else {
+        ;
     }
-    else
-    {;}
 
-    ske_lp_set_key_uint32((SKE_CRYPTO_ENCRYPT == crypto)?key+4:key, 1, 2);
+    ske_lp_set_key_uint32((SKE_CRYPTO_ENCRYPT == crypto) ? key + 4 : key, 1, 2);
     ske_lp_expand_key(SKE_LP_DMA_DISABLE);
 
     g_ske_lp_reg->m_din[0] = g_ske_lp_reg->m_dout[0];
@@ -1045,12 +977,11 @@ unsigned int tdes_ecb_update_one_block(unsigned int is_EEE, unsigned int key[6],
 
     ske_lp_start();
     ret = ske_lp_wait_till_done();
-    if(SKE_SUCCESS != ret)
-    {
+    if (SKE_SUCCESS != ret) {
         goto END;
+    } else {
+        ;
     }
-    else
-    {;}
 
     out[0] = g_ske_lp_reg->m_dout[0];
     out[1] = g_ske_lp_reg->m_dout[1];
@@ -1062,4 +993,3 @@ END:
     return ret;
 }
 #endif
-

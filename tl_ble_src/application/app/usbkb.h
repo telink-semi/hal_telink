@@ -32,40 +32,40 @@
 
 /* Enable C linkage for C++ Compilers: */
 #if defined(__cplusplus)
-extern "C" {
+extern "C"
+{
 #endif
 
 
-#define DAT_TYPE_KB         1
-#define DAT_TYPE_MOUSE      2
+#define DAT_TYPE_KB    1
+#define DAT_TYPE_MOUSE 2
 
-#define USB_FIFO_NUM        4
-#define USB_FIFO_SIZE       8
+#define USB_FIFO_NUM   4
+#define USB_FIFO_SIZE  8
 
-extern u8 usb_fifo[USB_FIFO_NUM][USB_FIFO_SIZE];
-extern u8 usb_ff_rptr;
-extern u8 usb_ff_wptr;
+    extern u8 usb_fifo[USB_FIFO_NUM][USB_FIFO_SIZE];
+    extern u8 usb_ff_rptr;
+    extern u8 usb_ff_wptr;
 
 
+#define KEYBOARD_REPORT_KEY_MAX 6
 
-#define KEYBOARD_REPORT_KEY_MAX     6
-typedef struct {
-    u8 Modifier; /**< Keyboard modifier byte, indicating pressed modifier keys (a combination of
+    typedef struct __attribute__((packed))
+    {
+        u8 Modifier;                         /**< Keyboard modifier byte, indicating pressed modifier keys (a combination of
                        *   \c HID_KEYBOARD_MODIFIER_* masks).
                        */
-    u8 Reserved; /**< Reserved for OEM use, always set to 0. */
-    u8 KeyCode[KEYBOARD_REPORT_KEY_MAX]; /**< Key codes of the currently pressed keys. */
-} usbkb_hid_report_t;
+        u8 Reserved;                         /**< Reserved for OEM use, always set to 0. */
+        u8 KeyCode[KEYBOARD_REPORT_KEY_MAX]; /**< Key codes of the currently pressed keys. */
+    } usbkb_hid_report_t;
 
+    void usbkb_report_consumer_key(u16 consumer_key);
 
-void usbkb_report_consumer_key(u16 consumer_key);
+    void usbkb_hid_report(kb_data_t *data);
 
-void usbkb_hid_report(kb_data_t *data);
-
-int usb_hid_report_fifo_proc(void);
+    int usb_hid_report_fifo_proc(void);
 
 /* Disable C linkage for C++ Compilers: */
 #if defined(__cplusplus)
 }
 #endif
-

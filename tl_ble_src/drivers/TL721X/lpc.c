@@ -31,14 +31,11 @@
  */
 void lpc_set_input_ref(lpc_mode_e mode, lpc_reference_e ref)
 {
-    if(mode == LPC_LOWPOWER)
-    {
+    if (mode == LPC_LOWPOWER) {
         //switch uvlo vref
         analog_write_reg8(0x0b, analog_read_reg8(0x0b) & 0xf7);
         analog_write_reg8(0x0d, analog_read_reg8(0x0d) | 0x80);
-    }
-    else if(mode == LPC_NORMAL)
-    {
+    } else if (mode == LPC_NORMAL) {
         //switch bg vref
         analog_write_reg8(0x0b, analog_read_reg8(0x0b) | 0x08);
         analog_write_reg8(0x0d, analog_read_reg8(0x0d) & 0x7f);
@@ -46,4 +43,3 @@ void lpc_set_input_ref(lpc_mode_e mode, lpc_reference_e ref)
 
     analog_write_reg8(0x0d, (analog_read_reg8(0x0d) & 0x8f) | (ref << 4));
 }
-

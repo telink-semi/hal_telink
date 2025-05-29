@@ -41,4 +41,4 @@ void app_audio_ui_init(void);
  */
 void app_audio_ui_loop(void);
 
-#endif  //ASSISTANT_VERSION == UNIVERSAL_VERSION
+#endif //ASSISTANT_VERSION == UNIVERSAL_VERSION

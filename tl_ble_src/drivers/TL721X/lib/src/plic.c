@@ -69,23 +69,19 @@ unsigned int g_wfi_disable_int = 0;
  *                - Return the value of the mstatus.MIE bit in other cases.
  * @note    plic_enter_critical_sec and plic_exit_critical_sec must be used in pairs.
  */
-_attribute_ram_code_com_sec_noinline_ unsigned int plic_enter_critical_sec(unsigned char preempt_en, unsigned char threshold)
+_attribute_ram_code_sec_noinline_ unsigned int plic_enter_critical_sec(unsigned char preempt_en, unsigned char threshold)
 {
     unsigned int r;
-    if (g_plic_preempt_en && preempt_en)
-    {
+    if (g_plic_preempt_en && preempt_en) {
         /**
          * Get the current value of reg_irq_threshold, if the target value to be written is larger than the current value, update it to reg_irq_threshold, otherwise do not update it, \n
          * to achieve the purpose of shielding the interrupt with priority less than or equal to the threshold.
          */
         r = reg_irq_threshold;
-        if (threshold > r)
-        {
+        if (threshold > r) {
             plic_set_threshold(threshold);
         }
-    }
-    else
-    {
+    } else {
         r = core_interrupt_disable();
     }
     return r;
@@ -100,14 +96,11 @@ _attribute_ram_code_com_sec_noinline_ unsigned int plic_enter_critical_sec(unsig
  *                 - The value of mstatus.MIE or threshold to restore when exit critical section, it must be the value returned by the plic_enter_critical_sec function.
  * @return  none
  */
-_attribute_ram_code_com_sec_noinline_ void plic_exit_critical_sec(unsigned char preempt_en, unsigned int r)
+_attribute_ram_code_sec_noinline_ void plic_exit_critical_sec(unsigned char preempt_en, unsigned int r)
 {
-    if (g_plic_preempt_en && preempt_en)
-    {
+    if (g_plic_preempt_en && preempt_en) {
         plic_set_threshold(r); /* Restore to the value returned by the same level plic_enter_critical_sec. */
-    }
-    else
-    {
+    } else {
         core_restore_interrupt(r);
     }
 }
@@ -118,7 +111,7 @@ _attribute_ram_code_com_sec_noinline_ void plic_exit_critical_sec(unsigned char 
  * @param[in]   src - Interrupt source see @ref irq_source_index.
  * @return      none
  */
-_attribute_ram_code_com_sec_ __attribute__((always_inline)) inline void plic_isr(func_isr_t func, unsigned int src)
+_attribute_ram_code_sec_ __attribute__((always_inline)) inline void plic_isr(func_isr_t func, unsigned int src)
 {
     /**
      * Adding always_inline modifier function is for code reduction and better real-time performance.
@@ -126,8 +119,7 @@ _attribute_ram_code_com_sec_ __attribute__((always_inline)) inline void plic_isr
      *   see the compiler's processing is: all the general-purpose registers of the mcu are in the stack and out of the stack protection.
      * - if you add always_inline, and the user's interrupt handling function does not have a complex function call, the compiler can do, only the general-purpose registers used by the program for the stack and out of the stack protection.
      */
-    if (g_plic_preempt_en)
-    {
+    if (g_plic_preempt_en) {
         /**
          * MEI not interrupted by MSI or MTI handling
          *   -# save MIE register;
@@ -147,9 +139,7 @@ _attribute_ram_code_com_sec_ __attribute__((always_inline)) inline void plic_isr
          * PLIC is required to ensure that a complete message for the previous interrupt has reached the PLIC before sending the interrupt claim.
          */
         fence_iorw;
-    }
-    else
-    {
+    } else {
         func();                       /* irq handler */
         plic_interrupt_complete(src); /* complete interrupt */
     }
@@ -166,7 +156,7 @@ _attribute_ram_code_com_sec_ __attribute__((always_inline)) inline void plic_isr
  *          - When global interrupt is disabled, the application needs to call this interface to ensure that all PLIC interrupt requests have been processed.
  *          - When global interrupt is enabled, the application does not need to call this interface, the hardware and interrupt service routine handle interrupt requests.
  */
-_attribute_ram_code_com_sec_optimize_o2_noinline_ int plic_clr_all_request(void)
+_attribute_ram_code_sec_optimize_o2_noinline_ int plic_clr_all_request(void)
 {
     unsigned int claim_cnt = 0;
     unsigned int cur_claim = 0;
@@ -175,16 +165,14 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ int plic_clr_all_request(void)
      * when global interrupts are disabled, software needs to ensure that all interrupts have been claimed and completed, \n
      * When global interrupt enable, hardware handles the claim, complete is handled in the plic_isr function.
      */
-    do
-    {
+    do {
         cur_claim = plic_interrupt_claim();
         plic_interrupt_complete(cur_claim);
         claim_cnt++;
     } while ((cur_claim != 0) && (claim_cnt <= IRQ_RZ * 2));
 
     /* Clearing all PLIC interrupt requests fails, returning an error code to notify the application program. */
-    if (claim_cnt > IRQ_RZ * 2)
-    {
+    if (claim_cnt > IRQ_RZ * 2) {
         return 0;
     }
 
@@ -196,13 +184,13 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ int plic_clr_all_request(void)
  * @return     none
  * @note       plic_all_interrupt_save_and_disable and plic_all_interrupt_restore must be used in pairs.
  */
-_attribute_ram_code_com_sec_optimize_o2_noinline_ void plic_all_interrupt_save_and_disable(void)
+_attribute_ram_code_sec_optimize_o2_noinline_ void plic_all_interrupt_save_and_disable(void)
 {
     /* save PLIC irq and disable. */
     g_irq_src1_value = reg_irq_src1;
     g_irq_src0_value = reg_irq_src0;
-    reg_irq_src1 = 0;
-    reg_irq_src0 = 0;
+    reg_irq_src1     = 0;
+    reg_irq_src0     = 0;
 }
 
 /**
@@ -210,7 +198,7 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ void plic_all_interrupt_save_a
  * @return     none
  * @note       plic_all_interrupt_save_and_disable and plic_all_interrupt_restore must be used in pairs.
  */
-_attribute_ram_code_com_sec_optimize_o2_noinline_ void plic_all_interrupt_restore(void)
+_attribute_ram_code_sec_optimize_o2_noinline_ void plic_all_interrupt_restore(void)
 {
     /* restore PLIC irq. */
     reg_irq_src0 = g_irq_src0_value;
@@ -227,15 +215,12 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ void plic_all_interrupt_restor
  *  - When the core is awoken by the pending interrupt and global interrupts disable, it will resume and start to execute from the instruction after the WFI instruction.
  *  - plic_irqs_preprocess_for_wfi and plic_irqs_postprocess_for_wfi must be used in pairs.
  */
-_attribute_ram_code_com_sec_optimize_o2_noinline_ void plic_irqs_preprocess_for_wfi(unsigned char flag, mie_e mie)
+_attribute_ram_code_sec_optimize_o2_noinline_ void plic_irqs_preprocess_for_wfi(unsigned char flag, mie_e mie)
 {
-    if (flag)
-    {
+    if (flag) {
         g_wfi_disable_int = 1;
-        g_mstatus_value = core_interrupt_disable();
-    }
-    else
-    {
+        g_mstatus_value   = core_interrupt_disable();
+    } else {
         g_wfi_disable_int = 0;
     }
 
@@ -253,10 +238,9 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ void plic_irqs_preprocess_for_
  *  - This function will enable PLIC interrupt so this interface cannot be called from the interrupt service routine.
  *  - plic_irqs_preprocess_for_wfi and plic_irqs_postprocess_for_wfi must be used in pairs.
  */
-_attribute_ram_code_com_sec_optimize_o2_noinline_ void plic_irqs_postprocess_for_wfi(void)
+_attribute_ram_code_sec_optimize_o2_noinline_ void plic_irqs_postprocess_for_wfi(void)
 {
-    if (g_wfi_disable_int)
-    {
+    if (g_wfi_disable_int) {
         /* When global interrupt is disabled, the application needs to call this interface to ensure that the corresponding PLIC interrupt requests have been processed. */
         plic_clr_all_request();
     }
@@ -264,8 +248,7 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ void plic_irqs_postprocess_for
     plic_all_interrupt_restore();
     core_mie_restore(g_mie_value);
 
-    if (g_wfi_disable_int)
-    {
+    if (g_wfi_disable_int) {
         core_restore_interrupt(g_mstatus_value);
     }
 }

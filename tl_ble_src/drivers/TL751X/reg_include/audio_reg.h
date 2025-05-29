@@ -56,9 +56,9 @@
 #define REG_AUDIO_ANC1_BASE                     0x142fe0
 #define REG_AUDIO_ANC_ADDR(i)                   (0x1428e0 + 0x700 * (i))
 
-#define REG_AUDIO_CODEC_CTRL_BASS               0x1436e0
+#define REG_AUDIO_CODEC_CTRL_BASE               0x1436e0
 
-#define REG_AUDIO_CLK_IRQ_CTRL_BASS             0x143760
+#define REG_AUDIO_CLK_IRQ_CTRL_BASE             0x143760
 
 #define REG_AUDIO_CODEC0_BASE                   0x143800
 #define REG_AUDIO_CODEC1_BASE                   0x143880
@@ -293,7 +293,7 @@ enum
 #define reg_audio_hac_bq_a2(hac, bq)            REG_ADDR32(REG_AUDIO_HAC_BASE + 0x64 + (bq) * 0x14 + (hac) * 0xc8) /* hac[0-7] bq[0-9] */
 
 #define reg_audio_hac_tx_fifo_clr               REG_ADDR8(REG_AUDIO_HAC_BASE + 0x694)
-#define reg_audio_hac_mux_sel                   REG_ADDR8(REG_AUDIO_HAC_BASE + 0x695)
+#define reg_audio_hac_mux_sel                   REG_ADDR8(REG_AUDIO_HAC_BASE + 0x695) /* src 1: MCU, 0: matrix. */
 #define reg_audio_hac_rx_afifo_clr              REG_ADDR8(REG_AUDIO_HAC_BASE + 0x696)
 
 #define reg_audio_hac_tx_fifo_overnum           REG_ADDR8(REG_AUDIO_HAC_BASE + 0x697)
@@ -350,7 +350,7 @@ enum
     FLD_HAC_ARB_FIFO_CLR                        = BIT(0),
 };
 
-#define reg_audio_hac_hmst_sel                  REG_ADDR8(REG_AUDIO_HAC_BASE + 0x69d)
+#define reg_audio_hac_hmst_sel                  REG_ADDR8(REG_AUDIO_HAC_BASE + 0x69d) /* dst 1: AHB_MST, 0 matrix. */
 #define reg_audio_hac_haddr_set                 REG_ADDR8(REG_AUDIO_HAC_BASE + 0x69e)
 enum
 {
@@ -512,6 +512,14 @@ enum
     FLD_HAC_AHB_SLV_DAT_SEL                     = BIT(2),
 };
 
+ /**
+  * @brief 
+  *  - 0: 192/384/768KHz
+  *  - 1: 32/44.1/48/96/192KHz
+  *  - 2: 96/192/384KHz
+  *  - 3: 16/32/44.1/48/96KHz
+  * So software configurations 0 and 3 will cover all input coverage, and configurations 1 and 2 will produce ASRC output a few cycles faster than 3.
+  */
 #define reg_audio_hac_asrc_interval            REG_ADDR16(REG_AUDIO_HAC_BASE + 0x6e2)
 enum
 {
@@ -1113,7 +1121,7 @@ enum
 };
 
 /**************************************************** CODEC control register *****************************************************************/
-#define reg_audio_codec_ctrl                    REG_ADDR8(REG_AUDIO_CODEC_CTRL_BASS)
+#define reg_audio_codec_ctrl                    REG_ADDR8(REG_AUDIO_CODEC_CTRL_BASE)
 enum
 {
     FLD_CODEC_CTRL_DAC_MST_EN                   = BIT(0), /**< 1: dac master en. */
@@ -1122,7 +1130,7 @@ enum
     FLD_CODEC_CTRL_CODEC1_ADC_A_MST_EN          = BIT(3), /**< 1: codec1 ADC_A master en. */
 };
 
-#define reg_audio_codec_data_fmt_l              REG_ADDR8(REG_AUDIO_CODEC_CTRL_BASS + 0x02)
+#define reg_audio_codec_data_fmt_l              REG_ADDR8(REG_AUDIO_CODEC_CTRL_BASE + 0x02)
 enum
 {
     FLD_CODEC_CTRL_ADC0_SL_SEL                  = BIT(0),
@@ -1135,37 +1143,37 @@ enum
     FLD_CODEC_CTRL_DAC_SR_SEL                   = BIT(7),
 };
 
-#define reg_audio_codec0_int_pcm_num            REG_ADDR16(REG_AUDIO_CODEC_CTRL_BASS + 0x04)
+#define reg_audio_codec0_int_pcm_num            REG_ADDR16(REG_AUDIO_CODEC_CTRL_BASE + 0x04)
 enum
 {
     FLD_CODEC0_INT_PCM_NUM                      = BIT_RNG(0, 12),
 };
 
-#define reg_audio_codec0_dec0_pcm_num           REG_ADDR16(REG_AUDIO_CODEC_CTRL_BASS + 0x08)
+#define reg_audio_codec0_dec0_pcm_num           REG_ADDR16(REG_AUDIO_CODEC_CTRL_BASE + 0x08)
 enum
 {
     FLD_CODEC0_DEC0_PCM_NUM                     = BIT_RNG(0, 12),
 };
 
-#define reg_audio_codec0_dec1_pcm_num           REG_ADDR16(REG_AUDIO_CODEC_CTRL_BASS + 0x0c)
+#define reg_audio_codec0_dec1_pcm_num           REG_ADDR16(REG_AUDIO_CODEC_CTRL_BASE + 0x0c)
 enum
 {
     FLD_CODEC0_DEC1_PCM_NUM                     = BIT_RNG(0, 12),
 };
 
-#define reg_audio_codec_dmic_dec2_pcm_num       REG_ADDR16(REG_AUDIO_CODEC_CTRL_BASS + 0x10)
+#define reg_audio_codec_dmic_dec2_pcm_num       REG_ADDR16(REG_AUDIO_CODEC_CTRL_BASE + 0x10)
 enum
 {
     FLD_CODEC_DMIC_DEC2_PCM_NUM                 = BIT_RNG(0, 12),
 };
 
-#define reg_audio_codec_dac_stimer_target       REG_ADDR32(REG_AUDIO_CODEC_CTRL_BASS + 0x14)
-#define reg_audio_codec_adc0_stimer_target      REG_ADDR32(REG_AUDIO_CODEC_CTRL_BASS + 0x18)
-#define reg_audio_codec_adc1_stimer_target      REG_ADDR32(REG_AUDIO_CODEC_CTRL_BASS + 0x1c)
-#define reg_audio_codec_adc2_stimer_target      REG_ADDR32(REG_AUDIO_CODEC_CTRL_BASS + 0x20)
-#define reg_audio_codec_adc_stimer_target(adc)  REG_ADDR32(REG_AUDIO_CODEC_CTRL_BASS + 0x18 + ((adc) << 2))
+#define reg_audio_codec_dac_stimer_target       REG_ADDR32(REG_AUDIO_CODEC_CTRL_BASE + 0x14)
+#define reg_audio_codec_adc0_stimer_target      REG_ADDR32(REG_AUDIO_CODEC_CTRL_BASE + 0x18)
+#define reg_audio_codec_adc1_stimer_target      REG_ADDR32(REG_AUDIO_CODEC_CTRL_BASE + 0x1c)
+#define reg_audio_codec_adc2_stimer_target      REG_ADDR32(REG_AUDIO_CODEC_CTRL_BASE + 0x20)
+#define reg_audio_codec_adc_stimer_target(adc)  REG_ADDR32(REG_AUDIO_CODEC_CTRL_BASE + 0x18 + ((adc) << 2))
 
-#define reg_audio_codec_misc_ctrl               REG_ADDR8(REG_AUDIO_CODEC_CTRL_BASS + 0x28)
+#define reg_audio_codec_misc_ctrl               REG_ADDR8(REG_AUDIO_CODEC_CTRL_BASE + 0x28)
 enum
 {
     FLD_CODEC_DAC_SCHEDULE_EN                   = BIT(0),
@@ -1175,9 +1183,9 @@ enum
     FLD_CODEC_DAC_MODE                          = BIT(4),
 };
 
-#define reg_audio_codec0_auto_bist_ctrl         REG_ADDR8(REG_AUDIO_CODEC_CTRL_BASS + 0x29)
-#define reg_audio_codec1_auto_bist_ctrl         REG_ADDR8(REG_AUDIO_CODEC_CTRL_BASS + 0x2e)
-#define reg_audio_codec_auto_bist_ctrl(codec)   REG_ADDR8(REG_AUDIO_CODEC_CTRL_BASS + 0x29 + (codec) * 5) /* codec[0-1] */
+#define reg_audio_codec0_auto_bist_ctrl         REG_ADDR8(REG_AUDIO_CODEC_CTRL_BASE + 0x29)
+#define reg_audio_codec1_auto_bist_ctrl         REG_ADDR8(REG_AUDIO_CODEC_CTRL_BASE + 0x2e)
+#define reg_audio_codec_auto_bist_ctrl(codec)   REG_ADDR8(REG_AUDIO_CODEC_CTRL_BASE + 0x29 + (codec) * 5) /* codec[0-1] */
 enum
 {
     FLD_CODEC_AUTO_BIST_EN                      = BIT(0),
@@ -1188,9 +1196,9 @@ enum
     FLD_CODEC_AUTO_BIST_CLK_RD                  = BIT(5),
 };
 
-#define reg_audio_codec0_manual_bist_ctrl       REG_ADDR8(REG_AUDIO_CODEC_CTRL_BASS + 0x2a)
-#define reg_audio_codec1_manual_bist_ctrl       REG_ADDR8(REG_AUDIO_CODEC_CTRL_BASS + 0x2f)
-#define reg_audio_codec_manual_bist_ctrl(codec) REG_ADDR8(REG_AUDIO_CODEC_CTRL_BASS + 0x2a + (codec) * 5) /* codec[0-1] */
+#define reg_audio_codec0_manual_bist_ctrl       REG_ADDR8(REG_AUDIO_CODEC_CTRL_BASE + 0x2a)
+#define reg_audio_codec1_manual_bist_ctrl       REG_ADDR8(REG_AUDIO_CODEC_CTRL_BASE + 0x2f)
+#define reg_audio_codec_manual_bist_ctrl(codec) REG_ADDR8(REG_AUDIO_CODEC_CTRL_BASE + 0x2a + (codec) * 5) /* codec[0-1] */
 enum
 {
     FLD_CODEC_BIST_MODE                         = BIT(0),
@@ -1203,11 +1211,11 @@ enum
     FLD_CODEC_BIST_ERR_CNT_CLR                  = BIT(7),
 };
 
-#define reg_audio_codec0_bist_err_cnt           REG_ADDR16(REG_AUDIO_CODEC_CTRL_BASS + 0x2c)
-#define reg_audio_codec1_bist_err_cnt           REG_ADDR16(REG_AUDIO_CODEC_CTRL_BASS + 0x30)
-#define reg_audio_codec_bist_err_cnt(codec)     REG_ADDR16(REG_AUDIO_CODEC_CTRL_BASS + 0x2c + (codec) * 4) /* codec[0-1] */
+#define reg_audio_codec0_bist_err_cnt           REG_ADDR16(REG_AUDIO_CODEC_CTRL_BASE + 0x2c)
+#define reg_audio_codec1_bist_err_cnt           REG_ADDR16(REG_AUDIO_CODEC_CTRL_BASE + 0x30)
+#define reg_audio_codec_bist_err_cnt(codec)     REG_ADDR16(REG_AUDIO_CODEC_CTRL_BASE + 0x2c + (codec) * 4) /* codec[0-1] */
 
-#define reg_audio_codec_ms                      REG_ADDR8(REG_AUDIO_CODEC_CTRL_BASS + 0x32)
+#define reg_audio_codec_ms                      REG_ADDR8(REG_AUDIO_CODEC_CTRL_BASE + 0x32)
 enum
 {
     FLD_CODEC_DMIC_MS_MODE                      = BIT(0),
@@ -1217,7 +1225,7 @@ enum
 };
 
 /**************************************************** CLK and IRQ control register *****************************************************************/
-#define reg_audio_clk_en                        REG_ADDR8(REG_AUDIO_CLK_IRQ_CTRL_BASS)
+#define reg_audio_clk_en                        REG_ADDR8(REG_AUDIO_CLK_IRQ_CTRL_BASE)
 enum
 {
     FLD_CLK_ACLK_EN                             = BIT(0),
@@ -1229,27 +1237,27 @@ enum
     FLD_CLK_CODEC1_EN                           = BIT(6),
 };
 
-#define reg_audio_clk_aclk_sel                  REG_ADDR8(REG_AUDIO_CLK_IRQ_CTRL_BASS + 0x01)
+#define reg_audio_clk_aclk_sel                  REG_ADDR8(REG_AUDIO_CLK_IRQ_CTRL_BASE + 0x01)
 enum
 {
     FLD_CLK_ACLK_SET                            = BIT_RNG(0, 3),
 };
 
-#define reg_audio_clk_i2s0_step                 REG_ADDR16(REG_AUDIO_CLK_IRQ_CTRL_BASS + 0x02)
-#define reg_audio_clk_i2s1_step                 REG_ADDR16(REG_AUDIO_CLK_IRQ_CTRL_BASS + 0x04)
-#define reg_audio_clk_i2s2_step                 REG_ADDR16(REG_AUDIO_CLK_IRQ_CTRL_BASS + 0x06)
-#define reg_audio_clk_i2s_step(i2s)             REG_ADDR16(REG_AUDIO_CLK_IRQ_CTRL_BASS + 0x02 + ((i2s) << 1)) /* i2s[0-2] */
+#define reg_audio_clk_i2s0_step                 REG_ADDR16(REG_AUDIO_CLK_IRQ_CTRL_BASE + 0x02)
+#define reg_audio_clk_i2s1_step                 REG_ADDR16(REG_AUDIO_CLK_IRQ_CTRL_BASE + 0x04)
+#define reg_audio_clk_i2s2_step                 REG_ADDR16(REG_AUDIO_CLK_IRQ_CTRL_BASE + 0x06)
+#define reg_audio_clk_i2s_step(i2s)             REG_ADDR16(REG_AUDIO_CLK_IRQ_CTRL_BASE + 0x02 + ((i2s) << 1)) /* i2s[0-2] */
 enum
 {
     FLD_CLK_I2S_STEP                            = BIT_RNG(0, 14)
 };
 
-#define reg_audio_clk_i2s0_mod                  REG_ADDR16(REG_AUDIO_CLK_IRQ_CTRL_BASS + 0x08)
-#define reg_audio_clk_i2s1_mod                  REG_ADDR16(REG_AUDIO_CLK_IRQ_CTRL_BASS + 0x0a)
-#define reg_audio_clk_i2s2_mod                  REG_ADDR16(REG_AUDIO_CLK_IRQ_CTRL_BASS + 0x0c)
-#define reg_audio_clk_i2s_mod(i2s)              REG_ADDR16(REG_AUDIO_CLK_IRQ_CTRL_BASS + 0x08 + ((i2s) << 1)) /* i2s[0-2] */
+#define reg_audio_clk_i2s0_mod                  REG_ADDR16(REG_AUDIO_CLK_IRQ_CTRL_BASE + 0x08)
+#define reg_audio_clk_i2s1_mod                  REG_ADDR16(REG_AUDIO_CLK_IRQ_CTRL_BASE + 0x0a)
+#define reg_audio_clk_i2s2_mod                  REG_ADDR16(REG_AUDIO_CLK_IRQ_CTRL_BASE + 0x0c)
+#define reg_audio_clk_i2s_mod(i2s)              REG_ADDR16(REG_AUDIO_CLK_IRQ_CTRL_BASE + 0x08 + ((i2s) << 1)) /* i2s[0-2] */
 
-#define reg_audio_clk_rst_en_l                  REG_ADDR8(REG_AUDIO_CLK_IRQ_CTRL_BASS + 0x0e)
+#define reg_audio_clk_rst_en_l                  REG_ADDR8(REG_AUDIO_CLK_IRQ_CTRL_BASE + 0x0e)
 enum
 {
     FLD_CLK_RST_I2S0_EN                         = BIT(0),
@@ -1262,7 +1270,7 @@ enum
     FLD_CLK_RST_CODECIF_EN                      = BIT(7),
 };
 
-#define reg_audio_clk_rst_en_h                  REG_ADDR8(REG_AUDIO_CLK_IRQ_CTRL_BASS + 0x0f)
+#define reg_audio_clk_rst_en_h                  REG_ADDR8(REG_AUDIO_CLK_IRQ_CTRL_BASE + 0x0f)
 enum
 {
     FLD_CLK_RST_SDT0_EN                         = BIT(0),
@@ -1274,7 +1282,7 @@ enum
     FLD_CLK_RST_MATRIX_EN                       = BIT(6),
 };
 
-#define reg_audio_clk_irq_status0               REG_ADDR8(REG_AUDIO_CLK_IRQ_CTRL_BASS + 0x10)
+#define reg_audio_clk_irq_status0               REG_ADDR8(REG_AUDIO_CLK_IRQ_CTRL_BASE + 0x10)
 enum
 {
     FLD_DMA_FIFO_IRQ0                           = BIT(0),
@@ -1287,7 +1295,7 @@ enum
     FLD_DMA_FIFO_IRQ7                           = BIT(7),
 };
 
-#define reg_audio_clk_irq_status1               REG_ADDR8(REG_AUDIO_CLK_IRQ_CTRL_BASS + 0x11)
+#define reg_audio_clk_irq_status1               REG_ADDR8(REG_AUDIO_CLK_IRQ_CTRL_BASE + 0x11)
 enum
 {
     FLD_HAC_IRQ0                                = BIT(0),
@@ -1300,14 +1308,14 @@ enum
     FLD_HAC_IRQ7                                = BIT(7),
 };
 
-#define reg_audio_clk_irq_status2               REG_ADDR8(REG_AUDIO_CLK_IRQ_CTRL_BASS + 0x12)
+#define reg_audio_clk_irq_status2               REG_ADDR8(REG_AUDIO_CLK_IRQ_CTRL_BASE + 0x12)
 enum
 {
     FLD_CODEC_IRQ                               = BIT(0),
     FLD_HMST_RESP_IRQ                           = BIT(1),
 };
 
-#define reg_audio_clk_hmst_resp_irq_ctrl        REG_ADDR8(REG_AUDIO_CLK_IRQ_CTRL_BASS + 0x14)
+#define reg_audio_clk_hmst_resp_irq_ctrl        REG_ADDR8(REG_AUDIO_CLK_IRQ_CTRL_BASE + 0x14)
 enum
 {
     FLD_HMST_RESP_IRQ_EN                        = BIT(0),

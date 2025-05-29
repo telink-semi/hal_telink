@@ -27,7 +27,6 @@
  *******************************************************************************************************/
 #include "lib/include/trng/trng_portable.h"
 #include "compiler.h"
-#include "lib/include/core.h"
 /**********************************************************************************************************************
  *                                            local constants                                                       *
  *********************************************************************************************************************/
@@ -39,15 +38,15 @@
 /*This mode is to use the random number module, the randomness of obtaining random numbers will be better,
   but the time and power consumption will be large, and there will be compatibility effects with the former.
 */
-#define TRUE_RANDOM_MODE                                          1
+#define TRUE_RANDOM_MODE 1
 
 /*This mode is to obtain a random number seed to be processed so as to obtain a random number,
   the performance of the random number obtained in this mode is poor (compared to the true random number module to obtain random numbers),
   but this mode will greatly reduce the power consumption.
 */
-#define PSEUDO_RANDOM_MODE                                        2
+#define PSEUDO_RANDOM_MODE 2
 
-#define  TRNG_MODE           PSEUDO_RANDOM_MODE
+#define TRNG_MODE          PSEUDO_RANDOM_MODE
 
 /**********************************************************************************************************************
  *                                             local data type                                                     *
@@ -64,7 +63,7 @@ _attribute_data_retention_sec_ unsigned int g_rnd_m_z = 0;
 /**
  * trng error timeout(us),a large value is set by default,can set it by trng_set_error_timeout().
  */
-unsigned int g_trng_error_timeout_us  = 0xffffffff;
+unsigned int g_trng_error_timeout_us = 0xffffffff;
 
 /**********************************************************************************************************************
  *                                              local variable                                                     *
@@ -96,7 +95,8 @@ void trng_hw_reset(void)
  *            1. at least 1ms;
  *            2. maximum interrupt processing time;
  */
-void trng_set_error_timeout(unsigned int timeout_us){
+void trng_set_error_timeout(unsigned int timeout_us)
+{
     g_trng_error_timeout_us = timeout_us;
 }
 
@@ -113,18 +113,18 @@ __attribute__((weak)) void trng_timeout_handler(unsigned int trng_error_timeout_
     trng_hw_reset();
 }
 
-#if(TRNG_MODE == PSEUDO_RANDOM_MODE)
+#if (TRNG_MODE == PSEUDO_RANDOM_MODE)
 /**
  * @brief     This function serves to check whether the trng is ready.
  * @return    0:ready   1:no ready.
  */
-static bool trng_is_ready(void){
+static bool trng_is_ready(void)
+{
     return !(rTRNG_SR & BIT(1));
 }
 #endif
 
-#define TRNG_WAIT()                         wait_condition_fails_or_timeout(trng_is_ready,g_trng_error_timeout_us,trng_timeout_handler,(unsigned int)0)
-
+#define TRNG_WAIT() wait_condition_fails_or_timeout(trng_is_ready, g_trng_error_timeout_us, trng_timeout_handler, (unsigned int)0)
 
 /**
  * @brief Initialize TRNG-related generic configurations.
@@ -142,6 +142,7 @@ void trng_dig_en(void)
     trng_reset();
     trng_clk_en();
 }
+
 /**
  * @brief     Disable TRNG module.
  * @return    none
@@ -162,8 +163,8 @@ void trng_dig_dis(void)
  */
 drv_api_status_e trng_init(void)
 {
-#if(TRNG_MODE == TRUE_RANDOM_MODE)
-#if 0
+#if (TRNG_MODE == TRUE_RANDOM_MODE)
+    #if 0
     /**
      *1: The default register configuration of the chip's random number module is set up
      *   according to the best possible randomness, so some of the initialization setup
@@ -195,22 +196,22 @@ drv_api_status_e trng_init(void)
     trng_set_freq(3);
     /***enable ro rng***/
     trng_enable();
-#endif
-#elif(TRNG_MODE == PSEUDO_RANDOM_MODE)
+    #endif
+#elif (TRNG_MODE == PSEUDO_RANDOM_MODE)
     //TRNG module Reset clear
     reg_rst2 |= FLD_RST2_TRNG;
     //turn on TRNG clock
     reg_clk_en2 |= FLD_CLK2_TRNG_EN;
 
     rTRNG_CR &= ~BIT(0); //disable
-    rTRNG_MSEL = 0x00;               //TCR_MSEL
-    rTRNG_CR |= BIT(0); //enable
+    rTRNG_MSEL = 0x00;   //TCR_MSEL
+    rTRNG_CR |= BIT(0);  //enable
     trng_reseed();
-    if(TRNG_WAIT()){
+    if (TRNG_WAIT()) {
         return DRV_API_TIMEOUT;
     }
-    g_rnd_m_w = rTRNG_DR;   //get the random number
-    if(TRNG_WAIT()){
+    g_rnd_m_w = rTRNG_DR; //get the random number
+    if (TRNG_WAIT()) {
         return DRV_API_TIMEOUT;
     }
     g_rnd_m_z = rTRNG_DR;
@@ -221,16 +222,15 @@ drv_api_status_e trng_init(void)
     reg_clk_en2 &= ~(FLD_CLK2_TRNG_EN);
 #endif
     return DRV_API_SUCCESS;
-
 }
 
 /**
  * @brief     This function performs to get one random number.
  * @return    the value of one random number.
  */
-int trng_rand(void)
+unsigned int trng_rand(void)
 {
-#if(TRNG_MODE == TRUE_RANDOM_MODE)
+#if (TRNG_MODE == TRUE_RANDOM_MODE)
     unsigned char i;
     unsigned char status;
     unsigned char trng_buf[4];
@@ -243,20 +243,18 @@ int trng_rand(void)
      *   it takes 235us to run the function in memory to get 4 bytes of data, and 269us to run the function in flash memory to get 4 bytes of data.
      */
     trng_dig_en();
-    for(i=0;i<6;i++)
-    {
+    for (i = 0; i < 6; i++) {
         status = get_rand(trng_buf, 4);
-        if(status == TRNG_SUCCESS)
-        {
+        if (status == TRNG_SUCCESS) {
             break;
         }
     }
     trng_dig_dis();
-    return *(int*)trng_buf;
-#elif(TRNG_MODE == PSEUDO_RANDOM_MODE)
-    g_rnd_m_w = 18000 * (g_rnd_m_w & 0xffff) + (g_rnd_m_w >> 16);
-    g_rnd_m_z = 36969 * (g_rnd_m_z & 0xffff) + (g_rnd_m_z >> 16);
+    return *(unsigned int *)trng_buf;
+#elif (TRNG_MODE == PSEUDO_RANDOM_MODE)
+    g_rnd_m_w           = 18000 * (g_rnd_m_w & 0xffff) + (g_rnd_m_w >> 16);
+    g_rnd_m_z           = 36969 * (g_rnd_m_z & 0xffff) + (g_rnd_m_z >> 16);
     unsigned int result = (g_rnd_m_z << 16) + g_rnd_m_w;
-    return (int)( result  ^ stimer_get_tick() );
+    return (unsigned int)(result ^ stimer_get_tick());
 #endif
 }

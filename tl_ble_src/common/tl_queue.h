@@ -29,38 +29,38 @@
 /**
  *  @brief Definition for priority calculate function
  */
-typedef u32(*priCmpCbFunc_t)(u32);
+typedef u32 (*priCmpCbFunc_t)(u32);
 
 /**
  *  @brief Structure of an item in the Queue
  */
-typedef struct queue_item {
-    struct queue_item *next;        //!<  Pointer to the next element
+typedef struct queue_item
+{
+    struct queue_item *next; //!<  Pointer to the next element
 } queue_item_t;
 
 /**
  *  @brief Definition for the Queue structure
  */
-typedef struct queue {
-    queue_item_t *head;             //!<  Pointer to the head item of the queue
-    queue_item_t *tail;             //!<  Pointer to the tail item of the queue
-    priCmpCbFunc_t priCmpCb;        //!<  Priority function, NULL means not use priority
-    u32 curNum;                     //!<  The total number of enqueued items in the queue
+typedef struct queue
+{
+    queue_item_t  *head;     //!<  Pointer to the head item of the queue
+    queue_item_t  *tail;     //!<  Pointer to the tail item of the queue
+    priCmpCbFunc_t priCmpCb; //!<  Priority function, NULL means not use priority
+    u32            curNum;   //!<  The total number of enqueued items in the queue
 } queue_t;
 
 /**
  *  @brief Definition for the status of the Queue Module
  */
-typedef enum {
-    QUEUE_SUCCESS,                  //!< Queue operation success
-    QUEUE_PARAM_INVALID,            //!< Queue input parameter invalid
-    QUEUE_EMPTY,                    //!< Queue is empty
-    QUEUE_NOT_FOUND,                //!< Queue is not found
-    QUEUE_OVERFLOWED,               //!< Queue is overflowed
+typedef enum
+{
+    QUEUE_SUCCESS,       //!< Queue operation success
+    QUEUE_PARAM_INVALID, //!< Queue input parameter invalid
+    QUEUE_EMPTY,         //!< Queue is empty
+    QUEUE_NOT_FOUND,     //!< Queue is not found
+    QUEUE_OVERFLOWED,    //!< Queue is overflowed
 } queue_sts_t;
-
-
-
 
 /*********************************************************************
  * @fn      queue_init
@@ -70,7 +70,7 @@ typedef enum {
  *                    NULL means not use the priority feature
  * @return  Status
  */
-queue_sts_t     queue_init(queue_t *pQueue, priCmpCbFunc_t priFunc);
+queue_sts_t queue_init(queue_t *pQueue, priCmpCbFunc_t priFunc);
 
 /*********************************************************************
   * @fn          queue_enq
@@ -79,7 +79,7 @@ queue_sts_t     queue_init(queue_t *pQueue, priCmpCbFunc_t priFunc);
   * @param[in]   pItem  - The payload of the new element
   * @return      Status
   */
-queue_sts_t     queue_enq(queue_t *pQueue, queue_item_t *pItem);
+queue_sts_t queue_enq(queue_t *pQueue, queue_item_t *pItem);
 
 /*********************************************************************
  * @fn          queue_deq
@@ -87,7 +87,7 @@ queue_sts_t     queue_enq(queue_t *pQueue, queue_item_t *pItem);
  * @param[in]   pQueue - The specified queue
  * @return      Pointer to first element in the queue
  */
-queue_item_t *  queue_deq(queue_t *pQueue);
+queue_item_t *queue_deq(queue_t *pQueue);
 
 /*********************************************************************
   * @fn          queue_insert
@@ -99,7 +99,7 @@ queue_item_t *  queue_deq(queue_t *pQueue);
   *                       Note: if the pPrev is NULL, the pItem is the 1st element in queue.
   * @return      Status
   */
-queue_sts_t     queue_insert(queue_t *pQueue, void *pItem, void *pPrev);
+queue_sts_t queue_insert(queue_t *pQueue, void *pItem, void *pPrev);
 
 /*********************************************************************
   * @fn          queue_insert
@@ -112,7 +112,7 @@ queue_sts_t     queue_insert(queue_t *pQueue, void *pItem, void *pPrev);
   *                       means the pItem is the 1st element in queue
   * @return      Status
   */
-queue_sts_t     queue_remove(queue_t *pQueue, void *pItem, void *pPrev);
+queue_sts_t queue_remove(queue_t *pQueue, void *pItem, void *pPrev);
 
 /*********************************************************************
  * @fn          queue_delete
@@ -121,7 +121,7 @@ queue_sts_t     queue_remove(queue_t *pQueue, void *pItem, void *pPrev);
  * @param[in]   pItem  - Pointer to the target element to be removed
  * @return  Status
  */
-queue_sts_t     queue_delete(queue_t *pQueue, queue_item_t *pItem);
+queue_sts_t queue_delete(queue_t *pQueue, queue_item_t *pItem);
 
 /*********************************************************************
  * @fn          queue_isempty
@@ -129,7 +129,7 @@ queue_sts_t     queue_delete(queue_t *pQueue, queue_item_t *pItem);
  * @param[in]   pQueue - The specified queue
  * @return      Return TRUE, if the specified queue is empty
  */
-bool            queue_isempty(queue_t *pQueue);
+bool queue_isempty(queue_t *pQueue);
 
 /*********************************************************************
  * @fn          queue_count
@@ -137,7 +137,7 @@ bool            queue_isempty(queue_t *pQueue);
  * @param[in]   pQueue - The specified queue
  * @return      Number of elements in queue
  */
-u32             queue_count(queue_t *pQueue);
+u32 queue_count(queue_t *pQueue);
 
 
 #endif /* COMMON_TL_QUEUE_H_ */

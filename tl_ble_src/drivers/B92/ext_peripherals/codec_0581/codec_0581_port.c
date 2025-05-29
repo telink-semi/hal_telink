@@ -23,11 +23,11 @@
  *******************************************************************************************************/
 #include "codec_0581.h"
 
-#define CODEC_DUMMY_DATA                (0x00)
-#define CODEC_WRITE_CMD                 (0x00)
-#define CODEC_READ_CMD                  (0x01)
-#define CODEC_WRITE_HEAD                (0x04)
-#define CODEC_READ_HEAD                 (0x04)
+#define CODEC_DUMMY_DATA (0x00)
+#define CODEC_WRITE_CMD  (0x00)
+#define CODEC_READ_CMD   (0x01)
+#define CODEC_WRITE_HEAD (0x04)
+#define CODEC_READ_HEAD  (0x04)
 
 /**
  * @brief       This function servers to read codec_0581 register data.
@@ -45,14 +45,13 @@ void codec_0581_reg_read(unsigned int reg_addr, unsigned int *reg_data)
 
     wr_buf[0] = CODEC_READ_CMD;
     wr_buf[1] = (reg_addr >> 8) & 0xff; /* starting address [15:08] */
-    wr_buf[2] = (reg_addr)&0xff;        /* starting address [07:00] */
+    wr_buf[2] = (reg_addr) & 0xff;      /* starting address [07:00] */
     wr_buf[3] = CODEC_DUMMY_DATA;
 
     spi_master_write_read(GSPI_MODULE, wr_buf, CODEC_READ_HEAD, rd_buf, reg_width);
 
     *reg_data = 0;
-    for (unsigned char i = 0; i < reg_width; i += 1)
-    {
+    for (unsigned char i = 0; i < reg_width; i += 1) {
         *reg_data += rd_buf[i] << (i * 8);
     }
 }
@@ -72,8 +71,8 @@ void codec_0581_reg_write(unsigned int reg_addr, unsigned int reg_data)
 
     /* write head */
     wr_buf[0] = CODEC_WRITE_CMD;
-    wr_buf[1] = (reg_addr >> 8) & 0xff; /* starting address [15:08] */
-    wr_buf[2] = (reg_addr)&0xff;        /* starting address [07:00] */
+    wr_buf[1] = (reg_addr >> 8) & 0xff;     /* starting address [15:08] */
+    wr_buf[2] = (reg_addr) & 0xff;          /* starting address [07:00] */
     wr_buf[3] = CODEC_DUMMY_DATA;
 
     for (char i = 0; i < reg_width; i += 1) /* payload placed after WR head */
@@ -92,12 +91,12 @@ codec_0581_error_e codec_0581_init(void)
 {
     /* init spi */
     gspi_pin_config_t spi_pin_config = {
-        .spi_csn_pin        = GPIO_FC_PE7,
-        .spi_clk_pin        = GPIO_FC_PE6,
-        .spi_mosi_io0_pin   = GPIO_FC_PF0,
-        .spi_miso_io1_pin   = GPIO_FC_PF1,
-        .spi_io2_pin        = 0,
-        .spi_io3_pin        = 0,
+        .spi_csn_pin      = GPIO_FC_PE7,
+        .spi_clk_pin      = GPIO_FC_PE6,
+        .spi_mosi_io0_pin = GPIO_FC_PF0,
+        .spi_miso_io1_pin = GPIO_FC_PF1,
+        .spi_io2_pin      = 0,
+        .spi_io3_pin      = 0,
     };
 
     spi_master_init(GSPI_MODULE, sys_clk.pll_clk * 1000000 / 12000000, SPI_MODE0);
@@ -108,20 +107,19 @@ codec_0581_error_e codec_0581_init(void)
     codec_0581_power_on(GPIO_PC1, CODEC_BOOL_TRUE);
 
     /* pull the SS pin low three times, in the meanwhile, toggling the SCLK pin three times, codec can enter SPI mode so read id three times can trigger spi mode */
-    unsigned char id1;
+    unsigned char  id1;
     unsigned short id2;
-    unsigned char id3;
-    for (int i = 0; i < 3; i++)
-    {
+    unsigned char  id3;
+    for (int i = 0; i < 3; i++) {
         codec_0581_get_id(&id1, &id2, &id3);
-        if (id1 != 0x41) /* if check id err then delay 5ms for next trigger */
+        if (id1 != 0x41) { /* if check id err then delay 5ms for next trigger */
             delay_ms(5);
+        }
     }
 
     /* real get, if failed means spi communication failed */
     codec_0581_get_id(&id1, &id2, &id3);
-    if (id1 != 0x41)
-    {
+    if (id1 != 0x41) {
         /* read id fail means communication failed */
         return CODEC_0581_ERROR;
     }
@@ -136,17 +134,15 @@ codec_0581_error_e codec_0581_init(void)
     codec_0581_clk_enable_pll_power_on(CODEC_BOOL_TRUE);
     /* to access FastDSP and EQ memories, the PLL must be locked */
     unsigned char locked = 0;
-    unsigned int cnt = 0;
-    while ((locked == 0) && (cnt <= 100))
-    {
+    unsigned int  cnt    = 0;
+    while ((locked == 0) && (cnt <= 100)) {
         codec_0581_clk_get_pll_locked_status(&locked);
         delay_ms(1);
         cnt++;
     }
 
     /* pll is not locked */
-    if (cnt > 100)
-    {
+    if (cnt > 100) {
         return CODEC_0581_PLL_NOT_LOCKED;
     }
 
@@ -180,27 +176,26 @@ void codec_0581_i2s_init(codec_0581_i2s_init_t *i2s_init, codec_0581_i2s_input_t
     };
 
     audio_i2s_config_t audio_i2s_config = {
-        .i2s_select = I2S1,
-        .i2s_mode = I2S_I2S_MODE,
-        .pin_config = &i2s_pin_config,
-        .data_width = i2s_init->data_width,
+        .i2s_select        = I2S1,
+        .i2s_mode          = I2S_I2S_MODE,
+        .pin_config        = &i2s_pin_config,
+        .data_width        = i2s_init->data_width,
         .master_slave_mode = I2S_AS_MASTER_EN,
-        .sample_rate = i2s_init->sample_rate,
+        .sample_rate       = i2s_init->sample_rate,
     };
 
     /**** mcu i2s config init ****/
     audio_i2s_config_init(&audio_i2s_config);
     /**** mcu i2s input init ****/
-    if (i2s_input)
-    {
+    if (i2s_input) {
         audio_i2s_input_output_t audio_i2s_input = {
-            .i2s_select             = audio_i2s_config.i2s_select,
-            .data_width             = audio_i2s_config.data_width,
-            .i2s_ch_sel             = i2s_input->i2s_ch_sel,
-            .fifo_chn               = FIFO1,
-            .dma_num                = i2s_input->rx_dma_num,
-            .data_buf               = i2s_input->input_data_buf,
-            .data_buf_size          = i2s_input->input_buf_size,
+            .i2s_select    = audio_i2s_config.i2s_select,
+            .data_width    = audio_i2s_config.data_width,
+            .i2s_ch_sel    = i2s_input->i2s_ch_sel,
+            .fifo_chn      = FIFO1,
+            .dma_num       = i2s_input->rx_dma_num,
+            .data_buf      = i2s_input->input_data_buf,
+            .data_buf_size = i2s_input->input_buf_size,
         };
         /* init input channel and dma */
         audio_i2s_input_init(&audio_i2s_input);
@@ -208,16 +203,15 @@ void codec_0581_i2s_init(codec_0581_i2s_init_t *i2s_init, codec_0581_i2s_input_t
     }
 
     /**** mcu i2s output init ****/
-    if (i2s_output)
-    {
+    if (i2s_output) {
         audio_i2s_input_output_t audio_i2s_output = {
-            .i2s_select             = audio_i2s_config.i2s_select,
-            .data_width             = audio_i2s_config.data_width,
-            .i2s_ch_sel             = I2S_MONO,
-            .fifo_chn               = FIFO1,
-            .dma_num                = i2s_output->tx_dma_num,
-            .data_buf               = i2s_output->output_data_buf,
-            .data_buf_size          = i2s_output->output_buf_size,
+            .i2s_select    = audio_i2s_config.i2s_select,
+            .data_width    = audio_i2s_config.data_width,
+            .i2s_ch_sel    = I2S_MONO,
+            .fifo_chn      = FIFO1,
+            .dma_num       = i2s_output->tx_dma_num,
+            .data_buf      = i2s_output->output_data_buf,
+            .data_buf_size = i2s_output->output_buf_size,
         };
         /* init output channel and dma */
         audio_i2s_output_init(&audio_i2s_output);

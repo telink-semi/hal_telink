@@ -24,35 +24,32 @@
 #include "../bis_sink_config.h"
 #if (PRODUCT_BIS_SINK_SELECT == PRODUCT_GOOGLE_BROADCAST_SINK)
 
-#include "tl_common.h"
-#include "drivers.h"
-#include "app_uart.h"
+    #include "tl_common.h"
+    #include "drivers.h"
+    #include "app_uart.h"
 
-typedef struct{
+typedef struct
+{
     int size;
-    u8 txBuf[UART_TX_BUFF_SIZE];
+    u8  txBuf[UART_TX_BUFF_SIZE];
 } uart_tx_t;
 
-#define UART_TX_RING_BUFF_COUNT             16
+    #define UART_TX_RING_BUFF_COUNT 16
 
 uart_tx_t uartTxDmaBuf[UART_TX_RING_BUFF_COUNT];
 
-int txWptr = 0;
-int txRptr = 0;
+int txWptr      = 0;
+int txRptr      = 0;
 int uartTxState = 0;
 
 _attribute_ram_code_ void uart1_irq_handler(void)
 {
-    if(uart_get_irq_status(UART_PORT, UART_TXDONE))
-    {
+    if (uart_get_irq_status(UART_PORT, UART_TXDONE)) {
         uart_clr_tx_done(UART_PORT);
-        txRptr = (txRptr+1)&(UART_TX_RING_BUFF_COUNT-1);
-        if(txRptr == txWptr)
-        {
+        txRptr = (txRptr + 1) & (UART_TX_RING_BUFF_COUNT - 1);
+        if (txRptr == txWptr) {
             uartTxState = 0;
-        }
-        else
-        {
+        } else {
             uart_send_dma(UART_PORT, uartTxDmaBuf[txRptr].txBuf, uartTxDmaBuf[txRptr].size);
         }
     }
@@ -63,8 +60,8 @@ void app_uart_init(void)
     uart_reset(UART_PORT);
     uart_set_pin(UART_TX_PIN, UART_RX_PIN);
     unsigned short div;
-    unsigned char bwpc;
-    uart_cal_div_and_bwpc(UART_BAUDRATE, sys_clk.pclk*1000*1000, &div, &bwpc);
+    unsigned char  bwpc;
+    uart_cal_div_and_bwpc(UART_BAUDRATE, sys_clk.pclk * 1000 * 1000, &div, &bwpc);
     uart_init(UART_PORT, div, bwpc, UART_PARITY_NONE, UART_STOP_BIT_ONE);
 
     uart_set_tx_dma_config(UART_PORT, UART_TX_DMA);
@@ -76,27 +73,25 @@ void app_uart_init(void)
 
     uart_clr_irq_mask(UART_PORT, UART_RX_IRQ_MASK | UART_TX_IRQ_MASK | UART_TXDONE_MASK | UART_RXDONE_MASK);
     uart_clr_tx_done(UART_PORT);
-    dma_clr_irq_mask(UART_TX_DMA, TC_MASK|ABT_MASK|ERR_MASK);
+    dma_clr_irq_mask(UART_TX_DMA, TC_MASK | ABT_MASK | ERR_MASK);
 
     uart_set_rx_timeout(UART_PORT, bwpc, 12, UART_BW_MUL2);
-//  uart_set_irq_mask(UART_PORT, UART_RXDONE_MASK);
+    //  uart_set_irq_mask(UART_PORT, UART_RXDONE_MASK);
     uart_set_irq_mask(UART_PORT, UART_TXDONE_MASK);
 
-    plic_interrupt_enable(UART_PORT == UART0 ? IRQ_UART0:IRQ_UART1);
-    plic_set_priority(UART_PORT == UART0 ? IRQ_UART0:IRQ_UART1, 2);
-
+    plic_interrupt_enable(UART_PORT == UART0 ? IRQ_UART0 : IRQ_UART1);
+    plic_set_priority(UART_PORT == UART0 ? IRQ_UART0 : IRQ_UART1, 2);
 }
 
-void app_uart_send_value(u8* inBuf, int size)
+void app_uart_send_value(u8 *inBuf, int size)
 {
     uartTxDmaBuf[txWptr].size = min(UART_TX_BUFF_SIZE, size);
     memcpy(uartTxDmaBuf[txWptr].txBuf, inBuf, uartTxDmaBuf[txWptr].size);
-    if(uartTxState == 0)
-    {
+    if (uartTxState == 0) {
         uart_send_dma(UART_PORT, uartTxDmaBuf[txWptr].txBuf, uartTxDmaBuf[txWptr].size);
         uartTxState = 1;
     }
-    txWptr = (txWptr+1)&(UART_TX_RING_BUFF_COUNT-1);
+    txWptr = (txWptr + 1) & (UART_TX_RING_BUFF_COUNT - 1);
 }
 
 #endif

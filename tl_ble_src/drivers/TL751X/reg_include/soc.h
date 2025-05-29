@@ -65,7 +65,7 @@
 #define D25_ILM_BASE                (0x20000)
 #define D25_DLM_BASE                (0x80000)
 
-#define SC_BASE_ADDR                0x140800
+#define SC_BASE_ADDR                0x80140800
 
 #define reg_mspi_clk_set            REG_ADDR8(SC_BASE_ADDR + 0x00)
 enum{
@@ -306,3 +306,62 @@ enum{
 };
 
 #define reg_dma_set             REG_ADDR32(SC_BASE_ADDR + 0x78)
+
+#define D25F_SRAM_EMA_ADDR     (SC_BASE_ADDR + 0x70)//D25F_PKE_SDIO_NPE_SRAM
+#define D25F_SRAM_EMA_DATA_LEN                   8
+#define reg_soc_dp_sram_cfg0   REG_ADDR8(D25F_SRAM_EMA_ADDR)
+enum{
+    FLD_DP_SRAM_EMAA           = BIT_RNG(0,2),
+    FLD_DP_SRAM_EMAWA          = BIT_RNG(3,4),
+    FLD_DP_SRAM_EMASA          = BIT(5),
+    FLD_DP_SRAM_WABL           = BIT(6),
+};
+#define reg_soc_dp_sram_cfg1  REG_ADDR8(SC_BASE_ADDR + 0x71)
+enum{
+    FLD_DP_SRAM_EMAB           = BIT_RNG(0,2),
+    FLD_DP_SRAM_EMAWB          = BIT_RNG(3,4),
+    FLD_DP_SRAM_EMASB          = BIT(5),
+    FLD_DP_SRAM_WABLM          = BIT_RNG(6,7),
+};
+
+#define reg_soc_2p_reg_cfg0     REG_ADDR8(SC_BASE_ADDR + 0x72)
+enum{
+    FLD_2P_REG_EMAA            = BIT_RNG(0,2),
+    FLD_2P_REG_EMAB            = BIT_RNG(3,5),
+    FLD_2P_REG_EMASA           = BIT(6),
+};
+
+#define reg_soc_2p_reg_cfg1    REG_ADDR8(SC_BASE_ADDR + 0x73)
+enum{
+    FLD_2P_REG_WABL           = BIT(0),
+    FLD_2P_REG_WABLM          = BIT_RNG(1,2),
+};
+
+#define reg_soc_sram_cfg0       REG_ADDR8(SC_BASE_ADDR + 0x74)
+enum{
+    FLD_SRAM_EMA              = BIT_RNG(0,2),
+    FLD_SRAM_EMAW             = BIT_RNG(3,4),
+    FLD_SRAM_EMAS             = BIT(5),
+};
+
+#define reg_soc_sram_cfg1       REG_ADDR8(SC_BASE_ADDR + 0x75)
+enum{
+    FLD_SRAM_RAML             = BIT(0),
+    FLD_SRAM_RAWLM            = BIT_RNG(1,2),
+    FLD_SRAM_WABL             = BIT(3),
+    FLD_SRAM_WABLM            = BIT_RNG(4,6),
+};
+
+#define reg_soc_reg_cfg0        REG_ADDR8(SC_BASE_ADDR + 0x76)
+enum{
+    FLD_REG_EMA              = BIT_RNG(0,2),
+    FLD_REG_EMAW             = BIT_RNG(3,4),
+    FLD_REG_EMAS             = BIT(5),
+};
+#define reg_soc_reg_cfg1        REG_ADDR8(SC_BASE_ADDR + 0x77)
+enum{
+    FLD_REG_RAWL             = BIT(0),
+    FLD_REG_RAWLM            = BIT_RNG(1,2),
+    FLD_REG_WABL             = BIT(3),
+    FLD_REG_WABLM            = BIT_RNG(4,5),
+};

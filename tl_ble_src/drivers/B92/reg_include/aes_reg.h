@@ -56,6 +56,11 @@ enum{
 
 #define reg_aes_ptr                 REG_ADDR32(aes_base_addr + 0xc4)    //only the lower 16 bits are used.
 
+enum
+{
+    FLD_AES_PTR         = BIT_RNG(0, 15),
+    FLD_E0_ADDR_POINTER = BIT_RNG(16, 31),
+};
 #define reg_aes_rpase_cnt           REG_ADDR32(aes_base_addr + 0x288)
 enum{
     FLD_AES_PRAND               =   BIT_RNG(0, 23),

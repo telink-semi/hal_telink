@@ -13,10 +13,10 @@
  */
 void ring_buf_init(ring_buf_t *ring_buf, u16 size, u8 *buffer)
 {
-    ring_buf->size = size;
-    ring_buf->buffer = buffer;
+    ring_buf->size        = size;
+    ring_buf->buffer      = buffer;
     ring_buf->write_index = 0;
-    ring_buf->read_index = 0;
+    ring_buf->read_index  = 0;
 }
 
 /**
@@ -44,10 +44,11 @@ u16 ring_buf_free_space(ring_buf_t *ring_buf)
  * @return        number of bytes written.
  */
 _attribute_ram_code_
-u16 ring_buf_write(ring_buf_t *ring_buf, u16 length, u8 *buffer)
+    u16
+    ring_buf_write(ring_buf_t *ring_buf, u16 length, u8 *buffer)
 {
     u16 free_space = ring_buf_free_space(ring_buf);
-    u16 remaining = length;
+    u16 remaining  = length;
     u16 len2;
 
     if (ring_buf->write_index >= ring_buf->read_index) {
@@ -56,10 +57,9 @@ u16 ring_buf_write(ring_buf_t *ring_buf, u16 length, u8 *buffer)
             len1 = remaining;
         }
 
-//        memcpy(&ring_buf->buffer[ring_buf->write_index], buffer, len1);
+        //        memcpy(&ring_buf->buffer[ring_buf->write_index], buffer, len1);
         //Interrupt code, must be placed in ramcode
-        for(int i=0; i< len1; i++)
-        {
+        for (int i = 0; i < len1; i++) {
             ring_buf->buffer[ring_buf->write_index + i] = buffer[i];
         }
 
@@ -70,10 +70,9 @@ u16 ring_buf_write(ring_buf_t *ring_buf, u16 length, u8 *buffer)
     }
 
     len2 = remaining < free_space ? remaining : free_space;
-//    memcpy(&ring_buf->buffer[ring_buf->write_index], buffer, len2);
+    //    memcpy(&ring_buf->buffer[ring_buf->write_index], buffer, len2);
     //Interrupt code, must be placed in ramcode
-    for(int i=0; i< len2; i++)
-    {
+    for (int i = 0; i < len2; i++) {
         ring_buf->buffer[ring_buf->write_index + i] = buffer[i];
     }
     remaining -= len2;

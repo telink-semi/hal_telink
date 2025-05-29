@@ -68,7 +68,7 @@ _attribute_data_retention_sec_  unsigned int        g_sleep_stimer_tick;
  * @param[in]  wakeup_tick - the time of short sleep, which means MCU can sleep for less than 5 minutes.
  * @return     indicate whether the cpu is wake up successful.
  */
-_attribute_ram_code_com_sec_optimize_o2_noinline_ int cpu_sleep_wakeup_32k_rc_ram(pm_sleep_mode_e sleep_mode,  pm_sleep_wakeup_src_e wakeup_src, unsigned int  wakeup_tick)
+_attribute_ram_code_sec_optimize_o2_noinline_ int cpu_sleep_wakeup_32k_rc_ram(pm_sleep_mode_e sleep_mode,  pm_sleep_wakeup_src_e wakeup_src, unsigned int  wakeup_tick)
 {
     g_sleep_32k_rc_cnt = 0;
     g_sleep_stimer_tick = 0;
@@ -80,7 +80,7 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ int cpu_sleep_wakeup_32k_rc_ra
      *  ==============================          -O2 compilation compatibility processing        ==============================
      *
      * The pm_sleep_wakeup interface will stop xip, so this function can not have a text section of code called, workaround:
-     * (1) for very short functions add _always_inline (2) for large functions, specify _attribute_ram_code_com_sec_noinline_.
+     * (1) for very short functions add _always_inline (2) for large functions, specify _attribute_ram_code_sec_noinline_.
      */
 
     ////////// disable IRQ //////////////////////////////////////////
@@ -130,7 +130,7 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ int cpu_sleep_wakeup_32k_rc_ra
     //modify by bingyu.li, confirmed by jianzhi.chen at 20230810.
     plic_irqs_preprocess_for_wfi(0, FLD_MIE_MEIE);
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     /******************************************debug_pm_info 2 **********************************************/
     debug_pm_info = 2;
 #endif
@@ -145,7 +145,7 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ int cpu_sleep_wakeup_32k_rc_ra
     clock_save_clock_config();
     clock_set_all_clock_to_default();
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     /******************************************debug_pm_info 3 **********************************************/
     debug_pm_info = 3;
 #endif
@@ -161,33 +161,34 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ int cpu_sleep_wakeup_32k_rc_ra
     #endif
 
 
-    unsigned int  tick_32k_halfCalib = g_pm_tick_32k_calib>>1;
+    unsigned int tick_32k_halfCalib = g_pm_tick_32k_calib >> 1;
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     analog_write_reg16(PM_ANA_REG_POWER_ON_CLR_BUF1, g_pm_tick_32k_calib);
     /******************************************debug_pm_info 4 **********************************************/
-    debug_pm_info = 4;
+    debug_pm_info      = 4;
+    debug_tick_32k_cur = analog_read_reg32(areg_aon_0x60);
 #endif
 
     /////////////////// stop system timer /////////////////////////////////
 #if SYS_TIMER_AUTO_MODE
-    stimer_32k_tracking_disable();  //disable 32k track
-    stimer_set_update_upon_nxt_32k_enable();        //system tick only update upon 32k posedge, must set before enable 32k read update!!!
+    stimer_32k_tracking_disable();           //disable 32k track
+    stimer_set_update_upon_nxt_32k_enable(); //system tick only update upon 32k posedge, must set before enable 32k read update!!!
     g_pm_tick_32k_cur = clock_get_32k_tick();
-    g_pm_tick_cur = stimer_get_tick();
+    g_pm_tick_cur     = stimer_get_tick();
 
     //TL721 BB time needs requires manual setup to save and restore.
     ext_BBTimerTick_BeforeSleep  = rf_bb_timer_get_tick();
     ext_STimerTick_BeforeSleep   = g_pm_tick_cur;
 
     stimer_set_update_upon_nxt_32k_disable();
-    stimer_disable();   //disable system timer
+    stimer_disable(); //disable system timer
 #else
-    #error -- Manual mode is only for internal testing, and 37 in the code may not be accurate
-    stimer_32k_tracking_disable();  //disable 32k track
-    g_pm_tick_cur = stimer_get_tick() + 37 * SYSTEM_TIMER_TICK_1US;  //cpu_get_32k_tick will cost 30~40 us
-    stimer_disable();       //disable system timer
-    g_pm_tick_32k_cur = clock_get_32k_tick ();
+    #error-- Manual mode is only for internal testing, and 37 in the code may not be accurate
+    stimer_32k_tracking_disable();                                  //disable 32k track
+    g_pm_tick_cur = stimer_get_tick() + 37 * SYSTEM_TIMER_TICK_1US; //cpu_get_32k_tick will cost 30~40 us
+    stimer_disable();                                               //disable system timer
+    g_pm_tick_32k_cur = clock_get_32k_tick();
 #endif
 
 #if PM_START_CODE_DEBUG
@@ -198,21 +199,20 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ int cpu_sleep_wakeup_32k_rc_ra
     gpio_set_low_level(GPIO_PB5);
 #endif
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     /******************************************debug_pm_info 5 **********************************************/
-    debug_pm_info = 5;
+    debug_pm_info         = 5;
+    debug_min_code_tick_1 = rdmcycle();
 #endif
 
     unsigned int earlyWakeup_us;
-    if(sleep_mode & DEEPSLEEP_RETENTION_FLAG)  //deep sleep with retention
+    if (sleep_mode & DEEPSLEEP_RETENTION_FLAG) //deep sleep with retention
     {
         earlyWakeup_us = g_pm_early_wakeup_time_us.deep_ret_early_wakeup_time_us;
-    }
-    else if(sleep_mode == DEEPSLEEP_MODE)  //deepsleep no retention
+    } else if (sleep_mode == DEEPSLEEP_MODE)   //deepsleep no retention
     {
         earlyWakeup_us = g_pm_early_wakeup_time_us.deep_early_wakeup_time_us;
-    }
-    else  //suspend
+    } else                                     //suspend
     {
         earlyWakeup_us = g_pm_early_wakeup_time_us.suspend_early_wakeup_time_us;
     }
@@ -223,8 +223,7 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ int cpu_sleep_wakeup_32k_rc_ra
     
     //The variable pmcd.ref_tick is added, replacing the original variable g_pm_tick_cur. Because pmcd.ref_tick directly affects the value of
     //g_pm_long_suspend, g_pm_long_suspend can be assigned after pmcd.ref_tick is updated.changed by weihua,confirmed by biao.li.20201204.
-    if(timer_wakeup_enable)
-    {
+    if (timer_wakeup_enable) {
         #if PM_32k_RC_CALIBRATION_ALGORITHM_EN
             unsigned int tick_reset;
             unsigned int tick_wakeup_reset;
@@ -270,25 +269,23 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ int cpu_sleep_wakeup_32k_rc_ra
         //add by weihua.zhang at 20240827
         clock_set_32k_tick(tick_reset);
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
         analog_write_reg32(PM_ANA_REG_WD_CLR_BUF1, g_pm_tick_32k_cur);
-        debug_ana_32k_tick = analog_read_reg32(areg_aon_0x65);
-        if(tick_reset != debug_ana_32k_tick)
-        {
-            debug_ana_tick_reset = tick_reset;
+        debug_ana_32k_tick   = analog_read_reg32(areg_aon_0x65);
+        debug_ana_tick_reset = tick_reset;
+        if (tick_reset != debug_ana_32k_tick) {
             stimer_enable_in_manual_mode();
-            stimer_32k_tracking_enable();   //enable 32k cal
+            stimer_32k_tracking_enable(); //enable 32k cal
             gpio_set_high_level(GPIO_PE7);
-            while(1);
+            while (1);
         }
         /******************************************debug_pm_info 6 **********************************************/
-        debug_pm_info = 6;
+        debug_pm_info         = 6;
+        debug_min_code_tick_2 = rdmcycle();
 #endif
-
     }
 
-
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     /******************************************debug_pm_info 7 **********************************************/
     debug_pm_info = 7;
 #endif
@@ -296,41 +293,38 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ int cpu_sleep_wakeup_32k_rc_ra
     /////////////////// set wakeup source /////////////////////////////////
     pm_set_wakeup_src(wakeup_src);
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     /******************************************debug_pm_info 8 **********************************************/
     debug_pm_info = 8;
 #endif
 
     /////////////////// auto power down /////////////////////////////////
-    unsigned short auto_power_down = FLD_PD_32K_RC|FLD_PD_32K_XTAL|FLD_PD_24M_XTAL|FLD_PD_DCDC|FLD_PD_VBUS_LDO|FLD_PD_ANA_BBPLL_TEMP_LDO\
-                                    |FLD_PD_DCORE_SRAM_LDO|FLD_PD_VBUS_SW|FLD_PD_SEQUENCE_EN;
-    unsigned char sleep_ldo_en = 0;
+    unsigned short auto_power_down = FLD_PD_32K_RC | FLD_PD_32K_XTAL | FLD_PD_24M_XTAL | FLD_PD_DCDC | FLD_PD_VBUS_LDO | FLD_PD_ANA_BBPLL_TEMP_LDO | FLD_PD_DCORE_SRAM_LDO | FLD_PD_VBUS_SW | FLD_PD_SEQUENCE_EN;
+    unsigned char  sleep_ldo_en    = 0;
 
-    if(sleep_mode & DEEPSLEEP_RETENTION_FLAG)  //deep sleep with retention
+    if (sleep_mode & DEEPSLEEP_RETENTION_FLAG)                                       //deep sleep with retention
     {
-        g_pm_multi_addr = reg_mspi_xip_core_size | (reg_mspi_xip_core_offset << 16);//after retention, multiple address offset is lost, save it
+        g_pm_multi_addr = reg_mspi_xip_core_size | (reg_mspi_xip_core_offset << 16); //after retention, multiple address offset is lost, save it
 
         /*
         * afe_0x7e<3:0> sram_ret default(0000)
         * afe_0x7e<7:4> rsvd
-        * For Tercel only deep retention need to set sleep_mode, this can save time for enter deep/suspend sleep mode.
+        * For tl721x only deep retention need to set sleep_mode, this can save time for enter deep/suspend sleep mode.
         */
         analog_write_reg8(areg_aon_0x7e, sleep_mode);
 
         auto_power_down |= FLD_PD_ISOLATION;
         sleep_ldo_en = FLD_PD_DIG_RET_LDO;
-    }
-    else if(sleep_mode == DEEPSLEEP_MODE)  //deepsleep no retention
+    } else if (sleep_mode == DEEPSLEEP_MODE) //deepsleep no retention
     {
         auto_power_down |= FLD_PD_ISOLATION;
         sleep_ldo_en = 0;
-    }
-    else  //suspend
+    } else //suspend
     {
         sleep_ldo_en = FLD_PD_SPD_LDO;
     }
 
-    if(!(wakeup_src & PM_WAKEUP_COMPARATOR)){
+    if (!(wakeup_src & PM_WAKEUP_COMPARATOR)) {
         auto_power_down |= FLD_PD_LPC;
     }
 
@@ -343,25 +337,22 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ int cpu_sleep_wakeup_32k_rc_ra
     //areg_aon_0x06 need to restore after wake up
     analog_write_reg8(areg_aon_0x06, (analog_read_reg8(areg_aon_0x06) | FLD_PD_BBPLL_LDO | FLD_PD_SPD_LDO | FLD_PD_DIG_RET_LDO) & (~sleep_ldo_en));
     sys_clk_config.bbpll_is_used = g_bbpll_is_used;
-    g_bbpll_is_used = 0;
+    g_bbpll_is_used              = 0;
     analog_write_reg16(areg_aon_0x4c, auto_power_down);
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     /******************************************debug_pm_info 9 **********************************************/
     debug_pm_info = 9;
 #endif
 
     /////////////////// R DELAY AND XTAL DELAY /////////////////////////////////
-    if(sleep_mode == DEEPSLEEP_MODE)
-    {
+    if (sleep_mode == DEEPSLEEP_MODE) {
         pm_set_delay_cycle(g_pm_r_delay_cycle.deep_xtal_delay_cycle, g_pm_r_delay_cycle.deep_r_delay_cycle);
-    }
-    else
-    {
+    } else {
         pm_set_delay_cycle(g_pm_r_delay_cycle.suspend_ret_xtal_delay_cycle, g_pm_r_delay_cycle.suspend_ret_r_delay_cycle);
     }
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     /******************************************debug_pm_info 10 **********************************************/
     debug_pm_info = 10;
 #endif
@@ -370,27 +361,25 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ int cpu_sleep_wakeup_32k_rc_ra
     //This process will generate an intermediate value, which may be the same as the current 32k tick value.
     //If the value is the same, the state of the timer wake source will be set.
     //changed by weihua, confirmed by jianzhi. 20240711.
-    pm_clr_irq_status(FLD_WAKEUP_STATUS_ALL);               //clear all flag
+    pm_clr_irq_status(FLD_WAKEUP_STATUS_ALL); //clear all flag
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     debug_sleep_start_wakeup_src1 = pm_get_wakeup_src();
     /******************************************debug_pm_info 11 **********************************************/
     debug_pm_info = 11;
 #endif
 
-    if(pm_get_wakeup_src() & WAKEUP_STATUS_INUSE_ALL){
-
-#if(PM_DEBUG)
+    if (pm_get_wakeup_src() & WAKEUP_STATUS_INUSE_ALL) {
+#if (PM_DEBUG)
         debug_sleep_start_wakeup_src2 = pm_get_wakeup_src();
-        debug_sleep_start_cur_tick = analog_read_reg32(0x60);
-        debug_sleep_start_set_tick = analog_read_reg32(0x65);
+        debug_sleep_start_cur_tick    = analog_read_reg32(0x60);
+        debug_sleep_start_set_tick    = analog_read_reg32(0x65);
 #endif
 
-    }else{
-
-        if(sleep_mode & DEEPSLEEP_RETENTION_FLAG){
+    } else {
+        if (sleep_mode & DEEPSLEEP_RETENTION_FLAG) {
             g_areg_aon_7f = (g_areg_aon_7f & (~FLD_BOOTFROMBROM)) | g_pm_pad_filter_en;
-        }else{
+        } else {
             g_areg_aon_7f = (g_areg_aon_7f | FLD_BOOTFROMBROM | g_pm_pad_filter_en);
         }
         analog_write_reg8(areg_aon_0x7f, g_areg_aon_7f);
@@ -399,26 +388,26 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ int cpu_sleep_wakeup_32k_rc_ra
         pm_sleep_start(sleep_mode);
     }
 
-#if(PM_DEBUG)
-        /******************************************debug_pm_info 12 **********************************************/
+#if (PM_DEBUG)
+    /******************************************debug_pm_info 12 **********************************************/
     debug_pm_info = 12;
 #endif
 
-    if(sleep_mode == DEEPSLEEP_MODE){
-        sys_reset_all();  //reboot
+    if (sleep_mode == DEEPSLEEP_MODE) {
+        sys_reset_all(); //reboot
     }
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     /******************************************debug_pm_info 13 **********************************************/
     debug_pm_info = 13;
 #endif
 
 //    pm_stimer_recover();
 
-    extern unsigned int pm_tim_recover_32k_rc(void);
+    extern void pm_tim_recover_32k_rc(void);
     pm_tim_recover_32k_rc();
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     /******************************************debug_pm_info 14 **********************************************/
     debug_pm_info = 14;
 #endif
@@ -427,7 +416,7 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ int cpu_sleep_wakeup_32k_rc_ra
 
     mspi_set_xip_en();
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     /******************************************debug_pm_info 15 **********************************************/
     debug_pm_info = 15;
 #endif
@@ -439,7 +428,7 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ int cpu_sleep_wakeup_32k_rc_ra
 #if PM_SUSPEND_WHILE_DEBUG
     gpio_set_low_level(GPIO_PB5);
 #endif
-    if((g_pm_status_info.wakeup_src & WAKEUP_STATUS_TIMER) && timer_wakeup_enable)  //wakeup from timer only
+    if ((g_pm_status_info.wakeup_src & WAKEUP_STATUS_TIMER) && timer_wakeup_enable) //wakeup from timer only
     {
           while((unsigned int)(stimer_get_tick() - wakeup_tick) > BIT(30));
     }
@@ -448,7 +437,7 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ int cpu_sleep_wakeup_32k_rc_ra
     gpio_set_high_level(GPIO_PB5);
 #endif
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     /******************************************debug_pm_info 16 **********************************************/
     debug_pm_info = 16;
 #endif
@@ -459,7 +448,7 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ int cpu_sleep_wakeup_32k_rc_ra
     plic_irqs_postprocess_for_wfi();
     core_restore_interrupt(r);
 
-#if(PM_DEBUG)
+#if (PM_DEBUG)
     /******************************************debug_pm_info 17 **********************************************/
     debug_pm_info = 17;
 #endif
@@ -494,7 +483,7 @@ _attribute_text_sec_ _attribute_no_inline_ int cpu_sleep_wakeup_32k_rc(pm_sleep_
 }
 
 
-_attribute_ram_code_com_sec_optimize_o2_noinline_ unsigned int pm_tim_recover_32k_rc(void)
+_attribute_ram_code_sec_optimize_o2_noinline_ void pm_tim_recover_32k_rc(void)
 {
     unsigned int wakeup_tick;
     stimer_enable(STIMER_AUTO_MODE_W_AND_NXT_32K_START, 0);
@@ -526,12 +515,52 @@ _attribute_ram_code_com_sec_optimize_o2_noinline_ unsigned int pm_tim_recover_32
     stimer_enable(STIMER_AUTO_MODE_W_AND_NXT_32K_DONE, wakeup_tick + 1);
 
     stimer_32k_tracking_enable();           //enable 32k cal
-    return wakeup_tick;
+    //return wakeup_tick;
 
+}
+
+_attribute_text_sec_ _attribute_no_inline_ int cpu_long_sleep_wakeup_32k_rc(pm_sleep_mode_e sleep_mode,  pm_sleep_wakeup_src_e wakeup_src, unsigned int  wakeup_tick)
+{
+    //todo
+    if(func_before_suspend){
+        if (!func_before_suspend())
+        {
+            return WAKEUP_STATUS_PAD;
+        }
+    }
+    int status = 0;
+    DISABLE_BTB;
+#if  0  //debug
+    status = cpu_sleep_wakeup_32k_rc_ram(sleep_mode, wakeup_src, wakeup_tick);
+#else  //debug
+    extern  int pm_sleep_wakeup_ram(pm_sleep_mode_e sleep_mode,  pm_sleep_wakeup_src_e wakeup_src, pm_wakeup_tick_type_e wakeup_tick_type, unsigned int  wakeup_tick);
+    status = pm_sleep_wakeup_ram(sleep_mode, wakeup_src, PM_TICK_STIMER, wakeup_tick);
+#endif
+    ENABLE_BTB;
+    return status;
 }
 #if 0
 int cpu_long_sleep_wakeup_32k_rc(pm_sleep_mode_e sleep_mode,  pm_sleep_wakeup_src_e wakeup_src, unsigned int  wakeup_tick)
 {
+
+    //todo
+    if(func_before_suspend){
+        if (!func_before_suspend())
+        {
+            return WAKEUP_STATUS_PAD;
+        }
+    }
+    int status = 0;
+    DISABLE_BTB;
+#if 0 //debug
+    status = cpu_sleep_wakeup_32k_rc_ram(sleep_mode, wakeup_src, wakeup_tick);
+#else  //debug
+    extern  int pm_sleep_wakeup_ram(pm_sleep_mode_e sleep_mode,  pm_sleep_wakeup_src_e wakeup_src, pm_wakeup_tick_type_e wakeup_tick_type, unsigned int  wakeup_tick);
+    status = pm_sleep_wakeup_ram(sleep_mode, wakeup_src, PM_TICK_STIMER, wakeup_tick);
+#endif
+    ENABLE_BTB;
+    return status;
+
     int sys_tick0 = clock_time();
     int timer_wakeup_enable = (wakeup_src & PM_WAKEUP_TIMER);
     #if PM_32k_RC_CALIBRATION_ALGORITHM_EN

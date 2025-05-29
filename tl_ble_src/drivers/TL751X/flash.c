@@ -30,27 +30,16 @@
 #include "core.h"
 #include "stimer.h"
 #include "types.h"
-
-/*
- *  If add flash type, need pay attention to the read uid command and the bit number of status register
- *  Flash trim scheme has been added for P25Q80U.If other types of flash adds this scheme, user need to modify "flash_trim" and "flash_trim_check" function.
- *  When adding flash, if tRES1 is greater than 25us, update the delay of EFUSE_LOAD_AND_FLASH_WAKEUP_LOOP_NUM in the S file.
- *  If tRES1 is greater than 150us, this flash model cannot be used, because the chip hardware boot program only waits for 150us.
-    Flash Type  uid CMD     MID         Company     tRES1   Sector Erase Time(MAX)
-    P25Q32SL      0x4b      0x166085      PUYA      8us     16ms
- */
-unsigned int flash_support_mid[] = {0x166085};
-const unsigned int FLASH_CNT = sizeof(flash_support_mid)/sizeof(*flash_support_mid);
+#include "watchdog.h"               //BLE SDK use
 
 
-
-_attribute_data_retention_sec_ flash_handler_t flash_read_page = flash_read_data;
+_attribute_data_retention_sec_ flash_handler_t flash_read_page = flash_dread;
 _attribute_data_retention_sec_ flash_handler_t flash_write_page = flash_page_program;
 /*
  * note:flash_write_page_encrypt and flash_read_page_decrypt_check should be used in combination,and the check read address is corresponding to the encrypted write.
  */
 _attribute_data_retention_sec_ flash_handler_t flash_write_page_encrypt = flash_page_program_encrypt;
-_attribute_data_retention_sec_ flash_read_check_handler_t flash_read_page_decrypt_check = flash_read_data_decrypt_check;
+_attribute_data_retention_sec_ flash_read_check_handler_t flash_read_page_decrypt_check = flash_dread_decrypt_check;
 
 
 
@@ -103,33 +92,9 @@ void flash_plic_preempt_config(unsigned char preempt_en,unsigned char threshold)
  */
 _attribute_text_sec_ void flash_erase_sector(unsigned long addr)
 {
+    wd_clear(); //BLE SDK use
     DISABLE_BTB;
     flash_mspi_write_ram(FLASH_SECT_ERASE_CMD, addr, 0, 0, FLASH_WRITE_ENABLE_CMD, FLASH_READ_STATUS_CMD_LOWBYTE);
-    ENABLE_BTB;
-}
-
-/**
- * @brief       This function reads the content from a page to the buf with single mode.
- * @param[in]   addr    - slave base address + the access address of flash.The base address of device0 is 0.
- *                      If there are multiple devices, the base address of other devices is determined by the mspi_slave_device_addr_space_config() function.
- * @param[in]   len     - the length(in byte, must be above 0) of content needs to read out from the page.
- * @param[out]  buf     - the start address of the buffer(ram address).
- * @return      none.
- * @note        cmd:1x, addr:1x, data:1x, dummy:0
- *              Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
- *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.
- *              Taking into account the factors such as power supply fluctuations, the safe voltage value needs to be greater
- *              than the minimum chip operating voltage. For the specific value, please make a reasonable setting according
- *              to the specific application and hardware circuit.
- *
- *              Risk description: When the chip power supply voltage is relatively low, due to the unstable power supply,
- *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
- *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
- */
-_attribute_text_sec_ void flash_read_data(unsigned long addr, unsigned long len, unsigned char *buf)
-{
-    DISABLE_BTB;
-    flash_mspi_read_ram(FLASH_READ_CMD,addr, buf,len);
     ENABLE_BTB;
 }
 
@@ -181,33 +146,6 @@ _attribute_text_sec_ void flash_4read(unsigned long addr, unsigned long len, uns
     DISABLE_BTB;
     flash_mspi_read_ram(FLASH_X4READ_CMD, addr,  buf,len);
     ENABLE_BTB;
-}
-
-/**
- * @brief       This function serves to decrypt the read data from the flash at the specified address and compare it with the plain text in single mode.
- * @param[in]   addr        - slave base address + the access address of flash.The base address of device0 is 0.
- *                          If there are multiple devices, the base address of other devices is determined by the mspi_slave_device_addr_space_config() function.
- * @param[in]   plain_len   - the length(in byte, must be above 0) of content needs to read out from the page.
- * @param[out]  plain_buf   - the start address of the plain buffer(ram address).
- * @return      0: check pass; 1: check fail.
- * @note        cmd:1x, addr:1x, data:1x, dummy:0
- *              Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
- *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.
- *              Taking into account the factors such as power supply fluctuations, the safe voltage value needs to be greater
- *              than the minimum chip operating voltage. For the specific value, please make a reasonable setting according
- *              to the specific application and hardware circuit.
- *
- *              Risk description: When the chip power supply voltage is relatively low, due to the unstable power supply,
- *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
- *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
- */
-_attribute_text_sec_ unsigned char  flash_read_data_decrypt_check(unsigned long addr,unsigned long plain_len,unsigned char* plain_buf)
-{
-    unsigned char check_data=0;
-    DISABLE_BTB;
-    check_data = flash_mspi_read_decrypt_check_ram(FLASH_READ_CMD,addr,plain_buf,plain_len);
-    ENABLE_BTB;
-    return check_data;
 }
 
 /**
@@ -705,53 +643,8 @@ _attribute_text_sec_ unsigned char  flash_read_config(mspi_slave_device_num_e de
  *******************************************************************************************************/
 
 /**
- * @brief       This function serves to read flash mid and uid,and check the correctness of mid and uid.
- * @param[in]   device_num  - the number of slave device.
- * @param[out]  flash_mid   - Flash Manufacturer ID.
- * @param[out]  flash_uid   - Flash Unique ID.
- * @return      0: flash no uid or not a known flash model   1:the flash model is known and the uid is read.
- * @note        Attention: Before calling the FLASH function, please check the power supply voltage of the chip.
- *              Only if the detected voltage is greater than the safe voltage value, the FLASH function can be called.
- *              Taking into account the factors such as power supply fluctuations, the safe voltage value needs to be greater
- *              than the minimum chip operating voltage. For the specific value, please make a reasonable setting according
- *              to the specific application and hardware circuit.
- *
- *              Risk description: When the chip power supply voltage is relatively low, due to the unstable power supply,
- *              there may be a risk of error in the operation of the flash (especially for the write and erase operations.
- *              If an abnormality occurs, the firmware and user data may be rewritten, resulting in the final Product failure)
- */
-_attribute_text_sec_ int flash_read_mid_uid_with_check_with_device_num(mspi_slave_device_num_e device_num, unsigned int *flash_mid ,unsigned char *flash_uid)
-{
-    unsigned char no_uid[16]={0x51,0x01,0x51,0x01,0x51,0x01,0x51,0x01,0x51,0x01,0x51,0x01,0x51,0x01,0x51,0x01};
-    unsigned int i,f_cnt=0;
-    *flash_mid = flash_read_mid_with_device_num(device_num);
-
-    for(i=0; i<FLASH_CNT; i++){
-        if(flash_support_mid[i] == *flash_mid){
-            flash_read_uid_with_device_num(device_num, ((FLASH_READ_UID_CMD_GD_PUYA_ZB_TH>>16)&0xff), (unsigned char *)flash_uid);
-            break;
-        }
-    }
-    if(i == FLASH_CNT){
-        return 0;
-    }
-
-    for(i=0; i<16; i++){
-        if(flash_uid[i] == no_uid[i]){
-            f_cnt++;
-        }
-    }
-
-    if(f_cnt == 16){    //no uid flash
-        return 0;
-    }else{
-        return 1;
-    }
-}
-
-/**
  * @brief       This function serves to get flash vendor.
- * @param[in]   none.
+ * @param[in]   flash_mid - MID of the flash(4 bytes).
  * @return      0 - err, other - flash vendor.
  */
 unsigned int flash_get_vendor(unsigned int flash_mid)
@@ -773,4 +666,14 @@ unsigned int flash_get_vendor(unsigned int flash_mid)
     default:
         return 0;
     }
+}
+
+/**
+ * @brief       This function serves to get flash capacity.
+ * @param[in]   flash_mid - MID of the flash(4 bytes).
+ * @return      flash capacity.
+ */
+flash_capacity_e  flash_get_capacity(unsigned int flash_mid)
+{
+    return (flash_mid&0x00ff0000)>>16;
 }

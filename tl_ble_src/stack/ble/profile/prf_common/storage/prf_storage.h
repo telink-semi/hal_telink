@@ -26,23 +26,23 @@
 
 /* for LE Audio SDP: bonding audio GATT service information area (reuse FLASH_SDP_ATT_ADDRESS_1M_FLASH) */
 #ifndef FLASH_AUD_ATT_ADDRESS_1M_FLASH
-#define FLASH_AUD_ATT_ADDRESS_1M_FLASH                          0xF0000 //F0000 & F1000 & F2000 & F3000
-#endif                                                                  //Reuse 'ACL Central simple SDP' storage area
+    #define FLASH_AUD_ATT_ADDRESS_1M_FLASH 0xF0000 //F0000 & F1000 & F2000 & F3000
+#endif                                             //Reuse 'ACL Central simple SDP' storage area
 
 /* for LE Audio SDP: bonding audio GATT service information area (reuse FLASH_SDP_ATT_ADDRESS_2M_FLASH) */
 #ifndef FLASH_AUD_ATT_ADDRESS_2M_FLASH
-#define FLASH_AUD_ATT_ADDRESS_2M_FLASH                          0x1E8000 //1E8000 & 1E9000 & 1EA000 & 1EB000
-#endif                                                                   //Reuse 'ACL Central simple SDP' storage area
+    #define FLASH_AUD_ATT_ADDRESS_2M_FLASH 0x1E8000 //1E8000 & 1E9000 & 1EA000 & 1EB000
+#endif                                              //Reuse 'ACL Central simple SDP' storage area
 
 /* for LE Audio SDP: bonding audio GATT service information area (reuse FLASH_SDP_ATT_ADDRESS_4M_FLASH) */
 #ifndef FLASH_AUD_ATT_ADDRESS_4M_FLASH
-#define FLASH_AUD_ATT_ADDRESS_4M_FLASH                          0x3E8000 //3E8000 & 3E9000 & 3EA000 & 3EB000
-#endif                                                                   //Reuse 'ACL Central simple SDP' storage area
+    #define FLASH_AUD_ATT_ADDRESS_4M_FLASH 0x3E8000 //3E8000 & 3E9000 & 3EA000 & 3EB000
+#endif                                              //Reuse 'ACL Central simple SDP' storage area
 
 /* for LE Audio SDP: bonding audio GATT service information area (reuse FLASH_SDP_ATT_ADDRESS_16M_FLASH) */
 #ifndef FLASH_AUD_ATT_ADDRESS_16M_FLASH
-#define FLASH_AUD_ATT_ADDRESS_16M_FLASH                         0xFE8000 //FE8000 & FE9000 & FEA000 & FEB000
-#endif                                                                   //Reuse 'ACL Central simple SDP' storage area
+    #define FLASH_AUD_ATT_ADDRESS_16M_FLASH 0xFE8000 //FE8000 & FE9000 & FEA000 & FEB000
+#endif                                               //Reuse 'ACL Central simple SDP' storage area
 
 
 /**
@@ -62,3 +62,18 @@ void blc_prf_initPairingInfoStoreModule(void);
  * @note       If used, need to call before FUNC: blc_prf_initPairingInfoStoreModule
  */
 void blc_prf_configPairingInfoStorageAddressAndSize(int address, int size_byte);
+
+/**
+ * @brief       This function is used for retrieving location of stored bonding information based on ACL handle
+ * @param[in]   connHandle  - ACL Connect Handle..
+ * @param[out]  valueLen    - length of the stored nv record, NULL if none found
+ * @return      flash address of the record found.
+ */
+u32 blt_prf_searchBondingDeviceByAclHandle(u16 connHandle, u16* valueLen);
+
+/**
+ * @brief       This function is used for removing stored bonding information based on ACL handle
+ * @param[in]   connHandle  - ACL Connect Handle..
+ * @return      none.
+ */
+void blt_prf_deleteBondingInfoByFlashAddress(u32 flashAddr);

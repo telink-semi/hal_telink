@@ -23,12 +23,11 @@
  *******************************************************************************************************/
 #include "watchdog.h"
 
-
 /**
  * @brief     start 32k watchdog.
  * @return    none.
  */
-_attribute_ram_code_com_sec_noinline_ void wd_32k_start(void)
+_attribute_ram_code_sec_noinline_ void wd_32k_start(void)
 {
     analog_write_reg8(0x79, analog_read_reg8(0x79) | 0x01);
 }
@@ -39,7 +38,7 @@ _attribute_ram_code_com_sec_noinline_ void wd_32k_start(void)
  * @note      -# the interface sys_init() must be called before this interface can be invoked.
  *            -# after calling this interface, wd_32k_get_status() will be cleared.
  */
-_attribute_ram_code_com_sec_noinline_ void wd_32k_stop(void)
+_attribute_ram_code_sec_noinline_ void wd_32k_stop(void)
 {
     analog_write_reg8(0x79, analog_read_reg8(0x79) & 0xfe);
 }
@@ -53,7 +52,7 @@ _attribute_ram_code_com_sec_noinline_ void wd_32k_stop(void)
  *                - software reboot(sys_reboot())/deep/deepretation/32k watchdog come back,the interface status remains;
  *                - power cyele/reset pin/vbus detect come back, the status of the interface is lost;
  */
-_attribute_ram_code_com_sec_noinline_ unsigned char wd_32k_get_status(void)
+_attribute_ram_code_sec_noinline_ unsigned char wd_32k_get_status(void)
 {
     return (analog_read_reg8(0x69) & 0x80);
 }
@@ -63,7 +62,7 @@ _attribute_ram_code_com_sec_noinline_ unsigned char wd_32k_get_status(void)
  * @return    none.
  * @note      -# the interface sys_init() must be called before this interface can be invoked.
  */
-_attribute_ram_code_com_sec_noinline_ void wd_32k_clear_status(void)
+_attribute_ram_code_sec_noinline_ void wd_32k_clear_status(void)
 {
     analog_write_reg8(0x69, 0x80);
 }
@@ -73,7 +72,7 @@ _attribute_ram_code_com_sec_noinline_ void wd_32k_clear_status(void)
  * @param[in] period_ms - The watchdog trigger time. Unit is  millisecond,the lower 8bit of the wd timer register is invalid,so ranges from 8~134,217,720ms.
  * @return    none
  */
-_attribute_ram_code_com_sec_noinline_ void wd_32k_set_interval_ms(unsigned int period_ms)
+_attribute_ram_code_sec_noinline_ void wd_32k_set_interval_ms(unsigned int period_ms)
 {
     unsigned int tmp_period_ms = 0;
 

@@ -24,7 +24,7 @@
 #pragma once
 
 #include "reg_include/charger_reg.h"
-#include "analog.h"
+#include "lib/include/analog.h"
 
 
 extern unsigned int read_done;
@@ -47,7 +47,7 @@ static inline void charger_reset(void)
  */
 static inline void charger_control(chg_irq_control_e command)
 {
-    reg_chg_control = ((reg_chg_control & 0xf0)|command);
+    reg_chg_control = ((reg_chg_control & 0xf0) | command);
 }
 
 /**
@@ -76,7 +76,7 @@ static inline unsigned char charger_read_data(void)
  */
 static inline void charger_clr_irq_status(chg_irq_status_e status)
 {
-    reg_chg_irq = status;/*add by weihua.zhang, confirmed by jianzhi.chen*/
+    reg_chg_irq = status; /*add by weihua.zhang, confirmed by jianzhi.chen*/
 }
 
 /**
@@ -87,7 +87,7 @@ static inline void charger_clr_irq_status(chg_irq_status_e status)
  */
 static inline unsigned char charger_get_irq_status(chg_irq_status_e status)
 {
-    return  reg_chg_irq & status;
+    return reg_chg_irq & status;
 }
 
 /**
@@ -141,4 +141,3 @@ void charger_bin_mst_wr_byte(unsigned char cmd, unsigned char data);
  * @return      Data received.
  */
 unsigned int charger_bin_mst_rd_byte(void);
-

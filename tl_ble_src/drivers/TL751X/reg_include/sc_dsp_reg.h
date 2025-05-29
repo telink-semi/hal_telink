@@ -89,8 +89,11 @@ enum{
 
 #define reg_dsp_reset_vector            REG_ADDR32(SC_DSP_BASE_ADDR + 0x30)
 
-#define reg_dsp_sram_cfg                REG_ADDR16(SC_DSP_BASE_ADDR + 0x34)
-#define reg_dsp_sram_cfg0               REG_ADDR8(SC_DSP_BASE_ADDR + 0x34)
+#define DSP_SRAM_EMA_REG_ADDR              (SC_DSP_BASE_ADDR + 0x34)
+#define DSP_SRAM_EMA_DATA_LEN                    4
+
+#define reg_dsp_sram_cfg                REG_ADDR16(DSP_SRAM_EMA_REG_ADDR)
+#define reg_dsp_sram_cfg0               REG_ADDR8(DSP_SRAM_EMA_REG_ADDR)
 enum{
     FLD_DSP_SRAM_EMA        =   BIT_RNG(0, 2),
     FLD_DSP_SRAM_EMAW       =   BIT_RNG(3, 4),

@@ -29,59 +29,55 @@
 #define INIT_STACK_H_
 
 
-
-
 /******************************* init start ******************************************************************/
 
 
-#define         CONNECT_REQ_GOING                       BIT(0)
-#define         CONNECT_REQ_LEG_PENDING                 BIT(1)
-#define         CONNECT_REQ_EXT_PENDING                 BIT(2)
-#define         CONNECT_REQ_FOR_PAWR                    BIT(3)
+#define CONNECT_REQ_GOING       BIT(0)
+#define CONNECT_REQ_LEG_PENDING BIT(1)
+#define CONNECT_REQ_EXT_PENDING BIT(2)
+#define CONNECT_REQ_FOR_PAWR    BIT(3)
 
 
-#define         LEG_INITIATE_GOING                      BIT(0)
-#define         EXT_INITIATE_GOING                      BIT(1)
+#define LEG_INITIATE_GOING      BIT(0)
+#define EXT_INITIATE_GOING      BIT(1)
 
 
 #if (LL_ASYNC_LEA_EN)
-#define         BLMS_WINSIZE                            7  //winSize 1.25*8=10mS
+    #define BLMS_WINSIZE           7 //winSize 1.25*8=10mS
 
-#define         BSLOT_NUM_HALF_WINSIZE                  7  //half winSize = 625uS * 8
+    #define BSLOT_NUM_HALF_WINSIZE 7 //half winSize = 625uS * 8
 #else
-#define         BLMS_WINSIZE                            5  //winSize 1.25*5=6.25mS
+    #define BLMS_WINSIZE           5 //winSize 1.25*5=6.25mS
 
-#define         BSLOT_NUM_HALF_WINSIZE                  5  //half winSize = 625uS * 5
+    #define BSLOT_NUM_HALF_WINSIZE 5 //half winSize = 625uS * 5
 #endif
 
 
-typedef struct __attribute__((packed)){
+typedef struct __attribute__((packed))
+{
     u32 dma_len;
 
-    u8  type   :4;
-    u8  rfu1   :1;
-    u8  chan_sel:1;
-    u8  txAddr :1;
-    u8  rxAddr :1;
+    u8 type     : 4;
+    u8 rfu1     : 1;
+    u8 chan_sel : 1;
+    u8 txAddr   : 1;
+    u8 rxAddr   : 1;
 
-    u8  rf_len;             //LEN(6)_RFU(2)
-    u8  initA[6];           //
-    u8  advA[6];            //
-    u32 access_code;            // access code
+    u8  rf_len;      //LEN(6)_RFU(2)
+    u8  initA[6];    //
+    u8  advA[6];     //
+    u32 access_code; // access code
     u8  crcinit[3];
     u8  wsize;
     u16 woffset;
-    u16 interval;   //for ext_init, determine final value according to current PHY
+    u16 interval; //for ext_init, determine final value according to current PHY
     u16 latency;
-    u16 timeout;    //for ext_init, determine final value according to current PHY
+    u16 timeout;  //for ext_init, determine final value according to current PHY
     u8  chm[5];
-    u8  hop;                //sca(3)_hop(5)
-}rf_packet_ll_init_t;
-extern  _attribute_aligned_(4)  rf_packet_ll_init_t pkt_init;
+    u8  hop;      //sca(3)_hop(5)
+} rf_packet_ll_init_t;
 
-
-
-
+extern _attribute_aligned_(4) rf_packet_ll_init_t pkt_init;
 
 
 /*************************************************************************************************************
@@ -112,122 +108,99 @@ so 24 is best
 
 24 ->   0b'00000000 00000000 00000001   0x000001
  *************************************************************************************************************/
-#define         INTV_MSK_1_TIME                                 0xFFFFFF
-#define         INTV_MSK_2_TIME                                 0x555555
-#define         INTV_MSK_3_TIME                                 0x249249
-#define         INTV_MSK_4_TIME                                 0x111111
-#define         INTV_MSK_6_TIME                                 0x041041
-#define         INTV_MSK_8_TIME                                 0x010101
-#define         INTV_MSK_12_TIME                                0x001001
-#define         INTV_MSK_24_TIME                                0x000001
+#define INTV_MSK_1_TIME  0xFFFFFF
+#define INTV_MSK_2_TIME  0x555555
+#define INTV_MSK_3_TIME  0x249249
+#define INTV_MSK_4_TIME  0x111111
+#define INTV_MSK_6_TIME  0x041041
+#define INTV_MSK_8_TIME  0x010101
+#define INTV_MSK_12_TIME 0x001001
+#define INTV_MSK_24_TIME 0x000001
 
-_attribute_aligned_(4)
-typedef struct {
-    u8      init_fp;    //initiator filter policy
-    u8      mas_intv_mul;
-    u8      sec_chn_init;  //0: primary channel initiate; 1: secondary channel initiate
+_attribute_aligned_(4) typedef struct
+{
+    u8 init_fp;       //initiator filter policy
+    u8 mas_intv_mul;
+    u8 sec_chn_init;  //0: primary channel initiate; 1: secondary channel initiate
 
-    u8      own_addr_type;  // 0/1/2/3
-    u8      init_ownAddr_rpa;
-    u8      init_specify_peerAdvA_rpa;
+    u8 own_addr_type; // 0/1/2/3
+    u8 init_ownAddr_rpa;
+    u8 init_specify_peerAdvA_rpa;
 
-    u8      creatConCmd_peerAdrType;            //create connection command peer address type
-    u8      creatConCmd_peerAddr[BLE_ADDR_LEN]; //create connection command peer address
+    u8 creatConCmd_peerAdrType;            //create connection command peer address type
+    u8 creatConCmd_peerAddr[BLE_ADDR_LEN]; //create connection command peer address
 
-    u8      init_mac_type;
-    u8      init_mac_addr[6];
+    u8 init_mac_type;
+    u8 init_mac_addr[6];
 
 
-    u8      aclc_idx_init; //current created ACL CEN index   set by application layer
-    u8      u8_rsvd[3];
+    u8 aclc_idx_init; //current created ACL CEN index   set by application layer
+    u8 u8_rsvd[3];
 
-    u32     mas_intv_msk;
+    u32 mas_intv_msk;
 
     ll_resolv_list_t *pRslvlst_extInit;
-}ll_init_t;
-extern  _attribute_aligned_(4) ll_init_t  bltInit;
+} ll_init_t;
+
+extern _attribute_aligned_(4) ll_init_t bltInit;
 
 
-
-
-
-extern  u32 blms_timeout_connectDevice;
+extern u32 blms_timeout_connectDevice;
 
 
 extern const u32 interMask_tbl[];
 
 
-void        blt_ll_initInitiatingCommon(void);
-ble_sts_t   blt_ll_createConnCommon( init_fp_t fp, own_addr_type_t ownAdrType, u8 peerAdrType, u8 *peerAddr);
-int         blt_init_calculateMasterIntervalMultiplier(u16 master_connInter, u16 conn_min, u16 conn_max);
-void        blt_ll_procInitiateConnectionTimeout(void);
+void      blt_ll_initInitiatingCommon(void);
+ble_sts_t blt_ll_createConnCommon(init_fp_t fp, own_addr_type_t ownAdrType, u8 peerAdrType, u8 *peerAddr);
+int       blt_init_calculateMasterIntervalMultiplier(u16 master_connInter, u16 conn_min, u16 conn_max);
+void      blt_ll_procInitiateConnectionTimeout(void);
 
 
-bool        blt_ll_init_filter(int, u8, u8, u8 *, u8 *);
+bool blt_ll_init_filter(int, u8, u8, u8 *, u8 *);
 
-int         blt_init_mainloop_task (int flag);
-int         blt_prichn_procInitPkt(u8 *raw_pkt);
+int blt_init_mainloop_task(int flag);
+int blt_prichn_procInitPkt(u8 *raw_pkt);
 
 
 //int           blt_extended_initiate_process(u8 *);
 /******************************* init end ******************************************************************/
 
 
-
-
-
-
 /******************************* leg_init start ******************************************************************/
-int         blt_legacy_initiate_process(u8 *raw_pkt);
+int blt_legacy_initiate_process(u8 *raw_pkt);
 
-ble_sts_t   blc_hci_le_createConnection( hci_le_createConn_cmdParam_t * pCmdParam);
+ble_sts_t blc_hci_le_createConnection(hci_le_createConn_cmdParam_t *pCmdParam);
 /******************************* leg_init end ******************************************************************/
 
 
-
-
-
-
-
-
-ble_sts_t   blt_ll_createConnection( scan_inter_t scanInter, scan_wind_t scanWindow, init_fp_t fp, u8 peerAdrType, u8 *peerAddr, own_addr_type_t ownAdrType,
-                                     conn_inter_t conn_min,  conn_inter_t conn_max, u16 conn_latency, conn_tm_t timeout, u16 ce_min,   u16 ce_max );
-
-
-
-
+ble_sts_t blt_ll_createConnection(scan_inter_t scanInter, scan_wind_t scanWindow, init_fp_t fp, u8 peerAdrType, u8 *peerAddr, own_addr_type_t ownAdrType, conn_inter_t conn_min, conn_inter_t conn_max, u16 conn_latency, conn_tm_t timeout, u16 ce_min, u16 ce_max);
 
 
 /******************************* ext_init start ******************************************************************/
 
 #ifndef FIX_AUX_CONN_SLOT_IDX_CAL
-#define FIX_AUX_CONN_SLOT_IDX_CAL                           0
+    #define FIX_AUX_CONN_SLOT_IDX_CAL 0
 #endif
 
 
-_attribute_aligned_(4)
-typedef struct {
+_attribute_aligned_(4) typedef struct
+{
+    u8 mas_hold_intv_mul[3]; //hold data for "mas_intv_mul"
+    u8 u8_rsvd[1];
 
-    u8      mas_hold_intv_mul[3]; //hold data for "mas_intv_mul"
-    u8      u8_rsvd[1];
+    u16 hold_timeout[3];
+    u16 u16_rsvd;
 
-    u16     hold_timeout[3];
-    u16     u16_rsvd;
+    u32 mas_hold_intv_msk[3]; //hold data for "mas_intv_msk"
 
-    u32     mas_hold_intv_msk[3]; //hold data for "mas_intv_msk"
+} ll_extinit_t;
 
-}ll_extinit_t;
-extern _attribute_aligned_(4)   ll_extinit_t        bltExtInit;
-
-
+extern _attribute_aligned_(4) ll_extinit_t bltExtInit;
 
 
-
-
-int  blt_ext_init_interrupt_task (int flag);
-int  blt_secchn_procInitPkt(u8 *raw_pkt);
-
-
+int blt_ext_init_interrupt_task(int flag);
+int blt_secchn_procInitPkt(u8 *raw_pkt);
 
 
 /**
@@ -235,14 +208,10 @@ int  blt_secchn_procInitPkt(u8 *raw_pkt);
  * @param[in]  pCmdParam - point to a buffer for extended scan parameters.
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t   blc_hci_le_extended_createConnection( hci_le_ext_createConn_cmdParam_t * pCmdParam);
+ble_sts_t blc_hci_le_extended_createConnection(hci_le_ext_createConn_cmdParam_t *pCmdParam);
 
 
 /******************************* ext_init end ******************************************************************/
-
-
-
-
 
 
 #endif /* INIT_STACK_H_ */

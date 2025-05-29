@@ -57,7 +57,7 @@
  * @brief      This function serves to judge whether analog is busy.
  * @return     0: not busy  1:busy
  */
-_attribute_ram_code_sec_noinline_ bool analog_busy(void)
+_attribute_ram_code_sec_optimize_o2_noinline_ bool analog_busy(void)
 {
     return reg_ana_ctrl & FLD_ANA_BUSY;
 }
@@ -66,7 +66,7 @@ _attribute_ram_code_sec_noinline_ bool analog_busy(void)
  * @brief      This function serves to judge whether analog Tx buffer is empty.
  * @return     0:not empty      1: empty
  */
-_attribute_ram_code_sec_noinline_ bool analog_txbuf_no_empty(void)
+_attribute_ram_code_sec_optimize_o2_noinline_ bool analog_txbuf_no_empty(void)
 {
     /**
         Because the logic of the current chip hardware to write the first data is:
@@ -84,7 +84,8 @@ _attribute_ram_code_sec_noinline_ bool analog_txbuf_no_empty(void)
  */
 static _always_inline void analog_wait(void)
 {
-    while(reg_ana_ctrl & FLD_ANA_BUSY){}
+    while (reg_ana_ctrl & FLD_ANA_BUSY) {
+    }
 }
 
 /**
@@ -99,7 +100,7 @@ static _always_inline void analog_wait_txbuf_no_empty(void)
         In order to prevent incorrect data from being emitted due to the slow filling of the FIFO,
         we need to determine whether the FIFO is non-empty before triggering the write action.
     */
-    while(!(reg_ana_buf_cnt & FLD_ANA_TX_BUFCNT));
+    while (!(reg_ana_buf_cnt & FLD_ANA_TX_BUFCNT));
 }
 #endif
 
@@ -113,16 +114,17 @@ static _always_inline void analog_wait_txbuf_no_empty(void)
  * @param[in]  addr - address need to be read.
  * @return     the result of read.
  */
-_attribute_ram_code_sec_noinline_ unsigned char analog_read_reg8(unsigned char addr){
-    unsigned int r=core_interrupt_disable();
-    reg_ana_addr = addr;
-    reg_ana_len=0x1;
-    reg_ana_ctrl = FLD_ANA_CYC;
+
+_attribute_ram_code_sec_optimize_o2_noinline_ unsigned char analog_read_reg8(unsigned char addr)
+{
+    unsigned int r = core_interrupt_disable();
+    reg_ana_addr   = addr;
+    reg_ana_len    = 0x1;
+    reg_ana_ctrl   = FLD_ANA_CYC;
     analog_wait();
-    unsigned char data= reg_ana_data(0);
+    unsigned char data = reg_ana_data(0);
     core_restore_interrupt(r);
     return data;
-
 }
 
 /**
@@ -131,15 +133,16 @@ _attribute_ram_code_sec_noinline_ unsigned char analog_read_reg8(unsigned char a
  * @param[in]  data - the value need to be write.
  * @return     none.
  */
-_attribute_ram_code_sec_noinline_ void analog_write_reg8(unsigned char addr, unsigned char data){
-    unsigned int r=core_interrupt_disable();
-    reg_ana_len = 1;
-    reg_ana_addr = addr;
+
+_attribute_ram_code_sec_optimize_o2_noinline_ void analog_write_reg8(unsigned char addr, unsigned char data){
+    unsigned int r  = core_interrupt_disable();
+    reg_ana_len     = 1;
+    reg_ana_addr    = addr;
     reg_ana_data(0) = data;
     analog_wait_txbuf_no_empty();
     reg_ana_ctrl = (FLD_ANA_CYC | FLD_ANA_RW);
     analog_wait();
-    reg_ana_ctrl =0x00;
+    reg_ana_ctrl = 0x00;
     core_restore_interrupt(r);
 }
 
@@ -149,16 +152,16 @@ _attribute_ram_code_sec_noinline_ void analog_write_reg8(unsigned char addr, uns
  * @param[in]  data - the value need to be write.
  * @return     none.
  */
-_attribute_ram_code_sec_noinline_ void analog_write_reg16(unsigned char addr, unsigned short data)
+_attribute_ram_code_sec_optimize_o2_noinline_ void analog_write_reg16(unsigned char addr, unsigned short data)
 {
-    unsigned int r=core_interrupt_disable();
-    reg_ana_len=2;
-    reg_ana_addr = addr;
+    unsigned int r      = core_interrupt_disable();
+    reg_ana_len         = 2;
+    reg_ana_addr        = addr;
     reg_ana_addr_data16 = data;
     analog_wait_txbuf_no_empty();
     reg_ana_ctrl = (FLD_ANA_CYC | FLD_ANA_RW);
     analog_wait();
-    reg_ana_ctrl =0x00;
+    reg_ana_ctrl = 0x00;
     core_restore_interrupt(r);
 }
 
@@ -167,37 +170,34 @@ _attribute_ram_code_sec_noinline_ void analog_write_reg16(unsigned char addr, un
  * @param[in]  addr - address need to be read.
  * @return     the result of read.
  */
-_attribute_ram_code_sec_noinline_ unsigned short analog_read_reg16(unsigned char addr)
+_attribute_ram_code_sec_optimize_o2_noinline_ unsigned short analog_read_reg16(unsigned char addr)
 {
-    unsigned int r=core_interrupt_disable();
-    reg_ana_len=2;
-    reg_ana_addr = addr;
-    reg_ana_ctrl = FLD_ANA_CYC;
+    unsigned int r = core_interrupt_disable();
+    reg_ana_len    = 2;
+    reg_ana_addr   = addr;
+    reg_ana_ctrl   = FLD_ANA_CYC;
     analog_wait();
-    unsigned short data=reg_ana_addr_data16;
+    unsigned short data = reg_ana_addr_data16;
     core_restore_interrupt(r);
     return data;
 }
-
-
 
 /**
  * @brief      This function serves to analog register read by word.
  * @param[in]  addr - address need to be read.
  * @return     the result of read.
  */
-_attribute_ram_code_sec_noinline_ unsigned int analog_read_reg32(unsigned char addr)
+_attribute_ram_code_sec_optimize_o2_noinline_ unsigned int analog_read_reg32(unsigned char addr)
 {
-    unsigned int r=core_interrupt_disable();
-    reg_ana_len = 4;
-    reg_ana_addr = addr;
-    reg_ana_ctrl = FLD_ANA_CYC;
+    unsigned int r = core_interrupt_disable();
+    reg_ana_len    = 4;
+    reg_ana_addr   = addr;
+    reg_ana_ctrl   = FLD_ANA_CYC;
     analog_wait();
-    unsigned int data=reg_ana_addr_data32;
+    unsigned int data = reg_ana_addr_data32;
     core_restore_interrupt(r);
     return data;
 }
-
 
 /**
  * @brief      This function serves to analog register write by word.
@@ -205,16 +205,16 @@ _attribute_ram_code_sec_noinline_ unsigned int analog_read_reg32(unsigned char a
  * @param[in]  data - the value need to be write.
  * @return     none.
  */
-_attribute_ram_code_sec_noinline_ void analog_write_reg32(unsigned char addr, unsigned int data)
+_attribute_ram_code_sec_optimize_o2_noinline_ void analog_write_reg32(unsigned char addr, unsigned int data)
 {
-    unsigned int r=core_interrupt_disable();
-    reg_ana_len = 4;
-    reg_ana_addr = addr;
+    unsigned int r      = core_interrupt_disable();
+    reg_ana_len         = 4;
+    reg_ana_addr        = addr;
     reg_ana_addr_data32 = data;
     analog_wait_txbuf_no_empty();
     reg_ana_ctrl = (FLD_ANA_CYC | FLD_ANA_RW);
     analog_wait();
-    reg_ana_ctrl =0x00;
+    reg_ana_ctrl = 0x00;
     core_restore_interrupt(r);
 }
 
@@ -227,23 +227,22 @@ _attribute_ram_code_sec_noinline_ void analog_write_reg32(unsigned char addr, un
  */
 _attribute_ram_code_sec_noinline_ void analog_write_buff(unsigned char addr, unsigned char *buff, unsigned char len)
 {
-    if(len > 8){
+    if (len > 8) {
         return;
     }
-    unsigned int r=core_interrupt_disable();
+    unsigned int r = core_interrupt_disable();
 
-    reg_ana_len = len;
-    reg_ana_addr = addr;
+    reg_ana_len     = len;
+    reg_ana_addr    = addr;
     reg_ana_data(0) = *(buff++);
     analog_wait_txbuf_no_empty();
     reg_ana_ctrl = (FLD_ANA_CYC | FLD_ANA_RW);
-    for(unsigned int i=1; i<len; i++)
-    {
+    for (unsigned int i = 1; i < len; i++) {
         reg_ana_data(i % 4) = *(buff++);
     }
 
     analog_wait();
-    reg_ana_ctrl =0x00;
+    reg_ana_ctrl = 0x00;
     core_restore_interrupt(r);
 }
 
@@ -256,19 +255,17 @@ _attribute_ram_code_sec_noinline_ void analog_write_buff(unsigned char addr, uns
  */
 _attribute_ram_code_sec_noinline_ void analog_read_buff(unsigned char addr, unsigned char *buff, unsigned char len)
 {
-    unsigned int r=core_interrupt_disable();
+    unsigned int r = core_interrupt_disable();
 
-    reg_ana_len = len;
+    reg_ana_len  = len;
     reg_ana_addr = addr;
     reg_ana_ctrl = FLD_ANA_CYC;
-    for(unsigned int i=0; i<len; i++)
-    {
-        while(!(reg_ana_buf_cnt & FLD_ANA_RX_BUFCNT));
+    for (unsigned int i = 0; i < len; i++) {
+        while (!(reg_ana_buf_cnt & FLD_ANA_RX_BUFCNT));
         *(buff++) = reg_ana_data(i % 4);
     }
 
     analog_wait();
-    reg_ana_ctrl =0x00;
+    reg_ana_ctrl = 0x00;
     core_restore_interrupt(r);
 }
-

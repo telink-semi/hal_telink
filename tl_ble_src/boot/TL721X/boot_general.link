@@ -63,8 +63,6 @@ SECTIONS
     .iram_bss (NOLOAD): { KEEP(*(.iram_bss )) }
     PROVIDE (_IRAM_BSS_VMA_END = .);
     
-    
-    
     . = ALIGN(LOADADDR (.ram_code) + SIZEOF (.ram_code), 8);
     .text           : AT(ALIGN(LOADADDR (.ram_code) + SIZEOF (.ram_code), 8)) 
         { *(.text .stub .text.* .gnu.linkonce.t.* ) KEEP(*(.text.*personality* )) *(.gnu.warning )  }
@@ -78,7 +76,11 @@ SECTIONS
         
     . = (0x00080000*__DRAM_1_EN) + (ALIGN(ADDR(.iram_bss) + SIZEOF (.iram_bss), 8)*__DRAM_DIS);
     PROVIDE( __global_pointer$ = . + (4K / 2) );
-    .data   : AT(ALIGN(LOADADDR (.eh_frame) + SIZEOF (.eh_frame),  ALIGNOF(.data)))
+    .rf_certification_cfg : AT(ALIGN(LOADADDR(.eh_frame) + SIZEOF(.eh_frame), ALIGNOF(.rf_certification_cfg)))
+        { KEEP(*(.rf_certification_cfg)) }
+    PROVIDE (_RF_CERTIFICATION_CFG_ADDR_OFFSET = LOADADDR(.rf_certification_cfg) - BIN_BEGIN);
+    . = ALIGN(8);
+    .data   : AT(ALIGN(LOADADDR (.rf_certification_cfg) + SIZEOF (.rf_certification_cfg),  ALIGNOF(.data)))
         { *(.data .data.* .gnu.linkonce.d.* ) KEEP(*(.gnu.linkonce.d.*personality* )) SORT(CONSTRUCTORS) 
           *(.srodata.cst16 ) *(.srodata.cst8 ) *(.srodata.cst4 ) *(.srodata.cst2 ) *(.srodata .srodata.* ) *(.sdata .sdata.* .gnu.linkonce.s.* ) *(.sdata2 .sdata2.* .gnu.linkonce.s.* )
         }

@@ -23,9 +23,9 @@
  *******************************************************************************************************/
 #ifndef MAILBOX_REG_H
 #define MAILBOX_REG_H
-/*******************************      mailbox registers: 0x101C00    ******************************/
+/*******************************      mailbox registers: 0x80101C00    ******************************/
 /*******************************    m0:D25F , m1:N22 , m2:DSP ******************************/
-#define  MAILBOX_BASE_ADDR                 0x101C00
+#define  MAILBOX_BASE_ADDR                 0x80101C00
 
 #define reg_msg_d25f_to_dsp_word0           REG_ADDR32(MAILBOX_BASE_ADDR)
 #define reg_msg_d25f_to_dsp_word1           REG_ADDR32(MAILBOX_BASE_ADDR+0x04)

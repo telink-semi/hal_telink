@@ -25,13 +25,15 @@
 
 //DIS: Device Information Service.
 
-typedef struct{
+typedef struct
+{
     u8 manufacturer[5]; //manufacturer-defined identifier
     u8 oui[3];          //Organizationally Unique Identifier(OUI)
 } dis_system_id_t;
 
-typedef struct __attribute__((packed)){
-    u8 vidSrc;
+typedef struct __attribute__((packed))
+{
+    u8  vidSrc;
     u16 vid;
     u16 pid;
     u16 ver;

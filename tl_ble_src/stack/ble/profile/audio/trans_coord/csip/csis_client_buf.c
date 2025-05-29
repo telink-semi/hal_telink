@@ -26,10 +26,8 @@
 #include "stack/ble/ble.h"
 
 
-
 _attribute_ble_data_retention_
-blc_csis_client_t gCsis[ACL_CENTRAL_MAX_NUM];
-
+    blc_csis_client_t gCsis[ACL_CENTRAL_MAX_NUM];
 
 blc_csis_client_t *blt_csisc_getClientBuf(u8 instIdx)
 {
@@ -37,8 +35,3 @@ blc_csis_client_t *blt_csisc_getClientBuf(u8 instIdx)
 
     return &gCsis[instIdx];
 }
-
-
-
-
-

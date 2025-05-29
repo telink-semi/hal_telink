@@ -94,8 +94,11 @@ SECTIONS
     .sbss   (NOLOAD)    : { *(.dynsbss ) *(.sbss .sbss.* .gnu.linkonce.sb.* ) *(.scommon .scommon.* ) }
     .bss    (NOLOAD)    : { *(.dynbss ) *(.bss .bss.* .gnu.linkonce.b.* ) *(COMMON ) . = ALIGN(8); }
     PROVIDE (_BSS_VMA_END = .);
-    
-    .sdk_version    : AT(LOADADDR (.data) + SIZEOF (.data))
+
+    .gcc_except_table    : AT(LOADADDR (.data) + SIZEOF (.data))
+        { KEEP(*(.gcc_except_table)) *(.gcc_except_table.*) }
+
+    .sdk_version    : AT(LOADADDR (.gcc_except_table) + SIZEOF (.gcc_except_table))
         { KEEP(*(.sdk_version )) }
 
     PROVIDE (BIN_SIZE = LOADADDR(.sdk_version) + SIZEOF(.sdk_version) - BIN_BEGIN);

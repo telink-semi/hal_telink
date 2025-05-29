@@ -27,8 +27,8 @@
 #include "cap.h"
 
 
-const u8 gAppAudioAclMaxNum = APP_AUDIO_ACL_MAX_CONN;
-const u8 gAppAudioAclCentralNum = ACL_CENTRAL_MAX_NUM;
+const u8 gAppAudioAclMaxNum        = APP_AUDIO_ACL_MAX_CONN;
+const u8 gAppAudioAclCentralNum    = ACL_CENTRAL_MAX_NUM;
 const u8 gAppAudioAclPeripheralNum = ACL_PERIPHR_MAX_NUM;
 
 //CAP Role Initiator, initialize Content Control, include MCP Media Control Server and CCP Call Control Server.
@@ -41,28 +41,28 @@ void blc_cap_initiatorContentCtrl(void)
 //CAP Role Initiator, initialize Audio Stream Transitions, include CSIP Set Coordinator and BAP Unicast Client.
 void blc_cap_initiatorStreamTrans(void)
 {
-    blc_audio_registerBapUnicastClient(NULL);           //BAP Unicast Client init
-    blc_audio_registerCSISControlClient(NULL);  //CSIP Set Coordinator init
+    blc_audio_registerBapUnicastClient(NULL);  //BAP Unicast Client init
+    blc_audio_registerCSISControlClient(NULL); //CSIP Set Coordinator init
 }
 
 //CAP Role Commander, initialize Capture and Rendering Control, include VCP Volume Controller and MICP Microphone Controller.
 void blc_cap_commanderCaptureRenderingCtrl(void)
 {
-    blc_audio_registerVCSControlClient(NULL);   //VCP Volume Controller init
-    blc_audio_registerMICSControlClient(NULL);  //MICP Microphone Controller init
+    blc_audio_registerVCSControlClient(NULL);  //VCP Volume Controller init
+    blc_audio_registerMICSControlClient(NULL); //MICP Microphone Controller init
 }
 
 //CAP Role Commander, initialize Audio Stream Transitions, include CSIP Set Coordinator and BAP Broadcast Assistant.
 void blc_cap_commanderStreamTrans(void)
 {
-    blc_audio_registerBroadcastAssistant(NULL);         //BAP Broadcast Assistant(Scan Delegator) init
-    blc_audio_registerCSISControlClient(NULL); //CSIP Set Coordinator init
+    blc_audio_registerBroadcastAssistant(NULL); //BAP Broadcast Assistant(Scan Delegator) init
+    blc_audio_registerCSISControlClient(NULL);  //CSIP Set Coordinator init
 }
 
 //CAP Role Acceptor, initialize Content Control, include MCP Media Control Client and CCP Call Control Client.
 void blc_cap_acceptorContentCtrl(void)
 {
-    blc_audio_registerCallControlClient(NULL); //CCP Call Control Client init
+    blc_audio_registerCallControlClient(NULL);  //CCP Call Control Client init
     blc_audio_registerMediaControlClient(NULL); //MCP Media Control Client init
 }
 
@@ -70,19 +70,20 @@ void blc_cap_acceptorContentCtrl(void)
 void blc_cap_acceptorCaptureRenderingCtrl(void)
 {
     blc_audio_registerVCSControlServer(&defaultVcpRendererParam); //VCP Volume Renderer init
-    blc_audio_registerMICSControlServer(&defaultMicpParam); //MICP Microphone Device init
+    blc_audio_registerMICSControlServer(&defaultMicpParam);       //MICP Microphone Device init
 }
 
 //CAP Role Acceptor, initialize Audio Stream Transitions, include CSIP Set Member, BAP Unicast Server, BAP Broadcast Sink.
 //Only Unicast Audio Audio Stream Transitions
 const blc_bapus_regParam_t defaultUnicastSvrParam =
-{
-    .pAscsParam = NULL,
-    .pPacsParam = &defaultPacsParam,
+    {
+        .pAscsParam = NULL,
+        .pPacsParam = &defaultPacsParam,
 };
+
 void blc_cap_acceptorUnicastStreamTrans(void)
 {
-    blc_audio_registerBapUnicastServer(&defaultUnicastSvrParam); //BAP Unicast Server init
+    blc_audio_registerBapUnicastServer(&defaultUnicastSvrParam);     //BAP Unicast Server init
     blc_audio_registerCSISControlServer(&defaultCsipSetMemberParam); //CSIP Set Member init
 }
 
@@ -91,9 +92,10 @@ const blc_bapbs_regParam_t defaultBcstSinkParam = {
     .pBassParam = NULL,
     .pPacsParam = &defaultPacsParam,
 };
+
 void blc_cap_acceptorBcstStreamTrans(void)
 {
-    blc_audio_registerBapBroadcastSink(&defaultBcstSinkParam);//BAP Broadcast Sink(Scan Delegator) init
+    blc_audio_registerBapBroadcastSink(&defaultBcstSinkParam);       //BAP Broadcast Sink(Scan Delegator) init
     blc_audio_registerCSISControlServer(&defaultCsipSetMemberParam); //CSIP Set Member init
 }
 
@@ -103,7 +105,6 @@ void blc_cap_acceptorStreamTrans(void)
     blc_cap_acceptorUnicastStreamTrans();
     blc_cap_acceptorBcstStreamTrans();
 }
-
 
 void blc_cap_initUnicastInitiator(void)
 {
@@ -120,7 +121,7 @@ void blc_cap_initBcstCommander(void)
     blc_cap_commanderStreamTrans();
 
     //////////// Capture and Rendering Control( *Broadcast Commander only support VCP Volume Controller) /////////////////////////
-    blc_audio_registerVCSControlClient(NULL);   //VCP Volume Controller init
+    blc_audio_registerVCSControlClient(NULL); //VCP Volume Controller init
 }
 
 void blc_cap_initUnicastAcceptor(void)
@@ -150,22 +151,16 @@ void blc_cap_initAudioAcceptor(void)
     blc_cap_acceptorCaptureRenderingCtrl();
 }
 
-
 const blc_capAnnouncement_t capGeneralAnnouncement = {
-   .ltv.len  = 4,
-   .ltv.type = DT_SERVICE_DATA,
-   .casUuid  = SERVICE_UUID_COMMON_AUDIO,
-   .announcementType = BLC_AUDIO_GENERAL_ANNOUNCEMENT,
+    .ltv.len          = 4,
+    .ltv.type         = DT_SERVICE_DATA,
+    .casUuid          = SERVICE_UUID_COMMON_AUDIO,
+    .announcementType = BLC_AUDIO_GENERAL_ANNOUNCEMENT,
 };
 
 const blc_capAnnouncement_t capTargetAnnouncement = {
-   .ltv.len  = 4,
-   .ltv.type = DT_SERVICE_DATA,
-   .casUuid  = SERVICE_UUID_COMMON_AUDIO,
-   .announcementType = BLC_AUDIO_TARGETED_ANNOUNCEMENT,
+    .ltv.len          = 4,
+    .ltv.type         = DT_SERVICE_DATA,
+    .casUuid          = SERVICE_UUID_COMMON_AUDIO,
+    .announcementType = BLC_AUDIO_TARGETED_ANNOUNCEMENT,
 };
-
-
-
-
-

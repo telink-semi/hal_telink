@@ -66,15 +66,15 @@ static dma_chain_config_t g_audio_rx_dma_list_cfg[4];
 static i2s_invert_config_t audio_i2s_invert_config[3] = {
     {
      .i2s_lr_clk_invert_select = I2S_LR_CLK_INVERT_DIS,
-     .i2s_data_invert_select = I2S_DATA_INVERT_DIS,
+     .i2s_data_invert_select   = I2S_DATA_INVERT_DIS,
      },
     {
      .i2s_lr_clk_invert_select = I2S_LR_CLK_INVERT_DIS,
-     .i2s_data_invert_select = I2S_DATA_INVERT_DIS,
+     .i2s_data_invert_select   = I2S_DATA_INVERT_DIS,
      },
     {
      .i2s_lr_clk_invert_select = I2S_LR_CLK_INVERT_DIS,
-     .i2s_data_invert_select = I2S_DATA_INVERT_DIS,
+     .i2s_data_invert_select   = I2S_DATA_INVERT_DIS,
      },
 };
 
@@ -84,64 +84,64 @@ static i2s_invert_config_t audio_i2s_invert_config[3] = {
  */
 dma_config_t audio_dma_rx_config[4] = {
     {
-     .dst_req_sel = 0,
-     .src_req_sel = DMA_REQ_AUDIO0_RX,
-     .dst_addr_ctrl = DMA_ADDR_INCREMENT,
-     .src_addr_ctrl = DMA_ADDR_FIX,
-     .dstmode = DMA_NORMAL_MODE,
-     .srcmode = DMA_HANDSHAKE_MODE,
-     .dstwidth = DMA_CTR_WORD_WIDTH,
-     .srcwidth = DMA_CTR_WORD_WIDTH,
+     .dst_req_sel    = 0,
+     .src_req_sel    = DMA_REQ_AUDIO0_RX,
+     .dst_addr_ctrl  = DMA_ADDR_INCREMENT,
+     .src_addr_ctrl  = DMA_ADDR_FIX,
+     .dstmode        = DMA_NORMAL_MODE,
+     .srcmode        = DMA_HANDSHAKE_MODE,
+     .dstwidth       = DMA_CTR_WORD_WIDTH,
+     .srcwidth       = DMA_CTR_WORD_WIDTH,
      .src_burst_size = DMA_BURST_1_WORD,
-     .read_num_en = 0,
-     .priority = 0,
-     .write_num_en = 0,
-     .auto_en = 0,
+     .read_num_en    = 0,
+     .priority       = 0,
+     .write_num_en   = 0,
+     .auto_en        = 0,
      },
     {
-     .dst_req_sel = 0,
-     .src_req_sel = DMA_REQ_AUDIO1_RX,
-     .dst_addr_ctrl = DMA_ADDR_INCREMENT,
-     .src_addr_ctrl = DMA_ADDR_FIX,
-     .dstmode = DMA_NORMAL_MODE,
-     .srcmode = DMA_HANDSHAKE_MODE,
-     .dstwidth = DMA_CTR_WORD_WIDTH,
-     .srcwidth = DMA_CTR_WORD_WIDTH,
+     .dst_req_sel    = 0,
+     .src_req_sel    = DMA_REQ_AUDIO1_RX,
+     .dst_addr_ctrl  = DMA_ADDR_INCREMENT,
+     .src_addr_ctrl  = DMA_ADDR_FIX,
+     .dstmode        = DMA_NORMAL_MODE,
+     .srcmode        = DMA_HANDSHAKE_MODE,
+     .dstwidth       = DMA_CTR_WORD_WIDTH,
+     .srcwidth       = DMA_CTR_WORD_WIDTH,
      .src_burst_size = DMA_BURST_1_WORD,
-     .read_num_en = 0,
-     .priority = 0,
-     .write_num_en = 0,
-     .auto_en = 0,
+     .read_num_en    = 0,
+     .priority       = 0,
+     .write_num_en   = 0,
+     .auto_en        = 0,
      },
     {
-     .dst_req_sel = 0,
-     .src_req_sel = DMA_REQ_AUDIO2_RX,
-     .dst_addr_ctrl = DMA_ADDR_INCREMENT,
-     .src_addr_ctrl = DMA_ADDR_FIX,
-     .dstmode = DMA_NORMAL_MODE,
-     .srcmode = DMA_HANDSHAKE_MODE,
-     .dstwidth = DMA_CTR_WORD_WIDTH,
-     .srcwidth = DMA_CTR_WORD_WIDTH,
+     .dst_req_sel    = 0,
+     .src_req_sel    = DMA_REQ_AUDIO2_RX,
+     .dst_addr_ctrl  = DMA_ADDR_INCREMENT,
+     .src_addr_ctrl  = DMA_ADDR_FIX,
+     .dstmode        = DMA_NORMAL_MODE,
+     .srcmode        = DMA_HANDSHAKE_MODE,
+     .dstwidth       = DMA_CTR_WORD_WIDTH,
+     .srcwidth       = DMA_CTR_WORD_WIDTH,
      .src_burst_size = DMA_BURST_1_WORD,
-     .read_num_en = 0,
-     .priority = 0,
-     .write_num_en = 0,
-     .auto_en = 0,
+     .read_num_en    = 0,
+     .priority       = 0,
+     .write_num_en   = 0,
+     .auto_en        = 0,
      },
     {
-     .dst_req_sel = 0,
-     .src_req_sel = DMA_REQ_AUDIO3_RX,
-     .dst_addr_ctrl = DMA_ADDR_INCREMENT,
-     .src_addr_ctrl = DMA_ADDR_FIX,
-     .dstmode = DMA_NORMAL_MODE,
-     .srcmode = DMA_HANDSHAKE_MODE,
-     .dstwidth = DMA_CTR_WORD_WIDTH,
-     .srcwidth = DMA_CTR_WORD_WIDTH,
+     .dst_req_sel    = 0,
+     .src_req_sel    = DMA_REQ_AUDIO3_RX,
+     .dst_addr_ctrl  = DMA_ADDR_INCREMENT,
+     .src_addr_ctrl  = DMA_ADDR_FIX,
+     .dstmode        = DMA_NORMAL_MODE,
+     .srcmode        = DMA_HANDSHAKE_MODE,
+     .dstwidth       = DMA_CTR_WORD_WIDTH,
+     .srcwidth       = DMA_CTR_WORD_WIDTH,
      .src_burst_size = DMA_BURST_1_WORD,
-     .read_num_en = 0,
-     .priority = 0,
-     .write_num_en = 0,
-     .auto_en = 0,
+     .read_num_en    = 0,
+     .priority       = 0,
+     .write_num_en   = 0,
+     .auto_en        = 0,
      },
 };
 
@@ -151,64 +151,64 @@ dma_config_t audio_dma_rx_config[4] = {
  */
 dma_config_t audio_dma_tx_config[4] = {
     {
-     .dst_req_sel = DMA_REQ_AUDIO0_TX,
-     .src_req_sel = 0,
-     .dst_addr_ctrl = DMA_ADDR_FIX,
-     .src_addr_ctrl = DMA_ADDR_INCREMENT,
-     .dstmode = DMA_HANDSHAKE_MODE,
-     .srcmode = DMA_NORMAL_MODE,
-     .dstwidth = DMA_CTR_WORD_WIDTH,
-     .srcwidth = DMA_CTR_WORD_WIDTH,
+     .dst_req_sel    = DMA_REQ_AUDIO0_TX,
+     .src_req_sel    = 0,
+     .dst_addr_ctrl  = DMA_ADDR_FIX,
+     .src_addr_ctrl  = DMA_ADDR_INCREMENT,
+     .dstmode        = DMA_HANDSHAKE_MODE,
+     .srcmode        = DMA_NORMAL_MODE,
+     .dstwidth       = DMA_CTR_WORD_WIDTH,
+     .srcwidth       = DMA_CTR_WORD_WIDTH,
      .src_burst_size = DMA_BURST_1_WORD,
-     .read_num_en = 0,
-     .priority = 0,
-     .write_num_en = 0,
-     .auto_en = 0,
+     .read_num_en    = 0,
+     .priority       = 0,
+     .write_num_en   = 0,
+     .auto_en        = 0,
      },
     {
-     .dst_req_sel = DMA_REQ_AUDIO1_TX,
-     .src_req_sel = 0,
-     .dst_addr_ctrl = DMA_ADDR_FIX,
-     .src_addr_ctrl = DMA_ADDR_INCREMENT,
-     .dstmode = DMA_HANDSHAKE_MODE,
-     .srcmode = DMA_NORMAL_MODE,
-     .dstwidth = DMA_CTR_WORD_WIDTH,
-     .srcwidth = DMA_CTR_WORD_WIDTH,
+     .dst_req_sel    = DMA_REQ_AUDIO1_TX,
+     .src_req_sel    = 0,
+     .dst_addr_ctrl  = DMA_ADDR_FIX,
+     .src_addr_ctrl  = DMA_ADDR_INCREMENT,
+     .dstmode        = DMA_HANDSHAKE_MODE,
+     .srcmode        = DMA_NORMAL_MODE,
+     .dstwidth       = DMA_CTR_WORD_WIDTH,
+     .srcwidth       = DMA_CTR_WORD_WIDTH,
      .src_burst_size = DMA_BURST_1_WORD,
-     .read_num_en = 0,
-     .priority = 0,
-     .write_num_en = 0,
-     .auto_en = 0,
+     .read_num_en    = 0,
+     .priority       = 0,
+     .write_num_en   = 0,
+     .auto_en        = 0,
      },
     {
-     .dst_req_sel = DMA_REQ_AUDIO2_TX,
-     .src_req_sel = 0,
-     .dst_addr_ctrl = DMA_ADDR_FIX,
-     .src_addr_ctrl = DMA_ADDR_INCREMENT,
-     .dstmode = DMA_HANDSHAKE_MODE,
-     .srcmode = DMA_NORMAL_MODE,
-     .dstwidth = DMA_CTR_WORD_WIDTH,
-     .srcwidth = DMA_CTR_WORD_WIDTH,
+     .dst_req_sel    = DMA_REQ_AUDIO2_TX,
+     .src_req_sel    = 0,
+     .dst_addr_ctrl  = DMA_ADDR_FIX,
+     .src_addr_ctrl  = DMA_ADDR_INCREMENT,
+     .dstmode        = DMA_HANDSHAKE_MODE,
+     .srcmode        = DMA_NORMAL_MODE,
+     .dstwidth       = DMA_CTR_WORD_WIDTH,
+     .srcwidth       = DMA_CTR_WORD_WIDTH,
      .src_burst_size = DMA_BURST_1_WORD,
-     .read_num_en = 0,
-     .priority = 0,
-     .write_num_en = 0,
-     .auto_en = 0,
+     .read_num_en    = 0,
+     .priority       = 0,
+     .write_num_en   = 0,
+     .auto_en        = 0,
      },
     {
-     .dst_req_sel = DMA_REQ_AUDIO3_TX,
-     .src_req_sel = 0,
-     .dst_addr_ctrl = DMA_ADDR_FIX,
-     .src_addr_ctrl = DMA_ADDR_INCREMENT,
-     .dstmode = DMA_HANDSHAKE_MODE,
-     .srcmode = DMA_NORMAL_MODE,
-     .dstwidth = DMA_CTR_WORD_WIDTH,
-     .srcwidth = DMA_CTR_WORD_WIDTH,
+     .dst_req_sel    = DMA_REQ_AUDIO3_TX,
+     .src_req_sel    = 0,
+     .dst_addr_ctrl  = DMA_ADDR_FIX,
+     .src_addr_ctrl  = DMA_ADDR_INCREMENT,
+     .dstmode        = DMA_HANDSHAKE_MODE,
+     .srcmode        = DMA_NORMAL_MODE,
+     .dstwidth       = DMA_CTR_WORD_WIDTH,
+     .srcwidth       = DMA_CTR_WORD_WIDTH,
      .src_burst_size = DMA_BURST_1_WORD,
-     .read_num_en = 0,
-     .priority = 0,
-     .write_num_en = 0,
-     .auto_en = 0,
+     .read_num_en    = 0,
+     .priority       = 0,
+     .write_num_en   = 0,
+     .auto_en        = 0,
      },
 };
 
@@ -221,6 +221,136 @@ dma_config_t audio_dma_tx_config[4] = {
  */
 
 /**
+ * @brief      This function serves to set dac control resample fs.
+ *
+ * @param[in]  anc_chn - anc channel.
+ * @param[in]  in_fs   - resample input fs.
+ * @param[in]  out_fs  - resample output fs.
+ * @note
+ *             - when resample fs rely on dac, this function must be called
+ */
+void audio_dac_ctl_anc_resample_fs(audio_anc_chn_e anc_chn, audio_anc_resample_in_fs_e in_fs, audio_anc_resample_out_fs_e out_fs)
+{
+    char reg_data = 0;
+    /* find dac cnt mode register data: 0: 48k->768k; 1: 96k->768k or 48k->384k; 2: 96k->384k. */
+    if ((ANC_RESAMPLE_IN_FS_48K == in_fs) && (ANC_RESAMPLE_OUT_FS_768K == out_fs))
+    {
+        reg_data = 0;
+    }
+    else if ((ANC_RESAMPLE_IN_FS_96K == in_fs) && (ANC_RESAMPLE_OUT_FS_384K == out_fs))
+    {
+        reg_data = 2;
+    }
+    else
+    {
+        reg_data = 1;
+    }
+
+    reg_audio_anc_config2(anc_chn) = (reg_audio_anc_config2(anc_chn) & (~FLD_ANC_DAC_CNT_MODE)) |
+                                     MASK_VAL(FLD_ANC_DAC_CNT_MODE, reg_data); /* set dac cnt mode to control audio pcm rate. */
+}
+
+/**
+ * @brief      This function serves to set the resample frequency of anc.
+ * 
+ * @param[in]  anc_chn     - anc channel.
+ * @param[in]  fs_decision - who decides the resample frequency of anc.
+ * @param[in]  in_fs       - resample input fs.
+ * @param[in]  out_fs      - resample output fs.
+ */
+void audio_anc_set_resample_in_out_fs(audio_anc_chn_e anc_chn, audio_anc_resample_fs_decision_e fs_decision, audio_anc_resample_in_fs_e in_fs,
+                                      audio_anc_resample_out_fs_e out_fs)
+{
+    if (fs_decision == ANC_RESAMPLE_DAC_DECISION_FS)
+    {
+        BM_SET(reg_audio_anc_config(anc_chn), FLD_ANC_SRC_EN);
+        BM_SET(reg_audio_anc_config(anc_chn), FLD_ANC_SRC_RATE_SEL);
+        audio_dac_ctl_anc_resample_fs(anc_chn, in_fs, out_fs);
+    }
+    else
+    {
+        BM_CLR(reg_audio_anc_config(anc_chn), FLD_ANC_SRC_RATE_SEL);
+    }
+
+    audio_anc_set_resample_in_fs(anc_chn, in_fs);
+    audio_anc_set_resample_out_fs(anc_chn, out_fs);
+}
+
+/**
+ * @brief      This function servers to set anc wz fir filter coefficients.
+ *
+ * @param[in]  anc_chn  - anc channel.
+ * @param[in]  data     - wz fir filter data address.
+ * @param[in]  data_len - wz fir data len max length is 384(wz fir max is 384taps).
+ * @note
+ *             - bypass coefficients: wz[0] = 0x4000, the rest of the parameters are all set to 0
+ * @return     none
+ */
+void audio_anc_set_wz_fir_coef(audio_anc_chn_e anc_chn, signed short *data, unsigned short data_len)
+{
+    for (unsigned short i = 0; i < data_len; i++)
+    {
+        reg_audio_anc_wz_h(anc_chn, i) = data[i];
+    }
+}
+
+/**
+ * @brief      This function servers to set anc wz biquad iir filter coefficients.
+ *
+ * @param[in]  anc_chn - anc channel.
+ * @param[in]  data    - wz biquad iir filter data address data[][b0, b1, b2, a1, a2].
+ * @note
+ *             - bypass coefficients: every b[0] = 0x10000000, the rest of the parameters are all set to 0
+ * @return     none
+ */
+void audio_anc_set_wz_iir_coef(audio_anc_chn_e anc_chn, signed int data[5][5])
+{
+    for (unsigned char i = 0; i < 5; i++)
+    {
+        reg_audio_anc_wz_iir_b0(anc_chn, i) = data[i][0];
+        reg_audio_anc_wz_iir_b1(anc_chn, i) = data[i][1];
+        reg_audio_anc_wz_iir_b2(anc_chn, i) = data[i][2];
+        reg_audio_anc_wz_iir_a1(anc_chn, i) = data[i][3];
+        reg_audio_anc_wz_iir_a2(anc_chn, i) = data[i][4];
+    }
+}
+
+/**
+ * @brief      This function servers to set anc cz fir filter coefficients.
+ *
+ * @param[in]  anc_chn  - anc channel.
+ * @param[in]  data     - cz fir filter data address.
+ * @param[in]  data_len - cz fir data len max length is 128(cz fir max step is 128taps).
+ * @return     none
+ */
+void audio_anc_cz_fir_set(audio_anc_chn_e anc_chn, signed short *data, unsigned short data_len)
+{
+    for (unsigned short i = 0; i < data_len; i++)
+    {
+        reg_audio_anc_cz_h(anc_chn, i) = data[i];
+    }
+}
+
+/**
+ * @brief      This function servers to set anc cz biquad iir filter coefficients.
+ *
+ * @param[in]  anc_chn - anc channel.
+ * @param[in]  data    - cz biquad iir filter data address data[][b0, b1, b2, a1, a2].
+ * @return     none
+ */
+void audio_anc_cz_iir_set(audio_anc_chn_e anc_chn, signed int data[5][5])
+{
+    for (unsigned char i = 0; i < 5; i++)
+    {
+        reg_audio_anc_cz_iir_b0(anc_chn, i) = data[i][0];
+        reg_audio_anc_cz_iir_b1(anc_chn, i) = data[i][1];
+        reg_audio_anc_cz_iir_b2(anc_chn, i) = data[i][2];
+        reg_audio_anc_cz_iir_a1(anc_chn, i) = data[i][3];
+        reg_audio_anc_cz_iir_a2(anc_chn, i) = data[i][4];
+    }
+}
+
+/**
  * @}
  */
 
@@ -231,6 +361,57 @@ dma_config_t audio_dma_tx_config[4] = {
  * @name Audio asrc interface
  * @{
  */
+/**
+ * @brief      This function serves to update asrc droop coefficients.
+ * 
+ * @param[in]  asrc_chn  - asrc channel select.
+ * @param[in]  d_coef    - asrc droop coefficients data address.
+ * @param[in]  data_len  - asrc droop coefficients data length.
+ * @return     none
+ * @note
+ *             - droop coef max length is 9.
+ */
+void audio_asrc_set_droop_coef(audio_hac_chn_e asrc_chn, signed short *d_coef, unsigned char data_len)
+{
+    for (unsigned char i = 0; i < data_len; i++)
+    {
+        reg_audio_asrc_drop_coef(asrc_chn, i) = d_coef[i] & FLD_ASRC_DROP_COEF;
+    }
+}
+
+/**
+ * @brief      This function serves to update asrc half_band1 coefficients.
+ * 
+ * @param[in]  asrc_chn - asrc channel.
+ * @param[in]  hb1_coef - asrc half_band1 coefficients data address.
+ * @return     none
+ * @note
+ *             - asrc half_band1 coefficient length is 32 word, bit[0-25] valid.
+ */
+void audio_asrc_set_hb1_coef(audio_hac_chn_e asrc_chn, signed int *hb1_coef)
+{
+    for (unsigned char i = 0; i < 32; i++)
+    {
+        reg_audio_asrc_hb1_coef(asrc_chn, i) = hb1_coef[i] & FLD_ASRC_HB1_COEF;
+    }
+}
+
+/**
+ * @brief      This function serves to update asrc half_band2 coefficients.
+ * 
+ * @param[in]  asrc_chn - asrc channel.
+ * @param[in]  hb2_coef - asrc half_band2 coefficients data address. 
+ * @return     none
+ * @note
+ *             - asrc half_band2 coefficient length is 7 word, bit[0-25] valid.
+ */
+void audio_asrc_set_hb2_coef(audio_hac_chn_e asrc_chn, signed int *hb2_coef)
+{
+    for (unsigned char i = 0; i < 7; i++)
+    {
+        reg_audio_asrc_hb2_coef(asrc_chn, i) = hb2_coef[i] & FLD_ASRC_HB1_COEF;
+    }
+}
 
 /**
  * @}
@@ -401,11 +582,101 @@ void audio_codec0_power_down(void)
     audio_codec0_adc_power_down(AUDIO_DMIC_ADC_A1_A2);
     audio_codec0_adc_power_down(AUDIO_DMIC_ADC_B1);
 
-    /* todo: power down dmic. */
+    /* power down dmic. */
+    audio_codec0_dmic_clk_en(AUDIO_DMIC_ADC_A1_A2, 0);
+    audio_codec0_dmic_clk_en(AUDIO_DMIC_ADC_B1_B2, 0);
 
     /* power down codec0. */
     reg_audio_codec0_cr_vic = reg_audio_codec0_cr_vic | 0x0f;
     BM_CLR(reg_audio_clk_en, FLD_CLK_CODEC0_EN); /* After clock disable, cannot access codec registers. */
+}
+
+/**
+ * @brief      This function configures codec0 stream0 dmic pin.
+ * @param[in]  dmic0_data - the data of  dmic pin
+ * @param[in]  dmic0_clk1 - the clk1 of dmic pin
+ * @param[in]  dmic0_clk2 - the clk2 of dmic pin,if need not set clk2, please set AUDIO_DMIC_NONE_PIN.
+ * @return     none
+ */
+void audio_codec0_set_stream0_dmic_pin(audio_dmic_pin_e dmic0_data, audio_dmic_pin_e dmic0_clk1, audio_dmic_pin_e dmic0_clk2)
+{
+    /* dmic0 data. */
+    gpio_input_en((gpio_pin_e)dmic0_data);
+    gpio_set_mux_function((gpio_func_pin_e)dmic0_data, DMIC0_DAT_I);
+    gpio_function_dis((gpio_pin_e)dmic0_data);
+    /* dmic0 clock0. */
+    gpio_set_mux_function((gpio_func_pin_e)dmic0_clk1, DMIC0_CLK0);
+    gpio_function_dis((gpio_pin_e)dmic0_clk1);
+    /* dmic1 clock0. */
+    if (dmic0_clk2 != AUDIO_DMIC_NONE_PIN)
+    {
+        gpio_set_mux_function((gpio_func_pin_e)dmic0_clk2, DMIC0_CLK1);
+        gpio_function_dis((gpio_pin_e)dmic0_clk2);
+    }
+}
+
+/**
+ * @brief      This function configures codec0 stream1 dmic pin.
+ * @param[in]  dmic1_data - the data of dmic pin.
+ * @param[in]  dmic1_clk1 - the clk1 of dmic pin.
+ * @param[in]  dmic1_clk2 - the clk2 of dmic pin, if need not set clk2,please set AUDIO_DMIC_NONE_PIN.
+ * @return     none
+ */
+void audio_codec0_set_stream1_dmic_pin(audio_dmic_pin_e dmic1_data, audio_dmic_pin_e dmic1_clk1, audio_dmic_pin_e dmic1_clk2)
+{
+    /* dmic1 data. */
+    gpio_input_en((gpio_pin_e)dmic1_data);
+    gpio_set_mux_function((gpio_func_pin_e)dmic1_data, DMIC1_DAT_I);
+    gpio_function_dis((gpio_pin_e)dmic1_data);
+    /* dmic1 clock0. */
+    gpio_set_mux_function((gpio_func_pin_e)dmic1_clk1, DMIC1_CLK0);
+    gpio_function_dis((gpio_pin_e)dmic1_clk1);
+    /* dmic1 clock0. */
+    if (dmic1_clk2 != AUDIO_DMIC_NONE_PIN)
+    {
+        gpio_set_mux_function((gpio_func_pin_e)dmic1_clk2, DMIC1_CLK1);
+        gpio_function_dis((gpio_pin_e)dmic1_clk2);
+    }
+}
+
+/**
+ * @brief      This function serves to enable/disable codec0 dmic clock.
+ * @param[in]  input  - input channel.
+ * @param[in]  enable - 1: active dmic clock, 0: power-down dmic clock.
+ */
+void audio_codec0_dmic_clk_en(audio_codec0_input_select_e input, unsigned char enable)
+{
+    unsigned char channel = input & BIT_RNG(0, 3); /* bit[0-3] adc channel. */
+
+    switch (channel)
+    {
+    case AUDIO_DMIC_ADC_A1: /* ADC_A1. */
+        reg_audio_codec0_cr_dmic_adca_sb = (reg_audio_codec0_cr_dmic_adca_sb & (~FLD_CODEC0_SB_DMIC_ADCA1)) |
+                                           MASK_VAL(FLD_CODEC0_SB_DMIC_ADCA1, !enable);
+        break;
+    case AUDIO_DMIC_ADC_A2: /* ADC_A2. */
+        reg_audio_codec0_cr_dmic_adca_sb = (reg_audio_codec0_cr_dmic_adca_sb & (~FLD_CODEC0_SB_DMIC_ADCA2)) |
+                                           MASK_VAL(FLD_CODEC0_SB_DMIC_ADCA2, !enable);
+        break;
+    case AUDIO_DMIC_ADC_B1: /* ADC_B1. */
+        reg_audio_codec0_cr_dmic_adcb_sb = (reg_audio_codec0_cr_dmic_adcb_sb & (~FLD_CODEC0_SB_DMIC_ADCB1)) |
+                                           MASK_VAL(FLD_CODEC0_SB_DMIC_ADCB1, !enable);
+        break;
+    case AUDIO_DMIC_ADC_B2: /* ADC_B2. */
+        reg_audio_codec0_cr_dmic_adcb_sb = (reg_audio_codec0_cr_dmic_adcb_sb & (~FLD_CODEC0_SB_DMIC_ADCB2)) |
+                                           MASK_VAL(FLD_CODEC0_SB_DMIC_ADCB2, !enable);
+        break;
+    case AUDIO_DMIC_ADC_A1_A2: /*ADC_A1_A2. */
+        reg_audio_codec0_cr_dmic_adca_sb = (reg_audio_codec0_cr_dmic_adca_sb & (~(FLD_CODEC0_SB_DMIC_ADCA1 | FLD_CODEC0_SB_DMIC_ADCA2))) |
+                                           MASK_VAL(FLD_CODEC0_SB_DMIC_ADCA1, !enable, FLD_CODEC0_SB_DMIC_ADCA2, !enable);
+        break;
+    case AUDIO_DMIC_ADC_B1_B2: /*ADC_B1_B2. */
+        reg_audio_codec0_cr_dmic_adcb_sb = (reg_audio_codec0_cr_dmic_adcb_sb & (~(FLD_CODEC0_SB_DMIC_ADCB1 | FLD_CODEC0_SB_DMIC_ADCB2))) |
+                                           MASK_VAL(FLD_CODEC0_SB_DMIC_ADCB1, !enable, FLD_CODEC0_SB_DMIC_ADCB2, !enable);
+        break;
+    default:
+        break;
+    }
 }
 
 /**
@@ -555,12 +826,12 @@ void audio_codec0_set_input_fs(audio_codec0_input_select_e input, audio_sample_r
     if ((channel == AUDIO_DMIC_ADC_A1) || (channel == AUDIO_DMIC_ADC_A2) || (channel == AUDIO_DMIC_ADC_A1_A2)) /* ADC_A. */
     {
         reg_audio_codec0_cr_adca_freq_sel = (reg_audio_codec0_cr_adca_freq_sel & (~FLD_CODEC0_ADCA_FREQ)) | (fs & 0xff);
-        reg_audio_codec0_dec0_pcm_num = fs >> 8; /* fs = 12.288MHz/11.2896MHz / (reg_audio_codec_dec_pcm_num + 1) */
+        reg_audio_codec0_dec0_pcm_num     = fs >> 8; /* fs = 12.288MHz/11.2896MHz / (reg_audio_codec_dec_pcm_num + 1) */
     }
     else if ((channel == AUDIO_DMIC_ADC_B1) || (channel == AUDIO_DMIC_ADC_B2) || channel == AUDIO_DMIC_ADC_B1_B2) /* ADC_B. */
     {
         reg_audio_codec0_cr_adcb_freq_sel = (reg_audio_codec0_cr_adcb_freq_sel & (~FLD_CODEC0_ADCB_FREQ)) | (fs & 0xff);
-        reg_audio_codec0_dec1_pcm_num = fs >> 8; /* fs = 12.288MHz/11.2896MHz / (reg_audio_codec_dec_pcm_num + 1) */
+        reg_audio_codec0_dec1_pcm_num     = fs >> 8; /* fs = 12.288MHz/11.2896MHz / (reg_audio_codec_dec_pcm_num + 1) */
     }
 }
 
@@ -574,7 +845,7 @@ void audio_codec0_set_input_fs(audio_codec0_input_select_e input, audio_sample_r
 void audio_codec0_set_output_fs(audio_sample_rate_e fs)
 {
     reg_audio_codec0_cr_daca_freq_sel = (reg_audio_codec0_cr_daca_freq_sel & (~FLD_CODEC0_DACA_FREQ)) | (fs & 0xff);
-    reg_audio_codec0_int_pcm_num = fs >> 8; /* fs = 12.288MHz/11.2896MHz / (reg_audio_codec_dec_pcm_num + 1) */
+    reg_audio_codec0_int_pcm_num      = fs >> 8; /* fs = 12.288MHz/11.2896MHz / (reg_audio_codec_dec_pcm_num + 1) */
 }
 
 /**
@@ -776,6 +1047,36 @@ void audio_codec0_set_input_snr_opt(audio_codec0_input_select_e input, unsigned 
 }
 
 /**
+ * @brief      This function serves to enable/disable codec0 input.
+ * @param[in]  input  - input channel.
+ * @param[in]  enable - 1: enable, 0: disable.
+ * @return     none 
+ * @note
+ *             - Must be disable when switching the input sample rate.
+ *             - ADC_A1/2 or ADC_B1/2 are set in pairs.
+ */
+void audio_codec0_input_en(audio_codec0_input_select_e input, unsigned char enable)
+{
+    unsigned char channel = input & BIT_RNG(0, 3); /* bit[0-3] adc channel. */
+
+    switch (channel)
+    {
+    case AUDIO_DMIC_ADC_A1:    /*ADC_A1 */
+    case AUDIO_DMIC_ADC_A2:    /*ADC_A2 */
+    case AUDIO_DMIC_ADC_A1_A2: /*ADC_A1_A2 */
+        reg_audio_codec_ctrl = (reg_audio_codec_ctrl & (~FLD_CODEC_CTRL_CODEC0_ADC_A_MST_EN)) | MASK_VAL(FLD_CODEC_CTRL_CODEC0_ADC_A_MST_EN, enable);
+        break;
+    case AUDIO_DMIC_ADC_B1:    /*ADC_B1 */
+    case AUDIO_DMIC_ADC_B2:    /*ADC_B2 */
+    case AUDIO_DMIC_ADC_B1_B2: /*ADC_B1_B2 */
+        reg_audio_codec_ctrl = (reg_audio_codec_ctrl & (~FLD_CODEC_CTRL_CODEC0_ADC_B_MST_EN)) | MASK_VAL(FLD_CODEC_CTRL_CODEC0_ADC_B_MST_EN, enable);
+        break;
+    default:
+        break;
+    }
+}
+
+/**
  * @brief      This function serves to enable/disable codec0 input HPF(High Pass Filter).
  * @param[in]  input  - input channel.
  * @param[in]  enable - 1: adc High Pass Filter active, 0:adc High Pass Filter inactive.
@@ -811,7 +1112,7 @@ void audio_codec0_input_hpf_en(audio_codec0_input_select_e input, unsigned char 
  */
 void audio_codec0_input_init(audio_codec0_input_config_t *input_config)
 {
-    unsigned char channel = input_config->input_src & BIT_RNG(0, 3);
+    unsigned char channel    = input_config->input_src & BIT_RNG(0, 3);
     unsigned char input_type = 0; /* 0: analog data, 1: digital data. */
 
     audio_codec0_set_input_mute(input_config->input_src, 1); /* adc mute. */
@@ -831,22 +1132,28 @@ void audio_codec0_input_init(audio_codec0_input_config_t *input_config)
     }
     else
     {
-        /* dmic todo. */
-        input_type = 1; /* digital data. */
+        input_type = 1;                                       /* digital data. */
+        audio_codec0_dmic_clk_en(input_config->input_src, 1); /* enable dmic clock. */
     }
 
     switch (channel)
     {
-    case AUDIO_DMIC_ADC_A1:                                                /* ADC_A1. */
-        BM_SET(reg_audio_codec_ctrl, FLD_CODEC_CTRL_CODEC0_ADC_A_MST_EN);  /* audio adc A master en, codec adc A is slave. */
-        BM_CLR(reg_audio_codec0_cr_adca12, FLD_CODEC0_SB_ADCA1);           /* adc A1 channel active. */
+    case AUDIO_DMIC_ADC_A1:                                               /* ADC_A1. */
+        BM_SET(reg_audio_codec_ctrl, FLD_CODEC_CTRL_CODEC0_ADC_A_MST_EN); /* audio adc A master en, codec adc A is slave. */
+        if (0 == input_type)                                              /* analog data. */
+        {
+            BM_CLR(reg_audio_codec0_cr_adca12, FLD_CODEC0_SB_ADCA1); /* adc A1 channel active. */
+        }
         BM_CLR(reg_audio_codec0_cr_adca_ai_sb, FLD_CODEC0_SB_AICR_ADCA12); /* ADCA12 audio interface active. */
         reg_audio_codec0_cr_mic_adca_12_sel = (reg_audio_codec0_cr_mic_adca_12_sel & ~(FLD_CODEC0_ADCA1_MIC_SEL)) |
                                               MASK_VAL(FLD_CODEC0_ADCA1_MIC_SEL, input_type); /* select ADC_A1 input data type. */
         break;
-    case AUDIO_DMIC_ADC_A2:                                                /* ADC_A2. */
-        BM_SET(reg_audio_codec_ctrl, FLD_CODEC_CTRL_CODEC0_ADC_A_MST_EN);  /* audio adc A master en, codec adc A is slave. */
-        BM_CLR(reg_audio_codec0_cr_adca12, FLD_CODEC0_SB_ADCA2);           /* adc A2 channel active. */
+    case AUDIO_DMIC_ADC_A2:                                               /* ADC_A2. */
+        BM_SET(reg_audio_codec_ctrl, FLD_CODEC_CTRL_CODEC0_ADC_A_MST_EN); /* audio adc A master en, codec adc A is slave. */
+        if (0 == input_type)                                              /* analog data. */
+        {
+            BM_CLR(reg_audio_codec0_cr_adca12, FLD_CODEC0_SB_ADCA2); /* adc A2 channel active. */
+        }
         BM_CLR(reg_audio_codec0_cr_adca_ai_sb, FLD_CODEC0_SB_AICR_ADCA12); /* ADCA12 audio interface active. */
         reg_audio_codec0_cr_mic_adca_12_sel = (reg_audio_codec0_cr_mic_adca_12_sel & ~(FLD_CODEC0_ADCA2_MIC_SEL)) |
                                               MASK_VAL(FLD_CODEC0_ADCA2_MIC_SEL, input_type); /* select ADC_A2 input data type. */
@@ -857,17 +1164,28 @@ void audio_codec0_input_init(audio_codec0_input_config_t *input_config)
         BM_CLR(reg_audio_codec0_cr_adcb_ai_sb, FLD_CODEC0_SB_AICR_ADCB12); /* ADCB12 audio interface active. */
         reg_audio_codec0_cr_mic_adcb_12_sel = (reg_audio_codec0_cr_mic_adcb_12_sel & ~(FLD_CODEC0_ADCB1_MIC_SEL)) |
                                               MASK_VAL(FLD_CODEC0_ADCB1_MIC_SEL, input_type); /* select ADC_B1 input data type. */
+        if (1 == input_type) /* digital data, set dmic1 clk(dmic0 clk default is 3072KHZ). */
+        {
+            audio_codec0_set_dmic1_clk(AUDIO_CODEC0_DMIC_CLK_3072KHZ);
+        }
         break;
     case AUDIO_DMIC_ADC_B2:                                                    /* ADC_B2. */
         BM_SET(reg_audio_codec_ctrl, FLD_CODEC_CTRL_CODEC0_ADC_B_MST_EN);      /* audio adc B master en, codec adc B is slave. */
         BM_CLR(reg_audio_codec0_cr_adcb_ai_sb, FLD_CODEC0_SB_AICR_ADCB12);     /* ADCB12 audio interface active. */
         BM_SET(reg_audio_codec0_cr_mic_adcb_12_sel, FLD_CODEC0_ADCB2_MIC_SEL); /* set ADC_B2 digital input. */
+        if (1 == input_type)                                                   /* digital data, set dmic1 clk(dmic0 clk default is 3072KHZ). */
+        {
+            audio_codec0_set_dmic1_clk(AUDIO_CODEC0_DMIC_CLK_3072KHZ);
+        }
         break;
     case AUDIO_DMIC_ADC_A1_A2:                                            /* ADC_A1_A2. */
         BM_SET(reg_audio_codec_ctrl, FLD_CODEC_CTRL_CODEC0_ADC_A_MST_EN); /* audio adc A master en, codec adc A is slave. */
-        reg_audio_codec0_cr_adca12 = (reg_audio_codec0_cr_adca12 & (~(FLD_CODEC0_SB_ADCA1 | FLD_CODEC0_SB_ADCA2))) |
-                                     MASK_VAL(FLD_CODEC0_SB_ADCA1, 0, FLD_CODEC0_SB_ADCA2, 0); /* adc A1/A2 channel active. */
-        BM_CLR(reg_audio_codec0_cr_adca_ai_sb, FLD_CODEC0_SB_AICR_ADCA12);                     /* ADCA12 audio interface active. */
+        if (0 == input_type)                                              /* analog data. */
+        {
+            reg_audio_codec0_cr_adca12 = (reg_audio_codec0_cr_adca12 & (~(FLD_CODEC0_SB_ADCA1 | FLD_CODEC0_SB_ADCA2))) |
+                                         MASK_VAL(FLD_CODEC0_SB_ADCA1, 0, FLD_CODEC0_SB_ADCA2, 0); /* adc A1/A2 channel active. */
+        }
+        BM_CLR(reg_audio_codec0_cr_adca_ai_sb, FLD_CODEC0_SB_AICR_ADCA12); /* ADCA12 audio interface active. */
         reg_audio_codec0_cr_mic_adca_12_sel =
                 (reg_audio_codec0_cr_mic_adca_12_sel & ~((FLD_CODEC0_ADCA1_MIC_SEL | FLD_CODEC0_ADCA2_MIC_SEL))) |
                 MASK_VAL(FLD_CODEC0_ADCA1_MIC_SEL, input_type, FLD_CODEC0_ADCA2_MIC_SEL, input_type); /* select ADC_A1/ADC_A2 input data type. */
@@ -876,6 +1194,12 @@ void audio_codec0_input_init(audio_codec0_input_config_t *input_config)
         BM_SET(reg_audio_codec_ctrl, FLD_CODEC_CTRL_CODEC0_ADC_B_MST_EN);  /* audio adc B master en, codec adc B is slave. */
         BM_CLR(reg_audio_codec0_cr_adcb12, FLD_CODEC0_SB_ADCB1);           /* adc B2 channel active. */
         BM_CLR(reg_audio_codec0_cr_adcb_ai_sb, FLD_CODEC0_SB_AICR_ADCB12); /* ADCB12 audio interface active. */
+        reg_audio_codec0_cr_mic_adcb_12_sel = (reg_audio_codec0_cr_mic_adcb_12_sel & ~(FLD_CODEC0_ADCB1_MIC_SEL | FLD_CODEC0_ADCB2_MIC_SEL)) |
+                                              MASK_VAL(FLD_CODEC0_ADCB1_MIC_SEL, 1, FLD_CODEC0_ADCB2_MIC_SEL, 1); /* select ADC_B1 input data type. */
+        if (1 == input_type) /* digital data, set dmic1 clk(dmic0 clk default is 3072KHZ). */
+        {
+            audio_codec0_set_dmic1_clk(AUDIO_CODEC0_DMIC_CLK_3072KHZ);
+        }
         break;
     default:
         break;
@@ -968,11 +1292,11 @@ void audio_rx_dma_config(dma_chn_e chn, unsigned short *dst_addr, unsigned int d
  */
 void audio_rx_dma_add_list_element(dma_chain_config_t *config_addr, dma_chain_config_t *llpointer, unsigned short *dst_addr, unsigned int data_len)
 {
-    config_addr->dma_chain_ctl = reg_dma_ctrl(audio_rx_dma_chn) | FLD_DMA_CHANNEL_ENABLE;
+    config_addr->dma_chain_ctl      = reg_dma_ctrl(audio_rx_dma_chn) | FLD_DMA_CHANNEL_ENABLE;
     config_addr->dma_chain_src_addr = REG_AUDIO_FIFO_ADDR(audio_rx_fifo_chn);
     config_addr->dma_chain_dst_addr = (unsigned int)(dst_addr);
     config_addr->dma_chain_data_len = dma_cal_size(data_len, 4);
-    config_addr->dma_chain_llp_ptr = (unsigned int)(llpointer);
+    config_addr->dma_chain_llp_ptr  = (unsigned int)(llpointer);
 }
 
 /**
@@ -1020,11 +1344,11 @@ void audio_tx_dma_config(dma_chn_e chn, unsigned short *src_addr, unsigned int d
  */
 void audio_tx_dma_add_list_element(dma_chain_config_t *config_addr, dma_chain_config_t *llpointer, unsigned short *src_addr, unsigned int data_len)
 {
-    config_addr->dma_chain_ctl = reg_dma_ctrl(audio_tx_dma_chn) | FLD_DMA_CHANNEL_ENABLE;
+    config_addr->dma_chain_ctl      = reg_dma_ctrl(audio_tx_dma_chn) | FLD_DMA_CHANNEL_ENABLE;
     config_addr->dma_chain_src_addr = (unsigned int)src_addr;
     config_addr->dma_chain_dst_addr = REG_AUDIO_FIFO_ADDR(audio_tx_fifo_chn);
     config_addr->dma_chain_data_len = dma_cal_size(data_len, 4);
-    config_addr->dma_chain_llp_ptr = (unsigned int)llpointer;
+    config_addr->dma_chain_llp_ptr  = (unsigned int)llpointer;
 }
 
 /**
@@ -1054,6 +1378,258 @@ void audio_tx_dma_chain_init(audio_fifo_chn_e tx_fifo_chn, dma_chn_e chn, unsign
  * @name Audio hac interface
  * @{
  */
+
+/**
+ * @brief      This function servers to update hac biquad filter coefficients.
+ *
+ * @param[in]  hac_chn - hac channel.
+ * @param[in]  biquad  - biquad step audio_hac_biquad_e.
+ * @param[in]  data    - biquad filter data address, [b0, b1, b2, a1, a2].
+ * @return     none
+ */
+void audio_hac_biquad_coef_update(audio_hac_chn_e hac_chn, audio_hac_biquad_e biquad, signed int *data)
+{
+    reg_audio_hac_bq_b0(hac_chn, biquad) = data[0];
+    reg_audio_hac_bq_b1(hac_chn, biquad) = data[1];
+    reg_audio_hac_bq_b2(hac_chn, biquad) = data[2];
+    reg_audio_hac_bq_a1(hac_chn, biquad) = data[3];
+    reg_audio_hac_bq_a2(hac_chn, biquad) = data[4];
+}
+
+/**
+ * @brief This function servers to select hac's asrc input and output fs.
+ * 
+ * @param[in]  hac_chn   - asrc channel.
+ * @param[in]  fs_in_out - input and output fs audio_hac_fs_in_out_e.
+ * @param[in]  ppm       - ppm value.
+ * @return     none
+ */
+void audio_asrc_fs_select(audio_hac_chn_e hac_chn, audio_hac_fs_in_out_e fs_in_out, int ppm)
+{
+    int frac_advance = 0;
+    int den_rate     = 0;
+    char int_advance = 0;
+
+    if (fs_in_out >= BIT(8)) /* in_fs == out_fs, only ppm work */
+    {
+        den_rate = 1000000;
+        if (ppm <= 0)
+        {
+            frac_advance = 1000000 + ppm * 16;
+            int_advance  = 15;
+        }
+        else
+        {
+            frac_advance = ppm * 16;
+            int_advance  = 16;
+        }
+    }
+    else
+    {
+        switch (fs_in_out)
+        {
+        case AUDIO_ASRC_FS_IN_32K_OUT_16K:
+            den_rate = 1000000;
+            if (ppm <= 0)
+            {
+                frac_advance = 1000000 + ppm * 32;
+                int_advance  = 31;
+            }
+            else
+            {
+                frac_advance = ppm * 32;
+                int_advance  = 32;
+            }
+            break;
+        case AUDIO_ASRC_FS_IN_44P1K_OUT_16K:
+            den_rate     = 10000000;
+            frac_advance = 1000000 + ppm * 441;
+            int_advance  = 44;
+            break;
+        case AUDIO_ASRC_FS_IN_48K_OUT_16K:
+            den_rate = 1000000;
+            if (ppm <= 0)
+            {
+                frac_advance = 1000000 + ppm * 48;
+                int_advance  = 47;
+            }
+            else
+            {
+                frac_advance = ppm * 48;
+                int_advance  = 48;
+            }
+            break;
+        case AUDIO_ASRC_FS_IN_96K_OUT_16K:
+            den_rate = 1000000;
+            if (ppm <= 0)
+            {
+                frac_advance = 1000000 + ppm * 96;
+                int_advance  = 95;
+            }
+            else
+            {
+                frac_advance = ppm * 96;
+                int_advance  = 96;
+            }
+            break;
+        case AUDIO_ASRC_FS_IN_16K_OUT_32K:
+            den_rate = 1000000;
+            if (ppm <= 0)
+            {
+                frac_advance = 1000000 + ppm * 8;
+                int_advance  = 7;
+            }
+            else
+            {
+                frac_advance = ppm * 8;
+                int_advance  = 8;
+            }
+            break;
+        case AUDIO_ASRC_FS_IN_44P1K_OUT_32K:
+            den_rate     = 20000000;
+            frac_advance = 1000000 + ppm * 441;
+            int_advance  = 22;
+            break;
+        case AUDIO_ASRC_FS_IN_48K_OUT_32K:
+            den_rate = 1000000;
+            if (ppm <= 0)
+            {
+                frac_advance = 1000000 + ppm * 24;
+                int_advance  = 23;
+            }
+            else
+            {
+                frac_advance = ppm * 24;
+                int_advance  = 24;
+            }
+            break;
+        case AUDIO_ASRC_FS_IN_96K_OUT_32K:
+            den_rate = 1000000;
+            if (ppm <= 0)
+            {
+                frac_advance = 1000000 + ppm * 48;
+                int_advance  = 47;
+            }
+            else
+            {
+                frac_advance = ppm * 48;
+                int_advance  = 48;
+            }
+            break;
+        case AUDIO_ASRC_FS_IN_16K_OUT_44P1K:
+            den_rate     = 1378125; /* 459375 * 3 */
+            frac_advance = 1109375 + ppm * 8;
+            int_advance  = 5;
+            break;
+        case AUDIO_ASRC_FS_IN_32K_OUT_44P1K:
+            den_rate     = 1378125; /* 459375 * 3 */
+            frac_advance = 840625 + ppm * 16;
+            int_advance  = 11;
+            break;
+        case AUDIO_ASRC_FS_IN_48K_OUT_44P1K:
+            den_rate     = 459375;
+            frac_advance = 190625 + ppm * 8;
+            int_advance  = 17;
+            break;
+        case AUDIO_ASRC_FS_IN_96K_OUT_44P1K:
+            den_rate     = 459375;
+            frac_advance = 381250 + ppm * 16;
+            int_advance  = 34;
+            break;
+        case AUDIO_ASRC_FS_IN_16K_OUT_48K:
+            den_rate     = 3000000;
+            frac_advance = 1000000 + ppm * 16;
+            int_advance  = 5;
+            break;
+        case AUDIO_ASRC_FS_IN_32K_OUT_48K:
+            den_rate     = 3000000;
+            frac_advance = 2000000 + ppm * 32;
+            int_advance  = 10;
+            break;
+        case AUDIO_ASRC_FS_IN_44P1K_OUT_48K:
+            den_rate     = 10000000;
+            frac_advance = 7000000 + ppm * 147;
+            int_advance  = 14;
+            break;
+        case AUDIO_ASRC_FS_IN_96K_OUT_48K:
+            den_rate = 1000000;
+            if (ppm <= 0)
+            {
+                frac_advance = 1000000 + ppm * 32;
+                int_advance  = 31;
+            }
+            else
+            {
+                frac_advance = ppm * 32;
+                int_advance  = 32;
+            }
+            break;
+        case AUDIO_ASRC_FS_IN_16K_OUT_96K:
+            den_rate     = 3000000;
+            frac_advance = 2000000 + ppm * 8;
+            int_advance  = 2;
+            break;
+        case AUDIO_ASRC_FS_IN_32K_OUT_96K:
+            den_rate     = 3000000;
+            frac_advance = 1000000 + ppm * 16;
+            int_advance  = 5;
+            break;
+        case AUDIO_ASRC_FS_IN_44P1K_OUT_96K:
+            den_rate     = 20000000;
+            frac_advance = 7000000 + ppm * 147;
+            int_advance  = 7;
+            break;
+        case AUDIO_ASRC_FS_IN_48K_OUT_96K:
+            den_rate = 1000000;
+            if (ppm <= 0)
+            {
+                frac_advance = 1000000 + ppm * 8;
+                int_advance  = 7;
+            }
+            else
+            {
+                frac_advance = ppm * 8;
+                int_advance  = 8;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
+    audio_asrc_interval_set(hac_chn, fs_in_out);
+    audio_asrc_frac_adc_set(hac_chn, frac_advance);
+    audio_asrc_den_rate_set(hac_chn, den_rate);
+    audio_asrc_int_adv_set(hac_chn, int_advance);
+    audio_asrc_lag_int_config_done(hac_chn);
+}
+
+/**
+ * @brief      This function serves to get asrc out data cnt.
+ *
+ * @param[in]  hac_chn - hac channel.
+ * @return     hac out data cnt, 0 means timeout, the unit is word.
+ * @note
+ *             - You need to stop the ASRC data input before calling this interface.
+ */
+unsigned int audio_asrc_get_out_data_cnt(audio_hac_chn_e hac_chn)
+{
+    unsigned int fifo_cnt = 0;
+
+    delay_us(313); /* Wait for ASRC calculation to complete, maximum wait time is 16K samples, 5 samples(5 / 16000 * 1000000 = 313us). */
+
+    BM_SET(reg_audio_hac_tx_fifo_cnt_ind(hac_chn), FLD_HAC_TX_FIFO_INDICATE); /* Write 1 means software need to read txfifo_cnt */
+    unsigned int ref_tick = stimer_get_tick();
+    while (BM_IS_CLR(reg_audio_hac_tx_fifo_cnt_ind(hac_chn), FLD_HAC_TX_FIFO_INDICATE)) /* bit set means read done. */
+    {
+        if (clock_time_exceed(ref_tick, 10000)) /* timeout. */
+            return 0;
+    }
+    fifo_cnt = reg_audio_hac_tx_fifo_cnt_ind(hac_chn) & FLD_HAC_TX_FIFO_CNT;
+    BM_CLR(reg_audio_hac_tx_fifo_cnt_ind(hac_chn), FLD_HAC_TX_FIFO_INDICATE); /* clear tx data done */
+
+    return fifo_cnt;
+}
 
 /**
  * @}
@@ -1224,6 +1800,28 @@ void audio_matrix_set_rx_fifo_route(audio_fifo_chn_e fifo_num, audio_matrix_rx_f
     case FIFO_RX_ROUTE_I2S2_RX:
         reg_audio_matrix_i2s2_rx_sel = (reg_audio_matrix_i2s2_rx_sel & (~FLD_MATRIX_I2S2_RX_SEL)) | data_format;
         break;
+    case FIFO_RX_ROUTE_ANC0:
+        if (fifo_num <= FIFO1)
+        {
+            reg_audio_matrix_anc0_rx_sel = (reg_audio_matrix_anc0_rx_sel & (~FLD_MATRIX_ANC0_RX_SEL)) | MASK_VAL(FLD_MATRIX_ANC0_RX_SEL, data_format);
+        }
+        else
+        {
+            reg_audio_matrix_anc0_rx_sel = (reg_audio_matrix_anc0_rx_sel & (~FLD_MATRIX_ANC0_RX_V2_SEL)) |
+                                           MASK_VAL(FLD_MATRIX_ANC0_RX_V2_SEL, data_format);
+        }
+        break;
+    case FIFO_RX_ROUTE_ANC1:
+        if (fifo_num <= FIFO1)
+        {
+            reg_audio_matrix_anc1_rx_sel = (reg_audio_matrix_anc1_rx_sel & (~FLD_MATRIX_ANC1_RX_SEL)) | MASK_VAL(FLD_MATRIX_ANC1_RX_SEL, data_format);
+        }
+        else
+        {
+            reg_audio_matrix_anc1_rx_sel = (reg_audio_matrix_anc1_rx_sel & (~FLD_MATRIX_ANC1_RX_V2_SEL)) |
+                                           MASK_VAL(FLD_MATRIX_ANC1_RX_V2_SEL, data_format);
+        }
+        break;
     case FIFO_RX_ROUTE_CODEC0_ADCA:
         reg_audio_matrix_adc01_sel = (reg_audio_matrix_adc01_sel & (~FLD_MATRIX_ADC0_SEL)) | MASK_VAL(FLD_MATRIX_ADC0_SEL, data_format);
         break;
@@ -1326,6 +1924,245 @@ void audio_matrix_set_i2s_tx_route(audio_i2s_tx_chn_e i2s_tx_chn, audio_matrix_i
 }
 
 /**
+ * @brief      This function serves to select anc_src route source and format.
+ *
+ * @param[in]  anc_chn     - anc channel.
+ * @param[in]  route_from  - anc_src route from.
+ * @param[in]  data_format - anc src data format(route from fifo/i2s/adc valid), others select ANC_SRC_DATA_FORMAT_INVALID.
+ * @return     none
+ */
+void audio_matrix_set_anc_src_route(audio_anc_chn_e anc_chn, audio_matrix_anc_src_route_e route_from, audio_matrix_anc_src_format_e data_format)
+{
+    reg_audio_matrix_anc_src_sel(anc_chn) = (reg_audio_matrix_anc_src_sel(anc_chn) & (~FLD_MATRIX_ANC_SRC_SEL)) | (route_from << 4);
+    if (anc_chn == ANC0)
+    {
+        switch (route_from)
+        {
+        case ANC_SRC_ROUTE_FIFO:
+            reg_audio_matrix_anc0_src_sel = (reg_audio_matrix_anc0_src_sel & (~FLD_MATRIX_ANC0_SRC_DMA_SEL)) |
+                                            MASK_VAL(FLD_MATRIX_ANC0_SRC_DMA_SEL, data_format);
+            break;
+        case ANC_SRC_ROUTE_I2S0_RX:
+            reg_audio_matrix_i2s_rx_anc_sel_0(0) = (reg_audio_matrix_i2s_rx_anc_sel_0(0) & (~FLD_MATRIX_I2S_RX_ANC0_SRC_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_I2S_RX_ANC0_SRC_SEL, data_format);
+            break;
+        case ANC_SRC_ROUTE_I2S1_RX:
+            reg_audio_matrix_i2s_rx_anc_sel_0(1) = (reg_audio_matrix_i2s_rx_anc_sel_0(1) & (~FLD_MATRIX_I2S_RX_ANC0_SRC_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_I2S_RX_ANC0_SRC_SEL, data_format);
+            break;
+        case ANC_SRC_ROUTE_I2S2_RX:
+            reg_audio_matrix_i2s_rx_anc_sel_0(2) = (reg_audio_matrix_i2s_rx_anc_sel_0(2) & (~FLD_MATRIX_I2S_RX_ANC0_SRC_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_I2S_RX_ANC0_SRC_SEL, data_format);
+            break;
+        case ANC_SRC_ROUTE_CODEC0_ADCA:
+            reg_audio_matrix_adc_rx_anc_sel_0(0) = (reg_audio_matrix_adc_rx_anc_sel_0(0) & (~FLD_MATRIX_ADC_RX_ANC0_SRC_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_ADC_RX_ANC0_SRC_SEL, data_format);
+            break;
+        case ANC_SRC_ROUTE_CODEC0_ADCB:
+            reg_audio_matrix_adc_rx_anc_sel_0(1) = (reg_audio_matrix_adc_rx_anc_sel_0(1) & (~FLD_MATRIX_ADC_RX_ANC0_SRC_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_ADC_RX_ANC0_SRC_SEL, data_format);
+            break;
+        case ANC_SRC_ROUTE_CODEC1_ADCA:
+            reg_audio_matrix_adc_rx_anc_sel_0(2) = (reg_audio_matrix_adc_rx_anc_sel_0(2) & (~FLD_MATRIX_ADC_RX_ANC0_SRC_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_ADC_RX_ANC0_SRC_SEL, data_format);
+            break;
+        default:
+            break;
+        }
+    }
+    else
+    {
+        switch (route_from)
+        {
+        case ANC_SRC_ROUTE_FIFO:
+            reg_audio_matrix_anc1_src_sel = (reg_audio_matrix_anc1_src_sel & (~FLD_MATRIX_ANC1_SRC_DMA_SEL)) |
+                                            MASK_VAL(FLD_MATRIX_ANC1_SRC_DMA_SEL, data_format);
+            break;
+        case ANC_SRC_ROUTE_I2S0_RX:
+            reg_audio_matrix_i2s_rx_anc_sel_1(0) = (reg_audio_matrix_i2s_rx_anc_sel_1(0) & (~FLD_MATRIX_I2S_RX_ANC1_SRC_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_I2S_RX_ANC1_SRC_SEL, data_format);
+            break;
+        case ANC_SRC_ROUTE_I2S1_RX:
+            reg_audio_matrix_i2s_rx_anc_sel_1(1) = (reg_audio_matrix_i2s_rx_anc_sel_1(1) & (~FLD_MATRIX_I2S_RX_ANC1_SRC_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_I2S_RX_ANC1_SRC_SEL, data_format);
+            break;
+        case ANC_SRC_ROUTE_I2S2_RX:
+            reg_audio_matrix_i2s_rx_anc_sel_1(2) = (reg_audio_matrix_i2s_rx_anc_sel_1(2) & (~FLD_MATRIX_I2S_RX_ANC1_SRC_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_I2S_RX_ANC1_SRC_SEL, data_format);
+            break;
+        case ANC_SRC_ROUTE_CODEC0_ADCA:
+            reg_audio_matrix_adc_rx_anc_sel_1(0) = (reg_audio_matrix_adc_rx_anc_sel_1(0) & (~FLD_MATRIX_ADC_RX_ANC1_SRC_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_ADC_RX_ANC1_SRC_SEL, data_format);
+            break;
+        case ANC_SRC_ROUTE_CODEC0_ADCB:
+            reg_audio_matrix_adc_rx_anc_sel_1(1) = (reg_audio_matrix_adc_rx_anc_sel_1(1) & (~FLD_MATRIX_ADC_RX_ANC1_SRC_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_ADC_RX_ANC1_SRC_SEL, data_format);
+            break;
+        case ANC_SRC_ROUTE_CODEC1_ADCA:
+            reg_audio_matrix_adc_rx_anc_sel_1(2) = (reg_audio_matrix_adc_rx_anc_sel_1(2) & (~FLD_MATRIX_ADC_RX_ANC1_SRC_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_ADC_RX_ANC1_SRC_SEL, data_format);
+            break;
+        default:
+            break;
+        }
+    }
+}
+
+/**
+ * @brief      This function serves to select anc_src route source and format.
+ *
+ * @param[in]  anc_chn     - anc channel.
+ * @param[in]  route_from  - anc_ref route from.
+ * @param[in]  data_format - anc ref data format(route from i2s/adc valid), others select ANC_REF_DATA_FORMAT_INVALID.
+ * @return     none
+ */
+void audio_matrix_set_anc_ref_route(audio_anc_chn_e anc_chn, audio_matrix_anc_ref_route_e route_from, audio_matrix_anc_ref_format_e data_format)
+{
+    reg_audio_matrix_anc_ref_sel(anc_chn) = (reg_audio_matrix_anc_ref_sel(anc_chn) & (~FLD_MATRIX_ANC_REF_SEL)) | (route_from << 4);
+    if (anc_chn == ANC0)
+    {
+        switch (route_from)
+        {
+        case ANC_REF_ROUTE_I2S0_RX:
+            reg_audio_matrix_i2s_rx_anc_sel_0(0) = (reg_audio_matrix_i2s_rx_anc_sel_0(0) & (~FLD_MATRIX_I2S_RX_ANC0_REF_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_I2S_RX_ANC0_REF_SEL, data_format);
+            break;
+        case ANC_REF_ROUTE_I2S1_RX:
+            reg_audio_matrix_i2s_rx_anc_sel_0(1) = (reg_audio_matrix_i2s_rx_anc_sel_0(1) & (~FLD_MATRIX_I2S_RX_ANC0_REF_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_I2S_RX_ANC0_REF_SEL, data_format);
+            break;
+        case ANC_REF_ROUTE_I2S2_RX:
+            reg_audio_matrix_i2s_rx_anc_sel_0(2) = (reg_audio_matrix_i2s_rx_anc_sel_0(2) & (~FLD_MATRIX_I2S_RX_ANC0_REF_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_I2S_RX_ANC0_REF_SEL, data_format);
+            break;
+        case ANC_REF_ROUTE_CODEC0_ADCA:
+            reg_audio_matrix_adc_rx_anc_sel_0(0) = (reg_audio_matrix_adc_rx_anc_sel_0(0) & (~FLD_MATRIX_ADC_RX_ANC0_REF_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_ADC_RX_ANC0_REF_SEL, data_format);
+            break;
+        case ANC_REF_ROUTE_CODEC0_ADCB:
+            reg_audio_matrix_adc_rx_anc_sel_0(1) = (reg_audio_matrix_adc_rx_anc_sel_0(1) & (~FLD_MATRIX_ADC_RX_ANC0_REF_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_ADC_RX_ANC0_REF_SEL, data_format);
+            break;
+        case ANC_REF_ROUTE_CODEC1_ADCA:
+            reg_audio_matrix_adc_rx_anc_sel_0(2) = (reg_audio_matrix_adc_rx_anc_sel_0(2) & (~FLD_MATRIX_ADC_RX_ANC0_REF_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_ADC_RX_ANC0_REF_SEL, data_format);
+            break;
+        default:
+            break;
+        }
+    }
+    else
+    {
+        switch (route_from)
+        {
+        case ANC_REF_ROUTE_I2S0_RX:
+            reg_audio_matrix_i2s_rx_anc_sel_2(0) = (reg_audio_matrix_i2s_rx_anc_sel_2(0) & (~FLD_MATRIX_I2S_RX_ANC1_REF_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_I2S_RX_ANC1_REF_SEL, data_format);
+            break;
+        case ANC_REF_ROUTE_I2S1_RX:
+            reg_audio_matrix_i2s_rx_anc_sel_2(1) = (reg_audio_matrix_i2s_rx_anc_sel_2(1) & (~FLD_MATRIX_I2S_RX_ANC1_REF_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_I2S_RX_ANC1_REF_SEL, data_format);
+            break;
+        case ANC_REF_ROUTE_I2S2_RX:
+            reg_audio_matrix_i2s_rx_anc_sel_2(2) = (reg_audio_matrix_i2s_rx_anc_sel_2(2) & (~FLD_MATRIX_I2S_RX_ANC1_REF_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_I2S_RX_ANC1_REF_SEL, data_format);
+            break;
+        case ANC_REF_ROUTE_CODEC0_ADCA:
+            reg_audio_matrix_adc_rx_anc_sel_2(0) = (reg_audio_matrix_adc_rx_anc_sel_2(0) & (~FLD_MATRIX_ADC_RX_ANC1_REF_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_ADC_RX_ANC1_REF_SEL, data_format);
+            break;
+        case ANC_REF_ROUTE_CODEC0_ADCB:
+            reg_audio_matrix_adc_rx_anc_sel_2(1) = (reg_audio_matrix_adc_rx_anc_sel_2(1) & (~FLD_MATRIX_ADC_RX_ANC1_REF_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_ADC_RX_ANC1_REF_SEL, data_format);
+            break;
+        case ANC_REF_ROUTE_CODEC1_ADCA:
+            reg_audio_matrix_adc_rx_anc_sel_2(2) = (reg_audio_matrix_adc_rx_anc_sel_2(2) & (~FLD_MATRIX_ADC_RX_ANC1_REF_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_ADC_RX_ANC1_REF_SEL, data_format);
+            break;
+        default:
+            break;
+        }
+    }
+}
+
+/**
+ * @brief      This function serves to select anc_err route source and data format.
+ *
+ * @param[in]  anc_chn     - anc channel.
+ * @param[in]  route_from  - anc_err route from.
+ * @param[in]  data_format - anc err data format(route from i2s/adc valid), others select ANC_ERR_DATA_FORMAT_INVALID.
+ * @return     none
+ */
+void audio_matrix_set_anc_err_route(audio_anc_chn_e anc_chn, audio_matrix_anc_err_route_e route_from, audio_matrix_anc_err_format_e data_format)
+{
+    reg_audio_matrix_anc_err_sel(anc_chn) = (reg_audio_matrix_anc_err_sel(anc_chn) & (~FLD_MATRIX_ANC_ERR_SEL)) | (route_from << 4);
+    if (anc_chn == ANC0)
+    {
+        switch (route_from)
+        {
+        case ANC_ERR_ROUTE_I2S0_RX:
+            reg_audio_matrix_i2s_rx_anc_sel_1(0) = (reg_audio_matrix_i2s_rx_anc_sel_1(0) & (~FLD_MATRIX_I2S_RX_ANC0_ERR_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_I2S_RX_ANC0_ERR_SEL, data_format);
+            break;
+        case ANC_ERR_ROUTE_I2S1_RX:
+            reg_audio_matrix_i2s_rx_anc_sel_1(1) = (reg_audio_matrix_i2s_rx_anc_sel_1(1) & (~FLD_MATRIX_I2S_RX_ANC0_ERR_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_I2S_RX_ANC0_ERR_SEL, data_format);
+            break;
+        case ANC_ERR_ROUTE_I2S2_RX:
+            reg_audio_matrix_i2s_rx_anc_sel_1(2) = (reg_audio_matrix_i2s_rx_anc_sel_1(2) & (~FLD_MATRIX_I2S_RX_ANC0_ERR_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_I2S_RX_ANC0_ERR_SEL, data_format);
+            break;
+        case ANC_ERR_ROUTE_CODEC0_ADCA:
+            reg_audio_matrix_adc_rx_anc_sel_1(0) = (reg_audio_matrix_adc_rx_anc_sel_1(0) & (~FLD_MATRIX_ADC_RX_ANC0_ERR_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_ADC_RX_ANC0_ERR_SEL, data_format);
+            break;
+        case ANC_ERR_ROUTE_CODEC0_ADCB:
+            reg_audio_matrix_adc_rx_anc_sel_1(1) = (reg_audio_matrix_adc_rx_anc_sel_1(1) & (~FLD_MATRIX_ADC_RX_ANC0_ERR_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_ADC_RX_ANC0_ERR_SEL, data_format);
+            break;
+        case ANC_ERR_ROUTE_CODEC1_ADCA:
+            reg_audio_matrix_adc_rx_anc_sel_1(2) = (reg_audio_matrix_adc_rx_anc_sel_1(2) & (~FLD_MATRIX_ADC_RX_ANC0_ERR_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_ADC_RX_ANC0_ERR_SEL, data_format);
+            break;
+        default:
+            break;
+        }
+    }
+    else
+    {
+        switch (route_from)
+        {
+        case ANC_ERR_ROUTE_I2S0_RX:
+            reg_audio_matrix_i2s_rx_anc_sel_2(0) = (reg_audio_matrix_i2s_rx_anc_sel_2(0) & (~FLD_MATRIX_I2S_RX_ANC1_ERR_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_I2S_RX_ANC1_ERR_SEL, data_format);
+            break;
+        case ANC_ERR_ROUTE_I2S1_RX:
+            reg_audio_matrix_i2s_rx_anc_sel_2(1) = (reg_audio_matrix_i2s_rx_anc_sel_2(1) & (~FLD_MATRIX_I2S_RX_ANC1_ERR_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_I2S_RX_ANC1_ERR_SEL, data_format);
+            break;
+        case ANC_ERR_ROUTE_I2S2_RX:
+            reg_audio_matrix_i2s_rx_anc_sel_2(2) = (reg_audio_matrix_i2s_rx_anc_sel_2(2) & (~FLD_MATRIX_I2S_RX_ANC1_ERR_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_I2S_RX_ANC1_ERR_SEL, data_format);
+            break;
+        case ANC_ERR_ROUTE_CODEC0_ADCA:
+            reg_audio_matrix_adc_rx_anc_sel_2(0) = (reg_audio_matrix_adc_rx_anc_sel_2(0) & (~FLD_MATRIX_ADC_RX_ANC1_ERR_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_ADC_RX_ANC1_ERR_SEL, data_format);
+            break;
+        case ANC_ERR_ROUTE_CODEC0_ADCB:
+            reg_audio_matrix_adc_rx_anc_sel_2(1) = (reg_audio_matrix_adc_rx_anc_sel_2(1) & (~FLD_MATRIX_ADC_RX_ANC1_ERR_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_ADC_RX_ANC1_ERR_SEL, data_format);
+            break;
+        case ANC_ERR_ROUTE_CODEC1_ADCA:
+            reg_audio_matrix_adc_rx_anc_sel_2(2) = (reg_audio_matrix_adc_rx_anc_sel_2(2) & (~FLD_MATRIX_ADC_RX_ANC1_ERR_SEL)) |
+                                                   MASK_VAL(FLD_MATRIX_ADC_RX_ANC1_ERR_SEL, data_format);
+            break;
+        default:
+            break;
+        }
+    }
+}
+
+/**
  * @brief      This function serves to select dac route source and data format.
  *
  * @param[in]  dac_chn     - dac channel.
@@ -1341,7 +2178,14 @@ void audio_matrix_set_dac_route(audio_codec0_output_select_e dac_chn, audio_matr
         reg_audio_matrix_dac_sel = (reg_audio_matrix_dac_sel & (~FLD_MATRIX_DAC_L_SEL)) | route_from;
         break;
     case AUDIO_DAC_A2:
-        reg_audio_matrix_dac_sel = (reg_audio_matrix_dac_sel & (~FLD_MATRIX_DAC_R_SEL)) | (route_from << 4);
+        if (route_from == DAC_ROUTE_FIFO)
+        {
+            reg_audio_matrix_dac_sel = (route_from << 4) | route_from;
+        }
+        else
+        {
+            reg_audio_matrix_dac_sel = (reg_audio_matrix_dac_sel & (~FLD_MATRIX_DAC_R_SEL)) | (route_from << 4);
+        }
         break;
     case AUDIO_DAC_A1_A2:
         reg_audio_matrix_dac_sel = (route_from << 4) | route_from;
@@ -1353,6 +2197,51 @@ void audio_matrix_set_dac_route(audio_codec0_output_select_e dac_chn, audio_matr
     if (route_from == DAC_ROUTE_FIFO)
     {
         reg_audio_matrix_dac_dma_sel = (reg_audio_matrix_dac_dma_sel & (~FLD_MATRIX_DAC_DMA_SEL)) | MASK_VAL(FLD_MATRIX_DAC_DMA_SEL, data_format);
+    }
+}
+
+/**
+ * @brief      This function serves to select hac route source and data format.
+ *
+ * @param[in]  hac_chn     - hac channel.
+ * @param[in]  route_from  - hac route from.
+ * @param[in]  data_format - hac data format(route from i2s/adc valid), others select HAC_DATA_FORMAT_INVALID.
+ * @return     none
+ * @note
+ *             - The filters inside the HAC are processed according to 24bit data.
+ */
+void audio_matrix_set_hac_route(audio_hac_chn_e hac_chn, audio_matrix_hac_route_e route_from, audio_matrix_hac_format_e data_format)
+{
+    reg_audio_matrix_hac_tx_sel(hac_chn) = (reg_audio_matrix_hac_tx_sel(hac_chn) & (~FLD_MATRIX_HAC_TX_SEL)) | route_from;
+
+    /* hac data format set(route from i2s/adc valid). */
+    unsigned char chn_mask = (hac_chn % 2) ? FLD_MATRIX_I2S_RX_HAC_ODD_SEL : FLD_MATRIX_I2S_RX_HAC_EVEN_SEL;
+
+    switch (route_from)
+    {
+    case HAC_DATA_ROUTE_I2S0_RX:
+        reg_audio_matrix_i2s_rx_hac_sel(I2S0, hac_chn) = (reg_audio_matrix_i2s_rx_hac_sel(I2S0, hac_chn) & (~chn_mask)) |
+                                                         MASK_VAL(chn_mask, data_format);
+        break;
+    case HAC_DATA_ROUTE_I2S1_RX:
+        reg_audio_matrix_i2s_rx_hac_sel(I2S1, hac_chn) = (reg_audio_matrix_i2s_rx_hac_sel(I2S1, hac_chn) & (~chn_mask)) |
+                                                         MASK_VAL(chn_mask, data_format);
+        break;
+    case HAC_DATA_ROUTE_I2S2_RX:
+        reg_audio_matrix_i2s_rx_hac_sel(I2S2, hac_chn) = (reg_audio_matrix_i2s_rx_hac_sel(I2S2, hac_chn) & (~chn_mask)) |
+                                                         MASK_VAL(chn_mask, data_format);
+        break;
+    case HAC_DATA_ROUTE_CODEC0_ADCA:
+        reg_audio_matrix_adc_rx_hac_sel(0, hac_chn) = (reg_audio_matrix_adc_rx_hac_sel(0, hac_chn) & (~chn_mask)) | MASK_VAL(chn_mask, data_format);
+        break;
+    case HAC_DATA_ROUTE_CODEC0_ADCB:
+        reg_audio_matrix_adc_rx_hac_sel(1, hac_chn) = (reg_audio_matrix_adc_rx_hac_sel(1, hac_chn) & (~chn_mask)) | MASK_VAL(chn_mask, data_format);
+        break;
+    case HAC_DATA_ROUTE_CODEC1_ADCA:
+        reg_audio_matrix_adc_rx_hac_sel(2, hac_chn) = (reg_audio_matrix_adc_rx_hac_sel(2, hac_chn) & (~chn_mask)) | MASK_VAL(chn_mask, data_format);
+        break;
+    default:
+        break;
     }
 }
 

@@ -48,5 +48,10 @@ void blc_app_memory_set(void *pd, int val, unsigned int len, unsigned int dst_ma
  */
 void blc_app_memory_copy(void *pd, const void *ps, unsigned int len, unsigned int dst_max_len, unsigned int error_code);
 
+/**
+ * @brief      This function is used to user operate reboot at the application layer
+ * @return     none:
+ */
+void app_start_reboot(void);
 
 #endif /* VENDOR_COMMON_SNF_COMMON_H_ */

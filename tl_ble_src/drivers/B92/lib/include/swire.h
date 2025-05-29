@@ -27,51 +27,52 @@
 #include "compiler.h"
 #include "gpio.h"
 
-
 /**
  *  @brief  Define SWM pin types
  */
-typedef enum{
-     SWM_PA0 = GPIO_PA0,
-     SWM_PA1 = GPIO_PA1,
-     SWM_PA2 = GPIO_PA2,
-     SWM_PA3 = GPIO_PA3,
-     SWM_PA4 = GPIO_PA4,
-     SWM_PB0 = GPIO_PB0,
-     SWM_PB1 = GPIO_PB1,
-     SWM_PB2 = GPIO_PB2,
-     SWM_PB3 = GPIO_PB3,
-     SWM_PB4 = GPIO_PB4,
-     SWM_PB5 = GPIO_PB5,
-     SWM_PB6 = GPIO_PB6,
-     SWM_PB7 = GPIO_PB7,
-     SWM_PD0 = GPIO_PD0,
-     SWM_PD1 = GPIO_PD1,
-     SWM_PD2 = GPIO_PD2,
-     SWM_PD3 = GPIO_PD3,
-     SWM_PD4 = GPIO_PD4,
-     SWM_PD5 = GPIO_PD5,
-     SWM_PD6 = GPIO_PD6,
-     SWM_PD7 = GPIO_PD7,
-     SWM_PE6 = GPIO_PE6,
-     SWM_PE7 = GPIO_PE7,
-     SWM_PF0 = GPIO_PF0,
-     SWM_PF1 = GPIO_PF1,
-     SWM_PF2 = GPIO_PF2,
-     SWM_PF3 = GPIO_PF3,
-     SWM_PF4 = GPIO_PF4,
-     SWM_PF5 = GPIO_PF5,
-     SWM_PF6 = GPIO_PF6,
-     SWM_PF7 = GPIO_PF7,
-}swm_pin_e;
+typedef enum
+{
+    SWM_PA0 = GPIO_PA0,
+    SWM_PA1 = GPIO_PA1,
+    SWM_PA2 = GPIO_PA2,
+    SWM_PA3 = GPIO_PA3,
+    SWM_PA4 = GPIO_PA4,
+    SWM_PB0 = GPIO_PB0,
+    SWM_PB1 = GPIO_PB1,
+    SWM_PB2 = GPIO_PB2,
+    SWM_PB3 = GPIO_PB3,
+    SWM_PB4 = GPIO_PB4,
+    SWM_PB5 = GPIO_PB5,
+    SWM_PB6 = GPIO_PB6,
+    SWM_PB7 = GPIO_PB7,
+    SWM_PD0 = GPIO_PD0,
+    SWM_PD1 = GPIO_PD1,
+    SWM_PD2 = GPIO_PD2,
+    SWM_PD3 = GPIO_PD3,
+    SWM_PD4 = GPIO_PD4,
+    SWM_PD5 = GPIO_PD5,
+    SWM_PD6 = GPIO_PD6,
+    SWM_PD7 = GPIO_PD7,
+    SWM_PE6 = GPIO_PE6,
+    SWM_PE7 = GPIO_PE7,
+    SWM_PF0 = GPIO_PF0,
+    SWM_PF1 = GPIO_PF1,
+    SWM_PF2 = GPIO_PF2,
+    SWM_PF3 = GPIO_PF3,
+    SWM_PF4 = GPIO_PF4,
+    SWM_PF5 = GPIO_PF5,
+    SWM_PF6 = GPIO_PF6,
+    SWM_PF7 = GPIO_PF7,
+} swm_pin_e;
+
 /**
  * @brief     This function resets the SWIRE module.
  * @return    none
  */
 static inline void swire_reset(void)
 {
-     reg_rst0 &= (~FLD_RST0_SWIRE);
-     reg_rst0 |= (FLD_RST0_SWIRE);
+    reg_rst0 &= (~FLD_RST0_SWIRE);
+    reg_rst0 |= (FLD_RST0_SWIRE);
 }
 
 /**
@@ -94,7 +95,7 @@ static inline void swire_wait_wr_done(void)
 static inline void swire_master_write_cmd(unsigned char cmd)
 {
     reg_swire_data = cmd;
-    reg_swire_ctl = (FLD_SWIRE_CMD | FLD_SWIRE_WR );
+    reg_swire_ctl  = (FLD_SWIRE_CMD | FLD_SWIRE_WR);
     swire_wait_wr_done();
 }
 
@@ -106,7 +107,7 @@ static inline void swire_master_write_cmd(unsigned char cmd)
 static inline void swire_master_write_data(unsigned char data)
 {
     reg_swire_data = data;
-    reg_swire_ctl =  FLD_SWIRE_WR ;
+    reg_swire_ctl  = FLD_SWIRE_WR;
     swire_wait_wr_done();
 }
 
@@ -120,7 +121,6 @@ static inline void swire_master_write_data(unsigned char data)
 static inline void swire_fifo_mode_dis(void)
 {
     BM_CLR(reg_swire_id, FLD_SWIRE_FIFO_MODE);
-
 }
 
 /**
@@ -133,7 +133,6 @@ static inline void swire_fifo_mode_dis(void)
 static inline void swire_fifo_mode_en(void)
 {
     BM_SET(reg_swire_id, FLD_SWIRE_FIFO_MODE);
-
 }
 
 /**
@@ -146,7 +145,7 @@ static inline void swire_fifo_mode_en(void)
  * @param[in] dp_through_swire_en - If the master is connected to the DP pin of the slave device, this parameter needs to be set to 1.
  * @return    none.
  */
-void swire_sync (swm_pin_e gpio_swm,unsigned char dp_through_swire_en);
+void swire_sync(swm_pin_e gpio_swm, unsigned char dp_through_swire_en);
 
 /**
  * @brief     This function is to set GPIO_PC0 as the swm function.
@@ -194,7 +193,7 @@ void swire_set_slave_id(unsigned char id);
  * @param[in] data_len  - data length.
  * @return    none.
  */
-void swire_master_write(unsigned char slave_id,unsigned char *addr, unsigned char addr_len,unsigned char *data,unsigned int data_len);
+void swire_master_write(unsigned char slave_id, unsigned char *addr, unsigned char addr_len, unsigned char *data, unsigned int data_len);
 
 /**
  * @brief      This function is used by the master device to read data to the slave device.
@@ -210,7 +209,7 @@ void swire_master_write(unsigned char slave_id,unsigned char *addr, unsigned cha
  * @param[in]  data_len  - data length.
  * @return     0:read timeout  1:read success.
  */
-unsigned char  swire_master_read (unsigned char slave_id,unsigned char *addr, unsigned char addr_len,unsigned char *data,unsigned int data_len);
+unsigned char swire_master_read(unsigned char slave_id, unsigned char *addr, unsigned char addr_len, unsigned char *data, unsigned int data_len);
 
 /*
  * @brief      This function is used to set swire read timeout tick.
@@ -226,7 +225,7 @@ unsigned char  swire_master_read (unsigned char slave_id,unsigned char *addr, un
  * @param[in]  slave_clk_hz   - swire slave  clock,unit is HZ.
  * @return     none.
  */
-void swire_read_set_timeout_tick(unsigned int master_clk_hz,unsigned int slave_clk_hz);
+void swire_read_set_timeout_tick(unsigned int master_clk_hz, unsigned int slave_clk_hz);
 
 /*
  * @brief      This function is used to set swire read timeout tick.

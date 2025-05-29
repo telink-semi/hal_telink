@@ -32,5 +32,4 @@
 void blt_firmware_signature_check(void);
 
 
-
 #endif /* BLT_FW_SIGNATURE_H_ */

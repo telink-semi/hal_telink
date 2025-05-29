@@ -222,7 +222,7 @@ void generateRandomNum(int len, unsigned char *data)
     /* if len is odd */
     for (i=0; i<len; i++ ) {
         if( (i & 3) == 0 ){
-            randNums = rand();
+            randNums = trng_rand();
         }
 
         data[i] = randNums & 0xff;

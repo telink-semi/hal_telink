@@ -43,22 +43,22 @@
  */
 void memcpy_(void *dst, const void *src, unsigned int size)
 {
-#if 0
+    #if 0
     while(size--)
     {
         *(dst++) = *(src++);
     }
-#else
+    #else
     unsigned int *a_u32;
     const unsigned int *b_u32;
     unsigned char *a_u8 = (unsigned char *)dst;
     const unsigned char *b_u8 = (const unsigned char *)src;
     unsigned int i, count, tmp;
 
-#ifdef SUPPORT_STATIC_ANALYSIS
+        #ifdef SUPPORT_STATIC_ANALYSIS
     if((NULL != dst) && (NULL != src))
     {
-#endif
+        #endif
         if((0U != (((unsigned int)dst) & 3U)) || (0U != (((unsigned int)src) & 3U)))
         {
             for(i = 0U; i<size; i++)
@@ -89,12 +89,12 @@ void memcpy_(void *dst, const void *src, unsigned int size)
             else
             {}
         }
-#ifdef SUPPORT_STATIC_ANALYSIS
+        #ifdef SUPPORT_STATIC_ANALYSIS
     }
     else
     {}
-#endif
-#endif
+        #endif
+    #endif
 }
 
 
@@ -111,24 +111,24 @@ void memcpy_(void *dst, const void *src, unsigned int size)
  */
 void memset_(void *dst, unsigned char value, unsigned int size)
 {
-#if 0
+    #if 0
     unsigned int i = 0u;
 
     for(; i<size; i++)
     {
         ((unsigned char *)dst)[i] = value;
     }
-#else
+    #else
     unsigned int i, count, tmp;
     unsigned int is_over = 0U;
     unsigned int bytes = size;
     unsigned char *a_u8 = (unsigned char *)dst;
     unsigned int *a_u32;
 
-#ifdef SUPPORT_STATIC_ANALYSIS
+        #ifdef SUPPORT_STATIC_ANALYSIS
     if(NULL != dst)
     {
-#endif
+        #endif
         tmp = ((unsigned int)dst) & 3U;
         if(0U != tmp)
         {
@@ -184,12 +184,12 @@ void memset_(void *dst, unsigned char value, unsigned int size)
         }
         else
         {}
-#ifdef SUPPORT_STATIC_ANALYSIS
+        #ifdef SUPPORT_STATIC_ANALYSIS
     }
     else
     {}
-#endif
-#endif
+        #endif
+    #endif
 }
 
 
@@ -211,10 +211,10 @@ unsigned char memcmp_(const void *m1, const void *m2, unsigned int size)
     unsigned int bytes = size;
     unsigned char c = (unsigned char)0;
 
-#ifdef SUPPORT_STATIC_ANALYSIS
+    #ifdef SUPPORT_STATIC_ANALYSIS
     if((NULL != m1) && (NULL != m2))
     {
-#endif
+    #endif
         while(0U != bytes)
         {
             c = p1[0] - p2[0];
@@ -229,11 +229,11 @@ unsigned char memcmp_(const void *m1, const void *m2, unsigned int size)
             p2 = &p2[1];
             bytes--;
         }
-#ifdef SUPPORT_STATIC_ANALYSIS
+    #ifdef SUPPORT_STATIC_ANALYSIS
     }
     else
     {}
-#endif
+    #endif
 
     return c;
 }
@@ -256,21 +256,17 @@ void uint32_set(unsigned int *a, unsigned int value, unsigned int wordLen)
     unsigned int i = wordLen;
 
 #ifdef SUPPORT_STATIC_ANALYSIS
-    if(NULL != a)
-    {
+    if (NULL != a) {
 #endif
-        while(0U != i)
-        {
+        while (0U != i) {
             --i;
             a[i] = value;
         }
 #ifdef SUPPORT_STATIC_ANALYSIS
+    } else {
     }
-    else
-    {}
 #endif
 }
-
 
 /**
  * @brief       copy uint32 buffer
@@ -288,25 +284,19 @@ void uint32_copy(unsigned int *dst, const unsigned int *src, unsigned int wordLe
     unsigned int i;
 
 #ifdef SUPPORT_STATIC_ANALYSIS
-    if((NULL != dst) && (NULL != src))
-    {
+    if ((NULL != dst) && (NULL != src)) {
 #endif
-        if(dst != src)
-        {
-            for(i=0U; i<wordLen; i++)
-            {
+        if (dst != src) {
+            for (i = 0U; i < wordLen; i++) {
                 dst[i] = src[i];
             }
+        } else {
         }
-        else
-        {}
 #ifdef SUPPORT_STATIC_ANALYSIS
+    } else {
     }
-    else
-    {}
 #endif
 }
-
 
 /**
  * @brief       copy uint32 buffer of 8 words
@@ -321,8 +311,7 @@ void uint32_copy(unsigned int *dst, const unsigned int *src, unsigned int wordLe
 void uint32_copy_8_words(unsigned int *dst, const unsigned int *src)
 {
 #ifdef SUPPORT_STATIC_ANALYSIS
-    if((NULL != dst) && (NULL != src))
-    {
+    if ((NULL != dst) && (NULL != src)) {
 #endif
         dst[0] = src[0];
         dst[1] = src[1];
@@ -333,17 +322,15 @@ void uint32_copy_8_words(unsigned int *dst, const unsigned int *src)
         dst[6] = src[6];
         dst[7] = src[7];
 #ifdef SUPPORT_STATIC_ANALYSIS
+    } else {
     }
-    else
-    {}
 #endif
 }
-
 
 /**
  * @brief       clear uint32 buffer
  * @param[in]   a             - input&output, word buffer a.
- * @param[in]   aWordLen      - input, word length of buffer a.
+ * @param[in]   wordLen      - input, word length of buffer a.
  * @return      none
  * @note
    @verbatim
@@ -355,29 +342,24 @@ void uint32_clear(unsigned int *a, unsigned int wordLen)
     volatile unsigned int i;
 
 #ifdef SUPPORT_STATIC_ANALYSIS
-    if(NULL != a)
-    {
+    if (NULL != a) {
 #endif
 #if 1
         i = wordLen;
-        while(0U != i)
-        {
-            i-=1U;
+        while (0U != i) {
+            i -= 1U;
             a[i] = 0U;
         }
 #else
-        for(i=0U;i<wordLen;i++)
-        {
-            a[i] = 0U;
-        }
+    for (i = 0U; i < wordLen; i++) {
+        a[i] = 0U;
+    }
 #endif
 #ifdef SUPPORT_STATIC_ANALYSIS
+    } else {
     }
-    else
-    {}
 #endif
 }
-
 
 /**
  * @brief       clear uint32 buffer of 8 words
@@ -391,8 +373,7 @@ void uint32_clear(unsigned int *a, unsigned int wordLen)
 void uint32_clear_8_words(unsigned int *a)
 {
 #ifdef SUPPORT_STATIC_ANALYSIS
-    if(NULL != a)
-    {
+    if (NULL != a) {
 #endif
         a[0] = 0U;
         a[1] = 0U;
@@ -403,12 +384,10 @@ void uint32_clear_8_words(unsigned int *a)
         a[6] = 0U;
         a[7] = 0U;
 #ifdef SUPPORT_STATIC_ANALYSIS
+    } else {
     }
-    else
-    {}
 #endif
 }
-
 
 /**
  * @brief       sleep for a while
@@ -417,19 +396,17 @@ void uint32_clear_8_words(unsigned int *a)
  */
 static unsigned int uint32_sleep1(unsigned int count)
 {
-    MEM_VOLATILE unsigned int a=0U, b=0U;
+    MEM_VOLATILE unsigned int a = 0U, b = 0U;
     MEM_VOLATILE unsigned int i;
-    volatile unsigned int result=0U;
+    volatile unsigned int     result = 0U;
 
-    for (i=0U; i<count; i++)
-    {
-        result |= (a - (b+i));
+    for (i = 0U; i < count; i++) {
+        result |= (a - (b + i));
         a &= result;
     }
 
     return result;
 }
-
 
 /**
  * @brief       sleep for a while
@@ -438,19 +415,17 @@ static unsigned int uint32_sleep1(unsigned int count)
  */
 static unsigned int uint32_sleep2(unsigned int count)
 {
-    MEM_VOLATILE unsigned int a=0U, b=0U;
+    MEM_VOLATILE unsigned int a = 0U, b = 0U;
     MEM_VOLATILE unsigned int i;
-    volatile unsigned int result=0U;
+    volatile unsigned int     result = 0U;
 
-    for (i=0U; i<count; i++)
-    {
-        result |= ((a+i) ^ b);
+    for (i = 0U; i < count; i++) {
+        result |= ((a + i) ^ b);
         b ^= result;
     }
 
     return result;
 }
-
 
 /**
  * @brief       sleep for a while
@@ -460,12 +435,9 @@ static unsigned int uint32_sleep2(unsigned int count)
  */
 void uint32_sleep(unsigned int count, unsigned char rand_bit)
 {
-    if(0U == (((unsigned int)rand_bit) & 0x01U))
-    {
+    if (0U == (((unsigned int)rand_bit) & 0x01U)) {
         (void)uint32_sleep1(count);
-    }
-    else
-    {
+    } else {
         (void)uint32_sleep2(count);
     }
 }
@@ -572,30 +544,25 @@ void reverse_word_array(unsigned char *in, unsigned int *out, unsigned int wordL
  */
 void reverse_byte_array(const unsigned char *in, unsigned char *out, unsigned int byteLen)
 {
-    unsigned int idx, round_num = byteLen >> 1;
+    unsigned int  idx, round_num = byteLen >> 1;
     unsigned char tmp;
 
 #ifdef SUPPORT_STATIC_ANALYSIS
-    if((NULL != in) && (NULL != out))
-    {
+    if ((NULL != in) && (NULL != out)) {
 #endif
-        for (idx = 0U; idx < round_num; idx++)
-        {
-            tmp = in[idx];
-            out[idx] = in[byteLen - 1U - idx];
+        for (idx = 0U; idx < round_num; idx++) {
+            tmp                     = in[idx];
+            out[idx]                = in[byteLen - 1U - idx];
             out[byteLen - 1U - idx] = tmp;
         }
 
-        if ((0U != (byteLen & 0x1U)) && (in != out))
-        {
+        if ((0U != (byteLen & 0x1U)) && (in != out)) {
             out[round_num] = in[round_num];
+        } else {
         }
-        else
-        {}
 #ifdef SUPPORT_STATIC_ANALYSIS
+    } else {
     }
-    else
-    {}
 #endif
 }
 
@@ -728,24 +695,21 @@ void dma_reverse_word_array(unsigned int *in, unsigned int *out, unsigned int wo
 void u8big_to_u32little_256bits(const unsigned char *in, unsigned int *out)
 {
 #ifdef SUPPORT_STATIC_ANALYSIS
-    if((NULL != in) && (NULL != out))
-    {
+    if ((NULL != in) && (NULL != out)) {
 #endif
-        out[7] = ((unsigned int)in[3])  | (((unsigned int)in[2]) << 8u)  | (((unsigned int)in[1]) << 16u)  | (((unsigned int)in[0]) << 24u);
-        out[6] = ((unsigned int)in[7])  | (((unsigned int)in[6]) << 8u)  | (((unsigned int)in[5]) << 16u)  | (((unsigned int)in[4]) << 24u);
-        out[5] = ((unsigned int)in[11]) | (((unsigned int)in[10]) << 8u) | (((unsigned int)in[9]) << 16u)  | (((unsigned int)in[8]) << 24u);
+        out[7] = ((unsigned int)in[3]) | (((unsigned int)in[2]) << 8u) | (((unsigned int)in[1]) << 16u) | (((unsigned int)in[0]) << 24u);
+        out[6] = ((unsigned int)in[7]) | (((unsigned int)in[6]) << 8u) | (((unsigned int)in[5]) << 16u) | (((unsigned int)in[4]) << 24u);
+        out[5] = ((unsigned int)in[11]) | (((unsigned int)in[10]) << 8u) | (((unsigned int)in[9]) << 16u) | (((unsigned int)in[8]) << 24u);
         out[4] = ((unsigned int)in[15]) | (((unsigned int)in[14]) << 8u) | (((unsigned int)in[13]) << 16u) | (((unsigned int)in[12]) << 24u);
         out[3] = ((unsigned int)in[19]) | (((unsigned int)in[18]) << 8u) | (((unsigned int)in[17]) << 16u) | (((unsigned int)in[16]) << 24u);
         out[2] = ((unsigned int)in[23]) | (((unsigned int)in[22]) << 8u) | (((unsigned int)in[21]) << 16u) | (((unsigned int)in[20]) << 24u);
         out[1] = ((unsigned int)in[27]) | (((unsigned int)in[26]) << 8u) | (((unsigned int)in[25]) << 16u) | (((unsigned int)in[24]) << 24u);
         out[0] = ((unsigned int)in[31]) | (((unsigned int)in[30]) << 8u) | (((unsigned int)in[29]) << 16u) | (((unsigned int)in[28]) << 24u);
 #ifdef SUPPORT_STATIC_ANALYSIS
+    } else {
     }
-    else
-    {}
 #endif
 }
-
 
 /**
  * @brief     reverse byte array
@@ -762,28 +726,25 @@ void u8big_to_u32little_256bits_self(unsigned int *a)
     unsigned int tmp;
 
 #ifdef SUPPORT_STATIC_ANALYSIS
-    if(NULL != a)
-    {
+    if (NULL != a) {
 #endif
-        tmp = a[7];
-        a[7] = (((unsigned int)a[0])>>24) | ((((unsigned int)a[0])>>8)&0xFF00u) | ((((unsigned int)a[0])<<8)&0xFF0000u) | (((unsigned int)a[0])<<24);
-        a[0] = (tmp>>24) | ((tmp>>8)&0xFF00u) | ((tmp<<8)&0xFF0000u) | (tmp<<24);
-        tmp = a[6];
-        a[6] = (((unsigned int)a[1])>>24) | ((((unsigned int)a[1])>>8)&0xFF00u) | ((((unsigned int)a[1])<<8)&0xFF0000u) | (((unsigned int)a[1])<<24);
-        a[1] = (tmp>>24) | ((tmp>>8)&0xFF00u) | ((tmp<<8)&0xFF0000u) | (tmp<<24);
-        tmp = a[5];
-        a[5] = (((unsigned int)a[2])>>24) | ((((unsigned int)a[2])>>8)&0xFF00u) | ((((unsigned int)a[2])<<8)&0xFF0000u) | (((unsigned int)a[2])<<24);
-        a[2] = (tmp>>24) | ((tmp>>8)&0xFF00u) | ((tmp<<8)&0xFF0000u) | (tmp<<24);
-        tmp = a[4];
-        a[4] = (((unsigned int)a[3])>>24) | ((((unsigned int)a[3])>>8)&0xFF00u) | ((((unsigned int)a[3])<<8)&0xFF0000u) | (((unsigned int)a[3])<<24);
-        a[3] = (tmp>>24) | ((tmp>>8)&0xFF00u) | ((tmp<<8)&0xFF0000u) | (tmp<<24);
+        tmp  = a[7];
+        a[7] = (((unsigned int)a[0]) >> 24) | ((((unsigned int)a[0]) >> 8) & 0xFF00u) | ((((unsigned int)a[0]) << 8) & 0xFF0000u) | (((unsigned int)a[0]) << 24);
+        a[0] = (tmp >> 24) | ((tmp >> 8) & 0xFF00u) | ((tmp << 8) & 0xFF0000u) | (tmp << 24);
+        tmp  = a[6];
+        a[6] = (((unsigned int)a[1]) >> 24) | ((((unsigned int)a[1]) >> 8) & 0xFF00u) | ((((unsigned int)a[1]) << 8) & 0xFF0000u) | (((unsigned int)a[1]) << 24);
+        a[1] = (tmp >> 24) | ((tmp >> 8) & 0xFF00u) | ((tmp << 8) & 0xFF0000u) | (tmp << 24);
+        tmp  = a[5];
+        a[5] = (((unsigned int)a[2]) >> 24) | ((((unsigned int)a[2]) >> 8) & 0xFF00u) | ((((unsigned int)a[2]) << 8) & 0xFF0000u) | (((unsigned int)a[2]) << 24);
+        a[2] = (tmp >> 24) | ((tmp >> 8) & 0xFF00u) | ((tmp << 8) & 0xFF0000u) | (tmp << 24);
+        tmp  = a[4];
+        a[4] = (((unsigned int)a[3]) >> 24) | ((((unsigned int)a[3]) >> 8) & 0xFF00u) | ((((unsigned int)a[3]) << 8) & 0xFF0000u) | (((unsigned int)a[3]) << 24);
+        a[3] = (tmp >> 24) | ((tmp >> 8) & 0xFF00u) | ((tmp << 8) & 0xFF0000u) | (tmp << 24);
 #ifdef SUPPORT_STATIC_ANALYSIS
+    } else {
     }
-    else
-    {}
 #endif
 }
-
 
 /**
  * @brief     reverse byte array
@@ -834,19 +795,17 @@ void u32little_to_u8big_256bits(const unsigned int *in, unsigned char *out)
 #elif 0
     unsigned int i, j;
 
-    for(i = 0u; i < 8u; i++)
-    {
-        j = 28u - (i << 2);
+    for (i = 0u; i < 8u; i++) {
+        j           = 28u - (i << 2);
         out[j]      = (unsigned char)((in[i] >> 24) & 0xffu);
         out[j + 1u] = (unsigned char)((in[i] >> 16) & 0xffu);
         out[j + 2u] = (unsigned char)((in[i] >> 8) & 0xffu);
         out[j + 3u] = (unsigned char)((in[i]) & 0xffu);
     }
 #else
-#ifdef SUPPORT_STATIC_ANALYSIS
-    if((NULL != in) && (NULL != out))
-    {
-#endif
+    #ifdef SUPPORT_STATIC_ANALYSIS
+    if ((NULL != in) && (NULL != out)) {
+    #endif
         out[28] = ((unsigned char)(in[0] >> 24));
         out[29] = ((unsigned char)(in[0] >> 16));
         out[30] = ((unsigned char)(in[0] >> 8));
@@ -879,25 +838,12 @@ void u32little_to_u8big_256bits(const unsigned int *in, unsigned char *out)
         out[1]  = ((unsigned char)(in[7] >> 16));
         out[2]  = ((unsigned char)(in[7] >> 8));
         out[3]  = ((unsigned char)in[7]);
-#ifdef SUPPORT_STATIC_ANALYSIS
+    #ifdef SUPPORT_STATIC_ANALYSIS
+    } else {
     }
-    else
-    {}
-#endif
+    #endif
 #endif
 }
-
-
-/* function: C = A XOR B
- * parameters:
- *     A -------------------------- input, byte buffer a
- *     B -------------------------- input, byte buffer b
- *     C -------------------------- output, C = A XOR B
- *     byteLen -------------------- input, byte length of A,B,C
- * return: none
- * caution:
- *     1. please make sure none of A,B,C is NULL.
- */
 
 /**
  * @brief    C = A XOR B
@@ -916,20 +862,16 @@ void uint8_XOR(const unsigned char *A, const unsigned char *B, unsigned char *C,
     unsigned int i;
 
 #ifdef SUPPORT_STATIC_ANALYSIS
-    if((NULL != A) && (NULL != B) && (NULL != C))
-    {
+    if ((NULL != A) && (NULL != B) && (NULL != C)) {
 #endif
-        for(i=0U; i<byteLen; i++)
-        {
+        for (i = 0U; i < byteLen; i++) {
             C[i] = A[i] ^ B[i];
         }
 #ifdef SUPPORT_STATIC_ANALYSIS
+    } else {
     }
-    else
-    {}
 #endif
 }
-
 
 /**
  * @brief    C = A XOR B
@@ -948,20 +890,16 @@ void uint32_XOR(const unsigned int *A, const unsigned int *B, unsigned int *C, u
     unsigned int i;
 
 #ifdef SUPPORT_STATIC_ANALYSIS
-    if((NULL != A) && (NULL != B) && (NULL != C))
-    {
+    if ((NULL != A) && (NULL != B) && (NULL != C)) {
 #endif
-        for(i=0U; i<wordLen; i++)
-        {
+        for (i = 0U; i < wordLen; i++) {
             C[i] = A[i] ^ B[i];
         }
 #ifdef SUPPORT_STATIC_ANALYSIS
+    } else {
     }
-    else
-    {}
 #endif
 }
-
 
 /**
  * @brief   get aimed bit value of big integer a
@@ -979,24 +917,19 @@ unsigned int get_bit_value_by_index(const unsigned int *a, unsigned int bit_inde
     unsigned int ret = 0u;
 
 #ifdef SUPPORT_STATIC_ANALYSIS
-    if(NULL != a)
-    {
+    if (NULL != a) {
 #endif
-        if(0u != (a[(bit_index) >> 5u] & ((unsigned int)1u << (bit_index & 31u))))
-        {
+        if (0u != (a[(bit_index) >> 5u] & ((unsigned int)1u << (bit_index & 31u)))) {
             ret = 1u;
+        } else {
         }
-        else
-        {}
 #ifdef SUPPORT_STATIC_ANALYSIS
+    } else {
     }
-    else
-    {}
 #endif
 
     return ret;
 }
-
 
 /**
  * @brief   get real bit length of big number a of wordLen words
@@ -1014,44 +947,33 @@ unsigned int get_valid_bits(const unsigned int *a, unsigned int wordLen)
     unsigned int j;
 
 #ifdef SUPPORT_STATIC_ANALYSIS
-    if(NULL != a)
-    {
+    if (NULL != a) {
 #endif
-        for (i = wordLen; i > 0U; i--)
-        {
-            if (0U != a[i - 1U])
-            {
+        for (i = wordLen; i > 0U; i--) {
+            if (0U != a[i - 1U]) {
                 break;
+            } else {
             }
-            else
-            {}
         }
 
-        if(0U != i)
-        {
-            for (j = 32U; j > 0U; j--)
-            {
-                if (0U != (a[i - 1U] & (((unsigned int)0x1) << (j - 1U))))
-                {
+        if (0U != i) {
+            for (j = 32U; j > 0U; j--) {
+                if (0U != (a[i - 1U] & (((unsigned int)0x1) << (j - 1U)))) {
                     break;
+                } else {
                 }
-                else
-                {}
             }
 
             i = ((i - 1U) << 5U) + j;
+        } else {
         }
-        else
-        {}
 #ifdef SUPPORT_STATIC_ANALYSIS
+    } else {
     }
-    else
-    {}
 #endif
 
     return i;
 }
-
 
 /**
  * @brief   get real word length of big number a of max_words words
@@ -1069,31 +991,25 @@ unsigned int get_valid_words(const unsigned int *a, unsigned int max_words)
     unsigned int i;
 
 #ifdef SUPPORT_STATIC_ANALYSIS
-    if(NULL != a)
-    {
+    if (NULL != a) {
 #endif
         i = max_words;
-        while(i > 0U)
-        {
-            if (0U != a[i - 1U])
-            {
+        while (i > 0U) {
+            if (0U != a[i - 1U]) {
                 ret = i;
                 break;
+            } else {
             }
-            else
-            {}
 
             i--;
         }
 #ifdef SUPPORT_STATIC_ANALYSIS
+    } else {
     }
-    else
-    {}
 #endif
 
     return ret;
 }
-
 
 /**
  * @brief   check whether big number or unsigned char buffer a is all zero or not
@@ -1111,29 +1027,23 @@ unsigned int uint8_BigNum_Check_Zero(const unsigned char *a, unsigned int aByteL
     unsigned int ret = 0U;
 
 #ifdef SUPPORT_STATIC_ANALYSIS
-    if(NULL != a)
-    {
+    if (NULL != a) {
 #endif
         ret = 1U;
-        for(i=0U; i<aByteLen; i++)
-        {
-            if(0U != a[i])
-            {
+        for (i = 0U; i < aByteLen; i++) {
+            if (0U != a[i]) {
                 ret = 0U;
                 break;
+            } else {
             }
-            else
-            {}
         }
 #ifdef SUPPORT_STATIC_ANALYSIS
+    } else {
     }
-    else
-    {}
 #endif
 
     return ret;
 }
-
 
 /**
  * @brief   check whether big number or unsigned int buffer a is all zero or not
@@ -1151,29 +1061,23 @@ unsigned int uint32_BigNum_Check_Zero(const unsigned int *a, unsigned int aWordL
     unsigned int ret = 0U;
 
 #ifdef SUPPORT_STATIC_ANALYSIS
-    if(NULL != a)
-    {
+    if (NULL != a) {
 #endif
         ret = 1U;
-        for(i=0U; i<aWordLen; i++)
-        {
-            if(0U != a[i])
-            {
+        for (i = 0U; i < aWordLen; i++) {
+            if (0U != a[i]) {
                 ret = 0U;
                 break;
+            } else {
             }
-            else
-            {}
         }
 #ifdef SUPPORT_STATIC_ANALYSIS
+    } else {
     }
-    else
-    {}
 #endif
 
     return ret;
 }
-
 
 /**
  * @brief   a = a + b
@@ -1188,49 +1092,36 @@ unsigned int uint32_BigNum_Check_Zero(const unsigned int *a, unsigned int aWordL
       -# 2. this is mainly used for counter++ in SKE, KDF, etc.
    @endverbatim
  */
-unsigned int uint8_big_num_big_endian_add_little(unsigned char *a, unsigned int a_bytes, unsigned char b, 
-        unsigned char is_secure)
+unsigned int uint8_big_num_big_endian_add_little(unsigned char *a, unsigned int a_bytes, unsigned char b, unsigned char is_secure)
 {
-    unsigned int ret = 0U;
-    unsigned int i;
+    unsigned int  ret = 0U;
+    unsigned int  i;
     unsigned char carry = b;
 
 #ifdef SUPPORT_STATIC_ANALYSIS
-    if(NULL != a)
-    {
+    if (NULL != a) {
 #endif
-        if((unsigned char)0 != is_secure)
-        {
+        if ((unsigned char)0 != is_secure) {
             i = a_bytes;
-            while(0U != i)
-            {
+            while (0U != i) {
                 i--;
                 a[i] += carry;
-                if(a[i] < carry)
-                {
+                if (a[i] < carry) {
                     carry = (unsigned char)1;
-                }
-                else
-                {
+                } else {
                     carry = (unsigned char)0;
                 }
             }
 
             ret = (unsigned int)carry;
-        }
-        else
-        {
+        } else {
             i = a_bytes;
-            while(0U != i)
-            {
+            while (0U != i) {
                 i--;
                 a[i] += carry;
-                if(a[i] < carry)
-                {
+                if (a[i] < carry) {
                     carry = (unsigned char)1;
-                }
-                else
-                {
+                } else {
                     carry = (unsigned char)0;
                     break;
                 }
@@ -1239,14 +1130,12 @@ unsigned int uint8_big_num_big_endian_add_little(unsigned char *a, unsigned int 
             ret = (unsigned int)carry;
         }
 #ifdef SUPPORT_STATIC_ANALYSIS
+    } else {
     }
-    else
-    {}
 #endif
 
     return ret;
 }
-
 
 /**
  * @brief   a = a + b
@@ -1261,49 +1150,36 @@ unsigned int uint8_big_num_big_endian_add_little(unsigned char *a, unsigned int 
       -# this is mainly used for public key algorithm implementation.
    @endverbatim
  */
-unsigned int uint32_big_num_little_endian_add_little(unsigned int *a, unsigned int a_words, unsigned int b, 
-        unsigned char is_secure)
+unsigned int uint32_big_num_little_endian_add_little(unsigned int *a, unsigned int a_words, unsigned int b, unsigned char is_secure)
 {
     unsigned int ret = 0U;
     unsigned int i;
     unsigned int carry = b;
 
 #ifdef SUPPORT_STATIC_ANALYSIS
-    if(NULL != a)
-    {
+    if (NULL != a) {
 #endif
-        if((unsigned char)0 != is_secure)
-        {
-            for(i = 0U; i < a_words; i++)
-            {
+        if ((unsigned char)0 != is_secure) {
+            for (i = 0U; i < a_words; i++) {
                 a[i] += carry;
-    #if 0
+#if 0
                 carry = (unsigned int)(a[i] < carry);
-    #else
-                if(a[i] < carry)
-                {
+#else
+                if (a[i] < carry) {
                     carry = 1U;
-                }
-                else
-                {
+                } else {
                     carry = 0U;
                 }
-    #endif
+#endif
             }
 
             ret = carry;
-        }
-        else
-        {
-            for(i = 0U; i < a_words; i++)
-            {
+        } else {
+            for (i = 0U; i < a_words; i++) {
                 a[i] += carry;
-                if(a[i] < carry)
-                {
+                if (a[i] < carry) {
                     carry = 1U;
-                }
-                else
-                {
+                } else {
                     carry = 0U;
                     break;
                 }
@@ -1312,57 +1188,45 @@ unsigned int uint32_big_num_little_endian_add_little(unsigned int *a, unsigned i
             ret = carry;
         }
 #ifdef SUPPORT_STATIC_ANALYSIS
+    } else {
     }
-    else
-    {}
 #endif
 
     return ret;
 }
 
-
-/* function: compare big integer a and b(same word length)
- * parameters:
- *     a -------------------------- input, big integer a
- *     b -------------------------- input, big integer b
- *     words ---------------------- input, real word length of a,b
- * return:
- *     0:a=b,   1:a>b,   -1: a<b
- * caution:
+/**
+ * @brief      compare big integer a and b(same word length)
+ * @param[in]  a  input, big integer a
+ * @param[in]  b  input, big integer b
+ * @param[in]  words input, real word length of a,b
+ * @return     0:a=b,   1:a>b,   -1: a<b
+ * @note:
  *     1. please make sure neither of a,b is NULL.
  */
-FLAG_STATIC int32_t uint32_BigNumCmp_internal(const unsigned int *a, const unsigned int *b, unsigned int words)
+static int32_t uint32_BigNumCmp_internal(const unsigned int *a, const unsigned int *b, unsigned int words)
 {
-    int32_t ret = 0;
-    unsigned int i = words;
+    int32_t      ret = 0;
+    unsigned int i   = words;
 
-    while(0U != i)
-    {
+    while (0U != i) {
         i--;
-        if(a[i] > b[i])
-        {
+        if (a[i] > b[i]) {
             ret = 1;
-        }
-        else if(a[i] < b[i])
-        {
+        } else if (a[i] < b[i]) {
             ret = -1;
-        }
-        else
-        {
+        } else {
             //nothing to do, just for static analysis.
         }
 
-        if(0 != ret)
-        {
+        if (0 != ret) {
             break;
+        } else {
         }
-        else
-        {}
     }
 
     return ret;
 }
-
 
 /**
  * @brief   compare big integer a and b
@@ -1379,36 +1243,28 @@ FLAG_STATIC int32_t uint32_BigNumCmp_internal(const unsigned int *a, const unsig
 int32_t uint32_BigNumCmp(const unsigned int *a, unsigned int aWordLen, const unsigned int *b, unsigned int bWordLen)
 {
     unsigned int a_words, b_words;
-    int32_t ret = 0;
+    int32_t      ret = 0;
 
 #ifdef SUPPORT_STATIC_ANALYSIS
-    if((NULL != a) && (NULL != b))
-    {
+    if ((NULL != a) && (NULL != b)) {
 #endif
         a_words = get_valid_words(a, aWordLen);
         b_words = get_valid_words(b, bWordLen);
 
-        if(a_words > b_words)
-        {
+        if (a_words > b_words) {
             ret = 1;
-        }
-        else if(a_words < b_words)
-        {
+        } else if (a_words < b_words) {
             ret = -1;
-        }
-        else
-        {
+        } else {
             ret = uint32_BigNumCmp_internal(a, b, a_words);
         }
 #ifdef SUPPORT_STATIC_ANALYSIS
+    } else {
     }
-    else
-    {}
 #endif
 
     return ret;
 }
-
 
 /**
  * @brief   for a = b*2^t, b is odd, get t
@@ -1422,36 +1278,29 @@ int32_t uint32_BigNumCmp(const unsigned int *a, unsigned int aWordLen, const uns
  */
 unsigned int Get_Multiple2_Number(const unsigned int *a)
 {
-    unsigned int t, i=0U, j=0U;
+    unsigned int t, i = 0U, j = 0U;
 
 #ifdef SUPPORT_STATIC_ANALYSIS
-    if(NULL != a)
-    {
+    if (NULL != a) {
 #endif
-        while(0U == (a[i]))
-        {
+        while (0U == (a[i])) {
             i++;
         }
 
         t = a[i];
-        for(; j<32U; j++)
-        {
-            if(0U != (t&(((unsigned int)1U)<<j)))
-            {
+        for (; j < 32U; j++) {
+            if (0U != (t & (((unsigned int)1U) << j))) {
                 break;
+            } else {
             }
-            else
-            {}
         }
 #ifdef SUPPORT_STATIC_ANALYSIS
+    } else {
     }
-    else
-    {}
 #endif
 
-    return (i<<5)|j;
+    return (i << 5) | j;
 }
-
 
 /**
  * @brief   a = a/(2^n), here n<32
@@ -1470,38 +1319,20 @@ FLAG_STATIC unsigned int Big_Div2n_n_less_than_32(unsigned int *a, unsigned int 
     unsigned int ret;
     unsigned int i;
 
-    for(i=0U; i<(a_words-1U); i++)
-    {
+    for (i = 0U; i < (a_words - 1U); i++) {
         a[i] >>= n;
-        a[i] |= (a[i+1U]<<(32U-n));
+        a[i] |= (a[i + 1U] << (32U - n));
     }
     a[i] >>= n;
 
-    if(0U == a[i])
-    {
+    if (0U == a[i]) {
         ret = i;
-    }
-    else
-    {
+    } else {
         ret = a_words;
     }
 
     return ret;
 }
-
-
-/* function: a = a/(2^n), here n>=32
- * parameters:
- *     a -------------------------- big integer a
- *     a_words -------------------- word length of a
- *     n -------------------------- exponent of 2^n, n>=32
- * return:
- *     word length of a = a/(2^n),
- * caution:
- *     1. please make sure a is not NULL.
- *     2. make sure a_words is real word length of a and a_words is not 0
- *     3. actually n could be any value
- */
 
 /**
  * @brief   a = a/(2^n), here n>=32
@@ -1525,36 +1356,30 @@ FLAG_STATIC unsigned int Big_Div2n_n_not_less_than_32(unsigned int *a, unsigned 
     j    = n/32;
     bits = n%32;
 #else
-    j    = n>>5U;
-    bits = n&31U;
+    j    = n >> 5U;
+    bits = n & 31U;
 #endif
 
-    if(j < a_words)
-    {
-        for(i=0; i<(a_words-j); i++)
-        {
-            a[i] = a[i+j];
+    if (j < a_words) {
+        for (i = 0; i < (a_words - j); i++) {
+            a[i] = a[i + j];
         }
-        uint32_clear(&a[a_words-j], j);
+        uint32_clear(&a[a_words - j], j);
 
-        if(0U != bits)   //bits is in [1, 31]
+        if (0U != bits) //bits is in [1, 31]
         {
-            ret = Big_Div2n_n_less_than_32(a, a_words-j, bits);
-        }
-        else             //bits is 0
+            ret = Big_Div2n_n_less_than_32(a, a_words - j, bits);
+        } else          //bits is 0
         {
-            ret = a_words-j;
+            ret = a_words - j;
         }
-    }
-    else
-    {
+    } else {
         uint32_clear(a, a_words);
         ret = 0U;
     }
 
     return ret;
 }
-
 
 /**
  * @brief   a = a/(2^n)
@@ -1575,32 +1400,26 @@ unsigned int Big_Div2n(unsigned int *a, unsigned int aWordLen, unsigned int n)
     unsigned int a_words;
 
 #ifdef SUPPORT_STATIC_ANALYSIS
-    if(NULL != a)
-    {
+    if (NULL != a) {
 #endif
         a_words = get_valid_words(a, aWordLen);
 
-        if((0U == n) || (0U == a_words))
-        {
+        if ((0U == n) || (0U == a_words)) {
             ret = a_words;
-        }
-        else if(n<32U)  //now a is not zero(a_words is not zero), and n is not zero either.
+        } else if (n < 32U) //now a is not zero(a_words is not zero), and n is not zero either.
         {
             ret = Big_Div2n_n_less_than_32(a, a_words, n);
-        }
-        else  //now a is not zero(a_words is not zero), and n is greater than 31
+        } else              //now a is not zero(a_words is not zero), and n is greater than 31
         {
             ret = Big_Div2n_n_not_less_than_32(a, a_words, n);
         }
 #ifdef SUPPORT_STATIC_ANALYSIS
+    } else {
     }
-    else
-    {}
 #endif
 
     return ret;
 }
-
 
 /**
  * @brief   check whether a is equal to 1 or not
@@ -1618,36 +1437,27 @@ unsigned int Bigint_Check_1(const unsigned int *a, unsigned int aWordLen)
     unsigned int ret = 0U;
 
 #ifdef SUPPORT_STATIC_ANALYSIS
-    if(NULL != a)
-    {
+    if (NULL != a) {
 #endif
-        if((0U == aWordLen) || (a[0] != 1U))
-        {
+        if ((0U == aWordLen) || (a[0] != 1U)) {
             ret = 0U;
-        }
-        else
-        {
+        } else {
             ret = 1U;
-            for(i=1U; i<aWordLen; i++)
-            {
-                if(0U != a[i])
-                {
+            for (i = 1U; i < aWordLen; i++) {
+                if (0U != a[i]) {
                     ret = 0U;
                     break;
+                } else {
                 }
-                else
-                {}
             }
         }
 #ifdef SUPPORT_STATIC_ANALYSIS
+    } else {
     }
-    else
-    {}
 #endif
 
     return ret;
 }
-
 
 /**
  * @brief   check whether a is equal to p-1 or not
@@ -1667,36 +1477,27 @@ unsigned int Bigint_Check_p_1(const unsigned int *a, const unsigned int *p, unsi
     unsigned int ret = 0U;
 
 #ifdef SUPPORT_STATIC_ANALYSIS
-    if((NULL != a) && (NULL != p))
-    {
+    if ((NULL != a) && (NULL != p)) {
 #endif
-        if((0U == wordLen) || (a[0] != (p[0] - 1U)))
-        {
+        if ((0U == wordLen) || (a[0] != (p[0] - 1U))) {
             ret = 0U;
-        }
-        else
-        {
+        } else {
             ret = 1U;
-            for(i=1U; i<wordLen; i++)
-            {
-                if(a[i] != p[i])
-                {
+            for (i = 1U; i < wordLen; i++) {
+                if (a[i] != p[i]) {
                     ret = 0U;
                     break;
+                } else {
                 }
-                else
-                {}
             }
         }
 #ifdef SUPPORT_STATIC_ANALYSIS
+    } else {
     }
-    else
-    {}
 #endif
 
     return ret;
 }
-
 
 /* function: check whether integer k is in [1, n-1]
  * parameters:
@@ -1720,25 +1521,17 @@ unsigned int Bigint_Check_p_1(const unsigned int *a, const unsigned int *p, unsi
  *             ret_big       k is greater/bigger than or equal to n
  *             ret_success   k is in [1, n-1]
  */
-unsigned int uint32_integer_check(const unsigned int *k, const unsigned int *n, unsigned int wordLen, 
-        unsigned int ret_zero, unsigned int ret_big, unsigned int ret_success)
+unsigned int uint32_integer_check(const unsigned int *k, const unsigned int *n, unsigned int wordLen, unsigned int ret_zero, unsigned int ret_big, unsigned int ret_success)
 {
     unsigned int ret;
 
-    if(0U != uint32_BigNum_Check_Zero(k, wordLen))
-    {
+    if (0U != uint32_BigNum_Check_Zero(k, wordLen)) {
         ret = ret_zero;
-    }
-    else if(uint32_BigNumCmp(k, wordLen, n, wordLen) >= 0)
-    {
+    } else if (uint32_BigNumCmp(k, wordLen, n, wordLen) >= 0) {
         ret = ret_big;
-    }
-    else
-    {
+    } else {
         ret = ret_success;
     }
 
     return ret;
 }
-
-

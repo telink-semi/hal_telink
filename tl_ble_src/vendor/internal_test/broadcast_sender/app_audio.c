@@ -53,52 +53,47 @@ u8  gbisSamplingFreq;
 u8  gbisFrameDuration;
 u16 gbisOctetPer;
 
-u16 gAppAudioBuffer[APP_AUDIO_FRAME_BYTES *2];
+u16  gAppAudioBuffer[APP_AUDIO_FRAME_BYTES * 2];
 bool gAppAudioIsSend = false;
 
-#if(MCU_CORE_TYPE == MCU_CORE_B92)
+    #if (MCU_CORE_TYPE == MCU_CORE_B92)
 audio_codec_stream0_input_t audio_codec_input =
-{
-    .input_src = DMIC_STREAM0_STEREO,
-    .sample_rate = AUDIO_48K,
-    .fifo_num = FIFO0,
-    .data_width = CODEC_BIT_16_DATA,
-    .dma_num = DMA2,
-    .data_buf = gAppAudioBuffer,
-    .data_buf_size = sizeof(gAppAudioBuffer),
+    {
+        .input_src     = DMIC_STREAM0_STEREO,
+        .sample_rate   = AUDIO_48K,
+        .fifo_num      = FIFO0,
+        .data_width    = CODEC_BIT_16_DATA,
+        .dma_num       = DMA2,
+        .data_buf      = gAppAudioBuffer,
+        .data_buf_size = sizeof(gAppAudioBuffer),
 };
 audio_codec_output_t audio_codec_output =
-{
-    .output_src = CODEC_DAC_STEREO,
-    .sample_rate = AUDIO_48K,
-    .fifo_num = FIFO0,
-    .data_width = CODEC_BIT_16_DATA,
-    .dma_num = DMA3,
-    .mode = HP_MODE,
-    .data_buf = gAppAudioBuffer,
-    .data_buf_size = sizeof(gAppAudioBuffer),
+    {
+        .output_src    = CODEC_DAC_STEREO,
+        .sample_rate   = AUDIO_48K,
+        .fifo_num      = FIFO0,
+        .data_width    = CODEC_BIT_16_DATA,
+        .dma_num       = DMA3,
+        .mode          = HP_MODE,
+        .data_buf      = gAppAudioBuffer,
+        .data_buf_size = sizeof(gAppAudioBuffer),
 };
-#endif
-
-
+    #endif
 
 
 int app_audio_init(void)
 {
-
     lc3enc_encode_init_bap(0, gbisSamplingFreq, gbisFrameDuration, gbisOctetPer);
     lc3enc_encode_init_bap(1, gbisSamplingFreq, gbisFrameDuration, gbisOctetPer);
 
-    #if(APP_AUDIO_INPUT_TYPE == APP_AUDIO_INPUT_USB_MIC)
-        app_audio_usb_speak_init();
+    #if (APP_AUDIO_INPUT_TYPE == APP_AUDIO_INPUT_USB_MIC)
+    app_audio_usb_speak_init();
     #else
-        app_audio_codec_init();
+    app_audio_codec_init();
     #endif
 
     return 0;
 }
-
-
 
 void app_audio_handler(void)
 {
@@ -112,14 +107,12 @@ bool app_audio_check_send_flag(void)
 
 void app_audio_send_handler(void)
 {
-#if(APP_AUDIO_INPUT_TYPE == APP_AUDIO_INPUT_USB_MIC)
+    #if (APP_AUDIO_INPUT_TYPE == APP_AUDIO_INPUT_USB_MIC)
     app_audio_usb_speaker_handle();
-#else
+    #else
     app_audio_buffer_handle();
-#endif
-
+    #endif
 }
-
 
 
 #endif /* INTER_TEST_MODE */

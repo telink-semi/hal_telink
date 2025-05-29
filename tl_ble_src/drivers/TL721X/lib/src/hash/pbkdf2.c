@@ -30,9 +30,7 @@
 #include "lib/include/hash/pbkdf2.h"
 
 
-
 #define PBKDF2_HIGH_SPEED
-
 
 
 #ifdef PBKDF2_HIGH_SPEED
@@ -46,9 +44,9 @@ void pbkdf2_hmac_backup(HMAC_CTX *ctx_bak, HMAC_CTX *ctx)
 {
     memcpy_((unsigned char *)ctx_bak, (unsigned char *)ctx, sizeof(HMAC_CTX));
 
-#ifndef CONFIG_HASH_SUPPORT_MUL_THREAD
+    #ifndef CONFIG_HASH_SUPPORT_MUL_THREAD
     hash_get_iterator((unsigned char *)(ctx_bak->hash_ctx->hash_buffer), ctx_bak->hash_ctx->iterator_word_len);
-#endif
+    #endif
 }
 #endif
 
@@ -64,9 +62,9 @@ void pbkdf2_hmac_recover(HMAC_CTX *ctx, HMAC_CTX *ctx_bak)
 {
     memcpy_((unsigned char *)ctx, (unsigned char *)ctx_bak, sizeof(HMAC_CTX));
 
-#ifndef CONFIG_HASH_SUPPORT_MUL_THREAD
+    #ifndef CONFIG_HASH_SUPPORT_MUL_THREAD
     hash_set_iterator((unsigned int *)(ctx_bak->hash_ctx->hash_buffer), ctx_bak->hash_ctx->iterator_word_len);
-#endif
+    #endif
 }
 #endif
 
@@ -83,16 +81,15 @@ void pbkdf2_hmac_recover(HMAC_CTX *ctx, HMAC_CTX *ctx_bak)
  * @param[in]   out_bytes        - byte length of derived key.
  * @return      0:success     other:error
  */
-unsigned int pbkdf2_hmac(HASH_ALG hash_alg, unsigned char *pwd, unsigned short sp_key_idx, unsigned int pwd_bytes, unsigned char *salt, unsigned int salt_bytes,
-        unsigned int iter, unsigned char *out, unsigned int out_bytes)
+unsigned int pbkdf2_hmac(HASH_ALG hash_alg, unsigned char *pwd, unsigned short sp_key_idx, unsigned int pwd_bytes, unsigned char *salt, unsigned int salt_bytes, unsigned int iter, unsigned char *out, unsigned int out_bytes)
 {
-    unsigned int i;
-    int j;
-    unsigned int digest_words, digest_bytes, tmp_bytes;
-    unsigned char counter[4] = {0,0,0,1};
-    unsigned int tmp[HASH_DIGEST_MAX_WORD_LEN];
-    unsigned int mac[HASH_DIGEST_MAX_WORD_LEN];
-    unsigned int ret;
+    unsigned int  i;
+    int           j;
+    unsigned int  digest_words, digest_bytes, tmp_bytes;
+    unsigned char counter[4] = {0, 0, 0, 1};
+    unsigned int  tmp[HASH_DIGEST_MAX_WORD_LEN];
+    unsigned int  mac[HASH_DIGEST_MAX_WORD_LEN];
+    unsigned int  ret;
 
     HMAC_CTX ctx[1];
 
@@ -100,54 +97,44 @@ unsigned int pbkdf2_hmac(HASH_ALG hash_alg, unsigned char *pwd, unsigned short s
     HMAC_CTX ctx_bak[1];
 #endif
 
-    if(HASH_SUCCESS != check_hash_alg(hash_alg))
-    {
+    if (HASH_SUCCESS != check_hash_alg(hash_alg)) {
         return HASH_INPUT_INVALID;
-    }
-    else if(NULL == out)
-    {
+    } else if (NULL == out) {
         return HASH_BUFFER_NULL;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    if(NULL == pwd)
-    {
+    if (NULL == pwd) {
         pwd_bytes = 0;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    if(NULL == salt)
-    {
+    if (NULL == salt) {
         salt_bytes = 0;
+    } else {
+        ;
     }
-    else
-    {;}
 
     digest_words = hash_get_digest_word_len(hash_alg);
-    digest_bytes = 4*digest_words;
+    digest_bytes = 4 * digest_words;
 
 #ifdef PBKDF2_HIGH_SPEED
-    ret  = hmac_init(ctx, hash_alg, pwd, sp_key_idx, pwd_bytes);
-    if(HASH_SUCCESS != ret)
-    {
+    ret = hmac_init(ctx, hash_alg, pwd, sp_key_idx, pwd_bytes);
+    if (HASH_SUCCESS != ret) {
         goto END;
+    } else {
+        ;
     }
-    else
-    {;}
 
     pbkdf2_hmac_backup(ctx_bak, ctx);
 #endif
 
-    while(out_bytes)
-    {
-        if(out_bytes > digest_bytes)
-        {
+    while (out_bytes) {
+        if (out_bytes > digest_bytes) {
             tmp_bytes = digest_bytes;
-        }
-        else
-        {
+        } else {
             tmp_bytes = out_bytes;
         }
 
@@ -156,49 +143,43 @@ unsigned int pbkdf2_hmac(HASH_ALG hash_alg, unsigned char *pwd, unsigned short s
         pbkdf2_hmac_recover(ctx, ctx_bak);
         ret = 0;
 #else
-        ret  = hmac_init(ctx, hash_alg, pwd, sp_key_idx, pwd_bytes);
+        ret = hmac_init(ctx, hash_alg, pwd, sp_key_idx, pwd_bytes);
 #endif
-        ret |= hash_update(ctx->hash_ctx, salt, salt_bytes);//hmac_update(ctx, salt, salt_bytes);
-        ret |= hash_update(ctx->hash_ctx, counter, 4);      //hmac_update(ctx, counter, 4);
+        ret |= hash_update(ctx->hash_ctx, salt, salt_bytes); //hmac_update(ctx, salt, salt_bytes);
+        ret |= hash_update(ctx->hash_ctx, counter, 4);       //hmac_update(ctx, counter, 4);
         ret |= hmac_final(ctx, (unsigned char *)mac);
-        if(HASH_SUCCESS != ret)
-        {
+        if (HASH_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
         uint32_copy(tmp, mac, digest_words);
 
-        for(i=1; i<iter; i++)
-        {
+        for (i = 1; i < iter; i++) {
 #ifdef PBKDF2_HIGH_SPEED
             pbkdf2_hmac_recover(ctx, ctx_bak);
             ret = 0;
 #else
-            ret  = hmac_init(ctx, hash_alg, pwd, sp_key_idx, pwd_bytes);
+            ret = hmac_init(ctx, hash_alg, pwd, sp_key_idx, pwd_bytes);
 #endif
             ret |= hash_update(ctx->hash_ctx, (unsigned char *)tmp, digest_bytes);
             ret |= hmac_final(ctx, (unsigned char *)tmp);
-            if(HASH_SUCCESS != ret)
-            {
+            if (HASH_SUCCESS != ret) {
                 goto END;
+            } else {
+                ;
             }
-            else
-            {;}
 
-            for(j=0; j<(int)digest_words; j++)
-            {
+            for (j = 0; j < (int)digest_words; j++) {
                 mac[j] ^= tmp[j];
             }
         }
 
         //add 1
-        for(j=3; j>-1; j--)
-        {
+        for (j = 3; j > -1; j--) {
             counter[j] += 1;
-            if(counter[j] != 0)
-            {
+            if (counter[j] != 0) {
                 break;
             }
         }
@@ -215,4 +196,3 @@ END:
 
     return ret;
 }
-

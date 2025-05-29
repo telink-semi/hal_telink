@@ -26,19 +26,14 @@
 #include "stack/ble/ble.h"
 
 
-#define CSISS_DEFAULT_LOCK_TIMEOUT              60      //60s
-#define CSISS_DEFAULT_PLAIN_SIRK                {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0f, 0x10}        //must 16byte
+#define CSISS_DEFAULT_LOCK_TIMEOUT 60                                                                                               //60s
+#define CSISS_DEFAULT_PLAIN_SIRK   {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0f, 0x10} //must 16byte
 
 const blc_csiss_regParam_t defaultCsipSetMemberParam =
-{
-        .setSize = 2,
-        .setRank = 1,
+    {
+        .setSize       = 2,
+        .setRank       = 1,
         .lockedTimeout = CSISS_DEFAULT_LOCK_TIMEOUT,
-        .SIRK_type = 1,
-        .SIRK = CSISS_DEFAULT_PLAIN_SIRK,
+        .SIRK_type     = 1,
+        .SIRK          = CSISS_DEFAULT_PLAIN_SIRK,
 };
-
-
-
-
-

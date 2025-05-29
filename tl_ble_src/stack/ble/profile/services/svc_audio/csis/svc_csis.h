@@ -25,7 +25,8 @@
 
 //CSIS: Coordinated Set Identification Service
 
-typedef struct{
+typedef struct
+{
     u8 type;
     u8 value[16];
 } svc_csis_SIRK_t;

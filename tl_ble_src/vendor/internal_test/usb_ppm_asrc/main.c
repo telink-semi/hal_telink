@@ -29,18 +29,19 @@
 
 #if (INTER_TEST_MODE == TEST_USB_PPM_ASRC)
 
-extern void app_usb_irq_proc (void);
+extern void app_usb_irq_proc(void);
 
 /**
  * @brief       usb interrupt handler.
  * @param[in]   none
  * @return      none
  */
-_attribute_ram_code_ void  usb_endpoint_irq_handler (void)
+_attribute_ram_code_ void usb_endpoint_irq_handler(void)
 {
     app_usb_irq_proc();
 }
 PLIC_ISR_REGISTER(usb_endpoint_irq_handler, IRQ_USB_ENDPOINT)
+
 //_attribute_ram_code_ void timer0_irq_handler(void)
 //{
 //    //Attention: AES_CCM_Encryption in IRQ, AES_CCM_Decryption in main_loop maybe overlap!!!
@@ -69,32 +70,30 @@ _attribute_ram_code_ int main(void)
     blc_pm_select_internal_32k_crystal();
 
     #if (MCU_CORE_TYPE == MCU_CORE_B91)
-        sys_init(DCDC_1P4_LDO_1P8, VBAT_MAX_VALUE_GREATER_THAN_3V6,INTERNAL_CAP_XTAL24M);
+    sys_init(DCDC_1P4_LDO_1P8, VBAT_MAX_VALUE_GREATER_THAN_3V6, INTERNAL_CAP_XTAL24M);
     #elif (MCU_CORE_TYPE == MCU_CORE_B92)
-        sys_init(DCDC_1P4_LDO_2P0, VBAT_MAX_VALUE_GREATER_THAN_3V6, GPIO_VOLTAGE_3V3, INTERNAL_CAP_XTAL24M);
-        wd_32k_stop();          //todo: Deep wakeup shall not call wd stop after A1. Jaguar A0 have problem on PM now, so call 32k watchdog stop here now. See <Skype-B91m driver: 2022-10-25>
+    sys_init(DCDC_1P4_LDO_2P0, VBAT_MAX_VALUE_GREATER_THAN_3V6, GPIO_VOLTAGE_3V3, INTERNAL_CAP_XTAL24M);
+    wd_32k_stop(); //todo: Deep wakeup shall not call wd stop after A1. Jaguar A0 have problem on PM now, so call 32k watchdog stop here now. See <Skype-B91m driver: 2022-10-25>
     #endif
 
     /* detect if MCU is wake_up from deep retention mode */
-    int deepRetWakeUp = pm_is_MCU_deepRetentionWakeup();  //MCU deep retention wakeUp
+    int deepRetWakeUp = pm_is_MCU_deepRetentionWakeup(); //MCU deep retention wakeUp
 
     CCLK_96M_HCLK_48M_PCLK_24M;
     //rf_drv_ble_init();
 
-//  gpio_init(!deepRetWakeUp);
+    //  gpio_init(!deepRetWakeUp);
 
-    if( deepRetWakeUp ){ //MCU wake_up from deepSleep retention mode
-        user_init_deepRetn ();
-    }
-    else{ //MCU power_on or wake_up from deepSleep mode
+    if (deepRetWakeUp) { //MCU wake_up from deepSleep retention mode
+        user_init_deepRetn();
+    } else {             //MCU power_on or wake_up from deepSleep mode
         user_init_normal();
     }
 
-    irq_enable();//audio_get_rx_dma_wptr
+    irq_enable(); //audio_get_rx_dma_wptr
 
-    while(1)
-    {
-        main_loop ();
+    while (1) {
+        main_loop();
     }
     return 0;
 }

@@ -49,7 +49,7 @@ void user_init_deepRetn(void);
  * @param[in]  none.
  * @return     none.
  */
-int main_idle_loop (void);
+int main_idle_loop(void);
 
 
 /**
@@ -57,7 +57,7 @@ int main_idle_loop (void);
  * @param[in]  none.
  * @return     none.
  */
-void main_loop (void);
+void main_loop(void);
 
 
 /**
@@ -67,7 +67,7 @@ void main_loop (void);
  * @param[in]  n       the length of event parameter.
  * @return
  */
-int app_controller_event_callback (u32 h, u8 *p, int n);
+int app_controller_event_callback(u32 h, u8 *p, int n);
 
 
 /**
@@ -77,7 +77,7 @@ int app_controller_event_callback (u32 h, u8 *p, int n);
  * @param[in]  n       the length of event parameter.
  * @return
  */
-int app_host_event_callback (u32 h, u8 *para, int n);
+int app_host_event_callback(u32 h, u8 *para, int n);
 
 /**
  * @brief     Configuration of the Legacy advertising parameter

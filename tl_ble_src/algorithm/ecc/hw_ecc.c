@@ -38,17 +38,23 @@ eccp_curve_t* blt_ecc_get_eccp_curve(ecc_curve_t curve)
 //          pEccCurve = (eccp_curve_t*)secp160r1;
 //      break;
 
+#ifdef SUPPORT_SECP192R1
         case ECC_use_secp192r1:
             pEccCurve = (eccp_curve_t*)secp192r1;
         break;
+#endif
 
+#ifdef SUPPORT_SECP224R1
         case ECC_use_secp224r1:
             pEccCurve = (eccp_curve_t*)secp224r1;
         break;
+#endif
 
+#ifdef SUPPORT_SECP256R1
         case ECC_use_secp256r1:
             pEccCurve = (eccp_curve_t*)secp256r1;
         break;
+#endif
 
 //      case ECC_use_secp256k1:
 //          pEccCurve = (eccp_curve_t*)secp256k1;
@@ -69,10 +75,8 @@ static hECC_rng_func g_rng_function = NULL;
 void hwECC_set_rng(hECC_rng_func rng_func) {
     g_rng_function = rng_func;
 
-#if ((MCU_CORE_TYPE == MCU_CORE_TL751X))
+#if ((MCU_CORE_TYPE == MCU_CORE_TL751X) || (MCU_CORE_TYPE == MCU_CORE_TL322X) || (MCU_CORE_TYPE == MCU_CORE_TL323X) )
     pke_dig_en();
-#else
-  //  #warning  "Please check whether the chip enable PKE by default"
 #endif
 
 }

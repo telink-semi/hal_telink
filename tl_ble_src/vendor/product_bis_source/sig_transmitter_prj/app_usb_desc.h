@@ -27,13 +27,14 @@
 
 #if (PRODUCT_BIS_SOURCE_SELECT == PRODUCT_SIG_AURACAST_TRANSMITTER)
 
-typedef struct{
+typedef struct
+{
     u16 vendorId;
     u16 productId;
     u32 speakSampleRate;
-    u8 speakNum;
+    u8  speakNum;
 } vendor_usbDesc_t;
 
-void app_usb_changeDesc(vendor_usbDesc_t* newDesc);
+void app_usb_changeDesc(vendor_usbDesc_t *newDesc);
 
-#endif  //PRODUCT_BIS_SOURCE_SELECT == PRODUCT_SIG_AURACAST_TRANSMITTER
+#endif //PRODUCT_BIS_SOURCE_SELECT == PRODUCT_SIG_AURACAST_TRANSMITTER

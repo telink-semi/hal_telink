@@ -34,44 +34,37 @@
 
 void app_configLegacyScanParam(void)
 {
-    blc_ll_setScanEnable (BLC_SCAN_DISABLE, DUP_FILTER_DISABLE);
+    blc_ll_setScanEnable(BLC_SCAN_DISABLE, DUP_FILTER_DISABLE);
     u8 local_addr_type = OWN_ADDRESS_PUBLIC;
     //ACL Central RPA Configuration - 1: ACL Central role.
     //If bond number is not 0, add the latest bonding device to resolving list and white list and set SCAN Filter Policy to SCAN_FP_ALLOW_ADV_WL.
     //Only the latest bonding device ADV can be reported and connected.
     u8 bond_number = blc_smp_param_getCurrentBondingDeviceNumber(1, 0);
-    if(bond_number != 0)    //No bondind device
+    if (bond_number != 0) //No bondind device
     {
         local_addr_type = OWN_ADDRESS_RESOLVE_PRIVATE_PUBLIC;
-        tlkapi_printf(APP_LOG_EN,"bond number addr not 0, is %x\n", bond_number);
+        tlkapi_printf(APP_LOG_EN, "bond number addr not 0, is %x\n", bond_number);
 
-        smp_param_save_t  bondInfo;
-        blc_smp_loadBondingInfoFromFlashByIndex(1, 0, bond_number-1, &bondInfo);  //get the latest bonding device (index: bond_number-1 )
-        tlkapi_send_string_data(APP_LOG_EN,"[APP][SMP] bondInfo.peer_irk", bondInfo.peer_irk, 16);
-        tlkapi_send_string_data(APP_LOG_EN,"[APP][SMP] bondInfo.local_irk", bondInfo.local_irk, 16);
-        if(!blc_app_isIrkValid(bondInfo.peer_irk))
-        {
+        smp_param_save_t bondInfo;
+        blc_smp_loadBondingInfoFromFlashByIndex(1, 0, bond_number - 1, &bondInfo); //get the latest bonding device (index: bond_number-1 )
+        tlkapi_send_string_data(APP_LOG_EN, "[APP][SMP] bondInfo.peer_irk", bondInfo.peer_irk, 16);
+        tlkapi_send_string_data(APP_LOG_EN, "[APP][SMP] bondInfo.local_irk", bondInfo.local_irk, 16);
+        if (!blc_app_isIrkValid(bondInfo.peer_irk)) {
             memset(bondInfo.peer_irk, 0, 16);
         }
-        if(!blc_app_isIrkValid(bondInfo.local_irk))
-        {
+        if (!blc_app_isIrkValid(bondInfo.local_irk)) {
             local_addr_type = OWN_ADDRESS_PUBLIC;
             memset(bondInfo.local_irk, 0, 16);
         }
         //add bonding message to resolve list
-        blc_ll_addDeviceToResolvingList(bondInfo.peer_id_adrType,bondInfo.peer_id_addr,bondInfo.peer_irk,bondInfo.local_irk);
-
+        blc_ll_addDeviceToResolvingList(bondInfo.peer_id_adrType, bondInfo.peer_id_addr, bondInfo.peer_irk, bondInfo.local_irk);
 
 
         blc_ll_setAddressResolutionEnable(1);
     }
     //should set scan mode again to scan slave ADV packet
-    blc_ll_setScanParameter(SCAN_TYPE_PASSIVE, SCAN_INTERVAL_100MS, SCAN_WINDOW_50MS,
-            local_addr_type, SCAN_FP_ALLOW_ADV_ANY);
-    blc_ll_setScanEnable (BLC_SCAN_ENABLE, DUP_FILTER_DISABLE);
+    blc_ll_setScanParameter(SCAN_TYPE_PASSIVE, SCAN_INTERVAL_100MS, SCAN_WINDOW_50MS, local_addr_type, SCAN_FP_ALLOW_ADV_ANY);
+    blc_ll_setScanEnable(BLC_SCAN_ENABLE, DUP_FILTER_DISABLE);
 }
 
 #endif //end of (FEATURE_TEST_MODE == ...)
-
-
-

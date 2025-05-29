@@ -44,7 +44,6 @@
 // ~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*
 
 
-
 /**
  * @brief Used to setup the data timing parameters of the MCAN module
  * This is a simplified struct, requiring only the prescaler value (1:x), number of time quanta before and after the sample point.
@@ -64,7 +63,6 @@ typedef struct
     uint8_t DataTqAfterSamplePoint : 5;
 
 } TCAN4x5x_MCAN_Data_Timing_Simple;
-
 
 /**
  * @brief Used to setup the timing parameters of the MCAN module
@@ -98,12 +96,11 @@ typedef struct
 
 } TCAN4x5x_MCAN_Data_Timing_Raw;
 
-
 /**
  * @brief Used to setup the nominal timing parameters of the MCAN module
  * This is a simplified struct, requiring only the prescaler value (1:x), number of time quanta before and after the sample point.
  */
-typedef struct
+typedef struct __attribute__((packed))
 {
     //! @brief NBRP: The prescaler value from the MCAN system clock. Value interpreted as 1:x
     //! \n Valid range is: 1 to 512
@@ -118,7 +115,6 @@ typedef struct
     uint8_t NominalTqAfterSamplePoint : 8;
 
 } TCAN4x5x_MCAN_Nominal_Timing_Simple;
-
 
 /**
  * @brief Used to setup the nominal timing parameters of the MCAN module
@@ -142,7 +138,6 @@ typedef struct
     //! \n Valid values are: 0 to 127
     uint8_t NominalSyncJumpWidth : 7;
 } TCAN4x5x_MCAN_Nominal_Timing_Raw;
-
 
 /**
  * @brief Data payload defines for the different MRAM sections, used by the @c TCAN4x5x_MRAM_Config struct
@@ -234,11 +229,10 @@ typedef struct
 
 } TCAN4x5x_MRAM_Config;
 
-
 /**
  * @brief struct containing the bit fields of the MCAN CCCR register
  */
-typedef struct
+typedef struct __attribute__((packed))
 {
     union
     {
@@ -296,17 +290,16 @@ typedef struct
     };
 } TCAN4x5x_MCAN_CCCR_Config;
 
-
-
 /**
  * @brief Struct containing the MCAN interrupt bit field
  */
-typedef struct
+typedef struct __attribute__((packed))
 {
     union
     {
         //! @brief Full register as single 32-bit word
         uint32_t word;
+
         struct
         {
             //! @brief IR[0] RF0N: Rx FIFO 0 new message
@@ -405,16 +398,16 @@ typedef struct
     };
 } TCAN4x5x_MCAN_Interrupts;
 
-
 /**
  * @brief Struct containing the MCAN interrupt enable bit field
  */
-typedef struct
+typedef struct __attribute__((packed))
 {
     union
     {
         //! Full register as single 32-bit word
         uint32_t word;
+
         struct
         {
             //! @brief IE[0] RF0NE: Rx FIFO 0 new message
@@ -513,7 +506,6 @@ typedef struct
     };
 } TCAN4x5x_MCAN_Interrupt_Enable;
 
-
 /**
  * @brief CAN message header
  */
@@ -552,69 +544,67 @@ typedef struct
     //! @brief Accepted non matching frame flag
     uint8_t ANMF : 1;
 
-} TCAN4x5x_MCAN_RX_Header ;
-
+} TCAN4x5x_MCAN_RX_Header;
 
 /**
  * @brief CAN message header for transmitted messages
  */
 typedef struct
 {
-   //! @brief CAN ID to send
+    //! @brief CAN ID to send
     uint32_t ID : 29;
 
-   //! @brief Remote Transmission Request flag
+    //! @brief Remote Transmission Request flag
     uint8_t RTR : 1;
 
-   //! @brief Extended Identifier flag
+    //! @brief Extended Identifier flag
     uint8_t XTD : 1;
 
-   //! @brief Error state indicator flag
+    //! @brief Error state indicator flag
     uint8_t ESI : 1;
 
-   //! @brief Data length code
+    //! @brief Data length code
     uint8_t DLC : 4;
 
-   //! @brief Bit rate switch used flag
+    //! @brief Bit rate switch used flag
     uint8_t BRS : 1;
 
-   //! @brief CAN FD Format flag
+    //! @brief CAN FD Format flag
     uint8_t FDF : 1;
 
-   //! @brief Reserved
+    //! @brief Reserved
     uint8_t reserved : 1;
 
-   //! @brief Event FIFO Control flag, to store tx events or not
+    //! @brief Event FIFO Control flag, to store tx events or not
     uint8_t EFC : 1;
 
-   //! @brief Message Marker, used if @c EFC is set to 1
+    //! @brief Message Marker, used if @c EFC is set to 1
     uint8_t MM : 8;
 
 } TCAN4x5x_MCAN_TX_Header;
 
-
 typedef enum
 {
     //! Disabled filter. This filter will do nothing if it matches a packet
-    TCAN4x5x_SID_SFEC_DISABLED          = 0x0,
+    TCAN4x5x_SID_SFEC_DISABLED = 0x0,
 
     //! Store in RX FIFO 0 if the filter matches the incoming message
-    TCAN4x5x_SID_SFEC_STORERX0          = 0x1,
+    TCAN4x5x_SID_SFEC_STORERX0 = 0x1,
 
     //! Store in RX FIFO 1 if the filter matches the incoming message
-    TCAN4x5x_SID_SFEC_STORERX1          = 0x2,
+    TCAN4x5x_SID_SFEC_STORERX1 = 0x2,
 
     //! Reject the packet (do not store, do not notify MCU) if the filter matches the incoming message
-    TCAN4x5x_SID_SFEC_REJECTMATCH       = 0x3,
+    TCAN4x5x_SID_SFEC_REJECTMATCH = 0x3,
 
     //! Store in default location but set a high priority message interrupt if the filter matches the incoming message
-    TCAN4x5x_SID_SFEC_PRIORITY          = 0x4,
+    TCAN4x5x_SID_SFEC_PRIORITY = 0x4,
 
     //! Store in RX FIFO 0 and set a high priority message interrupt if the filter matches the incoming message
-    TCAN4x5x_SID_SFEC_PRIORITYSTORERX0  = 0x5,
+    TCAN4x5x_SID_SFEC_PRIORITYSTORERX0 = 0x5,
 
     //! Store in RX FIFO 1 and set a high priority message interrupt if the filter matches the incoming message
-    TCAN4x5x_SID_SFEC_PRIORITYSTORERX1  = 0x6,
+    TCAN4x5x_SID_SFEC_PRIORITYSTORERX1 = 0x6,
 
     //! Store in RX Buffer for debug if the filter matches the incoming message. SFT is ignored if this is selected.
     TCAN4x5x_SID_SFEC_STORERXBUFORDEBUG = 0x7
@@ -623,23 +613,22 @@ typedef enum
 typedef enum
 {
     //! Disabled filter. This filter will match nothing
-    TCAN4x5x_SID_SFT_DISABLED           = 0x3,
+    TCAN4x5x_SID_SFT_DISABLED = 0x3,
 
     //! Classic filter with SFID1 as the ID to match, and SFID2 as the bit mask that applies to SFID1
-    TCAN4x5x_SID_SFT_CLASSIC            = 0x2,
+    TCAN4x5x_SID_SFT_CLASSIC = 0x2,
 
     //! Dual ID filter, where both SFID1 and SFID2 hold IDs that can match (must match exactly)
-    TCAN4x5x_SID_SFT_DUALID             = 0x1,
+    TCAN4x5x_SID_SFT_DUALID = 0x1,
 
     //! Range Filter. SFID1 holds the start address, and SFID2 holds the end address. Any address in between will match
-    TCAN4x5x_SID_SFT_RANGE              = 0x0
+    TCAN4x5x_SID_SFT_RANGE = 0x0
 } TCAN4x5x_SID_SFT_Values;
-
 
 /**
  * @brief Standard ID filter struct
  */
-typedef struct
+typedef struct __attribute__((packed))
 {
     union
     {
@@ -666,30 +655,28 @@ typedef struct
     };
 } TCAN4x5x_MCAN_SID_Filter;
 
-
-
 typedef enum
 {
     //! Disabled filter. This filter will do nothing if it matches a packet
-    TCAN4x5x_XID_EFEC_DISABLED          = 0x0,
+    TCAN4x5x_XID_EFEC_DISABLED = 0x0,
 
     //! Store in RX FIFO 0 if the filter matches the incoming message
-    TCAN4x5x_XID_EFEC_STORERX0          = 0x1,
+    TCAN4x5x_XID_EFEC_STORERX0 = 0x1,
 
     //! Store in RX FIFO 1 if the filter matches the incoming message
-    TCAN4x5x_XID_EFEC_STORERX1          = 0x2,
+    TCAN4x5x_XID_EFEC_STORERX1 = 0x2,
 
     //! Reject the packet (do not store, do not notify MCU) if the filter matches the incoming message
-    TCAN4x5x_XID_EFEC_REJECTMATCH       = 0x3,
+    TCAN4x5x_XID_EFEC_REJECTMATCH = 0x3,
 
     //! Store in default location but set a high priority message interrupt if the filter matches the incoming message
-    TCAN4x5x_XID_EFEC_PRIORITY          = 0x4,
+    TCAN4x5x_XID_EFEC_PRIORITY = 0x4,
 
     //! Store in RX FIFO 0 and set a high priority message interrupt if the filter matches the incoming message
-    TCAN4x5x_XID_EFEC_PRIORITYSTORERX0  = 0x5,
+    TCAN4x5x_XID_EFEC_PRIORITYSTORERX0 = 0x5,
 
     //! Store in RX FIFO 1 and set a high priority message interrupt if the filter matches the incoming message
-    TCAN4x5x_XID_EFEC_PRIORITYSTORERX1  = 0x6,
+    TCAN4x5x_XID_EFEC_PRIORITYSTORERX1 = 0x6,
 
     //! Store in RX Buffer for debug if the filter matches the incoming message.
     TCAN4x5x_XID_EFEC_STORERXBUFORDEBUG = 0x7
@@ -698,25 +685,23 @@ typedef enum
 typedef enum
 {
     //! Range filter from EFID1 to EFID2, The XIDAM mask is not applied
-    TCAN4x5x_XID_EFT_RANGENOMASK        = 0x3,
+    TCAN4x5x_XID_EFT_RANGENOMASK = 0x3,
 
     //! Classic Filter, EFID1 is the ID/filter, and EFID2 is the mask
-    TCAN4x5x_XID_EFT_CLASSIC            = 0x2,
+    TCAN4x5x_XID_EFT_CLASSIC = 0x2,
 
     //! Dual ID filter matches if the incoming ID matches EFID1 or EFID2
-    TCAN4x5x_XID_EFT_DUALID             = 0x1,
+    TCAN4x5x_XID_EFT_DUALID = 0x1,
 
     //! Range filter from EFID1 to EFID2
-    TCAN4x5x_XID_EFT_RANGE              = 0x0
+    TCAN4x5x_XID_EFT_RANGE = 0x0
 } TCAN4x5x_XID_EFT_Values;
-
 
 /**
  * @brief Extended ID filter struct
  */
 typedef struct
 {
-
     //! @brief EFID2[28:0]
     uint32_t EFID2 : 29;
 
@@ -733,24 +718,25 @@ typedef struct
     TCAN4x5x_XID_EFEC_Values EFEC : 3;
 } TCAN4x5x_MCAN_XID_Filter;
 
-
-typedef enum {
+typedef enum
+{
     TCAN4x5x_GFC_ACCEPT_INTO_RXFIFO0 = 0,
     TCAN4x5x_GFC_ACCEPT_INTO_RXFIFO1 = 1,
-    TCAN4x5x_GFC_REJECT = 2
+    TCAN4x5x_GFC_REJECT              = 2
 } TCAN4x5x_GFC_NO_MATCH_BEHAVIOR;
 
 /**
  * @brief Struct containing the register values for the Global Filter Configuration Register
  */
-typedef struct
+typedef struct __attribute__((packed))
 {
     union
     {
         //! Full word of register
         uint32_t word;
 
-        struct {
+        struct
+        {
             //! @brief GFC[0] :  Reject Remote Frames for Extended IDs
             uint8_t RRFE : 1;
 
@@ -777,8 +763,6 @@ typedef struct
     };
 } TCAN4x5x_MCAN_Global_Filter_Configuration;
 
-
-
 // ~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*
 //                        TCAN4x5x Device Structures
 // ~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*
@@ -787,7 +771,7 @@ typedef struct
 /**
  * @brief Struct containing the device interrupt bit field
  */
-typedef struct
+typedef struct __attribute__((packed))
 {
     union
     {
@@ -898,7 +882,7 @@ typedef struct
 /**
  * @brief Struct containing the device interrupt enable bit field
  */
-typedef struct
+typedef struct __attribute__((packed))
 {
     union
     {
@@ -985,44 +969,43 @@ typedef struct
     };
 } TCAN4x5x_Device_Interrupt_Enable;
 
-
 typedef enum
 {
-    TCAN4x5x_DEV_CONFIG_GPO1_SPI_FAULT_INT = 0,
-    TCAN4x5x_DEV_CONFIG_GPO1_MCAN_INT1 = 1,
+    TCAN4x5x_DEV_CONFIG_GPO1_SPI_FAULT_INT                = 0,
+    TCAN4x5x_DEV_CONFIG_GPO1_MCAN_INT1                    = 1,
     TCAN4x5x_DEV_CONFIG_GPO1_UNDER_VOLTAGE_OR_THERMAL_INT = 2,
 } TCAN4x5x_DEV_CONFIG_GPO1_CONFIG;
 
 typedef enum
 {
-    TCAN4x5x_DEV_CONFIG_GPIO1_CONFIG_GPO = 0,
+    TCAN4x5x_DEV_CONFIG_GPIO1_CONFIG_GPO            = 0,
     TCAN4x5x_DEV_CONFIG_GPIO1_CONFIG_WATCHDOG_INPUT = 2
 } TCAN4x5x_DEV_CONFIG_GPIO1_CONFIG;
 
 typedef enum
 {
-    TCAN4x5x_DEV_CONFIG_WDT_ACTION_nINT = 0,
-    TCAN4x5x_DEV_CONFIG_WDT_ACTION_PULSE_INH = 1,
+    TCAN4x5x_DEV_CONFIG_WDT_ACTION_nINT             = 0,
+    TCAN4x5x_DEV_CONFIG_WDT_ACTION_PULSE_INH        = 1,
     TCAN4x5x_DEV_CONFIG_WDT_ACTION_PULSE_WDT_OUTPUT = 2
 } TCAN4x5x_DEV_CONFIG_WDT_ACTION;
 
 typedef enum
 {
-    TCAN4x5x_DEV_CONFIG_GPO2_NO_ACTION = 0,
-    TCAN4x5x_DEV_CONFIG_GPO2_MCAN_INT0 = 1,
-    TCAN4x5x_DEV_CONFIG_GPO2_WATCHDOG = 2,
+    TCAN4x5x_DEV_CONFIG_GPO2_NO_ACTION  = 0,
+    TCAN4x5x_DEV_CONFIG_GPO2_MCAN_INT0  = 1,
+    TCAN4x5x_DEV_CONFIG_GPO2_WATCHDOG   = 2,
     TCAN4x5x_DEV_CONFIG_GPO2_MIRROR_INT = 3
 } TCAN4x5x_DEV_CONFIG_GPO2_CONFIG;
 
 typedef enum
 {
-    TCAN4x5x_DEV_CONFIG_WAKE_DISABLED = 0,
-    TCAN4x5x_DEV_CONFIG_WAKE_RISING_EDGE = 1,
+    TCAN4x5x_DEV_CONFIG_WAKE_DISABLED     = 0,
+    TCAN4x5x_DEV_CONFIG_WAKE_RISING_EDGE  = 1,
     TCAN4x5x_DEV_CONFIG_WAKE_FALLING_EDGE = 2,
-    TCAN4x5x_DEV_CONFIG_WAKE_BOTH_EDGES = 3
+    TCAN4x5x_DEV_CONFIG_WAKE_BOTH_EDGES   = 3
 } TCAN4x5x_DEV_CONFIG_WAKE_CONFIG;
 
-typedef struct
+typedef struct __attribute__((packed))
 {
     union
     {
@@ -1037,7 +1020,7 @@ typedef struct
 
             //! @brief DEV_MODE_PINS[1] : Sleep wake error disable.
             //! Setting this to 1 will disable the 4 minute timer that puts the part back to sleep if no activity is detected
-            uint8_t SWE_DIS: 1;
+            uint8_t SWE_DIS : 1;
 
             //! @brief DEV_MODE_PINS[2] : Device reset. Write a 1 to perform a reset on the part
             uint8_t DEVICE_RESET : 1;

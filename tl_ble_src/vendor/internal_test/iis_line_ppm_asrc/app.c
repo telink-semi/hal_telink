@@ -42,13 +42,11 @@ int my_usb_audio_debug(unsigned char *p, int len)
 {
     my_dump_str_data(1, "my_usb_audio_debug receive\r\n", p, len);
 
-    if (p[0] != 0x11)
-    {
+    if (p[0] != 0x11) {
         return 1;
     }
 
-    switch (p[1])
-    {
+    switch (p[1]) {
     case 0:
         break;
     default:
@@ -56,8 +54,6 @@ int my_usb_audio_debug(unsigned char *p, int len)
     }
     return 0;
 }
-
-
 
 /**
  * @brief       This function servers to set the time for the next timer interrupt.
@@ -67,32 +63,28 @@ int my_usb_audio_debug(unsigned char *p, int len)
  * @param[in]   cap_tick - the time for the next timer interrupt,
  * @return      none.
  */
-_attribute_ram_code_ void my_timer_set_mode(timer_type_e type, timer_mode_e mode,unsigned int init_tick, unsigned int cap_tick)
+_attribute_ram_code_ void my_timer_set_mode(timer_type_e type, timer_mode_e mode, unsigned int init_tick, unsigned int cap_tick)
 {
-    u32 r = core_interrupt_disable ();
+    u32 r              = core_interrupt_disable();
     reg_tmr_tick(type) = init_tick;
     reg_tmr_capt(type) = cap_tick;
 
-    switch(type)
-    {
-        case TIMER0:
-            reg_tmr_sta |= FLD_TMR_STA_TMR0; //clear irq status
-            reg_tmr_ctrl0 &= (~FLD_TMR0_MODE);
-            reg_tmr_ctrl0 |= mode;
-            break;
-        case TIMER1:
-            reg_tmr_sta |= FLD_TMR_STA_TMR1; //clear irq status
-            reg_tmr_ctrl0 &= (~FLD_TMR1_MODE);
-            reg_tmr_ctrl0 |= (mode<<4);
-            break;
-        default:
-            break;
+    switch (type) {
+    case TIMER0:
+        reg_tmr_sta |= FLD_TMR_STA_TMR0; //clear irq status
+        reg_tmr_ctrl0 &= (~FLD_TMR0_MODE);
+        reg_tmr_ctrl0 |= mode;
+        break;
+    case TIMER1:
+        reg_tmr_sta |= FLD_TMR_STA_TMR1; //clear irq status
+        reg_tmr_ctrl0 &= (~FLD_TMR1_MODE);
+        reg_tmr_ctrl0 |= (mode << 4);
+        break;
+    default:
+        break;
     }
-    core_restore_interrupt (r);
+    core_restore_interrupt(r);
 }
-
-
-
 
 /**
  * @brief       This function servers to start the timer.
@@ -101,22 +93,19 @@ _attribute_ram_code_ void my_timer_set_mode(timer_type_e type, timer_mode_e mode
  */
 _attribute_ram_code_ void my_timer_start(timer_type_e type)
 {
-    u32 r = core_interrupt_disable ();
-    switch(type)
-    {
-        case TIMER0:
-            reg_tmr_ctrl0 |= FLD_TMR0_EN;
-            break;
-        case TIMER1:
-            reg_tmr_ctrl0 |= FLD_TMR1_EN;
-            break;
-        default:
-            break;
+    u32 r = core_interrupt_disable();
+    switch (type) {
+    case TIMER0:
+        reg_tmr_ctrl0 |= FLD_TMR0_EN;
+        break;
+    case TIMER1:
+        reg_tmr_ctrl0 |= FLD_TMR1_EN;
+        break;
+    default:
+        break;
     }
-    core_restore_interrupt (r);
+    core_restore_interrupt(r);
 }
-
-
 
 /**
  * @brief       This function servers to stop the timer.
@@ -125,21 +114,20 @@ _attribute_ram_code_ void my_timer_start(timer_type_e type)
  */
 _attribute_ram_code_ void my_timer_stop(timer_type_e type)
 {
-    u32 r = core_interrupt_disable ();
-    switch(type)
-    {
-        case TIMER0:
-            reg_tmr_ctrl0 &= (~FLD_TMR0_EN);
-            timer_clr_irq_status(FLD_TMR_STA_TMR0);
-            break;
-        case TIMER1:
-            reg_tmr_ctrl0 &= (~FLD_TMR1_EN);
-            timer_clr_irq_status(FLD_TMR_STA_TMR1);
-            break;
-        default:
-            break;
+    u32 r = core_interrupt_disable();
+    switch (type) {
+    case TIMER0:
+        reg_tmr_ctrl0 &= (~FLD_TMR0_EN);
+        timer_clr_irq_status(FLD_TMR_STA_TMR0);
+        break;
+    case TIMER1:
+        reg_tmr_ctrl0 &= (~FLD_TMR1_EN);
+        timer_clr_irq_status(FLD_TMR_STA_TMR1);
+        break;
+    default:
+        break;
     }
-    core_restore_interrupt (r);
+    core_restore_interrupt(r);
 }
 
 /**
@@ -150,11 +138,11 @@ _attribute_ram_code_ void my_timer_stop(timer_type_e type)
 _attribute_ram_code_ void stimer_irq_handler(void)
 {
     log_task_begin_irq(1, SL01_IRQ);
-    my_timer_set_mode(TIMER0, TIMER_MODE_SYSCLK, 0,  (ASRC_OFFSET0_TICK* SYSTEM_TIMER_TICK_1US* sys_clk.pclk+ SYSTEM_TIMER_TICK_1US/2)/SYSTEM_TIMER_TICK_1US);
+    my_timer_set_mode(TIMER0, TIMER_MODE_SYSCLK, 0, (ASRC_OFFSET0_TICK * SYSTEM_TIMER_TICK_1US * sys_clk.pclk + SYSTEM_TIMER_TICK_1US / 2) / SYSTEM_TIMER_TICK_1US);
     my_timer_start(TIMER0);
 
 
-    my_timer_set_mode(TIMER1, TIMER_MODE_SYSCLK, 0,  (ASRC_OFFSET1_TICK* SYSTEM_TIMER_TICK_1US* sys_clk.pclk+ SYSTEM_TIMER_TICK_1US/2)/SYSTEM_TIMER_TICK_1US);
+    my_timer_set_mode(TIMER1, TIMER_MODE_SYSCLK, 0, (ASRC_OFFSET1_TICK * SYSTEM_TIMER_TICK_1US * sys_clk.pclk + SYSTEM_TIMER_TICK_1US / 2) / SYSTEM_TIMER_TICK_1US);
     my_timer_start(TIMER1);
 
     asrc_i2s_48k_ppm();
@@ -162,7 +150,7 @@ _attribute_ram_code_ void stimer_irq_handler(void)
     systimer_clr_irq_status();
 
     //set_next_anchor
-    async.task_tick += 10*1000*SYSTEM_TIMER_TICK_1US;
+    async.task_tick += 10 * 1000 * SYSTEM_TIMER_TICK_1US;
     stimer_set_irq_capture(async.task_tick);
     log_task_end_irq(1, SL01_IRQ);
 }
@@ -182,6 +170,7 @@ _attribute_ram_code_ void timer0_irq_handler(void)
     log_task_end_irq(1, SL01_dbug0);
 }
 PLIC_ISR_REGISTER(timer0_irq_handler, IRQ_TIMER0)
+
 /**
  * @brief       Timer1 interrupt handler.
  * @param[in]   none
@@ -195,6 +184,7 @@ _attribute_ram_code_ void timer1_irq_handler(void)
     log_task_end_irq(1, SL01_dbug1);
 }
 PLIC_ISR_REGISTER(timer1_irq_handler, IRQ_TIMER1)
+
 /**
  * @brief       user initialization when MCU power on or wake_up from deepSleep mode
  * @param[in]   none
@@ -202,23 +192,22 @@ PLIC_ISR_REGISTER(timer1_irq_handler, IRQ_TIMER1)
  */
 _attribute_no_inline_ void user_init_normal(void)
 {
-//////////////////////////// basic hardware Initialization  Begin //////////////////////////////////
+    //////////////////////////// basic hardware Initialization  Begin //////////////////////////////////
     /* random number generator must be initiated here( in the beginning of user_init_normal).
      * When deepSleep retention wakeUp, no need initialize again */
     random_generator_init();
 
     #if (TLKAPI_DEBUG_ENABLE)
-        tlkapi_debug_init();
-        blc_debug_enableStackLog(STK_LOG_NONE);
-        myudb_register_hci_debug_cb(my_usb_audio_debug);
+    tlkapi_debug_init();
+    blc_debug_enableStackLog(STK_LOG_NONE);
+    myudb_register_hci_debug_cb(my_usb_audio_debug);
     #endif
 
     blc_readFlashSize_autoConfigCustomFlashSector();
 
     /* attention that this function must be called after "blc readFlashSize_autoConfigCustomFlashSector" !!!*/
     blc_app_loadCustomizedParameters_normal();
-//////////////////////////// basic hardware Initialization  End /////////////////////////////////
-
+    //////////////////////////// basic hardware Initialization  End /////////////////////////////////
 
 
     app_audio_init();
@@ -233,14 +222,10 @@ _attribute_no_inline_ void user_init_normal(void)
     plic_interrupt_enable(IRQ_TIMER1);
     plic_set_priority(IRQ_TIMER1, 1);
 
-    async.task_tick = clock_time()+1000*SYSTEM_TIMER_TICK_1US;
+    async.task_tick = clock_time() + 1000 * SYSTEM_TIMER_TICK_1US;
     stimer_set_irq_capture(async.task_tick);
-    analog_write_reg8(0x1c,0xb0);// close charge auto mode.
-
+    analog_write_reg8(0x1c, 0xb0); // close charge auto mode.
 }
-
-
-
 
 /**
  * @brief       user initialization when MCU wake_up from deepSleep_retention mode
@@ -249,9 +234,7 @@ _attribute_no_inline_ void user_init_normal(void)
  */
 void user_init_deepRetn(void)
 {
-
 }
-
 
 /////////////////////////////////////////////////////////////////////
 // main loop flow
@@ -263,11 +246,11 @@ void user_init_deepRetn(void)
  * @return     none.
  */
 //_attribute_ram_code_
-int main_idle_loop (void)
+int main_idle_loop(void)
 {
     ////////////////////////////////////// Debug entry /////////////////////////////////
     #if (TLKAPI_DEBUG_ENABLE)
-        tlkapi_debug_handler();
+    tlkapi_debug_handler();
     #endif
     ////////////////////////////////////// UI entry /////////////////////////////////
     #if (UI_KEYBOARD_ENABLE)
@@ -278,18 +261,18 @@ int main_idle_loop (void)
     return 0; //must return 0 due to SDP flow
 }
 
-
 u32 ledToggleTick = 0;
+
 _attribute_no_inline_
-//_attribute_ram_code_
-void main_loop (void)
+    //_attribute_ram_code_
+    void
+    main_loop(void)
 {
-    if(clock_time_exceed(ledToggleTick, 1000 * 1000))
-    {  //led toggle interval: 1000mS
+    if (clock_time_exceed(ledToggleTick, 1000 * 1000)) { //led toggle interval: 1000mS
         ledToggleTick = clock_time();
         gpio_toggle(GPIO_LED_RED);
     }
-    main_idle_loop ();
+    main_idle_loop();
 }
 
 #endif

@@ -23,6 +23,6 @@
  *******************************************************************************************************/
 #pragma once
 
-
-#define BLT_OTS_LOG(fmt, ...)           BLC_AUDIO_PRF_DBG(DBG_PRF_MASK_OTS_LOG, "[OTS]"fmt, ##__VA_ARGS__)
-
+#ifndef BLT_OTS_LOG
+    #define BLT_OTS_LOG(fmt, ...) BLC_AUDIO_PRF_DBG(DBG_PRF_MASK_OTS_LOG, "[OTS]" fmt, ##__VA_ARGS__)
+#endif

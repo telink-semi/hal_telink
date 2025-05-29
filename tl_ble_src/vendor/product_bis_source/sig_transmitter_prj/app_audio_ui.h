@@ -41,4 +41,4 @@ void app_audio_ui_init(void);
  */
 void app_audio_ui_loop(void);
 
-#endif  //PRODUCT_BIS_SOURCE_SELECT == PRODUCT_SIG_AURACAST_TRANSMITTER
+#endif //PRODUCT_BIS_SOURCE_SELECT == PRODUCT_SIG_AURACAST_TRANSMITTER

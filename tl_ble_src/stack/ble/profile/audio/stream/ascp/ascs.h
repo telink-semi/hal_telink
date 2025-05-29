@@ -27,12 +27,9 @@
 #include "ascs_server_buf.h"
 
 
-
-
 /******************************* ASCS Common Start **********************************************************************/
 
 /******************************* ASCS Common End **********************************************************************/
-
 
 
 /******************************* ASCS Client Start **********************************************************************/
@@ -40,23 +37,24 @@
 extern const u8 gAppAscsCltSinkAseNum;
 extern const u8 gAppAscsCltSrcAseNum;
 
-typedef struct{
-    u8  cigID;
-    u8  cisID;
-    blc_audio_codec_id_t  codecId;
-    u8  codecFrameBlksPerSDU;
-    u8  frequency;
-    u8  duration;
-    u16 frameOcts;
-    u32 location;
+typedef struct
+{
+    u8                   cigID;
+    u8                   cisID;
+    blc_audio_codec_id_t codecId;
+    u8                   codecFrameBlksPerSDU;
+    u8                   frequency;
+    u8                   duration;
+    u16                  frameOcts;
+    u32                  location;
 } blc_ascsc_aseConfig_t;
 
 //ASCS Client Event ID
-typedef enum{
+typedef enum
+{
     AUDIO_EVT_ASCSC_START = AUDIO_EVT_TYPE_ASCSC,
     //NONE: all take over by BAP Unicast_Client Event, refer to 'audio_bapuc_evt_enum'
 } audio_ascsc_evt_enum;
-
 
 /**
  * @brief       This function serves to register ASCS Client function
@@ -81,18 +79,18 @@ extern const u8 gAscssSinkAseCnt;
 extern const u8 gAscssSrcAseCnt;
 
 //ASCS Server Event ID
-typedef enum{
+typedef enum
+{
     AUDIO_EVT_ASCSS_START = AUDIO_EVT_TYPE_ASCSS,
     //NONE: all take over by BAP Unicast_Server Event, refer to 'audio_bapus_evt_enum'
 } audio_ascss_evt_enum;
-
 
 /**
  * @brief       This function serves to register ASCS Server function
  * @param[in]   currently not used, input NULL
  * @return      none.
  */
-void                    blc_audio_registerASCSControlServer(const blc_ascss_regParam_t *param);
+void blc_audio_registerASCSControlServer(const blc_ascss_regParam_t *param);
 
 /**
  * @brief       This function serves to get ASE state information.
@@ -100,7 +98,7 @@ void                    blc_audio_registerASCSControlServer(const blc_ascss_regP
  * @return      NULL        - not find
  *              NON NULL    - the structure pointer of the ASE State.
  */
-blt_ascss_ase_state_t*  blc_ascss_getAseStateInfo(u8 index);
+blt_ascss_ase_state_t *blc_ascss_getAseStateInfo(u8 index);
 
 /**
  * @brief       This function serves to get ASE state information.
@@ -108,14 +106,14 @@ blt_ascss_ase_state_t*  blc_ascss_getAseStateInfo(u8 index);
  * @return      NULL        - not find
  *              NON NULL    - the structure pointer of the ASE State.
  */
-blc_ascs_server_t*      blc_ascss_getAscssInfo(u8 index);
+blc_ascs_server_t *blc_ascss_getAscssInfo(u8 index);
 
 /**
  * @brief       This function serves to initialize ASE state information.
  * @param[in]   aseState    - the structure pointer of the ASE State.
  * @return      none.
  */
-void                    blc_ascss_initAseParam(blt_ascss_ase_state_t* aseState);
+void blc_ascss_initAseParam(blt_ascss_ase_state_t *aseState);
 
 
 /******************************* ASCS Server End **********************************************************************/

@@ -26,39 +26,38 @@
 
 #if (INTER_TEST_MODE == TEST_CIS_AUDIO_SERVER)
 
-#define APP_STATE_NONE                               0
-#define APP_STATE_RENDER_START                       BIT(0)
-#define APP_STATE_RENDER_CONTINUE                    BIT(1)
+    #define APP_STATE_NONE                           0
+    #define APP_STATE_RENDER_START                   BIT(0)
+    #define APP_STATE_RENDER_CONTINUE                BIT(1)
 
-#define APP_AUDIO_OUTPUT_BUFFER_SIZE                 2048
-#define APP_AUDIO_INPUT_BUFFER_SIZE                  2048
-#define APP_AUDIO_SUPPORT_MAX_FRAME_SAMPLE           480
-#define APP_AUDIO_SUPPORT_MAX_ENCODE_FRAME_BYTES     155
-
+    #define APP_AUDIO_OUTPUT_BUFFER_SIZE             2048
+    #define APP_AUDIO_INPUT_BUFFER_SIZE              2048
+    #define APP_AUDIO_SUPPORT_MAX_FRAME_SAMPLE       480
+    #define APP_AUDIO_SUPPORT_MAX_ENCODE_FRAME_BYTES 155
 
 typedef struct
 {
-    u32     renderPoint;
-    u16     buffer[APP_AUDIO_SUPPORT_MAX_FRAME_SAMPLE];
-}audio_pkt_mono_t;
+    u32 renderPoint;
+    u16 buffer[APP_AUDIO_SUPPORT_MAX_FRAME_SAMPLE];
+} audio_pkt_mono_t;
+
 typedef struct
 {
-    u32     renderPoint;
-    u16     buffer[2*APP_AUDIO_SUPPORT_MAX_FRAME_SAMPLE];
-}audio_pkt_stereo_t;
-
+    u32 renderPoint;
+    u16 buffer[2 * APP_AUDIO_SUPPORT_MAX_FRAME_SAMPLE];
+} audio_pkt_stereo_t;
 
 struct list_node_mono_t
 {
-    u32     renderPoint;
-    u16     buffer[APP_AUDIO_SUPPORT_MAX_FRAME_SAMPLE];
+    u32                      renderPoint;
+    u16                      buffer[APP_AUDIO_SUPPORT_MAX_FRAME_SAMPLE];
     struct list_node_mono_t *next;
 };
 
 struct list_node_stereo_t
 {
-    u32     renderPoint;
-    u16     buffer[2*APP_AUDIO_SUPPORT_MAX_FRAME_SAMPLE];
+    u32                        renderPoint;
+    u16                        buffer[2 * APP_AUDIO_SUPPORT_MAX_FRAME_SAMPLE];
     struct list_node_stereo_t *next;
 };
 

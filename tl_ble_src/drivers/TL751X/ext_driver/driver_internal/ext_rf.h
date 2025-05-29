@@ -29,11 +29,12 @@
 #ifndef DRIVERS_TL751X_EXT_DRIVER_DRIVER_LIB_EXT_RF_H_
 #define DRIVERS_TL751X_EXT_DRIVER_DRIVER_LIB_EXT_RF_H_
 
+#include "common/types.h"
 
 typedef struct {
     unsigned char  rfMode_init_flag;
     unsigned char  txPower_index;
-
+    unsigned char  txPower_level;   /*!< added to be compatible with driver api */
 }ext_rf_t;
 
 extern ext_rf_t blt_extRF;
@@ -44,6 +45,16 @@ extern ext_rf_t blt_extRF;
 #define FAST_SETTLE         0
 #endif
 
+enum{
+    FLD_DMA_RPTR_MASK               = BIT_RNG(0,4),
+    FLD_DMA_RPTR_SET                = BIT(5),
+    FLD_DMA_RPTR_NEXT               = BIT(6),
+    FLD_DMA_RPTR_CLR                = BIT(7),
+};
+
+enum{
+    FLD_DMA_WPTR_MASK =         BIT_RNG(0,4),
+};
 
 enum{
     //BLE mode
@@ -327,7 +338,7 @@ enum{
  */
 __INLINE void zb_rt_irq_enable(void)
 {
-    plic_interrupt_enable(IRQ15_ZB_RT);
+    plic_interrupt_enable(IRQ_ZB_RT);
 }
 
 
@@ -409,6 +420,18 @@ __INLINE void zb_rt_irq_enable(void)
 #define         TX_STL_AUTO_MODE_2M                             (132 - PRMBL_EXTRA_2M * 4 - ONCA_CHIP_TX_DELAY_TOTAL)
 #define         TX_STL_AUTO_MODE_CODED                          (125 - 0 - - ONCA_CHIP_TX_DELAY_TOTAL)
 
+
+#if(1) //(LL_FEATURE_ENABLE_FRAME_SPACE_UPDATE)
+    #define         RX_PATH_DLY_EXTRA_PREAMBLE_1M                   (150 - TX_STL_AUTO_MODE_1M)
+    #define         RX_PATH_DLY_EXTRA_PREAMBLE_2M                   (150 - TX_STL_AUTO_MODE_2M)
+
+    #if(BLE_S2_S8_NEW_PATH)
+        #define         RX_PATH_DLY_EXTRA_PREAMBLE_S2               (150-TX_STL_AUTO_MODE_CODED_S2)
+        #define         RX_PATH_DLY_EXTRA_PREAMBLE_S8               (150-TX_STL_AUTO_MODE_CODED_S8)
+    #else
+        #define         RX_PATH_DLY_EXTRA_PREAMBLE_CODED            (150- TX_STL_AUTO_MODE_CODED)
+    #endif
+#endif
 
 
 /* 1M & 2M & Coded PHY first anchor point must be aligned */

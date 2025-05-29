@@ -25,18 +25,18 @@
 
 #if (ASSISTANT_VERSION == ASSISTANT_WITH_PERIPHERAL_VERSION)
 
-#include "tl_common.h"
-#include "drivers.h"
-#include "stack/ble/ble.h"
+    #include "tl_common.h"
+    #include "drivers.h"
+    #include "stack/ble/ble.h"
 
-#include "app_parse_char.h"
-#include "app_audio.h"
+    #include "app_parse_char.h"
+    #include "app_audio.h"
 
 u16 scanSourceHandle = 0x00;
-u8 scanSourceIndex = 0x00;
+u8  scanSourceIndex  = 0x00;
 
 extern const char locationStr[32][30];
-extern bool muteFlag;
+extern bool       muteFlag;
 
 /**
  * @brief       Assistant UI show information(scan sink device/connected sink device/scan source/sink vcp).
@@ -47,34 +47,25 @@ extern bool muteFlag;
  */
 static void app_audio_ui_show_info(char *argv[], int argc, void *user_data)
 {
-    if(strcasecmp(argv[0], "conn") == 0)
-    {
+    if (strcasecmp(argv[0], "conn") == 0) {
         app_parse_printf("connect sink info\r\n");
         app_audio_showConnInfo();
-    }
-    else if(strcasecmp(argv[0], "sink") == 0)
-    {
+    } else if (strcasecmp(argv[0], "sink") == 0) {
         app_parse_printf("scan sink info\r\n");
         app_audio_showSinkInfo();
-    }
-    else if(strcasecmp(argv[0], "source") == 0)
-    {
-        if(!scanSourceHandle){
+    } else if (strcasecmp(argv[0], "source") == 0) {
+        if (!scanSourceHandle) {
             app_parse_printf("No Source Scanning\r\n");
-        }else
-        {
+        } else {
             app_parse_printf("Connected Index:%x is scanning source info\r\n", scanSourceIndex);
             app_audio_showSourceInfo();
         }
-    }
-    else if(strcasecmp(argv[0], "vcp") == 0)
-    {
+    } else if (strcasecmp(argv[0], "vcp") == 0) {
         int index = app_parse_str2n(argv[1]);
 
         u16 connHandle = app_audio_getConnHandle(index);
 
-        if(!connHandle)
-        {
+        if (!connHandle) {
             return app_parse_printf("index error.You can run the \"show conn\" command to view connection information. \r\n");
         }
 
@@ -82,40 +73,32 @@ static void app_audio_ui_show_info(char *argv[], int argc, void *user_data)
 
         audio_error_enum state = blc_vcpc_getState(connHandle, &vcpState);
 
-        if(state != AUDIO_ESUCC)
+        if (state != AUDIO_ESUCC) {
             return app_parse_printf("get vcp state error\r\n");
+        }
 
         app_parse_printf("Remote Volume Control State, connHandle: 0x%02x\r\n", connHandle);
 
-        app_parse_printf("volume(min:0, max:255) is %d, muteSate:%s\r\n", vcpState.volState.volumeSetting, vcpState.volState.mute?"Mute":"Unmute");
-        if(vcpState.vosCnt)
-        {
-            for(int i=0; i<vcpState.vosCnt; i++)
-            {
+        app_parse_printf("volume(min:0, max:255) is %d, muteSate:%s\r\n", vcpState.volState.volumeSetting, vcpState.volState.mute ? "Mute" : "Unmute");
+        if (vcpState.vosCnt) {
+            for (int i = 0; i < vcpState.vosCnt; i++) {
                 app_parse_printf("VOCS index is %d \r\n", i);
-                blc_audio_volumeOffsetState_t* vocs = &vcpState.voc[i];
+                blc_audio_volumeOffsetState_t *vocs = &vcpState.voc[i];
                 app_parse_printf("Location:");
-                for(int j=0; j<32; j++)
-                {
-                    if(vocs->location & BIT(j))
-                    {
+                for (int j = 0; j < 32; j++) {
+                    if (vocs->location & BIT(j)) {
                         app_parse_printf("%s ", &locationStr[j][0]);
                     }
                 }
                 app_parse_printf("\r\nAudio Description is %.*s\r\n", vocs->outDescLen, vocs->outDesc);
                 app_parse_printf("Volume Offset(min:-255, max:255) is %d\r\n", vocs->volumeOffset);
             }
-        }
-        else
-        {
+        } else {
             app_parse_printf("Not Had VOCS\r\n");
         }
-    }
-    else
-    {
+    } else {
         app_parse_printf("show <conn|sink|source|vcp>\r\n");
     }
-
 }
 
 /**
@@ -132,24 +115,17 @@ static void app_audio_ui_scan_sink(char *argv[], int argc, void *user_data)
         return;
     }
 
-    if(strcasecmp(argv[0], "start") == 0)
-    {
+    if (strcasecmp(argv[0], "start") == 0) {
         app_parse_printf("assistant start scan sink\r\n");
         app_audio_initSinkInfoBuf();
         app_audio_openScanSink();
-    }
-    else if(strcasecmp(argv[0], "stop") == 0)
-    {
+    } else if (strcasecmp(argv[0], "stop") == 0) {
         app_parse_printf("assistant stop scan sink\r\n");
         app_audio_closeScanSink();
-    }
-    else if(strcasecmp(argv[0], "clear") == 0)
-    {
+    } else if (strcasecmp(argv[0], "clear") == 0) {
         app_audio_initSinkInfoBuf();
         app_parse_printf("assistant clear sink info\r\n");
-    }
-    else
-    {
+    } else {
         app_parse_printf("scan-sink not support [%s]", argv[0]);
         app_parse_printf("scan-sink <start|stop|clear>\r\n");
     }
@@ -164,24 +140,19 @@ static void app_audio_ui_scan_sink(char *argv[], int argc, void *user_data)
  */
 static void app_audio_ui_conn_sink(char *argv[], int argc, void *user_data)
 {
-    if(argc != 1)
-    {
+    if (argc != 1) {
         app_parse_printf("conn-sink <dev_idx>\r\n");
-        return ;
+        return;
     }
 
-    if(app_audio_aclConnFull())
-    {
+    if (app_audio_aclConnFull()) {
         app_parse_printf("connect sink fail: Connection already exists");
-        return ;
+        return;
     }
 
-    if(app_audio_createSinkConn(app_parse_str2n(argv[0])))
-    {
+    if (app_audio_createSinkConn(app_parse_str2n(argv[0]))) {
         app_parse_printf("assistant start connect sink\r\n");
-    }
-    else
-    {
+    } else {
         app_parse_printf("connect sink index error\r\n");
         app_parse_printf("show sink to view sink index\r\n");
     }
@@ -196,60 +167,48 @@ static void app_audio_ui_conn_sink(char *argv[], int argc, void *user_data)
  */
 static void app_audio_ui_scan_source(char *argv[], int argc, void *user_data)
 {
-    if(argc != 2)
-    {
+    if (argc != 2) {
         app_parse_printf("scan-bcast <start|stop|clear> <conn_idx>\r\n");
-        return ;
+        return;
     }
     int index = app_parse_str2n(argv[1]);
 
     u16 connHandle = app_audio_getConnHandle(index);
 
-    if(!connHandle)
-    {
+    if (!connHandle) {
         return app_parse_printf("index error.You can run the \"show conn\" command to view connection information. \r\n");
     }
 
-    connect_info_t* pConn = app_audio_getConn(connHandle);
+    connect_info_t *pConn = app_audio_getConn(connHandle);
 
-    if(pConn->sdp_over == 0)
-    {
+    if (pConn->sdp_over == 0) {
         return app_parse_printf("wait sdp discovery ending\r\n");
     }
 
-    if(pConn->BASS_server == 0)
-    {
+    if (pConn->BASS_server == 0) {
         return app_parse_printf("connect device not supported BASS Server \r\n");
     }
 
-    if(pConn->PACS_server == 0)
-    {
+    if (pConn->PACS_server == 0) {
         return app_parse_printf("connect device not supported PACS Server \r\n");
     }
 
-    if(strcasecmp(argv[0], "start") == 0)
-    {
+    if (strcasecmp(argv[0], "start") == 0) {
         app_audio_initSourceInfoBuf();
-        scanSourceIndex = index;
+        scanSourceIndex  = index;
         scanSourceHandle = connHandle;
         blc_bapba_writeRemoteScanStarted(connHandle);
         app_parse_printf("assistant start scan broadcast source\r\n");
-    }
-    else if(strcasecmp(argv[0], "stop") == 0)
-    {
+    } else if (strcasecmp(argv[0], "stop") == 0) {
         blc_bapba_writeRemoteScanStopped(connHandle);
         app_parse_printf("assistant stop scan broadcast source\r\n");
-    }
-    else if(strcasecmp(argv[0], "clear") == 0)
-    {
-        scanSourceIndex = 0;
+    } else if (strcasecmp(argv[0], "clear") == 0) {
+        scanSourceIndex  = 0;
         scanSourceHandle = 0;
         app_audio_initSourceInfoBuf();
         blc_bapba_writeRemoteScanStopped(connHandle);
         app_parse_printf("assistant clear broadcast source info\r\n");
-    }
-    else
-    {
+    } else {
         app_parse_printf("scan-sink not support [%s]", argv[0]);
     }
 }
@@ -263,68 +222,59 @@ static void app_audio_ui_scan_source(char *argv[], int argc, void *user_data)
  */
 static void app_audio_ui_add_source(char *argv[], int argc, void *user_data)
 {
-    if(argc < 3)
-    {
+    if (argc < 3) {
         app_parse_printf("add-source <conn_idx> <source_idx> <bis_sync> [broadcast_key]\r\n");
-        return ;
+        return;
     }
 
     u16 connHandle = app_audio_getConnHandle(app_parse_str2n(argv[0]));
-    if(!connHandle)
-    {
+    if (!connHandle) {
         return app_parse_printf("index error.You can run the \"show conn\" command to view connection information. \r\n");
     }
 
-    int sourceIndex = app_parse_str2n(argv[1]);
-    source_info_t* sourceInfo = app_audio_getSourceInfo(sourceIndex);
-    if(!sourceInfo)
-    {
+    int            sourceIndex = app_parse_str2n(argv[1]);
+    source_info_t *sourceInfo  = app_audio_getSourceInfo(sourceIndex);
+    if (!sourceInfo) {
         return app_parse_printf("index error.You can run the \"show source\" command to view source information. \r\n");
     }
 
     int bisSync = app_parse_str2n(argv[2]);
 
-    connect_info_t* pConn = app_audio_getConn(connHandle);
+    connect_info_t *pConn = app_audio_getConn(connHandle);
 
-    if(sourceInfo->enc)
-    {
-        if(argc != 4){
+    if (sourceInfo->enc) {
+        if (argc != 4) {
             return app_parse_printf("source is Encrypted, please enter broadcast code\r\n");
         }
         strncpy(pConn->broadcastCode, argv[3], 16);
     }
 
     int bisIndex = 0;
-    for(int i=0; i<sourceInfo->bisCnt; i++)
-    {
-        bisIndex |= BIT(sourceInfo->bisIndex[i]-1);
+    for (int i = 0; i < sourceInfo->bisCnt; i++) {
+        bisIndex |= BIT(sourceInfo->bisIndex[i] - 1);
     }
 
-    if(bisSync & (~bisIndex))
-    {
+    if (bisSync & (~bisIndex)) {
         return app_parse_printf("Bis sync is error, only set 0x%08x", bisIndex);
     }
 
-    if(pConn->sinkState == SINK_STATE_NO_SOURCE) {
+    if (pConn->sinkState == SINK_STATE_NO_SOURCE) {
         blc_bapba_writeAddSourceNoPast(connHandle, (blc_audio_source_head_t *)sourceInfo, bisSync);
-    }
-    else
-    {
-        if(pConn->sinkState == SINK_STATE_HAD_SOURCE) {
+    } else {
+        if (pConn->sinkState == SINK_STATE_HAD_SOURCE) {
             pConn->sinkState = SINK_STATE_MODIFY_SOURCE;
             blc_bapba_writeModifySourceNotSyncPA(connHandle, pConn->remoteSourceId, 0);
 
             pConn->sourceIndex = sourceIndex;
-            pConn->bisSync = bisSync;
+            pConn->bisSync     = bisSync;
 
-        }
-        else{
-            app_parse_printf("please use clean-source command, reset sink state\r\n"); return ;
+        } else {
+            app_parse_printf("please use clean-source command, reset sink state\r\n");
+            return;
         }
     }
 
     app_parse_printf("started add source\r\n");
-
 }
 
 /**
@@ -336,21 +286,18 @@ static void app_audio_ui_add_source(char *argv[], int argc, void *user_data)
  */
 static void app_audio_ui_mute_sink(char *argv[], int argc, void *user_data)
 {
-    if(argc < 1)
-    {
+    if (argc < 1) {
         return app_parse_printf("mute <conn_idx>\r\n");
     }
     u16 connHandle = app_audio_getConnHandle(app_parse_str2n(argv[0]));
 
-    if(!connHandle)
-    {
+    if (!connHandle) {
         return app_parse_printf("index error.You can run the \"show conn\" command to view connection information. \r\n");
     }
 
-    connect_info_t* pConn = app_audio_getConn(connHandle);
+    connect_info_t *pConn = app_audio_getConn(connHandle);
 
-    if(pConn->VCS_server == 0)
-    {
+    if (pConn->VCS_server == 0) {
         return app_parse_printf("connect device not supported VCS Server \r\n");
     }
 
@@ -358,10 +305,9 @@ static void app_audio_ui_mute_sink(char *argv[], int argc, void *user_data)
 
     app_parse_printf("mute flag is %d", muteFlag);
 
-    if(muteFlag){
+    if (muteFlag) {
         blc_vcsc_writeMute(connHandle);
-    }
-    else{
+    } else {
         blc_vcsc_writeUnmute(connHandle);
     }
 }
@@ -375,21 +321,18 @@ static void app_audio_ui_mute_sink(char *argv[], int argc, void *user_data)
  */
 static void app_audio_ui_vol_up(char *argv[], int argc, void *user_data)
 {
-    if(argc < 1)
-    {
+    if (argc < 1) {
         return app_parse_printf("vol+ <conn_idx>\r\n");
     }
     u16 connHandle = app_audio_getConnHandle(app_parse_str2n(argv[0]));
 
-    if(!connHandle)
-    {
+    if (!connHandle) {
         return app_parse_printf("index error.You can run the \"show conn\" command to view connection information. \r\n");
     }
 
-    connect_info_t* pConn = app_audio_getConn(connHandle);
+    connect_info_t *pConn = app_audio_getConn(connHandle);
 
-    if(pConn->VCS_server == 0)
-    {
+    if (pConn->VCS_server == 0) {
         return app_parse_printf("connect device not supported VCS Server \r\n");
     }
 
@@ -405,21 +348,18 @@ static void app_audio_ui_vol_up(char *argv[], int argc, void *user_data)
  */
 static void app_audio_ui_vol_down(char *argv[], int argc, void *user_data)
 {
-    if(argc < 1)
-    {
+    if (argc < 1) {
         return app_parse_printf("vol- <conn_idx>\r\n");
     }
     u16 connHandle = app_audio_getConnHandle(app_parse_str2n(argv[0]));
 
-    if(!connHandle)
-    {
+    if (!connHandle) {
         return app_parse_printf("index error.You can run the \"show conn\" command to view connection information. \r\n");
     }
 
-    connect_info_t* pConn = app_audio_getConn(connHandle);
+    connect_info_t *pConn = app_audio_getConn(connHandle);
 
-    if(pConn->VCS_server == 0)
-    {
+    if (pConn->VCS_server == 0) {
         return app_parse_printf("connect device not supported VCS Server \r\n");
     }
 
@@ -435,22 +375,19 @@ static void app_audio_ui_vol_down(char *argv[], int argc, void *user_data)
  */
 static void app_audio_ui_vol(char *argv[], int argc, void *user_data)
 {
-    if(argc < 2)
-    {
+    if (argc < 2) {
         return app_parse_printf("set-vol <conn_idx> <volume value>\r\n");
     }
 
     u16 connHandle = app_audio_getConnHandle(app_parse_str2n(argv[0]));
 
-    if(!connHandle)
-    {
+    if (!connHandle) {
         return app_parse_printf("index error.You can run the \"show conn\" command to view connection information. \r\n");
     }
 
-    connect_info_t* pConn = app_audio_getConn(connHandle);
+    connect_info_t *pConn = app_audio_getConn(connHandle);
 
-    if(pConn->VCS_server == 0)
-    {
+    if (pConn->VCS_server == 0) {
         return app_parse_printf("connect device not supported VCS Server \r\n");
     }
 
@@ -465,12 +402,9 @@ static void app_audio_ui_vol(char *argv[], int argc, void *user_data)
  */
 static void app_audio_set_vol_offset_cb(u16 connHandle, att_err_t err)
 {
-    if(err == ATT_SUCCESS)
-    {
+    if (err == ATT_SUCCESS) {
         app_parse_printf("write volume offset value is success\r\n");
-    }
-    else
-    {
+    } else {
         app_parse_printf("write volume offset error, ATT error code is 0x%x", err);
     }
 }
@@ -484,8 +418,7 @@ static void app_audio_set_vol_offset_cb(u16 connHandle, att_err_t err)
  */
 static void app_audio_ui_set_vol_offset(char *argv[], int argc, void *user_data)
 {
-    if(argc != 3)
-    {
+    if (argc != 3) {
         return app_parse_printf("set-vol-offset <conn_idx> <vocs_idx> <vol_offset>\r\n");
     }
 
@@ -493,8 +426,7 @@ static void app_audio_ui_set_vol_offset(char *argv[], int argc, void *user_data)
 
     u16 connHandle = app_audio_getConnHandle(index);
 
-    if(!connHandle)
-    {
+    if (!connHandle) {
         return app_parse_printf("index error.You can run the \"show conn\" command to view connection information. \r\n");
     }
 
@@ -502,36 +434,38 @@ static void app_audio_ui_set_vol_offset(char *argv[], int argc, void *user_data)
 
     int state = blc_vcpc_getState(connHandle, &vcpState);
 
-    if(state != AUDIO_ESUCC)
+    if (state != AUDIO_ESUCC) {
         return app_parse_printf("get vcp state error\r\n");
+    }
 
-    int vocsIdx = app_parse_str2n(argv[1]);
+    int vocsIdx    = app_parse_str2n(argv[1]);
     int vol_offset = app_parse_str2n(argv[2]);
 
-    if(vocsIdx >= vcpState.vosCnt)
+    if (vocsIdx >= vcpState.vosCnt) {
         return app_parse_printf("vocs index is error, \"show vcp <conn_idx> \" command to view vcp information. \r\n");
+    }
 
-    if(vol_offset > 255 || vol_offset < -255)
+    if (vol_offset > 255 || vol_offset < -255) {
         return app_parse_printf("volume offset value is error, must in -255~255.");
+    }
 
     state = blc_vocsc_vcpWriteSetVolOffset(connHandle, vocsIdx, vol_offset, app_audio_set_vol_offset_cb);
 
-    if(state != BLE_SUCCESS)
-    {
+    if (state != BLE_SUCCESS) {
         return app_parse_printf("write Volume Offset command error, BLE error state is 0x%x", state);
     }
 }
 
 static const parse_fun_list_t assistantParse[] = {
-    {"show", app_audio_ui_show_info},
-    {"scan-sink", app_audio_ui_scan_sink},
-    {"conn-sink", app_audio_ui_conn_sink},
-    {"scan-bcast", app_audio_ui_scan_source},
-    {"add-source", app_audio_ui_add_source},
-    {"mute", app_audio_ui_mute_sink},
-    {"vol+", app_audio_ui_vol_up},
-    {"vol-", app_audio_ui_vol_down},
-    {"set-vol", app_audio_ui_vol},
+    {"show",           app_audio_ui_show_info     },
+    {"scan-sink",      app_audio_ui_scan_sink     },
+    {"conn-sink",      app_audio_ui_conn_sink     },
+    {"scan-bcast",     app_audio_ui_scan_source   },
+    {"add-source",     app_audio_ui_add_source    },
+    {"mute",           app_audio_ui_mute_sink     },
+    {"vol+",           app_audio_ui_vol_up        },
+    {"vol-",           app_audio_ui_vol_down      },
+    {"set-vol",        app_audio_ui_vol           },
     {"set-vol-offset", app_audio_ui_set_vol_offset},
 };
 
@@ -555,6 +489,4 @@ void app_audio_ui_loop(void)
     app_parse_loop();
 }
 
-#endif  //ASSISTANT_VERSION == ASSISTANT_WITH_PERIPHERAL_VERSION
-
-
+#endif //ASSISTANT_VERSION == ASSISTANT_WITH_PERIPHERAL_VERSION

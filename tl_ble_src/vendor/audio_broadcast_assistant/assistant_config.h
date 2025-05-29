@@ -25,12 +25,12 @@
 
 #include "config.h"
 
-#define UNIVERSAL_VERSION                   1
+#define UNIVERSAL_VERSION                 1
 
-#define ASSISTANT_WITH_PERIPHERAL_VERSION   2
+#define ASSISTANT_WITH_PERIPHERAL_VERSION 2
 
 
-#define ASSISTANT_VERSION                   UNIVERSAL_VERSION
+#define ASSISTANT_VERSION                 UNIVERSAL_VERSION
 
-#define BLC_PM_EN                           0
-#define BLC_PM_DEEP_RETENTION_MODE_EN       0
+#define BLC_PM_EN                         0
+#define BLC_PM_DEEP_RETENTION_MODE_EN     0

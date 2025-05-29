@@ -41,8 +41,9 @@
 
 #include <stdbool.h>
 #include "lib/include/plic.h"
-#include "analog.h"
+#include "lib/include/analog.h"
 #include "reg_include/gpio_reg.h"
+
 /**********************************************************************************************************************
  *                                         global constants                                                           *
  *********************************************************************************************************************/
@@ -58,14 +59,16 @@
 /**
  *  @brief  Define GPIO group types
  */
-typedef enum{
-        GPIO_GROUP_A    = 0,
-        GPIO_GROUP_B    = 1,
-        GPIO_GROUP_C    = 2,
-        GPIO_GROUP_D    = 3,
-        GPIO_GROUP_E    = 4,
-        GPIO_GROUP_F    = 5,
-}gpio_group_e;
+typedef enum
+{
+    GPIO_GROUP_A = 0,
+    GPIO_GROUP_B = 1,
+    GPIO_GROUP_C = 2,
+    GPIO_GROUP_D = 3,
+    GPIO_GROUP_E = 4,
+    GPIO_GROUP_F = 5,
+} gpio_group_e;
+
 /**
  *  @brief  Define GPIO types
  *  @note   the following two points need to noticed when using PC5 GPIO port:
@@ -75,276 +78,288 @@ typedef enum{
  *          Therefore, this pin can't be used in applications where a certain level state needs to be maintained all the time.
  *          The PG group can only be used as an mspi pin and cannot be used as a wake-up source.
  */
-typedef enum{
-        GPIO_GROUPA    = 0x000,
-        GPIO_GROUPB    = 0x100,
-        GPIO_GROUPC    = 0x200,
-        GPIO_GROUPD    = 0x300,
-        GPIO_GROUPE    = 0x400,
-        GPIO_GROUPF    = 0x500,
-        GPIO_GROUPG    = 0X600,
-        GPIO_ALL       = 0x700,
-        GPIO_PA0 = GPIO_GROUPA | BIT(0),
-        GPIO_PA1 = GPIO_GROUPA | BIT(1),
-        GPIO_PA2 = GPIO_GROUPA | BIT(2),
-        GPIO_PA3 = GPIO_GROUPA | BIT(3),
-        GPIO_PA4 = GPIO_GROUPA | BIT(4),
-        GPIO_PA5 = GPIO_GROUPA | BIT(5),GPIO_DM=GPIO_PA5, // only support  DM
-        GPIO_PA6 = GPIO_GROUPA | BIT(6),GPIO_DP=GPIO_PA6, // only support  DP
-        GPIO_PA7 = GPIO_GROUPA | BIT(7),GPIO_SWS=GPIO_PA7,// only support  SWS(default)
-        GPIOA_ALL = GPIO_GROUPA | 0x00ff,
+typedef enum
+{
+    GPIO_GROUPA = 0x000,
+    GPIO_GROUPB = 0x100,
+    GPIO_GROUPC = 0x200,
+    GPIO_GROUPD = 0x300,
+    GPIO_GROUPE = 0x400,
+    GPIO_GROUPF = 0x500,
+    GPIO_GROUPG = 0X600,
+    GPIO_ALL    = 0x700,
+    GPIO_PA0    = GPIO_GROUPA | BIT(0),
+    GPIO_PA1    = GPIO_GROUPA | BIT(1),
+    GPIO_PA2    = GPIO_GROUPA | BIT(2),
+    GPIO_PA3    = GPIO_GROUPA | BIT(3),
+    GPIO_PA4    = GPIO_GROUPA | BIT(4),
+    GPIO_PA5    = GPIO_GROUPA | BIT(5),
+    GPIO_DM     = GPIO_PA5, // only support  DM
+    GPIO_PA6    = GPIO_GROUPA | BIT(6),
+    GPIO_DP     = GPIO_PA6, // only support  DP
+    GPIO_PA7    = GPIO_GROUPA | BIT(7),
+    GPIO_SWS    = GPIO_PA7, // only support  SWS(default)
+    GPIOA_ALL   = GPIO_GROUPA | 0x00ff,
 
-        GPIO_PB0 = GPIO_GROUPB | BIT(0),
-        GPIO_PB1 = GPIO_GROUPB | BIT(1),
-        GPIO_PB2 = GPIO_GROUPB | BIT(2),
-        GPIO_PB3 = GPIO_GROUPB | BIT(3),
-        GPIO_PB4 = GPIO_GROUPB | BIT(4),
-        GPIO_PB5 = GPIO_GROUPB | BIT(5),
-        GPIO_PB6 = GPIO_GROUPB | BIT(6),
-        GPIO_PB7 = GPIO_GROUPB | BIT(7),
+    GPIO_PB0 = GPIO_GROUPB | BIT(0),
+    GPIO_PB1 = GPIO_GROUPB | BIT(1),
+    GPIO_PB2 = GPIO_GROUPB | BIT(2),
+    GPIO_PB3 = GPIO_GROUPB | BIT(3),
+    GPIO_PB4 = GPIO_GROUPB | BIT(4),
+    GPIO_PB5 = GPIO_GROUPB | BIT(5),
+    GPIO_PB6 = GPIO_GROUPB | BIT(6),
+    GPIO_PB7 = GPIO_GROUPB | BIT(7),
 
-        GPIO_PC0 = GPIO_GROUPC | BIT(0),//default: SSPI_CN
-        GPIO_PC1 = GPIO_GROUPC | BIT(1),//default: SSPI_CK
-        GPIO_PC2 = GPIO_GROUPC | BIT(2),//default: SSPI_SI
-        GPIO_PC3 = GPIO_GROUPC | BIT(3),//default: SSPI_SO
-        GPIO_PC4 = GPIO_GROUPC | BIT(4),//default: TDI
-        GPIO_PC5 = GPIO_GROUPC | BIT(5),//default: TDO
-        GPIO_PC6 = GPIO_GROUPC | BIT(6),//default: TMS
-        GPIO_PC7 = GPIO_GROUPC | BIT(7),//default: TCK
-        GPIOC_ALL = GPIO_GROUPC | 0x00ff,
+    GPIO_PC0  = GPIO_GROUPC | BIT(0), //default: SSPI_CN
+    GPIO_PC1  = GPIO_GROUPC | BIT(1), //default: SSPI_CK
+    GPIO_PC2  = GPIO_GROUPC | BIT(2), //default: SSPI_SI
+    GPIO_PC3  = GPIO_GROUPC | BIT(3), //default: SSPI_SO
+    GPIO_PC4  = GPIO_GROUPC | BIT(4), //default: TDI
+    GPIO_PC5  = GPIO_GROUPC | BIT(5), //default: TDO
+    GPIO_PC6  = GPIO_GROUPC | BIT(6), //default: TMS
+    GPIO_PC7  = GPIO_GROUPC | BIT(7), //default: TCK
+    GPIOC_ALL = GPIO_GROUPC | 0x00ff,
 
-        GPIO_PD0 = GPIO_GROUPD | BIT(0),
-        GPIO_PD1 = GPIO_GROUPD | BIT(1),
-        GPIO_PD2 = GPIO_GROUPD | BIT(2),
-        GPIO_PD3 = GPIO_GROUPD | BIT(3),
-        GPIO_PD4 = GPIO_GROUPD | BIT(4),
-        GPIO_PD5 = GPIO_GROUPD | BIT(5),
-        GPIO_PD6 = GPIO_GROUPD | BIT(6),
-        GPIO_PD7 = GPIO_GROUPD | BIT(7),
+    GPIO_PD0 = GPIO_GROUPD | BIT(0),
+    GPIO_PD1 = GPIO_GROUPD | BIT(1),
+    GPIO_PD2 = GPIO_GROUPD | BIT(2),
+    GPIO_PD3 = GPIO_GROUPD | BIT(3),
+    GPIO_PD4 = GPIO_GROUPD | BIT(4),
+    GPIO_PD5 = GPIO_GROUPD | BIT(5),
+    GPIO_PD6 = GPIO_GROUPD | BIT(6),
+    GPIO_PD7 = GPIO_GROUPD | BIT(7),
 
-        GPIO_PE0 = GPIO_GROUPE | BIT(0), // only support  LSPI_CN
-        GPIO_PE1 = GPIO_GROUPE | BIT(1), // only support  LSPI_CK
-        GPIO_PE2 = GPIO_GROUPE | BIT(2), // only support  LSPI_MOSI
-        GPIO_PE3 = GPIO_GROUPE | BIT(3), // only support  LSPI_MISO
-        GPIO_PE4 = GPIO_GROUPE | BIT(4), // only support  LSPI_IO2
-        GPIO_PE5 = GPIO_GROUPE | BIT(5), // only support  LSPI_IO3
-        GPIO_PE6 = GPIO_GROUPE | BIT(6),
-        GPIO_PE7 = GPIO_GROUPE | BIT(7),
-        GPIOE_ALL = GPIO_GROUPE | 0x00ff,
+    GPIO_PE0  = GPIO_GROUPE | BIT(0), // only support  LSPI_CN
+    GPIO_PE1  = GPIO_GROUPE | BIT(1), // only support  LSPI_CK
+    GPIO_PE2  = GPIO_GROUPE | BIT(2), // only support  LSPI_MOSI
+    GPIO_PE3  = GPIO_GROUPE | BIT(3), // only support  LSPI_MISO
+    GPIO_PE4  = GPIO_GROUPE | BIT(4), // only support  LSPI_IO2
+    GPIO_PE5  = GPIO_GROUPE | BIT(5), // only support  LSPI_IO3
+    GPIO_PE6  = GPIO_GROUPE | BIT(6),
+    GPIO_PE7  = GPIO_GROUPE | BIT(7),
+    GPIOE_ALL = GPIO_GROUPE | 0x00ff,
 
-        GPIO_PF0 = GPIO_GROUPF | BIT(0),
-        GPIO_PF1 = GPIO_GROUPF | BIT(1),
-        GPIO_PF2 = GPIO_GROUPF | BIT(2),
-        GPIO_PF3 = GPIO_GROUPF | BIT(3),
-        GPIO_PF4 = GPIO_GROUPF | BIT(4),
-        GPIO_PF5 = GPIO_GROUPF | BIT(5),
-        GPIO_PF6 = GPIO_GROUPF | BIT(6), //Not support GSPI_CSN3,GSPI_CSN2,GSPI_CSN1,I2C1_SCL_IO,I2C1_SDA_IO in enum "gpio_func_e"
-        GPIO_PF7 = GPIO_GROUPF | BIT(7), //Not support GSPI_CSN3,GSPI_CSN2,GSPI_CSN1,I2C1_SCL_IO,I2C1_SDA_IO in enum "gpio_func_e"
+    GPIO_PF0 = GPIO_GROUPF | BIT(0),
+    GPIO_PF1 = GPIO_GROUPF | BIT(1),
+    GPIO_PF2 = GPIO_GROUPF | BIT(2),
+    GPIO_PF3 = GPIO_GROUPF | BIT(3),
+    GPIO_PF4 = GPIO_GROUPF | BIT(4),
+    GPIO_PF5 = GPIO_GROUPF | BIT(5),
+    GPIO_PF6 = GPIO_GROUPF | BIT(6), //Not support GSPI_CSN3,GSPI_CSN2,GSPI_CSN1,I2C1_SCL_IO,I2C1_SDA_IO in enum "gpio_func_e"
+    GPIO_PF7 = GPIO_GROUPF | BIT(7), //Not support GSPI_CSN3,GSPI_CSN2,GSPI_CSN1,I2C1_SCL_IO,I2C1_SDA_IO in enum "gpio_func_e"
 
-        GPIO_PG0 = GPIO_GROUPG | BIT(0), // only support  MSPI_MOSI(default)
-        GPIO_PG1 = GPIO_GROUPG | BIT(1), // only support  MSPI_CK(default)
-        GPIO_PG2 = GPIO_GROUPG | BIT(2), // only support  MSPI_IO3(default)
-        GPIO_PG3 = GPIO_GROUPG | BIT(3), // only support  MSPI_CN(default)
-        GPIO_PG4 = GPIO_GROUPG | BIT(4), // only support  MSPI_MISO(default)
-        GPIO_PG5 = GPIO_GROUPG | BIT(5), // only support  MSPI_IO2(default)
+    GPIO_PG0 = GPIO_GROUPG | BIT(0), // only support  MSPI_MOSI(default)
+    GPIO_PG1 = GPIO_GROUPG | BIT(1), // only support  MSPI_CK(default)
+    GPIO_PG2 = GPIO_GROUPG | BIT(2), // only support  MSPI_IO3(default)
+    GPIO_PG3 = GPIO_GROUPG | BIT(3), // only support  MSPI_CN(default)
+    GPIO_PG4 = GPIO_GROUPG | BIT(4), // only support  MSPI_MISO(default)
+    GPIO_PG5 = GPIO_GROUPG | BIT(5), // only support  MSPI_IO2(default)
 
-}gpio_pin_e;
+} gpio_pin_e;
+
 /**
  *  @brief  Define GPIO function pin types.
  */
-typedef enum{
+typedef enum
+{
 
-        GPIO_FC_PA0 =GPIO_PA0 ,
-        GPIO_FC_PA1 =GPIO_PA1,
-        GPIO_FC_PA2 =GPIO_PA2,
-        GPIO_FC_PA3 =GPIO_PA3,
-        GPIO_FC_PA4 =GPIO_PA4,
+    GPIO_FC_PA0 = GPIO_PA0,
+    GPIO_FC_PA1 = GPIO_PA1,
+    GPIO_FC_PA2 = GPIO_PA2,
+    GPIO_FC_PA3 = GPIO_PA3,
+    GPIO_FC_PA4 = GPIO_PA4,
 
-        GPIO_FC_PB0 =GPIO_PB0,
-        GPIO_FC_PB1 =GPIO_PB1,
-        GPIO_FC_PB2 =GPIO_PB2,
-        GPIO_FC_PB3 =GPIO_PB3,
-        GPIO_FC_PB4 =GPIO_PB4,
-        GPIO_FC_PB5 =GPIO_PB5,
-        GPIO_FC_PB6 =GPIO_PB6,
-        GPIO_FC_PB7 =GPIO_PB7,
+    GPIO_FC_PB0 = GPIO_PB0,
+    GPIO_FC_PB1 = GPIO_PB1,
+    GPIO_FC_PB2 = GPIO_PB2,
+    GPIO_FC_PB3 = GPIO_PB3,
+    GPIO_FC_PB4 = GPIO_PB4,
+    GPIO_FC_PB5 = GPIO_PB5,
+    GPIO_FC_PB6 = GPIO_PB6,
+    GPIO_FC_PB7 = GPIO_PB7,
 
-        GPIO_FC_PC0 =GPIO_PC0,
-        GPIO_FC_PC1 =GPIO_PC1,
-        GPIO_FC_PC2 =GPIO_PC2,
-        GPIO_FC_PC3 =GPIO_PC3,
-        GPIO_FC_PC4 =GPIO_PC4,
-        GPIO_FC_PC5 =GPIO_PC5,
-        GPIO_FC_PC6 =GPIO_PC6,
-        GPIO_FC_PC7 =GPIO_PC7,
+    GPIO_FC_PC0 = GPIO_PC0,
+    GPIO_FC_PC1 = GPIO_PC1,
+    GPIO_FC_PC2 = GPIO_PC2,
+    GPIO_FC_PC3 = GPIO_PC3,
+    GPIO_FC_PC4 = GPIO_PC4,
+    GPIO_FC_PC5 = GPIO_PC5,
+    GPIO_FC_PC6 = GPIO_PC6,
+    GPIO_FC_PC7 = GPIO_PC7,
 
-        GPIO_FC_PD0 =GPIO_PD0,
-        GPIO_FC_PD1 =GPIO_PD1,
-        GPIO_FC_PD2 =GPIO_PD2,
-        GPIO_FC_PD3 =GPIO_PD3,
-        GPIO_FC_PD4 =GPIO_PD4,
-        GPIO_FC_PD5 =GPIO_PD5,
-        GPIO_FC_PD6 =GPIO_PD6,
-        GPIO_FC_PD7 =GPIO_PD7,
+    GPIO_FC_PD0 = GPIO_PD0,
+    GPIO_FC_PD1 = GPIO_PD1,
+    GPIO_FC_PD2 = GPIO_PD2,
+    GPIO_FC_PD3 = GPIO_PD3,
+    GPIO_FC_PD4 = GPIO_PD4,
+    GPIO_FC_PD5 = GPIO_PD5,
+    GPIO_FC_PD6 = GPIO_PD6,
+    GPIO_FC_PD7 = GPIO_PD7,
 
-        GPIO_FC_PE6 =GPIO_PE6,
-        GPIO_FC_PE7 =GPIO_PE7,
+    GPIO_FC_PE6 = GPIO_PE6,
+    GPIO_FC_PE7 = GPIO_PE7,
 
-        GPIO_FC_PF0 =GPIO_PF0,
-        GPIO_FC_PF1 =GPIO_PF1,
-        GPIO_FC_PF2 =GPIO_PF2,
-        GPIO_FC_PF3 =GPIO_PF3,
-        GPIO_FC_PF4 =GPIO_PF4,
-        GPIO_FC_PF5 =GPIO_PF5,
-        GPIO_FC_PF6 =GPIO_PF6, //Not support GSPI_CSN3,GSPI_CSN2,GSPI_CSN1,I2C1_SCL_IO,I2C1_SDA_IO in enum "gpio_func_e"
-        GPIO_FC_PF7 =GPIO_PF7, //Not support GSPI_CSN3,GSPI_CSN2,GSPI_CSN1,I2C1_SCL_IO,I2C1_SDA_IO in enum "gpio_func_e"
-        GPIO_NONE_PIN =0x00,
-}gpio_func_pin_e;
+    GPIO_FC_PF0   = GPIO_PF0,
+    GPIO_FC_PF1   = GPIO_PF1,
+    GPIO_FC_PF2   = GPIO_PF2,
+    GPIO_FC_PF3   = GPIO_PF3,
+    GPIO_FC_PF4   = GPIO_PF4,
+    GPIO_FC_PF5   = GPIO_PF5,
+    GPIO_FC_PF6   = GPIO_PF6, //Not support GSPI_CSN3,GSPI_CSN2,GSPI_CSN1,I2C1_SCL_IO,I2C1_SDA_IO in enum "gpio_func_e"
+    GPIO_FC_PF7   = GPIO_PF7, //Not support GSPI_CSN3,GSPI_CSN2,GSPI_CSN1,I2C1_SCL_IO,I2C1_SDA_IO in enum "gpio_func_e"
+    GPIO_NONE_PIN = 0x00,
+} gpio_func_pin_e;
 
 /**
  *  @brief  Define GPIO function mux types
  */
-typedef enum{
+typedef enum
+{
 
-        PWM0           =1,
-        PWM1           =2,
-        PWM2           =3,
-        PWM3           =4,
-        PWM4           =5,
-        PWM5           =6,
-        PWM0_N         =7,
-        PWM1_N         =8,
-        PWM2_N         =9,
-        PWM3_N         =10,
-        PWM4_N         =11,
-        PWM5_N         =12,
+    PWM0   = 1,
+    PWM1   = 2,
+    PWM2   = 3,
+    PWM3   = 4,
+    PWM4   = 5,
+    PWM5   = 6,
+    PWM0_N = 7,
+    PWM1_N = 8,
+    PWM2_N = 9,
+    PWM3_N = 10,
+    PWM4_N = 11,
+    PWM5_N = 12,
 
-        GSPI_CSN0_IO    =13,
-        GSPI_CLK_IO     =14,
-        GSPI_IO3_IO    =15,
-        GSPI_IO2_IO    =16,
-        GSPI_MISO_IO   =17,
-        GSPI_MOSI_IO   =18,
+    GSPI_CSN0_IO = 13,
+    GSPI_CLK_IO  = 14,
+    GSPI_IO3_IO  = 15,
+    GSPI_IO2_IO  = 16,
+    GSPI_MISO_IO = 17,
+    GSPI_MOSI_IO = 18,
 
-        I2C_SCL_IO     =19,
-        I2C_SDA_IO     =20,
+    I2C_SCL_IO = 19,
+    I2C_SDA_IO = 20,
 
-        UART0_CTS_I    =21,
-        UART0_RTS      =22,
-        UART0_TX       =23,
-        UART0_RTX_IO   =24,
-        UART1_CTS_I    =25,
-        UART1_RTS      =26,
-        UART1_TX       =27,
-        UART1_RTX      =28,
+    UART0_CTS_I  = 21,
+    UART0_RTS    = 22,
+    UART0_TX     = 23,
+    UART0_RTX_IO = 24,
+    UART1_CTS_I  = 25,
+    UART1_RTS    = 26,
+    UART1_TX     = 27,
+    UART1_RTX    = 28,
 
-        CLK_7816       =29,
+    CLK_7816 = 29,
 
-        I2S0_BCK_IO    =30,
-        I2S0_LR_OUT_IO =31,
-        I2S0_DAT_OUT   =32,
-        I2S0_LR_IN_IO  =33,
-        I2S0_DAT_IN_I  =34,
-        I2S0_CLK       =35,
-        I2S1_BCK_IO    =36,
-        I2S1_LR_OUT_IO =37,
-        I2S1_DAT_OUT   =38,
-        I2S1_LR_IN_IO  =39,
-        I2S1_DAT_IN_I  =40,
-        I2S1_CLK       =41,
+    I2S0_BCK_IO    = 30,
+    I2S0_LR_OUT_IO = 31,
+    I2S0_DAT_OUT   = 32,
+    I2S0_LR_IN_IO  = 33,
+    I2S0_DAT_IN_I  = 34,
+    I2S0_CLK       = 35,
+    I2S1_BCK_IO    = 36,
+    I2S1_LR_OUT_IO = 37,
+    I2S1_DAT_OUT   = 38,
+    I2S1_LR_IN_IO  = 39,
+    I2S1_DAT_IN_I  = 40,
+    I2S1_CLK       = 41,
 
-        DMIC0_CLK      =42,
-        DMIC0_DAT_I    =43,
-        DMIC1_CLK      =44,
-        DMIC1_DAT_I    =45,
+    DMIC0_CLK   = 42,
+    DMIC0_DAT_I = 43,
+    DMIC1_CLK   = 44,
+    DMIC1_DAT_I = 45,
 
-        DBG_PROBE_CLK  =46,
-        TX_CYC2PA      =47,
-        WIFI_DENY_I    =48,
-        BT_ACTIVITY    =49,
-        BT_STATUS      =50,
-        BT_INBAND      =51,
-        ATSEL_0        =52,
-        ATSEL_1        =53,
-        ATSEL_2        =54,
-        ATSEL_3        =55,
-        RX_CYC2LNA     =56,
+    DBG_PROBE_CLK = 46,
+    TX_CYC2PA     = 47,
+    WIFI_DENY_I   = 48,
+    BT_ACTIVITY   = 49,
+    BT_STATUS     = 50,
+    BT_INBAND     = 51,
+    ATSEL_0       = 52,
+    ATSEL_1       = 53,
+    ATSEL_2       = 54,
+    ATSEL_3       = 55,
+    RX_CYC2LNA    = 56,
 
-        I2C1_SDA_IO    =59, //Not support PF6,PF7 in enum "gpio_func_pin_e"
-        I2C1_SCL_IO    =60, //Not support PF6,PF7 in enum "gpio_func_pin_e"
-        GSPI_CSN1      =61, //Not support PF6,PF7 in enum "gpio_func_pin_e"
-        GSPI_CSN2      =62, //Not support PF6,PF7 in enum "gpio_func_pin_e"
-        GSPI_CSN3      =63, //Not support PF6,PF7 in enum "gpio_func_pin_e"
-}gpio_func_e;
+    I2C1_SDA_IO = 59, //Not support PF6,PF7 in enum "gpio_func_pin_e"
+    I2C1_SCL_IO = 60, //Not support PF6,PF7 in enum "gpio_func_pin_e"
+    GSPI_CSN1   = 61, //Not support PF6,PF7 in enum "gpio_func_pin_e"
+    GSPI_CSN2   = 62, //Not support PF6,PF7 in enum "gpio_func_pin_e"
+    GSPI_CSN3   = 63, //Not support PF6,PF7 in enum "gpio_func_pin_e"
+} gpio_func_e;
 
 /**
  *  @brief  Define GPIO mux func
  */
-typedef enum{
-        AS_GPIO,
-        AS_MSPI,
+typedef enum
+{
+    AS_GPIO,
+    AS_MSPI,
 
-        AS_SWS,
-        AS_SWM,
+    AS_SWS,
+    AS_SWM,
 
-        AS_USB_DP,
-        AS_USB_DM,
+    AS_USB_DP,
+    AS_USB_DM,
 
-        AS_TDI,
-        AS_TDO,
-        AS_TMS,
-        AS_TCK,
-}gpio_fuc_e;
+    AS_TDI,
+    AS_TDO,
+    AS_TMS,
+    AS_TCK,
+} gpio_fuc_e;
 
 /*
  * @brief define gpio irq status types
  */
-typedef enum{
-    FLD_GPIO_IRQ_CLR                      = BIT(0),
-    FLD_GPIO_IRQ_GPIO2RISC0_CLR           = BIT(1),
-    FLD_GPIO_IRQ_GPIO2RISC1_CLR           = BIT(2),
-}gpio_irq_status_e;
-
+typedef enum
+{
+    FLD_GPIO_IRQ_CLR            = BIT(0),
+    FLD_GPIO_IRQ_GPIO2RISC0_CLR = BIT(1),
+    FLD_GPIO_IRQ_GPIO2RISC1_CLR = BIT(2),
+} gpio_irq_status_e;
 
 /*
  *  @brief define gpio irq mask types
  */
-typedef enum{
-    GPIO_IRQ_MASK_GPIO       =          BIT(2),
-    GPIO_IRQ_MASK_GPIO2RISC0 =          BIT(3),
-    GPIO_IRQ_MASK_GPIO2RISC1 =          BIT(4),
-}gpio_irq_mask_e;
+typedef enum
+{
+    GPIO_IRQ_MASK_GPIO       = BIT(2),
+    GPIO_IRQ_MASK_GPIO2RISC0 = BIT(3),
+    GPIO_IRQ_MASK_GPIO2RISC1 = BIT(4),
+} gpio_irq_mask_e;
 
 /*
  * @brief define gpio group irq types
  */
-typedef enum{
-    FLD_GPIO_GROUP_IRQ0                     = BIT(0),
-    FLD_GPIO_GROUP_IRQ1                     = BIT(1),
-    FLD_GPIO_GROUP_IRQ2                     = BIT(2),
-    FLD_GPIO_GROUP_IRQ3                     = BIT(3),
-    FLD_GPIO_GROUP_IRQ4                     = BIT(4),
-    FLD_GPIO_GROUP_IRQ5                     = BIT(5),
-    FLD_GPIO_GROUP_IRQ6                     = BIT(6),
-    FLD_GPIO_GROUP_IRQ7                     = BIT(7),
-}gpio_group_irq_e;
+typedef enum
+{
+    FLD_GPIO_GROUP_IRQ0 = BIT(0),
+    FLD_GPIO_GROUP_IRQ1 = BIT(1),
+    FLD_GPIO_GROUP_IRQ2 = BIT(2),
+    FLD_GPIO_GROUP_IRQ3 = BIT(3),
+    FLD_GPIO_GROUP_IRQ4 = BIT(4),
+    FLD_GPIO_GROUP_IRQ5 = BIT(5),
+    FLD_GPIO_GROUP_IRQ6 = BIT(6),
+    FLD_GPIO_GROUP_IRQ7 = BIT(7),
+} gpio_group_irq_e;
 
 /**
  *  @brief  Define rising/falling types
  */
-typedef enum{
-    POL_RISING   = 0,
-    POL_FALLING  = 1,
-}gpio_pol_e;
+typedef enum
+{
+    POL_RISING  = 0,
+    POL_FALLING = 1,
+} gpio_pol_e;
 
 /**
  *  @brief  Define interrupt types
  */
-typedef enum{
-     INTR_RISING_EDGE=0,
-     INTR_FALLING_EDGE ,
-     INTR_HIGH_LEVEL,
-     INTR_LOW_LEVEL,
+typedef enum
+{
+    INTR_RISING_EDGE = 0,
+    INTR_FALLING_EDGE,
+    INTR_HIGH_LEVEL,
+    INTR_LOW_LEVEL,
 } gpio_irq_trigger_type_e;
 
 /**
@@ -353,36 +368,39 @@ typedef enum{
  *          MOSFET and affected by the IO voltage VDDO3. The lower the IO voltage of GPIO,
  *          the higher the pull-up/pull-down resistance of GPIO.
  */
-typedef enum {
-    GPIO_PIN_UP_DOWN_FLOAT      = 0,
-    GPIO_PIN_PULLUP_1M          = 1,
-    GPIO_PIN_PULLDOWN_100K      = 2,
-    GPIO_PIN_PULLUP_10K         = 3,
-}gpio_pull_type_e;
+typedef enum
+{
+    GPIO_PIN_UP_DOWN_FLOAT = 0,
+    GPIO_PIN_PULLUP_1M     = 1,
+    GPIO_PIN_PULLDOWN_100K = 2,
+    GPIO_PIN_PULLUP_10K    = 3, //PULLUP_10K cannot be used as a wake-up function, otherwise it may fail to wake up.
+} gpio_pull_type_e;
 
-typedef enum{
-    PROBE_CCLK              = 0,
-    PROBE_HCLK              = 1,
-    PROBE_PCLK              = 2,
-    PROBE_CLKPLL            = 3,
-    PROBE_XTL24M            = 4,
-    PROBE_RC24M             = 5,
-    PROBE_CLK32K            = 6,
-    PROBE_CLK_STIMER        = 7,
-    PROBE_CLK_MSPI          = 8,
-    PROBE_CLK_GSPI          = 9,
-    PROBE_CLK_LSPI          = 10,
-    PROBE_CLK_USBPHY        = 11,
-    PROBE_CLK_ZB_MST        = 12,
-    PROBE_CLK_ZB_32K        = 13,
-    PROBE_CODEC_MCLK        = 14,
-    PROBE_CLK_EOC           = 15,
-    PROBE_CLK_EOC_SRC       = 16,
-    PROBE_CODEC_ADC_CLK_6M  = 17,
-    PROBE_CODEC_ADC_CLK_1M  = 18,
-    PROBE_CODEC_DAC_CLK     = 19,
-    PROBE_ANA_PA_CLK_6M     = 20,
-}probe_clk_sel_e;
+typedef enum
+{
+    PROBE_CCLK             = 0,
+    PROBE_HCLK             = 1,
+    PROBE_PCLK             = 2,
+    PROBE_CLKPLL           = 3,
+    PROBE_XTL24M           = 4,
+    PROBE_RC24M            = 5,
+    PROBE_CLK32K           = 6,
+    PROBE_CLK_STIMER       = 7,
+    PROBE_CLK_MSPI         = 8,
+    PROBE_CLK_GSPI         = 9,
+    PROBE_CLK_LSPI         = 10,
+    PROBE_CLK_USBPHY       = 11,
+    PROBE_CLK_ZB_MST       = 12,
+    PROBE_CLK_ZB_32K       = 13,
+    PROBE_CODEC_MCLK       = 14,
+    PROBE_CLK_EOC          = 15,
+    PROBE_CLK_EOC_SRC      = 16,
+    PROBE_CODEC_ADC_CLK_6M = 17,
+    PROBE_CODEC_ADC_CLK_1M = 18,
+    PROBE_CODEC_DAC_CLK    = 19,
+    PROBE_ANA_PA_CLK_6M    = 20,
+} probe_clk_sel_e;
+
 /**********************************************************************************************************************
  *                                     global variable declaration                                                    *
  *********************************************************************************************************************/
@@ -398,7 +416,7 @@ typedef enum{
  */
 static inline void gpio_function_en(gpio_pin_e pin)
 {
-    unsigned char   bit = pin & 0xff;
+    unsigned char bit = pin & 0xff;
     BM_SET(reg_gpio_func(pin), bit);
 }
 
@@ -409,7 +427,7 @@ static inline void gpio_function_en(gpio_pin_e pin)
  */
 static inline void gpio_function_dis(gpio_pin_e pin)
 {
-    unsigned char   bit = pin & 0xff;
+    unsigned char bit = pin & 0xff;
     BM_CLR(reg_gpio_func(pin), bit);
 }
 
@@ -420,9 +438,8 @@ static inline void gpio_function_dis(gpio_pin_e pin)
  */
 static _always_inline void gpio_set_high_level(gpio_pin_e pin)
 {
-    unsigned char   bit = pin & 0xff;
+    unsigned char bit = pin & 0xff;
     BM_SET(reg_gpio_out(pin), bit);
-
 }
 
 /**
@@ -432,9 +449,8 @@ static _always_inline void gpio_set_high_level(gpio_pin_e pin)
  */
 static _always_inline void gpio_set_low_level(gpio_pin_e pin)
 {
-    unsigned char   bit = pin & 0xff;
+    unsigned char bit = pin & 0xff;
     BM_CLR(reg_gpio_out(pin), bit);
-
 }
 
 /**
@@ -445,12 +461,9 @@ static _always_inline void gpio_set_low_level(gpio_pin_e pin)
  */
 static _always_inline void gpio_set_level(gpio_pin_e pin, unsigned char value)
 {
-    if(value)
-    {
+    if (value) {
         gpio_set_high_level(pin);
-    }
-    else
-    {
+    } else {
         gpio_set_low_level(pin);
     }
 }
@@ -499,7 +512,7 @@ static _always_inline void gpio_toggle(gpio_pin_e pin)
  */
 static inline void gpio_output_en(gpio_pin_e pin)
 {
-    unsigned char   bit = pin & 0xff;
+    unsigned char bit = pin & 0xff;
     BM_CLR(reg_gpio_oen(pin), bit);
 }
 
@@ -510,7 +523,7 @@ static inline void gpio_output_en(gpio_pin_e pin)
  */
 static inline void gpio_output_dis(gpio_pin_e pin)
 {
-    unsigned char   bit = pin & 0xff;
+    unsigned char bit = pin & 0xff;
     BM_SET(reg_gpio_oen(pin), bit);
 }
 
@@ -521,15 +534,11 @@ static inline void gpio_output_dis(gpio_pin_e pin)
  */
 static inline void gpio_set_output(gpio_pin_e pin, unsigned char value)
 {
-    if(value)
-    {
+    if (value) {
         gpio_output_en(pin);
-    }
-    else
-    {
+    } else {
         gpio_output_dis(pin);
     }
-
 }
 
 /**
@@ -538,7 +547,7 @@ static inline void gpio_set_output(gpio_pin_e pin, unsigned char value)
  * @return     1: the pin's output function is enabled.
  *             0: the pin's output function is disabled.
  */
-static inline bool  gpio_is_output_en(gpio_pin_e pin)
+static inline bool gpio_is_output_en(gpio_pin_e pin)
 {
     return !BM_IS_SET(reg_gpio_oen(pin), pin & 0xff);
 }
@@ -651,7 +660,7 @@ static inline void gpio_set_irq_mask(gpio_irq_mask_e mask)
  */
 static inline void gpio_set_group_irq_mask(gpio_group_irq_e mask)
 {
-   BM_SET(reg_gpio_irq_src_mask, mask);
+    BM_SET(reg_gpio_irq_src_mask, mask);
 }
 
 /**
@@ -661,7 +670,7 @@ static inline void gpio_set_group_irq_mask(gpio_group_irq_e mask)
  */
 static inline void gpio_clr_irq_mask(gpio_irq_mask_e mask)
 {
-     BM_CLR(reg_gpio_irq_ctrl, mask);
+    BM_CLR(reg_gpio_irq_ctrl, mask);
 }
 
 /**
@@ -741,7 +750,7 @@ void gpio_set_src_irq(gpio_pin_e pin, gpio_irq_trigger_type_e trigger_type);
  * @param[in]  function - the function need to set.
  * @return     none.
  */
-void gpio_set_mux_function(gpio_func_pin_e pin,gpio_func_e function);
+void gpio_set_mux_function(gpio_func_pin_e pin, gpio_func_e function);
 
 /**
  * @brief      This function set the input function of a pin.
@@ -795,7 +804,7 @@ void gpio_set_pullup_res_30k(gpio_pin_e pin);
  * @param[in] sel_clk
  * @return    none.
  */
-void  gpio_set_probe_clk_function(gpio_func_pin_e pin,probe_clk_sel_e sel_clk);
+void gpio_set_probe_clk_function(gpio_func_pin_e pin, probe_clk_sel_e sel_clk);
 
 /**
  * @brief     This function serves to set jtag(4 wires) pin , Where, PC[4]; PC[5]; PC[6]; PC[7] correspond to TDI; TDO; TMS; TCK functions mux respectively.
@@ -804,7 +813,7 @@ void  gpio_set_probe_clk_function(gpio_func_pin_e pin,probe_clk_sel_e sel_clk);
  * @note      Power-on or hardware reset will detect the level of PB0 (reboot will not detect it), detecting a low level is configured as jtag, 
                detecting a high level is configured as sdp.  the level of PB0 can not be configured internally by the software, and can only be input externally.
  */
- void jtag_set_pin_en(void);
+void jtag_set_pin_en(void);
 
 /**
  * @brief     This function serves to set sdp(2 wires) pin ,where, PC[6]; PC[7] correspond to TMS and TCK functions mux respectively.
@@ -813,7 +822,7 @@ void  gpio_set_probe_clk_function(gpio_func_pin_e pin,probe_clk_sel_e sel_clk);
  * @note      Power-on or hardware reset will detect the level of PB0 (reboot will not detect it), detecting a low level is configured as jtag, 
                detecting a high level is configured as sdp.  the level of PB0 can not be configured internally by the software, and can only be input externally.
  */
- void sdp_set_pin_en(void);
+void sdp_set_pin_en(void);
 
 /**
  * @brief     This function select the irq group source.
@@ -832,7 +841,3 @@ static inline void gpio_set_src_irq_group(gpio_group_e group)
 }
 
 #endif
-
-
-
-

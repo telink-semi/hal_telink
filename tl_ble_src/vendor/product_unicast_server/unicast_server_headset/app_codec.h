@@ -25,55 +25,56 @@
 #define APP_CODEC_H_
 
 #if (UNICAST_SERVER_SELECT == UNICAST_SERVER_HEADSET)
-#define APP_AUDIO_OUTPUT_BUFFER_SIZE                 1200
-#define APP_AUDIO_INPUT_BUFFER_SIZE                  1200
-#define APP_AUDIO_SUPPORT_MAX_FRAME_SAMPLE           480
-#define APP_AUDIO_SUPPORT_MAX_ENCODE_FRAME_BYTES     155
+    #define APP_AUDIO_OUTPUT_BUFFER_SIZE             1200
+    #define APP_AUDIO_INPUT_BUFFER_SIZE              1200
+    #define APP_AUDIO_SUPPORT_MAX_FRAME_SAMPLE       480
+    #define APP_AUDIO_SUPPORT_MAX_ENCODE_FRAME_BYTES 155
 
 
-#if (APP_SCENE == APP_SCENE_HEADSET_EP2)
+    #if (APP_SCENE == APP_SCENE_HEADSET_EP2)
 /**
  *  @brief  app render point buffers
  */
-typedef struct __attribute__((packed)) 
+typedef struct __attribute__((packed))
 {
-    u32     renderPoint;
-    u16     buffer[APP_AUDIO_SUPPORT_MAX_FRAME_SAMPLE];
-}audio_pkt_t;
+    u32 renderPoint;
+    u16 buffer[APP_AUDIO_SUPPORT_MAX_FRAME_SAMPLE];
+} audio_pkt_t;
 
 /**
  *  @brief  list node
  */
-struct __attribute__((packed))  list_node_t
+struct __attribute__((packed)) list_node_t
 {
-    u32     renderPoint;
-    u16     buffer[APP_AUDIO_SUPPORT_MAX_FRAME_SAMPLE];
-    struct __attribute__((packed))  list_node_t *next;
+    u32                                         renderPoint;
+    u16                                         buffer[APP_AUDIO_SUPPORT_MAX_FRAME_SAMPLE];
+    struct __attribute__((packed)) list_node_t *next;
 };
-#elif(APP_SCENE == APP_SCENE_HEADSET_EP1_MULTIPLEXING)
-typedef struct __attribute__((packed)) 
+    #elif (APP_SCENE == APP_SCENE_HEADSET_EP1_MULTIPLEXING)
+typedef struct __attribute__((packed))
 {
-    u32     renderPoint;
-    u16     buffer[2*APP_AUDIO_SUPPORT_MAX_FRAME_SAMPLE];
-}audio_pkt_t;
+    u32 renderPoint;
+    u16 buffer[2 * APP_AUDIO_SUPPORT_MAX_FRAME_SAMPLE];
+} audio_pkt_t;
 
-struct __attribute__((packed))  list_node_t
+struct __attribute__((packed)) list_node_t
 {
-    u32     renderPoint;
-    u16     buffer[2*APP_AUDIO_SUPPORT_MAX_FRAME_SAMPLE];
-    struct __attribute__((packed))  list_node_t *next;
+    u32                                         renderPoint;
+    u16                                         buffer[2 * APP_AUDIO_SUPPORT_MAX_FRAME_SAMPLE];
+    struct __attribute__((packed)) list_node_t *next;
 };
-#endif
+    #endif
 
 /**
  *  @brief  app codec concerned parameters
  */
-typedef struct __attribute__((packed)) {
-    u8   cC;       //channel counts
-    u16  fSample;  //sample each frame
-    u16  fOctets;  //octets each frame
-    u16  frameUs;  //time each frame,us conut
-}app_codec_desc_t;
+typedef struct __attribute__((packed))
+{
+    u8  cC;      //channel counts
+    u16 fSample; //sample each frame
+    u16 fOctets; //octets each frame
+    u16 frameUs; //time each frame,us conut
+} app_codec_desc_t;
 
 /**
  * @brief      Codec init function.

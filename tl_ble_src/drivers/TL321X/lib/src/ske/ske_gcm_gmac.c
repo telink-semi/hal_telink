@@ -30,7 +30,6 @@
 #include "lib/include/ske/ske_gcm_gmac.h"
 
 
-
 #ifdef SUPPORT_SKE_MODE_GCM
 /**
  * @brief       ske_lp gcm mode init config(CPU style)
@@ -56,32 +55,24 @@
       -# 5.aad_bytes and c_bytes could not be zero at the same time.
   @endverbatim
  */
-unsigned int ske_lp_gcm_init(SKE_GCM_CTX *ctx, SKE_ALG alg, SKE_CRYPTO crypto, unsigned char *key, unsigned short sp_key_idx,
-        unsigned char *iv, unsigned int iv_bytes, unsigned int aad_bytes, unsigned int c_bytes, unsigned int mac_bytes)
+unsigned int ske_lp_gcm_init(SKE_GCM_CTX *ctx, SKE_ALG alg, SKE_CRYPTO crypto, unsigned char *key, unsigned short sp_key_idx, unsigned char *iv, unsigned int iv_bytes, unsigned int aad_bytes, unsigned int c_bytes, unsigned int mac_bytes)
 {
     unsigned int tmp[4];
 
-    if(NULL == ctx || NULL == iv)
-    {
+    if (NULL == ctx || NULL == iv) {
         return SKE_BUFFER_NULL;
-    }
-    else if(12 != iv_bytes)
-    {
+    } else if (12 != iv_bytes) {
         return SKE_INPUT_INVALID;
-    }
-    else if((0 == aad_bytes) && (0 == c_bytes))
-    {
+    } else if ((0 == aad_bytes) && (0 == c_bytes)) {
         return SKE_INPUT_INVALID;
-    }
-    else if (mac_bytes > SKE_LP_GCM_MAX_BYTES)
-    {
+    } else if (mac_bytes > SKE_LP_GCM_MAX_BYTES) {
         return SKE_INPUT_INVALID;
+    } else {
+        ;
     }
-    else
-    {;}
 
     memcpy_(tmp, iv, iv_bytes);
-    memset_(((unsigned char *)(tmp))+iv_bytes, 0, sizeof(tmp)-iv_bytes);
+    memset_(((unsigned char *)(tmp)) + iv_bytes, 0, sizeof(tmp) - iv_bytes);
 
     ctx->aad_bytes     = aad_bytes;
     ctx->c_bytes       = c_bytes;
@@ -97,7 +88,7 @@ unsigned int ske_lp_gcm_init(SKE_GCM_CTX *ctx, SKE_ALG alg, SKE_CRYPTO crypto, u
 }
 
 
-#ifdef SKE_LP_GCM_CPU_UPDATE_AAD_BY_STEP
+    #ifdef SKE_LP_GCM_CPU_UPDATE_AAD_BY_STEP
 /**
  * @brief       ske_lp gcm mode input aad.
  * @param[in]   ctx              - SKE_GCM_CTX context pointer.
@@ -119,45 +110,34 @@ unsigned int ske_lp_gcm_update_aad(SKE_GCM_CTX *ctx, unsigned char *aad, unsigne
     unsigned int total_bytes, idx, capacity_bytes;
     unsigned int ret = SKE_ERROR;
 
-    if(NULL == ctx)
-    {
+    if (NULL == ctx) {
         return SKE_BUFFER_NULL;
-    }
-    else if((0 == ctx->aad_bytes) || (NULL == aad) || (0 == bytes))
-    {
+    } else if ((0 == ctx->aad_bytes) || (NULL == aad) || (0 == bytes)) {
         return SKE_SUCCESS;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    idx = ctx->current_bytes & 0x0F;
+    idx            = ctx->current_bytes & 0x0F;
     capacity_bytes = 16 - idx;
 
     total_bytes = ctx->current_bytes + bytes;
-    if(total_bytes < bytes || total_bytes > ctx->aad_bytes)
-    {
+    if (total_bytes < bytes || total_bytes > ctx->aad_bytes) {
         return SKE_INPUT_INVALID;
-    }
-    else if(total_bytes == ctx->aad_bytes)
-    {
-        if(idx)
-        {
-            if(bytes > capacity_bytes)
-            {
+    } else if (total_bytes == ctx->aad_bytes) {
+        if (idx) {
+            if (bytes > capacity_bytes) {
                 memcpy_(ctx->buf + idx, aad, capacity_bytes);
                 ret = ske_lp_update_blocks_no_output(ctx->ske_gcm_ctx, ctx->buf, 16);
-                if(SKE_SUCCESS != ret)
-                {
+                if (SKE_SUCCESS != ret) {
                     goto END;
+                } else {
+                    ;
                 }
-                else
-                {;}
 
                 aad += capacity_bytes;
                 bytes -= capacity_bytes;
-            }
-            else
-            {
+            } else {
                 //the last block
                 memcpy_(ctx->buf + idx, aad, bytes);
                 memset_(ctx->buf + idx + bytes, 0, sizeof(ctx->buf) - (idx + bytes));
@@ -165,26 +145,24 @@ unsigned int ske_lp_gcm_update_aad(SKE_GCM_CTX *ctx, unsigned char *aad, unsigne
             }
         }
 
-        blocks_bytes = (bytes)&(~0x0F);
-        remainder_bytes = (bytes)&0x0F;
-        if(0 == remainder_bytes)
-        {
+        blocks_bytes    = (bytes) & (~0x0F);
+        remainder_bytes = (bytes) & 0x0F;
+        if (0 == remainder_bytes) {
             blocks_bytes -= 16;
             remainder_bytes = 16;
+        } else {
+            ;
         }
-        else
-        {;}
 
         ret = ske_lp_update_blocks_no_output(ctx->ske_gcm_ctx, aad, blocks_bytes);
-        if(SKE_SUCCESS != ret)
-        {
+        if (SKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
         //the last block
-        memcpy_(ctx->buf, aad+blocks_bytes, remainder_bytes);
+        memcpy_(ctx->buf, aad + blocks_bytes, remainder_bytes);
         memset_(ctx->buf + remainder_bytes, 0, sizeof(ctx->buf) - remainder_bytes);
 
 LAST_BLOCK:
@@ -193,60 +171,50 @@ LAST_BLOCK:
         ret = ske_lp_update_blocks_no_output(ctx->ske_gcm_ctx, ctx->buf, 16);
         ske_lp_set_last_block(0);
 
-        if(SKE_SUCCESS != ret)
-        {
+        if (SKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
         ctx->current_bytes = 0;
-    }
-    else
-    {
+    } else {
         ctx->current_bytes = total_bytes;
 
-        if(idx)
-        {
-            if(bytes >= capacity_bytes)
-            {
+        if (idx) {
+            if (bytes >= capacity_bytes) {
                 memcpy_(ctx->buf + idx, aad, capacity_bytes);
                 ret = ske_lp_update_blocks_no_output(ctx->ske_gcm_ctx, ctx->buf, 16);
-                if(SKE_SUCCESS != ret)
-                {
+                if (SKE_SUCCESS != ret) {
                     goto END;
+                } else {
+                    ;
                 }
-                else
-                {;}
 
                 aad += capacity_bytes;
                 bytes -= capacity_bytes;
-            }
-            else
-            {
+            } else {
                 memcpy_(ctx->buf + idx, aad, bytes);
                 ret = SKE_SUCCESS;
                 goto END;
             }
         }
 
-        blocks_bytes = (bytes)&(~0x0F);
-        remainder_bytes = (bytes)&0x0F;
+        blocks_bytes    = (bytes) & (~0x0F);
+        remainder_bytes = (bytes) & 0x0F;
 
         ret = ske_lp_update_blocks_no_output(ctx->ske_gcm_ctx, aad, blocks_bytes);
-        if(SKE_SUCCESS != ret)
-        {
+        if (SKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
-        if(remainder_bytes)
-        {
-            memcpy_(ctx->buf, aad+blocks_bytes, remainder_bytes);
+        if (remainder_bytes) {
+            memcpy_(ctx->buf, aad + blocks_bytes, remainder_bytes);
+        } else {
+            ;
         }
-        else
-        {;}
     }
 
     ret = SKE_SUCCESS;
@@ -255,7 +223,7 @@ END:
 
     return ret;
 }
-#endif
+    #endif
 
 /**
  * @brief       ske_lp gcm mode input aad(one-off style).
@@ -272,42 +240,37 @@ END:
  */
 unsigned int ske_lp_gcm_aad(SKE_GCM_CTX *ctx, unsigned char *aad)
 {
-#ifndef SKE_LP_GCM_CPU_UPDATE_AAD_BY_STEP
+    #ifndef SKE_LP_GCM_CPU_UPDATE_AAD_BY_STEP
     unsigned int blocks_bytes, remainder_bytes;
     unsigned int ret = SKE_ERROR;
 
-    if(NULL == ctx || (NULL == aad && ctx->aad_bytes != 0))
-    {
+    if (NULL == ctx || (NULL == aad && ctx->aad_bytes != 0)) {
         return SKE_BUFFER_NULL;
-    }
-    else if(0 == ctx->aad_bytes)
-    {
+    } else if (0 == ctx->aad_bytes) {
         return SKE_SUCCESS;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    blocks_bytes = (ctx->aad_bytes)&(~0x0F);
-    remainder_bytes = (ctx->aad_bytes)&0x0F;
+    blocks_bytes    = (ctx->aad_bytes) & (~0x0F);
+    remainder_bytes = (ctx->aad_bytes) & 0x0F;
 
-    if(0 == remainder_bytes)
-    {
+    if (0 == remainder_bytes) {
         blocks_bytes -= 16;
         remainder_bytes = 16;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ret = ske_lp_update_blocks_no_output(ctx->ske_gcm_ctx, aad, blocks_bytes);
-    if(SKE_SUCCESS != ret)
-    {
+    if (SKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //the last block
-    memcpy_(ctx->buf, aad+blocks_bytes, remainder_bytes);
+    memcpy_(ctx->buf, aad + blocks_bytes, remainder_bytes);
     memset_(ctx->buf + remainder_bytes, 0, sizeof(ctx->buf) - remainder_bytes);
 
     ske_lp_set_last_block(1);
@@ -315,18 +278,14 @@ unsigned int ske_lp_gcm_aad(SKE_GCM_CTX *ctx, unsigned char *aad)
     ske_lp_set_last_block(0);
 
     return ret;
-#else
-    if(NULL == ctx)
-    {
+    #else
+    if (NULL == ctx) {
         return SKE_BUFFER_NULL;
-    }
-    else
-    {
+    } else {
         return ske_lp_gcm_update_aad(ctx, aad, ctx->aad_bytes);
     }
-#endif
+    #endif
 }
-
 
 /**
  * @brief       ske_lp gcm mode input aad(one-off style).
@@ -354,79 +313,66 @@ unsigned int ske_lp_gcm_update_blocks(SKE_GCM_CTX *ctx, unsigned char *in, unsig
     unsigned int total_bytes;
     unsigned int ret = SKE_ERROR;
 
-    if(NULL == ctx || NULL == in || NULL == out)
-    {
+    if (NULL == ctx || NULL == in || NULL == out) {
         return SKE_BUFFER_NULL;
-    }
-    else if(0 == bytes)    //input is empty
+    } else if (0 == bytes) //input is empty
     {
         return SKE_SUCCESS;
+    } else {
+        ;
     }
-    else
-    {;}
 
     total_bytes = ctx->current_bytes + bytes;
-    if (total_bytes < bytes || total_bytes > ctx->c_bytes)  // overflow
+    if (total_bytes < bytes || total_bytes > ctx->c_bytes) // overflow
     {
         return SKE_INPUT_INVALID;
-    }
-    else if (total_bytes == ctx->c_bytes)
-    {
-        blocks_bytes = (bytes)&(~0x0F);
-        remainder_bytes = (bytes)&0x0F;
-        if(0 == remainder_bytes)
-        {
+    } else if (total_bytes == ctx->c_bytes) {
+        blocks_bytes    = (bytes) & (~0x0F);
+        remainder_bytes = (bytes) & 0x0F;
+        if (0 == remainder_bytes) {
             blocks_bytes -= 16;
             remainder_bytes = 16;
+        } else {
+            ;
         }
-        else
-        {;}
 
         ret = ske_lp_update_blocks_internal(ctx->ske_gcm_ctx, in, out, blocks_bytes);
-        if(SKE_SUCCESS != ret)
-        {
+        if (SKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
         //the last block
-        memcpy_(ctx->buf, in+blocks_bytes, remainder_bytes);
+        memcpy_(ctx->buf, in + blocks_bytes, remainder_bytes);
         memset_(ctx->buf + remainder_bytes, 0, sizeof(ctx->buf) - remainder_bytes);
 
         ske_lp_set_last_block(1);
         ret = ske_lp_update_blocks_internal(ctx->ske_gcm_ctx, ctx->buf, ctx->buf, 16);
         ske_lp_set_last_block(0);
 
-        if(SKE_SUCCESS != ret)
-        {
+        if (SKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
-        memcpy_(out+blocks_bytes, ctx->buf, remainder_bytes);
-    } 
-    else
-    {
-        if(bytes & (16-1))
-        {
+        memcpy_(out + blocks_bytes, ctx->buf, remainder_bytes);
+    } else {
+        if (bytes & (16 - 1)) {
             ret = SKE_INPUT_INVALID;
             goto END;
-        }
-        else
-        {
+        } else {
             ret = ske_lp_update_blocks_internal(ctx->ske_gcm_ctx, in, out, bytes);
-            if(SKE_SUCCESS != ret)
-            {
+            if (SKE_SUCCESS != ret) {
                 goto END;
+            } else {
+                ;
             }
-            else
-            {;}
         }
     }
 
-    ret = SKE_SUCCESS;
+    ret                = SKE_SUCCESS;
     ctx->current_bytes = total_bytes;
 
 END:
@@ -451,33 +397,28 @@ unsigned int ske_lp_gcm_final(SKE_GCM_CTX *ctx, unsigned char *mac)
 {
     unsigned int ret;
 
-    if(NULL == ctx || NULL == mac)
-    {
+    if (NULL == ctx || NULL == mac) {
         return SKE_BUFFER_NULL;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ske_lp_start();
 
     //get mac
     ret = ske_lp_wait_till_done();
-    if(SKE_SUCCESS != ret)
-    {
+    if (SKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ske_lp_simple_get_output_block((unsigned int *)ctx->buf, ctx->ske_gcm_ctx->block_words);
 
-    if(SKE_CRYPTO_ENCRYPT == ctx->crypto)
-    {
+    if (SKE_CRYPTO_ENCRYPT == ctx->crypto) {
         memcpy_(mac, ctx->buf, ctx->mac_bytes);
         ret = SKE_SUCCESS;
-    }
-    else
-    {
+    } else {
         ret = memcmp_(mac, ctx->buf, ctx->mac_bytes);
     }
 
@@ -520,44 +461,37 @@ unsigned int ske_lp_gcm_final(SKE_GCM_CTX *ctx, unsigned char *mac)
 
   @endverbatim
  */
-unsigned int ske_lp_gcm_crypto(SKE_ALG alg, SKE_CRYPTO crypto, unsigned char *key, unsigned short sp_key_idx, unsigned char *iv,
-        unsigned int iv_bytes, unsigned char *aad, unsigned int aad_bytes, unsigned char *in, unsigned char *out, unsigned int c_bytes,
-        unsigned char *mac, unsigned int mac_bytes)
+unsigned int ske_lp_gcm_crypto(SKE_ALG alg, SKE_CRYPTO crypto, unsigned char *key, unsigned short sp_key_idx, unsigned char *iv, unsigned int iv_bytes, unsigned char *aad, unsigned int aad_bytes, unsigned char *in, unsigned char *out, unsigned int c_bytes, unsigned char *mac, unsigned int mac_bytes)
 {
-    SKE_GCM_CTX ctx[1];
+    SKE_GCM_CTX  ctx[1];
     unsigned int ret;
 
     ret = ske_lp_gcm_init(ctx, alg, crypto, key, sp_key_idx, iv, iv_bytes, aad_bytes, c_bytes, mac_bytes);
-    if(SKE_SUCCESS != ret)
-    {
+    if (SKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ret = ske_lp_gcm_aad(ctx, aad);
-    if(SKE_SUCCESS != ret)
-    {
+    if (SKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ret = ske_lp_gcm_update_blocks(ctx, in, out, c_bytes);
-    if(SKE_SUCCESS != ret)
-    {
+    if (SKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     return ske_lp_gcm_final(ctx, mac);
 }
 
 
-
-
-#ifdef SUPPORT_SKE_MODE_GMAC
+    #ifdef SUPPORT_SKE_MODE_GMAC
 /**
  * @brief       ske_lp gcm mode init config(CPU style)
  * @param[in]   ctx              - SKE_GMAC_CTX context pointer.
@@ -582,15 +516,13 @@ unsigned int ske_lp_gcm_crypto(SKE_ALG alg, SKE_CRYPTO crypto, unsigned char *ke
       -# 5.aad_bytes and c_bytes could not be zero at the same time.
   @endverbatim
  */
-unsigned int ske_lp_gmac_init(SKE_GMAC_CTX *ctx, SKE_ALG alg, SKE_MAC mac_action, unsigned char *key, unsigned short sp_key_idx,
-        unsigned char *iv, unsigned int iv_bytes, unsigned int aad_bytes, unsigned int c_bytes, unsigned int mac_bytes)
+unsigned int ske_lp_gmac_init(SKE_GMAC_CTX *ctx, SKE_ALG alg, SKE_MAC mac_action, unsigned char *key, unsigned short sp_key_idx, unsigned char *iv, unsigned int iv_bytes, unsigned int aad_bytes, unsigned int c_bytes, unsigned int mac_bytes)
 {
-    if(NULL == ctx)
-    {
+    if (NULL == ctx) {
         return SKE_BUFFER_NULL;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ctx->mac_action = mac_action;
 
@@ -598,7 +530,7 @@ unsigned int ske_lp_gmac_init(SKE_GMAC_CTX *ctx, SKE_ALG alg, SKE_MAC mac_action
 }
 
 
-#ifdef SKE_LP_GCM_CPU_UPDATE_AAD_BY_STEP
+        #ifdef SKE_LP_GCM_CPU_UPDATE_AAD_BY_STEP
 /**
  * @brief       ske_lp gcm mode input aad(one-off style).
  * @param[in]   ctx              - SKE_GMAC_CTX context pointer.
@@ -618,7 +550,7 @@ unsigned int ske_lp_gmac_update_aad(SKE_GMAC_CTX *ctx, unsigned char *aad, unsig
 {
     return ske_lp_gcm_update_aad(ctx->gcm_ctx, aad, bytes);
 }
-#endif
+        #endif
 
 
 /**
@@ -637,12 +569,11 @@ unsigned int ske_lp_gmac_update_aad(SKE_GMAC_CTX *ctx, unsigned char *aad, unsig
  */
 unsigned int ske_lp_gmac_aad(SKE_GMAC_CTX *ctx, unsigned char *aad)
 {
-    if(NULL == ctx)
-    {
+    if (NULL == ctx) {
         return SKE_BUFFER_NULL;
+    } else {
+        ;
     }
-    else
-    {;}
 
     return ske_lp_gcm_aad(ctx->gcm_ctx, aad);
 }
@@ -668,45 +599,35 @@ unsigned int ske_lp_gmac_update(SKE_GMAC_CTX *ctx, unsigned char *in, unsigned i
     unsigned int total_bytes, idx, capacity_bytes;
     unsigned int ret = SKE_ERROR;
 
-    if(NULL == ctx || ((NULL == in) && bytes != 0))
-    {
+    if (NULL == ctx || ((NULL == in) && bytes != 0)) {
         return SKE_BUFFER_NULL;
-    }
-    else if((0 == ctx->gcm_ctx->c_bytes) || (NULL == in) || (0 == bytes))    //input is empty
+    } else if ((0 == ctx->gcm_ctx->c_bytes) || (NULL == in) || (0 == bytes)) //input is empty
     {
         return SKE_SUCCESS;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    idx = ctx->gcm_ctx->current_bytes & 0x0F;
+    idx            = ctx->gcm_ctx->current_bytes & 0x0F;
     capacity_bytes = 16 - idx;
 
     total_bytes = ctx->gcm_ctx->current_bytes + bytes;
-    if(total_bytes < bytes  || total_bytes > ctx->gcm_ctx->c_bytes)
-    {
+    if (total_bytes < bytes || total_bytes > ctx->gcm_ctx->c_bytes) {
         return SKE_INPUT_INVALID;
-    }
-    else if(total_bytes == ctx->gcm_ctx->c_bytes)
-    {
-        if(idx)
-        {
-            if(bytes > capacity_bytes)
-            {
+    } else if (total_bytes == ctx->gcm_ctx->c_bytes) {
+        if (idx) {
+            if (bytes > capacity_bytes) {
                 memcpy_(ctx->gcm_ctx->buf + idx, in, capacity_bytes);
                 ret = ske_lp_gmac_update_blocks_internal(ctx->gcm_ctx->buf, 16);
-                if(SKE_SUCCESS != ret)
-                {
+                if (SKE_SUCCESS != ret) {
                     goto END;
+                } else {
+                    ;
                 }
-                else
-                {;}
 
                 in += capacity_bytes;
                 bytes -= capacity_bytes;
-            }
-            else
-            {
+            } else {
                 //the last block
                 memcpy_(ctx->gcm_ctx->buf + idx, in, bytes);
                 memset_(ctx->gcm_ctx->buf + idx + bytes, 0, sizeof(ctx->gcm_ctx->buf) - (idx + bytes));
@@ -714,23 +635,21 @@ unsigned int ske_lp_gmac_update(SKE_GMAC_CTX *ctx, unsigned char *in, unsigned i
             }
         }
 
-        blocks_bytes = bytes & (~0x0F);
+        blocks_bytes    = bytes & (~0x0F);
         remainder_bytes = bytes & 0x0F;
-        if(0 == remainder_bytes)
-        {
+        if (0 == remainder_bytes) {
             blocks_bytes -= 16;
             remainder_bytes = 16;
+        } else {
+            ;
         }
-        else
-        {;}
 
         ret = ske_lp_gmac_update_blocks_internal(in, blocks_bytes);
-        if(SKE_SUCCESS != ret)
-        {
+        if (SKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
         //the last block
         memcpy_(ctx->gcm_ctx->buf, in + blocks_bytes, remainder_bytes);
@@ -741,60 +660,50 @@ LAST_BLOCK:
         ske_lp_set_last_block(1);
         ret = ske_lp_gmac_update_blocks_internal(ctx->gcm_ctx->buf, 16);
         ske_lp_set_last_block(0);
-        if(SKE_SUCCESS != ret)
-        {
+        if (SKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
         ctx->gcm_ctx->current_bytes = total_bytes;
-    }
-    else
-    {
+    } else {
         ctx->gcm_ctx->current_bytes = total_bytes;
 
-        if(idx)
-        {
-            if(bytes >= capacity_bytes)
-            {
+        if (idx) {
+            if (bytes >= capacity_bytes) {
                 memcpy_(ctx->gcm_ctx->buf + idx, in, capacity_bytes);
                 ret = ske_lp_gmac_update_blocks_internal(ctx->gcm_ctx->buf, 16);
-                if(SKE_SUCCESS != ret)
-                {
+                if (SKE_SUCCESS != ret) {
                     goto END;
+                } else {
+                    ;
                 }
-                else
-                {;}
 
                 in += capacity_bytes;
                 bytes -= capacity_bytes;
-            }
-            else
-            {
+            } else {
                 memcpy_(ctx->gcm_ctx->buf + idx, in, bytes);
                 ret = SKE_SUCCESS;
                 goto END;
             }
         }
 
-        blocks_bytes = (bytes)&(~0x0F);
-        remainder_bytes = (bytes)&0x0F;
+        blocks_bytes    = (bytes) & (~0x0F);
+        remainder_bytes = (bytes) & 0x0F;
 
         ret = ske_lp_gmac_update_blocks_internal(in, blocks_bytes);
-        if(SKE_SUCCESS != ret)
-        {
+        if (SKE_SUCCESS != ret) {
             goto END;
+        } else {
+            ;
         }
-        else
-        {;}
 
-        if(remainder_bytes)
-        {
-            memcpy_(ctx->gcm_ctx->buf, in+blocks_bytes, remainder_bytes);
+        if (remainder_bytes) {
+            memcpy_(ctx->gcm_ctx->buf, in + blocks_bytes, remainder_bytes);
+        } else {
+            ;
         }
-        else
-        {;}
     }
 
     ret = SKE_SUCCESS;
@@ -803,7 +712,6 @@ END:
 
     return ret;
 }
-
 
 /**
  * @brief       ske_lp gcm mode input aad(one-off style).
@@ -822,29 +730,24 @@ unsigned int ske_lp_gmac_final(SKE_GMAC_CTX *ctx, unsigned char *mac)
 {
     unsigned int ret;
 
-    if(NULL == ctx || NULL == mac)
-    {
+    if (NULL == ctx || NULL == mac) {
         return SKE_BUFFER_NULL;
+    } else {
+        ;
     }
-    else
-    {;}
 
     //get mac
     ret = ske_lp_gcm_final(ctx->gcm_ctx, ctx->gcm_ctx->buf);
-    if(SKE_SUCCESS != ret)
-    {
+    if (SKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    if(SKE_GENERATE_MAC == ctx->mac_action)
-    {
+    if (SKE_GENERATE_MAC == ctx->mac_action) {
         memcpy_(mac, ctx->gcm_ctx->buf, ctx->gcm_ctx->mac_bytes);
         ret = SKE_SUCCESS;
-    }
-    else
-    {
+    } else {
         ret = memcmp_(mac, ctx->gcm_ctx->buf, ctx->gcm_ctx->mac_bytes);
     }
 
@@ -881,44 +784,38 @@ unsigned int ske_lp_gmac_final(SKE_GMAC_CTX *ctx, unsigned char *mac)
  *        mac is input, return value SKE_SUCCESS means the mac is valid, otherwise mac is invalid.
   @endverbatim
  */
-unsigned int ske_lp_gmac_crypto(SKE_ALG alg, SKE_MAC mac_action, unsigned char *key, unsigned short sp_key_idx, unsigned char *iv,
-        unsigned int iv_bytes, unsigned char *aad, unsigned int aad_bytes, unsigned char *in, unsigned int c_bytes, unsigned char *mac,
-        unsigned int mac_bytes)
+unsigned int ske_lp_gmac_crypto(SKE_ALG alg, SKE_MAC mac_action, unsigned char *key, unsigned short sp_key_idx, unsigned char *iv, unsigned int iv_bytes, unsigned char *aad, unsigned int aad_bytes, unsigned char *in, unsigned int c_bytes, unsigned char *mac, unsigned int mac_bytes)
 {
     SKE_GMAC_CTX ctx[1];
     unsigned int ret;
 
     ret = ske_lp_gmac_init(ctx, alg, mac_action, key, sp_key_idx, iv, iv_bytes, aad_bytes, c_bytes, mac_bytes);
-    if(SKE_SUCCESS != ret)
-    {
+    if (SKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ret = ske_lp_gcm_aad(ctx->gcm_ctx, aad);
-    if(SKE_SUCCESS != ret)
-    {
+    if (SKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     ret = ske_lp_gmac_update(ctx, in, c_bytes);
-    if(SKE_SUCCESS != ret)
-    {
+    if (SKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
     return ske_lp_gmac_final(ctx, mac);
 }
-#endif
+    #endif
 
 
-
-#ifdef SKE_LP_DMA_FUNCTION
+    #ifdef SKE_LP_DMA_FUNCTION
 /**
  * @brief       ske_lp gcm mode init config(CPU style)
  * @param[in]   ctx              - SKE_GCM_CTX context pointer.
@@ -943,36 +840,26 @@ unsigned int ske_lp_gmac_crypto(SKE_ALG alg, SKE_MAC mac_action, unsigned char *
       -# 5.aad_bytes and c_bytes could not be zero at the same time.
   @endverbatim
  */
-unsigned int ske_lp_dma_gcm_init(SKE_GCM_CTX *ctx, SKE_ALG alg, SKE_CRYPTO crypto, unsigned char *key, unsigned short sp_key_idx,
-        unsigned char *iv, unsigned int iv_bytes, unsigned int aad_bytes, unsigned int c_bytes, unsigned int mac_bytes)
+unsigned int ske_lp_dma_gcm_init(SKE_GCM_CTX *ctx, SKE_ALG alg, SKE_CRYPTO crypto, unsigned char *key, unsigned short sp_key_idx, unsigned char *iv, unsigned int iv_bytes, unsigned int aad_bytes, unsigned int c_bytes, unsigned int mac_bytes)
 {
     unsigned int tmp[4];
 
-    if(NULL == ctx || NULL == iv)
-    {
+    if (NULL == ctx || NULL == iv) {
         return SKE_BUFFER_NULL;
-    }
-    else if(12 != iv_bytes)
-    {
+    } else if (12 != iv_bytes) {
         return SKE_INPUT_INVALID;
-    }
-    else if((0 == aad_bytes) && (0 == c_bytes))
-    {
+    } else if ((0 == aad_bytes) && (0 == c_bytes)) {
         return SKE_INPUT_INVALID;
-    }
-    else if ((aad_bytes > 0x1fffffff) || (c_bytes > 0x1fffffff))
-    {
+    } else if ((aad_bytes > 0x1fffffff) || (c_bytes > 0x1fffffff)) {
         return SKE_INPUT_INVALID;
-    }
-    else if (mac_bytes > SKE_LP_GCM_MAX_BYTES)
-    {
+    } else if (mac_bytes > SKE_LP_GCM_MAX_BYTES) {
         return SKE_INPUT_INVALID;
+    } else {
+        ;
     }
-    else
-    {;}
 
     memcpy_(tmp, iv, iv_bytes);
-    memset_(((unsigned char *)(tmp))+iv_bytes, 0, sizeof(tmp)-iv_bytes);
+    memset_(((unsigned char *)(tmp)) + iv_bytes, 0, sizeof(tmp) - iv_bytes);
 
     ctx->aad_bytes     = aad_bytes;
     ctx->c_bytes       = c_bytes;
@@ -984,7 +871,7 @@ unsigned int ske_lp_dma_gcm_init(SKE_GCM_CTX *ctx, SKE_ALG alg, SKE_CRYPTO crypt
     ske_lp_set_aad_len_uint32(aad_bytes);
     ske_lp_set_c_len_uint32(c_bytes);
 
-    return ske_lp_init_internal(ctx->ske_gcm_ctx, alg, SKE_MODE_GCM, crypto, key, sp_key_idx, (unsigned char *)tmp , SKE_LP_DMA_ENABLE);
+    return ske_lp_init_internal(ctx->ske_gcm_ctx, alg, SKE_MODE_GCM, crypto, key, sp_key_idx, (unsigned char *)tmp, SKE_LP_DMA_ENABLE);
 }
 
 /**
@@ -1006,55 +893,45 @@ unsigned int ske_lp_dma_gcm_init(SKE_GCM_CTX *ctx, SKE_ALG alg, SKE_CRYPTO crypt
  */
 unsigned int ske_lp_dma_gcm_update_aad_blocks(SKE_GCM_CTX *ctx, unsigned int *aad, unsigned int bytes, SKE_CALLBACK callback)
 {
-    unsigned int aad_blocks_words = ((bytes+15)&(~0x0F))/4;
+    unsigned int aad_blocks_words = ((bytes + 15) & (~0x0F)) / 4;
     unsigned int total_bytes;
     unsigned int ret;
 
-    if(NULL == ctx)
-    {
+    if (NULL == ctx) {
         return SKE_BUFFER_NULL;
-    }
-    else if((NULL == aad) || (0 == bytes))
-    {
+    } else if ((NULL == aad) || (0 == bytes)) {
         return SKE_SUCCESS;
+    } else {
+        ;
     }
-    else
-    {;}
 
     total_bytes = ctx->current_bytes + bytes;
 
-    if (total_bytes < bytes || total_bytes > ctx->aad_bytes)  // overflow
+    if (total_bytes < bytes || total_bytes > ctx->aad_bytes) // overflow
     {
         return SKE_INPUT_INVALID;
-    }
-    else if(total_bytes == ctx->aad_bytes)
-    {
+    } else if (total_bytes == ctx->aad_bytes) {
         ret = ske_lp_dma_operate(ctx->ske_gcm_ctx, aad, NULL, aad_blocks_words, 0, callback);
-        if(SKE_SUCCESS != ret)
-        {
+        if (SKE_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
 
         ctx->current_bytes = 0;
-    }
-    else
-    {
-        if(bytes & (16-1))
-        {
+    } else {
+        if (bytes & (16 - 1)) {
             return SKE_INPUT_INVALID;
+        } else {
+            ;
         }
-        else
-        {;}
 
         ret = ske_lp_dma_operate(ctx->ske_gcm_ctx, aad, NULL, aad_blocks_words, 0, callback);
-        if(SKE_SUCCESS != ret)
-        {
+        if (SKE_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
 
         ctx->current_bytes = total_bytes;
     }
@@ -1086,83 +963,67 @@ unsigned int ske_lp_dma_gcm_update_aad_blocks(SKE_GCM_CTX *ctx, unsigned int *aa
         cover the input.
   @endverbatim
  */
-unsigned int ske_lp_dma_gcm_update_blocks(SKE_GCM_CTX *ctx, unsigned int *in, unsigned int *out, unsigned int in_bytes,
-        SKE_CALLBACK callback)
+unsigned int ske_lp_dma_gcm_update_blocks(SKE_GCM_CTX *ctx, unsigned int *in, unsigned int *out, unsigned int in_bytes, SKE_CALLBACK callback)
 {
-    unsigned int in_blocks_words = ((in_bytes+15)&(~0x0F))/4;
+    unsigned int in_blocks_words = ((in_bytes + 15) & (~0x0F)) / 4;
     unsigned int total_bytes;
     unsigned int ret;
 
-    if((NULL == ctx) || (NULL == in) || (NULL == out))
-    {
+    if ((NULL == ctx) || (NULL == in) || (NULL == out)) {
         return SKE_BUFFER_NULL;
-    }
-    else if(0 == in_bytes)
-    {
+    } else if (0 == in_bytes) {
         return SKE_SUCCESS;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    if(0 == ctx->c_bytes)
-    {
-        if (0 == ctx->aad_bytes)
-        {
+    if (0 == ctx->c_bytes) {
+        if (0 == ctx->aad_bytes) {
             //hardware does not support
             return SKE_INPUT_INVALID;
-        }
-        else
-        {
+        } else {
             //just for the case that aad is not NULL, and c is NULL, here input aad block including tail.
             ret = ske_lp_dma_operate(ctx->ske_gcm_ctx, in, out, in_blocks_words, 4, callback);
-            if(SKE_SUCCESS != ret)
-            {
+            if (SKE_SUCCESS != ret) {
                 return ret;
+            } else {
+                ;
             }
-            else
-            {;}
 
             clear_block_tail(out, ctx->mac_bytes);
 
             return SKE_SUCCESS;
         }
+    } else {
+        ;
     }
-    else
-    {;}
 
     total_bytes = ctx->current_bytes + in_bytes;
-    if (total_bytes < in_bytes || total_bytes > ctx->c_bytes)  // overflow
+    if (total_bytes < in_bytes || total_bytes > ctx->c_bytes) // overflow
     {
         return SKE_INPUT_INVALID;
-    }
-    else if(total_bytes == ctx->c_bytes)
-    {
+    } else if (total_bytes == ctx->c_bytes) {
         ret = ske_lp_dma_operate(ctx->ske_gcm_ctx, in, out, in_blocks_words, in_blocks_words + 4, callback);
-        if(SKE_SUCCESS != ret)
-        {
+        if (SKE_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
 
         clear_block_tail(out + in_blocks_words, ctx->mac_bytes);
-    }
-    else
-    {
-        if(in_bytes & (16-1))
-        {
+    } else {
+        if (in_bytes & (16 - 1)) {
             return SKE_INPUT_INVALID;
+        } else {
+            ;
         }
-        else
-        {;}
 
         ret = ske_lp_dma_operate(ctx->ske_gcm_ctx, in, out, in_blocks_words, in_blocks_words, callback);
-        if(SKE_SUCCESS != ret)
-        {
+        if (SKE_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
     }
 
     ctx->current_bytes = total_bytes;
@@ -1181,12 +1042,11 @@ unsigned int ske_lp_dma_gcm_update_blocks(SKE_GCM_CTX *ctx, unsigned int *in, un
  */
 unsigned int ske_lp_dma_gcm_final(SKE_GCM_CTX *ctx)
 {
-    if(NULL == ctx)
-    {
+    if (NULL == ctx) {
         return SKE_BUFFER_NULL;
+    } else {
+        ;
     }
-    else
-    {;}
 
     memset_(ctx, 0, sizeof(SKE_GCM_CTX));
 
@@ -1229,56 +1089,47 @@ unsigned int ske_lp_dma_gcm_final(SKE_GCM_CTX *ctx)
         cover the input.
   @endverbatim
  */
-unsigned int ske_lp_dma_gcm_crypto(SKE_ALG alg, SKE_CRYPTO crypto, unsigned char *key, unsigned short sp_key_idx, unsigned char *iv,
-        unsigned int iv_bytes, unsigned int *aad, unsigned int aad_bytes, unsigned int *in, unsigned int *out, unsigned int c_bytes,
-        unsigned int mac_bytes, SKE_CALLBACK callback)
+unsigned int ske_lp_dma_gcm_crypto(SKE_ALG alg, SKE_CRYPTO crypto, unsigned char *key, unsigned short sp_key_idx, unsigned char *iv, unsigned int iv_bytes, unsigned int *aad, unsigned int aad_bytes, unsigned int *in, unsigned int *out, unsigned int c_bytes, unsigned int mac_bytes, SKE_CALLBACK callback)
 {
-    SKE_GCM_CTX ctx[1];
+    SKE_GCM_CTX  ctx[1];
     unsigned int ret;
 
     ret = ske_lp_dma_gcm_init(ctx, alg, crypto, key, sp_key_idx, iv, iv_bytes, aad_bytes, c_bytes, mac_bytes);
-    if(SKE_SUCCESS != ret)
-    {
+    if (SKE_SUCCESS != ret) {
         return ret;
+    } else {
+        ;
     }
-    else
-    {;}
 
-    if(aad_bytes && (0 == c_bytes))
-    {
-        ret = ske_lp_dma_operate(ctx->ske_gcm_ctx, aad, out, ((aad_bytes+15)/16)<<2, 4, callback);
-        if(SKE_SUCCESS != ret)
-        {
+    if (aad_bytes && (0 == c_bytes)) {
+        ret = ske_lp_dma_operate(ctx->ske_gcm_ctx, aad, out, ((aad_bytes + 15) / 16) << 2, 4, callback);
+        if (SKE_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
 
         clear_block_tail(out, mac_bytes);
-    }
-    else
-    {
+    } else {
         ret = ske_lp_dma_gcm_update_aad_blocks(ctx, aad, aad_bytes, callback);
-        if(SKE_SUCCESS != ret)
-        {
+        if (SKE_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
 
         ret = ske_lp_dma_gcm_update_blocks(ctx, in, out, c_bytes, callback);
-        if(SKE_SUCCESS != ret)
-        {
+        if (SKE_SUCCESS != ret) {
             return ret;
+        } else {
+            ;
         }
-        else
-        {;}
     }
 
     return ske_lp_dma_gcm_final(ctx);
 }
 
-#endif
+    #endif
 
 
 #endif

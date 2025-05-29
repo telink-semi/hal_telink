@@ -29,83 +29,81 @@
 
 
 #ifndef USB_MOUSE_REPORT_SMOOTH
-#define USB_MOUSE_REPORT_SMOOTH 0
+    #define USB_MOUSE_REPORT_SMOOTH 0
 #endif
 
 
-#define  USBMOUSE_BUFF_DATA_NUM    8
+#define USBMOUSE_BUFF_DATA_NUM 8
 static mouse_data_t mouse_dat_buff[USBMOUSE_BUFF_DATA_NUM];
 
 static u8  usbmouse_wptr, usbmouse_rptr;
 static u32 usbmouse_not_released;
 static u32 usbmouse_data_report_time;
 
-
-
-void usbmouse_add_frame (mouse_data_t *packet_mouse, int packet_num)
+void usbmouse_add_frame(mouse_data_t *packet_mouse, int packet_num)
 {
-    for(u8 i=0;i<packet_num ;i++)
-    {
-        memcpy((s8*)(&mouse_dat_buff[usbmouse_wptr]), (s8*)(packet_mouse + i), sizeof(mouse_data_t));
-        BOUND_INC_POW2(usbmouse_wptr,USBMOUSE_BUFF_DATA_NUM);
-        if(usbmouse_wptr == usbmouse_rptr)
-        {
-                //BOUND_INC_POW2(usbmouse_rptr,USBMOUSE_BUFF_DATA_NUM);
-                break;
+    for (u8 i = 0; i < packet_num; i++) {
+        memcpy((s8 *)(&mouse_dat_buff[usbmouse_wptr]), (s8 *)(packet_mouse + i), sizeof(mouse_data_t));
+        BOUND_INC_POW2(usbmouse_wptr, USBMOUSE_BUFF_DATA_NUM);
+        if (usbmouse_wptr == usbmouse_rptr) {
+            //BOUND_INC_POW2(usbmouse_rptr,USBMOUSE_BUFF_DATA_NUM);
+            break;
         }
     }
 }
 
-
-void usbmouse_release_check(void){
-    if(usbmouse_not_released && clock_time_exceed(usbmouse_data_report_time, USB_MOUSE_RELEASE_TIMEOUT)){
+void usbmouse_release_check(void)
+{
+#if (MCU_CORE_TYPE != CHIP_TYPE_TL322X)
+    if (usbmouse_not_released && clock_time_exceed(usbmouse_data_report_time, USB_MOUSE_RELEASE_TIMEOUT)) {
         u32 release_data = 0;
 
-        if(usbmouse_hid_report(USB_HID_MOUSE, (u8*)(&release_data), MOUSE_REPORT_DATA_LEN)){
+        if (usbmouse_hid_report(USB_HID_MOUSE, (u8 *)(&release_data), MOUSE_REPORT_DATA_LEN)) {
             usbmouse_not_released = 0;
         }
     }
+#endif
 }
 
-
-void usbmouse_report_frame(void){
-
-#if     USB_MOUSE_REPORT_SMOOTH
+void usbmouse_report_frame(void)
+{
+#if USB_MOUSE_REPORT_SMOOTH
     static u32 tick = 0;
-    if(usbhw_is_ep_busy(USB_EDP_MOUSE)) {
-            tick = clock_time ();
+    if (usbhw_is_ep_busy(USB_EDP_MOUSE)) {
+        tick = clock_time();
     }
 
     u8 diff = (usbmouse_wptr - usbmouse_rptr) & (USBMOUSE_BUFF_DATA_NUM - 1);
-    if (diff < 3 && !clock_time_exceed (tick, 5000)) {
+    if (diff < 3 && !clock_time_exceed(tick, 5000)) {
         return;
     }
 #endif
-
-    if(usbmouse_wptr != usbmouse_rptr){
-        u32 data = *(u32*)(&mouse_dat_buff[usbmouse_rptr]); // that is   >  0
-        int ret = usbmouse_hid_report(USB_HID_MOUSE,(u8*)(&data), MOUSE_REPORT_DATA_LEN);
-        if(ret){
-            BOUND_INC_POW2(usbmouse_rptr,USBMOUSE_BUFF_DATA_NUM);
+#if (MCU_CORE_TYPE != CHIP_TYPE_TL322X)
+    if (usbmouse_wptr != usbmouse_rptr) {
+        u32 data = *(u32 *)(&mouse_dat_buff[usbmouse_rptr]); // that is   >  0
+        int ret  = usbmouse_hid_report(USB_HID_MOUSE, (u8 *)(&data), MOUSE_REPORT_DATA_LEN);
+        if (ret) {
+            BOUND_INC_POW2(usbmouse_rptr, USBMOUSE_BUFF_DATA_NUM);
         }
-        if(0 == data && ret){           //  successfully  release the key
+        if (0 == data && ret) { //  successfully  release the key
             usbmouse_not_released = 0;
-        }else{
-            usbmouse_not_released = 1;
+        } else {
+            usbmouse_not_released     = 1;
             usbmouse_data_report_time = clock_time();
         }
     }
+#endif
     return;
 }
 
-
-int usbmouse_hid_report(u8 report_id, u8 *data, int cnt){
+int usbmouse_hid_report(u8 report_id, u8 *data, int cnt)
+{
     //unsigned char crc_in[8];
     //unsigned short crc;
     //unsigned int crch;
 
-
-    if(usbhw_is_ep_busy(USB_EDP_MOUSE)){
+#if (MCU_CORE_TYPE != CHIP_TYPE_TL322X)
+    if (usbhw_is_ep_busy(USB_EDP_MOUSE)) {
 #if 0 //mouse has its own buffer "mouse_dat_buff"
         u8 *pData = (u8 *)&usb_fifo[usb_ff_wptr++ & (USB_FIFO_NUM - 1)];
         pData[0] = DAT_TYPE_MOUSE;
@@ -131,18 +129,15 @@ int usbmouse_hid_report(u8 report_id, u8 *data, int cnt){
         reg_usb_ep_dat(USB_EDP_MOUSE) = data[0];
         reg_usb_ep_dat(USB_EDP_MOUSE) = data[1];
         reg_usb_ep_dat(USB_EDP_MOUSE) = data[2];
-    }
-    else {
+    } else {
         reg_usb_ep_dat(USB_EDP_MOUSE) = report_id;
-        foreach(i, cnt){
+        foreach (i, cnt) {
             reg_usb_ep_dat(USB_EDP_MOUSE) = data[i];
         }
     }
-//  reg_usb_ep_ctrl(USB_EDP_MOUSE) = FLD_EP_DAT_ACK;        // ACK
-    reg_usb_ep_ctrl(USB_EDP_MOUSE) = FLD_EP_DAT_ACK | (edp_toggle[USB_EDP_MOUSE] ? FLD_USB_EP_DAT1 : FLD_USB_EP_DAT0);  // ACK
+    //  reg_usb_ep_ctrl(USB_EDP_MOUSE) = FLD_EP_DAT_ACK;        // ACK
+    reg_usb_ep_ctrl(USB_EDP_MOUSE) = FLD_EP_DAT_ACK | (edp_toggle[USB_EDP_MOUSE] ? FLD_USB_EP_DAT1 : FLD_USB_EP_DAT0); // ACK
     edp_toggle[USB_EDP_MOUSE] ^= 1;
-
+#endif
     return 1;
 }
-
-

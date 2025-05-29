@@ -23,11 +23,11 @@
  *******************************************************************************************************/
 #pragma once
 
-#define PRODUCT_MCU_DEMO                                0
+#define PRODUCT_MCU_DEMO              0
 
-#define PRODUCT_GOOGLE_BROADCAST_SINK                   1
+#define PRODUCT_GOOGLE_BROADCAST_SINK 1
 
-#define PRODUCT_BIS_SINK_SELECT                         PRODUCT_GOOGLE_BROADCAST_SINK
+#define PRODUCT_BIS_SINK_SELECT       PRODUCT_GOOGLE_BROADCAST_SINK
 
-#define BLC_PM_EN                           0
-#define BLC_PM_DEEP_RETENTION_MODE_EN       0
+#define BLC_PM_EN                     0
+#define BLC_PM_DEEP_RETENTION_MODE_EN 0

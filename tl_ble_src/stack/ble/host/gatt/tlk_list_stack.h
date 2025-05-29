@@ -35,13 +35,15 @@
  * @param[in] node - the pointer of the node.
  * @return None.
  */
-typedef int (*traverseNodeCb_t)(void* node);
+typedef int (*traverseNodeCb_t)(void *node);
 
 /**
  * @brief Structure of a node in the single linked list.
  */
-struct single_list_node {
-    SLIST_ENTRY(single_list_node) next;     //!< Pointer to the next node.
+struct single_list_node
+{
+    SLIST_ENTRY(single_list_node)
+    next; //!< Pointer to the next node.
 };
 
 /**
@@ -52,17 +54,17 @@ SLIST_HEAD(single_list, single_list_node);
 /**
  * @brief Definition a variable single linked list and initial.
  */
-#define SLIST_DEF(name)             \
-struct single_list name = {             \
-    .slh_first = NULL,                  \
-}
+#define SLIST_DEF(name)         \
+    struct single_list name = { \
+        .slh_first = NULL,      \
+    }
 
-#define SLIST_INSERT_NODE_HEAD(sList, node) sList_headInsertNode((struct single_list*)(sList), (struct single_list_node*)(node))
-#define SLIST_INSERT_TAIL(sList, node)      sList_tailInsertNode((struct single_list*)(sList), (struct single_list_node*)(node))
-#define SLIST_INSERT_NODE(prevNode, node)   sList_insertNode((struct single_list_node*)(prevNode), (struct single_list_node*)(node))
-#define SLIST_DELETE_HEAD(sList)            (void*)sList_deleteHeadNode((struct single_list*)(sList))
-#define SLIST_DELETE_TAIL(sList)            (void*)sList_deleteTailNode((struct single_list*)(sList))
-#define SLIST_DELETE_NODE(sList, node)      sList_deleteSpecificNode((struct single_list*)(sList), (struct single_list_node*)(node))
+#define SLIST_INSERT_NODE_HEAD(sList, node) sList_headInsertNode((struct single_list *)(sList), (struct single_list_node *)(node))
+#define SLIST_INSERT_TAIL(sList, node)      sList_tailInsertNode((struct single_list *)(sList), (struct single_list_node *)(node))
+#define SLIST_INSERT_NODE(prevNode, node)   sList_insertNode((struct single_list_node *)(prevNode), (struct single_list_node *)(node))
+#define SLIST_DELETE_HEAD(sList)            (void *)sList_deleteHeadNode((struct single_list *)(sList))
+#define SLIST_DELETE_TAIL(sList)            (void *)sList_deleteTailNode((struct single_list *)(sList))
+#define SLIST_DELETE_NODE(sList, node)      sList_deleteSpecificNode((struct single_list *)(sList), (struct single_list_node *)(node))
 
 
 /**
@@ -70,7 +72,7 @@ struct single_list name = {             \
  * @param[in]   pList  - The single linked list need to use.
  * @return  None.
  */
-void sList_initial(struct single_list* pList);
+void sList_initial(struct single_list *pList);
 
 /**
  * @brief       single linked list insert a node into head.
@@ -78,7 +80,7 @@ void sList_initial(struct single_list* pList);
  * @param[in]   pNode  - The pointer of the new node.
  * @return  None.
  */
-void sList_headInsertNode(struct single_list* pList, struct single_list_node* pNode);
+void sList_headInsertNode(struct single_list *pList, struct single_list_node *pNode);
 
 /**
  * @brief       single linked list insert a node into tail.
@@ -86,7 +88,7 @@ void sList_headInsertNode(struct single_list* pList, struct single_list_node* pN
  * @param[in]   pNode  - The pointer of the new node.
  * @return  None.
  */
-void sList_tailInsertNode(struct single_list* pList, struct single_list_node* pNode);
+void sList_tailInsertNode(struct single_list *pList, struct single_list_node *pNode);
 
 /**
  * @brief       single linked list insert a node into previous node.
@@ -94,21 +96,21 @@ void sList_tailInsertNode(struct single_list* pList, struct single_list_node* pN
  * @param[in]   pRrev  - The pointer of the previous node.
  * @return  None.
  */
-void sList_insertNode(struct single_list_node* pNode, struct single_list_node* pPrev);
+void sList_insertNode(struct single_list_node *pNode, struct single_list_node *pPrev);
 
 /**
  * @brief       single linked list delete head node.
  * @param[in]   pList  - The single linked list that delete a node.
  * @return  the pointer of delete node.
  */
-struct single_list_node* sList_deleteHeadNode(struct single_list* pList);
+struct single_list_node *sList_deleteHeadNode(struct single_list *pList);
 
 /**
  * @brief       single linked list delete tail node.
  * @param[in]   pList  - The single linked list that delete a node.
  * @return  the pointer of delete node.
  */
-struct single_list_node* sList_deleteTailNode(struct single_list* pList);
+struct single_list_node *sList_deleteTailNode(struct single_list *pList);
 
 /**
  * @brief       single linked list delete specific node.
@@ -116,7 +118,7 @@ struct single_list_node* sList_deleteTailNode(struct single_list* pList);
  * @param[in]   pNode  - The pointer of want delete the node.
  * @return  None..
  */
-void sList_deleteSpecificNode(struct single_list* pList, struct single_list_node* pNode);
+void sList_deleteSpecificNode(struct single_list *pList, struct single_list_node *pNode);
 
 /**
  * @brief       single linked list check a node exist or not.
@@ -124,7 +126,7 @@ void sList_deleteSpecificNode(struct single_list* pList, struct single_list_node
  * @param[in]   pNode  - The pointer of want delete the node.
  * @return  None.
  */
-bool sList_checkNodeExist(struct single_list* pList, struct single_list_node* pNode);
+bool sList_checkNodeExist(struct single_list *pList, struct single_list_node *pNode);
 
 /**
  * @brief       single linked list traverse all node.
@@ -132,7 +134,7 @@ bool sList_checkNodeExist(struct single_list* pList, struct single_list_node* pN
  * @param[in]   cb  - The callback function for traverse node.
  * @return  None.
  */
-void sList_traverseAllNode(struct single_list* pList, traverseNodeCb_t cb);
+void sList_traverseAllNode(struct single_list *pList, traverseNodeCb_t cb);
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Single Priority Linked List structure
@@ -143,30 +145,31 @@ void sList_traverseAllNode(struct single_list* pList, traverseNodeCb_t cb);
  * @param[in] node - the pointer of the node.
  * @return priority value.
  */
-typedef int (*getNodePriorityCb_t)(void* node);
+typedef int (*getNodePriorityCb_t)(void *node);
 
 /**
  * @brief Definition for the single priority linked list structure.
  */
-struct single_priority_list{
-    struct single_list list;                //!< include a single linked list.
-    getNodePriorityCb_t cb;                 //!< Pointer to the get priority value.
-}__attribute__((packed));
+struct single_priority_list
+{
+    struct single_list  list; //!< include a single linked list.
+    getNodePriorityCb_t cb;   //!< Pointer to the get priority value.
+} __attribute__((packed));
 
 /**
  * @brief Definition a variable single priority linked list and initial.
  */
-#define SPLIST_DEF(name, callback)      \
-struct single_priority_list name = {    \
-    .list.slh_first = NULL,             \
-    .cb = callback,                     \
-}
+#define SPLIST_DEF(name, callback)       \
+    struct single_priority_list name = { \
+        .list.slh_first = NULL,          \
+        .cb             = callback,      \
+    }
 
-#define SPLIST_INSERT_NODE(spList, node)    spList_insertNode((struct single_priority_list*)(spList), (struct single_list_node*)(node))
-#define SPLIST_DELETE_NODE(spList, node)    spList_deleteNode((struct single_priority_list*)(spList), (struct single_list_node*)(node))
-#define SPLIST_DELETE_HEAD(spList, type)    (type*)sList_deleteHeadNode((struct single_list*)(spList))
-#define SPLIST_DELETE_PRIO(spList, prio)    spList_deletNodeUsePriorityValue((struct single_priority_list*)(spList), prio)
-#define SPLIST_TRAVERSE(spList, cb)         sList_traverseAllNode((struct single_list*)(spList), (traverseNodeCb_t)(cb))
+#define SPLIST_INSERT_NODE(spList, node) spList_insertNode((struct single_priority_list *)(spList), (struct single_list_node *)(node))
+#define SPLIST_DELETE_NODE(spList, node) spList_deleteNode((struct single_priority_list *)(spList), (struct single_list_node *)(node))
+#define SPLIST_DELETE_HEAD(spList, type) (type *)sList_deleteHeadNode((struct single_list *)(spList))
+#define SPLIST_DELETE_PRIO(spList, prio) spList_deletNodeUsePriorityValue((struct single_priority_list *)(spList), prio)
+#define SPLIST_TRAVERSE(spList, cb)      sList_traverseAllNode((struct single_list *)(spList), (traverseNodeCb_t)(cb))
 
 /**
  * @brief       Initial the single priority linked list.
@@ -174,7 +177,7 @@ struct single_priority_list name = {    \
  * @param[in]   cb      - the get priority value callback function.
  * @return None.
  */
-void spList_initial(struct single_priority_list* pList, getNodePriorityCb_t cb);
+void spList_initial(struct single_priority_list *pList, getNodePriorityCb_t cb);
 
 /**
  * @brief       single priority linked list insert a node.
@@ -182,7 +185,7 @@ void spList_initial(struct single_priority_list* pList, getNodePriorityCb_t cb);
  * @param[in]   pNode   - The pointer of the new node.
  * @return None.
  */
-void spList_insertNode(struct single_priority_list* pList, struct single_list_node* pNode);
+void spList_insertNode(struct single_priority_list *pList, struct single_list_node *pNode);
 
 /**
  * @brief       single priority linked list delete a node.
@@ -190,7 +193,7 @@ void spList_insertNode(struct single_priority_list* pList, struct single_list_no
  * @param[in]   pNode   - The pointer of the had node.
  * @return None.
  */
-void spList_deleteNode(struct single_priority_list* pList, struct single_list_node* pNode);
+void spList_deleteNode(struct single_priority_list *pList, struct single_list_node *pNode);
 
 /**
  * @brief       single priority linked list delete all node of the same priority.
@@ -198,8 +201,7 @@ void spList_deleteNode(struct single_priority_list* pList, struct single_list_no
  * @param[in]   priorityValue - the priority value.
  * @return None.
  */
-void spList_deletNodeUsePriorityValue(struct single_priority_list* pList, int priorityValue);
-
+void spList_deletNodeUsePriorityValue(struct single_priority_list *pList, int priorityValue);
 
 ///////////////////////////////////////////////////////////////////////////////
 //  single tail Linked List structure
@@ -208,8 +210,10 @@ void spList_deletNodeUsePriorityValue(struct single_priority_list* pList, int pr
 /**
  * @brief Structure of a node in the single tail linked list.
  */
-struct single_tail_list_node {
-    STAILQ_ENTRY(single_tail_list_node) next;       //!< Pointer to the next node.
+struct single_tail_list_node
+{
+    STAILQ_ENTRY(single_tail_list_node)
+    next; //!< Pointer to the next node.
 };
 
 /**
@@ -221,19 +225,20 @@ STAILQ_HEAD(single_tail_list, single_tail_list_node);
  * @brief Definition a variable single tail linked list and initial.
  */
 #define STLIST_DEF(name)                \
-struct single_tail_list name = {                \
-    .stqh_first = NULL,             \
-    .stqh_last = &name.stqh_first,  \
-}
+    struct single_tail_list name = {    \
+        .stqh_first = NULL,             \
+        .stqh_last  = &name.stqh_first, \
+    }
 
-#define STLIST_INIT(stList)                     stList_initial((struct single_tail_list*)(stList))
-#define STLIST_INSERT_HEAD(stList, node)        stList_headInsertNode((struct single_tail_list*)(stList), (struct single_tail_list_node*)(node))
-#define STLIST_INSERT_TAIL(stList, node)        stList_tailInsertNode((struct single_tail_list*)(stList), (struct single_tail_list_node*)(node))
-#define STLIST_INSERT_NODE(stList, prevNode, node)  stList_insertNode((struct single_tail_list*)(stList), \
-                                                            (struct single_tail_list_node*)(prevNode), (struct single_tail_list_node*)(node))
-#define STLIST_DELETE_HEAD(stList, type)            (type*)stList_deleteHeadNode((struct single_tail_list*)(stList))
-#define STLIST_DELETE_TAIL(stList, type)            (type*)stList_deleteTailNode((struct single_tail_list*)(stList))
-#define STLIST_DELETE_NODE(stList, node)        stList_deleteSpecificNode((struct single_tail_list*)(stList), (struct single_tail_list_node*)(node))
+#define STLIST_INIT(stList)                        stList_initial((struct single_tail_list *)(stList))
+#define STLIST_INSERT_HEAD(stList, node)           stList_headInsertNode((struct single_tail_list *)(stList), (struct single_tail_list_node *)(node))
+#define STLIST_INSERT_TAIL(stList, node)           stList_tailInsertNode((struct single_tail_list *)(stList), (struct single_tail_list_node *)(node))
+#define STLIST_INSERT_NODE(stList, prevNode, node) stList_insertNode((struct single_tail_list *)(stList),        \
+                                                                     (struct single_tail_list_node *)(prevNode), \
+                                                                     (struct single_tail_list_node *)(node))
+#define STLIST_DELETE_HEAD(stList, type) (type *)stList_deleteHeadNode((struct single_tail_list *)(stList))
+#define STLIST_DELETE_TAIL(stList, type) (type *)stList_deleteTailNode((struct single_tail_list *)(stList))
+#define STLIST_DELETE_NODE(stList, node) stList_deleteSpecificNode((struct single_tail_list *)(stList), (struct single_tail_list_node *)(node))
 
 
 /**
@@ -241,7 +246,7 @@ struct single_tail_list name = {                \
  * @param[in]   pList  - The single tail linked list need to use.
  * @return  None.
  */
-void stList_initial(struct single_tail_list* pList);
+void stList_initial(struct single_tail_list *pList);
 
 /**
  * @brief       single tail linked list insert a node into head.
@@ -249,7 +254,7 @@ void stList_initial(struct single_tail_list* pList);
  * @param[in]   pNode  - The pointer of the new node.
  * @return  None.
  */
-void stList_headInsertNode(struct single_tail_list* pList, struct single_tail_list_node* pNode);
+void stList_headInsertNode(struct single_tail_list *pList, struct single_tail_list_node *pNode);
 
 /**
  * @brief       single tail linked list insert a node into tail.
@@ -257,7 +262,7 @@ void stList_headInsertNode(struct single_tail_list* pList, struct single_tail_li
  * @param[in]   pNode  - The pointer of the new node.
  * @return  None.
  */
-void stList_tailInsertNode(struct single_tail_list* pList, struct single_tail_list_node* pNode);
+void stList_tailInsertNode(struct single_tail_list *pList, struct single_tail_list_node *pNode);
 
 /**
  * @brief       single tail linked list insert a node into previous node.
@@ -266,21 +271,21 @@ void stList_tailInsertNode(struct single_tail_list* pList, struct single_tail_li
  * @param[in]   pRrev  - The pointer of the previous node.
  * @return  None.
  */
-void stList_insertNode(struct single_tail_list* pList, struct single_tail_list_node* pNode, struct single_tail_list_node* pPrev);
+void stList_insertNode(struct single_tail_list *pList, struct single_tail_list_node *pNode, struct single_tail_list_node *pPrev);
 
 /**
  * @brief       single tail linked list delete head node.
  * @param[in]   pList  - The single tail linked list that delete a node.
  * @return  the pointer of delete node.
  */
-struct single_tail_list_node* stList_deleteHeadNode(struct single_tail_list* pList);
+struct single_tail_list_node *stList_deleteHeadNode(struct single_tail_list *pList);
 
 /**
  * @brief       single tail linked list delete tail node.
  * @param[in]   pList  - The single tail linked list that delete a node.
  * @return  the pointer of delete node.
  */
-struct single_tail_list_node* stList_deleteTailNode(struct single_tail_list* pList);
+struct single_tail_list_node *stList_deleteTailNode(struct single_tail_list *pList);
 
 /**
  * @brief       single tail linked list delete specific node.
@@ -288,7 +293,7 @@ struct single_tail_list_node* stList_deleteTailNode(struct single_tail_list* pLi
  * @param[in]   pNode  - The pointer of want delete the node.
  * @return  None..
  */
-void stList_deleteSpecificNode(struct single_tail_list* pList, struct single_tail_list_node* pNode);
+void stList_deleteSpecificNode(struct single_tail_list *pList, struct single_tail_list_node *pNode);
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -300,15 +305,14 @@ void stList_deleteSpecificNode(struct single_tail_list* pList, struct single_tai
  */
 STAILQ_HEAD(queue_single_tail_list, single_tail_list_node);
 
-#define QUEUE_DEF(name)                         STLIST_DEF(name)
+#define QUEUE_DEF(name)   STLIST_DEF(name)
 
-#define QUEUE_INIT(queue)                       STLIST_INIT(queue)
+#define QUEUE_INIT(queue) STLIST_INIT(queue)
 //removes the first element of the queue and returns.
-#define QUEUE_POP(queue, type)                  STLIST_DELETE_HEAD(queue, type)
+#define QUEUE_POP(queue, type) STLIST_DELETE_HEAD(queue, type)
 //return the first element of the queue.
-#define QUEUE_FRONT(queue)                      STAILQ_FIRST((struct single_tail_list*)(queue))
+#define QUEUE_FRONT(queue) STAILQ_FIRST((struct single_tail_list *)(queue))
 //push the element at tail of the queue.
-#define QUEUE_PUSH(queue, node)                 STLIST_INSERT_TAIL(queue, node)
+#define QUEUE_PUSH(queue, node) STLIST_INSERT_TAIL(queue, node)
 //return the tail element of the queue.
-#define QUEUE_BACK(queue, type)                 (type*)STAILQ_LAST((struct single_tail_list*)(queue), single_tail_list_node, next)
-
+#define QUEUE_BACK(queue, type) (type *)STAILQ_LAST((struct single_tail_list *)(queue), single_tail_list_node, next)

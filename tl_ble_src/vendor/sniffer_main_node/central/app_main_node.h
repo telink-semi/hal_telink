@@ -56,60 +56,61 @@
 extern volatile u8 log_sniffer_enable;
 
 
-#if (APP_TRANSPORT_UART_ENABLE)
-extern u32 my_spp_rx_fifo_tick_record[];
+    #if (APP_TRANSPORT_UART_ENABLE)
+extern u32       my_spp_rx_fifo_tick_record[];
 extern my_fifo_t spp_rx_fifo;
-#endif
+    #endif
 
 
-#define         SNIFFER_CMD_RSSI                0xFA
+    #define SNIFFER_CMD_RSSI              0xFA
 
-#define         SNIFFER_CMD_SCAN_REQ            0xFC
-#define         SNIFFER_CMD_SCAN_RSP            0xFD
+    #define SNIFFER_CMD_SCAN_REQ          0xFC
+    #define SNIFFER_CMD_SCAN_RSP          0xFD
 
-#define         SNIFFER_CMD_SCAN_REQ_DATA_LEN   28
+    #define SNIFFER_CMD_SCAN_REQ_DATA_LEN 28
 
-
-typedef struct __attribute__((packed)) {
-    u16     cmdId;
-    u16     dataLen;
-    u8      snifferIndex;
-    u16     snifferHandle;
+typedef struct __attribute__((packed))
+{
+    u16 cmdId;
+    u16 dataLen;
+    u8  snifferIndex;
+    u16 snifferHandle;
 } spp_main_node_cmd_rx_t;
 
-typedef struct __attribute__((packed)) {
-    u16     cmdId;
-    u16     dataLen;
-    u8      snifferIndex;
-    u16     snifferHandle;
-    u8      rssi;
-    u8      snifferChannel  :6;
-    u8      deviceType      :2;
-    u8      checksum;
+typedef struct __attribute__((packed))
+{
+    u16 cmdId;
+    u16 dataLen;
+    u8  snifferIndex;
+    u16 snifferHandle;
+    u8  rssi;
+    u8  snifferChannel : 6;
+    u8  deviceType     : 2;
+    u8  checksum;
 } spp_main_node_cmd_rssi_rx_t;
 
-
-typedef struct __attribute__((packed)) {
-    u16     cmdId;
-    u16     dataLen;
-    u8      snifferIndex;
-    u16     snifferHandle;
-    u8      status;
-    u8      checksum;
+typedef struct __attribute__((packed))
+{
+    u16 cmdId;
+    u16 dataLen;
+    u8  snifferIndex;
+    u16 snifferHandle;
+    u8  status;
+    u8  checksum;
 } spp_main_node_cmd_scan_rsp_rx_t;
 
-
-typedef struct __attribute__((packed)) {
-    u32     dmaLen;
-    u16     cmdId;
-    u16     dataLen;
-    u8      IsRPA;
-    u8      adr_type;
-    u8      mac[6];
-    u8      peer_irk[16];
-    u16     syncHandle;
-    u8      monitorEnable;
-    u8      checksum;
+typedef struct __attribute__((packed))
+{
+    u32 dmaLen;
+    u16 cmdId;
+    u16 dataLen;
+    u8  IsRPA;
+    u8  adr_type;
+    u8  mac[6];
+    u8  peer_irk[16];
+    u16 syncHandle;
+    u8  monitorEnable;
+    u8  checksum;
 } spp_main_node_cmd_scan_req_tx_t;
 
 extern _attribute_ble_data_retention_ volatile u8 receive_bus_rssi_flag;

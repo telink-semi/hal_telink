@@ -61,7 +61,7 @@
  *                                         global constants                                                           *
  *********************************************************************************************************************/
 
-#define AES_MAX_CNT   4
+#define AES_MAX_CNT 4
 
 /**********************************************************************************************************************
  *                                           global macro                                                             *
@@ -73,10 +73,12 @@
 /**
  * @brief AES mode.
  */
-typedef enum{
-    AES_ENCRYPT_MODE    =  0,
-    AES_DECRYPT_MODE    =  2,
-}aes_mode_e;
+typedef enum
+{
+    AES_ENCRYPT_MODE = 0,
+    AES_DECRYPT_MODE = 2,
+} aes_mode_e;
+
 /**********************************************************************************************************************
  *                                     global variable declaration                                                    *
  *********************************************************************************************************************/
@@ -91,7 +93,7 @@ typedef enum{
  * @param[out] result    - the result of encrypt, big--endian.
  * @return     none
  */
-int aes_encrypt(unsigned char *key, unsigned char* plaintext, unsigned char *result);
+int aes_encrypt(unsigned char *key, unsigned char *plaintext, unsigned char *result);
 
 /**
  * @brief      This function servers to perform aes_128 encryption for 16-Byte input data with specific 16-Byte key when BT is connected.
@@ -101,7 +103,7 @@ int aes_encrypt(unsigned char *key, unsigned char* plaintext, unsigned char *res
  * @return     none
  * @note       Invoking this interface avoids the risk of AES conflicts when BT is connected.
  */
-int aes_encrypt_bt_en(unsigned char* key, unsigned char* plaintext, unsigned char *result);
+int aes_encrypt_bt_en(unsigned char *key, unsigned char *plaintext, unsigned char *result);
 
 /**
  * @brief      This function servers to perform aes_128 decryption for 16-Byte input data with specific 16-Byte key.
@@ -110,7 +112,7 @@ int aes_encrypt_bt_en(unsigned char* key, unsigned char* plaintext, unsigned cha
  * @param[out] result      - the result of decrypt, big--endian.
  * @return     none.
  */
-int aes_decrypt(unsigned char *key, unsigned char* decrypttext, unsigned char *result);
+int aes_decrypt(unsigned char *key, unsigned char *decrypttext, unsigned char *result);
 
 /**
  * @brief      This function servers to perform aes_128 decryption for 16-Byte input data with specific 16-Byte key when BT is connected.
@@ -120,7 +122,7 @@ int aes_decrypt(unsigned char *key, unsigned char* decrypttext, unsigned char *r
  * @return     none.
  * @note       Invoking this interface avoids the risk of AES conflicts when BT is connected.
  */
-int aes_decrypt_bt_en(unsigned char* key, unsigned char* plaintext, unsigned char *result);
+int aes_decrypt_bt_en(unsigned char *key, unsigned char *plaintext, unsigned char *result);
 
 /**
  * @brief     This function refer to set the em base address.
@@ -140,7 +142,7 @@ void aes_set_em_base_addr(unsigned int addr);
  * @return    none.
  * @note      The AES module register must be used by word and the key and data lengths must be 16 bytes.
  */
-void aes_set_key_data(unsigned char *key, unsigned char* data);
+void aes_set_key_data(unsigned char *key, unsigned char *data);
 
 /**
  * @brief      This function refer to encrypt/decrypt to get result. AES module register must be used by word.

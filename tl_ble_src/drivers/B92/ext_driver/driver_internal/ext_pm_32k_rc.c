@@ -35,7 +35,7 @@
 #include "mspi.h"
 #include "flash.h"
 #include "stimer.h"
-#include "analog.h"
+#include "../../lib/include/analog.h"
 #include "compatibility_pack/cmpt.h"
 #include "../ext_pm.h"
 #include "ext_lib.h"
@@ -119,21 +119,23 @@ _attribute_ram_code_ int cpu_sleep_wakeup_32k_rc_ram(pm_sleep_mode_e sleep_mode,
     core_mie_disable(FLD_MIE_MSIE|FLD_MIE_MTIE);
 
     //The problem of inaccurate sleep time is solved by compensating 32K calibration value.
-    if((bbpll_power==0)&&(rc_24m_power==0))
+    if((bbpll_power==0)&&(rc_24m_power==0)){
         g_pm_tick_32k_calib_repair = 0x00000019;
-    else if((bbpll_power==1)&&(rc_24m_power==0))
+    } else if ((bbpll_power==1)&&(rc_24m_power==0)){
         g_pm_tick_32k_calib_repair = 0x0000000d;
-    else if((bbpll_power==0)&&(rc_24m_power==1))
+    } else if ((bbpll_power==0)&&(rc_24m_power==1)){
         g_pm_tick_32k_calib_repair = 0x0000000e;
+    }
 
     #if PM_32k_RC_CALIBRATION_ALGORITHM_EN//BLE ADD. by SunWei
         g_pm_tick_32k_calib = pm_ble_get_32k_rc_calib ();
     #else
         while(!read_reg32(0x140214));
-        if(g_chip_version == 0x11)
+        if(g_chip_version == 0x11){
             g_pm_tick_32k_calib = read_reg32(0x140214) - g_pm_tick_32k_calib_repair;
-        else
+        } else {
             g_pm_tick_32k_calib = read_reg32(0x140214);
+        }
     #endif
     unsigned int  tick_32k_halfCalib = g_pm_tick_32k_calib>>1;
 
@@ -152,13 +154,12 @@ _attribute_ram_code_ int cpu_sleep_wakeup_32k_rc_ram(pm_sleep_mode_e sleep_mode,
 #if SYS_TIMER_AUTO_MODE
     BM_CLR(reg_system_irq_mask,BIT(0));//disable 32k cal and stimer
 
-    REG_ADDR8(0x140218) = 0x01;//sys tick only update upon 32k posedge,must set before enable 32k read update!!!
-
-    BM_CLR(reg_system_ctrl,FLD_SYSTEM_32K_TRACK_EN);//disable 32k cal
-
+    REG_ADDR8(0x140218) = 0x01;                       //system tick only update upon 32k posedge, must set before enable 32k read update!!!
+    BM_CLR(reg_system_ctrl, FLD_SYSTEM_32K_TRACK_EN); //disable 32k track
     g_pm_tick_32k_cur = clock_get_32k_tick();
-    reg_system_st = FLD_SYSTEM_CMD_STOP;//stop stimer
-    g_pm_tick_cur = clock_time ();
+    g_pm_tick_cur     = stimer_get_tick();
+    BM_SET(reg_system_st, FLD_SYSTEM_CMD_STOP);       //write 1, stop system timer when using auto mode
+    REG_ADDR8(0x140218) = 0x00;
 #else
     g_pm_tick_cur = clock_time () + 37 * SYSTEM_TIMER_TICK_1US;  //clock_get_32k_tick will cost 30~40 us
 
@@ -186,12 +187,9 @@ _attribute_ram_code_ int cpu_sleep_wakeup_32k_rc_ram(pm_sleep_mode_e sleep_mode,
         //0x00->0xd1
         //<0>pd_rc32k_auto=1 <4>pwdn power suspend ldo=1
         //<6>power down sequence enable=1 <7>enable isolation=1
-        if(wakeup_src & PM_WAKEUP_COMPARATOR)
-        {
+        if( wakeup_src & PM_WAKEUP_COMPARATOR || wakeup_src & PM_WAKEUP_CTB ){
             analog_write_reg8(0x4d,0xfe);//retention
-        }
-        else
-        {
+        }else{
             analog_write_reg8(0x4d,0xff);//retention
         }
         analog_write_reg8(0x00, (analog_read_reg8(0x00) | 0xe0));   //<7-5>:ldo_main_trim,  default:100,->111 digital LDO output voltage trim: 1.15V
@@ -208,14 +206,10 @@ _attribute_ram_code_ int cpu_sleep_wakeup_32k_rc_ram(pm_sleep_mode_e sleep_mode,
 //      tick_adjust_us = ((wakeup_tick - g_pm_tick_cur)/800000) * 16 * SYSTEM_TIMER_TICK_1US;//50ms -- 16us
 #endif
         earlyWakeup_us = g_pm_early_wakeup_time_us.deep_ret_early_wakeup_time_us ;
-    }
-    else if(sleep_mode == DEEPSLEEP_MODE){  //deepsleep no retention
-        if(wakeup_src & PM_WAKEUP_COMPARATOR)
-        {
+    } else if (sleep_mode == DEEPSLEEP_MODE) {  //deepsleep no retention
+        if(wakeup_src & PM_WAKEUP_COMPARATOR || wakeup_src & PM_WAKEUP_CTB ) {
             analog_write_reg8(0x4d,0xfe);//deep
-        }
-        else
-        {
+        } else {
             analog_write_reg8(0x4d,0xff);//deep
         }
         analog_write_reg8(0x00, (analog_read_reg8(0x00) | 0xe0));   //<7-5>:ldo_main_trim,  default:100,->111 digital LDO output voltage trim: 1.15V
@@ -231,12 +225,9 @@ _attribute_ram_code_ int cpu_sleep_wakeup_32k_rc_ram(pm_sleep_mode_e sleep_mode,
         earlyWakeup_us = g_pm_early_wakeup_time_us.deep_early_wakeup_time_us;
     }
     else{  //suspend
-        if(wakeup_src & PM_WAKEUP_COMPARATOR)
-        {
+        if(wakeup_src & PM_WAKEUP_COMPARATOR || wakeup_src & PM_WAKEUP_CTB) {
             analog_write_reg8(0x4d,0x7e);//suspend
-        }
-        else
-        {
+        } else {
             analog_write_reg8(0x4d,0x7f);//suspend
         }
         analog_write_reg8(0x00, (analog_read_reg8(0x00) | 0xe0));   //<7-5>:ldo_main_trim,  default:100,->111 digital LDO output voltage trim: 1.15V
@@ -252,76 +243,70 @@ _attribute_ram_code_ int cpu_sleep_wakeup_32k_rc_ram(pm_sleep_mode_e sleep_mode,
         earlyWakeup_us = g_pm_early_wakeup_time_us.suspend_early_wakeup_time_us;
     }
 
-    unsigned int tick_wakeup_reset = wakeup_tick - earlyWakeup_us * SYSTEM_TIMER_TICK_1US;
     //auto power down
     if(((wakeup_src & PM_WAKEUP_PAD) && g_pm_pad_filter_en) || (wakeup_src & PM_WAKEUP_TIMER)/*|| (wakeup_src & PM_WAKEUP_MDEC)*/|| (wakeup_src & PM_WAKEUP_COMPARATOR) ){
         analog_write_reg8(0x4c,0xee);
-    }
-    else{
+    } else {
         analog_write_reg8(0x4c, 0xef);
     }
 
     //set DCDC delay duration
-    if(sleep_mode == DEEPSLEEP_MODE)
-    {
+    if(sleep_mode == DEEPSLEEP_MODE) {
         analog_write_reg8 (0x3d, g_pm_r_delay_cycle.deep_xtal_delay_cycle);
         analog_write_reg8 (0x3e, g_pm_r_delay_cycle.deep_r_delay_cycle);//(n):  if timer wake up : (n*2) 32k cycle; else pad wake up: (n*2-1) ~ (n*2)32k cycle
-    }
-    else
-    {
+    } else {
         analog_write_reg8 (0x3d, g_pm_r_delay_cycle.suspend_ret_xtal_delay_cycle);
         analog_write_reg8 (0x3e, g_pm_r_delay_cycle.suspend_ret_r_delay_cycle);//(n):  if timer wake up : (n*2) 32k cycle; else pad wake up: (n*2-1) ~ (n*2)32k cycle
     }
     unsigned int tick_reset;
-#if PM_32k_RC_CALIBRATION_ALGORITHM_EN
     if(timer_wakeup_enable){
-        if( (unsigned int)(tick_wakeup_reset - pmbcd.ref_tick) > 0x0ff00000 ){  //BIT(28) = 0x10000000   16M:16S
-            g_pm_long_suspend = 1;
-        }
-        else{
-            g_pm_long_suspend = 0;
-        }
-    }
-    #if 1  //SiHui fix
-        if(g_pm_long_suspend){
-            tick_reset = g_pm_tick_32k_cur + (unsigned int)(tick_wakeup_reset - g_pm_tick_cur)/ g_pm_tick_32k_calib * g_track_32kcnt;
-        }
-        else{
-            tick_reset = g_pm_tick_32k_cur + ((unsigned int)(tick_wakeup_reset - g_pm_tick_cur) * g_track_32kcnt + tick_32k_halfCalib) / g_pm_tick_32k_calib;
-        }
 
-    #endif //   #if 1  //SiHui fix
-#else
-#if !SYS_TIMER_AUTO_MODE
-    if(g_pm_long_suspend){
-        tick_reset = g_pm_tick_32k_cur + (unsigned int)(tick_wakeup_reset - tick_adjust_us - g_pm_tick_cur)/ g_pm_tick_32k_calib * g_track_32kcnt;
-    }
-    else{
-        tick_reset = g_pm_tick_32k_cur + ((unsigned int)(tick_wakeup_reset - tick_adjust_us - g_pm_tick_cur) * g_track_32kcnt + tick_32k_halfCalib) / g_pm_tick_32k_calib;
-    }
-#else
-    if(g_pm_long_suspend){
-        tick_reset = g_pm_tick_32k_cur + (unsigned int)(tick_wakeup_reset  - g_pm_tick_cur)/ g_pm_tick_32k_calib * g_track_32kcnt;
-    }
-    else{
-        tick_reset = g_pm_tick_32k_cur + ((unsigned int)(tick_wakeup_reset - g_pm_tick_cur) * g_track_32kcnt + tick_32k_halfCalib) / g_pm_tick_32k_calib;
-    }
-//  tick_reset = g_pm_tick_32k_cur + ((unsigned int)(wakeup_tick - g_pm_tick_cur) * g_track_32kcnt + tick_32k_halfCalib - tick_32k_halfCalib ) / g_pm_tick_32k_calib  - 1 - 3*2 - 2;
-#endif
-#endif
+        unsigned int tick_wakeup_reset = wakeup_tick - earlyWakeup_us * SYSTEM_TIMER_TICK_1US;
+        #if PM_32k_RC_CALIBRATION_ALGORITHM_EN
+            if( (unsigned int)(tick_wakeup_reset - pmbcd.ref_tick) > 0x0ff00000 ){  //BIT(28) = 0x10000000   16M:16S
+                tick_reset = g_pm_tick_32k_cur + (unsigned int)(tick_wakeup_reset - g_pm_tick_cur)/ g_pm_tick_32k_calib * g_track_32kcnt;
+                g_pm_long_suspend = 1;
+            }
+            else{
+                tick_reset = g_pm_tick_32k_cur + ((unsigned int)(tick_wakeup_reset - g_pm_tick_cur) * g_track_32kcnt + tick_32k_halfCalib) / g_pm_tick_32k_calib;
+                g_pm_long_suspend = 0;
+            }
 
-    clock_set_32k_tick(tick_reset);
+        #else
+            #if !SYS_TIMER_AUTO_MODE
+                if(g_pm_long_suspend){
+                    tick_reset = g_pm_tick_32k_cur + (unsigned int)(tick_wakeup_reset - tick_adjust_us - g_pm_tick_cur)/ g_pm_tick_32k_calib * g_track_32kcnt;
+                }
+                else{
+                    tick_reset = g_pm_tick_32k_cur + ((unsigned int)(tick_wakeup_reset - tick_adjust_us - g_pm_tick_cur) * g_track_32kcnt + tick_32k_halfCalib) / g_pm_tick_32k_calib;
+                }
+            #else
+                if(g_pm_long_suspend){
+                    tick_reset = g_pm_tick_32k_cur + (unsigned int)(tick_wakeup_reset  - g_pm_tick_cur)/ g_pm_tick_32k_calib * g_track_32kcnt;
+                }
+                else{
+                    tick_reset = g_pm_tick_32k_cur + ((unsigned int)(tick_wakeup_reset - g_pm_tick_cur) * g_track_32kcnt + tick_32k_halfCalib) / g_pm_tick_32k_calib;
+                }
+            //  tick_reset = g_pm_tick_32k_cur + ((unsigned int)(wakeup_tick - g_pm_tick_cur) * g_track_32kcnt + tick_32k_halfCalib - tick_32k_halfCalib ) / g_pm_tick_32k_calib  - 1 - 3*2 - 2;
+            #endif
+        #endif
+
+        clock_set_32k_tick(tick_reset);
+    }
+
+
 
     if(analog_read_reg8(0x64)&0x1f){
 
-    }
-    else{
-        if(sleep_mode & DEEPSLEEP_RETENTION_FLAG)
-        {
-            analog_write_reg8(0x7f, (0x44 | g_pm_pad_filter_en));
+    } else {
+        if (sleep_mode & DEEPSLEEP_RETENTION_FLAG) {
+            g_areg_aon_7f = (g_areg_aon_7f & 0xfe) | g_pm_pad_filter_en;
+        } else {
+            g_areg_aon_7f = (g_areg_aon_7f | 0x01 | g_pm_pad_filter_en);
         }
+        analog_write_reg8(0x7f, g_areg_aon_7f);
+
         pm_sleep_start(sleep_mode);
-        analog_write_reg8(0x7f, (0x45 | g_pm_pad_filter_en));
     }
     if(sleep_mode == DEEPSLEEP_MODE){
        write_reg8 (0x1401ef, 0x20);  //reboot
@@ -342,21 +327,22 @@ _attribute_ram_code_ int cpu_sleep_wakeup_32k_rc_ram(pm_sleep_mode_e sleep_mode,
 
     //unsigned int now_tick_32k = clock_get_digital_32k_tick() + 1;
     unsigned int now_tick_32k = clock_get_32k_tick() + 1;
-        u32 now_tick_stimer;
-#if 1  //SiHui fix
-    if(g_pm_long_suspend){
-        now_tick_stimer = pmbcd.ref_tick + (unsigned int)(now_tick_32k - pmbcd.ref_tick_32k) / g_track_32kcnt * g_pm_tick_32k_calib;
-    }
-    else{
-        now_tick_stimer = pmbcd.ref_tick + (unsigned int)(now_tick_32k - pmbcd.ref_tick_32k) * g_pm_tick_32k_calib / g_track_32kcnt;        // current clock
-    }
-#endif
+    u32 now_tick_stimer;
+    #if 1  //SiHui fix
+        if(g_pm_long_suspend){
+            now_tick_stimer = pmbcd.ref_tick + (unsigned int)(now_tick_32k - pmbcd.ref_tick_32k) / g_track_32kcnt * g_pm_tick_32k_calib;
+        } else {
+            now_tick_stimer = pmbcd.ref_tick + (unsigned int)(now_tick_32k - pmbcd.ref_tick_32k) * g_pm_tick_32k_calib / g_track_32kcnt;        // current clock
+        }
+    #endif
     g_sleep_32k_rc_cnt = now_tick_32k - g_pm_tick_32k_cur;
     g_sleep_stimer_tick = now_tick_stimer - g_pm_tick_cur;
-  #if PM_32k_RC_CALIBRATION_ALGORITHM_EN
+
+    #if PM_32k_RC_CALIBRATION_ALGORITHM_EN
     pmbcd.rc32_wakeup = now_tick_32k;
     pmbcd.rc32 = now_tick_32k - pmbcd.ref_tick_32k;
-  #endif
+    #endif
+
     reg_system_tick = now_tick_stimer + 1;
 
     while((reg_system_st & BIT(7)) == 0);
@@ -375,7 +361,7 @@ _attribute_ram_code_ int cpu_sleep_wakeup_32k_rc_ram(pm_sleep_mode_e sleep_mode,
     }
 
     reg_system_tick = g_pm_tick_cur + 20 * SYSTEM_TIMER_TICK_1US;
-    reg_system_ctrl |= FLD_SYSTEM_TIMER_EN | FLD_SYSTEM_32K_TRACK_EN;    //enable 32k cal and stimer
+    reg_system_ctrl |= (FLD_SYSTEM_TIMER_EN | FLD_SYSTEM_32K_TRACK_EN);    //enable 32k cal and stimer
 #endif
     write_reg8(0x1401d8, div_reg);      //restore div
     write_reg8(0x1401e8, cclk_reg);     //restore cclk
@@ -418,23 +404,23 @@ _attribute_ram_code_ unsigned int pm_tim_recover_32k_rc(unsigned int now_tick_32
 {
     unsigned int deepRet_tick;
 
-    {
-    #if PM_32k_RC_CALIBRATION_ALGORITHM_EN
-            if(g_pm_long_suspend){
-                deepRet_tick = pmbcd.ref_tick  + (unsigned int)(now_tick_32k - pmbcd.ref_tick_32k) / g_track_32kcnt * g_pm_tick_32k_calib;
-            }
-            else{
-                deepRet_tick = pmbcd.ref_tick  + (unsigned int)(now_tick_32k - pmbcd.ref_tick_32k) * g_pm_tick_32k_calib / g_track_32kcnt;      // current clock
-            }
-    #else
-                if(g_pm_long_suspend){
-                    deepRet_tick = g_pm_tick_cur + (unsigned int)(now_tick_32k - g_pm_tick_32k_cur) / g_track_32kcnt * g_pm_tick_32k_calib;
-                }
-                else{
-                    deepRet_tick = g_pm_tick_cur + (unsigned int)(now_tick_32k - g_pm_tick_32k_cur) * g_pm_tick_32k_calib / g_track_32kcnt;     // current clock
-                }
-    #endif
+
+#if PM_32k_RC_CALIBRATION_ALGORITHM_EN
+    if(g_pm_long_suspend){
+        deepRet_tick = pmbcd.ref_tick  + (unsigned int)(now_tick_32k - pmbcd.ref_tick_32k) / g_track_32kcnt * g_pm_tick_32k_calib;
     }
+    else{
+        deepRet_tick = pmbcd.ref_tick  + (unsigned int)(now_tick_32k - pmbcd.ref_tick_32k) * g_pm_tick_32k_calib / g_track_32kcnt;      // current clock
+    }
+#else
+    if(g_pm_long_suspend){
+        deepRet_tick = g_pm_tick_cur + (unsigned int)(now_tick_32k - g_pm_tick_32k_cur) / g_track_32kcnt * g_pm_tick_32k_calib;
+    }
+    else{
+        deepRet_tick = g_pm_tick_cur + (unsigned int)(now_tick_32k - g_pm_tick_32k_cur) * g_pm_tick_32k_calib / g_track_32kcnt;     // current clock
+    }
+#endif
+
     g_sleep_32k_rc_cnt = now_tick_32k - g_pm_tick_32k_cur;
     g_sleep_stimer_tick = deepRet_tick - g_pm_tick_cur;
 

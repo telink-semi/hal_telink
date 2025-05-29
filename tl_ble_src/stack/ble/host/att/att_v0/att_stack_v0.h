@@ -30,42 +30,38 @@
 
 
 #ifndef ATT_HANDLE_VALUE_CUSTOM_EN
-#define ATT_HANDLE_VALUE_CUSTOM_EN                          0
+    #define ATT_HANDLE_VALUE_CUSTOM_EN 0
 #endif
 
 
 #ifndef HANDLE_VALUE_CUSTOM_DBG_EN
-#define HANDLE_VALUE_CUSTOM_DBG_EN                          0
+    #define HANDLE_VALUE_CUSTOM_DBG_EN 0
 #endif
 
 
+#define ATT_MTU_SIZE 23 //!< Minimum ATT MTU size
 
-#define ATT_MTU_SIZE                        23  //!< Minimum ATT MTU size
-
-
-typedef struct
+typedef struct __attribute__((packed))
 {
-    u8* buff;
+    u8 *buff;
     u16 offset;
     u16 handle;
     u16 buffMaxLen;
-}att_pre_write_buff_t;
+} att_pre_write_buff_t;
 
-
-
-typedef struct
+typedef struct __attribute__((packed))
 {
-    u8  attHl_custom_en;
-    u8  attHl_cusNum;   //max 255 now
-    u8  smpPairingHoldATT;
-    u8  rsvd;
-}att_mng_t;
+    u8 attHl_custom_en;
+    u8 attHl_cusNum; //max 255 now
+    u8 smpPairingHoldATT;
+    u8 rsvd;
+} att_mng_t;
+
 extern att_mng_t bltAtt;
 
 
-u8 *    bls_att_l2capAttCmdHandler(u16 connHandle, u8 * p);
-void    blt_att_procMtuExgPending (u16 connHandle);
-
+u8  *bls_att_l2capAttCmdHandler(u16 connHandle, u8 *p);
+void blt_att_procMtuExgPending(u16 connHandle);
 
 
 u16 blt_att_change_sdkAttHandle_to_customAttHandle(u16 sdk_attHl);
@@ -73,7 +69,6 @@ u16 blt_att_change_customAttHandle_to_sdkAttHandle(u16 custom_attHl);
 
 
 void blt_att_processAttHandle_in_attCmd(rf_packet_l2cap_req_t *);
-
 
 
 /**
@@ -84,7 +79,7 @@ void blt_att_processAttHandle_in_attCmd(rf_packet_l2cap_req_t *);
  * @return[in]  0: success
  *              other: fail
  */
-ble_sts_t   blc_att_setAttributeHandleCustomTable (attHl_convert_t *pAttCus, int attHlConvert_num);
+ble_sts_t blc_att_setAttributeHandleCustomTable(attHl_convert_t *pAttCus, int attHlConvert_num);
 
 
 #endif /* ATT_STACK_H_ */

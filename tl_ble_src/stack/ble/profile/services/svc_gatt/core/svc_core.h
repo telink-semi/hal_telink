@@ -26,18 +26,17 @@
 #include "stack/ble/profile/services/svc_adv.h"
 
 
-
 #ifndef DEFAULT_DEV_APPEARE
-#define DEFAULT_DEV_APPEARE                     GAP_APPEARANCE_UNKNOWN
+    #define DEFAULT_DEV_APPEARE GAP_APPEARANCE_UNKNOWN
 #endif
 
 #ifndef DEFAULT_DEV_NAME
-#define DEFAULT_DEV_NAME                        "B91m_ble_multi_conn"
+    #define DEFAULT_DEV_NAME "B91m_ble_multi_conn"
 #endif
-#define MAX_DEV_NAME_LEN                        sizeof(DEFAULT_DEV_NAME)-1
+#define MAX_DEV_NAME_LEN sizeof(DEFAULT_DEV_NAME) - 1
 
 #ifndef EATT_SUPPORTED_FLAG
-#define EATT_SUPPORTED_FLAG                     0
+    #define EATT_SUPPORTED_FLAG 0
 #endif
 
 /**
@@ -68,21 +67,24 @@ void blc_svc_calculateDatabaseHash(void);
  */
 void blc_svc_setDeviceName(const char *name);
 
-typedef struct{
+typedef struct
+{
     blc_adv_ltv_t ltv;
-    u8 flags;
+    u8            flags;
 } blc_adv_flags_t;
 
-typedef struct{
+typedef struct
+{
     blc_adv_ltv_t ltv;
-    u8 completeName[sizeof(DEFAULT_DEV_NAME)];
+    u8            completeName[sizeof(DEFAULT_DEV_NAME)];
 } blc_adv_completeName_t;
 
-typedef struct{
+typedef struct
+{
     blc_adv_ltv_t ltv;
-    u16 appearance;
+    u16           appearance;
 } blc_adv_appearance_t;
 
-extern const blc_adv_flags_t advDefFlags;
+extern const blc_adv_flags_t        advDefFlags;
 extern const blc_adv_completeName_t advDefCompleteName;
-extern const blc_adv_appearance_t advDefAppearance;
+extern const blc_adv_appearance_t   advDefAppearance;

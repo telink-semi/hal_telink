@@ -21,7 +21,7 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-#pragma  once
+#pragma once
 
 /**
  * @brief
@@ -37,7 +37,7 @@ atts_group_t *blc_gatts_getAttributeServiceGroup(u16 connHandle);
  * @param[out]
  * @return      ble_sts_t.
  */
-void    blc_gatts_addAttributeServiceGroup(atts_group_t *pGroup);
+void blc_gatts_addAttributeServiceGroup(atts_group_t *pGroup);
 
 /**
  * @brief
@@ -45,7 +45,7 @@ void    blc_gatts_addAttributeServiceGroup(atts_group_t *pGroup);
  * @param[out]
  * @return      ble_sts_t.
  */
-void    blc_gatts_removeAttributeServiceGroup(u16 startHandle);
+void blc_gatts_removeAttributeServiceGroup(u16 startHandle);
 
 /**
  * @brief gatt server get attribute value and attribute value length
@@ -55,28 +55,29 @@ void    blc_gatts_removeAttributeServiceGroup(u16 startHandle);
  * @param[out] attrValueLen --- the attribute value length pointer
  * @return      ble_sts_t.
  */
-ble_sts_t blc_gatts_getAttributeInformationByHandle(u16 connHandle, u16 handle, u8** attrValue, u16** attrValueLen);
+ble_sts_t blc_gatts_getAttributeInformationByHandle(u16 connHandle, u16 handle, u8 **attrValue, u16 **attrValueLen);
 
-u8* blc_gatts_getAttributeValueByHandle(u16 connHandle, u16 handle);
-u8* blc_gatts_getReportReferenceValue(u16 connHandle, u16 handle);
+u8 *blc_gatts_getAttributeValueByHandle(u16 connHandle, u16 handle);
+u8 *blc_gatts_getReportReferenceValue(u16 connHandle, u16 handle);
 
-bool blc_gatts_calculateDatabaseHash(u16 connHandle, u8* databaseHash);
+bool blc_gatts_calculateDatabaseHash(u16 connHandle, u8 *databaseHash);
 
 
-ble_sts_t blc_gatts_notifyValue(u16 connHandle, u16 handle, u8* value, u16 valueLen);
+ble_sts_t blc_gatts_notifyValue(u16 connHandle, u16 handle, u8 *value, u16 valueLen);
 ble_sts_t blc_gatts_notifyAttr(u16 connHandle, u16 handle);
-void blc_gatts_notifyLoop(void);
-void blc_gatts_notifyDisconnect(u16 connHandle);
+void      blc_gatts_notifyLoop(void);
+void      blc_gatts_notifyDisconnect(u16 connHandle);
 
 typedef void (*gatts_cfmCb)(u16 connHandle, u16 scid);
 
-typedef struct __attribute__((packed)){
-    u16 connHandle;
-    u16 scid;
-    u16 attrHandle;
-    void* value;
-    u16 valueLen;
+typedef struct __attribute__((packed))
+{
+    u16         connHandle;
+    u16         scid;
+    u16         attrHandle;
+    void       *value;
+    u16         valueLen;
     gatts_cfmCb cb;
 } gattsIndValue_t;
 
-ble_sts_t blc_gatts_indicateValue(gattsIndValue_t* ind);
+ble_sts_t blc_gatts_indicateValue(gattsIndValue_t *ind);

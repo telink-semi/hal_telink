@@ -28,9 +28,6 @@
 #include "lib/include/hash/hmac_sha512_224.h"
 
 
-
-
-
 #ifdef SUPPORT_HASH_SHA512_224
 
 /**
@@ -62,7 +59,6 @@ unsigned int hmac_sha512_224_update(HMAC_SHA512_224_CTX *ctx, const unsigned cha
     return hmac_update(ctx, msg, msg_bytes);
 }
 
-
 /**
  * @brief       message update done, get the hmac
  * @param[in]   ctx                 - HMAC_CTX context pointer.
@@ -78,7 +74,6 @@ unsigned int hmac_sha512_224_final(HMAC_SHA512_224_CTX *ctx, unsigned char *mac)
 {
     return hmac_final(ctx, mac);
 }
-
 
 /**
  * @brief       input key and whole message, get the hmac
@@ -100,7 +95,7 @@ unsigned int hmac_sha512_224(unsigned char *key, unsigned short sp_key_idx, unsi
 }
 
 
-#ifdef HASH_DMA_FUNCTION
+    #ifdef HASH_DMA_FUNCTION
 /**
  * @brief       input key and whole message, get the hmac
  * @param[in]   ctx               - HMAC_SHA512_224_DMA_CTX context pointer.
@@ -110,8 +105,7 @@ unsigned int hmac_sha512_224(unsigned char *key, unsigned short sp_key_idx, unsi
  * @param[in]   callback          - callback function pointer.
  * @return      0:success     other:error
  */
-unsigned int hmac_sha512_224_dma_init(HMAC_SHA512_224_DMA_CTX *ctx, const unsigned char *key, unsigned short sp_key_idx, unsigned int key_bytes,
-        HASH_CALLBACK callback)
+unsigned int hmac_sha512_224_dma_init(HMAC_SHA512_224_DMA_CTX *ctx, const unsigned char *key, unsigned short sp_key_idx, unsigned int key_bytes, HASH_CALLBACK callback)
 {
     return hmac_dma_init(ctx, HASH_SHA512_224, key, sp_key_idx, key_bytes, callback);
 }
@@ -146,8 +140,7 @@ unsigned int hmac_sha512_224_dma_update_blocks(HMAC_SHA512_224_DMA_CTX *ctx, uns
       -# 1. please make sure the three parameters are valid, and ctx is initialized.
   @endverbatim
  */
-unsigned int hmac_sha512_224_dma_final(HMAC_SHA512_224_DMA_CTX *ctx, unsigned int *remainder_msg, unsigned int remainder_bytes,
-        unsigned int *mac)
+unsigned int hmac_sha512_224_dma_final(HMAC_SHA512_224_DMA_CTX *ctx, unsigned int *remainder_msg, unsigned int remainder_bytes, unsigned int *mac)
 {
     return hmac_dma_final(ctx, remainder_msg, remainder_bytes, mac);
 }
@@ -167,13 +160,12 @@ unsigned int hmac_sha512_224_dma_final(HMAC_SHA512_224_DMA_CTX *ctx, unsigned in
       -# 1. please make sure the three parameters are valid, and ctx is initialized.
   @endverbatim
  */
-unsigned int hmac_sha512_224_dma(unsigned char *key, unsigned short sp_key_idx, unsigned int key_bytes, unsigned int *msg, unsigned int msg_bytes,
-        unsigned int *mac, HASH_CALLBACK callback)
+unsigned int hmac_sha512_224_dma(unsigned char *key, unsigned short sp_key_idx, unsigned int key_bytes, unsigned int *msg, unsigned int msg_bytes, unsigned int *mac, HASH_CALLBACK callback)
 {
     return hmac_dma(HASH_SHA512_224, key, sp_key_idx, key_bytes, msg, msg_bytes, mac, callback);
 }
 
-#endif
+    #endif
 
 
 #endif

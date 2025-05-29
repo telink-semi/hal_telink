@@ -52,179 +52,173 @@
 #include "app_ui.h"
 #include "app_main_node.h"
 #if (APP_TRANSPORT_CANFD_ENABLE)
-#include "../tcan4x5x/TCAN4550.h"
+    #include "../tcan4x5x/TCAN4550.h"
 #endif
 
 #if (MAIN_NODE_ROLE_SELECT == MAIN_NODE_CENTRAL)
 
-_attribute_ble_data_retention_  u32         my_spp_rx_fifo_tick_record[SPP_RXFIFO_NUM];
-_attribute_ble_data_retention_  u8 __attribute__((aligned(4)))          spp_rx_fifo_b[SPP_RXFIFO_SIZE * SPP_RXFIFO_NUM] = {0};
-_attribute_ble_data_retention_  my_fifo_t   spp_rx_fifo = {
-                                                SPP_RXFIFO_SIZE,
-                                                SPP_RXFIFO_NUM,
-                                                0,
-                                                0,
-                                                spp_rx_fifo_b,};
+_attribute_ble_data_retention_ u32 my_spp_rx_fifo_tick_record[SPP_RXFIFO_NUM];
+_attribute_ble_data_retention_ u8 __attribute__((aligned(4))) spp_rx_fifo_b[SPP_RXFIFO_SIZE * SPP_RXFIFO_NUM] = {0};
+_attribute_ble_data_retention_ my_fifo_t                      spp_rx_fifo                                     = {
+    SPP_RXFIFO_SIZE,
+    SPP_RXFIFO_NUM,
+    0,
+    0,
+    spp_rx_fifo_b,
+};
 
-_attribute_ble_data_retention_  u8 __attribute__((aligned(4)))      spp_tx_fifo_b[SPP_TXFIFO_SIZE * SPP_TXFIFO_NUM] = {0};
-_attribute_ble_data_retention_  my_fifo_t   spp_tx_fifo = {
-                                                SPP_TXFIFO_SIZE,
-                                                SPP_TXFIFO_NUM,
-                                                0,
-                                                0,
-                                                spp_tx_fifo_b,};
+_attribute_ble_data_retention_ u8 __attribute__((aligned(4))) spp_tx_fifo_b[SPP_TXFIFO_SIZE * SPP_TXFIFO_NUM] = {0};
+_attribute_ble_data_retention_ my_fifo_t                      spp_tx_fifo                                     = {
+    SPP_TXFIFO_SIZE,
+    SPP_TXFIFO_NUM,
+    0,
+    0,
+    spp_tx_fifo_b,
+};
 
-_attribute_ble_data_retention_ volatile u8 log_sniffer_enable = 1;
+_attribute_ble_data_retention_ volatile u8 log_sniffer_enable    = 1;
 _attribute_ble_data_retention_ volatile u8 receive_bus_rssi_flag = 0;
 
-#if (APP_TRANSPORT_CANFD_ENABLE)
+    #if (APP_TRANSPORT_CANFD_ENABLE)
 _attribute_ble_data_retention_ u32 rx_rssi_tick[REMOTE_DEVICE_MAX_NUM][CHECK_SNIFFER_INDEX_MAX];
-_attribute_ble_data_retention_ u8 rssi_buffer[REMOTE_DEVICE_MAX_NUM][CHECK_SNIFFER_INDEX_MAX*2+1+1];// (handle+(sniffer_id+rssi)*4)*4
-#endif
+_attribute_ble_data_retention_ u8  rssi_buffer[REMOTE_DEVICE_MAX_NUM][CHECK_SNIFFER_INDEX_MAX * 2 + 1 + 1]; // (handle+(sniffer_id+rssi)*4)*4
+    #endif
 
 _attribute_ble_data_retention_ u8 rssi_crtl[SPP_TXFIFO_SIZE];
 
-#if (APP_TRANSPORT_UART_ENABLE)
+    #if (APP_TRANSPORT_UART_ENABLE)
 _attribute_ble_data_retention_ u8 uart_dma_send_done_flag = 1;
-#endif
+    #endif
 
 
-#if (APP_TRANSPORT_CANFD_ENABLE)
+    #if (APP_TRANSPORT_CANFD_ENABLE)
 void canfd_rxdata_handle(u8 *data, u8 len)
 {
-    u8* p = spp_rx_fifo.p + spp_rx_fifo.wptr * spp_rx_fifo.size;
+    u8 *p                                        = spp_rx_fifo.p + spp_rx_fifo.wptr * spp_rx_fifo.size;
     my_spp_rx_fifo_tick_record[spp_rx_fifo.wptr] = clock_time();
-    blc_app_memory_copy(p, data, len, SPP_RXFIFO_SIZE, 0x11170000|__LINE__);
-    (spp_rx_fifo.wptr == (spp_rx_fifo.num-1))?spp_rx_fifo.wptr=0:spp_rx_fifo.wptr++;
+    blc_app_memory_copy(p, data, len, SPP_RXFIFO_SIZE, 0x11170000 | __LINE__);
+    (spp_rx_fifo.wptr == (spp_rx_fifo.num - 1)) ? spp_rx_fifo.wptr = 0 : spp_rx_fifo.wptr++;
 }
-
 
 int canfd_send_data_handle(u16 sid, u8 *pData, u32 len)
 {
     int state;
 
     state = can_fd_data_send(sid, pData, len);
-    if(state != 0){
+    if (state != 0) {
         //Fail
         tlkapi_printf(APP_CAN_LOG_EN, "[APP][CAN] can_fd_data_send error:%d, ID:0x%x\n", state, sid);
     }
 
     return state;
 }
-#endif
+    #endif
 
 
 void snif_main_node_connection_setup(u16 connHandle, u8 role)
 {
-     if(role == ACL_ROLE_CENTRAL){
-        spp_main_node_cmd_scan_req_tx_t  *spp_common_cmd  = (spp_main_node_cmd_scan_req_tx_t *)rssi_crtl;
-        dev_char_info_t* dev_info = dev_char_info_search_by_connhandle (connHandle);
-        if(dev_info == NULL){
+    if (role == ACL_ROLE_CENTRAL) {
+        spp_main_node_cmd_scan_req_tx_t *spp_common_cmd = (spp_main_node_cmd_scan_req_tx_t *)rssi_crtl;
+        dev_char_info_t                 *dev_info       = dev_char_info_search_by_connhandle(connHandle);
+        if (dev_info == NULL) {
             return;
         }
 
         u8 idx = dev_char_get_conn_index_by_connhandle(connHandle);
-        if(idx == INVALID_CONN_IDX){
+        if (idx == INVALID_CONN_IDX) {
             return;
-        }
-        else{
+        } else {
             idx &= REMOTE_DEVICE_MAX_MASK;
-            if(idx >= REMOTE_DEVICE_MAX_NUM){
+            if (idx >= REMOTE_DEVICE_MAX_NUM) {
                 return;
             }
         }
 
         u32 flash_addr = blc_smp_searchBondingPeripheralDevice_by_PeerMacAddress(dev_info->peer_adrType, dev_info->peer_addr);
 
-        u8 temp_buffer[sizeof(smp_param_save_t)];
+        u8                temp_buffer[sizeof(smp_param_save_t)];
         smp_param_save_t *cur_smp_param = (smp_param_save_t *)temp_buffer;
         flash_read_page(flash_addr, sizeof(smp_param_save_t), temp_buffer);
 
-        if(blc_app_isIrkValid(cur_smp_param->peer_irk)){
-            blc_ll_setScanEnable (BLC_SCAN_DISABLE, DUP_FILTER_DISABLE);
+        if (blc_app_isIrkValid(cur_smp_param->peer_irk)) {
+            blc_ll_setScanEnable(BLC_SCAN_DISABLE, DUP_FILTER_DISABLE);
             blc_ll_setAddressResolutionEnable(0);
             u8 status = blc_ll_addDeviceToResolvingList(cur_smp_param->peer_id_adrType, cur_smp_param->peer_id_addr, cur_smp_param->peer_irk, NULL);
             tlkapi_printf(APP_LOG_EN, "[APP] add RL status = %d\n", status);
             status = blc_ll_setAddressResolutionEnable(1);
             tlkapi_printf(APP_LOG_EN, "[APP] enable RL status = %d\n", status);
-            if(acl_conn_central_num < ACL_CENTRAL_MAX_NUM) {
-                blc_ll_setScanEnable (BLC_SCAN_ENABLE, DUP_FILTER_DISABLE);
+            if (acl_conn_central_num < ACL_CENTRAL_MAX_NUM) {
+                blc_ll_setScanEnable(BLC_SCAN_ENABLE, DUP_FILTER_DISABLE);
             }
         }
 
-        spp_common_cmd->cmdId = SNIFFER_CMD_SCAN_REQ;
-        spp_common_cmd->dataLen = SNIFFER_CMD_SCAN_REQ_DATA_LEN;
-        spp_common_cmd->dmaLen = spp_common_cmd->dataLen + 4;
-        spp_common_cmd->IsRPA = blc_app_isIrkValid(cur_smp_param->peer_irk);
+        spp_common_cmd->cmdId         = SNIFFER_CMD_SCAN_REQ;
+        spp_common_cmd->dataLen       = SNIFFER_CMD_SCAN_REQ_DATA_LEN;
+        spp_common_cmd->dmaLen        = spp_common_cmd->dataLen + 4;
+        spp_common_cmd->IsRPA         = blc_app_isIrkValid(cur_smp_param->peer_irk);
         spp_common_cmd->monitorEnable = 1;
-        spp_common_cmd->syncHandle = connHandle;
-        spp_common_cmd->adr_type = cur_smp_param->peer_id_adrType;
+        spp_common_cmd->syncHandle    = connHandle;
+        spp_common_cmd->adr_type      = cur_smp_param->peer_id_adrType;
         memcpy(spp_common_cmd->mac, cur_smp_param->peer_id_addr, 6);
         //tlkapi_send_string_data(APP_SNIF_LOG_EN, "[APP][SNIF] mac", dev_info->peer_addr, 6);
         memcpy(spp_common_cmd->peer_irk, cur_smp_param->peer_irk, 16);
 
-        u8 checkSum = 0;
-        u8 checklen = sizeof(spp_main_node_cmd_scan_req_tx_t) - 5;// exclude dmaLen and checksum
-        u8 *ptx = (u8*)(spp_common_cmd);
-        foreach (j, checklen)
-        {
-            checkSum += *(ptx + j + 4);// skip dmaLen
+        u8  checkSum = 0;
+        u8  checklen = sizeof(spp_main_node_cmd_scan_req_tx_t) - 5; // exclude dmaLen and checksum
+        u8 *ptx      = (u8 *)(spp_common_cmd);
+        foreach (j, checklen) {
+            checkSum += *(ptx + j + 4);                             // skip dmaLen
         }
         spp_common_cmd->checksum = checkSum;
         //tlkapi_send_string_data(APP_SNIF_LOG_EN, "[APP][SNIF] check_sum", (u8*)&spp_common_cmd->checksum, 1);
-        tlkapi_send_string_data(APP_SNIF_LOG_EN, "[APP][SNIF] Tx", (u8*)&spp_common_cmd->cmdId, spp_common_cmd->dataLen + 4);
-        #if (APP_TRANSPORT_CANFD_ENABLE)
-            u32 nowTick = clock_time();
-            //u8 canSend = 1;
-            while(canfd_send_data_handle(SLAVE_TO_SNIFFER_SYNC_SID, ((u8*)&spp_common_cmd->cmdId), spp_common_cmd->dmaLen+4) != 0){
-                if(clock_time_exceed(nowTick, 100*1000))
-                {
-                    tlkapi_printf(APP_CAN_LOG_EN, "excced time\n");
-                    //canSend = 0;
-                    break;
-                }
+        tlkapi_send_string_data(APP_SNIF_LOG_EN, "[APP][SNIF] Tx", (u8 *)&spp_common_cmd->cmdId, spp_common_cmd->dataLen + 4);
+    #if (APP_TRANSPORT_CANFD_ENABLE)
+        u32 nowTick = clock_time();
+        //u8 canSend = 1;
+        while (canfd_send_data_handle(SLAVE_TO_SNIFFER_SYNC_SID, ((u8 *)&spp_common_cmd->cmdId), spp_common_cmd->dmaLen + 4) != 0) {
+            if (clock_time_exceed(nowTick, 100 * 1000)) {
+                tlkapi_printf(APP_CAN_LOG_EN, "excced time\n");
+                //canSend = 0;
+                break;
             }
-            tlkapi_printf(1, "CANFD trans OK\n");
-        #elif (APP_TRANSPORT_UART_ENABLE)
-            u32 uart_tx_start_tick = clock_time();
-            u32 uart_transmit_max_time = UART_TX_WAIT_MAX_BYTE * 10 * 1000 * 1000 / UART_BAUD_RATE; // 100 bytes transmit time (us)
-            while(!clock_time_exceed(uart_tx_start_tick, uart_transmit_max_time))
-            {
-                if(uart_dma_send_done_flag)
-                {
-                    checkSum = 0;
-                    foreach (k, checklen)
-                    {
-                        checkSum += *(ptx + k + 4);// skip dmaLen
-                    }
-                    spp_common_cmd->checksum = checkSum;
-                    if(uart_send_dma(UART_MODULE_SEL, (u8*)&spp_common_cmd->cmdId, spp_common_cmd->dataLen+4))
-                    {
-                        uart_dma_send_done_flag = 0;
-                    }
-                    break;
-                }
-            }
-            if(clock_time_exceed(uart_tx_start_tick, uart_transmit_max_time)){
-                //reach send timeout
-                uart_dma_send_done_flag = 1;
-            }
-        #endif
-
-        if(log_sniffer_enable){
-            tlkapi_printf(APP_SNIF_LOG_EN, "[APP][SNIF] SCAN_REQ:0x%x\n" ,idx);
         }
-     }
+        //tlkapi_printf(1, "CANFD trans OK\n");
+    #elif (APP_TRANSPORT_UART_ENABLE)
+        u32 uart_tx_start_tick     = clock_time();
+        u32 uart_transmit_max_time = UART_TX_WAIT_MAX_BYTE * 10 * 1000 * 1000 / UART_BAUD_RATE; // 100 bytes transmit time (us)
+        while (!clock_time_exceed(uart_tx_start_tick, uart_transmit_max_time)) {
+            if (uart_dma_send_done_flag) {
+                checkSum = 0;
+                foreach (k, checklen) {
+                    checkSum += *(ptx + k + 4); // skip dmaLen
+                }
+                spp_common_cmd->checksum = checkSum;
+                if (uart_send_dma(UART_MODULE_SEL, (u8 *)&spp_common_cmd->cmdId, spp_common_cmd->dataLen + 4)) {
+                    uart_dma_send_done_flag = 0;
+                }
+                break;
+            }
+        }
+        if (clock_time_exceed(uart_tx_start_tick, uart_transmit_max_time)) {
+            //reach send timeout
+            uart_dma_send_done_flag = 1;
+        }
+    #endif
+
+        if (log_sniffer_enable) {
+            tlkapi_printf(APP_SNIF_LOG_EN, "[APP][SNIF] SCAN_REQ:0x%x\n", idx);
+        }
+    }
 }
 
 
-#if (APP_TRANSPORT_CANFD_ENABLE)
-#define RSSI_FILTER_NUM_LESS    5
-#define RSSI_FILTER_NUM_MORE    10
-#define RSSI_NUM                RSSI_FILTER_NUM_LESS
-#if (RSSI_NUM != 5 && RSSI_NUM != 10)
-    #error "RSSI_FILTER_NUM set error !!!"
-#endif
+    #if (APP_TRANSPORT_CANFD_ENABLE)
+        #define RSSI_FILTER_NUM_LESS 5
+        #define RSSI_FILTER_NUM_MORE 10
+        #define RSSI_NUM             RSSI_FILTER_NUM_LESS
+        #if (RSSI_NUM != 5 && RSSI_NUM != 10)
+            #error "RSSI_FILTER_NUM set error !!!"
+        #endif
 _attribute_ram_code_ u8 rssi_filter(u8 idx, u8 rssi)
 {
     static u8 store_rssi_value[REMOTE_DEVICE_MAX_NUM][RSSI_NUM];
@@ -232,203 +226,180 @@ _attribute_ram_code_ u8 rssi_filter(u8 idx, u8 rssi)
     static u8 rssi_index[REMOTE_DEVICE_MAX_NUM];
 
     idx &= REMOTE_DEVICE_MAX_MASK;
-    if(idx >= REMOTE_DEVICE_MAX_NUM){
+    if (idx >= REMOTE_DEVICE_MAX_NUM) {
         return 0;
     }
 
     //store
-    if(rssi_index[idx] < RSSI_NUM)
-    {
+    if (rssi_index[idx] < RSSI_NUM) {
         store_rssi_value[idx][rssi_index[idx]] = rssi;
         rssi_index[idx]++;
         return rssi;
-    }
-    else
-    {
-        for(u8 i = 0;i < RSSI_NUM - 1;i++)
-        {
+    } else {
+        for (u8 i = 0; i < RSSI_NUM - 1; i++) {
             store_rssi_value[idx][i] = store_rssi_value[idx][i + 1];
         }
         store_rssi_value[idx][RSSI_NUM - 1] = rssi;
     }
 
-    for(u8 cnt = 0;cnt < RSSI_NUM;cnt++)
-    {
+    for (u8 cnt = 0; cnt < RSSI_NUM; cnt++) {
         sort_rssi_value[idx][cnt] = store_rssi_value[idx][cnt];
     }
 
     //sort
-    u8 i = 0,j = 0;
+    u8 i = 0, j = 0;
     u8 tmp_sort = 0;
-    for(i = 0;i < RSSI_NUM - 1;i++)
-    {
-        for(j = 0;j < RSSI_NUM - 1 - i;j++)
-        {
-            if(sort_rssi_value[idx][j] > sort_rssi_value[idx][j+1])
-            {
-                tmp_sort = sort_rssi_value[idx][j];
-                sort_rssi_value[idx][j] = sort_rssi_value[idx][j+1];
-                sort_rssi_value[idx][j+1] = tmp_sort;
+    for (i = 0; i < RSSI_NUM - 1; i++) {
+        for (j = 0; j < RSSI_NUM - 1 - i; j++) {
+            if (sort_rssi_value[idx][j] > sort_rssi_value[idx][j + 1]) {
+                tmp_sort                    = sort_rssi_value[idx][j];
+                sort_rssi_value[idx][j]     = sort_rssi_value[idx][j + 1];
+                sort_rssi_value[idx][j + 1] = tmp_sort;
             }
         }
     }
 
     u16 rssi_gauss_average;
-#if (1)
+        #if (1)
     //Maximum value
-    rssi_gauss_average = sort_rssi_value[idx][RSSI_NUM-1];
-#elif (0)
-    //smoothness in the center
-    #if (RSSI_NUM == RSSI_FILTER_NUM_MORE)
-        rssi_gauss_average = (sort_rssi_value[idx][2] + 2*sort_rssi_value[idx][3] + 3*sort_rssi_value[idx][4] + 8*sort_rssi_value[idx][5] + 3*sort_rssi_value[idx][6] + 2*sort_rssi_value[idx][7] + sort_rssi_value[idx][8])/20;
-    #elif (RSSI_NUM == RSSI_FILTER_NUM_LESS)
-        rssi_gauss_average = (sort_rssi_value[idx][0] + 3*sort_rssi_value[idx][1] + 8*sort_rssi_value[idx][2] + 3*sort_rssi_value[idx][3] + sort_rssi_value[idx][4])/16;
-    #endif
-#endif
+    rssi_gauss_average = sort_rssi_value[idx][RSSI_NUM - 1];
+        #elif (0)
+            //smoothness in the center
+            #if (RSSI_NUM == RSSI_FILTER_NUM_MORE)
+    rssi_gauss_average = (sort_rssi_value[idx][2] + 2 * sort_rssi_value[idx][3] + 3 * sort_rssi_value[idx][4] + 8 * sort_rssi_value[idx][5] + 3 * sort_rssi_value[idx][6] + 2 * sort_rssi_value[idx][7] + sort_rssi_value[idx][8]) / 20;
+            #elif (RSSI_NUM == RSSI_FILTER_NUM_LESS)
+    rssi_gauss_average = (sort_rssi_value[idx][0] + 3 * sort_rssi_value[idx][1] + 8 * sort_rssi_value[idx][2] + 3 * sort_rssi_value[idx][3] + sort_rssi_value[idx][4]) / 16;
+            #endif
+        #endif
 
     return rssi_gauss_average;
 }
-#endif
+    #endif
 
 
 void snif_main_node_disconnect(u16 connHandle)
 {
-    spp_main_node_cmd_scan_req_tx_t  *spp_common_cmd  = (spp_main_node_cmd_scan_req_tx_t *)rssi_crtl;
-    dev_char_info_t* dev_info = dev_char_info_search_by_connhandle (connHandle);
-    if(dev_info == NULL){
+    spp_main_node_cmd_scan_req_tx_t *spp_common_cmd = (spp_main_node_cmd_scan_req_tx_t *)rssi_crtl;
+    dev_char_info_t                 *dev_info       = dev_char_info_search_by_connhandle(connHandle);
+    if (dev_info == NULL) {
         return;
     }
 
     u8 idx = dev_char_get_conn_index_by_connhandle(connHandle);
-    if(idx == INVALID_CONN_IDX){
+    if (idx == INVALID_CONN_IDX) {
         return;
-    }
-    else{
+    } else {
         idx &= REMOTE_DEVICE_MAX_MASK;
-        if(idx >= REMOTE_DEVICE_MAX_NUM){
+        if (idx >= REMOTE_DEVICE_MAX_NUM) {
             return;
         }
     }
 
-    u32 flash_addr = blc_smp_searchBondingPeripheralDevice_by_PeerMacAddress(dev_info->peer_adrType, dev_info->peer_addr);
-    u8 temp_buffer[sizeof(smp_param_save_t)];
+    u32               flash_addr = blc_smp_searchBondingPeripheralDevice_by_PeerMacAddress(dev_info->peer_adrType, dev_info->peer_addr);
+    u8                temp_buffer[sizeof(smp_param_save_t)];
     smp_param_save_t *cur_smp_param = (smp_param_save_t *)temp_buffer;
     flash_read_page(flash_addr, sizeof(smp_param_save_t), temp_buffer);
 
-    if(blc_app_isIrkValid(cur_smp_param->peer_irk)){
-        blc_ll_setScanEnable (BLC_SCAN_DISABLE, DUP_FILTER_DISABLE);
+    if (blc_app_isIrkValid(cur_smp_param->peer_irk)) {
+        blc_ll_setScanEnable(BLC_SCAN_DISABLE, DUP_FILTER_DISABLE);
         blc_ll_setAddressResolutionEnable(0);
         u8 status = blc_ll_removeDeviceFromResolvingList(cur_smp_param->peer_id_adrType, cur_smp_param->peer_id_addr);
         tlkapi_printf(APP_LOG_EN, "[APP] del RL status = %d\n", status);
         status = blc_ll_setAddressResolutionEnable(1);
         tlkapi_printf(APP_LOG_EN, "[APP] enable RL status = %d\n", status);
-        blc_ll_setScanEnable (BLC_SCAN_ENABLE, DUP_FILTER_DISABLE);
+        blc_ll_setScanEnable(BLC_SCAN_ENABLE, DUP_FILTER_DISABLE);
     }
 
-    spp_common_cmd->cmdId = SNIFFER_CMD_SCAN_REQ;
-    spp_common_cmd->dataLen = SNIFFER_CMD_SCAN_REQ_DATA_LEN;
-    spp_common_cmd->dmaLen = spp_common_cmd->dataLen + 4;
-    spp_common_cmd->IsRPA = blc_app_isIrkValid(cur_smp_param->peer_irk);
+    spp_common_cmd->cmdId         = SNIFFER_CMD_SCAN_REQ;
+    spp_common_cmd->dataLen       = SNIFFER_CMD_SCAN_REQ_DATA_LEN;
+    spp_common_cmd->dmaLen        = spp_common_cmd->dataLen + 4;
+    spp_common_cmd->IsRPA         = blc_app_isIrkValid(cur_smp_param->peer_irk);
     spp_common_cmd->monitorEnable = 0;
-    spp_common_cmd->syncHandle = connHandle;
-    spp_common_cmd->adr_type = cur_smp_param->peer_id_adrType;
+    spp_common_cmd->syncHandle    = connHandle;
+    spp_common_cmd->adr_type      = cur_smp_param->peer_id_adrType;
     memcpy(spp_common_cmd->mac, cur_smp_param->peer_id_addr, 6);
     memcpy(spp_common_cmd->peer_irk, cur_smp_param->peer_irk, 16);
-    u8 checkSum = 0;
-    u8 checklen = sizeof(spp_main_node_cmd_scan_req_tx_t) - 5;// exclude dmaLen and checksum
-    u8 *ptx = (u8*)(spp_common_cmd);
-    foreach (j, checklen)
-    {
-        checkSum += *(ptx + j + 4);// skip dmaLen
+    u8  checkSum = 0;
+    u8  checklen = sizeof(spp_main_node_cmd_scan_req_tx_t) - 5; // exclude dmaLen and checksum
+    u8 *ptx      = (u8 *)(spp_common_cmd);
+    foreach (j, checklen) {
+        checkSum += *(ptx + j + 4);                             // skip dmaLen
     }
     spp_common_cmd->checksum = checkSum;
-    tlkapi_send_string_data(APP_SNIF_LOG_EN, "[APP][SNIF] Tx", (u8*)&spp_common_cmd->cmdId, spp_common_cmd->dataLen + 4);
+    tlkapi_send_string_data(APP_SNIF_LOG_EN, "[APP][SNIF] Tx", (u8 *)&spp_common_cmd->cmdId, spp_common_cmd->dataLen + 4);
     #if (APP_TRANSPORT_CANFD_ENABLE)
-        u32 nowTick = clock_time();
-        //u8 canSend = 1;
-        while(canfd_send_data_handle(SLAVE_TO_SNIFFER_SYNC_SID, ((u8*)&spp_common_cmd->cmdId), spp_common_cmd->dmaLen+4) != 0){
-            if(clock_time_exceed(nowTick, 100*1000))
-            {
-                //canSend = 0;
-                break;
-            }
+    u32 nowTick = clock_time();
+    //u8 canSend = 1;
+    while (canfd_send_data_handle(SLAVE_TO_SNIFFER_SYNC_SID, ((u8 *)&spp_common_cmd->cmdId), spp_common_cmd->dmaLen + 4) != 0) {
+        if (clock_time_exceed(nowTick, 100 * 1000)) {
+            //canSend = 0;
+            break;
         }
+    }
     #elif (APP_TRANSPORT_UART_ENABLE)
-        u32 uart_tx_start_tick = clock_time();
-        u32 uart_transmit_max_time = UART_TX_WAIT_MAX_BYTE * 10 * 1000 * 1000 / UART_BAUD_RATE; // 100 bytes transmit time (us)
-        while(!clock_time_exceed(uart_tx_start_tick, uart_transmit_max_time))
-        {
-            if(uart_dma_send_done_flag)
-            {
-                checkSum = 0;
-                foreach (k, checklen)
-                {
-                    checkSum += *(ptx + k + 4);// skip dmaLen
-                }
-                spp_common_cmd->checksum = checkSum;
-                if(uart_send_dma(UART_MODULE_SEL, (u8*)&spp_common_cmd->cmdId, spp_common_cmd->dataLen+4))
-                {
-                    uart_dma_send_done_flag = 0;
-                }
-                break;
+    u32 uart_tx_start_tick     = clock_time();
+    u32 uart_transmit_max_time = UART_TX_WAIT_MAX_BYTE * 10 * 1000 * 1000 / UART_BAUD_RATE; // 100 bytes transmit time (us)
+    while (!clock_time_exceed(uart_tx_start_tick, uart_transmit_max_time)) {
+        if (uart_dma_send_done_flag) {
+            checkSum = 0;
+            foreach (k, checklen) {
+                checkSum += *(ptx + k + 4); // skip dmaLen
             }
+            spp_common_cmd->checksum = checkSum;
+            if (uart_send_dma(UART_MODULE_SEL, (u8 *)&spp_common_cmd->cmdId, spp_common_cmd->dataLen + 4)) {
+                uart_dma_send_done_flag = 0;
+            }
+            break;
         }
-        if(clock_time_exceed(uart_tx_start_tick, uart_transmit_max_time)){
-            //reach send timeout
-            uart_dma_send_done_flag = 1;
-        }
+    }
+    if (clock_time_exceed(uart_tx_start_tick, uart_transmit_max_time)) {
+        //reach send timeout
+        uart_dma_send_done_flag = 1;
+    }
     #endif
 
-    if(log_sniffer_enable){
-        tlkapi_printf(APP_SNIF_LOG_EN, "[APP][SNIF] SCAN_REQ:0x%x\n" ,idx);
+    if (log_sniffer_enable) {
+        tlkapi_printf(APP_SNIF_LOG_EN, "[APP][SNIF] SCAN_REQ:0x%x\n", idx);
     }
     extern u16 sniffer_unpair_enable;
-    if(sniffer_unpair_enable) {
+    if (sniffer_unpair_enable) {
         sniffer_unpair_enable = 0;
         blc_smp_deleteBondingPeripheralInfo_by_PeerMacAddress(dev_info->peer_adrType, dev_info->peer_addr);
     }
-#if (APP_TRANSPORT_CANFD_ENABLE)
+    #if (APP_TRANSPORT_CANFD_ENABLE)
     u8 *ptr = rssi_buffer[idx];
-    blc_app_memory_set(ptr, 0xFF, CHECK_SNIFFER_INDEX_MAX*2+1+1, sizeof(rssi_buffer)/REMOTE_DEVICE_MAX_NUM, 0x11120000|__LINE__);
-#endif
+    blc_app_memory_set(ptr, 0xFF, CHECK_SNIFFER_INDEX_MAX * 2 + 1 + 1, sizeof(rssi_buffer) / REMOTE_DEVICE_MAX_NUM, 0x11120000 | __LINE__);
+    #endif
 }
-
-
-
-
 
 void snif_main_node_rx_data_process(void)
 {
-    if(spp_rx_fifo.wptr != spp_rx_fifo.rptr)
-    {
-        spp_main_node_cmd_rx_t  *rx_common_cmd  = (spp_main_node_cmd_rx_t *)(spp_rx_fifo.p + spp_rx_fifo.rptr * spp_rx_fifo.size);
-        spp_rx_fifo.rptr == (spp_rx_fifo.num-1)?spp_rx_fifo.rptr=0:spp_rx_fifo.rptr++;
+    if (spp_rx_fifo.wptr != spp_rx_fifo.rptr) {
+        spp_main_node_cmd_rx_t *rx_common_cmd = (spp_main_node_cmd_rx_t *)(spp_rx_fifo.p + spp_rx_fifo.rptr * spp_rx_fifo.size);
+        spp_rx_fifo.rptr == (spp_rx_fifo.num - 1) ? spp_rx_fifo.rptr = 0 : spp_rx_fifo.rptr++;
 
-        #if (UI_LED_ENABLE)
-            //rx data from bus
-            gpio_toggle(GPIO_LED_BLUE);
-        #endif
+    #if (UI_LED_ENABLE)
+        //rx data from bus
+        gpio_toggle(GPIO_LED_BLUE);
+    #endif
 
         u8 idx = dev_char_get_conn_index_by_connhandle(rx_common_cmd->snifferHandle);
-        if(idx == INVALID_CONN_IDX){
+        if (idx == INVALID_CONN_IDX) {
             return;
-        }
-        else{
+        } else {
             idx &= REMOTE_DEVICE_MAX_MASK;
-            if(idx >= REMOTE_DEVICE_MAX_NUM){
+            if (idx >= REMOTE_DEVICE_MAX_NUM) {
                 return;
             }
         }
 
-        if(rx_common_cmd->cmdId == SNIFFER_CMD_RSSI)
-        {
+        if (rx_common_cmd->cmdId == SNIFFER_CMD_RSSI) {
+            spp_main_node_cmd_rssi_rx_t *common_cmd = (spp_main_node_cmd_rssi_rx_t *)rx_common_cmd;
 
-            spp_main_node_cmd_rssi_rx_t  *common_cmd  = (spp_main_node_cmd_rssi_rx_t *)rx_common_cmd;
-
-            u8  rx_snifferIndex = common_cmd->snifferIndex;
-            u16 rx_snifferHandle = common_cmd->snifferHandle;
-            u8  rx_rssi = common_cmd->rssi;
-            u8  rx_deviceType = common_cmd->deviceType;
+            u8  rx_snifferIndex   = common_cmd->snifferIndex;
+            u16 rx_snifferHandle  = common_cmd->snifferHandle;
+            u8  rx_rssi           = common_cmd->rssi;
+            u8  rx_deviceType     = common_cmd->deviceType;
             u8  rx_snifferChannel = common_cmd->snifferChannel;
 
             u8 checkSum = 0;
@@ -439,48 +410,46 @@ void snif_main_node_rx_data_process(void)
             checkSum += common_cmd->rssi;
             checkSum += (common_cmd->deviceType << 6) | common_cmd->snifferChannel;
 
-            if(checkSum == common_cmd->checksum){
-                if(log_sniffer_enable){
+            if (checkSum == common_cmd->checksum) {
+                if (log_sniffer_enable) {
                     tlkapi_printf(APP_SNIF_LOG_EN, "[APP][SNIF] RSSI:0x%x,idx_%d,%d,chl:%d,rssi:%d\n", rx_snifferHandle, rx_snifferIndex, rx_deviceType, rx_snifferChannel, rx_rssi - 110);
                 }
-                #if (APP_TRANSPORT_CANFD_ENABLE)
-                    u8 slaverssi = blc_ll_getAclLatestAvgRSSI(rx_snifferHandle);
-                    slaverssi = rssi_filter(rx_snifferHandle&0x0F, slaverssi);
+    #if (APP_TRANSPORT_CANFD_ENABLE)
+                u8 slaverssi = blc_ll_getAclLatestAvgRSSI(rx_snifferHandle);
+                slaverssi    = rssi_filter(rx_snifferHandle & 0x0F, slaverssi);
 
-                    u8 *ptr = rssi_buffer[idx];
-                    ptr[0] = rx_snifferHandle;
-                    ptr[1] = slaverssi-110;
-                    ptr    = ptr+(rx_snifferIndex*2+2);
-                    ptr[0] = rx_snifferIndex;
-                    ptr[1] = rx_rssi - 110;
+                u8 *ptr = rssi_buffer[idx];
+                ptr[0]  = rx_snifferHandle;
+                ptr[1]  = slaverssi - 110;
+                ptr     = ptr + (rx_snifferIndex * 2 + 2);
+                ptr[0]  = rx_snifferIndex;
+                ptr[1]  = rx_rssi - 110;
 
-                    static u32 loss_packet_tick = 0;
-                    rx_rssi_tick[idx][rx_snifferIndex] = 1;
-                    if(clock_time_exceed(loss_packet_tick, (can_fd_cfg.reportInterval*3+50)*1000))
-                    {
-                        loss_packet_tick = clock_time();
+                static u32 loss_packet_tick        = 0;
+                rx_rssi_tick[idx][rx_snifferIndex] = 1;
+                //if(clock_time_exceed(loss_packet_tick, (can_fd_cfg.reportInterval*3+50)*1000))
+                if (clock_time_exceed(loss_packet_tick, (100 * 3 + 50) * 1000)) //TODO nodeSetting.reportIntvl
+                {
+                    loss_packet_tick = clock_time();
 
-                        for(u32 i=0; i<REMOTE_DEVICE_MAX_NUM; i++)
-                        {
-                            for(u32 j=0; j<CHECK_SNIFFER_INDEX_MAX; j++)
-                            {
-                                if(rx_rssi_tick[i][j]==0)
-                                {
-                                    ptr = rssi_buffer[i];
-                                    ptr = ptr+(j*2+2);
-                                    ptr[1] = 0;
-                                }
+                    for (u32 i = 0; i < REMOTE_DEVICE_MAX_NUM; i++) {
+                        for (u32 j = 0; j < CHECK_SNIFFER_INDEX_MAX; j++) {
+                            if (rx_rssi_tick[i][j] == 0) {
+                                ptr    = rssi_buffer[i];
+                                ptr    = ptr + (j * 2 + 2);
+                                ptr[1] = 0;
                             }
                         }
-
-                        memset((u8 *)rx_rssi_tick, 0, sizeof(rx_rssi_tick));
                     }
 
-                    receive_bus_rssi_flag = 1;
-                #endif
+                    memset((u8 *)rx_rssi_tick, 0, sizeof(rx_rssi_tick));
+                }
+
+                receive_bus_rssi_flag = 1;
+    #endif
             }
-        }else if(rx_common_cmd->cmdId == SNIFFER_CMD_SCAN_RSP){
-            spp_main_node_cmd_scan_rsp_rx_t  *common_cmd  = (spp_main_node_cmd_scan_rsp_rx_t *)rx_common_cmd;
+        } else if (rx_common_cmd->cmdId == SNIFFER_CMD_SCAN_RSP) {
+            spp_main_node_cmd_scan_rsp_rx_t *common_cmd = (spp_main_node_cmd_scan_rsp_rx_t *)rx_common_cmd;
 
             u8 checkSum = 0;
             checkSum += common_cmd->cmdId;
@@ -489,85 +458,79 @@ void snif_main_node_rx_data_process(void)
             checkSum += common_cmd->snifferHandle;
             checkSum += common_cmd->status;
 
-            if(checkSum == common_cmd->checksum){
-                if(common_cmd->status == BLE_SUCCESS){
+            if (checkSum == common_cmd->checksum) {
+                if (common_cmd->status == BLE_SUCCESS) {
                     tlkapi_printf(APP_SNIF_LOG_EN, "[APP][SNIF] SNIFFER_SCAN_CREATE\n");
-                } else{
-                    if(dev_char_info_is_connection_state_by_conn_handle(common_cmd->snifferHandle)){
-                        if(common_cmd->snifferIndex < CHECK_SNIFFER_INDEX_MAX){
+                } else {
+                    if (dev_char_info_is_connection_state_by_conn_handle(common_cmd->snifferHandle)) {
+                        if (common_cmd->snifferIndex < CHECK_SNIFFER_INDEX_MAX) {
                             tlkapi_printf(APP_SNIF_LOG_EN, "[APP][SNIF] SNIFFER_SCAN_STATUS = 0x%x\n", common_cmd->status);
                             snif_main_node_connection_setup(common_cmd->snifferHandle, dev_char_get_conn_role_by_connhandle(common_cmd->snifferHandle));
                         }
-
                     }
                 }
 
-                if(log_sniffer_enable){
+                if (log_sniffer_enable) {
                     tlkapi_printf(APP_SNIF_LOG_EN, "[APP][SNIF] SCAN_RSP:0x%x,idx_%d,%d\n", common_cmd->snifferHandle, common_cmd->snifferIndex, common_cmd->status);
                 }
             }
         }
     }
 
-#if (APP_TRANSPORT_CANFD_ENABLE)
-    if(1 == receive_bus_rssi_flag)
-    {
+    #if (APP_TRANSPORT_CANFD_ENABLE)
+    if (1 == receive_bus_rssi_flag) {
         static u32 report_rssi_tick = 0;
-        if(clock_time_exceed(report_rssi_tick, (can_fd_cfg.reportInterval-5)*1000))
+        //if(clock_time_exceed(report_rssi_tick, (can_fd_cfg.reportInterval-5)*1000))
+        if (clock_time_exceed(report_rssi_tick, (100 - 5) * 1000)) //TODO nodeSetting.reportIntvl
         {
             report_rssi_tick = clock_time();
-            if(blc_ll_getCurrentMasterRoleNumber()){
+            if (blc_ll_getCurrentMasterRoleNumber()) {
                 //peer-peripheral RSSI
-                canfd_send_data_handle(SLAVE_TO_ECU_SID, (u8*)&rssi_buffer[0], (sizeof(rssi_buffer)) / 2);
+                canfd_send_data_handle(SLAVE_TO_ECU_SID, (u8 *)&rssi_buffer[0], (sizeof(rssi_buffer)) / 2);
             }
             receive_bus_rssi_flag = 0;
         }
     }
-#endif
+    #endif
 }
-
 
 void snif_main_node_control_process(void)
 {
-#if (APP_TRANSPORT_CANFD_ENABLE)
-    if(gpio_read(TCAN4550_GPIO_INT_N) == 0)
-    {
+    #if (APP_TRANSPORT_CANFD_ENABLE)
+    if (gpio_read(TCAN4550_GPIO_INT_N) == 0) {
         tcan4550_isr();
     }
 
     snif_main_node_rx_data_process();
 
-    if(tcan_reset_flag)
-    {
+    if (tcan_reset_flag) {
         tcan_reset_flag = 0;
         tcan4550_reset_hw();
         Init_CAN();
     }
-#endif
+    #endif
 
-#if (UI_LED_ENABLE)
+    #if (UI_LED_ENABLE)
     static _attribute_ble_data_retention_ u32 tick_str;
-    if(clock_time_exceed(tick_str, 200*1000))
-    {
+    if (clock_time_exceed(tick_str, 200 * 1000)) {
         tick_str = clock_time();
         gpio_toggle(GPIO_LED_WHITE);
     }
-#endif
+    #endif
 }
 
 
-
-#if (APP_TRANSPORT_UART_ENABLE)
+    #if (APP_TRANSPORT_UART_ENABLE)
 
 void user_uart_init(void)
 {
     unsigned short div;
-    unsigned char bwpc;
+    unsigned char  bwpc;
 
     uart_reset(UART_MODULE_SEL);
     uart_set_pin(UART_MODULE_SEL, UART_MODULE_TX_PIN, UART_MODULE_RX_PIN);
 
-    uart_cal_div_and_bwpc(UART_BAUD_RATE, sys_clk.pclk*1000*1000, &div, &bwpc);
+    uart_cal_div_and_bwpc(UART_BAUD_RATE, sys_clk.pclk * 1000 * 1000, &div, &bwpc);
     uart_init(UART_MODULE_SEL, div, bwpc, UART_PARITY_NONE, UART_STOP_BIT_ONE);
 
     uart_set_tx_dma_config(UART_MODULE_SEL, UART_DMA_CHANNEL_TX);
@@ -576,13 +539,13 @@ void user_uart_init(void)
     uart_clr_irq_mask(UART_MODULE_SEL, UART_RX_IRQ_MASK | UART_TX_IRQ_MASK | UART_TXDONE_MASK | UART_RXDONE_MASK);
     uart_clr_irq_status(UART_MODULE_SEL, UART_TXDONE_IRQ_STATUS);
     uart_set_rx_timeout(UART_MODULE_SEL, bwpc, 12, UART_BW_MUL3);
-    uart_set_irq_mask(UART_MODULE_SEL, UART_RXDONE_MASK|UART_TXDONE_MASK);
+    uart_set_irq_mask(UART_MODULE_SEL, UART_RXDONE_MASK | UART_TXDONE_MASK);
 
-    plic_interrupt_enable(UART_MODULE_SEL == UART0_MODULE ? IRQ_UART0:IRQ_UART1);
-    plic_set_priority(UART_MODULE_SEL == UART0_MODULE ? IRQ_UART0:IRQ_UART1, 1);
+    plic_interrupt_enable(UART_MODULE_SEL == UART0_MODULE ? IRQ_UART0 : IRQ_UART1);
+    plic_set_priority(UART_MODULE_SEL == UART0_MODULE ? IRQ_UART0 : IRQ_UART1, 1);
 
 
-    u8 *uart_rx_addr = (spp_rx_fifo_b + (spp_rx_fifo.wptr & (spp_rx_fifo.num-1)) * spp_rx_fifo.size);
+    u8 *uart_rx_addr = (spp_rx_fifo_b + (spp_rx_fifo.wptr & (spp_rx_fifo.num - 1)) * spp_rx_fifo.size);
     //uart_recbuff_init(uart_rx_addr, spp_rx_fifo.size);
     uart_receive_dma(UART_MODULE_SEL, uart_rx_addr, spp_rx_fifo.size);
     uart_clr_irq_status(UART_MODULE_SEL, UART_TXDONE_IRQ_STATUS);
@@ -596,8 +559,7 @@ void user_uart_init(void)
  */
 _attribute_ram_code_sec_ void uart0_irq_handler(void)
 {
-    if(uart_get_irq_status(UART_MODULE_SEL,UART_TXDONE_IRQ_STATUS))
-    {
+    if (uart_get_irq_status(UART_MODULE_SEL, UART_TXDONE_IRQ_STATUS)) {
         uart_dma_send_done_flag = 1;
 
         /* after txdone 5us, the interrupt occurred*/
@@ -605,10 +567,9 @@ _attribute_ram_code_sec_ void uart0_irq_handler(void)
         uart_clr_irq_status(UART_MODULE_SEL, UART_TXDONE_IRQ_STATUS);
     }
 
-    if(uart_get_irq_status(UART_MODULE_SEL,UART_RXDONE_IRQ_STATUS))
-    {
-        /* after rxdone 42us, the interrupt occurred*/
-    #if 0
+    if (uart_get_irq_status(UART_MODULE_SEL, UART_RXDONE_IRQ_STATUS)) {
+            /* after rxdone 42us, the interrupt occurred*/
+        #if 0
         /* Get the length of Rx data */
         u32 rxLen= uart_get_dma_rev_data_len(UART_MODULE_SEL, UART_DMA_CHANNEL_RX);
         if(uart_get_irq_status(UART_MODULE_SEL,UART_TXDONE_IRQ_STATUS)==0)
@@ -617,42 +578,37 @@ _attribute_ram_code_sec_ void uart0_irq_handler(void)
                 uart_dma_send_done_flag = 0;
             }
         }
-    #endif
+        #endif
 
         my_spp_rx_fifo_tick_record[spp_rx_fifo.wptr] = clock_time();
-        spp_rx_fifo.wptr == (spp_rx_fifo.num-1)?spp_rx_fifo.wptr=0:spp_rx_fifo.wptr++;
-        u8* p = spp_rx_fifo.p + spp_rx_fifo.wptr * spp_rx_fifo.size;
+        spp_rx_fifo.wptr == (spp_rx_fifo.num - 1) ? spp_rx_fifo.wptr = 0 : spp_rx_fifo.wptr++;
+        u8 *p = spp_rx_fifo.p + spp_rx_fifo.wptr * spp_rx_fifo.size;
         /* Clear RxDone state */
         uart_clr_irq_status(UART_MODULE_SEL, UART_RXDONE_IRQ_STATUS);
-        uart_receive_dma(UART_MODULE_SEL, p, spp_rx_fifo.size);//[!!important - must]
+        uart_receive_dma(UART_MODULE_SEL, p, spp_rx_fifo.size); //[!!important - must]
 
-        if((uart_get_irq_status(UART_MODULE_SEL,UART_RX_ERR)))
-        {
-            uart_clr_irq_status(UART_MODULE_SEL,UART_RXDONE_IRQ_STATUS);
+        if ((uart_get_irq_status(UART_MODULE_SEL, UART_RX_ERR))) {
+            uart_clr_irq_status(UART_MODULE_SEL, UART_RXDONE_IRQ_STATUS);
         }
     }
 }
 PLIC_ISR_REGISTER(uart0_irq_handler, IRQ_UART0)
 
-int rx_from_uart_cb (void)
+int rx_from_uart_cb(void)
 {
-    if(spp_rx_fifo.wptr == spp_rx_fifo.rptr)
-    {
+    if (spp_rx_fifo.wptr == spp_rx_fifo.rptr) {
         return -1;
-    }
-    else
-    {
+    } else {
         snif_main_node_rx_data_process();
     }
     return 0;
 }
 
-
-int tx_to_uart_cb (void)
+int tx_to_uart_cb(void)
 {
     return 0;
 }
-#endif
+    #endif
 
 
 /**
@@ -663,13 +619,13 @@ int tx_to_uart_cb (void)
 void snif_main_node_init(void)
 {
     //////////// UART/CAN Initialization  Begin /////////////////////////
-#if (APP_TRANSPORT_UART_ENABLE)
+    #if (APP_TRANSPORT_UART_ENABLE)
     user_uart_init();
-    blc_register_hci_handler(rx_from_uart_cb, tx_to_uart_cb);   //customized uart handler
-#elif (APP_TRANSPORT_CANFD_ENABLE)
+    blc_register_hci_handler(rx_from_uart_cb, tx_to_uart_cb); //customized uart handler
+    #elif (APP_TRANSPORT_CANFD_ENABLE)
     tcan4550_init();
     memset((u8 *)rssi_buffer, 0xFF, sizeof(rssi_buffer));
-#endif
+    #endif
     //////////// UART/CAN Initialization  End ///////////////////////////
 
     blc_ll_setAclMasterConnParamUpdateRspLatency(0);
@@ -678,4 +634,3 @@ void snif_main_node_init(void)
 }
 
 #endif /* MAIN_NODE_ROLE_SELECT == MAIN_NODE_CENTRAL */
-

@@ -35,7 +35,7 @@
  * @param[in]  n    - the length of event parameter.
  * @return     none.
  */
-void proc_keyboard (u8 e, u8 *p, int n);
+void proc_keyboard(u8 e, u8 *p, int n);
 
 
 #endif //end of (FEATURE_TEST_MODE == ...)

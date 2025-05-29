@@ -23,10 +23,10 @@
  *******************************************************************************************************/
 #include "stack/ble/ble.h"
 
-#define MICS_START_HDL                  SERVICE_MICROPHONE_CONTROL_HDL
+#define MICS_START_HDL SERVICE_MICROPHONE_CONTROL_HDL
 
 _attribute_ble_data_retention_
-u8 micsMuteValue = 0x00;
+    u8           micsMuteValue    = 0x00;
 static const u16 micsMuteValueLen = 1;
 
 extern const u16 aicsIncludeValue[APP_AUDIO_AICS_SERVER_MAX_INSTANCE_NUM][3];
@@ -35,39 +35,38 @@ extern const u16 aicsIncludeValue[APP_AUDIO_AICS_SERVER_MAX_INSTANCE_NUM][3];
  * @brief the structure for default MICS service List.
  */
 static const atts_attribute_t micsList[] =
-{
-    ATTS_PRIMARY_SERVICE(serviceMicrophoneControlUuid),
+    {
+        ATTS_PRIMARY_SERVICE(serviceMicrophoneControlUuid),
 
 #if APP_AUDIO_MICS_INCLUDE_AICS_INSTANCE_NUM > 0
-    ATTS_INCLUDE_DEFINE(&aicsIncludeValue[0][0]),
+        ATTS_INCLUDE_DEFINE(&aicsIncludeValue[0][0]),
 #endif
 #if APP_AUDIO_MICS_INCLUDE_AICS_INSTANCE_NUM > 1
-    ATTS_INCLUDE_DEFINE(&aicsIncludeValue[1][0]),
+        ATTS_INCLUDE_DEFINE(&aicsIncludeValue[1][0]),
 #endif
 #if APP_AUDIO_MICS_INCLUDE_AICS_INSTANCE_NUM > 2
-    ATTS_INCLUDE_DEFINE(&aicsIncludeValue[2][0]),
+        ATTS_INCLUDE_DEFINE(&aicsIncludeValue[2][0]),
 #endif
 #if APP_AUDIO_MICS_INCLUDE_AICS_INSTANCE_NUM > 3
-    ATTS_INCLUDE_DEFINE(&aicsIncludeValue[3][0]),
+        ATTS_INCLUDE_DEFINE(&aicsIncludeValue[3][0]),
 #endif
 
-    //Mute
-    ATTS_CHAR_UUID_ENCR_RDWR_ENTITY_WCB(charPropReadWriteNotify, characteristicMuteUuid, micsMuteValue),
-    ATTS_COMMON_CCC_DEFINE,
+        //Mute
+        ATTS_CHAR_UUID_ENCR_RDWR_ENTITY_WCB(charPropReadWriteNotify, characteristicMuteUuid, micsMuteValue),
+        ATTS_COMMON_CCC_DEFINE,
 };
 
 /*
  * @brief the structure for default MICS service group.
  */
-_attribute_ble_data_retention_
-static atts_group_t svcMicsGroup =
-{
-    NULL,
-    micsList,
-    NULL,
-    NULL,
-    MICS_START_HDL,
-    0,
+_attribute_ble_data_retention_ static atts_group_t svcMicsGroup =
+    {
+        NULL,
+        micsList,
+        NULL,
+        NULL,
+        MICS_START_HDL,
+        0,
 };
 
 /**
@@ -78,7 +77,7 @@ static atts_group_t svcMicsGroup =
 
 void blc_svc_addMicsGroup(void)
 {
-    svcMicsGroup.endHandle = svcMicsGroup.startHandle+ARRAY_SIZE(micsList)-1;
+    svcMicsGroup.endHandle = svcMicsGroup.startHandle + ARRAY_SIZE(micsList) - 1;
     blc_gatts_addAttributeServiceGroup(&svcMicsGroup);
 }
 
@@ -100,6 +99,6 @@ void blc_svc_removeMicsGroup(void)
  */
 void blc_svc_micsCbackRegister(atts_r_cb_t readCback, atts_w_cb_t writeCback)
 {
-    svcMicsGroup.readCback = readCback;
+    svcMicsGroup.readCback  = readCback;
     svcMicsGroup.writeCback = writeCback;
 }

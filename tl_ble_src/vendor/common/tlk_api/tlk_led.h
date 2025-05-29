@@ -27,21 +27,21 @@
 
 /** for debug. */
 #ifndef TLK_LED_DBG_FLAG
-#define TLK_LED_DBG_FLAG            0
+    #define TLK_LED_DBG_FLAG 0
 #endif
 
 /** Register led number max */
 #ifndef TLK_LED_NUM_MAX
-#define TLK_LED_NUM_MAX             2
+    #define TLK_LED_NUM_MAX 2
 #endif
 
 #ifndef TLK_GPIO_TYPE_DEF
-#define TLK_GPIO_TYPE_DEF gpio_pin_e
+    #define TLK_GPIO_TYPE_DEF gpio_pin_e
 #endif
 
 /** TLK_LED_VALID_LEVEL :default led on level is 1 */
 #ifndef TLK_LED_VALID_LEVEL
-#define TLK_LED_VALID_LEVEL         1
+    #define TLK_LED_VALID_LEVEL 1
 #endif
 
 /*
@@ -74,39 +74,43 @@
  * Clock is 1MHz, Breath Freq. is 2KHz, so pwm counter is 500.
  */
 
-#define BRT_FULL_DUTY                     256
-#define BRT_FULL_STEP                     32
-#define BRT_BRIGHTEST_FULL_DUTY           484
+#define BRT_FULL_DUTY                      256
+#define BRT_FULL_STEP                      32
+#define BRT_BRIGHTEST_FULL_DUTY            484
 
-#define TIME_FOREVER                      0xffff
-#define TIME_NO_TIME                      0x0000
-#define FLASH_FOREVER                     0xffff
+#define TIME_FOREVER                       0xffff
+#define TIME_NO_TIME                       0x0000
+#define FLASH_FOREVER                      0xffff
 
-#define LED_COLOR_NOT_SET                 0xffff
-#define LED_MAX_COLOR                     BRT_BRIGHTEST_FULL_DUTY
-#define LED_DEFAULT_COLOR                 (LED_MAX_COLOR)
-#define GET_PWM_GPIO_FUNC(pwmid)  ((pwmid <= PWM5_ID) ? (PWM0 + pwmid) : 0)
-#define GET_PWM_FRAME_DONE_IRQ_MASK(pwmid)  ((pwmid == PWM0_ID) ? FLD_PWM0_FRAME_DONE_IRQ : \
-                                                (pwmid == PWM1_ID) ? FLD_PWM1_FRAME_DONE_IRQ : \
-                                                (pwmid == PWM2_ID) ? FLD_PWM2_FRAME_DONE_IRQ : \
-                                                (pwmid == PWM3_ID) ? FLD_PWM3_FRAME_DONE_IRQ : \
-                                                (pwmid == PWM4_ID) ? FLD_PWM4_FRAME_DONE_IRQ : \
-                                                (pwmid == PWM5_ID) ? FLD_PWM5_FRAME_DONE_IRQ : 0)
-#define GET_PWM_EN_TYPE(pwmid)  ((pwmid == PWM0_ID) ? FLD_PWM0_EN : \
-                                    (pwmid == PWM1_ID) ? FLD_PWM1_EN : \
-                                    (pwmid == PWM2_ID) ? FLD_PWM2_EN : \
-                                    (pwmid == PWM3_ID) ? FLD_PWM3_EN : \
-                                    (pwmid == PWM4_ID) ? FLD_PWM4_EN : \
-                                    (pwmid == PWM5_ID) ? FLD_PWM5_EN : 0)
+#define LED_COLOR_NOT_SET                  0xffff
+#define LED_MAX_COLOR                      BRT_BRIGHTEST_FULL_DUTY
+#define LED_DEFAULT_COLOR                  (LED_MAX_COLOR)
+#define GET_PWM_GPIO_FUNC(pwmid)           ((pwmid <= PWM5_ID) ? (PWM0 + pwmid) : 0)
+#define GET_PWM_FRAME_DONE_IRQ_MASK(pwmid) ((pwmid == PWM0_ID) ? FLD_PWM0_FRAME_DONE_IRQ : \
+                                            (pwmid == PWM1_ID) ? FLD_PWM1_FRAME_DONE_IRQ : \
+                                            (pwmid == PWM2_ID) ? FLD_PWM2_FRAME_DONE_IRQ : \
+                                            (pwmid == PWM3_ID) ? FLD_PWM3_FRAME_DONE_IRQ : \
+                                            (pwmid == PWM4_ID) ? FLD_PWM4_FRAME_DONE_IRQ : \
+                                            (pwmid == PWM5_ID) ? FLD_PWM5_FRAME_DONE_IRQ : \
+                                                                 0)
+#define GET_PWM_EN_TYPE(pwmid) ((pwmid == PWM0_ID) ? FLD_PWM0_EN : \
+                                (pwmid == PWM1_ID) ? FLD_PWM1_EN : \
+                                (pwmid == PWM2_ID) ? FLD_PWM2_EN : \
+                                (pwmid == PWM3_ID) ? FLD_PWM3_EN : \
+                                (pwmid == PWM4_ID) ? FLD_PWM4_EN : \
+                                (pwmid == PWM5_ID) ? FLD_PWM5_EN : \
+                                                     0)
 
 /** led_pattern mode */
-typedef enum {
+typedef enum
+{
     DEFAULT_PATTERN = 0,               /* use default pattern buffer            */
     USER_PATTERN    = !DEFAULT_PATTERN /* use pattern buffer registered by user */
 } tlk_led_patt_from_e;
 
 /** led_pattern default mode */
-typedef enum {
+typedef enum
+{
     LED_PATTERN_LED_OFF                = 0,
     LED_PATTERN_LED_ON                 = 1,
     LED_PATTERN_LED_FLASH_SLOW         = 2,
@@ -136,27 +140,30 @@ typedef enum {
     LED_PATTERN_LED_MAX_STATE,
 } led_pattern_index_e;
 
-typedef enum {
-    TLK_LED_SUCCESS             = 0,
-    TLK_LED_IS_INSERTING        = 1,
-    TLK_LED_PARAMETER_ERROR     = 2,
-    TLK_LED_PARTTEN_ERROR       = 3,
-    TLK_LED_NOT_ENOUGH          = 4,
-    TLK_LED_REPEAT              = 5,
-    TLK_LED_INSERT_CAUTION      = 6,
+typedef enum
+{
+    TLK_LED_SUCCESS         = 0,
+    TLK_LED_IS_INSERTING    = 1,
+    TLK_LED_PARAMETER_ERROR = 2,
+    TLK_LED_PARTTEN_ERROR   = 3,
+    TLK_LED_NOT_ENOUGH      = 4,
+    TLK_LED_REPEAT          = 5,
+    TLK_LED_INSERT_CAUTION  = 6,
 
-    TLK_LED_INVALID             = 0xff,
+    TLK_LED_INVALID = 0xff,
 } tlk_led_sts_e;
 
 /** Led config struct */
-typedef struct {
+typedef struct
+{
     TLK_GPIO_TYPE_DEF led_pin;
-    u8 led_on_level; /**< 0 or 1    default:TLK_LED_VALID_LEVEL   */
-    pwm_id_e  pwmid;        /**< io pwm */
+    u8                led_on_level; /**< 0 or 1    default:TLK_LED_VALID_LEVEL   */
+    pwm_id_e          pwmid;        /**< io pwm */
 } tlk_led_config_t;
 
 /** Led pattern struct */
-typedef struct {
+typedef struct
+{
     u16 behavior;    /**< zero is flash, non-zero is breath          */
     u16 duty;        /**< Duty for LED on                             */
     u16 latency;     /**< Off time                                    */
@@ -166,7 +173,8 @@ typedef struct {
 } tlk_led_pattern_t;
 
 /** led lum state struct */
-typedef struct {
+typedef struct
+{
     u16 state;
     u16 flags;
     u16 lum;
@@ -175,35 +183,41 @@ typedef struct {
 } tlk_lum_state_t;
 
 /** led pattern table struct */
-typedef struct {
-    u16 pattern_count;         /**< the number of color      */
+typedef struct
+{
+    u16                pattern_count;   /**< the number of color      */
     tlk_led_pattern_t *p_pattern_table; /**< the led event table     */
 } tlk_led_pattern_table_t;
 
 /** led color type struct */
-typedef struct {
+typedef struct
+{
     u16 color_value[TLK_LED_NUM_MAX]; /**< the led event table -LED_USE_DEFAULT_COLOR:use default color */
 } tlk_led_color_t;
+
 /** led color table struct */
-typedef struct {
-    u16 color_count;       /**< the number of color     */
+typedef struct
+{
+    u16              color_count;   /**< the number of color     */
     tlk_led_color_t *p_color_table; /**< the led color table     */
 } tlk_tlk_led_color_table_t;
 
 /** led env struct */
-typedef struct {
+typedef struct
+{
     tlk_led_pattern_t *p_pattern;
-    tlk_lum_state_t lum_state;
+    tlk_lum_state_t    lum_state;
 
     tlk_led_pattern_t *p_insert_pattern; /**< after execute insert pattern, return to pattern. */
-    tlk_lum_state_t insert_lum_state;
+    tlk_lum_state_t    insert_lum_state;
 } tlk_led_env_t;
 
 /** led control info struct */
-typedef struct {
-    u8 led_id; /**< led index, automatic allocation  0:unused,other:be using  */
-    u16 color_duty;
-    tlk_led_env_t led_env;
+typedef struct
+{
+    u8               led_id;   /**< led index, automatic allocation  0:unused,other:be using  */
+    u16              color_duty;
+    tlk_led_env_t    led_env;
     tlk_led_config_t led_info; /**< led user config                                            */
 } tlk_led_ctrl_t;
 

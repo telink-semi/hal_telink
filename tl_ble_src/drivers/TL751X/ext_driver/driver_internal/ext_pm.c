@@ -25,7 +25,6 @@
  *          file under Mutual Non-Disclosure Agreement. NO WARRANTY of ANY KIND is provided.
  *
  *******************************************************************************************************/
-#include "nds_intrinsic.h"
 #include "../../analog.h"
 #include "../../dma.h"
 #include "../../gpio.h"

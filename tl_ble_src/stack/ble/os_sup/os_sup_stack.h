@@ -36,6 +36,6 @@ extern os_give_sem_t blt_os_semCountIncrementIrq_cb;
  * @brief srack use
  */
 extern bool is_os_sup_en;
-#define blt_isOsSupEnable()                                     (is_os_sup_en)
+#define blt_isOsSupEnable() (is_os_sup_en)
 
 #endif /* OS_SUP_STACK_H_ */

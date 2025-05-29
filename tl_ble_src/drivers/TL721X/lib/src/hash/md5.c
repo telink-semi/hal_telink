@@ -28,9 +28,6 @@
 #include "lib/include/hash/md5.h"
 
 
-
-
-
 #ifdef SUPPORT_HASH_MD5
 /**
  * @brief       init md5
@@ -58,7 +55,6 @@ unsigned int md5_update(MD5_CTX *ctx, const unsigned char *msg, unsigned int msg
     return hash_update(ctx, msg, msg_bytes);
 }
 
-
 /**
  * @brief       message update done, get the md5 digest
  * @param[in]   ctx               - HMAC_CTX context pointer.
@@ -73,7 +69,6 @@ unsigned int md5_final(MD5_CTX *ctx, unsigned char *digest)
 {
     return hash_final(ctx, digest);
 }
-
 
 /**
  * @brief       input whole message and get its md5 digest
@@ -92,7 +87,7 @@ unsigned int md5(unsigned char *msg, unsigned int msg_bytes, unsigned char *dige
 }
 
 
-#ifdef HASH_DMA_FUNCTION
+    #ifdef HASH_DMA_FUNCTION
 /**
  * @brief       init dma md5
  * @param[in]   ctx            - MD5_DMA_CTX context pointer.
@@ -103,7 +98,6 @@ unsigned int md5_dma_init(MD5_DMA_CTX *ctx, HASH_CALLBACK callback)
 {
     return hash_dma_init(ctx, HASH_MD5, callback);
 }
-
 
 /**
  * @brief       dma md5 update some message blocks
@@ -121,7 +115,6 @@ unsigned int md5_dma_update_blocks(MD5_DMA_CTX *ctx, unsigned int *msg, unsigned
 {
     return hash_dma_update_blocks(ctx, msg, msg_words);
 }
-
 
 /**
  * @brief       dma md5 final(input the remainder message and get the digest)
@@ -141,7 +134,6 @@ unsigned int md5_dma_final(MD5_DMA_CTX *ctx, unsigned int *remainder_msg, unsign
     return hash_dma_final(ctx, remainder_msg, remainder_bytes, digest);
 }
 
-
 /**
  * @brief       dma md5 digest calculate
  * @param[in]   msg                      - message.
@@ -158,6 +150,6 @@ unsigned int md5_dma(unsigned int *msg, unsigned int msg_bytes, unsigned int *di
 {
     return hash_dma(HASH_MD5, msg, msg_bytes, digest, callback);
 }
-#endif
+    #endif
 
 #endif

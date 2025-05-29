@@ -37,7 +37,7 @@
 #include "clock.h"
 #include "mspi.h"
 #include "stimer.h"
-#include "analog.h"
+#include "lib/include/analog.h"
 #include "compatibility_pack/cmpt.h"
 #include "../ext_pm.h"
 #include "ext_lib.h"

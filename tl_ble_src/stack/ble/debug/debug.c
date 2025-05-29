@@ -29,12 +29,10 @@
 #include "stack/ble/ble.h"
 
 
+_attribute_ble_data_retention_ u32 stkLog_mask = 0;
 
-
-_attribute_ble_data_retention_  u32 stkLog_mask = 0;
 //_attribute_ble_data_retention_    u32* pErrMarkAddr = 0;
 //_attribute_ble_data_retention_    int errMark_len = 0;
-
 
 
 void blc_debug_enableStackLog(stk_log_msk_t mask)
@@ -47,12 +45,10 @@ void blc_debug_addStackLog(stk_log_msk_t mask)
     stkLog_mask |= mask;
 }
 
-
 void blc_debug_removeStackLog(stk_log_msk_t mask)
 {
     stkLog_mask &= ~mask;
 }
-
 
 
 #if 0
@@ -76,61 +72,59 @@ void blc_debug_configStackErrorMark(int enable, int start_sram_addr, int byte_le
 #endif
 
 
-
-
-
 #if (BLT_ERR_PROCESS == ERR_TRIGGER_CODE_STUCK)
-_attribute_ram_code_
-void blt_ll_error_debug(u32 x)
+_attribute_ram_code_ void blt_ll_error_debug(u32 x)
 {
-        irq_disable();
-        write_dbg32(DBG_SRAM_ADDR, x);
+    irq_disable();
+    write_dbg32(DBG_SRAM_ADDR, x);
 
-        #if (TLKAPI_DEBUG_ENABLE)
-            tlkapi_send_string_data(1, "*** error code mark ***", DBG_SRAM_ADDR, 16);
+    #if (TLKAPI_DEBUG_ENABLE)
+    tlkapi_send_string_data(1, "*** error code mark ***", DBG_SRAM_ADDR, 16);
+    #endif
+
+
+    DBG_CS_CHN6_TOGGLE;
+    DBG_CS_CHN6_TOGGLE;
+    DBG_CS_CHN6_TOGGLE;
+    DBG_CS_CHN6_TOGGLE;
+
+    #if (UI_LED_ENABLE)
+        #ifdef GPIO_LED_RED
+    gpio_write(GPIO_LED_RED, LED_ON_LEVEL);
         #endif
 
-
-        DBG_CS_CHN6_TOGGLE;DBG_CS_CHN6_TOGGLE;DBG_CS_CHN6_TOGGLE;DBG_CS_CHN6_TOGGLE;
-
-        #if (UI_LED_ENABLE)
-            #ifdef GPIO_LED_RED
-                gpio_write(GPIO_LED_RED, LED_ON_LEVEL);
-            #endif
-
-            #ifdef GPIO_LED_BLUE
-                gpio_write(GPIO_LED_BLUE, LED_ON_LEVEL);
-            #endif
-
-            #ifdef GPIO_LED_WHITE
-                gpio_write(GPIO_LED_WHITE, LED_ON_LEVEL);
-            #endif
-
-            #ifdef GPIO_LED_GREEN
-                gpio_write(GPIO_LED_GREEN, LED_ON_LEVEL);
-            #endif
+        #ifdef GPIO_LED_BLUE
+    gpio_write(GPIO_LED_BLUE, LED_ON_LEVEL);
         #endif
 
-        while(1){
-            #if (VCD_EN)
-                static u32 tick = 0;
-                if(clock_time_exceed(tick, 500)){
-                    tick = clock_time();
-                    log_event_irq(SL_STACK_VCD_EN, SLEV_timestamp);
-                }
-            #endif
+        #ifdef GPIO_LED_WHITE
+    gpio_write(GPIO_LED_WHITE, LED_ON_LEVEL);
+        #endif
 
-            #if (TLKAPI_DEBUG_ENABLE)
-                tlkapi_debug_handler();
-            #endif
+        #ifdef GPIO_LED_GREEN
+    gpio_write(GPIO_LED_GREEN, LED_ON_LEVEL);
+        #endif
+    #endif
+
+    while (1) {
+    #if (VCD_EN)
+        static u32 tick = 0;
+        if (clock_time_exceed(tick, 500)) {
+            tick = clock_time();
+            log_event_irq(SL_STACK_VCD_EN, SLEV_timestamp);
         }
+    #endif
+
+    #if (TLKAPI_DEBUG_ENABLE)
+        tlkapi_debug_handler();
+    #endif
+    }
 }
 
-#elif(BLT_ERR_PROCESS == ERR_LOG_ON_SRAM)
+#elif (BLT_ERR_PROCESS == ERR_LOG_ON_SRAM)
 
 
-_attribute_ram_code_
-void blt_ll_error_debug(u32 x)
+_attribute_ram_code_ void blt_ll_error_debug(u32 x)
 {
     write_dbg32(DBG_SRAM_ADDR, x);
 }

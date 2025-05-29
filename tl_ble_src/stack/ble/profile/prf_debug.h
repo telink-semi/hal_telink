@@ -25,28 +25,31 @@
 /////////////////////////Profile Debug Log Macro Control////////////////////////////
 
 #ifndef PROFILE_DEBUG_LOG_EN
-#define PROFILE_DEBUG_LOG_EN                                    1
+    #define PROFILE_DEBUG_LOG_EN 1
 #endif
 
 #ifndef PRF_DBG_COMMON_EN
-#define PRF_DBG_COMMON_EN                                       1
+    #define PRF_DBG_COMMON_EN 1
 #endif
 
 extern const unsigned char DBG_PRF_MASK_COMMON_LOG;
 
-#define BLC_PROFILE_DEBUG(en, fmt, ...)                         if(PROFILE_DEBUG_LOG_EN){tlkapi_printf(en, "[PRF]"fmt "\n", ##__VA_ARGS__);}
+#define BLC_PROFILE_DEBUG(en, fmt, ...)                     \
+    if (PROFILE_DEBUG_LOG_EN) {                             \
+        tlkapi_printf(en, "[PRF]" fmt "\n", ##__VA_ARGS__); \
+    }
 
 /////////////////////////Bluetooth Basic Profile Debug Log//////////////////////////
 #ifndef PRF_DBG_DIS_EN
-#define PRF_DBG_DIS_EN                                          1
+    #define PRF_DBG_DIS_EN 1
 #endif
 
 #ifndef PRF_DBG_BAS_EN
-#define PRF_DBG_BAS_EN                                          1
+    #define PRF_DBG_BAS_EN 1
 #endif
 
 #ifndef PRF_DBG_SCPS_EN
-#define PRF_DBG_SCPS_EN                                         1
+    #define PRF_DBG_SCPS_EN 1
 #endif
 
 extern const unsigned char DBG_PRF_MASK_DIS_LOG;
@@ -54,87 +57,87 @@ extern const unsigned char DBG_PRF_MASK_BAS_LOG;
 extern const unsigned char DBG_PRF_MASK_SCPS_LOG;
 /////////////////////////LE Audio Debug Log/////////////////////////////////////////
 #ifndef DBG_PRF_AUD_LOG
-#define DBG_PRF_AUD_LOG                                         1
+    #define DBG_PRF_AUD_LOG 1
 #endif
 
 #ifndef PRF_DBG_AUDIO_EN
-#define PRF_DBG_AUDIO_EN                                        1
+    #define PRF_DBG_AUDIO_EN 1
 #endif
 
 #ifndef PRF_DBG_ASCS_EN
-#define PRF_DBG_ASCS_EN                                         1
+    #define PRF_DBG_ASCS_EN 1
 #endif
 
 #ifndef PRF_DBG_BASS_EN
-#define PRF_DBG_BASS_EN                                         1
+    #define PRF_DBG_BASS_EN 1
 #endif
 
 #ifndef PRF_DBG_PACS_EN
-#define PRF_DBG_PACS_EN                                         1
+    #define PRF_DBG_PACS_EN 1
 #endif
 
 #ifndef PRF_DBG_BAP_EN
-#define PRF_DBG_BAP_EN                                          1
+    #define PRF_DBG_BAP_EN 1
 #endif
 
 #ifndef PRF_DBG_BCST_EN
-#define PRF_DBG_BCST_EN                                         1
+    #define PRF_DBG_BCST_EN 1
 #endif
 
 #ifndef PRF_DBG_CSIS_EN
-#define PRF_DBG_CSIS_EN                                         1
+    #define PRF_DBG_CSIS_EN 1
 #endif
 
 #ifndef PRF_DBG_OTS_EN
-#define PRF_DBG_OTS_EN                                          1
+    #define PRF_DBG_OTS_EN 1
 #endif
 
 #ifndef PRF_DBG_MCS_EN
-#define PRF_DBG_MCS_EN                                          1
+    #define PRF_DBG_MCS_EN 1
 #endif
 
 #ifndef PRF_DBG_TBS_EN
-#define PRF_DBG_TBS_EN                                          1
+    #define PRF_DBG_TBS_EN 1
 #endif
 
 #ifndef PRF_DBG_VCS_EN
-#define PRF_DBG_VCS_EN                                          1
+    #define PRF_DBG_VCS_EN 1
 #endif
 
 #ifndef PRF_DBG_VOCS_EN
-#define PRF_DBG_VOCS_EN                                         1
+    #define PRF_DBG_VOCS_EN 1
 #endif
 
 #ifndef PRF_DBG_MICS_EN
-#define PRF_DBG_MICS_EN                                         1
+    #define PRF_DBG_MICS_EN 1
 #endif
 
 #ifndef PRF_DBG_AICS_EN
-#define PRF_DBG_AICS_EN                                         1
+    #define PRF_DBG_AICS_EN 1
 #endif
 
 #ifndef PRF_DBG_CAP_EN
-#define PRF_DBG_CAP_EN                                          1
+    #define PRF_DBG_CAP_EN 1
 #endif
 
 #ifndef PRF_DBG_PBP_EN
-#define PRF_DBG_PBP_EN                                          1
+    #define PRF_DBG_PBP_EN 1
 #endif
 
 #ifndef PRF_DBG_TMAS_EN
-#define PRF_DBG_TMAS_EN                                         1
+    #define PRF_DBG_TMAS_EN 1
 #endif
 
 #ifndef PRF_DBG_HAS_EN
-#define PRF_DBG_HAS_EN                                          1
+    #define PRF_DBG_HAS_EN 1
 #endif
 
 #ifndef PRF_DBG_UCP_EN
-#define PRF_DBG_UCP_EN                                          1
+    #define PRF_DBG_UCP_EN 1
 #endif
 
 #ifndef PRF_DBG_STORE_EN
-#define PRF_DBG_STORE_EN                                        1
+    #define PRF_DBG_STORE_EN 1
 #endif
 
 extern const unsigned char DBG_PRF_MASK_AUD_LOG;
@@ -159,25 +162,39 @@ extern const unsigned char DBG_PRF_MASK_UCP_LOG;
 extern const unsigned char DBG_PRF_MASK_STORE_LOG;
 
 
-
-
 /////////////////////////Channel Sounding(HADM) Debug Log////////////////////////////
 #ifndef PRF_DBG_RAS_EN
-#define PRF_DBG_RAS_EN                                          1
+    #define PRF_DBG_RAS_EN 0
+#endif
+
+#ifndef PRF_DBG_RAS_DATA_EN
+    #define PRF_DBG_RAS_DATA_EN 0
 #endif
 
 extern const unsigned char DBG_PRF_MASK_RAS_LOG;
+extern const unsigned char DBG_PRF_MASK_RAS_DATA_LOG;
 
 /////////////////////////Electronic Shelf Label(ESL) Debug Log///////////////////////
 
+#ifndef PRF_DBG_ESLS_EN
+    #define PRF_DBG_ESLS_EN 1
+#endif
+
+#ifndef PRF_DBG_ESL_ESLP_EN
+    #define PRF_DBG_ESL_ESLP_EN 1
+#endif
+
+extern const unsigned char DBG_PRF_MASK_ESLS_LOG;
+extern const unsigned char DBG_PRF_MASK_ESL_ESLP_LOG;
+
 /////////////////////////Ultra Low Latency(ULL) HID Debug Log///////////////////////
 #ifndef PRF_DBG_HID_EN
-#define PRF_DBG_HID_EN                                          1
+    #define PRF_DBG_HID_EN 1
 #endif
 
 
 #ifndef PRF_DBG_ULLHID_EN
-#define PRF_DBG_ULLHID_EN                                       1
+    #define PRF_DBG_ULLHID_EN 1
 #endif
 
 extern const unsigned char DBG_PRF_MASK_HID_LOG;
@@ -185,7 +202,7 @@ extern const unsigned char DBG_PRF_MASK_ULL_HID_LOG;
 
 /////////////////////////Test Profile Debug Log////////////////////////////////////
 #ifndef PRF_DBG_TEST_PRF_EN
-#define PRF_DBG_TEST_PRF_EN                                     1
+    #define PRF_DBG_TEST_PRF_EN 1
 #endif
 
 extern const unsigned char DBG_PRF_MASK_TEST_PRF_LOG;

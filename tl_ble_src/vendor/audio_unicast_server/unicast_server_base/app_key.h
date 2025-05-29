@@ -27,9 +27,8 @@
 #if (UNICAST_SERVER_SELECT == UNICAST_SERVER_BASE)
 
 
-
-
-typedef enum {
+typedef enum
+{
     KEY_MODE_NULL = 0,
     KEY_MODE_TEST1,
     KEY_MODE_TEST2,

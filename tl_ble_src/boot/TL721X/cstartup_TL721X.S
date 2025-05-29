@@ -22,6 +22,10 @@
  *
  *******************************************************************************************************/
 
+ #include "user_config.h"
+#ifndef __CHANNEL_SOUNDING_EN__
+#define __CHANNEL_SOUNDING_EN__     0
+#endif
 /**
  * @brief   Set "DP_THROUGH_SWIRE_DIS" as "1" to disable the "dp_through_swire" function. Set "DP_THROUGH_SWIRE_DIS" as "0" to enable the "dp_through_swire" function.
  *          Risk description:
@@ -36,8 +40,6 @@
 #ifndef DP_THROUGH_SWIRE_DIS
 #define DP_THROUGH_SWIRE_DIS      1
 #endif
-
-#include "user_config.h"
 
 /* If using Andes toolchain, these two Macro are defined in it's toolchain */
 /* If using std gcc toolchain, these two core registers(not standard risc-v core registers)
@@ -65,7 +67,13 @@
 #define SRAM_256K      2    //256KSRAM, 256KB-IRAM(256KB-Retention)/0KB-DRAM
 #define SRAM_384K      3    //384KSRAM, 256KB-IRAM(256KB-Retention)/128KB-DRAM
 #define SRAM_512K      4    //512KSRAM, 256KB-IRAM(256KB-Retention)/256KB-DRAM
-#define SRAM_SIZE      SRAM_128K
+#if(__CHANNEL_SOUNDING_EN__)
+    #define SRAM_SIZE      SRAM_512K
+#elif(__PROJECT_ESLP_AP_DEMO__)
+    #define SRAM_SIZE      SRAM_256K
+#else
+    #define SRAM_SIZE      SRAM_128K
+#endif
 
 #if (SRAM_SIZE == SRAM_256K)
     .equ __IRAM_2_EN,   1
@@ -108,8 +116,12 @@
     .align 2
 _RESET_ENTRY:
     j        _START
-
-
+    //free the 6th ~ 7th byte to store the crc type of the bin file
+    /* This configuration is specifically for RF_Certification and does not need to be enabled for other scenarios */
+#ifdef RF_CERTIFICATION_CGF_EN
+    .org 0x10
+    .word(_RF_CERTIFICATION_CFG_ADDR_OFFSET)
+#endif
 /* used to check flash protection function consistency between the old and new  firmware when OTA upgrading */
 #if APP_FLASH_PROTECTION_ENABLE
     .org 0x15    //correspond to "FIRMWARE_FLASH_PROTECTION_FLAG_ADDR" in mcu_boot.h
@@ -126,9 +138,8 @@ _RESET_ENTRY:
 #if APP_HW_SECURE_BOOT_ENABLE
     .org 0x17        //correspond to "SECURE_BOOT_FLAG_ADDR" in mcu_boot.h
     .byte (0x5A)
-#endif
-
-    //free the 6th ~ 7th byte to store the crc type of the bin file
+ #endif
+ 
     .org 0x18
     .word (BIN_SIZE)
 
@@ -283,7 +294,29 @@ _DATA_INIT_BEGIN:
     addi   t1, t1, 4
     addi   t2, t2, 4
     j      _DATA_INIT_BEGIN
+#if __CHANNEL_SOUNDING_EN__
+    /* Zero .bss section in sram */
+_ZERO_BSS:
+    lui    t0, 0
+    la     t2, _BSS_VMA_START
+    la     t3, _BSS_VMA_END
+_ZERO_BSS_BEGIN:
+    bleu   t3, t2, _ZERO_IRAM_BSS
+    sw     t0, 0(t2)
+    addi   t2, t2, 4
+    j      _ZERO_BSS_BEGIN
 
+        /* Zero .iram_bss section in sram */
+_ZERO_IRAM_BSS:
+    lui    t0, 0
+    la     t2, _IRAM_BSS_VMA_START
+    la     t3, _IRAM_BSS_VMA_END
+_ZERO_IRAM_BSS_BEGIN:
+    bleu   t3, t2, _FILL_STK
+    sw     t0, 0(t2)
+    addi   t2, t2, 4
+    j      _ZERO_IRAM_BSS_BEGIN
+#else
     /* Zero .bss section in sram */
 _ZERO_BSS:
     lui    t0, 0
@@ -294,7 +327,7 @@ _ZERO_BSS_BEGIN:
     sw     t0, 0(t2)
     addi   t2, t2, 4
     j      _ZERO_BSS_BEGIN
-
+#endif
     /* Fill the remaining section in sram */
 _FILL_STK:
 #if 0
@@ -336,7 +369,9 @@ _IRESET_ENTRY:
     /* Decide whether this is an NMI or cold reset */
     j       _ISTART
 
-    .org 0x22
+    /* BLE SDK use: change from 0x22 to 0x24 */
+    .org 0x24
+
 _ISTART:
 #if 0
     // add debug, PB4 output 1

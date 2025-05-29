@@ -33,4 +33,3 @@ void app_media_event_callback(u16 connHandle, int evtID, u8 *pData, u16 dataLen)
 }
 
 #endif /* INTER_TEST_MODE */
-

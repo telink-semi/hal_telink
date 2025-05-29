@@ -33,7 +33,7 @@
 #include "vendor/common/tlk_api/tlk_key.h"
 
 #if (UNICAST_SERVER_SELECT == UNICAST_SERVER_BASE)
-#if (TLK_KEY_ENABLE)
+    #if (TLK_KEY_ENABLE)
 
 static int key_func_null_func(void);
 static int key_func_test1(void);
@@ -44,98 +44,101 @@ static int key_func_test5(void);
 
 /** key event table */
 static const tlk_key_func s_key_evt_table[KEY_MODE_MAX] = {
-    key_func_null_func,                       /**  */
-    key_func_test1,                           /**  */
-    key_func_test2,                           /**  */
-    key_func_test3,                           /**  */
-    key_func_test4,                           /**  */
-    key_func_test5,                           /**  */
+    key_func_null_func, /**  */
+    key_func_test1,     /**  */
+    key_func_test2,     /**  */
+    key_func_test3,     /**  */
+    key_func_test4,     /**  */
+    key_func_test5,     /**  */
 };
 
 /** key mode table 1 */
 static tlk_key_event_class_t key_mode_table_1 = {
-  ._short  = KEY_MODE_TEST1,
-  ._dclick = KEY_MODE_TEST5,
-  ._tclick = KEY_MODE_TEST1,
-  ._hold   = KEY_MODE_TEST1,
-  ._long   = KEY_MODE_TEST1,
+    ._short  = KEY_MODE_TEST1,
+    ._dclick = KEY_MODE_TEST5,
+    ._tclick = KEY_MODE_TEST1,
+    ._hold   = KEY_MODE_TEST1,
+    ._long   = KEY_MODE_TEST1,
 };
 
 /** key mode table 2*/
 static tlk_key_event_class_t key_mode_table_2 = {
-  ._short  = KEY_MODE_TEST2,
-  ._dclick = KEY_MODE_TEST2,
-  ._tclick = KEY_MODE_TEST2,
-  ._hold   = KEY_MODE_TEST2,
-  ._long   = KEY_MODE_TEST2,
+    ._short  = KEY_MODE_TEST2,
+    ._dclick = KEY_MODE_TEST2,
+    ._tclick = KEY_MODE_TEST2,
+    ._hold   = KEY_MODE_TEST2,
+    ._long   = KEY_MODE_TEST2,
 };
 
 /** key mode table 3*/
 static tlk_key_event_class_t key_mode_table_3 = {
-  ._short  = KEY_MODE_TEST3,
-  ._dclick = KEY_MODE_TEST3,
-  ._tclick = KEY_MODE_TEST3,
-  ._hold   = KEY_MODE_TEST3,
-  ._long   = KEY_MODE_TEST3,
+    ._short  = KEY_MODE_TEST3,
+    ._dclick = KEY_MODE_TEST3,
+    ._tclick = KEY_MODE_TEST3,
+    ._hold   = KEY_MODE_TEST3,
+    ._long   = KEY_MODE_TEST3,
 };
 
 /** key mode table 4*/
 static tlk_key_event_class_t key_mode_table_4 = {
-  ._short  = KEY_MODE_TEST4,
-  ._dclick = KEY_MODE_TEST4,
-  ._tclick = KEY_MODE_TEST4,
-  ._hold   = KEY_MODE_TEST4,
-  ._long   = KEY_MODE_TEST4,
+    ._short  = KEY_MODE_TEST4,
+    ._dclick = KEY_MODE_TEST4,
+    ._tclick = KEY_MODE_TEST4,
+    ._hold   = KEY_MODE_TEST4,
+    ._long   = KEY_MODE_TEST4,
 };
 
 /** key mode table 5*/
 static tlk_key_event_class_t key_mode_table_5 = {
-  ._short  = KEY_MODE_TEST5,
-  ._dclick = KEY_MODE_TEST5,
-  ._tclick = KEY_MODE_TEST5,
-  ._hold   = KEY_MODE_TEST5,
-  ._long   = KEY_MODE_TEST5,
+    ._short  = KEY_MODE_TEST5,
+    ._dclick = KEY_MODE_TEST5,
+    ._tclick = KEY_MODE_TEST5,
+    ._hold   = KEY_MODE_TEST5,
+    ._long   = KEY_MODE_TEST5,
 };
-
 
 static int key_func_null_func(void)
 {
     tlkapi_printf(APP_KEY_LOG_EN, "key_func_null_func\n");
     return 0;
 }
-#if (TLK_TONE_ENABLE)
-static int i=0;
-#endif
+        #if (TLK_TONE_ENABLE)
+static int i = 0;
+        #endif
 static int key_func_test1(void)
 {
     tlkapi_printf(APP_KEY_LOG_EN, "key_func_test1\n");
     app_audio_volume_up();
-#if (TLK_TONE_ENABLE)
-    tlk_tone_play(i++%6);
-#endif
+        #if (TLK_TONE_ENABLE)
+    tlk_tone_play(i++ % 6);
+        #endif
     return 0;
 }
+
 static int key_func_test2(void)
 {
     tlkapi_printf(APP_KEY_LOG_EN, "key_func_test2\n");
     app_audio_volume_down();
     return 0;
 }
+
 static int key_func_test3(void)
 {
     tlkapi_printf(APP_KEY_LOG_EN, "key_func_test3\n");
     return 0;
 }
+
 static int key_func_test4(void)
 {
     tlkapi_printf(APP_KEY_LOG_EN, "key_func_test4\n");
     return 0;
 }
+
 static int key_func_test5(void)
 {
     tlkapi_printf(APP_KEY_LOG_EN, "key_func_test5\n");
     static bool mute = false;
-    mute = !mute;
+    mute             = !mute;
     mute ? app_audio_mute() : app_audio_unmute();
     return 0;
 }
@@ -152,100 +155,83 @@ void app_key_init(void)
     /** key event table register */
     tlk_key_register_event_table(s_key_evt_table, KEY_MODE_MAX);
     tlk_key_config_t key_config;
-    int ret = 0;
-#ifdef KEY1_ID
+    int              ret = 0;
+        #ifdef KEY1_ID
     /** add key1 */
-    key_config.key_pin           = KEY1_GPIO_IN;
-    key_config.key_out_pin       = KEY1_GPIO_OUT;
-    key_config.key_down_level    = TLK_KEY_VALID_LEVEL;
-    key_config.key_hold_cnt      = 0;
-    key_config.key_long_cnt      = 200;
-    key_config.key_intervel_cnt  = 40;
-    ret = tlk_key_add(&key_config);
-    if(ret!=TLK_KEY_SUCCESS)
-    {
-        tlkapi_printf(APP_KEY_LOG_EN, "key_1 init fail,ret - %d\n",ret);
-    }
-    else
-    {
+    key_config.key_pin          = KEY1_GPIO_IN;
+    key_config.key_out_pin      = KEY1_GPIO_OUT;
+    key_config.key_down_level   = TLK_KEY_VALID_LEVEL;
+    key_config.key_hold_cnt     = 0;
+    key_config.key_long_cnt     = 200;
+    key_config.key_intervel_cnt = 40;
+    ret                         = tlk_key_add(&key_config);
+    if (ret != TLK_KEY_SUCCESS) {
+        tlkapi_printf(APP_KEY_LOG_EN, "key_1 init fail,ret - %d\n", ret);
+    } else {
         tlkapi_printf(APP_KEY_LOG_EN, "key_1 init success\n");
-        if(KEY1_ID!=0)
-        {
+        if (KEY1_ID != 0) {
             tlk_key_evt_mode_register(KEY1_ID, &key_mode_table_1);
         }
     }
-#endif
+        #endif
 
-#ifdef KEY2_ID
+        #ifdef KEY2_ID
     /** add key2 */
-    key_config.key_pin           = KEY2_GPIO_IN;
-    key_config.key_out_pin       = KEY2_GPIO_OUT;
-    key_config.key_down_level    = TLK_KEY_VALID_LEVEL;
-    key_config.key_hold_cnt      = 0;
-    key_config.key_long_cnt      = 200;
-    key_config.key_intervel_cnt  = 40;
-    ret = tlk_key_add(&key_config);
-    if(ret!=TLK_KEY_SUCCESS)
-    {
-        tlkapi_printf(APP_KEY_LOG_EN, "key_2 init fail,ret - %d\n",ret);
-    }
-    else
-    {
+    key_config.key_pin          = KEY2_GPIO_IN;
+    key_config.key_out_pin      = KEY2_GPIO_OUT;
+    key_config.key_down_level   = TLK_KEY_VALID_LEVEL;
+    key_config.key_hold_cnt     = 0;
+    key_config.key_long_cnt     = 200;
+    key_config.key_intervel_cnt = 40;
+    ret                         = tlk_key_add(&key_config);
+    if (ret != TLK_KEY_SUCCESS) {
+        tlkapi_printf(APP_KEY_LOG_EN, "key_2 init fail,ret - %d\n", ret);
+    } else {
         tlkapi_printf(APP_KEY_LOG_EN, "key_2 init success\n");
-        if(KEY2_ID!=0)
-        {
+        if (KEY2_ID != 0) {
             tlk_key_evt_mode_register(KEY2_ID, &key_mode_table_2);
         }
     }
-#endif
+        #endif
 
-#ifdef KEY3_ID
+        #ifdef KEY3_ID
     /** add key3 */
-    key_config.key_pin           = KEY3_GPIO_IN;
-    key_config.key_out_pin       = KEY3_GPIO_OUT;
-    key_config.key_down_level    = TLK_KEY_VALID_LEVEL;
-    key_config.key_hold_cnt      = 0;
-    key_config.key_long_cnt      = 200;
-    key_config.key_intervel_cnt  = 40;
-    ret = tlk_key_add(&key_config);
-    if(ret!=TLK_KEY_SUCCESS)
-    {
-        tlkapi_printf(APP_KEY_LOG_EN, "key_3 init fail,ret - %d\n",ret);
-    }
-    else
-    {
+    key_config.key_pin          = KEY3_GPIO_IN;
+    key_config.key_out_pin      = KEY3_GPIO_OUT;
+    key_config.key_down_level   = TLK_KEY_VALID_LEVEL;
+    key_config.key_hold_cnt     = 0;
+    key_config.key_long_cnt     = 200;
+    key_config.key_intervel_cnt = 40;
+    ret                         = tlk_key_add(&key_config);
+    if (ret != TLK_KEY_SUCCESS) {
+        tlkapi_printf(APP_KEY_LOG_EN, "key_3 init fail,ret - %d\n", ret);
+    } else {
         tlkapi_printf(APP_KEY_LOG_EN, "key_3 init success\n");
-        if(KEY3_ID!=0)
-        {
+        if (KEY3_ID != 0) {
             tlk_key_evt_mode_register(KEY3_ID, &key_mode_table_3);
         }
     }
-#endif
+        #endif
 
-#ifdef KEY4_ID
+        #ifdef KEY4_ID
     /** add key4 */
-    key_config.key_pin           = KEY4_GPIO_IN;
-    key_config.key_out_pin       = KEY4_GPIO_OUT;
-    key_config.key_down_level    = TLK_KEY_VALID_LEVEL;
-    key_config.key_hold_cnt      = 0;
-    key_config.key_long_cnt      = 200;
-    key_config.key_intervel_cnt  = 40;
-    ret = tlk_key_add(&key_config);
-    if(ret!=TLK_KEY_SUCCESS)
-    {
-        tlkapi_printf(APP_KEY_LOG_EN, "key_4 init fail,ret - %d\n",ret);
-    }
-    else
-    {
+    key_config.key_pin          = KEY4_GPIO_IN;
+    key_config.key_out_pin      = KEY4_GPIO_OUT;
+    key_config.key_down_level   = TLK_KEY_VALID_LEVEL;
+    key_config.key_hold_cnt     = 0;
+    key_config.key_long_cnt     = 200;
+    key_config.key_intervel_cnt = 40;
+    ret                         = tlk_key_add(&key_config);
+    if (ret != TLK_KEY_SUCCESS) {
+        tlkapi_printf(APP_KEY_LOG_EN, "key_4 init fail,ret - %d\n", ret);
+    } else {
         tlkapi_printf(APP_KEY_LOG_EN, "key_4 init success\n");
-        if(KEY4_ID!=0)
-        {
+        if (KEY4_ID != 0) {
             tlk_key_evt_mode_register(KEY4_ID, &key_mode_table_4);
         }
     }
-#endif
-
+        #endif
 }
 
-#endif   //end of TLK_KEY_ENABLE
+    #endif //end of TLK_KEY_ENABLE
 #endif

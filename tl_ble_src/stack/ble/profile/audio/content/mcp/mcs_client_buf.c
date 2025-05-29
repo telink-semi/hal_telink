@@ -26,12 +26,8 @@
 #include "stack/ble/ble.h"
 
 
-
-
-
 _attribute_ble_data_retention_
-blc_mcp_client_t gMcp[ACL_CENTRAL_MAX_NUM + ACL_PERIPHR_MAX_NUM];
-
+    blc_mcp_client_t gMcp[ACL_CENTRAL_MAX_NUM + ACL_PERIPHR_MAX_NUM];
 
 /**
  * @brief       mcp get client control buffer.
@@ -42,9 +38,5 @@ blc_mcp_client_t *blt_mcp_getClientcontrolBuffer(u8 instIdx)
 {
     assert(instIdx < gAppAudioAclMaxNum);
 
-    return instIdx>=ACL_CENTRAL_MAX_NUM + ACL_PERIPHR_MAX_NUM? NULL: &gMcp[instIdx];
+    return instIdx >= ACL_CENTRAL_MAX_NUM + ACL_PERIPHR_MAX_NUM ? NULL : &gMcp[instIdx];
 }
-
-
-
-

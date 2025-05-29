@@ -21,7 +21,7 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
-#pragma  once
+#pragma once
 
 
 #include "common/types.h"
@@ -55,4 +55,3 @@ u8 tlk_heap_alloc(u32 size);
  * @return      Address of the start of heap memory.
  */
 void *tlk_get_heap_free_startAddr(void);
-

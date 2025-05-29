@@ -29,18 +29,17 @@
 #include "app_ui.h"
 
 
+#if (MONITOR_ROLE_SELECT == MONITOR_CENTRAL)
+    #if (UI_KEYBOARD_ENABLE)
 
-#if (MONITOR_ROLE_SELECT==MONITOR_CENTRAL)
-#if (UI_KEYBOARD_ENABLE)
-
-_attribute_ble_data_retention_  int     key_not_released;
+_attribute_ble_data_retention_ int key_not_released;
 
 
-#define CONSUMER_KEY                1
-#define KEYBOARD_KEY                2
-#define PAIR_UNPAIR_KEY             3
+        #define CONSUMER_KEY    1
+        #define KEYBOARD_KEY    2
+        #define PAIR_UNPAIR_KEY 3
 
-_attribute_ble_data_retention_  u8      key_type;
+_attribute_ble_data_retention_ u8 key_type;
 
 /**
  * @brief   Check changed key value.
@@ -49,53 +48,36 @@ _attribute_ble_data_retention_  u8      key_type;
  */
 void key_change_proc(void)
 {
-
     u8 key0 = kb_event.keycode[0];
-//  u8 key_buf[8] = {0,0,0,0,0,0,0,0};
+    //  u8 key_buf[8] = {0,0,0,0,0,0,0,0};
 
     key_not_released = 1;
-    if (kb_event.cnt == 2)   //two key press
+    if (kb_event.cnt == 2)                  //two key press
     {
-    }
-    else if(kb_event.cnt == 1)
-    {
-        if(key0 >= CR_VOL_UP )  //volume up/down
+    } else if (kb_event.cnt == 1) {
+        if (key0 >= CR_VOL_UP)              //volume up/down
         {
             key_type = CONSUMER_KEY;
-            if(key0 == CR_VOL_UP){      //volume up
+            if (key0 == CR_VOL_UP) {        //volume up
+            } else if (key0 == CR_VOL_DN) { //volume down
             }
-            else if(key0 == CR_VOL_DN){ //volume down
-
-            }
-        }
-        else{
+        } else {
             key_type = PAIR_UNPAIR_KEY;
         }
 
-    }
-    else   //kb_event.cnt == 0,  key release
+    } else //kb_event.cnt == 0,  key release
     {
         key_not_released = 0;
         if (key_type == CONSUMER_KEY) {
-        }
-        else if (key_type == KEYBOARD_KEY)
-        {
-
-        }
-        else if (key_type == PAIR_UNPAIR_KEY)
-        {
-
+        } else if (key_type == KEYBOARD_KEY) {
+        } else if (key_type == PAIR_UNPAIR_KEY) {
         }
     }
-
 }
 
-
-
-
-#define GPIO_WAKEUP_KEYPROC_CNT             3
-_attribute_ble_data_retention_  static u32 keyScanTick = 0;
-_attribute_ble_data_retention_  static int gpioWakeup_keyProc_cnt = 0;
+        #define GPIO_WAKEUP_KEYPROC_CNT 3
+_attribute_ble_data_retention_ static u32 keyScanTick            = 0;
+_attribute_ble_data_retention_ static int gpioWakeup_keyProc_cnt = 0;
 
 /**
  * @brief      keyboard task handler
@@ -104,33 +86,30 @@ _attribute_ble_data_retention_  static int gpioWakeup_keyProc_cnt = 0;
  * @param[in]  n    - the length of event parameter.
  * @return     none.
  */
-void proc_keyboard (u8 e, u8 *p, int n)
+void proc_keyboard(u8 e, u8 *p, int n)
 {
     (void)n;
     (void)p;
     //when key press GPIO wake_up sleep, process key_scan at least GPIO_WAKEUP_KEYPROC_CNT times
-    if(e == BLT_EV_FLAG_GPIO_EARLY_WAKEUP){
+    if (e == BLT_EV_FLAG_GPIO_EARLY_WAKEUP) {
         gpioWakeup_keyProc_cnt = GPIO_WAKEUP_KEYPROC_CNT;
-    }
-    else if(gpioWakeup_keyProc_cnt){
-        gpioWakeup_keyProc_cnt --;
+    } else if (gpioWakeup_keyProc_cnt) {
+        gpioWakeup_keyProc_cnt--;
     }
 
-    if(gpioWakeup_keyProc_cnt || clock_time_exceed(keyScanTick, 10 * 1000)){ //keyScan interval: 10mS
+    if (gpioWakeup_keyProc_cnt || clock_time_exceed(keyScanTick, 10 * 1000)) { //keyScan interval: 10mS
         keyScanTick = clock_time();
-    }
-    else{
+    } else {
         return;
     }
 
     kb_event.keycode[0] = 0;
-    int det_key = kb_scan_key (0, 1);
+    int det_key         = kb_scan_key(0, 1);
 
-    if (det_key){
+    if (det_key) {
         key_change_proc();
     }
 }
-
 
 /**
  * @brief      user set keyboard wakeup
@@ -139,19 +118,18 @@ void proc_keyboard (u8 e, u8 *p, int n)
  * @param[in]  n - data length of event
  * @return     none
  */
-_attribute_ram_code_ void  app_set_kb_wakeup (u8 e, u8 *p, int n)
+_attribute_ram_code_ void app_set_kb_wakeup(u8 e, u8 *p, int n)
 {
     (void)e;
     (void)p;
     (void)n;
-    #if (BLE_APP_PM_ENABLE)
-        /* sleep time > 100ms.add GPIO wake_up */
-        if(((u32)(blc_pm_getWakeupSystemTick() - clock_time())) > 100 * SYSTEM_TIMER_TICK_1MS){
-            blc_pm_setWakeupSource(PM_WAKEUP_PAD);  //GPIO PAD wake_up
-        }
-    #endif
+        #if (BLE_APP_PM_ENABLE)
+    /* sleep time > 100ms.add GPIO wake_up */
+    if (((u32)(blc_pm_getWakeupSystemTick() - clock_time())) > 100 * SYSTEM_TIMER_TICK_1MS) {
+        blc_pm_setWakeupSource(PM_WAKEUP_PAD); //GPIO PAD wake_up
+    }
+        #endif
 }
-
 
 /**
  * @brief      keyboard initialization
@@ -160,16 +138,16 @@ _attribute_ram_code_ void  app_set_kb_wakeup (u8 e, u8 *p, int n)
  */
 void keyboard_init(void)
 {
-    #if (BLE_APP_PM_ENABLE)
-        u32 pin[] = KB_DRIVE_PINS;
+        #if (BLE_APP_PM_ENABLE)
+    u32 pin[] = KB_DRIVE_PINS;
 
-        /////////// keyboard GPIO wakeup init ////////
-        for (unsigned int i=0; i<(sizeof (pin)/sizeof(*pin)); i++){
-            pm_set_gpio_wakeup (pin[i], WAKEUP_LEVEL_HIGH, 1);  //drive pin pad high level wakeup deepsleep
-        }
-    #endif
+    /////////// keyboard GPIO wakeup init ////////
+    for (unsigned int i = 0; i < (sizeof(pin) / sizeof(*pin)); i++) {
+        pm_set_gpio_wakeup(pin[i], WAKEUP_LEVEL_HIGH, 1); //drive pin pad high level wakeup deepsleep
+    }
+        #endif
 }
 
-#endif   //end of UI_KEYBOARD_ENABLE
+    #endif //end of UI_KEYBOARD_ENABLE
 
 #endif

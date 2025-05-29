@@ -24,29 +24,27 @@
 #pragma once
 #include "../ull_hid_config.h"
 #if (ULL_HID_DEMO_SLECT == ULL_HID_HOST)
-#define ACL_CENTRAL_MAX_NUM                         1 // ACL central maximum number
-#define ACL_PERIPHR_MAX_NUM                         0 // ACL peripheral maximum number
+    #define ACL_CENTRAL_MAX_NUM 1 // ACL central maximum number
+    #define ACL_PERIPHR_MAX_NUM 0 // ACL peripheral maximum number
 
 
-///////////////////////// Feature Configuration////////////////////////////////////////////////
-#define ACL_CENTRAL_SMP_ENABLE                      1   //1 for smp,  0 no security
-#define ACL_CENTRAL_CUSTOM_PAIR_ENABLE              0
+    ///////////////////////// Feature Configuration////////////////////////////////////////////////
+    #define ACL_CENTRAL_SMP_ENABLE         1 //1 for smp,  0 no security
+    #define ACL_CENTRAL_CUSTOM_PAIR_ENABLE 0
 
 
-///////////////////////// UI Configuration ////////////////////////////////////////////////////
-#define UI_LED_ENABLE                               1
-#define UI_KEYBOARD_ENABLE                          0
-#define CIS_ADD_CIE                                 0  //todo
-#define APPLICATION_DONGLE                          0 //usb application used
+    ///////////////////////// UI Configuration ////////////////////////////////////////////////////
+    #define UI_LED_ENABLE      1
+    #define UI_KEYBOARD_ENABLE 0
+    #define CIS_ADD_CIE        0 //todo
+    #define APPLICATION_DONGLE 0 //usb application used
 
 ///////////////////////// DEBUG  Configuration ////////////////////////////////////////////////
 
-#define APP_LOG_EN                                  0
+    #define APP_LOG_EN 0
 
 
-
-#include "../common/default_config.h"
-
+    #include "../common/default_config.h"
 
 
-#endif    //INTER_TEST_MODE == TEST_ULL_HID_HOST_CUSTOMER
+#endif //INTER_TEST_MODE == TEST_ULL_HID_HOST_CUSTOMER

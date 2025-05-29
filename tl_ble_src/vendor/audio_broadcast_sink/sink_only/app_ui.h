@@ -24,12 +24,9 @@
 #include "../sink_config.h"
 #if (SINK_VERSION == SINK_ONLY_VERSION)
 
-#pragma once
+    #pragma once
 
-#include "tl_common.h"
-
-
-
+    #include "tl_common.h"
 
 
 /**
@@ -39,7 +36,7 @@
  * @param[in]  n    - the length of event parameter.
  * @return     none.
  */
-void proc_keyboard (u8 e, u8 *p, int n);
+void proc_keyboard(u8 e, u8 *p, int n);
 
 
-#endif      //SINK_VERSION == SINK_ONLY_VERSION
+#endif //SINK_VERSION == SINK_ONLY_VERSION

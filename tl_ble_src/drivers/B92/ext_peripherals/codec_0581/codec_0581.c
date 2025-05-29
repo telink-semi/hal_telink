@@ -31,28 +31,22 @@
  */
 char codec_0581_get_addr_length(unsigned int first_byte_addr, unsigned char *reg_width)
 {
-    unsigned int last_byte_addr;
+    unsigned int  last_byte_addr;
     unsigned char width = 0;
 
     last_byte_addr = first_byte_addr;
 
-    if (first_byte_addr >= CODEC_8BIT_REG_ADDR_START && first_byte_addr <= CODEC_8BIT_REG_ADDR_END)
-    {
-        if (last_byte_addr >= CODEC_8BIT_REG_ADDR_START && last_byte_addr <= CODEC_8BIT_REG_ADDR_END)
-        {
+    if (first_byte_addr >= CODEC_8BIT_REG_ADDR_START && first_byte_addr <= CODEC_8BIT_REG_ADDR_END) {
+        if (last_byte_addr >= CODEC_8BIT_REG_ADDR_START && last_byte_addr <= CODEC_8BIT_REG_ADDR_END) {
             width = 1;
         }
-    }
-    else
-    {
-        if (last_byte_addr < CODEC_8BIT_REG_ADDR_START || last_byte_addr > CODEC_8BIT_REG_ADDR_END)
-        {
+    } else {
+        if (last_byte_addr < CODEC_8BIT_REG_ADDR_START || last_byte_addr > CODEC_8BIT_REG_ADDR_END) {
             width = 4;
         }
     }
 
-    if (width > 0 && first_byte_addr % width == 0)
-    {
+    if (width > 0 && first_byte_addr % width == 0) {
         *reg_width = width;
         return 0;
     }
@@ -69,34 +63,27 @@ char codec_0581_get_addr_length(unsigned int first_byte_addr, unsigned char *reg
  */
 static void codec_0581_bf_read(unsigned int reg_addr, unsigned int bf_info, unsigned int *bf_val)
 {
-    unsigned int reg_value, reg_temp, reg_mask;
-    int reg_count, i;
+    unsigned int  reg_value, reg_temp, reg_mask;
+    int           reg_count, i;
     unsigned char bit_start = bf_info;
     unsigned char bit_count = bf_info >> 8;
 
-    if (reg_addr >= CODEC_8BIT_REG_ADDR_START && reg_addr <= CODEC_8BIT_REG_ADDR_END)
-    {
+    if (reg_addr >= CODEC_8BIT_REG_ADDR_START && reg_addr <= CODEC_8BIT_REG_ADDR_END) {
         reg_value = 0;
         reg_count = ((bit_start + bit_count) >> 3) + ((((bit_start + bit_count) & 7) > 0) ? 1 : 0);
-        for (i = 0; i < reg_count; i++)
-        {
+        for (i = 0; i < reg_count; i++) {
             codec_0581_reg_read(reg_addr + i, &reg_temp);
             reg_value += reg_temp << (i * 8);
         }
 
         reg_mask = (bit_count == 32) ? (unsigned int)0xffffffff : (unsigned int)((1 << bit_count) - 1);
-        *bf_val = (reg_value >> bit_start) & reg_mask;
-    }
-    else
-    {
+        *bf_val  = (reg_value >> bit_start) & reg_mask;
+    } else {
         codec_0581_reg_read(reg_addr, &reg_value);
-        if ((bit_count + bit_start) <= 32)
-        {
+        if ((bit_count + bit_start) <= 32) {
             reg_mask = (bit_count == 32) ? (unsigned int)0xffffffff : (unsigned int)((1 << bit_count) - 1);
-            *bf_val = (reg_value >> bit_start) & reg_mask;
-        }
-        else
-        {
+            *bf_val  = (reg_value >> bit_start) & reg_mask;
+        } else {
             *bf_val = reg_value >> bit_start;
             codec_0581_reg_read(reg_addr + 4, &reg_value);
             reg_mask = (1 << (bit_count - (32 - bit_start))) - 1;
@@ -114,53 +101,39 @@ static void codec_0581_bf_read(unsigned int reg_addr, unsigned int bf_info, unsi
  */
 static void codec_0581_bf_write(unsigned int reg_addr, unsigned int bf_info, unsigned int bf_val)
 {
-    unsigned int reg_value, reg_temp, reg_mask;
-    int reg_count, i;
+    unsigned int  reg_value, reg_temp, reg_mask;
+    int           reg_count, i;
     unsigned char bit_start = bf_info;
     unsigned char bit_count = bf_info >> 8;
 
-    if (reg_addr >= CODEC_8BIT_REG_ADDR_START && reg_addr <= CODEC_8BIT_REG_ADDR_END)
-    {
-        if ((bit_count == 8) && (bit_start == 0))
-        {
+    if (reg_addr >= CODEC_8BIT_REG_ADDR_START && reg_addr <= CODEC_8BIT_REG_ADDR_END) {
+        if ((bit_count == 8) && (bit_start == 0)) {
             codec_0581_reg_write(reg_addr, bf_val);
-        }
-        else
-        {
+        } else {
             reg_value = 0;
             reg_count = ((bit_start + bit_count) >> 3) + ((((bit_start + bit_count) & 7) > 0) ? 1 : 0);
-            for (i = 0; i < reg_count; i++)
-            {
+            for (i = 0; i < reg_count; i++) {
                 codec_0581_reg_read(reg_addr + i, &reg_temp);
                 reg_value += reg_temp << (i * 8);
             }
             reg_mask = (bit_count == 32) ? (unsigned int)0xffffffff : (unsigned int)((1 << bit_count) - 1);
             reg_value &= ~(reg_mask << bit_start);
             reg_value |= (bf_val << bit_start);
-            for (i = 0; i < reg_count; i++)
-            {
+            for (i = 0; i < reg_count; i++) {
                 codec_0581_reg_write(reg_addr + i, (reg_value >> (i * 8)) & 0xff);
             }
         }
-    }
-    else
-    {
-        if ((bit_count == 32) && (bit_start == 0))
-        {
+    } else {
+        if ((bit_count == 32) && (bit_start == 0)) {
             codec_0581_reg_write(reg_addr, bf_val);
-        }
-        else
-        {
+        } else {
             codec_0581_reg_read(reg_addr, &reg_value);
-            if ((bit_count + bit_start) <= 32)
-            {
+            if ((bit_count + bit_start) <= 32) {
                 reg_mask = (bit_count == 32) ? (unsigned int)0xffffffff : (unsigned int)((1 << bit_count) - 1);
                 reg_value &= ~(reg_mask << bit_start);
                 reg_value |= (bf_val << bit_start);
                 codec_0581_reg_write(reg_addr, reg_value);
-            }
-            else
-            {
+            } else {
                 reg_mask = 0xffffffff;
                 reg_value &= ~(reg_mask << bit_start);
                 reg_value |= (bf_val << bit_start);
@@ -187,8 +160,7 @@ static void codec_0581_bf_write(unsigned int reg_addr, unsigned int bf_info, uns
  */
 void codec_0581_power_on(gpio_pin_e power_pin, codec_0581_bool_e enable)
 {
-    if (CODEC_BOOL_TRUE == enable)
-    {
+    if (CODEC_BOOL_TRUE == enable) {
         gpio_function_en(power_pin);
         gpio_output_en(power_pin);
         delay_ms(35); /* there need at least 35ms delay for the CM voltage setting before any further operation */
@@ -227,12 +199,9 @@ void codec_0581_get_id(unsigned char *vid, unsigned short *did, unsigned char *d
  */
 void codec_0581_reset(codec_0581_bool_e full_reset)
 {
-    if (CODEC_BOOL_TRUE == full_reset)
-    {
+    if (CODEC_BOOL_TRUE == full_reset) {
         codec_0581_bf_write(BF_SOFT_FULL_RESET_INFO, 1);
-    }
-    else
-    {
+    } else {
         codec_0581_bf_write(BF_SOFT_RESET_INFO, 1);
     }
 }
@@ -267,12 +236,9 @@ void codec_0581_adc_get_power_state(codec_0581_adc_chnl_e adc_channel, unsigned 
  */
 void codec_0581_adc_set_sample_rate(codec_0581_adc_chnl_e adc_channel, codec_0581_adc_sample_rate_e rate)
 {
-    if (adc_channel < 2)
-    {
+    if (adc_channel < 2) {
         codec_0581_bf_write(BF_ADC01_FS_INFO, rate);
-    }
-    else
-    {
+    } else {
         codec_0581_bf_write(BF_ADC2_FS_INFO, rate);
     }
 }
@@ -287,12 +253,9 @@ void codec_0581_adc_get_sample_rate(codec_0581_adc_chnl_e adc_channel, codec_058
 {
     unsigned int bfvalue;
 
-    if (adc_channel < 2)
-    {
+    if (adc_channel < 2) {
         codec_0581_bf_read(BF_ADC01_FS_INFO, &bfvalue);
-    }
-    else
-    {
+    } else {
         codec_0581_bf_read(BF_ADC2_FS_INFO, &bfvalue);
     }
 
@@ -311,13 +274,10 @@ void codec_0581_adc_set_filter(codec_0581_adc_chnl_e adc_channel, codec_0581_adc
 {
     codec_0581_bf_write(BF_ADC0_HPF_EN_INFO + 2 * adc_channel, filter);
 
-    if (adc_channel < 2)
-    {
+    if (adc_channel < 2) {
         codec_0581_bf_write(BF_ADC01_DEC_ORDER_INFO, higher_order_enable ? 1 : 0);
         codec_0581_bf_write(BF_ADC01_FCOMP_INFO, high_freq_comp_enable ? 1 : 0);
-    }
-    else
-    {
+    } else {
         codec_0581_bf_write(BF_ADC2_DEC_ORDER_INFO, higher_order_enable ? 1 : 0);
         codec_0581_bf_write(BF_ADC2_FCOMP_INFO, high_freq_comp_enable ? 1 : 0);
     }
@@ -387,12 +347,12 @@ static void codec_0581_adc_set_volume(codec_0581_adc_chnl_e adc_channel, unsigne
  */
 void codec_0581_adc_set_volume_db(codec_0581_adc_chnl_e adc_channel, float vol_db)
 {
-    float volume;
+    float         volume;
     unsigned char vol_code;
 
-    volume = (24 - vol_db) / 0.375;
-    volume = (volume < 0) ? 0 : volume;
-    volume = (volume > 255) ? 255 : volume;
+    volume   = (24 - vol_db) / 0.375;
+    volume   = (volume < 0) ? 0 : volume;
+    volume   = (volume > 255) ? 255 : volume;
     vol_code = (unsigned char)(volume + 0.5);
 
     codec_0581_adc_set_volume(adc_channel, vol_code);
@@ -500,8 +460,7 @@ void codec_0581_clk_enable_pll_power_on(codec_0581_bool_e enable)
  * @param[in]   denominator  pll denominator
  * @return      none
  */
-void codec_0581_clk_config_pll(codec_0581_clk_pll_source_e pll_src, codec_0581_clk_pll_type_e type,
-                              codec_0581_clk_sync_source_e sync_src, unsigned char prescaler, unsigned short multiplier, unsigned short numerator, unsigned short denominator)
+void codec_0581_clk_config_pll(codec_0581_clk_pll_source_e pll_src, codec_0581_clk_pll_type_e type, codec_0581_clk_sync_source_e sync_src, unsigned char prescaler, unsigned short multiplier, unsigned short numerator, unsigned short denominator)
 {
     codec_0581_bf_write(BF_PLL_SOURCE_INFO, pll_src);
     codec_0581_clk_update_pll();
@@ -595,15 +554,12 @@ void codec_0581_dac_enable_power_on(codec_0581_bool_e enable)
  */
 void codec_0581_dac_enhanced_mode_enable(codec_0581_bool_e enable)
 {
-    if (enable)
-    {
+    if (enable) {
         codec_0581_bf_write(BF_PB_POWER_CTRL_INFO, 2);     /* enhance mode */
         codec_0581_bf_write(BF_DAC_LOW_NOISE_EN2_INFO, 1); /* set the DAC_LOW_NOISE_EN1 bit and DAC_LOW_NOISE_EN2 Bit for Better Performance when configured as ENHANCE_MODE. */
         codec_0581_bf_write(BF_DAC_LOW_NOISE_EN1_INFO, 1);
-    }
-    else
-    {
-        codec_0581_bf_write(BF_PB_POWER_CTRL_INFO, 0); /* normal mode */
+    } else {
+        codec_0581_bf_write(BF_PB_POWER_CTRL_INFO, 0);     /* normal mode */
         codec_0581_bf_write(BF_DAC_LOW_NOISE_EN2_INFO, 0);
         codec_0581_bf_write(BF_DAC_LOW_NOISE_EN1_INFO, 0);
     }
@@ -672,12 +628,12 @@ static void codec_0581_dac_set_volume(unsigned char volume)
  */
 void codec_0581_dac_set_volume_db(float vol_db)
 {
-    float volume;
+    float         volume;
     unsigned char vol_code;
 
-    volume = (24 - vol_db) / 0.375;
-    volume = (volume < 0) ? 0 : volume;
-    volume = (volume > 255) ? 255 : volume;
+    volume   = (24 - vol_db) / 0.375;
+    volume   = (volume < 0) ? 0 : volume;
+    volume   = (volume > 255) ? 255 : volume;
     vol_code = (unsigned char)(volume + 0.5);
 
     codec_0581_dac_set_volume(vol_code);
@@ -856,15 +812,13 @@ char codec_0581_fdsp_copy_param_bank(codec_0581_fdsp_copy_param_bank_e mask)
     /* Cannot copy to active bank */
     if (((sel == CODEC_FDSP_PARAM_BANK_A) && ((mask == CODEC_FDSP_COPY_PARAM_BANK_B2A) || (mask == CODEC_FDSP_COPY_PARAM_BANK_C2A))) ||
         ((sel == CODEC_FDSP_PARAM_BANK_B) && ((mask == CODEC_FDSP_COPY_PARAM_BANK_A2B) || (mask == CODEC_FDSP_COPY_PARAM_BANK_C2B))) ||
-        ((sel == CODEC_FDSP_PARAM_BANK_C) && ((mask == CODEC_FDSP_COPY_PARAM_BANK_A2C) || (mask == CODEC_FDSP_COPY_PARAM_BANK_B2C))))
-    {
+        ((sel == CODEC_FDSP_PARAM_BANK_C) && ((mask == CODEC_FDSP_COPY_PARAM_BANK_A2C) || (mask == CODEC_FDSP_COPY_PARAM_BANK_B2C)))) {
         return -1;
     }
 
     codec_0581_reg_write(REG_FDSP_CTRL3_ADDR, 1 << mask);
 
-    do
-    {
+    do {
         codec_0581_bf_read(BF_FDSP_BANK_COPY_DONE_INFO, &copy_done);
     } while ((copy_done == 0) && (loop_count++ < 1000));
 
@@ -981,8 +935,7 @@ void codec_0581_hpamp_set_output_mode(codec_0581_hpamp_mode_e mode)
  */
 void codec_0581_int_clr_irq(codec_0581_irq_index_e index)
 {
-    switch (index)
-    {
+    switch (index) {
     case 1:
         codec_0581_bf_write(BF_IRQ1_CLEAR_INFO, 1);
         break;
@@ -1002,8 +955,7 @@ void codec_0581_int_clr_irq(codec_0581_irq_index_e index)
  */
 void codec_0581_int_set_irq_pol(codec_0581_irq_index_e index, unsigned char pol)
 {
-    switch (index)
-    {
+    switch (index) {
     case 1:
         codec_0581_bf_write(BF_IRQ1_PINOUT_POL_INFO, pol);
         break;
@@ -1024,40 +976,37 @@ void codec_0581_int_set_irq_pol(codec_0581_irq_index_e index, unsigned char pol)
  */
 void codec_0581_int_enable_irq(codec_0581_irq_index_e index, codec_0581_irq_src_e irq_src, codec_0581_bool_e enable)
 {
-    unsigned int mask = enable > 0 ? 0 : 1;
+    unsigned int mask  = enable > 0 ? 0 : 1;
     unsigned int masks = 0;
 
-    if ((irq_src & 0x0000000f) > 0)
-    {
+    if ((irq_src & 0x0000000f) > 0) {
         codec_0581_reg_read(REG_IRQ1_MASK1_ADDR + (index - 1) * 3, &masks);
-        masks = ((irq_src & CODEC_IRQ_DAC0_CLIP) > 0)        ? ((masks & 0xfe) | (mask << 0)) : masks;
-        masks = ((irq_src & CODEC_IRQ_ADC0_CLIP) > 0)        ? ((masks & 0xef) | (mask << 4)) : masks;
-        masks = ((irq_src & CODEC_IRQ_ADC1_CLIP) > 0)        ? ((masks & 0xdf) | (mask << 5)) : masks;
-        masks = ((irq_src & CODEC_IRQ_ADC2_CLIP) > 0)        ? ((masks & 0xbf) | (mask << 6)) : masks;
+        masks = ((irq_src & CODEC_IRQ_DAC0_CLIP) > 0) ? ((masks & 0xfe) | (mask << 0)) : masks;
+        masks = ((irq_src & CODEC_IRQ_ADC0_CLIP) > 0) ? ((masks & 0xef) | (mask << 4)) : masks;
+        masks = ((irq_src & CODEC_IRQ_ADC1_CLIP) > 0) ? ((masks & 0xdf) | (mask << 5)) : masks;
+        masks = ((irq_src & CODEC_IRQ_ADC2_CLIP) > 0) ? ((masks & 0xbf) | (mask << 6)) : masks;
         codec_0581_reg_write(REG_IRQ1_MASK1_ADDR + (index - 1) * 3, masks);
     }
-    if ((irq_src & 0x00003cf0) > 0)
-    {
+    if ((irq_src & 0x00003cf0) > 0) {
         codec_0581_reg_read(REG_IRQ1_MASK2_ADDR + (index - 1) * 3, &masks);
-        masks = ((irq_src & CODEC_IRQ_PLL_LOCKED) > 0)       ? ((masks & 0xfe) | (mask << 0)) : masks;
-        masks = ((irq_src & CODEC_IRQ_PLL_UNLOCKED) > 0)     ? ((masks & 0xfd) | (mask << 1)) : masks;
-        masks = ((irq_src & CODEC_IRQ_AVDD_UVW) > 0)         ? ((masks & 0xfb) | (mask << 2)) : masks;
-        masks = ((irq_src & CODEC_IRQ_PRAMP) > 0)            ? ((masks & 0xf7) | (mask << 3)) : masks;
-        masks = ((irq_src & CODEC_IRQ_ASRCI_LOCKED) > 0)     ? ((masks & 0xef) | (mask << 4)) : masks;
-        masks = ((irq_src & CODEC_IRQ_ASRCI_UNLOCKED) > 0)   ? ((masks & 0xdf) | (mask << 5)) : masks;
-        masks = ((irq_src & CODEC_IRQ_ASRCO_LOCKED) > 0)     ? ((masks & 0xbf) | (mask << 6)) : masks;
-        masks = ((irq_src & CODEC_IRQ_ASRCO_UNLOCKED) > 0)   ? ((masks & 0x7f) | (mask << 7)) : masks;
+        masks = ((irq_src & CODEC_IRQ_PLL_LOCKED) > 0) ? ((masks & 0xfe) | (mask << 0)) : masks;
+        masks = ((irq_src & CODEC_IRQ_PLL_UNLOCKED) > 0) ? ((masks & 0xfd) | (mask << 1)) : masks;
+        masks = ((irq_src & CODEC_IRQ_AVDD_UVW) > 0) ? ((masks & 0xfb) | (mask << 2)) : masks;
+        masks = ((irq_src & CODEC_IRQ_PRAMP) > 0) ? ((masks & 0xf7) | (mask << 3)) : masks;
+        masks = ((irq_src & CODEC_IRQ_ASRCI_LOCKED) > 0) ? ((masks & 0xef) | (mask << 4)) : masks;
+        masks = ((irq_src & CODEC_IRQ_ASRCI_UNLOCKED) > 0) ? ((masks & 0xdf) | (mask << 5)) : masks;
+        masks = ((irq_src & CODEC_IRQ_ASRCO_LOCKED) > 0) ? ((masks & 0xbf) | (mask << 6)) : masks;
+        masks = ((irq_src & CODEC_IRQ_ASRCO_UNLOCKED) > 0) ? ((masks & 0x7f) | (mask << 7)) : masks;
         codec_0581_reg_write(REG_IRQ1_MASK2_ADDR + (index - 1) * 3, masks);
     }
-    if ((irq_src & 0x0005c300) > 0)
-    {
+    if ((irq_src & 0x0005c300) > 0) {
         codec_0581_reg_read(REG_IRQ1_MASK3_ADDR + (index - 1) * 3, &masks);
-        masks = ((irq_src & CODEC_IRQ_SPT0_UNLOCKED) > 0)    ? ((masks & 0xfe) | (mask << 0)) : masks;
-        masks = ((irq_src & CODEC_IRQ_SYNC_LOCKED) > 0)      ? ((masks & 0xfd) | (mask << 1)) : masks;
-        masks = ((irq_src & CODEC_IRQ_SYNC_UNLOCKED) > 0)    ? ((masks & 0xfb) | (mask << 2)) : masks;
+        masks = ((irq_src & CODEC_IRQ_SPT0_UNLOCKED) > 0) ? ((masks & 0xfe) | (mask << 0)) : masks;
+        masks = ((irq_src & CODEC_IRQ_SYNC_LOCKED) > 0) ? ((masks & 0xfd) | (mask << 1)) : masks;
+        masks = ((irq_src & CODEC_IRQ_SYNC_UNLOCKED) > 0) ? ((masks & 0xfb) | (mask << 2)) : masks;
         masks = ((irq_src & CODEC_IRQ_POWERUP_COMPLETE) > 0) ? ((masks & 0xef) | (mask << 4)) : masks;
-        masks = ((irq_src & CODEC_IRQ_EQ_CLR_DONE) > 0)      ? ((masks & 0xdf) | (mask << 5)) : masks;
-        masks = ((irq_src & CODEC_IRQ_FDSP) > 0)             ? ((masks & 0xbf) | (mask << 6)) : masks;
+        masks = ((irq_src & CODEC_IRQ_EQ_CLR_DONE) > 0) ? ((masks & 0xdf) | (mask << 5)) : masks;
+        masks = ((irq_src & CODEC_IRQ_FDSP) > 0) ? ((masks & 0xbf) | (mask << 6)) : masks;
         codec_0581_reg_write(REG_IRQ1_MASK3_ADDR + (index - 1) * 3, masks);
     }
 }
@@ -1073,8 +1022,7 @@ void codec_0581_int_get_irq_status(codec_0581_irq_index_e index, codec_0581_irq_
 {
     unsigned int irq_status = 0;
 
-    switch (irq_src)
-    {
+    switch (irq_src) {
     case CODEC_IRQ_DAC0_CLIP:
         codec_0581_bf_read((index - 1) * 3 + BF_IRQ1_DAC0_CLIP_INFO, &irq_status);
         break;
@@ -1354,36 +1302,34 @@ void codec_0581_sap_enable_chnl_output(codec_0581_bool_e enable_flag)
 void codec_0581_input_init(codec_0581_input_t *input_config)
 {
     /* adc */
-    if (input_config->adc_config)
-    {
+    if (input_config->adc_config) {
         codec_0581_adc_set_sample_rate(input_config->adc_config->adc_chnl, input_config->adc_config->adc_rate);
-        if (CODEC_ADC_CHNL_2 == input_config->adc_config->adc_chnl)
+        if (CODEC_ADC_CHNL_2 == input_config->adc_config->adc_chnl) {
             codec_0581_adc_set_input_mode(CODEC_ADC_CHNL_2, CODEC_BOOL_FALSE); /* ADC2 default single */
+        }
         codec_0581_adc_enable_power_on(input_config->adc_config->adc_chnl, CODEC_BOOL_TRUE);
     }
 
     /* asrco */
-    if (input_config->asrco_config)
-    {
+    if (input_config->asrco_config) {
         codec_0581_asrc_select_asrco_fs(input_config->asrco_config->asrco_in_fs);
         codec_0581_asrc_select_asrco_route(input_config->asrco_config->asrco_chnl, input_config->asrco_config->asrco_route_from);
         codec_0581_asrc_enable_chnl_power_on(input_config->asrco_config->asrco_chnl + 4, CODEC_BOOL_TRUE);
     }
 
     /* fdec */
-    if (input_config->fdec_config)
-    {
-        if (input_config->fdec_config->fdec_chnl <= CODEC_FDEC_CHNL_1)
+    if (input_config->fdec_config) {
+        if (input_config->fdec_config->fdec_chnl <= CODEC_FDEC_CHNL_1) {
             codec_0581_fdec_select_pair_chnls_fs(CODEC_FDEC_PAIR_CHNL_0_1, input_config->fdec_config->fdec_in_fs, input_config->fdec_config->fdec_out_fs);
-        else
+        } else {
             codec_0581_fdec_select_pair_chnls_fs(CODEC_FDEC_PAIR_CHNL_2_3, input_config->fdec_config->fdec_in_fs, input_config->fdec_config->fdec_out_fs);
+        }
         codec_0581_fdec_select_chnl_route(input_config->fdec_config->fdec_chnl, input_config->fdec_config->fdec_route_from);
         codec_0581_fdec_enable_chnl_power_on(input_config->fdec_config->fdec_chnl, CODEC_BOOL_TRUE);
     }
 
     /* sap */
-    if (input_config->sap_config)
-    {
+    if (input_config->sap_config) {
         codec_0581_sap_select_out_route(input_config->sap_config->slot_id, input_config->sap_config->sap_route_from);
         codec_0581_sap_enable_chnl_output(CODEC_BOOL_TRUE); /* sap output enable(mcu input means codec output) */
     }
@@ -1400,24 +1346,21 @@ void codec_0581_output_init(codec_0581_output_t *output_config)
     codec_0581_sap_enable_chnl_input(CODEC_BOOL_TRUE); /* sap input enable(mcu output means codec input) */
 
     /* asrci */
-    if (output_config->asrci_config)
-    {
+    if (output_config->asrci_config) {
         codec_0581_asrc_select_asrci_fs(output_config->asrci_config->asrci_out_fs);
         codec_0581_asrc_select_asrci_route(CODEC_SAP_SLOT1_RIGHT);
         codec_0581_asrc_enable_chnl_power_on(CODEC_ASRC_CHNL_ASRCI0, CODEC_BOOL_TRUE);
     }
 
     /* fint */
-    if (output_config->fint_config)
-    {
+    if (output_config->fint_config) {
         codec_0581_fint_select_pair_chnls_fs(CODEC_FINT_PAIR_CHNL_0_1, output_config->fint_config->fint_in_fs, output_config->fint_config->fint_out_fs);
         codec_0581_fint_select_chnl_route(output_config->fint_config->fint_chnl, output_config->fint_config->fint_route_from);
         codec_0581_fint_enable_chnl_power_on(output_config->fint_config->fint_chnl, CODEC_BOOL_TRUE);
     }
 
     /* dac */
-    if (output_config->dac_config)
-    {
+    if (output_config->dac_config) {
         codec_0581_dac_set_sample_rate(output_config->dac_config->dac_rate);
         codec_0581_dac_select_input_route(output_config->dac_config->dac_input);
         codec_0581_dac_enable_power_on(CODEC_BOOL_TRUE);
@@ -1437,20 +1380,18 @@ void codec_0581_eq_init(codec_0581_eq_config_t *eq_config)
     codec_0581_eq_sel_param_ram(eq_config->bank_id);
     codec_0581_eq_clear_param_ram();
 
-    unsigned int bank_addr = eq_config->bank_id * (CODEC_EQ_PARAM1_MEM_BASE - CODEC_EQ_PARAM0_MEM_BASE) + CODEC_EQ_PARAM_MEM_BASE;
+    unsigned int  bank_addr  = eq_config->bank_id * (CODEC_EQ_PARAM1_MEM_BASE - CODEC_EQ_PARAM0_MEM_BASE) + CODEC_EQ_PARAM_MEM_BASE;
     unsigned char reg_length = 0;
 
     /* write program data */
     codec_0581_get_addr_length(CODEC_EQ_PROGRAM_MEM_BASE, &reg_length);
-    for (unsigned int i = 0; i < eq_config->program_len; i++)
-    {
+    for (unsigned int i = 0; i < eq_config->program_len; i++) {
         codec_0581_reg_write(CODEC_EQ_PROGRAM_MEM_BASE + i * reg_length, *(eq_config->program_addr)++);
     }
 
     /* write param data */
     codec_0581_get_addr_length(bank_addr, &reg_length);
-    for (unsigned int j = 0; j < eq_config->param_len; j++)
-    {
+    for (unsigned int j = 0; j < eq_config->param_len; j++) {
         codec_0581_reg_write(bank_addr + j * reg_length, *(eq_config->param_addr)++);
     }
     codec_0581_eq_enable_run(CODEC_BOOL_TRUE);
@@ -1467,28 +1408,24 @@ void codec_0581_fdsp_init(codec_0581_fdsp_config_t *fdsp_config)
     codec_0581_fdsp_enable_run(CODEC_BOOL_FALSE);
     codec_0581_fdsp_select_param_bank(fdsp_config->bank_id);
 
-    unsigned int bank_addr = fdsp_config->bank_id * (CODEC_FDSP_PARAM_BANKB_BASE - CODEC_FDSP_PARAM_BANKA_BASE) + CODEC_FDSP_PARAM_MEM_BASE;
+    unsigned int  bank_addr  = fdsp_config->bank_id * (CODEC_FDSP_PARAM_BANKB_BASE - CODEC_FDSP_PARAM_BANKA_BASE) + CODEC_FDSP_PARAM_MEM_BASE;
     unsigned char reg_length = 0;
 
     /* write program data */
     codec_0581_get_addr_length(CODEC_FDSP_PROGRAM_MEM_BASE, &reg_length);
-    for (unsigned int i = 0; i < fdsp_config->program_len; i++)
-    {
+    for (unsigned int i = 0; i < fdsp_config->program_len; i++) {
         codec_0581_reg_write(CODEC_FDSP_PROGRAM_MEM_BASE + i * reg_length, *(fdsp_config->program_addr)++);
     }
 
     /* write param data */
     codec_0581_get_addr_length(bank_addr, &reg_length);
-    for (int row = 0; row < (CODEC_FDSP_PARAM_BANKB_BASE - CODEC_FDSP_PARAM_BANKA_BASE) / CODEC_FDSP_PARAM_SPAN; row++)
-    {
-        for (unsigned int column = 0; column < fdsp_config->program_len; column++)
-        {
+    for (int row = 0; row < (CODEC_FDSP_PARAM_BANKB_BASE - CODEC_FDSP_PARAM_BANKA_BASE) / CODEC_FDSP_PARAM_SPAN; row++) {
+        for (unsigned int column = 0; column < fdsp_config->program_len; column++) {
             codec_0581_reg_write(bank_addr + CODEC_FDSP_PARAM_SPAN * row + column * reg_length, *(fdsp_config->param_addr)++);
         }
     }
 
     codec_0581_fdsp_enable_run(CODEC_BOOL_TRUE);
 }
-
 
 /************************** end of file *****************************/

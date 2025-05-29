@@ -22,48 +22,52 @@
  *
  *******************************************************************************************************/
 #ifndef _CODEC_0581_H_
-#define _CODEC_0581_H_
+    #define _CODEC_0581_H_
 
-#include "audio.h"
-#include "clock.h"
-#include "gpio.h"
-#include "spi.h"
-#include "stimer.h"
-#include "reg_include/register.h"
+    #include "audio.h"
+    #include "clock.h"
+    #include "gpio.h"
+    #include "spi.h"
+    #include "stimer.h"
+    #include "reg_include/register.h"
 
 /**
  * @brief  enum for codec_0581 bool type
  */
-typedef enum {
-    CODEC_BOOL_FALSE  = 0,
-    CODEC_BOOL_TRUE   = 1,
+typedef enum
+{
+    CODEC_BOOL_FALSE = 0,
+    CODEC_BOOL_TRUE  = 1,
 } codec_0581_bool_e;
 
 /**
  * @brief  enum for codec_0581 error code
  */
-typedef enum {
-    CODEC_0581_OK                       =  0,           /*!< No Error */
-    CODEC_0581_ERROR                    = -1,           /*!< General Error  */
-    CODEC_0581_NULL_PARAM               = -2,           /*!< Null parameter */
-    CODEC_0581_INVALID_PARAM            = -3,           /*!< Invalid parameter passed */
-    CODEC_0581_NOT_SUPPORTED            = -4,           /*!< Not supported */
-    CODEC_0581_PLL_NOT_LOCKED           = -5,           /*!< PLL is not locked */
-}codec_0581_error_e;
+typedef enum
+{
+    CODEC_0581_OK             = 0,  /*!< No Error */
+    CODEC_0581_ERROR          = -1, /*!< General Error  */
+    CODEC_0581_NULL_PARAM     = -2, /*!< Null parameter */
+    CODEC_0581_INVALID_PARAM  = -3, /*!< Invalid parameter passed */
+    CODEC_0581_NOT_SUPPORTED  = -4, /*!< Not supported */
+    CODEC_0581_PLL_NOT_LOCKED = -5, /*!< PLL is not locked */
+} codec_0581_error_e;
 
 /**
  * @brief  enum for ADC channel
  */
-typedef enum {
-    CODEC_ADC_CHNL_0  = 0,
-    CODEC_ADC_CHNL_1  = 1,
-    CODEC_ADC_CHNL_2  = 2,
+typedef enum
+{
+    CODEC_ADC_CHNL_0 = 0,
+    CODEC_ADC_CHNL_1 = 1,
+    CODEC_ADC_CHNL_2 = 2,
 } codec_0581_adc_chnl_e;
 
 /**
  * @brief  enum for ADC sample rate
  */
-typedef enum {
+typedef enum
+{
     CODEC_ADC_SAMPLE_RATE_12KHz  = 0,
     CODEC_ADC_SAMPLE_RATE_24KHz  = 1,
     CODEC_ADC_SAMPLE_RATE_48KHz  = 2,
@@ -76,56 +80,62 @@ typedef enum {
 /**
  * @brief  enum for ADC HPF. (HPF -> high pass filter)
  */
-typedef enum {
-    CODEC_ADC_HPF_DISABLE        = 0,                         /* ADC high pass filter off */
-    CODEC_ADC_HPF_CUTOFF_1HZ     = 1,                         /* ADC high pass filter, cut off freq. 1Hz */
-    CODEC_ADC_HPF_CUTOFF_4HZ     = 2,                         /* ADC high pass filter, cut off freq. 4Hz */
-    CODEC_ADC_HPF_CUTOFF_8HZ     = 3                          /* ADC high pass filter, cut off freq. 5Hz */
+typedef enum
+{
+    CODEC_ADC_HPF_DISABLE    = 0, /* ADC high pass filter off */
+    CODEC_ADC_HPF_CUTOFF_1HZ = 1, /* ADC high pass filter, cut off freq. 1Hz */
+    CODEC_ADC_HPF_CUTOFF_4HZ = 2, /* ADC high pass filter, cut off freq. 4Hz */
+    CODEC_ADC_HPF_CUTOFF_8HZ = 3  /* ADC high pass filter, cut off freq. 5Hz */
 } codec_0581_adc_hpf_e;
 
 /**
  * @brief  enum for ADC dither level
  */
-typedef enum {
-    CODEC_ADC_DITHER_DISABLE    = 0,                          /* dither off */
-    CODEC_ADC_DITHER_QUARTE_LSB = 1,                          /* 1/4 lsb */
-    CODEC_ADC_DITHER_HALF_LSB   = 2                           /* 1/2 lsb */
+typedef enum
+{
+    CODEC_ADC_DITHER_DISABLE    = 0, /* dither off */
+    CODEC_ADC_DITHER_QUARTE_LSB = 1, /* 1/4 lsb */
+    CODEC_ADC_DITHER_HALF_LSB   = 2  /* 1/2 lsb */
 } codec_0581_adc_dither_level_e;
 
 /**
  * @brief  enum for ASRCO channel.(ASRCO -> output asynchronous sample rate converter)
  */
-typedef enum {
-    CODEC_ASRCO_CHNL_0   = 0,
-    CODEC_ASRCO_CHNL_1   = 1,
-    CODEC_ASRCO_CHNL_2   = 2,
+typedef enum
+{
+    CODEC_ASRCO_CHNL_0 = 0,
+    CODEC_ASRCO_CHNL_1 = 1,
+    CODEC_ASRCO_CHNL_2 = 2,
 } codec_0581_asrco_chnl_e;
 
 /**
  * @brief  enum for ASRC channel.(ASRC -> asynchronous sample rate converter)
  */
-typedef enum {
-    CODEC_ASRC_CHNL_ASRCI0   = 0,
-    CODEC_ASRC_CHNL_ASRCO0   = 4,
-    CODEC_ASRC_CHNL_ASRCO1   = 5,
-    CODEC_ASRC_CHNL_ASRCO2   = 6,
+typedef enum
+{
+    CODEC_ASRC_CHNL_ASRCI0 = 0,
+    CODEC_ASRC_CHNL_ASRCO0 = 4,
+    CODEC_ASRC_CHNL_ASRCO1 = 5,
+    CODEC_ASRC_CHNL_ASRCO2 = 6,
 } codec_0581_asrc_chnl_e;
 
 /**
  * @brief  enum for ASRCI output and ASRCO input frequency.(ASRCI -> input asynchronous sample rate converter)
  */
-typedef enum {
-    CODEC_ASRC_FS_12K    = 0,
-    CODEC_ASRC_FS_24K    = 1,
-    CODEC_ASRC_FS_48K    = 2,
-    CODEC_ASRC_FS_96K    = 3,
-    CODEC_ASRC_FS_192K   = 4,
+typedef enum
+{
+    CODEC_ASRC_FS_12K  = 0,
+    CODEC_ASRC_FS_24K  = 1,
+    CODEC_ASRC_FS_48K  = 2,
+    CODEC_ASRC_FS_96K  = 3,
+    CODEC_ASRC_FS_192K = 4,
 } codec_0581_asrc_fs_e;
 
 /**
  * @brief  enum for ASRCO route channel
  */
-typedef enum {
+typedef enum
+{
     CODEC_ASRCO_ROUTE_ADC0   = 0,
     CODEC_ASRCO_ROUTE_ADC1   = 1,
     CODEC_ASRCO_ROUTE_ADC2   = 2,
@@ -155,17 +165,19 @@ typedef enum {
 /**
  * @brief  enum for PLL source
  */
-typedef enum {
+typedef enum
+{
     CODEC_CLK_PLL_SOURCE_MCLKIN = 0,
     CODEC_CLK_PLL_SOURCE_FSYNC0 = 1,
     CODEC_CLK_PLL_SOURCE_BCLK0  = 2,
-    CODEC_CLK_PLL_SOURCE_RCOSC = 3,
+    CODEC_CLK_PLL_SOURCE_RCOSC  = 3,
 } codec_0581_clk_pll_source_e;
 
 /**
  * @brief  enum for PLL type.
  */
-typedef enum {
+typedef enum
+{
     CODEC_CLK_PLL_TYPE_INTEGER = 0,
     CODEC_CLK_PLL_TYPE_FRAC    = 1
 } codec_0581_clk_pll_type_e;
@@ -173,7 +185,8 @@ typedef enum {
 /**
  * @brief  enum for sync_source.
  */
-typedef enum {
+typedef enum
+{
     CODEC_CLK_SYNC_SOURCE_LRCLK0   = 0,
     CODEC_CLK_SYNC_SOURCE_LRCLK1   = 1,
     CODEC_CLK_SYNC_SOURCE_ASRCI    = 2,
@@ -183,7 +196,8 @@ typedef enum {
 /**
  * @brief  enum for DAC sample rate
  */
-typedef enum {
+typedef enum
+{
     CODEC_DAC_SAMPLE_RATE_12KHz  = 0,
     CODEC_DAC_SAMPLE_RATE_24KHz  = 1,
     CODEC_DAC_SAMPLE_RATE_48KHz  = 2,
@@ -196,30 +210,31 @@ typedef enum {
 /**
  * @brief  enum for DAC input routing
  */
-typedef enum {
-    CODEC_DAC_ROUTE_ADC0           = 0,
-    CODEC_DAC_ROUTE_ADC1           = 1,
-    CODEC_DAC_ROUTE_ADC2           = 2,
-    CODEC_DAC_ROUTE_ASRCI0         = 3,
-    CODEC_DAC_ROUTE_EQ             = 4,
-    CODEC_DAC_ROUTE_FDSP0          = 5,
-    CODEC_DAC_ROUTE_FDSP1          = 6,
-    CODEC_DAC_ROUTE_FDSP2          = 7,
-    CODEC_DAC_ROUTE_FDSP3          = 8,
-    CODEC_DAC_ROUTE_FDSP4          = 9,
-    CODEC_DAC_ROUTE_FDSP5          = 10,
-    CODEC_DAC_ROUTE_FDSP6          = 11,
-    CODEC_DAC_ROUTE_FDSP7          = 12,
-    CODEC_DAC_ROUTE_FDSP8          = 13,
-    CODEC_DAC_ROUTE_FDSP9          = 14,
-    CODEC_DAC_ROUTE_FDSP10         = 15,
-    CODEC_DAC_ROUTE_FDSP11         = 16,
-    CODEC_DAC_ROUTE_FDSP12         = 17,
-    CODEC_DAC_ROUTE_FDSP13         = 18,
-    CODEC_DAC_ROUTE_FDSP14         = 19,
-    CODEC_DAC_ROUTE_FDSP15         = 20,
-    CODEC_DAC_ROUTE_SAI0_00_LEFT   = 21,
-    CODEC_DAC_ROUTE_SAI0_01_RIGHT  = 22,
+typedef enum
+{
+    CODEC_DAC_ROUTE_ADC0          = 0,
+    CODEC_DAC_ROUTE_ADC1          = 1,
+    CODEC_DAC_ROUTE_ADC2          = 2,
+    CODEC_DAC_ROUTE_ASRCI0        = 3,
+    CODEC_DAC_ROUTE_EQ            = 4,
+    CODEC_DAC_ROUTE_FDSP0         = 5,
+    CODEC_DAC_ROUTE_FDSP1         = 6,
+    CODEC_DAC_ROUTE_FDSP2         = 7,
+    CODEC_DAC_ROUTE_FDSP3         = 8,
+    CODEC_DAC_ROUTE_FDSP4         = 9,
+    CODEC_DAC_ROUTE_FDSP5         = 10,
+    CODEC_DAC_ROUTE_FDSP6         = 11,
+    CODEC_DAC_ROUTE_FDSP7         = 12,
+    CODEC_DAC_ROUTE_FDSP8         = 13,
+    CODEC_DAC_ROUTE_FDSP9         = 14,
+    CODEC_DAC_ROUTE_FDSP10        = 15,
+    CODEC_DAC_ROUTE_FDSP11        = 16,
+    CODEC_DAC_ROUTE_FDSP12        = 17,
+    CODEC_DAC_ROUTE_FDSP13        = 18,
+    CODEC_DAC_ROUTE_FDSP14        = 19,
+    CODEC_DAC_ROUTE_FDSP15        = 20,
+    CODEC_DAC_ROUTE_SAI0_00_LEFT  = 21,
+    CODEC_DAC_ROUTE_SAI0_01_RIGHT = 22,
     /** attention b92 is not support TDM mode
     CODEC_DAC_ROUTE_SAI0_02        = 23,
     CODEC_DAC_ROUTE_SAI0_03        = 24,
@@ -236,24 +251,26 @@ typedef enum {
     CODEC_DAC_ROUTE_SAI0_14        = 35,
     CODEC_DAC_ROUTE_SAI0_15        = 36,
     */
-    CODEC_DAC_ROUTE_FINT0          = 37,
-    CODEC_DAC_ROUTE_FINT1          = 38
+    CODEC_DAC_ROUTE_FINT0 = 37,
+    CODEC_DAC_ROUTE_FINT1 = 38
 } codec_0581_dac_input_route_e;
 
 /**
  * @brief  enum for EQ bank
  */
-typedef enum {
-    CODEC_EQ_BANK_0                = 0,
-    CODEC_EQ_BANK_1                = 1,
-}codec_0581_eq_bank_e;
+typedef enum
+{
+    CODEC_EQ_BANK_0 = 0,
+    CODEC_EQ_BANK_1 = 1,
+} codec_0581_eq_bank_e;
 
 /**
  * @brief  enum for EQ audio source route
  */
-typedef enum {
-    CODEC_EQ_ROUTE_SAI0_0_LEFT   = 0,                          /* SAP0 channel0(left) */
-    CODEC_EQ_ROUTE_SAI0_1_RIGHT  = 1,                          /* SAP0 channel1(right) */
+typedef enum
+{
+    CODEC_EQ_ROUTE_SAI0_0_LEFT  = 0, /* SAP0 channel0(left) */
+    CODEC_EQ_ROUTE_SAI0_1_RIGHT = 1, /* SAP0 channel1(right) */
     /** attention b92 is not support TDM mode
     CODEC_EQ_ROUTE_SAI0_2        = 2,
     CODEC_EQ_ROUTE_SAI0_3        = 3,
@@ -270,32 +287,33 @@ typedef enum {
     CODEC_EQ_ROUTE_SAI0_14       = 14,
     CODEC_EQ_ROUTE_SAI0_15       = 15,
     */
-    CODEC_EQ_ROUTE_FDSP_0        = 16,                         /* FDSP channel0 */
-    CODEC_EQ_ROUTE_FDSP_1        = 17,                         /* FDSP channel1 */
-    CODEC_EQ_ROUTE_FDSP_2        = 18,                         /* FDSP channel2 */
-    CODEC_EQ_ROUTE_FDSP_3        = 19,                         /* FDSP channel3 */
-    CODEC_EQ_ROUTE_FDSP_4        = 20,                         /* FDSP channel4 */
-    CODEC_EQ_ROUTE_FDSP_5        = 21,                         /* FDSP channel5 */
-    CODEC_EQ_ROUTE_FDSP_6        = 22,                         /* FDSP channel6 */
-    CODEC_EQ_ROUTE_FDSP_7        = 23,                         /* FDSP channel7 */
-    CODEC_EQ_ROUTE_FDSP_8        = 24,                         /* FDSP channel8 */
-    CODEC_EQ_ROUTE_FDSP_9        = 25,                         /* FDSP channel9 */
-    CODEC_EQ_ROUTE_FDSP_10       = 26,                         /* FDSP channel10 */
-    CODEC_EQ_ROUTE_FDSP_11       = 27,                         /* FDSP channel11 */
-    CODEC_EQ_ROUTE_FDSP_12       = 28,                         /* FDSP channel12 */
-    CODEC_EQ_ROUTE_FDSP_13       = 29,                         /* FDSP channel13 */
-    CODEC_EQ_ROUTE_FDSP_14       = 30,                         /* FDSP channel14 */
-    CODEC_EQ_ROUTE_FDSP_15       = 31,                         /* FDSP channel15 */
-    CODEC_EQ_ROUTE_ASRCI_0       = 32,                         /* ASRCI channel0 */
-    CODEC_EQ_ROUTE_ADC_0         = 33,                         /* ADC channel0 */
-    CODEC_EQ_ROUTE_ADC_1         = 34,                         /* ADC channel1 */
-    CODEC_EQ_ROUTE_ADC_2         = 35,                         /* ADC channel2 */
+    CODEC_EQ_ROUTE_FDSP_0  = 16, /* FDSP channel0 */
+    CODEC_EQ_ROUTE_FDSP_1  = 17, /* FDSP channel1 */
+    CODEC_EQ_ROUTE_FDSP_2  = 18, /* FDSP channel2 */
+    CODEC_EQ_ROUTE_FDSP_3  = 19, /* FDSP channel3 */
+    CODEC_EQ_ROUTE_FDSP_4  = 20, /* FDSP channel4 */
+    CODEC_EQ_ROUTE_FDSP_5  = 21, /* FDSP channel5 */
+    CODEC_EQ_ROUTE_FDSP_6  = 22, /* FDSP channel6 */
+    CODEC_EQ_ROUTE_FDSP_7  = 23, /* FDSP channel7 */
+    CODEC_EQ_ROUTE_FDSP_8  = 24, /* FDSP channel8 */
+    CODEC_EQ_ROUTE_FDSP_9  = 25, /* FDSP channel9 */
+    CODEC_EQ_ROUTE_FDSP_10 = 26, /* FDSP channel10 */
+    CODEC_EQ_ROUTE_FDSP_11 = 27, /* FDSP channel11 */
+    CODEC_EQ_ROUTE_FDSP_12 = 28, /* FDSP channel12 */
+    CODEC_EQ_ROUTE_FDSP_13 = 29, /* FDSP channel13 */
+    CODEC_EQ_ROUTE_FDSP_14 = 30, /* FDSP channel14 */
+    CODEC_EQ_ROUTE_FDSP_15 = 31, /* FDSP channel15 */
+    CODEC_EQ_ROUTE_ASRCI_0 = 32, /* ASRCI channel0 */
+    CODEC_EQ_ROUTE_ADC_0   = 33, /* ADC channel0 */
+    CODEC_EQ_ROUTE_ADC_1   = 34, /* ADC channel1 */
+    CODEC_EQ_ROUTE_ADC_2   = 35, /* ADC channel2 */
 } codec_0581_eq_route_e;
 
 /**
  * @brief  enum for FDEC channel.(FDEC -> frequency decimation)
  */
-typedef enum {
+typedef enum
+{
     CODEC_FDEC_CHNL_0 = 0,
     CODEC_FDEC_CHNL_1 = 1,
     CODEC_FDEC_CHNL_2 = 2,
@@ -305,7 +323,8 @@ typedef enum {
 /**
  * @brief  enum for FDEC channel pairs
  */
-typedef enum {
+typedef enum
+{
     CODEC_FDEC_PAIR_CHNL_0_1 = 0,
     CODEC_FDEC_PAIR_CHNL_2_3 = 1,
 } codec_0581_fdec_pair_chnl_e;
@@ -313,69 +332,74 @@ typedef enum {
 /**
  * @brief  enum for FDEC input sample rate
  */
-typedef enum {
-    CODEC_FDEC_IN_FS_24K     = 1,                            /* input sample rate 24K, start from 1 */
-    CODEC_FDEC_IN_FS_48K     = 2,
-    CODEC_FDEC_IN_FS_96K     = 3,
-    CODEC_FDEC_IN_FS_192K    = 4,
-    CODEC_FDEC_IN_FS_384K    = 5,
-    CODEC_FDEC_IN_FS_768K    = 6,
+typedef enum
+{
+    CODEC_FDEC_IN_FS_24K  = 1, /* input sample rate 24K, start from 1 */
+    CODEC_FDEC_IN_FS_48K  = 2,
+    CODEC_FDEC_IN_FS_96K  = 3,
+    CODEC_FDEC_IN_FS_192K = 4,
+    CODEC_FDEC_IN_FS_384K = 5,
+    CODEC_FDEC_IN_FS_768K = 6,
 } codec_0581_fdec_in_fs_e;
 
 /**
  * @brief  enum for FDEC output sample rate
  */
-typedef enum {
-    CODEC_FDEC_OUT_FS_12K    = 0,
-    CODEC_FDEC_OUT_FS_24K    = 1,
-    CODEC_FDEC_OUT_FS_48K    = 2,
-    CODEC_FDEC_OUT_FS_96K    = 3,
-    CODEC_FDEC_OUT_FS_192K   = 4,
-    CODEC_FDEC_OUT_FS_384K   = 5,
+typedef enum
+{
+    CODEC_FDEC_OUT_FS_12K  = 0,
+    CODEC_FDEC_OUT_FS_24K  = 1,
+    CODEC_FDEC_OUT_FS_48K  = 2,
+    CODEC_FDEC_OUT_FS_96K  = 3,
+    CODEC_FDEC_OUT_FS_192K = 4,
+    CODEC_FDEC_OUT_FS_384K = 5,
 
-    CODEC_FDEC_OUT_FS_8K     = 8,
-    CODEC_FDEC_OUT_FS_16K    = 9,
+    CODEC_FDEC_OUT_FS_8K  = 8,
+    CODEC_FDEC_OUT_FS_16K = 9,
 } codec_0581_fdec_out_fs_e;
 
 /**
  * @brief  enum for FDEC route channel
  */
-typedef enum {
-    CODEC_FDEC_ROUTE_ADC0    = 0,
-    CODEC_FDEC_ROUTE_ADC1    = 1,
-    CODEC_FDEC_ROUTE_ADC2    = 2,
-    CODEC_FDEC_ROUTE_ASRCI0  = 3,
-    CODEC_FDEC_ROUTE_EQ      = 4,
-    CODEC_FDEC_ROUTE_FDSP0   = 5,
-    CODEC_FDEC_ROUTE_FDSP1   = 6,
-    CODEC_FDEC_ROUTE_FDSP2   = 7,
-    CODEC_FDEC_ROUTE_FDSP3   = 8,
-    CODEC_FDEC_ROUTE_FDSP4   = 9,
-    CODEC_FDEC_ROUTE_FDSP5   = 10,
-    CODEC_FDEC_ROUTE_FDSP6   = 11,
-    CODEC_FDEC_ROUTE_FDSP7   = 12,
-    CODEC_FDEC_ROUTE_FDSP8   = 13,
-    CODEC_FDEC_ROUTE_FDSP9   = 14,
-    CODEC_FDEC_ROUTE_FDSP10  = 15,
-    CODEC_FDEC_ROUTE_FDSP11  = 16,
-    CODEC_FDEC_ROUTE_FDSP12  = 17,
-    CODEC_FDEC_ROUTE_FDSP13  = 18,
-    CODEC_FDEC_ROUTE_FDSP14  = 19,
-    CODEC_FDEC_ROUTE_FDSP15  = 20,
+typedef enum
+{
+    CODEC_FDEC_ROUTE_ADC0   = 0,
+    CODEC_FDEC_ROUTE_ADC1   = 1,
+    CODEC_FDEC_ROUTE_ADC2   = 2,
+    CODEC_FDEC_ROUTE_ASRCI0 = 3,
+    CODEC_FDEC_ROUTE_EQ     = 4,
+    CODEC_FDEC_ROUTE_FDSP0  = 5,
+    CODEC_FDEC_ROUTE_FDSP1  = 6,
+    CODEC_FDEC_ROUTE_FDSP2  = 7,
+    CODEC_FDEC_ROUTE_FDSP3  = 8,
+    CODEC_FDEC_ROUTE_FDSP4  = 9,
+    CODEC_FDEC_ROUTE_FDSP5  = 10,
+    CODEC_FDEC_ROUTE_FDSP6  = 11,
+    CODEC_FDEC_ROUTE_FDSP7  = 12,
+    CODEC_FDEC_ROUTE_FDSP8  = 13,
+    CODEC_FDEC_ROUTE_FDSP9  = 14,
+    CODEC_FDEC_ROUTE_FDSP10 = 15,
+    CODEC_FDEC_ROUTE_FDSP11 = 16,
+    CODEC_FDEC_ROUTE_FDSP12 = 17,
+    CODEC_FDEC_ROUTE_FDSP13 = 18,
+    CODEC_FDEC_ROUTE_FDSP14 = 19,
+    CODEC_FDEC_ROUTE_FDSP15 = 20,
 } codec_0581_fdec_route_chnl_e;
 
 /**
  * @brief  enum for FastDSP mode
  */
-typedef enum {
+typedef enum
+{
     CODEC_FDSP_NORMAL_MODE = 0,
-    CODEC_FDSP_TURBO_MODE =  1,
+    CODEC_FDSP_TURBO_MODE  = 1,
 } codec_0581_fdsp_mode_e;
 
 /**
  * @brief  enum for FastDSP parameter bank
  */
-typedef enum {
+typedef enum
+{
     CODEC_FDSP_PARAM_BANK_A = 0,
     CODEC_FDSP_PARAM_BANK_B = 1,
     CODEC_FDSP_PARAM_BANK_C = 2
@@ -384,7 +408,8 @@ typedef enum {
 /**
  * @brief  enum for FastDSP parameter bank switch mode
  */
-typedef enum {
+typedef enum
+{
     CODEC_FDSP_PARAM_SWITCH_RAMP    = 0,
     CODEC_FDSP_PARAM_SWITCH_INSTANT = 1
 } codec_0581_fdsp_param_switch_mode_e;
@@ -392,54 +417,58 @@ typedef enum {
 /**
  * @brief  enum for FastDSP ramp rate
  */
-typedef enum {
-    CODEC_FDSP_RAMP_RATE_0P02SEC   = 0,                      /* 0.02s ramp */
-    CODEC_FDSP_RAMP_RATE_0P04SEC   = 1,                      /* 0.04s ramp */
-    CODEC_FDSP_RAMP_RATE_0P06SEC   = 2,                      /* 0.06s ramp */
-    CODEC_FDSP_RAMP_RATE_0P08SEC   = 3,                      /* 0.08s ramp */
-    CODEC_FDSP_RAMP_RATE_0P1SEC    = 4,                      /* 0.1s  ramp */
-    CODEC_FDSP_RAMP_RATE_0P15SEC   = 5,                      /* 0.15s ramp */
-    CODEC_FDSP_RAMP_RATE_0P2SEC    = 6,                      /* 0.2s  ramp */
-    CODEC_FDSP_RAMP_RATE_0P25SEC   = 7,                      /* 0.25s ramp */
-    CODEC_FDSP_RAMP_RATE_0P3SEC    = 8,                      /* 0.3s  ramp */
-    CODEC_FDSP_RAMP_RATE_0P5SEC    = 9,                      /* 0.5s  ramp */
-    CODEC_FDSP_RAMP_RATE_0P75SEC   = 10,                     /* 0.75s ramp */
-    CODEC_FDSP_RAMP_RATE_1SEC      = 11,                     /* 1s    ramp */
-    CODEC_FDSP_RAMP_RATE_1P25SEC   = 12,                     /* 1.25s ramp */
-    CODEC_FDSP_RAMP_RATE_1P5SEC    = 13,                     /* 1.5s  ramp */
-    CODEC_FDSP_RAMP_RATE_1P75SEC   = 14,                     /* 1.75s ramp */
-    CODEC_FDSP_RAMP_RATE_2SEC      = 15                      /* 2s    ramp */
+typedef enum
+{
+    CODEC_FDSP_RAMP_RATE_0P02SEC = 0,  /* 0.02s ramp */
+    CODEC_FDSP_RAMP_RATE_0P04SEC = 1,  /* 0.04s ramp */
+    CODEC_FDSP_RAMP_RATE_0P06SEC = 2,  /* 0.06s ramp */
+    CODEC_FDSP_RAMP_RATE_0P08SEC = 3,  /* 0.08s ramp */
+    CODEC_FDSP_RAMP_RATE_0P1SEC  = 4,  /* 0.1s  ramp */
+    CODEC_FDSP_RAMP_RATE_0P15SEC = 5,  /* 0.15s ramp */
+    CODEC_FDSP_RAMP_RATE_0P2SEC  = 6,  /* 0.2s  ramp */
+    CODEC_FDSP_RAMP_RATE_0P25SEC = 7,  /* 0.25s ramp */
+    CODEC_FDSP_RAMP_RATE_0P3SEC  = 8,  /* 0.3s  ramp */
+    CODEC_FDSP_RAMP_RATE_0P5SEC  = 9,  /* 0.5s  ramp */
+    CODEC_FDSP_RAMP_RATE_0P75SEC = 10, /* 0.75s ramp */
+    CODEC_FDSP_RAMP_RATE_1SEC    = 11, /* 1s    ramp */
+    CODEC_FDSP_RAMP_RATE_1P25SEC = 12, /* 1.25s ramp */
+    CODEC_FDSP_RAMP_RATE_1P5SEC  = 13, /* 1.5s  ramp */
+    CODEC_FDSP_RAMP_RATE_1P75SEC = 14, /* 1.75s ramp */
+    CODEC_FDSP_RAMP_RATE_2SEC    = 15  /* 2s    ramp */
 } codec_0581_fdsp_ramp_rate_e;
 
 /**
  * @brief  enum for FastDSP copy parameter bank
  */
-typedef enum {
-    CODEC_FDSP_COPY_PARAM_BANK_A2B = 0,                      /* copy parameter bank A to bank B */
-    CODEC_FDSP_COPY_PARAM_BANK_A2C = 1,                      /* copy parameter bank A to bank C */
-    CODEC_FDSP_COPY_PARAM_BANK_B2A = 2,                      /* copy parameter bank B to bank A */
-    CODEC_FDSP_COPY_PARAM_BANK_B2C = 3,                      /* copy parameter bank B to bank C */
-    CODEC_FDSP_COPY_PARAM_BANK_C2A = 4,                      /* copy parameter bank C to bank A */
-    CODEC_FDSP_COPY_PARAM_BANK_C2B = 5                       /* copy parameter bank C to bank B */
+typedef enum
+{
+    CODEC_FDSP_COPY_PARAM_BANK_A2B = 0, /* copy parameter bank A to bank B */
+    CODEC_FDSP_COPY_PARAM_BANK_A2C = 1, /* copy parameter bank A to bank C */
+    CODEC_FDSP_COPY_PARAM_BANK_B2A = 2, /* copy parameter bank B to bank A */
+    CODEC_FDSP_COPY_PARAM_BANK_B2C = 3, /* copy parameter bank B to bank C */
+    CODEC_FDSP_COPY_PARAM_BANK_C2A = 4, /* copy parameter bank C to bank A */
+    CODEC_FDSP_COPY_PARAM_BANK_C2B = 5  /* copy parameter bank C to bank B */
 } codec_0581_fdsp_copy_param_bank_e;
 
 /**
  * @brief  enum for FastDSP rate source
  */
-typedef enum {
-    CODEC_FDSP_RATE_SRC_ADC0_1     = 0,
-    CODEC_FDSP_RATE_SRC_ADC2       = 1,
-    CODEC_FDSP_RATE_SRC_EQ         = 5,
-    CODEC_FDSP_RATE_SRC_SAI0       = 6,
-    CODEC_FDSP_RATE_SRC_FINT0_1    = 10,
-    CODEC_FDSP_RATE_SRC_ASRCI      = 14,
-    CODEC_FDSP_RATE_SRC_FIXED      = 15
+typedef enum
+{
+    CODEC_FDSP_RATE_SRC_ADC0_1  = 0,
+    CODEC_FDSP_RATE_SRC_ADC2    = 1,
+    CODEC_FDSP_RATE_SRC_EQ      = 5,
+    CODEC_FDSP_RATE_SRC_SAI0    = 6,
+    CODEC_FDSP_RATE_SRC_FINT0_1 = 10,
+    CODEC_FDSP_RATE_SRC_ASRCI   = 14,
+    CODEC_FDSP_RATE_SRC_FIXED   = 15
 } codec_0581_fdsp_rate_src_e;
 
 /**
  * @brief  enum for FINT channel.(FINT -> frequency interpolation)
  */
-typedef enum {
+typedef enum
+{
     CODEC_FINT_CHNL_0 = 0,
     CODEC_FINT_CHNL_1 = 1,
 } codec_0581_fint_chnl_e;
@@ -447,63 +476,67 @@ typedef enum {
 /**
  * @brief  enum for FINT channel pairs
  */
-typedef enum {
+typedef enum
+{
     CODEC_FINT_PAIR_CHNL_0_1 = 0,
 } codec_0581_fint_pair_chnl_e;
 
 /**
  * @brief  enum for FINT output sample rate
  */
-typedef enum {
-    CODEC_FINT_OUT_FS_24K    = 1,                            /* input sample rate 24K, start from 1 */
-    CODEC_FINT_OUT_FS_48K    = 2,
-    CODEC_FINT_OUT_FS_96K    = 3,
-    CODEC_FINT_OUT_FS_192K   = 4,
-    CODEC_FINT_OUT_FS_384K   = 5,
-    CODEC_FINT_OUT_FS_768K   = 6,
+typedef enum
+{
+    CODEC_FINT_OUT_FS_24K  = 1, /* input sample rate 24K, start from 1 */
+    CODEC_FINT_OUT_FS_48K  = 2,
+    CODEC_FINT_OUT_FS_96K  = 3,
+    CODEC_FINT_OUT_FS_192K = 4,
+    CODEC_FINT_OUT_FS_384K = 5,
+    CODEC_FINT_OUT_FS_768K = 6,
 } codec_0581_fint_out_fs_e;
 
 /**
  * @brief  enum for FINT input sample rate
  */
-typedef enum {
-    CODEC_FINT_IN_FS_12K     = 0,
-    CODEC_FINT_IN_FS_24K     = 1,
-    CODEC_FINT_IN_FS_48K     = 2,
-    CODEC_FINT_IN_FS_96K     = 3,
-    CODEC_FINT_IN_FS_192K    = 4,
-    CODEC_FINT_IN_FS_384K    = 5,
-    CODEC_FINT_IN_FS_8K      = 8,
-    CODEC_FINT_IN_FS_16K     = 9,
+typedef enum
+{
+    CODEC_FINT_IN_FS_12K  = 0,
+    CODEC_FINT_IN_FS_24K  = 1,
+    CODEC_FINT_IN_FS_48K  = 2,
+    CODEC_FINT_IN_FS_96K  = 3,
+    CODEC_FINT_IN_FS_192K = 4,
+    CODEC_FINT_IN_FS_384K = 5,
+    CODEC_FINT_IN_FS_8K   = 8,
+    CODEC_FINT_IN_FS_16K  = 9,
 } codec_0581_fint_in_fs_e;
 
 /**
  * @brief  enum for FINT route channel
  */
-typedef enum {
-    CODEC_FINT_ROUTE_ADC0          = 0,
-    CODEC_FINT_ROUTE_ADC1          = 1,
-    CODEC_FINT_ROUTE_ADC2          = 2,
-    CODEC_FINT_ROUTE_ASRCI0        = 3,
-    CODEC_FINT_ROUTE_EQ            = 4,
-    CODEC_FINT_ROUTE_FDSP0         = 5,
-    CODEC_FINT_ROUTE_FDSP1         = 6,
-    CODEC_FINT_ROUTE_FDSP2         = 7,
-    CODEC_FINT_ROUTE_FDSP3         = 8,
-    CODEC_FINT_ROUTE_FDSP4         = 9,
-    CODEC_FINT_ROUTE_FDSP5         = 10,
-    CODEC_FINT_ROUTE_FDSP6         = 11,
-    CODEC_FINT_ROUTE_FDSP7         = 12,
-    CODEC_FINT_ROUTE_FDSP8         = 13,
-    CODEC_FINT_ROUTE_FDSP9         = 14,
-    CODEC_FINT_ROUTE_FDSP10        = 15,
-    CODEC_FINT_ROUTE_FDSP11        = 16,
-    CODEC_FINT_ROUTE_FDSP12        = 17,
-    CODEC_FINT_ROUTE_FDSP13        = 18,
-    CODEC_FINT_ROUTE_FDSP14        = 19,
-    CODEC_FINT_ROUTE_FDSP15        = 20,
-    CODEC_FINT_ROUTE_SAI0_0_LEFT   = 21,
-    CODEC_FINT_ROUTE_SAI0_1_RIGHT  = 22,
+typedef enum
+{
+    CODEC_FINT_ROUTE_ADC0         = 0,
+    CODEC_FINT_ROUTE_ADC1         = 1,
+    CODEC_FINT_ROUTE_ADC2         = 2,
+    CODEC_FINT_ROUTE_ASRCI0       = 3,
+    CODEC_FINT_ROUTE_EQ           = 4,
+    CODEC_FINT_ROUTE_FDSP0        = 5,
+    CODEC_FINT_ROUTE_FDSP1        = 6,
+    CODEC_FINT_ROUTE_FDSP2        = 7,
+    CODEC_FINT_ROUTE_FDSP3        = 8,
+    CODEC_FINT_ROUTE_FDSP4        = 9,
+    CODEC_FINT_ROUTE_FDSP5        = 10,
+    CODEC_FINT_ROUTE_FDSP6        = 11,
+    CODEC_FINT_ROUTE_FDSP7        = 12,
+    CODEC_FINT_ROUTE_FDSP8        = 13,
+    CODEC_FINT_ROUTE_FDSP9        = 14,
+    CODEC_FINT_ROUTE_FDSP10       = 15,
+    CODEC_FINT_ROUTE_FDSP11       = 16,
+    CODEC_FINT_ROUTE_FDSP12       = 17,
+    CODEC_FINT_ROUTE_FDSP13       = 18,
+    CODEC_FINT_ROUTE_FDSP14       = 19,
+    CODEC_FINT_ROUTE_FDSP15       = 20,
+    CODEC_FINT_ROUTE_SAI0_0_LEFT  = 21,
+    CODEC_FINT_ROUTE_SAI0_1_RIGHT = 22,
     /** attention b92 is not support TDM mode
     CODEC_FINT_ROUTE_SAI0_2        = 23,
     CODEC_FINT_ROUTE_SAI0_3        = 24,
@@ -525,7 +558,8 @@ typedef enum {
 /**
  * @brief  enum for HPAMP mode.(HPAMP -> headphone amplifier)
  */
-typedef enum {
+typedef enum
+{
     CODEC_HPAMP_HEADPHONE = 0,
     CODEC_HPAMP_LINE_OUT  = 1
 } codec_0581_hpamp_mode_e;
@@ -533,15 +567,17 @@ typedef enum {
 /**
  * @brief  enum for internal interrupt index (connected to IRQ1/2 pin)
  */
-typedef enum {
-    CODEC_IRQ_INDEX1           = 1,
-    CODEC_IRQ_INDEX2           = 2,
+typedef enum
+{
+    CODEC_IRQ_INDEX1 = 1,
+    CODEC_IRQ_INDEX2 = 2,
 } codec_0581_irq_index_e;
 
 /**
  * @brief  enum for internal interrupt (connected to IRQ1/2 pin)
  */
-typedef enum {
+typedef enum
+{
     CODEC_IRQ_DAC0_CLIP        = 0x00000001,
     CODEC_IRQ_ADC0_CLIP        = 0x00000002,
     CODEC_IRQ_ADC1_CLIP        = 0x00000004,
@@ -565,25 +601,28 @@ typedef enum {
 /**
  * @brief  enum for PGA channel.(PGA -> programmable gain amplifier)
  */
-typedef enum{
-    CODEC_PGA_CHNL_0             = 0,
-    CODEC_PGA_CHNL_1             = 1,
-    CODEC_PGA_CHNL_2             = 2,
+typedef enum
+{
+    CODEC_PGA_CHNL_0 = 0,
+    CODEC_PGA_CHNL_1 = 1,
+    CODEC_PGA_CHNL_2 = 2,
 } codec_0581_pga_chnl_e;
 
 /**
  * @brief  enum for codec_0581 power mode
  */
-typedef enum {
-    CODEC_PWR_MODE_HIBERNATE      = 0,
-    CODEC_PWR_MODE_ACTIVE         = 1,
+typedef enum
+{
+    CODEC_PWR_MODE_HIBERNATE = 0,
+    CODEC_PWR_MODE_ACTIVE    = 1,
 } codec_0581_pwr_mode_e;
 
 /**
  * @brief  enum for SAP(serial audio port/I2S) control's SAI mode (SPT_SAI_MODE, SPT -> serial port, SAI -> serial audio interface)
  */
-typedef enum {
-    CODEC_SAP_CTRL_SAI_MODE_STEREO       = 0,            /* sets the serial port in STEREO mode, assume 32-bit words per channel */
+typedef enum
+{
+    CODEC_SAP_CTRL_SAI_MODE_STEREO = 0, /* sets the serial port in STEREO mode, assume 32-bit words per channel */
     /** attention b92 is not support TDM mode
     CODEC_SAP_CTRL_SAI_MODE_TDM          = 1,
     */
@@ -592,9 +631,10 @@ typedef enum {
 /**
  * @brief  enum for SAP slot
  */
-typedef enum {
-    CODEC_SAP_SLOT0_LEFT                 = 0,
-    CODEC_SAP_SLOT1_RIGHT                = 1,
+typedef enum
+{
+    CODEC_SAP_SLOT0_LEFT  = 0,
+    CODEC_SAP_SLOT1_RIGHT = 1,
     /** attention b92 is not support TDM mode
     CODEC_SAP_SLOT2                      = 2,
     CODEC_SAP_SLOT3                      = 3,
@@ -616,26 +656,29 @@ typedef enum {
 /**
  * @brief  enum for SAP control's data format (SPT_DATA_FORMAT)
  */
-typedef enum {
-    CODEC_SAP_CTRL_DATA_FORMAT_LJ        = 1,            /* left justified,delay by 0 */
-    CODEC_SAP_CTRL_DATA_FORMAT_I2S       = 0,            /* typical I2S mode, delay by 1 */
-    CODEC_SAP_CTRL_DATA_FORMAT_DLY8      = 2,            /* delay by 8 */
-    CODEC_SAP_CTRL_DATA_FORMAT_DLY12     = 3,            /* delay by 12 */
-    CODEC_SAP_CTRL_DATA_FORMAT_DLY16     = 4             /* delay by 16 */
+typedef enum
+{
+    CODEC_SAP_CTRL_DATA_FORMAT_LJ    = 1, /* left justified,delay by 0 */
+    CODEC_SAP_CTRL_DATA_FORMAT_I2S   = 0, /* typical I2S mode, delay by 1 */
+    CODEC_SAP_CTRL_DATA_FORMAT_DLY8  = 2, /* delay by 8 */
+    CODEC_SAP_CTRL_DATA_FORMAT_DLY12 = 3, /* delay by 12 */
+    CODEC_SAP_CTRL_DATA_FORMAT_DLY16 = 4  /* delay by 16 */
 } codec_0581_sap_data_format_e;
 
 /**
  * @brief  enum for SAP control's tri-state enable (SPT_TRI_STATE)
  */
-typedef enum {
-    CODEC_SAP_CTRL_TRI_STATE_ENABLE      = 1,            /* tri-state enabled  */
-    CODEC_SAP_CTRL_TRI_STATE_DISABLE     = 0             /* tri-state disabled */
+typedef enum
+{
+    CODEC_SAP_CTRL_TRI_STATE_ENABLE  = 1, /* tri-state enabled  */
+    CODEC_SAP_CTRL_TRI_STATE_DISABLE = 0  /* tri-state disabled */
 } codec_0581_sap_tristate_e;
 
 /**
  * @brief  enum for sap mclk output rates
  */
-typedef enum {
+typedef enum
+{
     CODEC_SAP_MCLK_24576K = 0,
     CODEC_SAP_MCLK_12288K = 1,
     CODEC_SAP_MCLK_6144K  = 2,
@@ -649,50 +692,55 @@ typedef enum {
 /**
  * @brief  enum for SAP control's bclk src (SPT_BCLK_SRC)
  */
-typedef enum {
-    CODEC_SAP_CTRL_BCLK_SRC_SLAVE        = 0,
-    CODEC_SAP_CTRL_BCLK_SRC_3072K        = 1,
-    CODEC_SAP_CTRL_BCLK_SRC_6144K        = 2,
-    CODEC_SAP_CTRL_BCLK_SRC_12288K       = 3,
-    CODEC_SAP_CTRL_BCLK_SRC_24576K       = 4
+typedef enum
+{
+    CODEC_SAP_CTRL_BCLK_SRC_SLAVE  = 0,
+    CODEC_SAP_CTRL_BCLK_SRC_3072K  = 1,
+    CODEC_SAP_CTRL_BCLK_SRC_6144K  = 2,
+    CODEC_SAP_CTRL_BCLK_SRC_12288K = 3,
+    CODEC_SAP_CTRL_BCLK_SRC_24576K = 4
 } codec_0581_sap_bclk_src_e;
 
 /**
  * @brief  enum for SAP control's bclk polarity (SPT_BCLK_POL)
  */
-typedef enum {
-    CODEC_SAP_CTRL_BCLK_POL_NEG          = 0,            /* capture on rising edge  */
-    CODEC_SAP_CTRL_BCLK_POL_POS          = 1             /* capture on falling edge */
+typedef enum
+{
+    CODEC_SAP_CTRL_BCLK_POL_NEG = 0, /* capture on rising edge  */
+    CODEC_SAP_CTRL_BCLK_POL_POS = 1  /* capture on falling edge */
 } codec_0581_sap_bclk_polarity_e;
 
 /**
  * @brief  enum for SAP control's lrclk src (SPT_LRCLK_SRC)
  */
-typedef enum {
-    CODEC_SAP_CTRL_LRCLK_SRC_SLAVE       = 0,
-    CODEC_SAP_CTRL_LRCLK_SRC_48K         = 1,
-    CODEC_SAP_CTRL_LRCLK_SRC_96K         = 2,
-    CODEC_SAP_CTRL_LRCLK_SRC_192K        = 3,
-    CODEC_SAP_CTRL_LRCLK_SRC_12K         = 4,
-    CODEC_SAP_CTRL_LRCLK_SRC_24K         = 5,
-    CODEC_SAP_CTRL_LRCLK_SRC_384K        = 6,
-    CODEC_SAP_CTRL_LRCLK_SRC_768K        = 7,
-    CODEC_SAP_CTRL_LRCLK_SRC_8K          = 8,
-    CODEC_SAP_CTRL_LRCLK_SRC_16K         = 9
+typedef enum
+{
+    CODEC_SAP_CTRL_LRCLK_SRC_SLAVE = 0,
+    CODEC_SAP_CTRL_LRCLK_SRC_48K   = 1,
+    CODEC_SAP_CTRL_LRCLK_SRC_96K   = 2,
+    CODEC_SAP_CTRL_LRCLK_SRC_192K  = 3,
+    CODEC_SAP_CTRL_LRCLK_SRC_12K   = 4,
+    CODEC_SAP_CTRL_LRCLK_SRC_24K   = 5,
+    CODEC_SAP_CTRL_LRCLK_SRC_384K  = 6,
+    CODEC_SAP_CTRL_LRCLK_SRC_768K  = 7,
+    CODEC_SAP_CTRL_LRCLK_SRC_8K    = 8,
+    CODEC_SAP_CTRL_LRCLK_SRC_16K   = 9
 } codec_0581_sap_lrclk_src_e;
 
 /**
  * @brief  enum for SAP control's lrclk polarity (SPT_LRCLK_POL)
  */
-typedef enum {
-    CODEC_SAP_CTRL_LRCLK_POL_NORM        = 0,            /* normal polarity  */
-    CODEC_SAP_CTRL_LRCLK_POL_INVT        = 1             /* inverted polarity */
+typedef enum
+{
+    CODEC_SAP_CTRL_LRCLK_POL_NORM = 0, /* normal polarity  */
+    CODEC_SAP_CTRL_LRCLK_POL_INVT = 1  /* inverted polarity */
 } codec_0581_sap_lrclk_polarity_e;
 
 /**
  * @brief  enum for SAP output data source
  */
-typedef enum {
+typedef enum
+{
     CODEC_SAP_OUT_ROUTE_FROM_ADC0,
     CODEC_SAP_OUT_ROUTE_FROM_ADC1,
     CODEC_SAP_OUT_ROUTE_FROM_ADC2,
@@ -725,7 +773,8 @@ typedef enum {
 /**
  * @brief  struct for serial audio port configuration
  */
-typedef struct {
+typedef struct
+{
     codec_0581_sap_sai_mode_e       sai_mode;
     codec_0581_sap_data_format_e    data_format;
     codec_0581_sap_tristate_e       tri_state;
@@ -738,131 +787,144 @@ typedef struct {
 /**
  * @brief  struct for codec_0581 input adc config
  */
-typedef struct {
-    codec_0581_adc_chnl_e                adc_chnl;           /* ADC channel codec_0581_adc_chnl_e */
-    codec_0581_adc_sample_rate_e         adc_rate;           /* ADC sample rate codec_0581_adc_sample_rate_e */
+typedef struct
+{
+    codec_0581_adc_chnl_e        adc_chnl; /* ADC channel codec_0581_adc_chnl_e */
+    codec_0581_adc_sample_rate_e adc_rate; /* ADC sample rate codec_0581_adc_sample_rate_e */
 } codec_0581_input_adc_config_t;
 
 /**
  * @brief  struct for codec_0581 input asrco config
  */
-typedef struct {
-    codec_0581_asrc_fs_e                 asrco_in_fs;        /* ASRCO input frequency codec_0581_asrc_fs_e */
-    codec_0581_asrco_chnl_e              asrco_chnl;         /* ASRCO channel to be configured codec_0581_asrco_chnl_e */
-    codec_0581_asrco_route_chnl_e        asrco_route_from;   /* ASRCO input source channel codec_0581_asrco_route_chnl_e */
+typedef struct
+{
+    codec_0581_asrc_fs_e          asrco_in_fs;      /* ASRCO input frequency codec_0581_asrc_fs_e */
+    codec_0581_asrco_chnl_e       asrco_chnl;       /* ASRCO channel to be configured codec_0581_asrco_chnl_e */
+    codec_0581_asrco_route_chnl_e asrco_route_from; /* ASRCO input source channel codec_0581_asrco_route_chnl_e */
 } codec_0581_input_asrco_config_t;
 
 /**
  * @brief  struct for codec_0581 input fdec config
  */
-typedef struct {
-    codec_0581_fdec_chnl_e               fdec_chnl;          /* fdec channel to be configured codec_0581_fdec_chnl_e */
-    codec_0581_fdec_in_fs_e              fdec_in_fs;         /* fdec input frequency codec_0581_fdec_in_fs_e */
-    codec_0581_fdec_out_fs_e             fdec_out_fs;        /* fdec output frequency codec_0581_fdec_out_fs_e */
-    codec_0581_fdec_route_chnl_e         fdec_route_from;    /* fdec input source channel codec_0581_fdec_route_chnl_e */
-}codec_0581_input_fdec_config_t;
+typedef struct
+{
+    codec_0581_fdec_chnl_e       fdec_chnl;       /* fdec channel to be configured codec_0581_fdec_chnl_e */
+    codec_0581_fdec_in_fs_e      fdec_in_fs;      /* fdec input frequency codec_0581_fdec_in_fs_e */
+    codec_0581_fdec_out_fs_e     fdec_out_fs;     /* fdec output frequency codec_0581_fdec_out_fs_e */
+    codec_0581_fdec_route_chnl_e fdec_route_from; /* fdec input source channel codec_0581_fdec_route_chnl_e */
+} codec_0581_input_fdec_config_t;
 
 /**
  * @brief  struct for codec_0581 input sap config
  */
-typedef struct {
-    codec_0581_sap_slot_e                slot_id;            /* the slot id to be configured codec_0581_sap_slot_e, if the i2s channel is mono, it must be CODEC_SAP_SLOT1_RIGHT. */
-    codec_0581_sap_output_route_from_e   sap_route_from;     /* where the output data from codec_0581_sap_output_route_from_e */
+typedef struct
+{
+    codec_0581_sap_slot_e              slot_id;        /* the slot id to be configured codec_0581_sap_slot_e, if the i2s channel is mono, it must be CODEC_SAP_SLOT1_RIGHT. */
+    codec_0581_sap_output_route_from_e sap_route_from; /* where the output data from codec_0581_sap_output_route_from_e */
 } codec_0581_input_sap_config_t;
 
 /**
  * @brief  struct for codec_0581 input
  */
-typedef struct {
-    codec_0581_input_adc_config_t        *adc_config;        /* adc config  codec_0581_input_adc_config_t */
-    codec_0581_input_asrco_config_t      *asrco_config;      /* asrco config codec_0581_input_asrco_config_t */
-    codec_0581_input_fdec_config_t       *fdec_config;       /* fdec_config codec_0581_input_fdec_config_t */
-    codec_0581_input_sap_config_t        *sap_config;        /* sap_config codec_0581_input_sap_config_t */
+typedef struct
+{
+    codec_0581_input_adc_config_t   *adc_config;   /* adc config  codec_0581_input_adc_config_t */
+    codec_0581_input_asrco_config_t *asrco_config; /* asrco config codec_0581_input_asrco_config_t */
+    codec_0581_input_fdec_config_t  *fdec_config;  /* fdec_config codec_0581_input_fdec_config_t */
+    codec_0581_input_sap_config_t   *sap_config;   /* sap_config codec_0581_input_sap_config_t */
 } codec_0581_input_t;
 
 /**
  * @brief  struct for codec_0581 output asrci config
  */
-typedef struct {
-    codec_0581_asrc_fs_e                 asrci_out_fs;       /* ASRCI output frequency codec_0581_asrc_fs_e */
+typedef struct
+{
+    codec_0581_asrc_fs_e asrci_out_fs; /* ASRCI output frequency codec_0581_asrc_fs_e */
 } codec_0581_output_asrci_config_t;
 
 /**
  * @brief  struct for codec_0581 output dac config
  */
-typedef struct {
-    codec_0581_dac_sample_rate_e         dac_rate;           /* DAC sample rate codec_0581_dac_sample_rate_e */
-    codec_0581_dac_input_route_e         dac_input;          /* DAC input source channel codec_0581_dac_input_route_e */
+typedef struct
+{
+    codec_0581_dac_sample_rate_e dac_rate;  /* DAC sample rate codec_0581_dac_sample_rate_e */
+    codec_0581_dac_input_route_e dac_input; /* DAC input source channel codec_0581_dac_input_route_e */
 } codec_0581_output_dac_config_t;
 
 /**
  * @brief  struct for codec_0581 output fint config
  */
-typedef struct {
-    codec_0581_fint_chnl_e               fint_chnl;          /* fint channel to be configured codec_0581_fint_chnl_e */
-    codec_0581_fint_in_fs_e              fint_in_fs;         /* fint input frequency codec_0581_fint_in_fs_e */
-    codec_0581_fint_out_fs_e             fint_out_fs;        /* fint output frequency codec_0581_fint_out_fs_e */
-    codec_0581_fint_route_chnl_e         fint_route_from;    /* fint input source channel codec_0581_fint_route_chnl_e */
-}codec_0581_output_fint_config_t;
+typedef struct
+{
+    codec_0581_fint_chnl_e       fint_chnl;       /* fint channel to be configured codec_0581_fint_chnl_e */
+    codec_0581_fint_in_fs_e      fint_in_fs;      /* fint input frequency codec_0581_fint_in_fs_e */
+    codec_0581_fint_out_fs_e     fint_out_fs;     /* fint output frequency codec_0581_fint_out_fs_e */
+    codec_0581_fint_route_chnl_e fint_route_from; /* fint input source channel codec_0581_fint_route_chnl_e */
+} codec_0581_output_fint_config_t;
 
 /**
  * @brief  struct for codec_0581 output
  */
-typedef struct {
-    codec_0581_output_asrci_config_t     *asrci_config;      /* asrci_config codec_0581_output_asrci_config_t */
-    codec_0581_output_fint_config_t      *fint_config;       /* fint_config codec_0581_output_fint_config_t */
-    codec_0581_output_dac_config_t       *dac_config;        /* dac_config codec_0581_output_dac_config_t */
+typedef struct
+{
+    codec_0581_output_asrci_config_t *asrci_config; /* asrci_config codec_0581_output_asrci_config_t */
+    codec_0581_output_fint_config_t  *fint_config;  /* fint_config codec_0581_output_fint_config_t */
+    codec_0581_output_dac_config_t   *dac_config;   /* dac_config codec_0581_output_dac_config_t */
 } codec_0581_output_t;
 
 /**
  * @brief  struct for codec_0581 eq config
  */
-typedef struct {
-    unsigned int                        *program_addr;      /* eq program data addr */
-    unsigned int                        program_len;        /* eq program data length */
-    unsigned int                        *param_addr;        /* eq param data addr */
-    unsigned int                        param_len;          /* eq param data length */
-    codec_0581_eq_bank_e                 bank_id;           /* eq bank id to be selected codec_0581_eq_bank_e */
-    codec_0581_eq_route_e                eq_route_from;     /* eq route from codec_0581_eq_route_e */
-}codec_0581_eq_config_t;
+typedef struct
+{
+    unsigned int         *program_addr;  /* eq program data addr */
+    unsigned int          program_len;   /* eq program data length */
+    unsigned int         *param_addr;    /* eq param data addr */
+    unsigned int          param_len;     /* eq param data length */
+    codec_0581_eq_bank_e  bank_id;       /* eq bank id to be selected codec_0581_eq_bank_e */
+    codec_0581_eq_route_e eq_route_from; /* eq route from codec_0581_eq_route_e */
+} codec_0581_eq_config_t;
 
 /**
  * @brief  struct for codec_0581 fdsp config
  */
-typedef struct {
-    unsigned int                        *program_addr;      /* fdsp program data addr */
-    unsigned int                        program_len;        /* fdsp program data length */
-    unsigned int                        *param_addr;        /* fdsp param data addr param_len = program_len */
-    codec_0581_fdsp_param_bank_e         bank_id;           /* fdsp bank id to be selected codec_0581_fdsp_param_bank_e */
-}codec_0581_fdsp_config_t;
+typedef struct
+{
+    unsigned int                *program_addr; /* fdsp program data addr */
+    unsigned int                 program_len;  /* fdsp program data length */
+    unsigned int                *param_addr;   /* fdsp param data addr param_len = program_len */
+    codec_0581_fdsp_param_bank_e bank_id;      /* fdsp bank id to be selected codec_0581_fdsp_param_bank_e */
+} codec_0581_fdsp_config_t;
 
 /**
  * @brief  struct for codec_0581 i2s init
  */
-typedef struct {
-    unsigned short                      *sample_rate;       /* sample rate */
-    audio_i2s_wl_mode_e                 data_width;         /* i2s data width */
-}codec_0581_i2s_init_t;
+typedef struct
+{
+    unsigned short     *sample_rate; /* sample rate */
+    audio_i2s_wl_mode_e data_width;  /* i2s data width */
+} codec_0581_i2s_init_t;
 
 /**
  * @brief  struct for codec_0581 i2s input
  */
-typedef struct {
-    void                                *input_data_buf;    /* input data buffer address */
-    unsigned int                        input_buf_size;     /* input data buffer size */
-    i2s_channel_select_e                i2s_ch_sel;         /* i2s channel select */
-    dma_chn_e                           rx_dma_num;         /* rx dma channel select */
-}codec_0581_i2s_input_t;
+typedef struct
+{
+    void                *input_data_buf; /* input data buffer address */
+    unsigned int         input_buf_size; /* input data buffer size */
+    i2s_channel_select_e i2s_ch_sel;     /* i2s channel select */
+    dma_chn_e            rx_dma_num;     /* rx dma channel select */
+} codec_0581_i2s_input_t;
 
 /**
  * @brief  struct for codec_0581 i2s output
  */
-typedef struct {
-    void                                *output_data_buf;   /* output data buffer address */
-    unsigned int                        output_buf_size;    /* output data buffer size */
-    dma_chn_e                           tx_dma_num;         /* tx dma channel select */
-}codec_0581_i2s_output_t;
-
+typedef struct
+{
+    void        *output_data_buf; /* output data buffer address */
+    unsigned int output_buf_size; /* output data buffer size */
+    dma_chn_e    tx_dma_num;      /* tx dma channel select */
+} codec_0581_i2s_output_t;
 
 /**
  * @brief       This function servers to read codec_0581 register data.
@@ -1090,8 +1152,7 @@ void codec_0581_clk_enable_pll_power_on(codec_0581_bool_e enable);
  * @param[in]   denominator  pll denominator
  * @return      none
  */
-void codec_0581_clk_config_pll(codec_0581_clk_pll_source_e pll_src, codec_0581_clk_pll_type_e type,
-                              codec_0581_clk_sync_source_e sync_src, unsigned char prescaler, unsigned short multiplier, unsigned short numerator, unsigned short denominator);
+void codec_0581_clk_config_pll(codec_0581_clk_pll_source_e pll_src, codec_0581_clk_pll_type_e type, codec_0581_clk_sync_source_e sync_src, unsigned char prescaler, unsigned short multiplier, unsigned short numerator, unsigned short denominator);
 
 /**
  * @brief       This function servers to update all PLL configuration settings.

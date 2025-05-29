@@ -28,9 +28,6 @@
 #include "lib/include/hash/hmac_sm3.h"
 
 
-
-
-
 #ifdef SUPPORT_HASH_SM3
 
 
@@ -47,7 +44,6 @@ unsigned int hmac_sm3_init(HMAC_SM3_CTX *ctx, unsigned char *key, unsigned short
     return hmac_init(ctx, HASH_SM3, key, sp_key_idx, key_bytes);
 }
 
-
 /**
  * @brief       hmac-sm3 update message
  * @param[in]   ctx               - HMAC_SM3_CTX context pointer.
@@ -63,7 +59,6 @@ unsigned int hmac_sm3_update(HMAC_SM3_CTX *ctx, const unsigned char *msg, unsign
 {
     return hmac_update(ctx, msg, msg_bytes);
 }
-
 
 /**
  * @brief       message update done, get the hmac
@@ -101,7 +96,7 @@ unsigned int hmac_sm3(unsigned char *key, unsigned short sp_key_idx, unsigned in
 }
 
 
-#ifdef HASH_DMA_FUNCTION
+    #ifdef HASH_DMA_FUNCTION
 /**
  * @brief       init dma hmac-sm3
  * @param[in]   ctx            - HMAC_SM3_DMA_CTX context pointer.
@@ -111,12 +106,10 @@ unsigned int hmac_sm3(unsigned char *key, unsigned short sp_key_idx, unsigned in
  * @param[in]   callback       - callback function pointer.
  * @return      0:success     other:error
  */
-unsigned int hmac_sm3_dma_init(HMAC_SM3_DMA_CTX *ctx, const unsigned char *key, unsigned short sp_key_idx, unsigned int key_bytes,
-        HASH_CALLBACK callback)
+unsigned int hmac_sm3_dma_init(HMAC_SM3_DMA_CTX *ctx, const unsigned char *key, unsigned short sp_key_idx, unsigned int key_bytes, HASH_CALLBACK callback)
 {
     return hmac_dma_init(ctx, HASH_SM3, key, sp_key_idx, key_bytes, callback);
 }
-
 
 /**
  * @brief       input key and whole message, get the hmac
@@ -148,8 +141,7 @@ unsigned int hmac_sm3_dma_update_blocks(HMAC_SM3_DMA_CTX *ctx, unsigned int *msg
       -# 1. please make sure the three parameters are valid, and ctx is initialized.
   @endverbatim
  */
-unsigned int hmac_sm3_dma_final(HMAC_SM3_DMA_CTX *ctx, unsigned int *remainder_msg, unsigned int remainder_bytes,
-        unsigned int *mac)
+unsigned int hmac_sm3_dma_final(HMAC_SM3_DMA_CTX *ctx, unsigned int *remainder_msg, unsigned int remainder_bytes, unsigned int *mac)
 {
     return hmac_dma_final(ctx, remainder_msg, remainder_bytes, mac);
 }
@@ -165,13 +157,12 @@ unsigned int hmac_sm3_dma_final(HMAC_SM3_DMA_CTX *ctx, unsigned int *remainder_m
  * @param[in]   callback       - callback function pointer.
  * @return      0:success     other:error
  */
-unsigned int hmac_sm3_dma(unsigned char *key, unsigned short sp_key_idx, unsigned int key_bytes, unsigned int *msg, unsigned int msg_bytes,
-        unsigned int *mac, HASH_CALLBACK callback)
+unsigned int hmac_sm3_dma(unsigned char *key, unsigned short sp_key_idx, unsigned int key_bytes, unsigned int *msg, unsigned int msg_bytes, unsigned int *mac, HASH_CALLBACK callback)
 {
     return hmac_dma(HASH_SM3, key, sp_key_idx, key_bytes, msg, msg_bytes, mac, callback);
 }
 
-#endif
+    #endif
 
 
 #endif

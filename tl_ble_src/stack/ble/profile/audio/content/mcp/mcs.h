@@ -29,70 +29,74 @@
 /******************************* (G)MCS Common Start **********************************************************************/
 
 /* Media State values */
-typedef enum{
-    GMCS_MEDIA_STATE_INACTIVE           = 0x00,
-    GMCS_MEDIA_STATE_PLAYING           = 0x01,
-    GMCS_MEDIA_STATE_PAUSED             = 0x02,
-    GMCS_MEDIA_STATE_SEEKING            = 0x03,
-    GMCS_MEDIA_STATE_RFU                = 0xff,
-}blc_mcs_mediaState_enum;
+typedef enum
+{
+    GMCS_MEDIA_STATE_INACTIVE = 0x00,
+    GMCS_MEDIA_STATE_PLAYING  = 0x01,
+    GMCS_MEDIA_STATE_PAUSED   = 0x02,
+    GMCS_MEDIA_STATE_SEEKING  = 0x03,
+    GMCS_MEDIA_STATE_RFU      = 0xff,
+} blc_mcs_mediaState_enum;
 
 //media control opcode
-typedef enum{
-    BLC_MCS_OPCODE_NONE                 = 0x00,
-    BLC_MCS_OPCODE_PLAY                 = 0x01,
-    BLC_MCS_OPCODE_PAUSE                = 0x02,
-    BLC_MCS_OPCODE_FAST_REWIND          = 0x03,
-    BLC_MCS_OPCODE_FAST_FORWARD         = 0x04,
-    BLC_MCS_OPCODE_STOP                 = 0x05,
-    BLC_MCS_OPCODE_MOVE_RELATIVE        = 0x10,
-    BLC_MCS_OPCODE_PREVIOUS_SEGMENT     = 0x20,
-    BLC_MCS_OPCODE_NEXT_SEGMENT         = 0x21,
-    BLC_MCS_OPCODE_FIRST_SEGMENT        = 0x22,
-    BLC_MCS_OPCODE_LAST_SEGMENT         = 0x23,
-    BLC_MCS_OPCODE_GOTO_SEGMENT         = 0x24,
-    BLC_MCS_OPCODE_PREVIOUS_TRACK       = 0x30,
-    BLC_MCS_OPCODE_NEXT_TRACK           = 0x31,
-    BLC_MCS_OPCODE_FIRST_TRACK          = 0x32,
-    BLC_MCS_OPCODE_LAST_TRACK           = 0x33,
-    BLC_MCS_OPCODE_GOTO_TRACK           = 0x34,
-    BLC_MCS_OPCODE_PREVIOUS_GROUP       = 0x40,
-    BLC_MCS_OPCODE_NEXT_GROUP           = 0x41,
-    BLC_MCS_OPCODE_FIRST_GROUP          = 0x42,
-    BLC_MCS_OPCODE_LAST_GROUP           = 0x43,
-    BLC_MCS_OPCODE_GOTO_GROUP           = 0x44,
+typedef enum
+{
+    BLC_MCS_OPCODE_NONE             = 0x00,
+    BLC_MCS_OPCODE_PLAY             = 0x01,
+    BLC_MCS_OPCODE_PAUSE            = 0x02,
+    BLC_MCS_OPCODE_FAST_REWIND      = 0x03,
+    BLC_MCS_OPCODE_FAST_FORWARD     = 0x04,
+    BLC_MCS_OPCODE_STOP             = 0x05,
+    BLC_MCS_OPCODE_MOVE_RELATIVE    = 0x10,
+    BLC_MCS_OPCODE_PREVIOUS_SEGMENT = 0x20,
+    BLC_MCS_OPCODE_NEXT_SEGMENT     = 0x21,
+    BLC_MCS_OPCODE_FIRST_SEGMENT    = 0x22,
+    BLC_MCS_OPCODE_LAST_SEGMENT     = 0x23,
+    BLC_MCS_OPCODE_GOTO_SEGMENT     = 0x24,
+    BLC_MCS_OPCODE_PREVIOUS_TRACK   = 0x30,
+    BLC_MCS_OPCODE_NEXT_TRACK       = 0x31,
+    BLC_MCS_OPCODE_FIRST_TRACK      = 0x32,
+    BLC_MCS_OPCODE_LAST_TRACK       = 0x33,
+    BLC_MCS_OPCODE_GOTO_TRACK       = 0x34,
+    BLC_MCS_OPCODE_PREVIOUS_GROUP   = 0x40,
+    BLC_MCS_OPCODE_NEXT_GROUP       = 0x41,
+    BLC_MCS_OPCODE_FIRST_GROUP      = 0x42,
+    BLC_MCS_OPCODE_LAST_GROUP       = 0x43,
+    BLC_MCS_OPCODE_GOTO_GROUP       = 0x44,
 } blc_mcs_mediaCtrlPointOpcode_enum;
 
 //media support control opcode
-typedef enum{
-    BLC_MCS_OPCODE_SUPPORT_PLAY                 = BIT(0),
-    BLC_MCS_OPCODE_SUPPORT_PAUSE                = BIT(1),
-    BLC_MCS_OPCODE_SUPPORT_FAST_REWIND          = BIT(2),
-    BLC_MCS_OPCODE_SUPPORT_FAST_FORWARD         = BIT(3),
-    BLC_MCS_OPCODE_SUPPORT_STOP                 = BIT(4),
-    BLC_MCS_OPCODE_SUPPORT_MOVE_RELATIVE        = BIT(5),
-    BLC_MCS_OPCODE_SUPPORT_PREVIOUS_SEGMENT     = BIT(6),
-    BLC_MCS_OPCODE_SUPPORT_NEXT_SEGMENT         = BIT(7),
-    BLC_MCS_OPCODE_SUPPORT_FIRST_SEGMENT        = BIT(8),
-    BLC_MCS_OPCODE_SUPPORT_LAST_SEGMENT         = BIT(9),
-    BLC_MCS_OPCODE_SUPPORT_GOTO_SEGMENT         = BIT(10),
-    BLC_MCS_OPCODE_SUPPORT_PREVIOUS_TRACK       = BIT(11),
-    BLC_MCS_OPCODE_SUPPORT_NEXT_TRACK           = BIT(12),
-    BLC_MCS_OPCODE_SUPPORT_FIRST_TRACK          = BIT(13),
-    BLC_MCS_OPCODE_SUPPORT_LAST_TRACK           = BIT(14),
-    BLC_MCS_OPCODE_SUPPORT_GOTO_TRACK           = BIT(15),
-    BLC_MCS_OPCODE_SUPPORT_PREVIOUS_GROUP       = BIT(16),
-    BLC_MCS_OPCODE_SUPPORT_NEXT_GROUP           = BIT(17),
-    BLC_MCS_OPCODE_SUPPORT_FIRST_GROUP          = BIT(18),
-    BLC_MCS_OPCODE_SUPPORT_LAST_GROUP           = BIT(19),
-    BLC_MCS_OPCODE_SUPPORT_GOTO_GROUP           = BIT(20),
-    BLC_MCS_OPCODE_SUPPORT_RFU                  = 0xFFFFFFFF,
+typedef enum
+{
+    BLC_MCS_OPCODE_SUPPORT_PLAY             = BIT(0),
+    BLC_MCS_OPCODE_SUPPORT_PAUSE            = BIT(1),
+    BLC_MCS_OPCODE_SUPPORT_FAST_REWIND      = BIT(2),
+    BLC_MCS_OPCODE_SUPPORT_FAST_FORWARD     = BIT(3),
+    BLC_MCS_OPCODE_SUPPORT_STOP             = BIT(4),
+    BLC_MCS_OPCODE_SUPPORT_MOVE_RELATIVE    = BIT(5),
+    BLC_MCS_OPCODE_SUPPORT_PREVIOUS_SEGMENT = BIT(6),
+    BLC_MCS_OPCODE_SUPPORT_NEXT_SEGMENT     = BIT(7),
+    BLC_MCS_OPCODE_SUPPORT_FIRST_SEGMENT    = BIT(8),
+    BLC_MCS_OPCODE_SUPPORT_LAST_SEGMENT     = BIT(9),
+    BLC_MCS_OPCODE_SUPPORT_GOTO_SEGMENT     = BIT(10),
+    BLC_MCS_OPCODE_SUPPORT_PREVIOUS_TRACK   = BIT(11),
+    BLC_MCS_OPCODE_SUPPORT_NEXT_TRACK       = BIT(12),
+    BLC_MCS_OPCODE_SUPPORT_FIRST_TRACK      = BIT(13),
+    BLC_MCS_OPCODE_SUPPORT_LAST_TRACK       = BIT(14),
+    BLC_MCS_OPCODE_SUPPORT_GOTO_TRACK       = BIT(15),
+    BLC_MCS_OPCODE_SUPPORT_PREVIOUS_GROUP   = BIT(16),
+    BLC_MCS_OPCODE_SUPPORT_NEXT_GROUP       = BIT(17),
+    BLC_MCS_OPCODE_SUPPORT_FIRST_GROUP      = BIT(18),
+    BLC_MCS_OPCODE_SUPPORT_LAST_GROUP       = BIT(19),
+    BLC_MCS_OPCODE_SUPPORT_GOTO_GROUP       = BIT(20),
+    BLC_MCS_OPCODE_SUPPORT_RFU              = 0xFFFFFFFF,
 } blc_mcs_mediaCtrlPointOpcodeSupport_enum;
 
 //media control result
-typedef enum{
+typedef enum
+{
     //Action requested by the opcode write was completed successfully.
-    BLC_MCS_MEDIA_CTRL_RESULT_SUCCESS   = 0x01,
+    BLC_MCS_MEDIA_CTRL_RESULT_SUCCESS = 0x01,
     //An invalid or unsupported opcode was used for the Media Control Point write.
     BLC_MCS_MEDIA_CTRL_RESULT_OP_NOT_SUPP,
     //The Media Player State characteristic value is Inactive when the opcode is
@@ -105,7 +109,8 @@ typedef enum{
 } blc_mcs_mediaCtrlPointResult_enum;
 
 //search control items
-typedef enum{
+typedef enum
+{
     BLC_MCS_SEARCH_TYPE_TRACK_NAME = 0x01,
     BLC_MCS_SEARCH_TYPE_ARTIST_NAME,
     BLC_MCS_SEARCH_TYPE_ALBUM_NAME,
@@ -118,14 +123,16 @@ typedef enum{
     BLC_MCS_SEARCH_TYPE_RFU,
 } blc_mcs_searchCtrlPointType_enum;
 
-typedef enum{
+typedef enum
+{
     //Search request was accepted; search has started.
     BLC_MCS_SEARCH_CTRL_RESULT_SUCCESS,
     //Search request was invalid; no search started.
     BLC_MCS_SEARCH_CTRL_RESULT_FAILURE,
 } blc_mcs_searchCtrlPointResult_enum;
 
-typedef enum{
+typedef enum
+{
     BLC_MCS_PLAYING_ORDER_SINGLE_ONCE = 0x01,
     BLC_MCS_PLAYING_ORDER_SINGLE_REPEAT,
     BLC_MCS_PLAYING_ORDER_IN_ORDER_ONCE,
@@ -137,55 +144,56 @@ typedef enum{
     BLC_MCS_PLAYING_ORDER_SHUFFLE_ONCE,
     BLC_MCS_PLAYING_ORDER_SHUFFLE_REPEAT,
     BLC_MCS_PLAYING_ORDER_RFU = 0XFF,
-}blc_mcs_playingOrder_enum;
+} blc_mcs_playingOrder_enum;
 
-typedef enum{
-    BLC_MCS_PLAYING_ORDER_SUPPORT_SINGLE_ONCE       = 0x0001,
-    BLC_MCS_PLAYING_ORDER_SUPPORT_SINGLE_REPEAT     = 0x0002,
-    BLC_MCS_PLAYING_ORDER_SUPPORT_IN_ORDER_ONCE     = 0x0004,
-    BLC_MCS_PLAYING_ORDER_SUPPORT_IN_ORDER_REPEAT   = 0x0008,
-    BLC_MCS_PLAYING_ORDER_SUPPORT_OLDEST_ONCE       = 0x0010,
-    BLC_MCS_PLAYING_ORDER_SUPPORT_OLDEST_REPEAT     = 0x0020,
-    BLC_MCS_PLAYING_ORDER_SUPPORT_NEWEST_ONCE       = 0x0040,
-    BLC_MCS_PLAYING_ORDER_SUPPORT_NEWEST_REPEAT     = 0x0080,
-    BLC_MCS_PLAYING_ORDER_SUPPORT_SHUFFLE_ONCE      = 0x0100,
-    BLC_MCS_PLAYING_ORDER_SUPPORT_SHUFFLE_REPEAT    = 0x0200,
-    BLC_MCS_PLAYING_ORDER_SUPPORT_RFU               = 0XFFFF,
-}blc_mcs_playingOrderSupported_enum;
+typedef enum
+{
+    BLC_MCS_PLAYING_ORDER_SUPPORT_SINGLE_ONCE     = 0x0001,
+    BLC_MCS_PLAYING_ORDER_SUPPORT_SINGLE_REPEAT   = 0x0002,
+    BLC_MCS_PLAYING_ORDER_SUPPORT_IN_ORDER_ONCE   = 0x0004,
+    BLC_MCS_PLAYING_ORDER_SUPPORT_IN_ORDER_REPEAT = 0x0008,
+    BLC_MCS_PLAYING_ORDER_SUPPORT_OLDEST_ONCE     = 0x0010,
+    BLC_MCS_PLAYING_ORDER_SUPPORT_OLDEST_REPEAT   = 0x0020,
+    BLC_MCS_PLAYING_ORDER_SUPPORT_NEWEST_ONCE     = 0x0040,
+    BLC_MCS_PLAYING_ORDER_SUPPORT_NEWEST_REPEAT   = 0x0080,
+    BLC_MCS_PLAYING_ORDER_SUPPORT_SHUFFLE_ONCE    = 0x0100,
+    BLC_MCS_PLAYING_ORDER_SUPPORT_SHUFFLE_REPEAT  = 0x0200,
+    BLC_MCS_PLAYING_ORDER_SUPPORT_RFU             = 0XFFFF,
+} blc_mcs_playingOrderSupported_enum;
 
 /******************************* (G)MCS Common End **********************************************************************/
-
-
 
 
 /******************************* (G)MCS Client Start **********************************************************************/
 
 //GMCS Client Event ID
-typedef enum{
+typedef enum
+{
     AUDIO_EVT_GMCSC_START = AUDIO_EVT_TYPE_GMCSC,
-    AUDIO_EVT_MCSC_MEDIA_PLAYER_NAME,              //refer to 'blc_mcsc_mediaPlayerNameEvt_t'
-    AUDIO_EVT_MCSC_MEDIA_TRACK_CHANGED,            //refer to 'blc_mcsc_mediaTrackChangedEvt_t'
-    AUDIO_EVT_MCSC_MEDIA_TRACK_TITLE,              //refer to 'blc_mcsc_mediaTrackTitleEvt_t'
-    AUDIO_EVT_MCSC_MEDIA_TRACK_DURATION,           //refer to 'blc_mcsc_mediaTrackDurationEvt_t'
-    AUDIO_EVT_MCSC_MEDIA_TRACK_POSITION,           //refer to 'blc_mcsc_mediaTrackPositionEvt_t'
-    AUDIO_EVT_MCSC_MEDIA_PLAYBACK_SPEED,           //refer to 'blc_mcsc_mediaPlaybackSpeedEvt_t'
-    AUDIO_EVT_MCSC_MEDIA_SEEKING_SPEED,            //refer to 'blc_mcsc_mediaSeekingSpeedEvt_t'
-    AUDIO_EVT_MCSC_MEDIA_CURRENT_TRACK_OBJECT_ID,  //refer to 'blc_mcsc_mediaCurrentTrackObjectIdEvt_t'
-    AUDIO_EVT_MCSC_MEDIA_NEXT_TRACK_OBJECT_ID,     //refer to 'blc_mcsc_mediaNextTrackObjectIdEvt_t'
-    AUDIO_EVT_MCSC_MEDIA_PARENT_GROUP_OBJECT_ID,   //refer to 'blc_mcsc_mediaParentGroupObjectIdEvt_t'
-    AUDIO_EVT_MCSC_MEDIA_CURRENT_GROUP_OBJECT_ID,  //refer to 'blc_mcsc_mediaCurrentGroupObjectIdEvt_t'
-    AUDIO_EVT_MCSC_MEDIA_PLAYING_ORDER,            //refer to 'blc_mcsc_mediaPlayingOrderEvt_t'
-    AUDIO_EVT_MCSC_MEDIA_STATE,                    //refer to 'blc_mcsc_mediaStateEvt_t'
-    AUDIO_EVT_MCSC_MEDIA_CTRL_RESULT,              //refer to 'blc_mcsc_mediaCtrlResultEvt_t'
-    AUDIO_EVT_MCSC_MEDIA_CTRL_OPCODE_SUPPORT,      //refer to 'blc_mcsc_mediaCtrlOpcodeSupportEvt_t'
-    AUDIO_EVT_MCSC_SEARCH_CTRL_RESULT,             //refer to 'blc_mcsc_searchCtrlResultEvt_t'
-    AUDIO_EVT_MCSC_SEARCH_RESULT_OBJECT_ID,        //refer to 'blc_mcsc_searchResultObjectIdEvt_t'
+    AUDIO_EVT_MCSC_MEDIA_PLAYER_NAME,             //refer to 'blc_mcsc_mediaPlayerNameEvt_t'
+    AUDIO_EVT_MCSC_MEDIA_TRACK_CHANGED,           //refer to 'blc_mcsc_mediaTrackChangedEvt_t'
+    AUDIO_EVT_MCSC_MEDIA_TRACK_TITLE,             //refer to 'blc_mcsc_mediaTrackTitleEvt_t'
+    AUDIO_EVT_MCSC_MEDIA_TRACK_DURATION,          //refer to 'blc_mcsc_mediaTrackDurationEvt_t'
+    AUDIO_EVT_MCSC_MEDIA_TRACK_POSITION,          //refer to 'blc_mcsc_mediaTrackPositionEvt_t'
+    AUDIO_EVT_MCSC_MEDIA_PLAYBACK_SPEED,          //refer to 'blc_mcsc_mediaPlaybackSpeedEvt_t'
+    AUDIO_EVT_MCSC_MEDIA_SEEKING_SPEED,           //refer to 'blc_mcsc_mediaSeekingSpeedEvt_t'
+    AUDIO_EVT_MCSC_MEDIA_CURRENT_TRACK_OBJECT_ID, //refer to 'blc_mcsc_mediaCurrentTrackObjectIdEvt_t'
+    AUDIO_EVT_MCSC_MEDIA_NEXT_TRACK_OBJECT_ID,    //refer to 'blc_mcsc_mediaNextTrackObjectIdEvt_t'
+    AUDIO_EVT_MCSC_MEDIA_PARENT_GROUP_OBJECT_ID,  //refer to 'blc_mcsc_mediaParentGroupObjectIdEvt_t'
+    AUDIO_EVT_MCSC_MEDIA_CURRENT_GROUP_OBJECT_ID, //refer to 'blc_mcsc_mediaCurrentGroupObjectIdEvt_t'
+    AUDIO_EVT_MCSC_MEDIA_PLAYING_ORDER,           //refer to 'blc_mcsc_mediaPlayingOrderEvt_t'
+    AUDIO_EVT_MCSC_MEDIA_STATE,                   //refer to 'blc_mcsc_mediaStateEvt_t'
+    AUDIO_EVT_MCSC_MEDIA_CTRL_RESULT,             //refer to 'blc_mcsc_mediaCtrlResultEvt_t'
+    AUDIO_EVT_MCSC_MEDIA_CTRL_OPCODE_SUPPORT,     //refer to 'blc_mcsc_mediaCtrlOpcodeSupportEvt_t'
+    AUDIO_EVT_MCSC_SEARCH_CTRL_RESULT,            //refer to 'blc_mcsc_searchCtrlResultEvt_t'
+    AUDIO_EVT_MCSC_SEARCH_RESULT_OBJECT_ID,       //refer to 'blc_mcsc_searchResultObjectIdEvt_t'
 } audio_gmcsc_evt_enum;
 
 /**
  *  @brief  Event Parameters for "AUDIO_EVT_MCSC_MEDIA_PLAYER_NAME"
  */
-typedef struct{
+typedef struct
+{
     u16 connHandle;
     u8  mediaNameLen;
     u8  mediaName[50];
@@ -194,14 +202,16 @@ typedef struct{
 /**
  *  @brief  Event Parameters for "AUDIO_EVT_MCSC_MEDIA_TRACK_CHANGED"
  */
-typedef struct{
+typedef struct
+{
     u16 connHandle;
 } blc_mcsc_mediaTrackChangedEvt_t;
 
 /**
  *  @brief  Event Parameters for "AUDIO_EVT_MCSC_MEDIA_TRACK_TITLE"
  */
-typedef struct{
+typedef struct
+{
     u16 connHandle;
     u8  trackTitleLen;
     u8  trackTitle[50];
@@ -210,7 +220,8 @@ typedef struct{
 /**
  *  @brief  Event Parameters for "AUDIO_EVT_MCSC_MEDIA_TRACK_DURATION"
  */
-typedef struct{
+typedef struct
+{
     u16 connHandle;
     s32 trackDuration;
 } blc_mcsc_mediaTrackDurationEvt_t;
@@ -218,7 +229,8 @@ typedef struct{
 /**
  *  @brief  Event Parameters for "AUDIO_EVT_MCSC_MEDIA_TRACK_POSITION"
  */
-typedef struct{
+typedef struct
+{
     u16 connHandle;
     s32 trackPosition;
 } blc_mcsc_mediaTrackPositionEvt_t;
@@ -226,7 +238,8 @@ typedef struct{
 /**
  *  @brief  Event Parameters for "AUDIO_EVT_MCSC_MEDIA_PLAYBACK_SPEED"
  */
-typedef struct{
+typedef struct
+{
     u16 connHandle;
     s8  playbackSpeed;
 } blc_mcsc_mediaPlaybackSpeedEvt_t;
@@ -234,7 +247,8 @@ typedef struct{
 /**
  *  @brief  Event Parameters for "AUDIO_EVT_MCSC_MEDIA_SEEKING_SPEED"
  */
-typedef struct{
+typedef struct
+{
     u16 connHandle;
     s8  seekingSpeed;
 } blc_mcsc_mediaSeekingSpeedEvt_t;
@@ -244,54 +258,59 @@ typedef struct{
  *                              "AUDIO_EVT_MCSC_MEDIA_PARENT_GROUP_OBJECT_ID", "AUDIO_EVT_MCSC_MEDIA_CURRENT_GROUP_OBJECT_ID",
  *                              "AUDIO_EVT_MCSC_SEARCH_RESULT_OBJECT_ID"
  */
-typedef struct{
-    u16 connHandle;
-    blc_object_id_t  object;
-} blc_mcsc_mediaCurrentTrackObjectIdEvt_t, blc_mcsc_mediaNextTrackObjectIdEvt_t,\
-  blc_mcsc_mediaParentGroupObjectIdEvt_t, blc_mcsc_mediaCurrentGroupObjectIdEvt_t,\
-  blc_mcsc_searchResultObjectIdEvt_t;
+typedef struct
+{
+    u16             connHandle;
+    blc_object_id_t object;
+} blc_mcsc_mediaCurrentTrackObjectIdEvt_t, blc_mcsc_mediaNextTrackObjectIdEvt_t,
+    blc_mcsc_mediaParentGroupObjectIdEvt_t, blc_mcsc_mediaCurrentGroupObjectIdEvt_t,
+    blc_mcsc_searchResultObjectIdEvt_t;
 
 /**
  *  @brief  Event Parameters for "AUDIO_EVT_MCSC_MEDIA_PLAYING_ORDER"
  */
-typedef struct{
+typedef struct
+{
     u16 connHandle;
-    int order;  //blc_mcs_playingOrder_enum
-}blc_mcsc_mediaPlayingOrderEvt_t;
+    int order; //blc_mcs_playingOrder_enum
+} blc_mcsc_mediaPlayingOrderEvt_t;
 
 /**
  *  @brief  Event Parameters for "AUDIO_EVT_MCSC_MEDIA_STATE"
  */
-typedef struct{
+typedef struct
+{
     u16 connHandle;
-    int state;  //blc_mcs_mediaState_enum
-}blc_mcsc_mediaStateEvt_t;
+    int state; //blc_mcs_mediaState_enum
+} blc_mcsc_mediaStateEvt_t;
 
 /**
  *  @brief  Event Parameters for "AUDIO_EVT_MCSC_MEDIA_CTRL_RESULT"
  */
-typedef struct{
+typedef struct
+{
     u16 connHandle;
-    int op; //blc_mcs_mediaCtrlPointOpcode_enum
+    int op;     //blc_mcs_mediaCtrlPointOpcode_enum
     int result; //blc_mcs_mediaCtrlPointResult_enum
 } blc_mcsc_mediaCtrlResultEvt_t;
 
 /**
  *  @brief  Event Parameters for "AUDIO_EVT_MCSC_MEDIA_CTRL_OPCODE_SUPPORT"
  */
-typedef struct{
+typedef struct
+{
     u16 connHandle;
     u32 supportOpcode; //search for 'blc_mcs_mediaCtrlPointOpcodeSupport_enum'
-}blc_mcsc_mediaCtrlOpcodeSupportEvt_t;
+} blc_mcsc_mediaCtrlOpcodeSupportEvt_t;
 
 /**
  *  @brief  Event Parameters for "AUDIO_EVT_MCSC_SEARCH_CTRL_RESULT"
  */
-typedef struct{
+typedef struct
+{
     u16 connHandle;
     int result; //blc_mcs_searchCtrlPointResult_enum
 } blc_mcsc_searchCtrlResultEvt_t;
-
 
 /**
  * @brief       This function serves to register media control Client include MCS, GMCS and OTS.
@@ -323,25 +342,25 @@ int blc_gmcsc_readSearchResObjectId(u16 connHandle, prf_read_cb_t readCb);
 int blc_gmcsc_readContentCtrlID(u16 connHandle, prf_read_cb_t readCb);
 
 //GMCS Client Get Characteristic Value Operation API
-int blc_gmcsc_getMediaPlayerName(u16 connHandle, u8* mediaPlayerName, u16* len);
-int blc_gmcsc_getMediaPlayerIconObjectID(u16 connHandle, blc_object_id_t* id);
-int blc_gmcsc_getMediaPlayerIconURL(u16 connHandle, u8* url, u16* len);
-int blc_gmcsc_getTrackTitle(u16 connHandle, u8* title, u16* len);
-int blc_gmcsc_getTrackDuration(u16 connHandle, u32* duration);
-int blc_gmcsc_getTrackPosition(u16 connHandle, u32* position);
-int blc_gmcsc_getPlaybackSpeed(u16 connHandle, s8* playbackSpeed);
-int blc_gmcsc_getSeekingSpeed(u16 connHandle, s8* seekingSpeed);
-int blc_gmcsc_getCurrentTrackSegmentsObjectID(u16 connHandle, blc_object_id_t* id);
-int blc_gmcsc_getCurrentTrackObjectID(u16 connHandle, blc_object_id_t* id);
-int blc_gmcsc_getNextTrackObjectID(u16 connHandle, blc_object_id_t* id);
-int blc_gmcsc_getParentGroupObjectID(u16 connHandle, blc_object_id_t* id);
-int blc_gmcsc_getCurrentGroupObjectID(u16 connHandle, blc_object_id_t* id);
-int blc_gmcsc_getPlayingOrder(u16 connHandle, u8* playingOrder);
-int blc_gmcsc_getPlayingOrdersSupp(u16 connHandle, u16* playingOrderSupp);
-int blc_gmcsc_getMediaState(u16 connHandle, blc_mcs_mediaState_enum* mediaState);
-int blc_gmcsc_getMediaCtrlPointOpSupp(u16 connHandle, u32* mediaCtrlPointOpSupp);
-int blc_gmcsc_getSearchResObjectId(u16 connHandle, blc_object_id_t* id);
-int blc_gmcsc_getContentCtrlID(u16 connHandle, u8* ccid);
+int blc_gmcsc_getMediaPlayerName(u16 connHandle, u8 *mediaPlayerName, u16 *len);
+int blc_gmcsc_getMediaPlayerIconObjectID(u16 connHandle, blc_object_id_t *id);
+int blc_gmcsc_getMediaPlayerIconURL(u16 connHandle, u8 *url, u16 *len);
+int blc_gmcsc_getTrackTitle(u16 connHandle, u8 *title, u16 *len);
+int blc_gmcsc_getTrackDuration(u16 connHandle, u32 *duration);
+int blc_gmcsc_getTrackPosition(u16 connHandle, u32 *position);
+int blc_gmcsc_getPlaybackSpeed(u16 connHandle, s8 *playbackSpeed);
+int blc_gmcsc_getSeekingSpeed(u16 connHandle, s8 *seekingSpeed);
+int blc_gmcsc_getCurrentTrackSegmentsObjectID(u16 connHandle, blc_object_id_t *id);
+int blc_gmcsc_getCurrentTrackObjectID(u16 connHandle, blc_object_id_t *id);
+int blc_gmcsc_getNextTrackObjectID(u16 connHandle, blc_object_id_t *id);
+int blc_gmcsc_getParentGroupObjectID(u16 connHandle, blc_object_id_t *id);
+int blc_gmcsc_getCurrentGroupObjectID(u16 connHandle, blc_object_id_t *id);
+int blc_gmcsc_getPlayingOrder(u16 connHandle, u8 *playingOrder);
+int blc_gmcsc_getPlayingOrdersSupp(u16 connHandle, u16 *playingOrderSupp);
+int blc_gmcsc_getMediaState(u16 connHandle, blc_mcs_mediaState_enum *mediaState);
+int blc_gmcsc_getMediaCtrlPointOpSupp(u16 connHandle, u32 *mediaCtrlPointOpSupp);
+int blc_gmcsc_getSearchResObjectId(u16 connHandle, blc_object_id_t *id);
+int blc_gmcsc_getContentCtrlID(u16 connHandle, u8 *ccid);
 
 //GMCS Client Write Characteristic Value Operation API
 int blc_gmcsc_writeTrackPosition(u16 connHandle, u32 trackPosition, prf_write_cb_t writeCb);
@@ -358,11 +377,11 @@ int blc_gmcsc_writePlayingOrderObjectID(u16 connHandle, blc_object_id_t id, prf_
 int blc_gmcsc_writePlayingOrderObjectIDWithoutRsp(u16 connHandle, blc_object_id_t id);
 int blc_gmcsc_writeMediaCtrlPoint(u16 connHandle, blc_mcs_mediaCtrlPointOpcode_enum opcode, u8 *param, u16 paramLen, prf_write_cb_t writeCb);
 int blc_gmcsc_writeMediaCtrlPointWithoutRsp(u16 connHandle, blc_mcs_mediaCtrlPointOpcode_enum opcode, u8 *param, u16 paramLen);
-int blc_gmcsc_writeSearchCtrlPoint(u16 connHandle, blc_mcs_searchCtrlPointType_enum opcode, u8* param, u16 len, prf_write_cb_t writeCb);
-int blc_gmcsc_writeSearchCtrlPointWithoutRsp(u16 connHandle, blc_mcs_searchCtrlPointType_enum opcode, u8* param, u16 len);
+int blc_gmcsc_writeSearchCtrlPoint(u16 connHandle, blc_mcs_searchCtrlPointType_enum opcode, u8 *param, u16 len, prf_write_cb_t writeCb);
+int blc_gmcsc_writeSearchCtrlPointWithoutRsp(u16 connHandle, blc_mcs_searchCtrlPointType_enum opcode, u8 *param, u16 len);
 
 //GMCS client Media Control Point API
-int blc_gmcsc_writeMediaControl(u16 connHandle, blc_mcs_mediaCtrlPointOpcode_enum opcode, u8* param, u16 paramLen);
+int blc_gmcsc_writeMediaControl(u16 connHandle, blc_mcs_mediaCtrlPointOpcode_enum opcode, u8 *param, u16 paramLen);
 
 /**
  * @brief       This function use send play command to start playing the current track.
@@ -514,20 +533,18 @@ int blc_gmcsc_writeGotoGroup(u16 connHandle, int n);
 
 
 //GMCS client Search Control Point API
-int blc_gmcsc_writeSearchControl(u16 connHandle, blc_mcs_searchCtrlPointType_enum opcode, char* param);
-int blc_gmcsc_writeSearchCtrlTrackName(u16 connHandle, char* trackName);
-int blc_gmcsc_writeSearchCtrlArtistName(u16 connHandle, char* artistName);
-int blc_gmcsc_writeSearchCtrlAlbumName(u16 connHandle, char* albumName);
-int blc_gmcsc_writeSearchCtrlGroupName(u16 connHandle, char* groupName);
-int blc_gmcsc_writeSearchCtrlEarliestYear(u16 connHandle, char* earliestYear);
-int blc_gmcsc_writeSearchCtrlLatestYear(u16 connHandle, char* latestYear);
-int blc_gmcsc_writeSearchCtrlGenre(u16 connHandle, char* genre);
+int blc_gmcsc_writeSearchControl(u16 connHandle, blc_mcs_searchCtrlPointType_enum opcode, char *param);
+int blc_gmcsc_writeSearchCtrlTrackName(u16 connHandle, char *trackName);
+int blc_gmcsc_writeSearchCtrlArtistName(u16 connHandle, char *artistName);
+int blc_gmcsc_writeSearchCtrlAlbumName(u16 connHandle, char *albumName);
+int blc_gmcsc_writeSearchCtrlGroupName(u16 connHandle, char *groupName);
+int blc_gmcsc_writeSearchCtrlEarliestYear(u16 connHandle, char *earliestYear);
+int blc_gmcsc_writeSearchCtrlLatestYear(u16 connHandle, char *latestYear);
+int blc_gmcsc_writeSearchCtrlGenre(u16 connHandle, char *genre);
 int blc_gmcsc_writeSearchCtrlOnlyTracks(u16 connHandle);
 int blc_gmcsc_writeSearchCtrlOnlyGroups(u16 connHandle);
 
 /******************************* (G)MCS Client End **********************************************************************/
-
-
 
 
 /******************************* (G)MCS Server Start **********************************************************************/
@@ -535,14 +552,16 @@ int blc_gmcsc_writeSearchCtrlOnlyGroups(u16 connHandle);
 // Default MCS server par
 extern const blc_mcps_regParam_t defaultMcpsParam;
 
-typedef struct {
+typedef struct
+{
     u8 type;
     u8 paramLength;
     u8 param[];
 } blc_mcs_search_control_item_t;
 
 //GMCS Server Event ID
-typedef enum{
+typedef enum
+{
     AUDIO_EVT_GMCSS_START = AUDIO_EVT_TYPE_GMCSS,
     AUDIO_EVT_GMCSS_TRACK_POSITION,
     AUDIO_EVT_GMCSS_PLAYBACK_SPEED,
@@ -554,59 +573,70 @@ typedef enum{
     AUDIO_EVT_GMCSS_MEDIA_CONTROL_POINT,
 } audio_gmcss_evt_enum;
 
-typedef struct { //Event ID: AUDIO_EVT_GMCSS_TRACK_POSITION
+typedef struct
+{ //Event ID: AUDIO_EVT_GMCSS_TRACK_POSITION
     s32 position;
 } blc_mcss_mediaTrackPositionEvt_t;
 
-typedef struct { //Event ID: AUDIO_EVT_GMCSS_PLAYING_ORDER
-    int order;  //blc_mcs_playingOrder_enum
+typedef struct
+{              //Event ID: AUDIO_EVT_GMCSS_PLAYING_ORDER
+    int order; //blc_mcs_playingOrder_enum
 } blc_mcss_mediaPlayingOrderEvt_t;
 
-typedef struct { //Event ID: AUDIO_EVT_GMCSS_PLAYBACK_SPEED
+typedef struct
+{ //Event ID: AUDIO_EVT_GMCSS_PLAYBACK_SPEED
     s8 speed;
 } blc_mcss_mediaPlaybackSpeedEvt_t;
 
-typedef struct { //Event ID: AUDIO_EVT_GMCSS_MEDIA_CONTROL_POINT
-    u8 opcode;  //blc_mcs_mediaCtrlPointOpcode_enum
+typedef struct
+{              //Event ID: AUDIO_EVT_GMCSS_MEDIA_CONTROL_POINT
+    u8 opcode; //blc_mcs_mediaCtrlPointOpcode_enum
 } blc_mcss_mediaControlPointEvt_t;
 
-typedef struct {
-    u8 opcode;  //blc_mcs_mediaCtrlPointOpcode_enum
+typedef struct
+{
+    u8  opcode; //blc_mcs_mediaCtrlPointOpcode_enum
     s32 offset;
 } blc_mcss_mediaControlPointMoveRelativeEvt_t;
 
-typedef struct {
-    u8 opcode;  //blc_mcs_mediaCtrlPointOpcode_enum
+typedef struct
+{
+    u8  opcode; //blc_mcs_mediaCtrlPointOpcode_enum
     s32 n;
 } blc_mcss_mediaControlPointGotoSegmentEvt_t;
 
-typedef struct {
-    u8 opcode;  //blc_mcs_mediaCtrlPointOpcode_enum
+typedef struct
+{
+    u8  opcode; //blc_mcs_mediaCtrlPointOpcode_enum
     s32 n;
 } blc_mcss_mediaControlPointGotoTrackEvt_t;
 
-typedef struct {
-    u8 opcode;  //blc_mcs_mediaCtrlPointOpcode_enum
+typedef struct
+{
+    u8  opcode; //blc_mcs_mediaCtrlPointOpcode_enum
     s32 n;
 } blc_mcss_mediaControlPointGotoGroupEvt_t;
 
-typedef struct { //Event ID: AUDIO_EVT_GMCSS_CURRENT_TRACK_OBJECT_ID
+typedef struct
+{ //Event ID: AUDIO_EVT_GMCSS_CURRENT_TRACK_OBJECT_ID
     blc_object_id_t id;
 } blc_mcss_currentTrackObjectIdEvt_t;
 
-typedef struct { //Event ID: AUDIO_EVT_GMCSS_NEXT_TRACK_OBJECT_ID
+typedef struct
+{ //Event ID: AUDIO_EVT_GMCSS_NEXT_TRACK_OBJECT_ID
     blc_object_id_t id;
 } blc_mcss_nextTrackObjectIdEvt_t;
 
-typedef struct { //Event ID: AUDIO_EVT_GMCSS_CURRENT_GROUP_OBJECT_ID
+typedef struct
+{ //Event ID: AUDIO_EVT_GMCSS_CURRENT_GROUP_OBJECT_ID
     blc_object_id_t id;
 } blc_mcss_currentGroupObjectIdEvt_t;
 
-typedef struct { //Event ID: AUDIO_EVT_GMCSS_SEARCH_CONTROL_POINT
-    u8 numItems;
+typedef struct
+{ //Event ID: AUDIO_EVT_GMCSS_SEARCH_CONTROL_POINT
+    u8                            numItems;
     blc_mcs_search_control_item_t items[];
 } blc_mcss_currentSearchControlPointEvt_t;
-
 
 /**
  * @brief       This function serves to register media control Server include MCS, GMCS and OTS.
@@ -617,11 +647,11 @@ void blc_audio_registerMediaControlServer(const blc_mcps_regParam_t *param);
 
 
 //GMCS Server Update Characteristic Value Operation API
-int blc_gmcss_updateMediaPlayerName(u16 connHandle, u8* mediaPlayerName, u16 len);
+int blc_gmcss_updateMediaPlayerName(u16 connHandle, u8 *mediaPlayerName, u16 len);
 int blc_gmcss_updateMediaPlayerIconObjectId(u16 connHandle, const blc_object_id_t *id);
 int blc_gmcss_updateMediaPlayerIconURL(u16 connHandle, u8 *iconUrl, u8 iconUrlLen);
 int blc_gmcss_updateTrackChanged(u16 connHandle);
-int blc_gmcss_updateTrackTitle(u16 connHandle, u8* title, u16 len);
+int blc_gmcss_updateTrackTitle(u16 connHandle, u8 *title, u16 len);
 int blc_gmcss_updateTrackDuration(u16 connHandle, s32 duration);
 int blc_gmcss_updateTrackPosition(u16 connHandle, s32 position);
 int blc_gmcss_updatePlaybackSpeed(u16 connHandle, s8 playbackSpeed);

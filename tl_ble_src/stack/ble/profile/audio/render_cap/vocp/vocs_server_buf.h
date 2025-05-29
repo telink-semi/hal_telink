@@ -23,22 +23,23 @@
  *******************************************************************************************************/
 #pragma once
 
-typedef struct{
+typedef struct
+{
     /* Characteristic value handle */
     u16 volumeOffsetStateHdl;
     u16 audioLocationHdl;
     u16 volumeOffsetCtrlPoint;
     u16 audioOutDescHdl;
 
-}blc_vocs_server_t;
+} blc_vocs_server_t;
 
-
-typedef struct{
+typedef struct
+{
     /* Volume Offset State */
-    s16 volumeOffset;   //-255 to 255 MIN_VOLUME_OFFSET
+    s16 volumeOffset; //-255 to 255 MIN_VOLUME_OFFSET
 
     /* Audio Location */
-    u32 location;   //BLC_AUDIO_CHANNEL_ALLOCATION_RFU
+    u32 location; //BLC_AUDIO_CHANNEL_ALLOCATION_RFU
 
     /* Audio Output Description */
     char *desc;

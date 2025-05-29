@@ -27,9 +27,8 @@
 #if (INTER_TEST_MODE == TEST_LE_AUDIO_SWTICH_SERVER)
 
 
-
-
-typedef enum {
+typedef enum
+{
     KEY_MODE_NULL = 0,
     KEY_MODE_TEST1,
     KEY_MODE_TEST2,

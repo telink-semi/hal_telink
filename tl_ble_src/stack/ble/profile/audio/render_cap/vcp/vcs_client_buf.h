@@ -24,37 +24,40 @@
 #pragma once
 
 /* Volume Flags characteristic value fields */
-typedef enum  {
-    VOL_FLAG_RESET_VOL_SETTING = 0,
+typedef enum
+{
+    VOL_FLAG_RESET_VOL_SETTING    = 0,
     VOL_FLAG_USER_SET_VOL_SETTING = BIT(0),
 } blt_vcs_vol_flag_enum;
 
-typedef enum  {
+typedef enum
+{
     VCS_READ_VOL_STATE,
     VCS_READ_VOL_FLAG,
     VCS_READ_MAX,
 } blt_vcs_read_enum;
 
 /* Volume Control Point */
-typedef struct  {
+typedef struct
+{
     u8 opcode;
     u8 changeCnt;
 } blt_vcs_vol_cp_t;
 
-typedef struct  {
+typedef struct
+{
     blt_vcs_vol_cp_t cp;
-    u8 volSetting;
+    u8               volSetting;
 } blt_vcs_vol_cp_vol_t;
 
-
-typedef struct {
-
+typedef struct
+{
     gattc_sub_ccc_msg_t ntfInput;
 
     /* Characteristic value handle */
-    u16 volStateHdl;    /* Volume State */
-    u16 volCtrlPntHdl;  /* Volume Control Point */
-    u16 volFlagHdl;     /* Volume Flags */
+    u16 volStateHdl;   /* Volume State */
+    u16 volCtrlPntHdl; /* Volume Control Point */
+    u16 volFlagHdl;    /* Volume Flags */
     u16 reserved;
 
     /* Characteristic value */
@@ -63,8 +66,8 @@ typedef struct {
 
 } blc_vcs_client_t;
 
-typedef struct {
-
+typedef struct
+{
     blc_vcs_client_t vcsClient;
 
     /* AICS instances number */
@@ -80,11 +83,12 @@ typedef struct {
     blc_vocs_client_t *pVocsClient[STACK_AUDIO_VCS_CLIENT_INCLUDE_VOCS_INSTANCE_NUM];
 } blc_vcp_client_t;
 
-typedef struct {
-    blc_prf_proc_t process;
+typedef struct
+{
+    blc_prf_proc_t    process;
     blc_vcp_client_t *pVcpCtrl[STACK_PRF_ACL_CENTRAL_MAX_NUM];
 } blc_vcp_client_ctrl_t;
 
-typedef struct{
-
+typedef struct
+{
 } blc_vcsc_regParam_t;

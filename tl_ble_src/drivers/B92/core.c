@@ -22,6 +22,7 @@
  *
  *******************************************************************************************************/
 #include "core.h"
+
 /**********************************************************************************************************************
  *                                         global function implementation                                             *
  *********************************************************************************************************************/
@@ -33,10 +34,9 @@
 _attribute_ram_code_sec_optimize_o2_noinline_ void core_cclk_delay_tick(unsigned long long core_cclk_tick)
 {
     unsigned long long start = rdmcycle();
-    while (rdmcycle() - start < core_cclk_tick) {}
+    while (rdmcycle() - start < core_cclk_tick) {
+    }
 }
-
-
 
 /**
  * @brief       provides a unified timeout interface(for internal calls only).
@@ -93,17 +93,17 @@ _attribute_ram_code_sec_optimize_o2_noinline_ void core_cclk_delay_tick(unsigned
  *                   only define the enumeration xxx_api_error_timeout_code_e, no need to define the global variable
  *                   g_xxx_error_timeout_code, and the interface xxx_get_error_timeout_code(refer to aes);
  */
-_attribute_ram_code_sec_optimize_o2_noinline_  unsigned int wait_condition_fails_or_timeout(condition_fp condition,unsigned int timeout_us,timeout_handler_fp func,unsigned int err_code)
+_attribute_ram_code_sec_optimize_o2_noinline_ unsigned int wait_condition_fails_or_timeout(condition_fp condition, unsigned int timeout_us, timeout_handler_fp func, unsigned int err_code)
 {
-     unsigned long long start = rdmcycle();
-//Refer to the i2c_master_write/i2c_master_read judgment logic when the peripheral sends or receives data and the judgment condition needs to be compared with fifo cnt.
-     while(condition()){
-        if(core_cclk_time_exceed(start,timeout_us)){
+    unsigned long long start = rdmcycle();
+    //Refer to the i2c_master_write/i2c_master_read judgment logic when the peripheral sends or receives data and the judgment condition needs to be compared with fifo cnt.
+    while (condition()) {
+        if (core_cclk_time_exceed(start, timeout_us)) {
             func(err_code);
-            return  1;
+            return 1;
         }
-     }
-     return  0;
+    }
+    return 0;
 }
 
 /**
@@ -162,13 +162,14 @@ _attribute_ram_code_sec_optimize_o2_noinline_  unsigned int wait_condition_fails
  *                   only define the enumeration xxx_api_error_timeout_code_e, no need to define the global variable
  *                   g_xxx_error_timeout_code, and the interface xxx_get_error_timeout_code(refer to aes);
  */
-_attribute_ram_code_sec_optimize_o2_noinline_ unsigned int wait_condition_fails_or_timeout_with_param(condition_fp_with_param condition,unsigned int cdt_param,unsigned int timeout_us,timeout_handler_fp func,unsigned int  err_code){
-         unsigned long long start = rdmcycle();
-         while(condition(cdt_param)){
-            if(core_cclk_time_exceed(start,timeout_us)){
-                func(err_code);
-                return  1;
-            }
-         }
-         return  0;
+_attribute_ram_code_sec_optimize_o2_noinline_ unsigned int wait_condition_fails_or_timeout_with_param(condition_fp_with_param condition, unsigned int cdt_param, unsigned int timeout_us, timeout_handler_fp func, unsigned int err_code)
+{
+    unsigned long long start = rdmcycle();
+    while (condition(cdt_param)) {
+        if (core_cclk_time_exceed(start, timeout_us)) {
+            func(err_code);
+            return 1;
+        }
+    }
+    return 0;
 }

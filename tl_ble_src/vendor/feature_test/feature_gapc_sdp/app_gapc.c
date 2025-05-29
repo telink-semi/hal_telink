@@ -28,12 +28,13 @@
 
 #if (FEATURE_TEST_MODE == TEST_GAPC_SDP)
 
-typedef struct{
+typedef struct
+{
     u16 deviceNameLen;
-    u8 deviceName[30];
-    u8 batteryLevel;
+    u8  deviceName[30];
+    u8  batteryLevel;
     u16 appearance;
-    u8 ceneralAddress;
+    u8  ceneralAddress;
 } app_gap_info_t;
 
 static app_gap_info_t app_gap_info;
@@ -66,11 +67,10 @@ static void app_gap_displayGapInfo(void)
 
 static void app_gap_discGapServiceCb(u16 connHandle, u8 count, u16 startHandle, u16 endHandle)
 {
-    if(count == 0)
-    {
+    if (count == 0) {
         app_gap_displayGapInfo();
         app_gap_initGapReconn(connHandle);
-        return ;
+        return;
     }
     BLT_APP_LOG("GAP found service info");
 
@@ -84,10 +84,10 @@ static void app_gap_foundDeviceNameCharCb(u16 connHandle, u8 serviceCount, u8 pr
     BLT_APP_LOG("   -service num:0x%x properties:0x%x handle:0x%x", serviceCount, properties, valueHandle);
 }
 
-static void app_gap_deviceNameStartReadCb(u16 connHandle, u16 attrHandle, u8** read, u16** readLen, u16* readMaxSize, gapc_read_func_t *rdCbFunc)
+static void app_gap_deviceNameStartReadCb(u16 connHandle, u16 attrHandle, u8 **read, u16 **readLen, u16 *readMaxSize, gapc_read_func_t *rdCbFunc)
 {
-    *read = app_gap_info.deviceName;
-    *readLen = &app_gap_info.deviceNameLen;
+    *read        = app_gap_info.deviceName;
+    *readLen     = &app_gap_info.deviceNameLen;
     *readMaxSize = sizeof(app_gap_info.deviceName);
 }
 
@@ -97,25 +97,24 @@ static void app_gap_foundBatteryLevelCharCb(u16 connHandle, u8 serviceCount, u8 
     BLT_APP_LOG("   -service num:0x%x properties:0x%x handle:0x%x", serviceCount, properties, valueHandle);
 }
 
-static void app_gap_foundBatteryLevelDescCb(u16 connHandle, uuid_t* uuid, u16 attrHandle)
+static void app_gap_foundBatteryLevelDescCb(u16 connHandle, uuid_t *uuid, u16 attrHandle)
 {
     BLT_APP_STR_LOG("[APP}Battery level desc value is", uuid->uuidVal.u, uuid->uuidLen);
     BLT_APP_LOG("   -handle:0x%x", attrHandle);
 }
 
-static void app_gap_batteryLevelStartReadCb(u16 connHandle, u16 attrHandle, u8** read, u16** readLen, u16* readMaxSize, gapc_read_func_t *rdCbFunc)
+static void app_gap_batteryLevelStartReadCb(u16 connHandle, u16 attrHandle, u8 **read, u16 **readLen, u16 *readMaxSize, gapc_read_func_t *rdCbFunc)
 {
-    *read = &app_gap_info.batteryLevel;
-    *readLen = NULL;
+    *read        = &app_gap_info.batteryLevel;
+    *readLen     = NULL;
     *readMaxSize = sizeof(app_gap_info.batteryLevel);
 }
 
-static void app_gap_foundUnknownCharCb(u16 connHandle, uuid_t* uuid, u8 properties, u16 valueHandle)
+static void app_gap_foundUnknownCharCb(u16 connHandle, uuid_t *uuid, u8 properties, u16 valueHandle)
 {
     BLT_APP_STR_LOG("[APP]GAP found unknown characteristic uuid", uuid->uuidVal.u, uuid->uuidLen);
     BLT_APP_LOG("   -properties:0x%x handle:0x%x", properties, valueHandle);
 }
-
 
 static const blc_gapc_discService_t disGapService = {
     .uuid = UUID16_INIT(SERVICE_UUID_GENERIC_ACCESS),
@@ -124,104 +123,102 @@ static const blc_gapc_discService_t disGapService = {
 
 static const blc_gapc_discChar_t disGapChar[] = {
     {
-        .readValue = true,
-        .uuid = UUID16_INIT(CHARACTERISTIC_UUID_DEVICE_NAME),
-        .cfun = app_gap_foundDeviceNameCharCb,
-        .rfun = app_gap_deviceNameStartReadCb,
-    },
+     .readValue = true,
+     .uuid      = UUID16_INIT(CHARACTERISTIC_UUID_DEVICE_NAME),
+     .cfun      = app_gap_foundDeviceNameCharCb,
+     .rfun      = app_gap_deviceNameStartReadCb,
+     },
     {
-        .subscribeNtf = true,
-        .readValue = true,
-        .uuid = UUID16_INIT(CHARACTERISTIC_UUID_BATTERY_LEVEL),
-        .cfun = app_gap_foundBatteryLevelCharCb,
-        .dfun = app_gap_foundBatteryLevelDescCb,
-        .rfun = app_gap_batteryLevelStartReadCb,
-    },
+     .subscribeNtf = true,
+     .readValue    = true,
+     .uuid         = UUID16_INIT(CHARACTERISTIC_UUID_BATTERY_LEVEL),
+     .cfun         = app_gap_foundBatteryLevelCharCb,
+     .dfun         = app_gap_foundBatteryLevelDescCb,
+     .rfun         = app_gap_batteryLevelStartReadCb,
+     },
 };
 
 static const blc_gapc_discList_t discGap = {
     .maxServiceCount = 1,
-    .service = &disGapService,
-    .includeTable = {
-        .size = 0,
-    },
+    .service         = &disGapService,
+    .includeTable    = {
+                        .size = 0,
+                        },
     .characteristicTable = {
-        .size = ARRAY_SIZE(disGapChar),
-        .characteristic = disGapChar,
-        .ufun = app_gap_foundUnknownCharCb,
-    },
+                        .size           = ARRAY_SIZE(disGapChar),
+                        .characteristic = disGapChar,
+                        .ufun           = app_gap_foundUnknownCharCb,
+                        },
 };
 /**********************GAP Service SDP discovery end***************/
 
 /**********************GAP Service reconnect start***************/
 static const blc_gapc_reconnList_t reconnGap;
 
-
 static void app_gap_initGapReconn(u16 connHandle)
 {
     blc_gapc_registerReconnectService(connHandle, &reconnGap);
 }
 
-
-static int app_gap_deviceNameGetCharInfoCb(u16 connHandle, blc_gapc_charInfo_t* charInfo)
+static int app_gap_deviceNameGetCharInfoCb(u16 connHandle, blc_gapc_charInfo_t *charInfo)
 {
-    charInfo->properties = CHAR_PROP_READ;
+    charInfo->properties  = CHAR_PROP_READ;
     charInfo->valueHandle = 0x03;
     return 1;
 }
 
-static int app_gap_batteryLevelGetCharInfoCb(u16 connHandle, blc_gapc_charInfo_t* charInfo)
+static int app_gap_batteryLevelGetCharInfoCb(u16 connHandle, blc_gapc_charInfo_t *charInfo)
 {
-    charInfo->properties = CHAR_PROP_READ;
+    charInfo->properties  = CHAR_PROP_READ;
     charInfo->valueHandle = 11;
     return 1;
 }
 
 bool app_gap_GapReconn(u16 connHandle, int count)
 {
-    if(count == 0)
-    {
+    if (count == 0) {
         app_gap_displayGapInfo();
         app_gap_initVcpSdp(connHandle);
         return true;
     }
-    if(count > 1)
+    if (count > 1) {
         return false;
+    }
     return true;
 }
 
 static const blc_gapc_reconnChar_t reGapChar[] = {
     {
-        .ifun = app_gap_deviceNameGetCharInfoCb,
-        .rfun = app_gap_deviceNameStartReadCb,
-    },
+     .ifun = app_gap_deviceNameGetCharInfoCb,
+     .rfun = app_gap_deviceNameStartReadCb,
+     },
     {
-        .ifun = app_gap_batteryLevelGetCharInfoCb,
-        .rfun = app_gap_batteryLevelStartReadCb,
-    },
+     .ifun = app_gap_batteryLevelGetCharInfoCb,
+     .rfun = app_gap_batteryLevelStartReadCb,
+     },
 };
 
 static const blc_gapc_reconnList_t reconnGap = {
-    .resfun = app_gap_GapReconn,
-    .charTb.size = ARRAY_SIZE(reGapChar),
+    .resfun                = app_gap_GapReconn,
+    .charTb.size           = ARRAY_SIZE(reGapChar),
     .charTb.characteristic = reGapChar,
-    .inclSize = 0,
+    .inclSize              = 0,
 };
-
 
 bool app_gap_gattReconn(u16 connHandle, int count)
 {
-    if(count == 0)
-    {
+    if (count == 0) {
         tlkapi_printf(1, "sdp gap reconnect finish");
         return true;
     }
-    if(count > 1)
+    if (count > 1) {
         return false;
+    }
     return true;
 }
 
-typedef struct{
+typedef struct
+{
     u8 volState[3];
     u8 volOffsetState[3];
 } app_vcp_info_t;
@@ -245,11 +242,10 @@ static void app_gap_displayVcsInfo(void)
 
 static void app_gap_discVcsServiceCb(u16 connHandle, u8 count, u16 startHandle, u16 endHandle)
 {
-    if(count == 0)
-    {
+    if (count == 0) {
         app_gap_displayVcsInfo();
         app_gap_initVcpReconnect(connHandle);
-        return ;
+        return;
     }
     BLT_APP_LOG("VCP found VCS service info");
 
@@ -269,33 +265,33 @@ static void app_vocs_foundVolOffsetStateCharCb(u16 connHandle, u8 serviceCount, 
     BLT_APP_LOG("   -service num:0x%x properties:0x%x handle:0x%x", serviceCount, properties, valueHandle);
 }
 
-static void app_vcs_volumeStateStartReadCb(u16 connHandle, u16 attrHandle, u8** read, u16** readLen, u16* readMaxSize, gapc_read_func_t *rdCbFunc)
+static void app_vcs_volumeStateStartReadCb(u16 connHandle, u16 attrHandle, u8 **read, u16 **readLen, u16 *readMaxSize, gapc_read_func_t *rdCbFunc)
 {
-    *read = app_vcp_info.volState;
-    *readLen = NULL;
+    *read        = app_vcp_info.volState;
+    *readLen     = NULL;
     *readMaxSize = sizeof(app_vcp_info.volState);
 }
 
-static void app_vocs_volOffsetStateStartReadCb(u16 connHandle, u16 attrHandle, u8** read, u16** readLen, u16* readMaxSize, gapc_read_func_t *rdCbFunc)
+static void app_vocs_volOffsetStateStartReadCb(u16 connHandle, u16 attrHandle, u8 **read, u16 **readLen, u16 *readMaxSize, gapc_read_func_t *rdCbFunc)
 {
-    *read = app_vcp_info.volOffsetState;
-    *readLen = NULL;
+    *read        = app_vcp_info.volOffsetState;
+    *readLen     = NULL;
     *readMaxSize = sizeof(app_vcp_info.volOffsetState);
 }
 
-static void app_vcs_foundUnknownIncludeCb(u16 connHandle, uuid_t* uuid, u16 startHandle, u16 endHandle)
+static void app_vcs_foundUnknownIncludeCb(u16 connHandle, uuid_t *uuid, u16 startHandle, u16 endHandle)
 {
     BLT_APP_STR_LOG("[APP]VCP found unknown include uuid", uuid->uuidVal.u, uuid->uuidLen);
     BLT_APP_LOG("   -startHandle:0x%x endHandle:0x%x", startHandle, endHandle);
 }
 
-static void app_vcs_foundUnknownCharCb(u16 connHandle, uuid_t* uuid, u8 properties, u16 valueHandle)
+static void app_vcs_foundUnknownCharCb(u16 connHandle, uuid_t *uuid, u8 properties, u16 valueHandle)
 {
     BLT_APP_STR_LOG("[APP]VCS found unknown characteristic uuid", uuid->uuidVal.u, uuid->uuidLen);
     BLT_APP_LOG("   -properties:0x%x handle:0x%x", properties, valueHandle);
 }
 
-static void app_vocs_foundUnknownCharCb(u16 connHandle, uuid_t* uuid, u8 properties, u16 valueHandle)
+static void app_vocs_foundUnknownCharCb(u16 connHandle, uuid_t *uuid, u8 properties, u16 valueHandle)
 {
     BLT_APP_STR_LOG("[APP]VOCS found unknown characteristic uuid", uuid->uuidVal.u, uuid->uuidLen);
     BLT_APP_LOG("   -properties:0x%x handle:0x%x", properties, valueHandle);
@@ -304,8 +300,9 @@ static void app_vocs_foundUnknownCharCb(u16 connHandle, uuid_t* uuid, u8 propert
 static bool app_vocs_foundService(u16 connHandle, u16 startHandle, u16 endHandle)
 {
     static int count = 0;
-    if(count)
+    if (count) {
         return false;
+    }
     count++;
     BLT_APP_LOG("VOCS found service");
     BLT_APP_LOG("   -startHandle:0x%x endHandle:0x%x", startHandle, endHandle);
@@ -319,47 +316,47 @@ static const blc_gapc_discService_t discVcsService = {
 
 static const blc_gapc_discChar_t discVcpInclVocs[] = {
     {
-        .subscribeNtf = true,
-        .readValue = true,
-        .uuid = UUID16_INIT(CHARACTERISTIC_UUID_VOLUME_OFFSET_STATE),
-        .cfun = app_vocs_foundVolOffsetStateCharCb,
-        .rfun = app_vocs_volOffsetStateStartReadCb,
-    },
+     .subscribeNtf = true,
+     .readValue    = true,
+     .uuid         = UUID16_INIT(CHARACTERISTIC_UUID_VOLUME_OFFSET_STATE),
+     .cfun         = app_vocs_foundVolOffsetStateCharCb,
+     .rfun         = app_vocs_volOffsetStateStartReadCb,
+     },
 };
 
 static const blc_gapc_discInclude_t discVcpIncl = {
-    .uuid = UUID16_INIT(SERVICE_UUID_VOLUME_OFFSET_CONTROL),
+    .uuid           = UUID16_INIT(SERVICE_UUID_VOLUME_OFFSET_CONTROL),
     .characteristic = {
-        .size = ARRAY_SIZE(discVcpInclVocs),
-        .characteristic = discVcpInclVocs,
-        .ufun = app_vocs_foundUnknownCharCb,
-    },
+                       .size           = ARRAY_SIZE(discVcpInclVocs),
+                       .characteristic = discVcpInclVocs,
+                       .ufun           = app_vocs_foundUnknownCharCb,
+                       },
     .ifun = app_vocs_foundService,
 };
 
 static const blc_gapc_discChar_t discVcsChar[] = {
     {
-        .readValue = true,
-        .subscribeNtf = true,
-        .uuid = UUID16_INIT(CHARACTERISTIC_UUID_VOLUME_STATE),
-        .cfun = app_vcs_foundVolumeStateCharCb,
-        .rfun = app_vcs_volumeStateStartReadCb,
-    },
+     .readValue    = true,
+     .subscribeNtf = true,
+     .uuid         = UUID16_INIT(CHARACTERISTIC_UUID_VOLUME_STATE),
+     .cfun         = app_vcs_foundVolumeStateCharCb,
+     .rfun         = app_vcs_volumeStateStartReadCb,
+     },
 };
 
 static const blc_gapc_discList_t discVcp = {
     .maxServiceCount = 1,
-    .service = &discVcsService,
-    .includeTable = {
-        .size = 1,
-        .include[0] = &discVcpIncl,
-        .uifun = app_vcs_foundUnknownIncludeCb,
-    },
+    .service         = &discVcsService,
+    .includeTable    = {
+                        .size       = 1,
+                        .include[0] = &discVcpIncl,
+                        .uifun      = app_vcs_foundUnknownIncludeCb,
+                        },
     .characteristicTable = {
-        .size = ARRAY_SIZE(discVcsChar),
-        .characteristic = discVcsChar,
-        .ufun = app_vcs_foundUnknownCharCb,
-    },
+                        .size           = ARRAY_SIZE(discVcsChar),
+                        .characteristic = discVcsChar,
+                        .ufun           = app_vcs_foundUnknownCharCb,
+                        },
 };
 
 
@@ -374,34 +371,33 @@ static void app_gap_initVcpReconnect(u16 connHandle)
 
 bool app_vcp_reconnCallBack(u16 connHandle, int count)
 {
-    if(count == 0)
-    {
+    if (count == 0) {
         app_gap_displayVcsInfo();
         return false;
     }
-    if(count > 1)
+    if (count > 1) {
         return false;
+    }
     return true;
 }
 
-int app_vcs_volumeStateInfo(u16 connHandle, blc_gapc_charInfo_t* charInfo)
+int app_vcs_volumeStateInfo(u16 connHandle, blc_gapc_charInfo_t *charInfo)
 {
-    charInfo->properties = CHAR_PROP_READ;
+    charInfo->properties  = CHAR_PROP_READ;
     charInfo->valueHandle = 164;
     return 1;
 }
 
-int app_vocs_volOffsetStateInfo(u16 connHandle, blc_gapc_charInfo_t* charInfo)
+int app_vocs_volOffsetStateInfo(u16 connHandle, blc_gapc_charInfo_t *charInfo)
 {
-    charInfo->properties = CHAR_PROP_READ;
+    charInfo->properties  = CHAR_PROP_READ;
     charInfo->valueHandle = 178;
     return 1;
 }
 
 bool app_vocs_reconnGetIncl(u16 connHandle, int count)
 {
-    if(count > 1)
-    {
+    if (count > 1) {
         return false;
     }
 
@@ -410,30 +406,30 @@ bool app_vocs_reconnGetIncl(u16 connHandle, int count)
 
 static const blc_gapc_reconnChar_t reconnVcpChar[] = {
     {
-        .ifun = app_vcs_volumeStateInfo,
-        .rfun = app_vcs_volumeStateStartReadCb,
-    },
+     .ifun = app_vcs_volumeStateInfo,
+     .rfun = app_vcs_volumeStateStartReadCb,
+     },
 };
 
 static const blc_gapc_reconnChar_t reconnVocsChar[] = {
     {
-        .ifun = app_vocs_volOffsetStateInfo,
-        .rfun = app_vocs_volOffsetStateStartReadCb,
-    },
+     .ifun = app_vocs_volOffsetStateInfo,
+     .rfun = app_vocs_volOffsetStateStartReadCb,
+     },
 };
 
 static const blc_gapc_reconnInclTable_t vocsIncl = {
-    .reifun = app_vocs_reconnGetIncl,
-    .charTb.size = ARRAY_SIZE(reconnVocsChar),
+    .reifun                = app_vocs_reconnGetIncl,
+    .charTb.size           = ARRAY_SIZE(reconnVocsChar),
     .charTb.characteristic = reconnVocsChar,
 };
 
 static const blc_gapc_reconnList_t reconnVcp = {
-    .resfun = app_vcp_reconnCallBack,
-    .charTb.size = ARRAY_SIZE(reconnVcpChar),
+    .resfun                = app_vcp_reconnCallBack,
+    .charTb.size           = ARRAY_SIZE(reconnVcpChar),
     .charTb.characteristic = reconnVcpChar,
-    .inclSize = 1,
-    .includeCharTb[0] = &vocsIncl,
+    .inclSize              = 1,
+    .includeCharTb[0]      = &vocsIncl,
 };
 
 /*************************VCP service reconnect end******************************/

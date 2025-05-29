@@ -55,14 +55,14 @@ void trng_dig_en(void)
 void trng_init(void)
 {
     /**
-     *1、The default register configuration of the chip's random number module is set up
+     *1: The default register configuration of the chip's random number module is set up
      *   according to the best possible randomness, so some of the initialization setup
      *   code is commented out to reduce code size and execution time.
-     *2、Currently, trng has two entropy sources: RO and TERO, and we have confirmed with OSR
+     *2: Currently, trng has two entropy sources: RO and TERO, and we have confirmed with OSR
      *   that the randomness will be better if we choose RO as the entropy source.
-     *3、The lower the sampling clock of the RO mode, the better the randomization performance,
+     *3: The lower the sampling clock of the RO mode, the better the randomization performance,
      *   currently configurable values 1/4, 1/8, 1/16, 1/32 (the sampling clock frequency is the dividing factor of the input clock).
-     *4、The random number performance of trng is better when all the entropy sources are turned on, currently there are four entropy
+     *4: The random number performance of trng is better when all the entropy sources are turned on, currently there are four entropy
      *   sources (with more entropy sources turned on, the more power trng consumes).
      */
 
@@ -102,7 +102,7 @@ _attribute_ram_code_sec_noinline_  unsigned int trng_rand(void)
     unsigned char status;
     unsigned char trng_buf[4];
     /**
-     *1、The get_rand() function updates the random number seed after every 32 bytes of data has been obtained.
+     *1: The get_rand() function updates the random number seed after every 32 bytes of data has been obtained.
      */
     for(i=0;i<6;i++)
     {

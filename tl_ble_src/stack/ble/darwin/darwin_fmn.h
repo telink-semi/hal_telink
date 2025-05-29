@@ -25,8 +25,8 @@
 #ifndef STACK_BLE_DARWIN_DARWIN_FMN_H_
 #define STACK_BLE_DARWIN_DARWIN_FMN_H_
 
-typedef int (*blc_smp_paringreq_cb_t) (void);
-typedef void (*blc_smp_sec_info_cb_t) (u16 connHandle);
+typedef int (*blc_smp_paringreq_cb_t)(u16 connHandle);
+typedef void (*blc_smp_sec_info_cb_t)(u16 connHandle);
 
 /**
  * @brief      This func. used to enable custom fmn function.

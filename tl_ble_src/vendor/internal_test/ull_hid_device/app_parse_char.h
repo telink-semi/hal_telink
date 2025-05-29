@@ -25,60 +25,62 @@
 #include "../intest_config.h"
 #if (INTER_TEST_MODE == TEST_ULL_HID_DEVICE)
 
-#pragma once
+    #pragma once
 
 
-#ifndef PARSE_CHAR_UART_PORT
-#define PARSE_CHAR_UART_PORT                    UART0
-#endif
+    #ifndef PARSE_CHAR_UART_PORT
+        #define PARSE_CHAR_UART_PORT UART0
+    #endif
 
-#ifndef PARSE_CHAR_UART_TX_DMA
-#define PARSE_CHAR_UART_TX_DMA                  DMA5
-#endif
+    #ifndef PARSE_CHAR_UART_TX_DMA
+        #define PARSE_CHAR_UART_TX_DMA DMA5
+    #endif
 
-#ifndef PARSE_CHAR_UART_RX_DMA
-#define PARSE_CHAR_UART_RX_DMA                  DMA6
-#endif
+    #ifndef PARSE_CHAR_UART_RX_DMA
+        #define PARSE_CHAR_UART_RX_DMA DMA6
+    #endif
 
-#ifndef PARSE_CHAR_UART_TX_PIN
-#define PARSE_CHAR_UART_TX_PIN                  UART0_TX_PD2
-#endif
+    #ifndef PARSE_CHAR_UART_TX_PIN
+        #define PARSE_CHAR_UART_TX_PIN UART0_TX_PD2
+    #endif
 
-#ifndef PARSE_CHAR_UART_RX_PIN
-#define PARSE_CHAR_UART_RX_PIN                  UART0_RX_PD3
-#endif
+    #ifndef PARSE_CHAR_UART_RX_PIN
+        #define PARSE_CHAR_UART_RX_PIN UART0_RX_PD3
+    #endif
 
-#ifndef PARSE_CHAR_B92_UART_TX_PIN
-#define PARSE_CHAR_B92_UART_TX_PIN              GPIO_FC_PA0
-#endif
+    #ifndef PARSE_CHAR_B92_UART_TX_PIN
+        #define PARSE_CHAR_B92_UART_TX_PIN GPIO_FC_PA0
+    #endif
 
-#ifndef PARSE_CHAR_B92_UART_RX_PIN
-#define PARSE_CHAR_B92_UART_RX_PIN              GPIO_FC_PA1
-#endif
+    #ifndef PARSE_CHAR_B92_UART_RX_PIN
+        #define PARSE_CHAR_B92_UART_RX_PIN GPIO_FC_PA1
+    #endif
 
-#ifndef PARSE_CHAR_UART_BAUDRATE
-#define PARSE_CHAR_UART_BAUDRATE                1000000
-#endif
+    #ifndef PARSE_CHAR_UART_BAUDRATE
+        #define PARSE_CHAR_UART_BAUDRATE 1000000
+    #endif
 
-#ifndef PARSE_CHAR_UART_BUFF_SIZE
-#define PARSE_CHAR_UART_BUFF_SIZE               256
-#endif
+    #ifndef PARSE_CHAR_UART_BUFF_SIZE
+        #define PARSE_CHAR_UART_BUFF_SIZE 256
+    #endif
 
-#ifndef PARSE_CHAR_MAX_ARGV_SIZE
-#define PARSE_CHAR_MAX_ARGV_SIZE                16
-#endif
+    #ifndef PARSE_CHAR_MAX_ARGV_SIZE
+        #define PARSE_CHAR_MAX_ARGV_SIZE 16
+    #endif
 
-typedef struct __attribute__((packed)) {
+typedef struct __attribute__((packed))
+{
     char *fun_name;
     void (*fun)(char *argv[], int argc, void *user_data);
     void *user_data;
 } parse_fun_list_t;
 
-typedef struct __attribute__((packed)) {
-    char param_name[16];
+typedef struct __attribute__((packed))
+{
+    char  param_name[16];
     void *param_ptr;
-    char type;      //0:string, other: Numerical size
-    char maxSize;   //
+    char  type;    //0:string, other: Numerical size
+    char  maxSize; //
 } set_param_list_t;
 
 /**
@@ -101,7 +103,7 @@ void app_parse_loop(void);
  * @param[in]   ps: value string, '\0' ending, supported -1, -0xAB, 1.
  * @return      immediate value.
  */
-int app_parse_str2n (char * ps);
+int app_parse_str2n(char *ps);
 
 /**
  * @brief       parse print log function.
@@ -110,4 +112,4 @@ int app_parse_str2n (char * ps);
  */
 void app_parse_printf(const char *format, ...);
 
-#endif  //INTER_TEST_MODE == TEST_ULL_HID_DEVICE
+#endif //INTER_TEST_MODE == TEST_ULL_HID_DEVICE

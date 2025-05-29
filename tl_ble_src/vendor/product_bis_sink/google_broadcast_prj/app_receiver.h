@@ -27,9 +27,9 @@
 #if (PRODUCT_BIS_SINK_SELECT == PRODUCT_GOOGLE_BROADCAST_SINK)
 
 
-#define FILTER_COMPLETE_NAME                "Telink-BIS"
-#define FILTER_BROADCAST_NAME               "Telink-trans-value"
-#define DEFAULT_BROADCAST_CODE              "Telink 9518 EVK"
+    #define FILTER_COMPLETE_NAME   "Telink-BIS"
+    #define FILTER_BROADCAST_NAME  "Telink-trans-value"
+    #define DEFAULT_BROADCAST_CODE "Telink 9518 EVK"
 
 void app_bis_receiver_init(void);
 

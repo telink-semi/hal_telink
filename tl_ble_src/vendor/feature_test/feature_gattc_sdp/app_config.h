@@ -28,35 +28,32 @@
 #if (FEATURE_TEST_MODE == TEST_GATTC_SDP)
 
 
-#define ACL_CENTRAL_MAX_NUM                         1 // ACL central maximum number
-#define ACL_PERIPHR_MAX_NUM                         1 // ACL peripheral maximum number
+    #define ACL_CENTRAL_MAX_NUM 1 // ACL central maximum number
+    #define ACL_PERIPHR_MAX_NUM 1 // ACL peripheral maximum number
 
 
+    ///////////////////////// Feature Configuration////////////////////////////////////////////////
+    #define ACL_PERIPHR_SMP_ENABLE                         1 //1 for smp,  0 no security
+    #define ACL_CENTRAL_SMP_ENABLE                         1 //1 for smp,  0 no security
 
 
-///////////////////////// Feature Configuration////////////////////////////////////////////////
-#define ACL_PERIPHR_SMP_ENABLE                      1   //1 for smp,  0 no security
-#define ACL_CENTRAL_SMP_ENABLE                      1   //1 for smp,  0 no security
+    #define APP_DEFAULT_BUFFER_ACL_OCTETS_MTU_SIZE_MINIMUM 0
+    #define APP_DEFAULT_HID_BATTERY_OTA_ATTRIBUTE_TABLE    1
+    #define CENTRAL_CONNECT_PERIPHR_MAC_FILTER_EN          1
+
+    ///////////////////////// UI Configuration ////////////////////////////////////////////////////
+    #define UI_LED_ENABLE      1
+    #define UI_KEYBOARD_ENABLE 1
+
+    ///////////////////////// DEBUG  Configuration ////////////////////////////////////////////////
+    #define DEBUG_GPIO_ENABLE 0
+
+    #define APP_DBUG_LOG      1
+
+    #define VCD_EN            1
+    #define VCD_DEFINE_SELECT VCD_DEFINE_DEFAULT
 
 
-#define APP_DEFAULT_BUFFER_ACL_OCTETS_MTU_SIZE_MINIMUM      0
-#define APP_DEFAULT_HID_BATTERY_OTA_ATTRIBUTE_TABLE         1
-#define CENTRAL_CONNECT_PERIPHR_MAC_FILTER_EN               1
-
-///////////////////////// UI Configuration ////////////////////////////////////////////////////
-#define UI_LED_ENABLE                               1
-#define UI_KEYBOARD_ENABLE                          1
-
-///////////////////////// DEBUG  Configuration ////////////////////////////////////////////////
-#define DEBUG_GPIO_ENABLE                           0
-
-#define APP_DBUG_LOG                                1
-
-#define VCD_EN                                      1
-#define VCD_DEFINE_SELECT                           VCD_DEFINE_DEFAULT
-
-
-
-#include "../../common/default_config.h"
+    #include "../../common/default_config.h"
 
 #endif

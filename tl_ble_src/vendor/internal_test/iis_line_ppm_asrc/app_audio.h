@@ -30,21 +30,21 @@
 
 #if (INTER_TEST_MODE == TEST_PPM_ASRC_WITH_IIS_LINEIN)
 
-#define APP_AUDIO_INPUT_BUFFER_SIZE                 2048
-#define APP_AUDIO_INPUT_FRAME_SAMPLE_MAX             480
-#define APP_AUDIO_INPUT_FRAME_ENCODE_BYTES_MAX       155
+    #define APP_AUDIO_INPUT_BUFFER_SIZE             2048
+    #define APP_AUDIO_INPUT_FRAME_SAMPLE_MAX        480
+    #define APP_AUDIO_INPUT_FRAME_ENCODE_BYTES_MAX  155
 
-#define APP_AUDIO_OUTPUT_BUFFER_SIZE                2048
-#define APP_AUDIO_OUTPUT_FRAME_SAMPLE_MAX            480
-#define APP_AUDIO_OUTPUT_FRAME_ENCODE_BYTES_MAX       40
-
-
-#define APP_AUDIO_FRAME_SAMPLE                      480
-#define APP_AUDIO_FRAME_SAMPLE_BYTES                APP_AUDIO_FRAME_SAMPLE<<1
+    #define APP_AUDIO_OUTPUT_BUFFER_SIZE            2048
+    #define APP_AUDIO_OUTPUT_FRAME_SAMPLE_MAX       480
+    #define APP_AUDIO_OUTPUT_FRAME_ENCODE_BYTES_MAX 40
 
 
-#define ASRC_OFFSET0_TICK                           500//us
-#define ASRC_OFFSET1_TICK                           9500//us
+    #define APP_AUDIO_FRAME_SAMPLE                  480
+    #define APP_AUDIO_FRAME_SAMPLE_BYTES            APP_AUDIO_FRAME_SAMPLE << 1
+
+
+    #define ASRC_OFFSET0_TICK                       500  //us
+    #define ASRC_OFFSET1_TICK                       9500 //us
 
 typedef struct app_ble_sync_st
 {
@@ -62,16 +62,16 @@ typedef struct app_ble_sync_st
     u32 t_sample;
 
 
-    s16 playback[APP_AUDIO_INPUT_FRAME_SAMPLE_MAX*2];
+    s16 playback[APP_AUDIO_INPUT_FRAME_SAMPLE_MAX * 2];
 
-} __attribute__ ((aligned (4))) app_ble_sync_st_t;
+} __attribute__((aligned(4))) app_ble_sync_st_t;
 
-extern app_ble_sync_st_t    async;
+extern app_ble_sync_st_t async;
 
 void app_audio_init(void);
 void app_audio_input_task(void);
 void app_audio_output_task(void);
-int asrc_i2s_48k_ppm (void);
+int  asrc_i2s_48k_ppm(void);
 #endif
 
 #endif /* APP_AUDIO_H_ */

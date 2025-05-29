@@ -27,36 +27,27 @@
 #include "stack/ble/ble.h"
 
 
-
-
-
-const u8 defaultGtbsBearerProviderName[] = { 'D', 'e', 'f', 'a', 'u', 'l', 't', ' ', 'p', 'r', 'o', 'v', 'i', 'd', 'e', 'r' };
-const u8 defaultGtbsBearerUci[] = { 'u', 'n', '0', '0', '0' };
-const u8 defaultGtbsUriScheme[] = { 't', 'e', 'l' };
-const blc_tbss_uri_scheme_t defaultGtbsURISchemes[] = {
+const u8                    defaultGtbsBearerProviderName[] = {'D', 'e', 'f', 'a', 'u', 'l', 't', ' ', 'p', 'r', 'o', 'v', 'i', 'd', 'e', 'r'};
+const u8                    defaultGtbsBearerUci[]          = {'u', 'n', '0', '0', '0'};
+const u8                    defaultGtbsUriScheme[]          = {'t', 'e', 'l'};
+const blc_tbss_uri_scheme_t defaultGtbsURISchemes[]         = {
     {
-        .uri = defaultGtbsUriScheme,
-        .uriLen = sizeof(defaultGtbsUriScheme),
-    },
+     .uri    = defaultGtbsUriScheme,
+     .uriLen = sizeof(defaultGtbsUriScheme),
+     },
 };
 
 const blc_ccps_regParam_t defaultCppsParam = {
     .gtbsParam = {
-        .bearerProviderName = defaultGtbsBearerProviderName,
-        .bearerProviderNameLen = sizeof(defaultGtbsBearerProviderName),
-        .bearerUci = defaultGtbsBearerUci,
-        .bearerUciLen = sizeof(defaultGtbsBearerUci),
-        .bearerTechnology = GTBS_TECHNOLOGY_3G,
-        .bearerUriSchemeList = defaultGtbsURISchemes,
-        .bearerUriSchemeListLen = ARRAY_SIZE(defaultGtbsURISchemes),
-        .signalStrength = GTBS_SIGNAL_STRENGTH_UNAVAILABLE,
-        .CCID = 0,
-        .statusFlags.statusFlags = 0,
-    }
+                  .bearerProviderName      = defaultGtbsBearerProviderName,
+                  .bearerProviderNameLen   = sizeof(defaultGtbsBearerProviderName),
+                  .bearerUci               = defaultGtbsBearerUci,
+                  .bearerUciLen            = sizeof(defaultGtbsBearerUci),
+                  .bearerTechnology        = GTBS_TECHNOLOGY_3G,
+                  .bearerUriSchemeList     = defaultGtbsURISchemes,
+                  .bearerUriSchemeListLen  = ARRAY_SIZE(defaultGtbsURISchemes),
+                  .signalStrength          = GTBS_SIGNAL_STRENGTH_UNAVAILABLE,
+                  .CCID                    = 0,
+                  .statusFlags.statusFlags = 0,
+                  }
 };
-
-
-
-
-
-
