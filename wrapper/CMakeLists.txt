@@ -99,7 +99,7 @@ zephyr_compile_options(
     -DBLC_PM_EN=0
 )
 
-file(GLOB_RECURSE SOC_SOURCES
+file(GLOB SOC_SOURCES
     ${TL_BLE_SRC_DIR}/drivers/${SOC}/error_handler/*.c
     ${TL_BLE_SRC_DIR}/drivers/${SOC}/ext_driver/*.c
     ${TL_BLE_SRC_DIR}/drivers/${SOC}/ext_driver/driver_internal/*.c
