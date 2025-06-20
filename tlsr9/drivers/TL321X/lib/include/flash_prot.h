@@ -75,6 +75,9 @@ typedef enum{
     /* lock all Flash area, even system data and user data.
      * Attention: More conditions need to be considered, such as system data(SMP pairing information or OTA data if OTA used)*/
     FLASH_LOCK_ALL_AREA         =   4,
+
+    /* User can set 1920KB flash protect. */
+    FLASH_LOCK_FW_LOW_1920K     =   0x09,
 }flash_app_lock_e;
 
 
