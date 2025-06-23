@@ -12,6 +12,9 @@ elseif(CONFIG_SOC_RISCV_TELINK_TL321X)
 elseif(CONFIG_SOC_RISCV_TELINK_TL721X)
 	set(SOC "TL721X")
 	message(STATUS "Configuring for SOC: TELINK_TL721X")
+elseif(CONFIG_SOC_RISCV_TELINK_TL322X)
+	set(SOC "TL322X")
+	message(STATUS "Configuring for SOC: TELINK_TL322X")
 else()
 	message(FATAL_ERROR "Not supported SOC")
 endif()
@@ -158,6 +161,9 @@ zephyr_include_directories(
 	${TL_BLE_SRC_DIR}/drivers/${SOC}/compatibility_pack
 	${TL_BLE_SRC_DIR}/drivers/${SOC}/reg_include
 	${TL_BLE_SRC_DIR}/drivers/${SOC}/ext_driver
+    ${TL_BLE_SRC_DIR}/drivers/${SOC}/lib/include
+    ${TL_BLE_SRC_DIR}/drivers/${SOC}/lib/include/pm
+	${TL_BLE_SRC_DIR}/drivers/${SOC}/lib/include/crypto_common
 	${TL_BLE_SRC_DIR}/stack/ble/hal/hal_${SOC}
 	${TL_BLE_SRC_DIR}/common
 	${TL_BLE_SRC_DIR}/vendor/common
@@ -241,7 +247,11 @@ endif()
 
 if(CONFIG_USB_TELINK_B9X OR CONFIG_USB_TELINK_TLX)
 	zephyr_library_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/gpio.c)
-	zephyr_library_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/usbhw.c)
+	if(CONFIG_SOC_RISCV_TELINK_TL322X)
+		zephyr_library_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/usb1hw.c)
+	else()
+		zephyr_library_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/usbhw.c)
+	endif()
 endif()
 
 zephyr_library_sources(common/tl_flash.c)
