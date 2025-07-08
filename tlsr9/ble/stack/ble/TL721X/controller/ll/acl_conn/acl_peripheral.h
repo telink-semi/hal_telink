@@ -19,15 +19,12 @@
 #define ACL_PERIPHERAL_H_
 
 
-
-
-
 /**
  * @brief      for user to initialize ACL connection peripheral role.
  * @param      none
  * @return     none
  */
-void        blc_ll_initAclPeriphrRole_module(void);
+void blc_ll_initAclPeriphrRole_module(void);
 
 
 /**
@@ -39,7 +36,7 @@ void        blc_ll_initAclPeriphrRole_module(void);
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_initAclPeriphrTxFifo(u8 *pTxbuf, int fifo_size, int fifo_number, int conn_number);
+ble_sts_t blc_ll_initAclPeriphrTxFifo(u8 *pTxbuf, int fifo_size, int fifo_number, int conn_number);
 
 
 #endif /* ACL_PERIPHERAL_H_ */

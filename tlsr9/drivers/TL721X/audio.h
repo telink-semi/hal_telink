@@ -177,8 +177,8 @@ typedef enum
  */
 typedef enum
 {
-    CHANNEL_LEFT = BIT(0),
-    CHANNEL_RIGHT = BIT(1),
+    CHANNEL_LEFT   = BIT(0),
+    CHANNEL_RIGHT  = BIT(1),
     CHANNEL_STEREO = BIT(0) | BIT(1),
 } audio_chn_sel_e;
 
@@ -243,8 +243,8 @@ typedef enum
  */
 typedef enum
 {
-    I2S_CHANNEL_LEFT = BIT(0),
-    I2S_CHANNEL_RIGHT = BIT(1),
+    I2S_CHANNEL_LEFT   = BIT(0),
+    I2S_CHANNEL_RIGHT  = BIT(1),
     I2S_CHANNEL_STEREO = BIT(0) | BIT(1),
 } i2s_chn_select_e;
 
@@ -285,9 +285,9 @@ typedef enum
 typedef enum
 {
     ACLK_DBG_OPEN = BIT(0),
-    I2S0_CLK_DBG = BIT(1),
-    I2S1_CLK_DBG = BIT(2),
-    I2S2_CLK_DBG = BIT(3),
+    I2S0_CLK_DBG  = BIT(1),
+    I2S1_CLK_DBG  = BIT(2),
+    I2S2_CLK_DBG  = BIT(3),
     ADC_CLK6M_DBG = BIT(4),
     ADC_CLK1M_DBG = BIT(5),
     CODEC_CLK_DBG = BIT(6),
@@ -395,15 +395,15 @@ typedef enum
     CODEC_IN_D_GAIN_m24_DB = 16, /**< -24dB */
     CODEC_IN_D_GAIN_m18_DB = 20, /**< -18dB */
     CODEC_IN_D_GAIN_m12_DB = 24, /**< -12dB */
-    CODEC_IN_D_GAIN_m6_DB = 28,  /**< -6dB */
-    CODEC_IN_D_GAIN_0_DB = 32,   /**<  0dB  default */
-    CODEC_IN_D_GAIN_6_DB = 36,   /**<  6dB */
-    CODEC_IN_D_GAIN_12_DB = 40,  /**<  12dB */
-    CODEC_IN_D_GAIN_18_DB = 44,  /**<  18dB */
-    CODEC_IN_D_GAIN_24_DB = 48,  /**<  24dB */
-    CODEC_IN_D_GAIN_30_DB = 52,  /**<  30dB */
-    CODEC_IN_D_GAIN_36_DB = 56,  /**<  36dB */
-    CODEC_IN_D_GAIN_42_DB = 60,  /**<  42dB */
+    CODEC_IN_D_GAIN_m6_DB  = 28, /**< -6dB */
+    CODEC_IN_D_GAIN_0_DB   = 32, /**<  0dB  default */
+    CODEC_IN_D_GAIN_6_DB   = 36, /**<  6dB */
+    CODEC_IN_D_GAIN_12_DB  = 40, /**<  12dB */
+    CODEC_IN_D_GAIN_18_DB  = 44, /**<  18dB */
+    CODEC_IN_D_GAIN_24_DB  = 48, /**<  24dB */
+    CODEC_IN_D_GAIN_30_DB  = 52, /**<  30dB */
+    CODEC_IN_D_GAIN_36_DB  = 56, /**<  36dB */
+    CODEC_IN_D_GAIN_42_DB  = 60, /**<  42dB */
 } codec_in_path_digital_gain_e;
 
 /**
@@ -418,15 +418,15 @@ typedef enum
     ASCL_OUT_D_GAIN_m24_DB = 0x30, /**<-24dB */
     ASCL_OUT_D_GAIN_m18_DB = 0x34, /**<-18dB */
     ASCL_OUT_D_GAIN_m12_DB = 0x38, /**<-12dB */
-    ASCL_OUT_D_GAIN_m6_DB = 0x3C,  /**<-6dB */
-    ASCL_OUT_D_GAIN_0_DB = 0x40,   /**< 0dB  default  */
-    ASCL_OUT_D_GAIN_6_DB = 0x44,   /**< 6dB */
-    ASCL_OUT_D_GAIN_12_DB = 0x48,  /**< 12dB */
-    ASCL_OUT_D_GAIN_18_DB = 0x4C,  /**< 18dB */
-    ASCL_OUT_D_GAIN_24_DB = 0x50,  /**< 24dB */
-    ASCL_OUT_D_GAIN_30_DB = 0x54,  /**< 30dB */
-    ASCL_OUT_D_GAIN_36_DB = 0x58,  /**< 36dB */
-    ASCL_OUT_D_GAIN_42_DB = 0x5C,  /**< 42dB */
+    ASCL_OUT_D_GAIN_m6_DB  = 0x3C, /**<-6dB */
+    ASCL_OUT_D_GAIN_0_DB   = 0x40, /**< 0dB  default  */
+    ASCL_OUT_D_GAIN_6_DB   = 0x44, /**< 6dB */
+    ASCL_OUT_D_GAIN_12_DB  = 0x48, /**< 12dB */
+    ASCL_OUT_D_GAIN_18_DB  = 0x4C, /**< 18dB */
+    ASCL_OUT_D_GAIN_24_DB  = 0x50, /**< 24dB */
+    ASCL_OUT_D_GAIN_30_DB  = 0x54, /**< 30dB */
+    ASCL_OUT_D_GAIN_36_DB  = 0x58, /**< 36dB */
+    ASCL_OUT_D_GAIN_42_DB  = 0x5C, /**< 42dB */
 } ascl_out_path_digital_gain_e;
 
 /**
@@ -491,13 +491,13 @@ typedef struct
  */
 typedef struct
 {
-    void *data_buf;
-    unsigned int data_buf_size;
+    void                     *data_buf;
+    unsigned int              data_buf_size;
     codec_stream0_input_src_e input_src;
-    unsigned char sample_rate;
-    unsigned char data_width;
-    audio_fifo_chn_e fifo_chn;
-    dma_chn_e dma_num;
+    unsigned char             sample_rate;
+    unsigned char             data_width;
+    audio_fifo_chn_e          fifo_chn;
+    dma_chn_e                 dma_num;
 } audio_codec_stream0_input_t;
 
 /**
@@ -505,12 +505,12 @@ typedef struct
  */
 typedef struct
 {
-    void *data_buf;
-    unsigned int data_buf_size;
+    void                     *data_buf;
+    unsigned int              data_buf_size;
     audio_stream_output_src_e output_src;
-    unsigned char sample_rate;
-    unsigned char data_width;
-    dma_chn_e dma_num;
+    unsigned char             sample_rate;
+    unsigned char             data_width;
+    dma_chn_e                 dma_num;
 } audio_codec_output_t;
 
 /**
@@ -518,12 +518,12 @@ typedef struct
  */
 typedef struct
 {
-    unsigned short *sample_rate;
-    i2s_pin_config_t *pin_config;
-    audio_i2s_select_e i2s_select;
+    unsigned short     *sample_rate;
+    i2s_pin_config_t   *pin_config;
+    audio_i2s_select_e  i2s_select;
     audio_i2s_wl_mode_e data_width;
-    i2s_mode_select_e i2s_mode;
-    i2s_m_s_mode_e master_slave_mode;
+    i2s_mode_select_e   i2s_mode;
+    i2s_m_s_mode_e      master_slave_mode;
 } audio_i2s_config_t;
 
 /**
@@ -531,13 +531,13 @@ typedef struct
  */
 typedef struct
 {
-    void *data_buf;
-    unsigned int data_buf_size;
-    audio_i2s_select_e i2s_select;
-    i2s_chn_select_e i2s_ch_sel;
+    void               *data_buf;
+    unsigned int        data_buf_size;
+    audio_i2s_select_e  i2s_select;
+    i2s_chn_select_e    i2s_ch_sel;
     audio_i2s_wl_mode_e data_width;
-    audio_fifo_chn_e fifo_chn;
-    dma_chn_e dma_num;
+    audio_fifo_chn_e    fifo_chn;
+    dma_chn_e           dma_num;
 } audio_i2s_input_output_t;
 
 /**
@@ -545,7 +545,7 @@ typedef struct
  */
 typedef struct
 {
-    tdm_mode_select_e tdm_mode;
+    tdm_mode_select_e       tdm_mode;
     tdm_slot_width_select_e slot_num;
 } audio_i2s2_tdm_config_t;
 
@@ -555,10 +555,10 @@ typedef struct
 typedef struct
 {
     tdm_slot_number_select_e tdm_chn;
-    audio_i2s_wl_mode_e data_width;
-    dma_burst_size_e burst_size;
-    audio_fifo_chn_e fifo_chn;
-    dma_chn_e dma_num;
+    audio_i2s_wl_mode_e      data_width;
+    dma_burst_size_e         burst_size;
+    audio_fifo_chn_e         fifo_chn;
+    dma_chn_e                dma_num;
 } audio_i2s2_tdm_input_output_t;
 
 /**********************************************************************************************************************
@@ -622,6 +622,7 @@ static inline void audio_txfifo_wptr_en(audio_fifo_chn_e fifo_chn)
 {
     reg_rx_wptr_en |= BIT(fifo_chn + 4); // offset value is 4.
 }
+
 /**
  *  @brief      This function serves to rxfifo wptr pointer enable.
  *  @param[in]  fifo_chn - fifo channel.
@@ -661,6 +662,7 @@ static inline void audio_txfifo_wptr_dis(audio_fifo_chn_e fifo_chn)
 {
     reg_rx_wptr_en &= ~BIT(fifo_chn + 4); // offset value is 4.
 }
+
 /**
  *  @brief      This function serves to rxfifo wptr pointer disable.
  *  @param[in]  fifo_chn - fifo channel.
@@ -1162,7 +1164,7 @@ static inline void audio_sdm_set_dc_constant_value_right(unsigned short value)
 static inline void audio_sdm_set_pn_sequence_bit_num_left(unsigned short value)
 {
     reg_aud_pn1l = (reg_aud_pn1l & (~FDL_PN1_BITS_L)) | MASK_VAL(FDL_PN1_BITS_L, value & 0x1f);
-    reg_aud_pn2 = (reg_aud_pn2 & (~FLD_PN2_BITS_L)) | MASK_VAL(FLD_PN2_BITS_L, value & 0x1f);
+    reg_aud_pn2  = (reg_aud_pn2 & (~FLD_PN2_BITS_L)) | MASK_VAL(FLD_PN2_BITS_L, value & 0x1f);
 }
 
 /**
@@ -1171,7 +1173,7 @@ static inline void audio_sdm_set_pn_sequence_bit_num_left(unsigned short value)
  */
 static inline void audio_sdm_set_pn_sequence_bit_num_right(unsigned short value)
 {
-    reg_aud_pn1r = (reg_aud_pn1r & (~FLD_PN1_R)) | MASK_VAL(FLD_PN1_R, value & 0x1f);
+    reg_aud_pn1r  = (reg_aud_pn1r & (~FLD_PN1_R)) | MASK_VAL(FLD_PN1_R, value & 0x1f);
     reg_const_set = (reg_const_set & (~FLD_PN2_BITS_R)) | MASK_VAL(FLD_PN2_BITS_R, value & 0x1f);
 }
 
@@ -1201,12 +1203,9 @@ static inline void audio_sdm_mute_dis(void)
  */
 static inline void audio_set_ascl_gain(audio_ascl_select_e ascl_select, ascl_out_path_digital_gain_e gain)
 {
-    if (ascl_select != ASCL0)
-    {
+    if (ascl_select != ASCL0) {
         reg_ascl_vol(ascl_select) = ((reg_ascl_vol(ascl_select) & (~FLD_VOL_12)) | MASK_VAL(FLD_VOL_12, gain));
-    }
-    else
-    {
+    } else {
         reg_aud_vol = ((reg_aud_vol & (~FLD_VOL_0)) | MASK_VAL(FLD_VOL_0, gain));
     }
 }
@@ -1236,12 +1235,9 @@ static inline void audio_sdm_dis(void)
  */
 static inline void audio_ascl_lerp_en(audio_ascl_select_e ascl_select)
 {
-    if (ascl_select != ASCL0)
-    {
+    if (ascl_select != ASCL0) {
         BM_SET(reg_line(ascl_select), FLD_LINE_12);
-    }
-    else
-    {
+    } else {
         BM_SET(reg_aud_ctrl, FLD_LINE_0);
     }
 }
@@ -1253,12 +1249,9 @@ static inline void audio_ascl_lerp_en(audio_ascl_select_e ascl_select)
  */
 static inline void audio_ascl_lerp_dis(audio_ascl_select_e ascl_select)
 {
-    if (ascl_select != ASCL0)
-    {
+    if (ascl_select != ASCL0) {
         BM_CLR(reg_line(ascl_select), FLD_LINE_12);
-    }
-    else
-    {
+    } else {
         BM_CLR(reg_aud_ctrl, FLD_LINE_0);
     }
 }
@@ -1329,7 +1322,7 @@ static inline void audio_i2s1_src_clk_en(void)
  */
 static inline void audio_i2s2_src_clk_en(void)
 {
-    reg_i2s2_step |= FLD_I2S1_CLK_EN_0;
+    reg_i2s2_step |= FLD_I2S2_CLK_EN_0;
 }
 
 /**
@@ -1356,7 +1349,7 @@ static inline void audio_i2s1_src_clk_dis(void)
  */
 static inline void audio_i2s2_src_clk_dis(void)
 {
-    reg_i2s2_step &= ~FLD_I2S1_CLK_EN_0;
+    reg_i2s2_step &= ~FLD_I2S2_CLK_EN_0;
 }
 
 /**
@@ -1368,7 +1361,7 @@ static inline void audio_i2s2_src_clk_dis(void)
 static inline void audio_set_i2s0_clk(unsigned short div_numerator, unsigned short div_denominator)
 {
     reg_i2s0_step = (div_numerator & FLD_I2S0_STEP) | FLD_I2S0_CLK_EN_0;
-    reg_i2s0_mod = div_denominator;
+    reg_i2s0_mod  = div_denominator;
 }
 
 /**
@@ -1380,7 +1373,7 @@ static inline void audio_set_i2s0_clk(unsigned short div_numerator, unsigned sho
 static inline void audio_set_i2s1_clk(unsigned short div_numerator, unsigned short div_denominator)
 {
     reg_i2s1_step = (div_numerator & FLD_I2S0_STEP) | FLD_I2S1_CLK_EN_0;
-    reg_i2s1_mod = div_denominator;
+    reg_i2s1_mod  = div_denominator;
 }
 
 /**
@@ -1392,7 +1385,17 @@ static inline void audio_set_i2s1_clk(unsigned short div_numerator, unsigned sho
 static inline void audio_set_i2s2_clk(unsigned short div_numerator, unsigned short div_denominator)
 {
     reg_i2s2_step = (div_numerator & FLD_I2S0_STEP) | FLD_I2S2_CLK_EN_0;
-    reg_i2s2_mod = div_denominator;
+    reg_i2s2_mod  = div_denominator;
+}
+
+/**
+ *  @brief      This function serves to enable i2s src clock.
+ *  @param[in]  i2s_select i2s channel.
+ *  @return     none.
+ */
+static inline void audio_i2s_src_clk_en(audio_i2s_select_e i2s_select)
+{
+    (i2s_select == I2S0) ? (audio_i2s0_src_clk_en()) : ((i2s_select == I2S1) ? (audio_i2s1_src_clk_en()) : (audio_i2s2_src_clk_en()));
 }
 
 /**
@@ -1547,6 +1550,7 @@ static inline void audio_i2s_align_mask_dis(void)
 {
     BM_SET(reg_i2s_align_cfg, FLD_I2S_ALIGN_MASK);
 }
+
 /**
  *  @brief      This function serves to enable i2s is align mask.
  *  @return     none.
@@ -1637,14 +1641,14 @@ void i2s_set_pin(audio_i2s_select_e i2s_select, i2s_pin_config_t *config);
 void audio_rx_dma_config(dma_chn_e chn, unsigned short *dst_addr, unsigned int data_len, dma_chain_config_t *head_of_list);
 
 /**
- * @brief     This function serves to set rx dma chain transfer
+ * @brief     This function serves to set rx dma chain transfer.
  * @param[in] config_addr - the head of list of llp_pointer.
  * @param[in] llpointer   - the next element of llp_pointer.
  * @param[in] dst_addr    - the dma address of destination.
  * @param[in] data_len    - the length of dma size by byte.
  * @return    none.
  */
-void audio_rx_dma_add_list_element(dma_chain_config_t *rx_config, dma_chain_config_t *llpointer, unsigned short *dst_addr, unsigned int data_len);
+void audio_rx_dma_add_list_element(dma_chain_config_t *config_addr, dma_chain_config_t *llpointer, unsigned short *dst_addr, unsigned int data_len);
 
 /**
  * @brief  This function serves to set audio rx dma chain transfer.
@@ -1989,7 +1993,7 @@ void audio_set_debug_clk_as_mclk(audio_clk_dbg_e clk);
  * @param[in] i2s_select                    - i2s channel select.
  * @param[in] i2s_clk_config                 i2s_clk_config[2]   i2s_clk_config[3]-->lrclk_adc(sampling rate)
                                                   ||                  ||
- *  pll(192M default)------->div---->i2s_clk--->2*div(div=0,bypass)--->blck----->div
+ *  pll(240M default)------->div---->i2s_clk--->2*div(div=0,bypass)--->blck----->div
  *                           ||                                       ||
  *           i2s_clk_config[0]/i2s_clk_config[1]                 i2s_clk_config[4]-->lrclk_dac (sampling rate)
  *
@@ -1998,10 +2002,10 @@ void audio_set_debug_clk_as_mclk(audio_clk_dbg_e clk);
  * @return    none
  * @attention The default is from pll 240M(default). If the pll is changed, the clk will be changed accordingly.
  */
-_attribute_ram_code_sec_noinline_ void audio_set_i2s_clock(audio_i2s_select_e i2s_select, unsigned short *i2s_clk_config);
+_attribute_ram_code_com_sec_noinline_ void audio_set_i2s_clock(audio_i2s_select_e i2s_select, unsigned short *i2s_clk_config);
 
 /**
- * @brief     This function set i2s input data bit with .
+ * @brief     This function set i2s input data bit with.
  * @param[in] i2s_select       - channel select.
  * @param[in] data_mode        - i2s data bit with.
  * @return    none.
@@ -2021,7 +2025,7 @@ void audio_set_i2s_format(audio_i2s_select_e i2s_select, i2s_mode_select_e i2s_m
  *  @param[in]  i2s_select -i2s channel.
  *  @return     none.
  */
-void audio_i2s_clk_en(audio_i2s_select_e i2s_sel);
+void audio_i2s_clk_en(audio_i2s_select_e i2s_select);
 
 /**
  * @brief     This function serves to config i2s interface, word length, and m/s.

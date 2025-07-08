@@ -22,13 +22,7 @@
 
 #include "types.h"
 #include "../compatibility_pack/cmpt.h"
-#include "../lib/include/analog.h"
-#include "../adc.h"
-#include "../gpio.h"
-#include "../lib/include/stimer.h"
-#include "../lib/include/pm/pm.h"
-#include "lib/include/rf/rf_common.h"
-#include "../lib/include/trng/trng.h"
+#include "../driver.h"
 #include <stdbool.h>
 
 /*
@@ -48,19 +42,52 @@
 
 
 /******************************* core_start ******************************************************************/
-#define irq_disable                 core_interrupt_disable
-#define irq_enable                  core_interrupt_enable
+#ifndef BLC_ZEPHYR_BLE_INTEGRATION
+    #define irq_disable                 core_interrupt_disable
+    #define irq_enable                  core_interrupt_enable
+#else
+    #undef irq_disable
+    #undef irq_enable
+    #define irq_disable                 core_interrupt_disable
+    #define irq_enable                  core_interrupt_enable
+#endif
+
 #define irq_restore(en)             core_restore_interrupt(en)
 
+#define start_reboot                protected_sys_reboot   //This function serves to reboot chip.
 /******************************* core_end ********************************************************************/
 
 
 
 
-/******************************* efuse start *****************************************************************/
+/******************************* mac start ************************************************************/
+/**
+ * @brief      This function serves to read IEEE address from OTP.
+ * @param[out] buf  - Pointer to IEEE address buffer(IEEE address is 8bytes)
+ * @return     none
+ */
+// extern void otp_get_ieee_addr(unsigned char *buf);
 
-bool efuse_get_mac_address(u8* mac_read, int length);
-/******************************* efuse end *******************************************************************/
+ static inline bool get_device_mac_address(u8* mac_read, int length)
+ {
+    unsigned char mac[8];
+    otp_get_ieee_addr(mac);
+
+    u8 empty_8_byte_0[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    u8 empty_8_byte_F[8] = {0XFF, 0XFF, 0XFF, 0XFF, 0XFF, 0XFF, 0XFF, 0XFF};
+    if(memcmp(mac, empty_8_byte_0, 8) && memcmp(mac, empty_8_byte_F, 8)){
+        if(length > 8){
+            length = 8;
+        }
+        memcpy(mac_read, (u8*)mac, 6);
+
+        return TRUE;
+    }
+    else{
+        return FALSE;
+    }
+ }
+/*******************************  mac end **************************************************************/
 
 
 
@@ -125,7 +152,6 @@ void rf_drv_ble_init(void);
 
 #define RF_POWER_P3dBm   RF_POWER_INDEX_P3p04dBm
 #define RF_POWER_P0dBm   RF_POWER_INDEX_P0p03dBm
-#define RF_POWER_P4dbm   RF_POWER_INDEX_P4p09dBm
 #define RF_POWER_P9dBm   RF_POWER_INDEX_P9p10dBm
 
 #if RF_THREE_CHANNEL_CALIBRATION
@@ -151,8 +177,6 @@ void rf_set_channel_power_enable(unsigned char enable);
 
 
 /******************************* trng_start ******************************************************************/
-
-
 #define rand                        trng_rand
 
 #define random_generator_init       trng_init
@@ -237,6 +261,35 @@ void generateRandomNum(int len, unsigned char *data);
 //12 = 4(struct bis_rx_pdu_tag  *next) + 4(u32 payloadNum) + 4(u32 idealPldAnchorTick) in bis_rx_pdu_t
 #define     BIS_LL_RX_PDU_FIFO_SIZE(n)              (CAL_LL_ISO_RX_FIFO_SIZE(n) + 12)
 
+
+/*
+*  DMA_len(4us)
+*
+*  ExtraInfo(sizeof(cs_rx_para_t) = 62us)
+*
+*  Mode2_len: rx_early_us(5us) + (T_PM + T_SW)*(AntPath +1) - T_SW
+*  Mode1_len: rx_early_us(5us) + AA_Only(44us) + Sequence(maximum 128us) + extend (15us) = 192us
+*  Mode0_len: T_FM(80us)
+*
+*  Max_mode_len = max3(Mode2_len,Mode1_len,Mode0_len)
+*
+*  IQ sample_1us :  4[sample rate is 4Mhz] * 5[IQ_20_BIT] = 20 bytes
+*
+*  buffer_len = DMA_len(4us) + ExtraInfo(sizeof(cs_rx_para_t) = 62us) + Max_mode_len * IQ sample_1us
+*
+*  RX buffer size must be be 16*n, due to MCU design
+*
+*  RX buffer size : ((buffer_len + 15)/16) *16
+*
+*/
+
+#define     CS_EXTRAINFO_LEN                                                 80
+#define     CS_ALIGN_16(len)                                                 (((len + 15)>>4) <<4)
+#define     CS_RX_MODE0_FIFO_SIZE_MAX                                        CS_ALIGN_16(80*20 + CS_EXTRAINFO_LEN + 4)
+#define     CS_RX_MODE1_FIFO_SIZE_MAX                                        CS_ALIGN_16((5 + 44 + 128 + 15)*20 + CS_EXTRAINFO_LEN + 4)
+#define     CS_RX_MODE2_FIFO_SIZE_MAX(AP,PM, SW)                             CS_ALIGN_16((5 + (AP+1)*(PM+SW) - SW)*20 + CS_EXTRAINFO_LEN + 4)
+#define     CHANNEL_SOUNDING_RX_FIFO_SIZE_ALIGN16(N_AP, T_PM_US, T_SW_US)    max3(CS_RX_MODE0_FIFO_SIZE_MAX,CS_RX_MODE1_FIFO_SIZE_MAX, CS_RX_MODE2_FIFO_SIZE_MAX(N_AP, T_PM_US, T_SW_US))
+
 /******************************* dma_end ********************************************************************/
 
 
@@ -246,6 +299,25 @@ enum{//todo: SunWei &YeYang
     FLD_IRQ_ZB_RT_EN = 15,
 };
 /******************************* plic_end ********************************************************************/
+
+/******************************* cs_ant_switch_start *********************************************************/
+typedef struct{
+    gpio_pin_e  pin;
+    gpio_func_e  pin_fun;
+}rf_cs_ant_switch_ctrl;
+
+/**
+ * @brief        * This function initializes the GPIO pins used for antenna switching according to the specified configuration.
+ *                 It disables the input and output functions of the GPIO pins, sets the pull-down resistance, and configures
+ *                 the multiplexing function of the pins.
+ *
+ * @param[in]   switch_ctrl    - Pointer to the antenna switch control structure array.
+ * @param[in]   num            - Number of antenna switch pins
+ * @return      none.
+ */
+void rf_cs_ant_switch_pin_init(rf_cs_ant_switch_ctrl *switch_ctrl, u8 num);
+
+/******************************* cs_ant_switch_end **********************************************************/
 
 
 #endif /* DRIVERS_TL721X_EXT_MISC_H_ */

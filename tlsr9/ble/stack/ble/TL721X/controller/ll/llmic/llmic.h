@@ -19,54 +19,52 @@
 #ifndef STACK_BLE_CONTROLLER_LL_LLMIC_LLMIC_H_
 #define STACK_BLE_CONTROLLER_LL_LLMIC_LLMIC_H_
 
-
-typedef enum {
+typedef enum
+{
     LLMIC_SUCCESS = 0,
-    LLMIC_ERR_LIMIT_EXCEEDED ,
-}llmic_sts_e;
+    LLMIC_ERR_LIMIT_EXCEEDED,
+} llmic_sts_e;
 
-
-typedef enum{
-  LLMIC_MANUAL = 0X00,
-  LLMIC_ATUO   = 0X01,
-}llmic_controller_mode_e;
-
+typedef enum
+{
+    LLMIC_MANUAL = 0X00,
+    LLMIC_ATUO   = 0X01,
+} llmic_controller_mode_e;
 
 /*
  * brief:The current task priority level of the BLE module
  * */
-typedef enum{
-    BLE_SIGL_IDLE                 =0 ,//BLE task,
-    BLE_SIGL_NORMAL                  ,
-    BLE_SIGL_TSYNC                   ,//ACL Peripheral connect or update, need highest priority
-}llmic_ble_sigl_e;
-
+typedef enum
+{
+    BLE_SIGL_IDLE = 0, //BLE task,
+    BLE_SIGL_NORMAL,
+    BLE_SIGL_TSYNC,    //ACL Peripheral connect or update, need highest priority
+} llmic_ble_sigl_e;
 
 /*
  * brief:LLMIC module controls BLE module
  * */
-typedef enum{
-    LLMIC_SIGL_NONE               = 0,
-    LLMIC_SIGL_COMPROMISE            ,//LLMIC compromise
-    LLMIC_SIGL_REJECT                ,//LLMIC reject. maybe BLE inform too late, llmic can not process timely
-}llmic_mic_sigl_e;
-
+typedef enum
+{
+    LLMIC_SIGL_NONE = 0,
+    LLMIC_SIGL_COMPROMISE, //LLMIC compromise
+    LLMIC_SIGL_REJECT,     //LLMIC reject. maybe BLE inform too late, llmic can not process timely
+} llmic_mic_sigl_e;
 
 /*
  * brief: In the LLMIC function module, define the BLE controller scheduling parameters
  * */
-_attribute_aligned_(4)
-typedef struct {
+_attribute_aligned_(4) typedef struct
+{
     u8 ble_new_notify; // 1 with notification, 0 with no notification
     u8 ble_signal;     // For the parameter type, see llmic_ble_sigl_e
     u8 llmic_signal;   //  For the parameter type, see llmic_mic_sigl_e
     u8 u8_rsvd;        // unused
 
-    u32    stick_task_begin;
-    u32    stick_task_end;
+    u32 stick_task_begin;
+    u32 stick_task_end;
 
-}signal_fifo_t;
-
+} signal_fifo_t;
 
 /*
  * brief: Used in blc_ll_registerTelinkControllerFinishCallback
@@ -88,7 +86,7 @@ void blc_ll_set_llmic_enable(int enable);
  * @param[in]  signal_fifo_t
  * @return     none
  */
-signal_fifo_t * blc_ll_get_llmic_param(void);
+signal_fifo_t *blc_ll_get_llmic_param(void);
 
 
 /**
@@ -96,7 +94,7 @@ signal_fifo_t * blc_ll_get_llmic_param(void);
  * @param[in]  blc_ll_llmic_callback_t  (The registered function **must** be ram code)
  * @return     none
  */
-void blc_ll_registerTelinkControllerFinishCallback ( blc_ll_llmic_callback_t  p);
+void blc_ll_registerTelinkControllerFinishCallback(blc_ll_llmic_callback_t p);
 
 
 /**
@@ -105,7 +103,7 @@ void blc_ll_registerTelinkControllerFinishCallback ( blc_ll_llmic_callback_t  p)
  * @param[in]  workType Operational mode for the LLMIC. Defined by the `llmic_controller_mode_e` enum.
  * @return     llmic_sts_e :  Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-llmic_sts_e blc_ll_set_llmic_Parameters(u16 minTaskIntervalMs,llmic_controller_mode_e workType);
+llmic_sts_e blc_ll_set_llmic_Parameters(u16 minTaskIntervalMs, llmic_controller_mode_e workType);
 
 
 /**

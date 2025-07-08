@@ -28,7 +28,8 @@
 /**
  * define input IO.
  */
-typedef enum{
+typedef enum
+{
     LPC_INPUT_PB1 = 1,
     LPC_INPUT_PB2 = 2,
     LPC_INPUT_PB3 = 3,
@@ -36,40 +37,43 @@ typedef enum{
     LPC_INPUT_PB5 = 5,
     LPC_INPUT_PB6 = 6,
     LPC_INPUT_PB7 = 7,
-}lpc_input_channel_e;
+} lpc_input_channel_e;
 
 /**
  * define work mode.
  */
-typedef enum{
+typedef enum
+{
     LPC_NORMAL = 0,
     LPC_LOWPOWER,
-}lpc_mode_e;
+} lpc_mode_e;
 
 /**
  * define Reference voltage.
  * When BG or UVLO is enabled, the same value in the register represents a different vref value.
  * Default is UVLO Vref.
  */
-typedef enum{
-    LPC_REF_974MV  = 1,
-    LPC_REF_923MV  = 2,
-    LPC_REF_872MV  = 3,
-    LPC_REF_820MV  = 4,
-    LPC_REF_PB0    = 5,
-    LPC_REF_PB3    = 6,
-}lpc_reference_e;
+typedef enum
+{
+    LPC_REF_974MV = 1,
+    LPC_REF_923MV = 2,
+    LPC_REF_872MV = 3,
+    LPC_REF_820MV = 4,
+    LPC_REF_PB0   = 5,
+    LPC_REF_PB3   = 6,
+} lpc_reference_e;
 
 /**
  * define scale.
  * The input voltage is multiplied by the voltage divider factor and then compared to the reference voltage.
  */
-typedef enum{
-    LPC_SCALING_PER25  = 0,// 1/4
-    LPC_SCALING_PER50  = 1,// 2/4
-    LPC_SCALING_PER75  = 2,// 3/4
-    LPC_SCALING_PER100 = 3,// 4/4
-}lpc_scaling_e;
+typedef enum
+{
+    LPC_SCALING_PER25  = 0, // 1/4
+    LPC_SCALING_PER50  = 1, // 2/4
+    LPC_SCALING_PER75  = 2, // 3/4
+    LPC_SCALING_PER100 = 3, // 4/4
+} lpc_scaling_e;
 
 /**
  * @brief       This function servers to powers down low power comparator.
@@ -125,5 +129,3 @@ static inline unsigned char lpc_get_result(void)
  * @return      none.
  */
 void lpc_set_input_ref(lpc_mode_e mode, lpc_reference_e ref);
-
-

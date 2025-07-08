@@ -53,7 +53,7 @@
 /**********************************************************************************************************************
  *                                           global macro                                                             *
  *********************************************************************************************************************/
-#define ANALOG_TIMEOUT                0
+#define ANALOG_TIMEOUT 0
 
 /*
  * @note:
@@ -61,20 +61,20 @@
  * 2.the destination address is configured fixed.
  * 3.dma size needs to be configured DMA_CTR_WORD_WIDTH,the length needs to be configured as a multiple of four.
  */
-#define ANALOG_FIXED_ADDR_TX_DMA_CFG   \
-        (DMA_REQ_ALGM_TX        << DMA_CHACTRL_DST_REQ_SEL_OFFSET)  | \
-        (0                      << DMA_CHACTRL_SRC_REQ_SEL_OFFSET)  | \
-        (DMA_ADDR_FIX           << DMA_CHACTRL_DST_ADDR_CTRL_OFFSET) | \
-        (DMA_ADDR_FIX           << DMA_CHACTRL_SRC_ADDR_CTRL_OFFST) | \
-        (DMA_HANDSHAKE_MODE     << DMA_CHACTRL_DSTMODE_OFFSET) | \
-        (DMA_NORMAL_MODE        << DMA_CHACTRL_SRCMODE_OFFSET) | \
-        (DMA_CTR_WORD_WIDTH     << DMA_CHACTRL_DSTWIDTH_SIZE_OFFSET) | \
-        (DMA_CTR_WORD_WIDTH     << DMA_CHACTRL_SRCWIDTH_SIZE_OFFSET) | \
-        (0                      << DMA_CHACTRL_SRC_BURST_SIZE_OFFSET) | \
-        (0                      << DMA_CHACTRL_READ_NUM_EN_OFFSET) | \
-        (0                      << DMA_CHACTRL_PRIORITY_OFFSET) | \
-        (0                      << DMA_CHACTRL_WRITE_NUM_EN_OFFSET) | \
-        (0                      << DMA_CHACTRL_AUTO_EN_OFFSET)
+#define ANALOG_FIXED_ADDR_TX_DMA_CFG                               \
+    (DMA_REQ_ALGM_TX << DMA_CHACTRL_DST_REQ_SEL_OFFSET) |          \
+        (0 << DMA_CHACTRL_SRC_REQ_SEL_OFFSET) |                    \
+        (DMA_ADDR_FIX << DMA_CHACTRL_DST_ADDR_CTRL_OFFSET) |       \
+        (DMA_ADDR_FIX << DMA_CHACTRL_SRC_ADDR_CTRL_OFFST) |        \
+        (DMA_HANDSHAKE_MODE << DMA_CHACTRL_DSTMODE_OFFSET) |       \
+        (DMA_NORMAL_MODE << DMA_CHACTRL_SRCMODE_OFFSET) |          \
+        (DMA_CTR_WORD_WIDTH << DMA_CHACTRL_DSTWIDTH_SIZE_OFFSET) | \
+        (DMA_CTR_WORD_WIDTH << DMA_CHACTRL_SRCWIDTH_SIZE_OFFSET) | \
+        (0 << DMA_CHACTRL_SRC_BURST_SIZE_OFFSET) |                 \
+        (0 << DMA_CHACTRL_READ_NUM_EN_OFFSET) |                    \
+        (0 << DMA_CHACTRL_PRIORITY_OFFSET) |                       \
+        (0 << DMA_CHACTRL_WRITE_NUM_EN_OFFSET) |                   \
+        (0 << DMA_CHACTRL_AUTO_EN_OFFSET)
 
 /*
  * @note:
@@ -82,20 +82,20 @@
  * 2.the destination address is configured incrementally.
  * 3.dma size needs to be configured DMA_CTR_WORD_WIDTH,the length needs to be configured as a multiple of four.
  */
-#define ANALOG_INC_ADDR_TX_DMA_CFG   \
-        (DMA_REQ_ALGM_TX        << DMA_CHACTRL_DST_REQ_SEL_OFFSET)  | \
-        (0                      << DMA_CHACTRL_SRC_REQ_SEL_OFFSET)  | \
-        (DMA_ADDR_FIX           << DMA_CHACTRL_DST_ADDR_CTRL_OFFSET) | \
-        (DMA_ADDR_INCREMENT     << DMA_CHACTRL_SRC_ADDR_CTRL_OFFST) | \
-        (DMA_HANDSHAKE_MODE     << DMA_CHACTRL_DSTMODE_OFFSET) | \
-        (DMA_NORMAL_MODE        << DMA_CHACTRL_SRCMODE_OFFSET) | \
-        (DMA_CTR_WORD_WIDTH     << DMA_CHACTRL_DSTWIDTH_SIZE_OFFSET) | \
-        (DMA_CTR_WORD_WIDTH     << DMA_CHACTRL_SRCWIDTH_SIZE_OFFSET) | \
-        (0                      << DMA_CHACTRL_SRC_BURST_SIZE_OFFSET) | \
-        (0                      << DMA_CHACTRL_READ_NUM_EN_OFFSET) | \
-        (0                      << DMA_CHACTRL_PRIORITY_OFFSET) | \
-        (0                      << DMA_CHACTRL_WRITE_NUM_EN_OFFSET) | \
-        (0                      << DMA_CHACTRL_AUTO_EN_OFFSET)
+#define ANALOG_INC_ADDR_TX_DMA_CFG                                 \
+    (DMA_REQ_ALGM_TX << DMA_CHACTRL_DST_REQ_SEL_OFFSET) |          \
+        (0 << DMA_CHACTRL_SRC_REQ_SEL_OFFSET) |                    \
+        (DMA_ADDR_FIX << DMA_CHACTRL_DST_ADDR_CTRL_OFFSET) |       \
+        (DMA_ADDR_INCREMENT << DMA_CHACTRL_SRC_ADDR_CTRL_OFFST) |  \
+        (DMA_HANDSHAKE_MODE << DMA_CHACTRL_DSTMODE_OFFSET) |       \
+        (DMA_NORMAL_MODE << DMA_CHACTRL_SRCMODE_OFFSET) |          \
+        (DMA_CTR_WORD_WIDTH << DMA_CHACTRL_DSTWIDTH_SIZE_OFFSET) | \
+        (DMA_CTR_WORD_WIDTH << DMA_CHACTRL_SRCWIDTH_SIZE_OFFSET) | \
+        (0 << DMA_CHACTRL_SRC_BURST_SIZE_OFFSET) |                 \
+        (0 << DMA_CHACTRL_READ_NUM_EN_OFFSET) |                    \
+        (0 << DMA_CHACTRL_PRIORITY_OFFSET) |                       \
+        (0 << DMA_CHACTRL_WRITE_NUM_EN_OFFSET) |                   \
+        (0 << DMA_CHACTRL_AUTO_EN_OFFSET)
 
 /**********************************************************************************************************************
  *                                         global data type                                                           *
@@ -107,14 +107,22 @@
 /**********************************************************************************************************************
  *                                      global function prototype                                                     *
  *********************************************************************************************************************/
-
+/**
+ * @brief      This function serves to analog clock divide.
+ * @param[in]  div - 0: 2 frequency division of  pclk(default)
+ *                   1: 4 frequency division of  pclk
+ *                   2: 8 frequency division of  pclk
+ *                   3: 16 frequency division of  pclk
+ * @return     none.
+ */
+_attribute_ram_code_com_sec_ void analog_set_clk(unsigned char div);
 
 /**
  * @brief      This function serves to analog register read by byte.
  * @param[in]  addr - address need to be read.
  * @return     the result of read.
  */
-_attribute_ram_code_sec_optimize_o2_noinline_ unsigned char analog_read_reg8(unsigned char addr);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ unsigned char analog_read_reg8(unsigned char addr);
 
 /**
  * @brief      This function serves to analog register write by byte.
@@ -122,14 +130,14 @@ _attribute_ram_code_sec_optimize_o2_noinline_ unsigned char analog_read_reg8(uns
  * @param[in]  data - the value need to be write.
  * @return     none.
  */
-_attribute_ram_code_sec_optimize_o2_noinline_ void analog_write_reg8(unsigned char addr, unsigned char data);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ void analog_write_reg8(unsigned char addr, unsigned char data);
 
 /**
  * @brief      This function serves to analog register read by halfword.
  * @param[in]  addr - address need to be read.
  * @return     the result of read.
  */
-_attribute_ram_code_sec_optimize_o2_noinline_ unsigned short analog_read_reg16(unsigned char addr);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ unsigned short analog_read_reg16(unsigned char addr);
 
 /**
  * @brief      This function serves to analog register write by halfword.
@@ -137,14 +145,14 @@ _attribute_ram_code_sec_optimize_o2_noinline_ unsigned short analog_read_reg16(u
  * @param[in]  data - the value need to be write.
  * @return     none.
  */
-_attribute_ram_code_sec_optimize_o2_noinline_ void analog_write_reg16(unsigned char addr, unsigned short data);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ void analog_write_reg16(unsigned char addr, unsigned short data);
 
 /**
  * @brief      This function serves to analog register read by word.
  * @param[in]  addr - address need to be read.
  * @return     the result of read.
  */
-_attribute_ram_code_sec_optimize_o2_noinline_ unsigned int analog_read_reg32(unsigned char addr);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ unsigned int analog_read_reg32(unsigned char addr);
 
 /**
  * @brief      This function serves to analog register write by word.
@@ -152,7 +160,7 @@ _attribute_ram_code_sec_optimize_o2_noinline_ unsigned int analog_read_reg32(uns
  * @param[in]  data - the value need to be write.
  * @return     none.
  */
-_attribute_ram_code_sec_optimize_o2_noinline_ void analog_write_reg32(unsigned char addr, unsigned int data);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ void analog_write_reg32(unsigned char addr, unsigned int data);
 /**
  * @brief      This function serves to analog register read.
  * @param[in]  addr  - address need to be read.
@@ -160,7 +168,7 @@ _attribute_ram_code_sec_optimize_o2_noinline_ void analog_write_reg32(unsigned c
  * @param[in]  len   - the length of read value.
  * @return     none.
  */
-_attribute_ram_code_sec_noinline_ void analog_read_buff(unsigned char addr, unsigned char *buff, unsigned char len);
+_attribute_ram_code_com_sec_noinline_ void analog_read_buff(unsigned char addr, unsigned char *buff, unsigned char len);
 
 /**
  * @brief      This function serves to analog register write.
@@ -169,7 +177,7 @@ _attribute_ram_code_sec_noinline_ void analog_read_buff(unsigned char addr, unsi
  * @param[in]  len   - the length of write value.(The data length cannot be greater than 8)
  * @return     none.
  */
-_attribute_ram_code_sec_noinline_ void analog_write_buff(unsigned char addr, unsigned char *buff, unsigned char len);
+_attribute_ram_code_com_sec_noinline_ void analog_write_buff(unsigned char addr, unsigned char *buff, unsigned char len);
 
 /********************************************************************************************************
  *                                          internal
@@ -183,26 +191,23 @@ _attribute_ram_code_sec_noinline_ void analog_write_buff(unsigned char addr, uns
  * @brief      This function serves to judge whether analog Tx buffer is empty.
  * @return     0:not empty      1: empty
  */
-_attribute_ram_code_sec_optimize_o2_noinline_  bool analog_txbuf_no_empty(void);
+_attribute_ram_code_com_sec_optimize_o2_noinline_  bool analog_txbuf_no_empty(void);
 
 /**
  * @brief      This function serves to judge whether analog is busy.
  * @return     0: not busy  1:busy
  */
-_attribute_ram_code_sec_optimize_o2_noinline_  bool analog_busy(void);
+_attribute_ram_code_com_sec_optimize_o2_noinline_  bool analog_busy(void);
 
-/**
+    /**
  * @brief      This function serves to judge whether analog write/read is busy .
  * @return     none.
  */
-#define analog_wait()                  wait_condition_fails_or_timeout(analog_busy,g_drv_api_error_timeout_us,drv_timeout_handler,(unsigned int)DRV_API_ERROR_TIMEOUT_ANALOG_WAIT)
+    #define analog_wait() wait_condition_fails_or_timeout(analog_busy, g_drv_api_error_timeout_us, drv_timeout_handler, (unsigned int)DRV_API_ERROR_TIMEOUT_ANALOG_WAIT)
 
-/**
+    /**
  * @brief      This function serves to judge whether analog Tx buffer is empty.
  * @return     none.
  */
-#define analog_wait_txbuf_no_empty()  wait_condition_fails_or_timeout(analog_txbuf_no_empty,g_drv_api_error_timeout_us,drv_timeout_handler,(unsigned int)DRV_API_ERROR_TIMEOUT_ANA_TX_BUFCNT)
+    #define analog_wait_txbuf_no_empty() wait_condition_fails_or_timeout(analog_txbuf_no_empty, g_drv_api_error_timeout_us, drv_timeout_handler, (unsigned int)DRV_API_ERROR_TIMEOUT_ANA_TX_BUFCNT)
 #endif
-
-
-

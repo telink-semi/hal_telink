@@ -19,7 +19,6 @@
 #define BLE_CONTROLLER_H_
 
 
-
 #include "stack/ble/TL721X/ble_common.h"
 #include "stack/ble/TL721X/ble_format.h"
 
@@ -49,12 +48,6 @@
 #include "stack/ble/TL721X/controller/ll/init/init.h"
 #include "stack/ble/TL721X/controller/ll/init/leg_init.h"
 #include "stack/ble/TL721X/controller/ll/init/ext_init.h"
-
-
-#include "stack/ble/TL721X/controller/ll/prdadv/pda.h"
-#include "stack/ble/TL721X/controller/ll/prdadv/prd_adv.h"
-
-#include "stack/ble/TL721X/controller/ll/prdadv/pda_sync.h"
 
 
 

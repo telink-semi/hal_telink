@@ -51,8 +51,9 @@
 /**
  * @brief pem channel.
  */
-typedef enum{
-    PEM0 =0,
+typedef enum
+{
+    PEM0 = 0,
     PEM1,
     PEM2,
     PEM3,
@@ -76,13 +77,14 @@ typedef enum{
     PEM21,
     PEM22,
     PEM23,
-}pem_chn_e;
+} pem_chn_e;
 
 /**
  * @brief pem event module.
  */
-typedef enum{
-    PEM_EVENT_MSPI =0,
+typedef enum
+{
+    PEM_EVENT_MSPI = 0,
     PEM_EVENT_LSPI,
     PEM_EVENT_GSPI,
     PEM_EVENT_SECURITY_IP,
@@ -106,16 +108,17 @@ typedef enum{
     PEM_EVENT_KS,
     PEM_EVENT_USB,
     PEM_EVENT_ZB,
-}pem_event_module_sel_e;
+} pem_event_module_sel_e;
 
 /**
  * @brief pem task module.
  */
-typedef enum{
-    PEM_TASK_MSPI =0,
+typedef enum
+{
+    PEM_TASK_MSPI = 0,
     PEM_TASK_LSPI,
     PEM_TASK_GSPI,
-    PEM_TASK_GPIO =4,
+    PEM_TASK_GPIO = 4,
     PEM_TASK_DMA,
     PEM_TASK_QDEC,
     PEM_TASK_CPU,
@@ -135,69 +138,73 @@ typedef enum{
     PEM_TASK_KS,
     PEM_TASK_USB,
     PEM_TASK_ZB,
-}pem_task_module_sel_e;
+} pem_task_module_sel_e;
 
 /**
  * @brief pem clk.
  */
-typedef enum{
-    CCLK =0,
+typedef enum
+{
+    CCLK = 0,
     HCLK,
     PCLK,
-    ASYNC_CLK,  /**< ASYNCHRONOUS CLOCK :a signal belonging to the asynchronous clock domain is a clock that is not synchronized with CCLK HCLK PCLK.*/
-}pem_clk_sel_e;
+    ASYNC_CLK, /**< ASYNCHRONOUS CLOCK :a signal belonging to the asynchronous clock domain is a clock that is not synchronized with CCLK HCLK PCLK.*/
+} pem_clk_sel_e;
 
 /**
  * @brief pem trigger signal select.
  */
-typedef enum{
-    PULSE =0,
+typedef enum
+{
+    PULSE = 0,
     LEVEL,
-}pem_lvl_e;
+} pem_lvl_e;
 
 /**
  * @brief edge detection.
  * @note  convert the level signal into an edge signal.
  */
-typedef enum{
-    RISING_EDGE =0,
+typedef enum
+{
+    RISING_EDGE = 0,
     RISING_FALLING_EDGE,
-}pem_edge_detect_e;
+} pem_edge_detect_e;
 
 /**
  *  @brief  Define pem event struct.
  */
-typedef struct {
-    pem_event_module_sel_e  module:5;
-    unsigned char           :3;
-    unsigned char           :8;
-    unsigned char           sig_sel:3;
-    unsigned char           :3;
-    pem_clk_sel_e           clk_sel:2;
-    pem_edge_detect_e       edge_detect:1;
-    unsigned char           :1;
-    unsigned char           inv:1;
-    unsigned char           :1;
-    pem_lvl_e               lvl:1;
-    unsigned char           :1;
-    unsigned char           :2;
-}pem_event_config_t;
+typedef struct
+{
+    pem_event_module_sel_e module : 5;
+    unsigned char                 : 3;
+    unsigned char                 : 8;
+    unsigned char sig_sel         : 3;
+    unsigned char                 : 3;
+    pem_clk_sel_e     clk_sel     : 2;
+    pem_edge_detect_e edge_detect : 1;
+    unsigned char                 : 1;
+    unsigned char inv             : 1;
+    unsigned char                 : 1;
+    pem_lvl_e lvl                 : 1;
+    unsigned char                 : 1;
+    unsigned char                 : 2;
+} pem_event_config_t;
 
 /**
  *  @brief  Define pem task struct.
  */
-typedef struct {
-    unsigned char           :8;
-    pem_task_module_sel_e   module:5;
-    unsigned char           :3;
-    unsigned char           :3;
-    unsigned char           sig_sel:3;
-    unsigned char           :2;
-    unsigned char           :5;
-    pem_lvl_e               lvl:1;
-    pem_clk_sel_e           clk_sel:2;
-}pem_task_config_t;
-
+typedef struct
+{
+    unsigned char                : 8;
+    pem_task_module_sel_e module : 5;
+    unsigned char                : 3;
+    unsigned char                : 3;
+    unsigned char sig_sel        : 3;
+    unsigned char                : 2;
+    unsigned char                : 5;
+    pem_lvl_e     lvl            : 1;
+    pem_clk_sel_e clk_sel        : 2;
+} pem_task_config_t;
 
 /**
  * @brief      This function servers to enable pem that selected channel.
@@ -206,7 +213,7 @@ typedef struct {
  */
 static inline void pem_chn_en(pem_chn_e chn)
 {
-    BM_SET(reg_pem_ctr(chn),FLD_PEM_CH_EN);
+    BM_SET(reg_pem_ctr(chn), FLD_PEM_CH_EN);
 }
 
 /**
@@ -216,7 +223,7 @@ static inline void pem_chn_en(pem_chn_e chn)
  */
 static inline void pem_chn_dis(pem_chn_e chn)
 {
-    BM_CLR(reg_pem_ctr(chn),FLD_PEM_CH_EN);
+    BM_CLR(reg_pem_ctr(chn), FLD_PEM_CH_EN);
 }
 
 /**
@@ -244,4 +251,3 @@ void pem_task_config(pem_chn_e chn, unsigned int task_signal, pem_task_module_se
 void pem_event_config(pem_chn_e chn, unsigned int event_signal, pem_event_module_sel_e event_module);
 
 #endif /* PEM_H_ */
-

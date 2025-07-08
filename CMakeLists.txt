@@ -41,6 +41,10 @@ else()
 	message( FATAL_ERROR "Not supported SOC" )
 endif()
 
+zephyr_compile_options(
+	-DBLC_ZEPHYR_BLE_INTEGRATION=1
+)
+
 if(CONFIG_PM)
 zephyr_ld_options(-mtune=rocket)
 endif() # PM

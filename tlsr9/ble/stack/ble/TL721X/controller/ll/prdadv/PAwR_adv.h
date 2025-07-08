@@ -22,28 +22,6 @@
 #include "stack/ble/hci/hci_cmd.h"
 
 
-
-
-
-//typedef struct{
-//  u8 subevt_idx;
-//  u8 rspSlot_start;
-//  u8 rspSlot_count;
-//  u8 rsvd;
-//}setPdaSubevtData_subInfo_t;
-
-typedef struct{
-    u8 subevent;
-    u8 response_slotStart;
-    u8 response_slotCnt;
-    u8 subevent_dataLen;
-
-    u8* subevent_Data;
-}setSubeventDataCmd_subInfo_t;
-
-
-
-
 /**
  * @brief      for user to initialize periodic advertising withe response module.
  * @param[in]  pBuff - global buffer, same buffer as periodic advertising parameters buffer
@@ -51,7 +29,7 @@ typedef struct{
  * @return     Status - 0x00: command succeeded;
  *                      0x12: num_periodic_adv exceed maximum number of supported periodic advertising.
  */
-ble_sts_t   blc_ll_initPeriodicAdvWrModule_initPeriodicdAdvWrSetParamBuffer(u8 *pBuff, int num_periodic_adv);
+ble_sts_t blc_ll_initPeriodicAdvWrModule_initPeriodicdAdvWrSetParamBuffer(u8 *pBuff, int num_periodic_adv);
 
 /**
  * @brief      initialize Periodic Advertising Data buffer for all adv_set
@@ -60,7 +38,7 @@ ble_sts_t   blc_ll_initPeriodicAdvWrModule_initPeriodicdAdvWrSetParamBuffer(u8 *
  * @param[in]  subevent_data_cnt -
  * @return     none
  */
-void        blc_ll_initPeriodicAdvWrDataBuffer(u8 *pSubeventData, int subeventDataLenMax, int subeventDataCnt);
+void blc_ll_initPeriodicAdvWrDataBuffer(u8 *pSubeventData, int subeventDataLenMax, int subeventDataCnt);
 
 /**
  * @brief      This function is used by the Host to set the parameters for periodic advertising.
@@ -75,10 +53,7 @@ void        blc_ll_initPeriodicAdvWrDataBuffer(u8 *pSubeventData, int subeventDa
  * @param[in]  numResponseSlots -
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-hci_le_setPeriodicAdvParamV2_retParam_t blc_ll_setPeriodicAdvParam_v2(adv_handle_t adv_handle, u16 advInter_min,
-                                          u16 advInter_max, perd_adv_prop_t property,
-                                          u8 numSubevents,u8 subeventInterval,
-                                          u8 responseSlotDelay,u8 responseSlotSpace,u8 numResponseSlots);
+hci_le_setPeriodicAdvParamV2_retParam_t blc_ll_setPeriodicAdvParam_v2(adv_handle_t adv_handle, u16 advInter_min, u16 advInter_max, perd_adv_prop_t property, u8 numSubevents, u8 subeventInterval, u8 responseSlotDelay, u8 responseSlotSpace, u8 numResponseSlots);
 
 /**
  * @brief      This function is used by the Host to set periodic advertising subevent data.
@@ -87,7 +62,7 @@ hci_le_setPeriodicAdvParamV2_retParam_t blc_ll_setPeriodicAdvParam_v2(adv_handle
  * @param[in]  pSubevtCfg - refer to 'pdaSubevtData_subevtCfg_t'
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t   blc_ll_setPeriodicAdvSubeventData(adv_handle_t adv_handle, u8 num_subevent, pdaSubevtData_subevtCfg_t* pSubevtCfg);
+ble_sts_t blc_ll_setPeriodicAdvSubeventData(adv_handle_t adv_handle, u8 num_subevent, pdaSubevtData_subevtCfg_t *pSubevtCfg);
 
 /**
  * @brief      This function is used to create an ACL connection to a connectable advertiser [v2].
@@ -125,13 +100,7 @@ ble_sts_t   blc_ll_setPeriodicAdvSubeventData(adv_handle_t adv_handle, u8 num_su
  * @param[in]  timeout_2 - for Coded PHY: Supervision timeout for the LE Link.
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t   blc_ll_extended_createConnection_v2 (adv_handle_t adv_handle, u8 subevent,
-                                                init_fp_t  filter_policy, own_addr_type_t ownAdrType, u8 peerAdrType, u8 *peerAddr, init_phy_t init_phys,
-                                                scan_inter_t scanInter_0, scan_wind_t scanWindow_0, conn_inter_t conn_min_0, conn_inter_t conn_max_0, conn_tm_t timeout_0,
-                                                scan_inter_t scanInter_1, scan_wind_t scanWindow_1, conn_inter_t conn_min_1, conn_inter_t conn_max_1, conn_tm_t timeout_1,
-                                                scan_inter_t scanInter_2, scan_wind_t scanWindow_2, conn_inter_t conn_min_2, conn_inter_t conn_max_2, conn_tm_t timeout_2 );
-
-
+ble_sts_t blc_ll_extended_createConnection_v2(adv_handle_t adv_handle, u8 subevent, init_fp_t filter_policy, own_addr_type_t ownAdrType, u8 peerAdrType, u8 *peerAddr, init_phy_t init_phys, scan_inter_t scanInter_0, scan_wind_t scanWindow_0, conn_inter_t conn_min_0, conn_inter_t conn_max_0, conn_tm_t timeout_0, scan_inter_t scanInter_1, scan_wind_t scanWindow_1, conn_inter_t conn_min_1, conn_inter_t conn_max_1, conn_tm_t timeout_1, scan_inter_t scanInter_2, scan_wind_t scanWindow_2, conn_inter_t conn_min_2, conn_inter_t conn_max_2, conn_tm_t timeout_2);
 
 
 #endif

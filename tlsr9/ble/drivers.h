@@ -27,7 +27,7 @@
 #include "../drivers/TL321X/driver_tl321x.h"
 #include "../drivers/TL321X/ext_driver/driver_ext.h"
 #elif CONFIG_SOC_RISCV_TELINK_TL721X
-#include "../drivers/TL721X/driver_tl721x.h"
+#include "../drivers/TL721X/driver.h"
 #include "../drivers/TL721X/ext_driver/driver_ext.h"
 #endif
 #include "../common/types.h"
