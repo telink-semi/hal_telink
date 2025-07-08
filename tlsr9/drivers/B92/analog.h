@@ -64,7 +64,7 @@
  * @param[in]  addr - address need to be read.
  * @return     the result of read.
  */
-_attribute_ram_code_sec_optimize_o2_ unsigned char analog_read_reg8(unsigned char addr);
+_attribute_ram_code_com_sec_optimize_o2_ unsigned char analog_read_reg8(unsigned char addr);
 
 /**
  * @brief      This function serves to analog register write by byte.
@@ -72,7 +72,7 @@ _attribute_ram_code_sec_optimize_o2_ unsigned char analog_read_reg8(unsigned cha
  * @param[in]  data - the value need to be write.
  * @return     none.
  */
-_attribute_ram_code_sec_optimize_o2_ void analog_write_reg8(unsigned char addr, unsigned char data);
+_attribute_ram_code_com_sec_optimize_o2_ void analog_write_reg8(unsigned char addr, unsigned char data);
 
 /**
  * @brief      This function serves to analog register read by halfword.
@@ -87,14 +87,14 @@ _attribute_ram_code_com_sec_noinline_ unsigned short analog_read_reg16(unsigned 
  * @param[in]  data - the value need to be write.
  * @return     none.
  */
-_attribute_ram_code_sec_optimize_o2_ void analog_write_reg16(unsigned char addr, unsigned short data);
+_attribute_ram_code_com_sec_optimize_o2_ void analog_write_reg16(unsigned char addr, unsigned short data);
 
 /**
  * @brief      This function serves to analog register read by word.
  * @param[in]  addr - address need to be read.
  * @return     the result of read.
  */
-_attribute_ram_code_sec_optimize_o2_ unsigned int analog_read_reg32(unsigned char addr);
+_attribute_ram_code_com_sec_optimize_o2_ unsigned int analog_read_reg32(unsigned char addr);
 
  /**
   * @brief      This function serves to analog register write by word.
@@ -102,7 +102,7 @@ _attribute_ram_code_sec_optimize_o2_ unsigned int analog_read_reg32(unsigned cha
   * @param[in]  data - the value need to be write.
   * @return     none.
   */
-_attribute_ram_code_sec_optimize_o2_ void analog_write_reg32(unsigned char addr, unsigned int data);
+_attribute_ram_code_com_sec_optimize_o2_ void analog_write_reg32(unsigned char addr, unsigned int data);
 /**
  * @brief      This function serves to analog register read.
  * @param[in]  addr  - address need to be read.
