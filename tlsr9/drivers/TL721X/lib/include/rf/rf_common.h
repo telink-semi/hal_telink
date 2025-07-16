@@ -1009,6 +1009,7 @@ static inline unsigned char rf_get_rx_wptr(void)
  *            The default is RF_RX_NORMAL_PERFORMANCE, This mode is the default performance configuration.
  *            RX_HIGH_PERFORMANCE mode can improve performance, but the rx power consumption will increase
  */
+_attribute_ram_code_com_
 void rf_rx_performance_mode(rf_rx_performance_e rx_performance);
 
 /**
@@ -1042,6 +1043,7 @@ void rf_mode_init(void);
  * @param[in] none
  * @return    none.
  */
+_attribute_ram_code_com_
 void rf_set_tx_dma_config(void);
 
 /**
@@ -1073,6 +1075,7 @@ void rf_set_rx_dma(unsigned char *buff, unsigned char wptr_mask, unsigned short 
  * @param[in]   none
  * @return      none
  */
+_attribute_ram_code_com_
 void rf_set_rx_dma_config(void);
 
 /**
@@ -1136,6 +1139,7 @@ unsigned char *rf_get_rx_packet_addr(int fifo_num, int fifo_dep, void *addr);
  * @param[in]   level    - The power level to set.
  * @return      none.
  */
+_attribute_ram_code_com_sec_
 void rf_set_power_level(rf_power_level_e level);
 
 
@@ -1291,6 +1295,7 @@ static _always_inline void rf_set_rx_maxlen(unsigned int byte_len)
  * @return       0                   -  Correct configuration.
  *              -1                   -  Incorrect configuration.
  */
+_attribute_ram_code_com_
 signed char rf_fast_settle_config(rf_tx_fast_settle_time_e tx_settle_us, rf_rx_fast_settle_time_e rx_settle_us);
 
 
@@ -1299,6 +1304,7 @@ signed char rf_fast_settle_config(rf_tx_fast_settle_time_e tx_settle_us, rf_rx_f
  *  @param[in]  none
  *  @return     none
 */
+_attribute_ram_code_com_
 void rf_tx_fast_settle_en(void);
 
 /**
@@ -1306,6 +1312,7 @@ void rf_tx_fast_settle_en(void);
  *  @param[in]  none
  *  @return     none
 */
+_attribute_ram_code_com_
 void rf_tx_fast_settle_dis(void);
 
 /**
@@ -1313,6 +1320,7 @@ void rf_tx_fast_settle_dis(void);
  *  @param[in]  none
  *  @return     none
 */
+_attribute_ram_code_com_
 void rf_rx_fast_settle_en(void);
 
 /**
@@ -1320,6 +1328,7 @@ void rf_rx_fast_settle_en(void);
  *  @param[in]  none
  *  @return     none
 */
+_attribute_ram_code_com_
 void rf_rx_fast_settle_dis(void);
 
 /**
@@ -1431,6 +1440,7 @@ void rf_tx_fast_settle_get_cal_val(rf_tx_fast_settle_time_e tx_settle_time, unsi
  *  @param[in]  fs_cv           Fast settle calibration value address pointer.
  *  @return     none
 */
+_attribute_ram_code_com_
 void rf_tx_fast_settle_set_cal_val(rf_tx_fast_settle_time_e tx_settle_time, unsigned char chn, rf_fast_settle_t *fs_cv);
 
 /**
@@ -1451,6 +1461,7 @@ void rf_rx_fast_settle_get_cal_val(rf_rx_fast_settle_time_e rx_settle_time, unsi
  *  @param[in]  fs_cv           Fast settle calibration value address pointer.
  *  @return     none
 */
+_attribute_ram_code_com_
 void rf_rx_fast_settle_set_cal_val(rf_rx_fast_settle_time_e rx_settle_time, unsigned char chn, rf_fast_settle_t *fs_cv);
 
 /**

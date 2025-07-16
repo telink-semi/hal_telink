@@ -89,6 +89,7 @@ unsigned char ext_hci_getTxCompleteDone(void);
  *              0  the length is error.
  * @note        addr: must be aligned by word (4 bytes), otherwise the program will enter an exception.
  */
+_attribute_ram_code_com_sec_
 unsigned char ext_hci_uartSendData(unsigned char *addr, unsigned int len);
 
 /**
@@ -105,6 +106,7 @@ unsigned char ext_hci_uartSendData(unsigned char *addr, unsigned int len);
  *                when CEILING(Tx_len,4) > CEILING(Rx_len,4), When the length of the DMA carry reaches Rx_len, the DMA will not stop working and the excess data will not be carried into the buff. \n
  *                For example:Tx_len=21,Rx_len=20,When the DMA stops working the buff is written with a length of 21 and only 20 bytes of data are stored.It is recommended to configure the appropriate Rx_len to avoid this situation.
  */
+_attribute_ram_code_com_sec_
 void ext_hci_uartReceData(unsigned char *addr, unsigned int len);
 
 #endif /* DRIVERS_TL721X_EXT_DRIVER_EXT_HCI_UART_H_ */
