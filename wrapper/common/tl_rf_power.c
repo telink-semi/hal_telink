@@ -19,7 +19,7 @@
 #include "tl_rf_power.h"
 #if CONFIG_SOC_RISCV_TELINK_B91 || CONFIG_SOC_RISCV_TELINK_B92
  #include <rf.h>
-#elif CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X
+#elif CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X ||CONFIG_SOC_RISCV_TELINK_TL322X
 #include <rf_common.h>
 #endif
 
@@ -188,6 +188,45 @@ const uint8_t tl_tx_pwr_lt[] = {
 	RF_POWER_P6p71dBm,    /**<   6.7 dbm:   7 */
 	RF_POWER_P8p06dBm,    /**<   8.0 dbm:   8 */
 	RF_POWER_P9p10dBm,    /**<   9.1 dbm:   9 */
+	RF_POWER_P10p00dBm,   /**<  10.0 dbm:  10 */
+};
+
+
+#elif CONFIG_SOC_RISCV_TELINK_TL322X
+/* TX power TL721X lookup table */
+const uint8_t tl_tx_pwr_lt[] = {
+	/*VANT*/
+	RF_POWER_N19p40dBm,   /**< -19.4 dbm: -20 */
+	RF_POWER_N19p40dBm,   /**< -19.4 dbm: -19 */
+	RF_POWER_N19p40dBm,   /**< -19.4 dbm: -18 */
+	RF_POWER_N19p40dBm,   /**< -19.4 dbm: -17 */
+	RF_POWER_N16p30dBm,   /**< -16.3 dbm: -16 */
+	RF_POWER_N16p30dBm,   /**< -16.3 dbm: -15 */
+	RF_POWER_N16p30dBm,   /**< -16.3 dbm: -14 */
+	RF_POWER_N13p60dBm,   /**< -13.6 dbm: -13 */
+	RF_POWER_N12p00dBm,   /**< -12.0 dbm: -12 */
+	RF_POWER_N12p00dBm,   /**< -12.0 dbm: -11 */
+	RF_POWER_N10p30dBm,   /**< -10.3 dbm: -10 */
+	RF_POWER_N9p00dBm,    /**<  -9.0 dbm: -9  */
+	RF_POWER_N8p00dBm,    /**<  -8.0 dbm: -8  */
+	RF_POWER_N7p00dBm,    /**<  -7.0 dbm: -7  */
+	RF_POWER_N6p20dBm,    /**<  -6.2 dbm: -6  */
+	RF_POWER_N5p50dBm,    /**<  -5.5 dbm: -5  */
+	RF_POWER_N4p00dBm,    /**<  -4.0 dbm: -4  */
+	RF_POWER_N3p00dBm,    /**<  -3.0 dbm: -3  */
+	RF_POWER_N2p00dBm,    /**<  -2.0 dbm: -2  */
+	RF_POWER_N0p80dBm,    /**<  -0.8 dbm  -1  */
+	RF_POWER_P0p00dBm,    /**<   0.0 dbm:   0 */
+	RF_POWER_P1p00dBm,    /**<   1.0 dbm:   1 */
+	RF_POWER_P2p00dBm,    /**<   2.0 dbm:   2 */
+	RF_POWER_P3p00dBm,    /**<   3.0 dbm:   3 */
+	RF_POWER_P4p00dBm,    /**<   4.0 dbm:   4 */
+	/*VBAT*/
+	RF_POWER_P5p00dBm,    /**<   5.0 dbm:   5 */
+	RF_POWER_P6p00dBm,    /**<   6.0 dbm:   6 */
+	RF_POWER_P7p00dBm,    /**<   7.0 dbm:   7 */
+	RF_POWER_P8p00dBm,    /**<   8.0 dbm:   8 */
+	RF_POWER_P9p00dBm,    /**<   9.0 dbm:   9 */
 	RF_POWER_P10p00dBm,   /**<  10.0 dbm:  10 */
 };
 

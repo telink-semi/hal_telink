@@ -17,13 +17,8 @@
  *****************************************************************************/
 #include "zephyr/bluetooth/buf.h"
 #include <zephyr/storage/flash_map.h>
-#if CONFIG_SOC_RISCV_TELINK_TL321X
 #include "stack/ble/ble.h"
 #include "stack/ble/ble_format.h"
-#elif CONFIG_SOC_RISCV_TELINK_TL721X
-#include "stack/ble/ble.h"
-#include "stack/ble/ble_format.h"
-#endif
 #include "tlx_bt_buffer.h"
 #include "tlx_bt_init.h"
 #include "tlx_bt_flash.h"
@@ -157,7 +152,7 @@ int tlx_bt_blc_init(void *prx, void *ptx)
 	}
 #endif /* CONFIG_BT_PERIPHERAL */
 
-#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X
+#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL322X
 	blc_ll_configLegacyAdvEnableStrategy(LEG_ADV_EN_STRATEGY_3);
 #endif
 

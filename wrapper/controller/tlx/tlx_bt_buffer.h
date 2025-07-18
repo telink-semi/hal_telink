@@ -19,11 +19,7 @@
 #define TLX_BT_BUFFER_H_
 
 #include "zephyr/bluetooth/buf.h"
-#if CONFIG_SOC_RISCV_TELINK_TL321X
 #include "stack/ble/ble.h"
-#elif CONFIG_SOC_RISCV_TELINK_TL721X
-#include "stack/ble/ble.h"
-#endif
 
 #define BT_BUF_HCI_RX_SIZE                                                                             \
         MAX(BT_BUF_CMD_SIZE(CONFIG_BT_BUF_CMD_TX_SIZE), BT_BUF_ACL_SIZE(CONFIG_BT_BUF_ACL_TX_SIZE))

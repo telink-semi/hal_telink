@@ -17,11 +17,7 @@
  *****************************************************************************/
 #include "tlx_bt_flash.h"
 
-#if CONFIG_SOC_RISCV_TELINK_TL321X
 #include "stack/ble/ble_common.h"
-#elif CONFIG_SOC_RISCV_TELINK_TL721X
-#include "stack/ble/ble_common.h"
-#endif
 
 #include "flash.h"
 #include "string.h"

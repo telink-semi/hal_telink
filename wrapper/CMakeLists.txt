@@ -99,6 +99,7 @@ zephyr_compile_options(
 	-DPM_DEEPSLEEP_RETENTION_ENABLE=0
 	-DBLMS_PM_ENABLE=0
 	-DBLC_PM_EN=0
+	-DBLC_ZEPHYR_BLE_INTEGRATION=1
 )
 
 file(GLOB SOC_SOURCES
@@ -232,7 +233,7 @@ endif()
 
 if(CONFIG_BT OR CONFIG_IEEE802154)
 	zephyr_library_sources(common/tl_rf_power.c)
-	if(NOT ${SOC} STREQUAL "TL721X")
+	if(CONFIG_SOC_RISCV_TELINK_B91 OR CONFIG_SOC_RISCV_TELINK_B92)
 		zephyr_library_sources(${TL_BLE_SRC_DIR}/drivers/${SOC}/aes.c)
 	endif()
 	if(CONFIG_BT_B9X OR CONFIG_IEEE802154_TELINK_B9X)
