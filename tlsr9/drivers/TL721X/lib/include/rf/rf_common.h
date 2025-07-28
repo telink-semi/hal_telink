@@ -1039,6 +1039,18 @@ void rf_set_rx_dcoc_cali_by_sw(unsigned char en);
 void rf_mode_init(void);
 
 /**
+ * @brief      This function serves to initiate information of RF.
+ * @return       none.
+ * @return       none.
+ * @note          Attention:
+ *                 In order to solve the problem of poor receiver sensitivity performance of some chips with large DC offset:
+ *                 1.Added DCOC software calibration scheme to the rf_zigbee_mode_init() interface to get the smallest DC-offset for the chip.
+ *                But there is thing to note:
+ *                (1)Using DCOC software calibration will increase the software execution time of rf_zigbee_mode_init().
+ */
+void rf_zigbee_mode_init(void);
+
+/**
  * @brief     This function serves to set RF tx DMA setting.
  * @param[in] none
  * @return    none.
