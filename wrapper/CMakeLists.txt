@@ -100,7 +100,17 @@ zephyr_compile_options(
 	-DBLMS_PM_ENABLE=0
 	-DBLC_PM_EN=0
 	-DBLC_ZEPHYR_BLE_INTEGRATION=1
+	-DTLK_MAILBOX_MESSAGE_HOST_EN=1
+	-DTLK_ONLY_BLE_HOST_CONNCURRENT=1
 )
+
+if(FALSE)		#if(CONFIG_SOC_RISCV_TELINK_TL322X)		#
+zephyr_compile_options(
+	-DTLK_ONLY_BLE_HOST=1
+	-DTLK_MAILBOX_MESSAGE_HOST_EN=1
+	-DDUAL_CORE_MODE_ENABLED=1
+)
+endif()
 
 file(GLOB SOC_SOURCES
 	${TL_BLE_SRC_DIR}/drivers/${SOC}/error_handler/*.c
@@ -133,9 +143,12 @@ if(CONFIG_IEEE802154_TELINK_B9X OR CONFIG_IEEE802154_TELINK_TLX OR CONFIG_BT_B9X
 		${TL_BLE_SRC_DIR}/stack/ble/debug/*.c
 		${TL_BLE_SRC_DIR}/stack/ble/device/*.c
 		${TL_BLE_SRC_DIR}/stack/ble/hal/hal_${SOC}/*.c
-		${TL_BLE_SRC_DIR}/stack/ble/hci/*.c
 		${TL_BLE_SRC_DIR}/stack/ble/os_sup/*.c
 		${TL_BLE_SRC_DIR}/stack/ble/secureboot/*.c
+	)
+	
+	file(GLOB CONTROLLER_SOURCES
+		${TL_BLE_SRC_DIR}/stack/ble/hci/*.c
 		${TL_BLE_SRC_DIR}/stack/ble/controller/*.c
 		${TL_BLE_SRC_DIR}/stack/ble/controller/csa/*.c
 		${TL_BLE_SRC_DIR}/stack/ble/controller/ial/*.c
@@ -152,7 +165,19 @@ if(CONFIG_IEEE802154_TELINK_B9X OR CONFIG_IEEE802154_TELINK_TLX OR CONFIG_BT_B9X
 		${TL_BLE_SRC_DIR}/stack/ble/controller/ll/chn_class/*.c
 		${TL_BLE_SRC_DIR}/stack/ble/controller/ll/adv/*.c
 		${TL_BLE_SRC_DIR}/stack/ble/controller/ll/acl_conn/*.c
+		${TL_BLE_SRC_DIR}/stack/multiCoreComm/service/*.c
+		${TL_BLE_SRC_DIR}/stack/multiCoreComm/drv/*.c
+		${TL_BLE_SRC_DIR}/stack/multiCoreComm/*.c
 	)
+	file(GLOB HOST_SOURCES
+		${TL_BLE_SRC_DIR}/stack/multiCoreComm/*.c
+		${TL_BLE_SRC_DIR}/stack/multiCoreComm/drv/*.c
+		${TL_BLE_SRC_DIR}/stack/multiCoreComm/service/*.c
+		${TL_BLE_SRC_DIR}/stack/ble/host/hci/*.c
+		${TL_BLE_SRC_DIR}/stack/ble/host/hci/hci_simu_ll/*.c
+	)
+	list(APPEND BLE_SOURCES ${CONTROLLER_SOURCES})
+
 	zephyr_library_sources(${BLE_SOURCES})
 endif()
 

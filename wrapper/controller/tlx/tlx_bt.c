@@ -319,6 +319,9 @@ void tlx_bt_host_send_packet(uint8_t type, const uint8_t *data, uint16_t len)
 	*p++ = type;
 	memcpy(p, data, len);
 	bltHci_rxfifo.wptr++;
+#if TLK_ONLY_BLE_HOST_CONNCURRENT
+	tlk_d25f_hci_send_message(0, (u8 *)(uintptr_t)(const void*)p-1, len+1);
+#endif
 
 	k_sem_give(&controller_sem);
 }
