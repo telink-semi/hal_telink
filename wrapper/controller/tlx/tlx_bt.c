@@ -163,7 +163,12 @@ static void tlx_bt_controller_thread()
 {
 	while (tl_bt_state == TL_BT_CONTROLLER_STATE_ACTIVE ||
 		tl_bt_state == TL_BT_CONTROLLER_STATE_STOPPING) {
+#if TLK_ONLY_BLE_HOST_CONNCURRENT
+		k_sem_take(&controller_sem, K_MSEC(10));	//Mailbox irq can also trigger controller_sem in time.
+		tlk_multi_core_communication_loop();
+#else
 		k_sem_take(&controller_sem, K_FOREVER);
+#endif
 		blc_sdk_main_loop();
 	}
 }
@@ -318,9 +323,10 @@ void tlx_bt_host_send_packet(uint8_t type, const uint8_t *data, uint16_t len)
 	u8 *p = bltHci_rxfifo.p + (bltHci_rxfifo.wptr & bltHci_rxfifo.mask) * bltHci_rxfifo.size;
 	*p++ = type;
 	memcpy(p, data, len);
-	bltHci_rxfifo.wptr++;
 #if TLK_ONLY_BLE_HOST_CONNCURRENT
 	tlk_d25f_hci_send_message(0, (u8 *)(uintptr_t)(const void*)p-1, len+1);
+#else
+	bltHci_rxfifo.wptr++;
 #endif
 
 	k_sem_give(&controller_sem);
@@ -333,6 +339,9 @@ void tlx_bt_host_callback_register(const tlx_bt_host_callback_t *pcb)
 {
 	tlx_ctrl.callbacks.host_read_packet = pcb->host_read_packet;
 	tlx_ctrl.callbacks.host_send_available = pcb->host_send_available;
+#if TLK_ONLY_BLE_HOST_CONNCURRENT
+	tlk_d25f_register_hci_receive_cb(0, tlx_ctrl.callbacks.host_read_packet);
+#endif
 }
 
 /**
