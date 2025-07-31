@@ -78,6 +78,7 @@ _attribute_ble_data_retention_ u8
  */
 int tlx_bt_blc_init(void *prx, void *ptx)
 {
+#ifndef TLK_ONLY_BLE_HOST
 	/* random number generator must be initiated here(in the beginning of user_init_nromal).
 	 * When deepSleep retention wakeUp, no need initialize again */
 	random_generator_init();
@@ -199,11 +200,12 @@ int tlx_bt_blc_init(void *prx, void *ptx)
 	if (check_status != BLE_SUCCESS) {
 		return INIT_FAILED;
 	}
-#ifndef TLK_ONLY_BLE_HOST_CONNCURRENT
+#endif
+#ifndef TLK_ONLY_BLE_HOST
 	/* HCI configuration */
 	blc_register_hci_handler(prx, ptx);
 #endif
-
+#ifndef TLK_ONLY_BLE_HOST	//TODO: PM has not been ready yet.
 #ifdef CONFIG_PM
 	/* Enable PM for BLE stack */
 	blc_ll_enOsPowerManagement_module();
@@ -216,8 +218,7 @@ int tlx_bt_blc_init(void *prx, void *ptx)
 	blc_ll_setOsLowPowerExitLatencyUs(SUSPEND_EXIT_LATENCY_US, DEEPRETN_EXIT_LATENCY_US);
 	#endif
 #endif /* CONFIG_PM */
-
-
+#endif
 
 	return INIT_OK;
 }

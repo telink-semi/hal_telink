@@ -30,9 +30,8 @@
 #include "drivers.h"
 #include <stdlib.h>
 #include "tlx_bt_buffer.h"
-#if TLK_ONLY_BLE_HOST_CONNCURRENT
+#if TLK_ONLY_BLE_HOST
 #include "stack/multiCoreComm/drv/shareMemory.h"
-#include "stack/ble/controller/ble_controller.h"		//TODO: should delete then
 #else
 #include "stack/ble/controller/ble_controller.h"
 #endif
@@ -100,7 +99,7 @@ _attribute_ram_code_ void stimer_irq_handler(const void *param)
  */
 static int tlx_bt_hci_tx_handler(void)
 {
-#ifndef TLK_ONLY_BLE_HOST_CONNCURRENT	//TODO: TL_BT_CONTROLLER_STATE_STOPPING is not decided to remain now.
+#ifndef TLK_ONLY_BLE_HOST	//TODO: TL_BT_CONTROLLER_STATE_STOPPING is not decided to remain now.
 	/* check for data available */
 	while(bltHci_txfifo.wptr != bltHci_txfifo.rptr)
 	{
@@ -136,7 +135,7 @@ static int tlx_bt_hci_tx_handler(void)
  */
 static int tlx_bt_hci_rx_handler(void)
 {
-#ifndef TLK_ONLY_BLE_HOST_CONNCURRENT
+#ifndef TLK_ONLY_BLE_HOST
 	/* Check for data available */
 	if (bltHci_rxfifo.wptr == bltHci_rxfifo.rptr) {
 		/* No data to process, send host_send_available message to the host */
@@ -170,16 +169,16 @@ static void tlx_bt_controller_thread()
 {
 	while (tl_bt_state == TL_BT_CONTROLLER_STATE_ACTIVE ||
 		tl_bt_state == TL_BT_CONTROLLER_STATE_STOPPING) {
-#if TLK_ONLY_BLE_HOST_CONNCURRENT
+#if TLK_ONLY_BLE_HOST
 		k_sem_take(&controller_sem, K_MSEC(10));	//Mailbox irq can also trigger controller_sem in time.
 		tlk_multi_core_communication_loop();
 #else
 		k_sem_take(&controller_sem, K_FOREVER);
-#endif
 		blc_sdk_main_loop();
+#endif
 	}
 }
-
+#ifndef TLK_ONLY_BLE_HOST
 /**
  * @brief    BLE Controller IRQs initialization
  */
@@ -201,7 +200,7 @@ static void tlx_bt_irq_init()
 	plic_set_priority(IRQ_SYSTIMER, 2);
 	plic_set_priority(IRQ_ZB_RT, 2);
 }
-
+#endif
 /**
  * @brief    Telink TLX BLE Controller initialization
  * @return   Status - 0: command succeeded; -1: command failed
@@ -209,11 +208,12 @@ static void tlx_bt_irq_init()
 int tlx_bt_controller_init()
 {
 	int status;
-
+#ifndef TLK_ONLY_BLE_HOST	//TODO: PM has not been ready yet.
 #if CONFIG_PM && CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION
 	pm_policy_state_lock_get(PM_STATE_STANDBY, PM_ALL_SUBSTATES);
 #endif /* CONFIG_PM && CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION */
-#ifndef TLK_ONLY_BLE_HOST_CONNCURRENT //RF is controller by N22
+#endif
+#ifndef TLK_ONLY_BLE_HOST //RF is controller by N22
 	/* Reset Radio */
 	rf_radio_reset();
 #if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL322X
@@ -223,7 +223,7 @@ int tlx_bt_controller_init()
 	/* Init RF driver */
 	rf_drv_ble_init();
 #endif
-
+#ifndef TLK_ONLY_BLE_HOST
 #ifdef CONFIG_BT_CENTRAL
 	app_acl_mstTxfifo = (u8 *)calloc(ACL_MASTER_TX_FIFO_SIZE * ACL_MASTER_TX_FIFO_NUM * CONFIG_TL_BLE_CTRL_MASTER_MAX_NUM,1);
 #endif /* CONFIG_BT_CENTRAL */
@@ -242,14 +242,17 @@ int tlx_bt_controller_init()
 	if (status != INIT_OK) {
 		return status;
 	}
-
+#endif
+#ifndef TLK_ONLY_BLE_HOST
 	/* Init IRQs */
 	tlx_bt_irq_init();
-
+#endif
+#ifndef TLK_ONLY_BLE_HOST	//TODO: the os_sup seems not used now, not sure
 	/* Register callback to controller. */
 #if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL322X
 	blc_ll_registerGiveSemCb(os_give_sem_cb, os_give_sem_cb);
 	blc_setOsSupEnable(true);
+#endif
 #endif
 	/* init semaphore */
 	k_sem_reset(&controller_sem);
@@ -288,7 +291,7 @@ void tlx_bt_controller_deinit()
 
 	/* wait thread finish */
 	(void)k_thread_join(&tlx_bt_controller_thread_data, K_FOREVER);
-
+#ifndef TLK_ONLY_BLE_HOST
 	/* disable interrupts */
 	plic_interrupt_disable(IRQ_SYSTIMER);
 	plic_interrupt_disable(IRQ_ZB_RT);
@@ -299,7 +302,8 @@ void tlx_bt_controller_deinit()
 	rf_reset_dma();
 	rf_baseband_reset();
 #endif
-
+#endif
+#ifndef TLK_ONLY_BLE_HOST
 #ifdef CONFIG_BT_CENTRAL
 	free(app_acl_mstTxfifo);
 #endif /* CONFIG_BT_CENTRAL */
@@ -310,11 +314,12 @@ void tlx_bt_controller_deinit()
 	free(app_hci_rxfifo);
 	free(app_hci_txfifo);
 	free(app_hci_rxAclfifo);
-
-
+#endif
+#ifndef TLK_ONLY_BLE_HOST
 #if CONFIG_PM && CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION
 	pm_policy_state_lock_put(PM_STATE_STANDBY, PM_ALL_SUBSTATES);
 #endif /* CONFIG_PM && CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION */
+#endif
 }
 
 /**
@@ -328,7 +333,7 @@ void tlx_bt_host_send_packet(uint8_t type, const uint8_t *data, uint16_t len)
 		return;
 	}
 
-#if TLK_ONLY_BLE_HOST_CONNCURRENT
+#if TLK_ONLY_BLE_HOST
 	u8 hci_cmd[255+3] = {0}; 			//Controllers shall be able to accept HCI Command packets with up to 255 bytes of data excluding the HCI Command packet header.
 	hci_cmd[0] = type;
 	memcpy(hci_cmd+1, data, len);
@@ -354,9 +359,9 @@ void tlx_bt_host_send_packet(uint8_t type, const uint8_t *data, uint16_t len)
  */
 void tlx_bt_host_callback_register(const tlx_bt_host_callback_t *pcb)
 {
-	tlx_ctrl.callbacks.host_read_packet = pcb->host_read_packet;
-	tlx_ctrl.callbacks.host_send_available = pcb->host_send_available;
-#if TLK_ONLY_BLE_HOST_CONNCURRENT
+	tlx_ctrl.callbacks.host_read_packet = pcb->host_read_packet;		//hci_tlx_host_rcv_pkt
+	tlx_ctrl.callbacks.host_send_available = pcb->host_send_available;	//hci_tlx_controller_rcv_pkt_ready
+#if TLK_ONLY_BLE_HOST
 	tlk_d25f_register_hci_receive_cb(0, tlx_ctrl.callbacks.host_read_packet);
 #endif
 }
