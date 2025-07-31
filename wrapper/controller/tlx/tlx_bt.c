@@ -30,7 +30,12 @@
 #include "drivers.h"
 #include <stdlib.h>
 #include "tlx_bt_buffer.h"
+#if TLK_ONLY_BLE_HOST_CONNCURRENT
+#include "stack/multiCoreComm/drv/shareMemory.h"
+#include "stack/ble/controller/ble_controller.h"		//TODO: should delete then
+#else
 #include "stack/ble/controller/ble_controller.h"
+#endif
 #include "stack/ble/os_sup/os_sup.h"
 
 /* Module defines */
@@ -95,6 +100,7 @@ _attribute_ram_code_ void stimer_irq_handler(const void *param)
  */
 static int tlx_bt_hci_tx_handler(void)
 {
+#ifndef TLK_ONLY_BLE_HOST_CONNCURRENT	//TODO: TL_BT_CONTROLLER_STATE_STOPPING is not decided to remain now.
 	/* check for data available */
 	while(bltHci_txfifo.wptr != bltHci_txfifo.rptr)
 	{
@@ -121,7 +127,7 @@ static int tlx_bt_hci_tx_handler(void)
 			}
 		}
 	}
-
+#endif
 	return 0;
 }
 
@@ -130,6 +136,7 @@ static int tlx_bt_hci_tx_handler(void)
  */
 static int tlx_bt_hci_rx_handler(void)
 {
+#ifndef TLK_ONLY_BLE_HOST_CONNCURRENT
 	/* Check for data available */
 	if (bltHci_rxfifo.wptr == bltHci_rxfifo.rptr) {
 		/* No data to process, send host_send_available message to the host */
@@ -152,7 +159,7 @@ static int tlx_bt_hci_rx_handler(void)
 #endif
 		bltHci_rxfifo.rptr++;
 	}
-
+#endif
 	return 0;
 }
 
@@ -206,7 +213,7 @@ int tlx_bt_controller_init()
 #if CONFIG_PM && CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION
 	pm_policy_state_lock_get(PM_STATE_STANDBY, PM_ALL_SUBSTATES);
 #endif /* CONFIG_PM && CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION */
-
+#ifndef TLK_ONLY_BLE_HOST_CONNCURRENT //RF is controller by N22
 	/* Reset Radio */
 	rf_radio_reset();
 #if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL322X
@@ -215,6 +222,7 @@ int tlx_bt_controller_init()
 #endif
 	/* Init RF driver */
 	rf_drv_ble_init();
+#endif
 
 #ifdef CONFIG_BT_CENTRAL
 	app_acl_mstTxfifo = (u8 *)calloc(ACL_MASTER_TX_FIFO_SIZE * ACL_MASTER_TX_FIFO_NUM * CONFIG_TL_BLE_CTRL_MASTER_MAX_NUM,1);
@@ -320,12 +328,21 @@ void tlx_bt_host_send_packet(uint8_t type, const uint8_t *data, uint16_t len)
 		return;
 	}
 
+#if TLK_ONLY_BLE_HOST_CONNCURRENT
+	u8 hci_cmd[255+3] = {0}; 			//Controllers shall be able to accept HCI Command packets with up to 255 bytes of data excluding the HCI Command packet header.
+	hci_cmd[0] = type;
+	memcpy(hci_cmd+1, data, len);
+	tlk_sm_ret_e ret = tlk_d25f_hci_send_message(0, hci_cmd, len+1);
+	if (ret == TLK_SHARE_MEMOTY_SUCCESS) {
+		/* No data to process, send host_send_available message to the host */
+		if (tlx_ctrl.callbacks.host_send_available) {
+			tlx_ctrl.callbacks.host_send_available();
+		}
+	}
+#else
 	u8 *p = bltHci_rxfifo.p + (bltHci_rxfifo.wptr & bltHci_rxfifo.mask) * bltHci_rxfifo.size;
 	*p++ = type;
 	memcpy(p, data, len);
-#if TLK_ONLY_BLE_HOST_CONNCURRENT
-	tlk_d25f_hci_send_message(0, (u8 *)(uintptr_t)(const void*)p-1, len+1);
-#else
 	bltHci_rxfifo.wptr++;
 #endif
 

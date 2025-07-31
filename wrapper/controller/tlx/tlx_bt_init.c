@@ -199,9 +199,10 @@ int tlx_bt_blc_init(void *prx, void *ptx)
 	if (check_status != BLE_SUCCESS) {
 		return INIT_FAILED;
 	}
-
+#ifndef TLK_ONLY_BLE_HOST_CONNCURRENT
 	/* HCI configuration */
 	blc_register_hci_handler(prx, ptx);
+#endif
 
 #ifdef CONFIG_PM
 	/* Enable PM for BLE stack */
