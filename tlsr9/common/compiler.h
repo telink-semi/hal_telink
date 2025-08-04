@@ -33,8 +33,13 @@
 #define _attribute_ram_code_sec_noinline_       __attribute__((section(".ram_code"))) __attribute__((noinline))
 
 // STD-RISCV compiler
-#define _attribute_ram_code_sec_optimize_o2_                __attribute__((section(".ram_code_ble"))) __attribute__((optimize("O2")))
-#define _attribute_ram_code_sec_optimize_o2_noinline_       __attribute__((noinline)) __attribute__((section(".ram_code_ble"))) __attribute__((optimize("O2")))
+#if CONFIG_SOC_RISCV_TELINK_B9X
+    #define _attribute_ram_code_sec_optimize_o2_                __attribute__((section(".ram_code"))) __attribute__((optimize("O2")))
+    #define _attribute_ram_code_sec_optimize_o2_noinline_       __attribute__((noinline)) __attribute__((section(".ram_code"))) __attribute__((optimize("O2")))
+#else
+    #define _attribute_ram_code_sec_optimize_o2_                __attribute__((section(".ram_code_ble"))) __attribute__((optimize("O2")))
+    #define _attribute_ram_code_sec_optimize_o2_noinline_       __attribute__((noinline)) __attribute__((section(".ram_code_ble"))) __attribute__((optimize("O2")))
+#endif
 #define _attribute_ram_code_com_sec_optimize_o2_            __attribute__((section(".ram_code"))) __attribute__((optimize("O2")))
 #define _attribute_ram_code_com_sec_optimize_o2_noinline_   __attribute__((noinline)) __attribute__((section(".ram_code"))) __attribute__((optimize("O2")))
 
