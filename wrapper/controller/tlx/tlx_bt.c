@@ -32,6 +32,7 @@
 #include "tlx_bt_buffer.h"
 #if TLK_ONLY_BLE_HOST
 #include "stack/multiCoreComm/drv/shareMemory.h"
+#include "stack/multiCoreComm/service/service_shareMemory.h"
 #else
 #include "stack/ble/controller/ble_controller.h"
 #endif
@@ -207,7 +208,7 @@ static void tlx_bt_irq_init()
  */
 int tlx_bt_controller_init()
 {
-	int status;
+	int status = INIT_OK;
 #ifndef TLK_ONLY_BLE_HOST	//TODO: PM has not been ready yet.
 #if CONFIG_PM && CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION
 	pm_policy_state_lock_get(PM_STATE_STANDBY, PM_ALL_SUBSTATES);
@@ -242,6 +243,9 @@ int tlx_bt_controller_init()
 	if (status != INIT_OK) {
 		return status;
 	}
+#else
+	(void)tlx_bt_hci_rx_handler;
+	(void)tlx_bt_hci_tx_handler;
 #endif
 #ifndef TLK_ONLY_BLE_HOST
 	/* Init IRQs */
@@ -362,7 +366,7 @@ void tlx_bt_host_callback_register(const tlx_bt_host_callback_t *pcb)
 	tlx_ctrl.callbacks.host_read_packet = pcb->host_read_packet;		//hci_tlx_host_rcv_pkt
 	tlx_ctrl.callbacks.host_send_available = pcb->host_send_available;	//hci_tlx_controller_rcv_pkt_ready
 #if TLK_ONLY_BLE_HOST
-	tlk_d25f_register_hci_receive_cb(0, tlx_ctrl.callbacks.host_read_packet);
+	tlk_d25f_register_hci_receive_cb(0, (void (*)(unsigned char *, unsigned int))tlx_ctrl.callbacks.host_read_packet);
 #endif
 }
 
