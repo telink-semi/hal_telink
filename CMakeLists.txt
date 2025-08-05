@@ -33,9 +33,19 @@ else()
 	message(FATAL_ERROR "Not supported SOC")
 endif()
 
-add_subdirectory(tl_ble_sdk/tools)
-zephyr_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/tl_ble_sdk/tl_ble_sdk/proj_lib/lib_zephyr_${LIB_SOC_NAME}.a)
-# add_subdirectory(tl_ble_src/tools)
+set(CONFIG_COMPILE_SDK 1)
+
+if(CONFIG_COMPILE_SDK)
+	add_subdirectory(tl_ble_sdk/tools)
+	if(CONFIG_TELINK_TL322X_ENABLE_N22)
+		message("Enabling N22 support for TL322X")
+		zephyr_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/tl_ble_sdk/tl_ble_sdk/proj_lib/lib_zephyr_${LIB_SOC_NAME}_dual_core.a)
+	else()
+		zephyr_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/tl_ble_sdk/tl_ble_sdk/proj_lib/lib_zephyr_${LIB_SOC_NAME}_single_core.a)
+	endif()
+else()
+	add_subdirectory(tl_ble_src/tools)
+endif()
 
 add_subdirectory(wrapper)
 
