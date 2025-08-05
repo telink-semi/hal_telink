@@ -35,20 +35,20 @@
 
 void flash_protection_lock_init(void)
 {
-    // flash_protection_init();
+    flash_protection_init();
 
-    // unsigned int app_lockBlock = FLASH_PROTECT_BLOCK_SIZE; // init is 1M, in the ble lib, actual area will be less than 1m, so we protect 1m.
+    unsigned int app_lockBlock = FLASH_PROTECT_BLOCK_SIZE; // init is 1M, in the ble lib, actual area will be less than 1m, so we protect 1m.
 
-    // unsigned int flash_lockBlock_cmd = flash_change_app_lock_block_to_flash_lock_block(app_lockBlock);
+    unsigned int flash_lockBlock_cmd = flash_change_app_lock_block_to_flash_lock_block(app_lockBlock);
 
-    // flash_lock(flash_lockBlock_cmd);
+    flash_lock(flash_lockBlock_cmd);
 }
 
 void flash_protection_lock_operation(unsigned int offset)
 {
 	/* no need to lock again, detect fw addr will unlock flash. */
 	if(offset < FLASH_ADR_OFFSET_SELECT){
-		// flash_unlock();
+		flash_unlock();
 	}
 }
 
@@ -56,6 +56,6 @@ void flash_protection_unlock_operation(unsigned int offset)
 {
 	/* suppose we will operate lock area, it will do ota, will unlock first and not lock again until it will reboot. */
 	if(offset < FLASH_ADR_OFFSET_SELECT){
-		// flash_unlock();
+		flash_unlock();
 	}
 }
