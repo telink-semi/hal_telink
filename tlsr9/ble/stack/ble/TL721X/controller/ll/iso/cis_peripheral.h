@@ -18,11 +18,9 @@
 #ifndef CIS_PERIPHERAL_H_
 #define CIS_PERIPHERAL_H_
 
-
-
-#define         CIS_SLV_PARAM_LEN                           616 //user can't modify this value !!!
-
-
+#ifndef CIS_SLV_PARAM_LEN
+#define CIS_SLV_PARAM_LEN 488 //user can't modify this value !!!
+#endif
 
 
 /**
@@ -32,7 +30,7 @@
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_initCisPeriphrModule_initCisPeriphrParametersBuffer(u8 *pCisPerParamBuf, int cis_per_num);
+ble_sts_t blc_ll_initCisPeriphrModule_initCisPeriphrParametersBuffer(u8 *pCisPerParamBuf, int cis_per_num);
 
 
 /**
@@ -42,7 +40,7 @@ ble_sts_t   blc_ll_initCisPeriphrModule_initCisPeriphrParametersBuffer(u8 *pCisP
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_acceptCisRequest(u16 cisHandle);
+ble_sts_t blc_ll_acceptCisRequest(u16 cisHandle);
 
 
 /**
@@ -53,8 +51,7 @@ ble_sts_t   blc_ll_acceptCisRequest(u16 cisHandle);
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_rejectCisReq(u16 cisHandle, u8 reason);
-
+ble_sts_t blc_ll_rejectCisReq(u16 cisHandle, u8 reason);
 
 
 #endif /* CIS_PERIPHERAL_H_ */

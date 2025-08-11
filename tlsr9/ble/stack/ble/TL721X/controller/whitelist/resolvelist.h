@@ -19,10 +19,6 @@
 #define LL_RESOLVELIST_H_
 
 
-
-
-
-
 /**
  * @brief      This function is used to add a device to resolving list
  *             attention: maximum device number in Resolving List is 4 by default. Please contact Telink if this number can not meet your requirement.
@@ -33,7 +29,7 @@
  * @return     Status - 0x00: command succeeded;
  *                      Others: command failed, refer to definition of "ble_sts_t" to know the reason
  */
-ble_sts_t   blc_ll_addDeviceToResolvingList(ida_type_t peerIdAddrType, u8 *peerIdAddr, u8 *peer_irk, u8 *local_irk);
+ble_sts_t blc_ll_addDeviceToResolvingList(ida_type_t peerIdAddrType, u8 *peerIdAddr, u8 *peer_irk, u8 *local_irk);
 
 
 /**
@@ -45,7 +41,7 @@ ble_sts_t   blc_ll_addDeviceToResolvingList(ida_type_t peerIdAddrType, u8 *peerI
  * @return     Status - 0x00: command succeeded;
  *                      Others: command failed, refer to definition of "ble_sts_t" to know the reason
  */
-ble_sts_t   blc_ll_removeDeviceFromResolvingList(ida_type_t peerIdAddrType, u8 *peerIdAddr);
+ble_sts_t blc_ll_removeDeviceFromResolvingList(ida_type_t peerIdAddrType, u8 *peerIdAddr);
 
 
 /**
@@ -54,7 +50,7 @@ ble_sts_t   blc_ll_removeDeviceFromResolvingList(ida_type_t peerIdAddrType, u8 *
  * @return     Status - 0x00: command succeeded;
  *                      Others: command failed, refer to definition of "ble_sts_t" to know the reason
  */
-ble_sts_t   blc_ll_clearResolvingList(void);
+ble_sts_t blc_ll_clearResolvingList(void);
 
 
 /**
@@ -62,7 +58,7 @@ ble_sts_t   blc_ll_clearResolvingList(void);
  * @param[in]  none
  * @return     resolving list size
  */
-int         blc_ll_readResolvingListSize(void);
+int blc_ll_readResolvingListSize(void);
 
 
 /**
@@ -70,7 +66,7 @@ int         blc_ll_readResolvingListSize(void);
  * @param[in]  resolution_en - Address Resolution Enable/Disable
  * @return     Status - 0x00: command succeeded; 0x01-0xFF: command failed
  */
-ble_sts_t   blc_ll_setAddressResolutionEnable (addr_res_en_t resolution_en);
+ble_sts_t blc_ll_setAddressResolutionEnable(addr_res_en_t resolution_en);
 
 
 /*
@@ -84,7 +80,7 @@ ble_sts_t   blc_ll_setAddressResolutionEnable (addr_res_en_t resolution_en);
  * @return     Status - 0x00: command succeeded;
  *                      Others: command failed, refer to definition of "ble_sts_t" to know the reason
  */
-ble_sts_t       blc_ll_setResolvablePrivateAddressTimeout (u16 rpa_timeout_s);
+ble_sts_t blc_ll_setResolvablePrivateAddressTimeout(u16 rpa_timeout_s);
 
 
 /*
@@ -95,8 +91,7 @@ ble_sts_t       blc_ll_setResolvablePrivateAddressTimeout (u16 rpa_timeout_s);
  * @return     Status - 0x00: command succeeded;
  *                      Others: command failed, refer to definition of "ble_sts_t" to know the reason
  */
-ble_sts_t       blc_ll_setPrivacyMode(ida_type_t peerIdAddrType, u8* peerIdAddr, privacy_mode_t privMode);
-
+ble_sts_t blc_ll_setPrivacyMode(ida_type_t peerIdAddrType, u8 *peerIdAddr, privacy_mode_t privMode);
 
 
 #endif /* LL_RESOLVELIST_H_ */

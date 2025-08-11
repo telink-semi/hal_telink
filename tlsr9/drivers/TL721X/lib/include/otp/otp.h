@@ -15,34 +15,22 @@
  * limitations under the License.
  *
  *****************************************************************************/
-#pragma once
+#ifndef OTP_H_
+#define OTP_H_
 
-#include "lib/include/analog.h"
-#include "lib/include/clock.h"
-#include "lib/include/core.h"
-#include "lib/include/emi.h"
-#include "lib/include/flash_base.h"
-#include "lib/include/mspi.h"
-#include "lib/include/plic.h"
-#include "lib/include/stimer.h"
-#include "lib/include/sys.h"
-#include "lib/include/pke/pke.h"
-#include "lib/include/pm/pm.h"
-#include "lib/include/rf/rf_common.h"
-#include "lib/include/trng/trng.h"
+/**
+ * @brief      This function serves to read IEEE address from OTP.
+ * @param[out] buf  - Pointer to IEEE address buffer(IEEE address is 8bytes)
+ * @return     none
+ */
+void otp_get_ieee_addr(unsigned char *buf);
 
-#include "adc.h"
-#include "audio.h"
-#include "dma.h"
-#include "flash.h"
-#include "gpio.h"
-#include "i2c.h"
-#include "lpc.h"
-#include "pwm.h"
-#include "qdec.h"
-#include "s7816.h"
-#include "spi.h"
-#include "timer.h"
-#include "uart.h"
-#include "usbhw.h"
-#include "watchdog.h"
+/**
+ * @brief      This function is used to calib ADC 1.2V vref.
+ * @param[in]  none
+ * @return     DRV_API_SUCCESS - the calibration value update, DRV_API_FAILURE - the calibration value is not update.
+ */
+drv_api_status_e otp_calib_adc_vref(void);
+
+
+#endif /* OTP_H_ */

@@ -19,113 +19,112 @@
 #define ACL_SNIFFER_H_
 
 #include "tl_common.h"
-#include "stack/ble/TL721X/controller/ll/ll.h"
-
+#include "stack/ble/controller/ll/ll.h"
 
 /**
  * @brief   acl sniffer RSSI Report Type
  */
-typedef enum {
+typedef enum
+{
     //0x00
     RSSI_TYPE_INVALID,
     RSSI_TYPE_SLAVE,
     RSSI_TYPE_MASTER,
     RSSI_TYPE_ALL,
-}acl_sniffer_rssi_report_type_t;
-
+} acl_sniffer_rssi_report_type_t;
 
 #include "acl_sniffer_mst.h"
 #include "acl_sniffer_slv.h"
 
-
 /**
  * @brief   update acl sniffer sync result
  */
-enum{
+enum
+{
     //0x00
-    SNIFFER_SYNC_CREATE             = 0,            //
-    SNIFFER_CURRENT_STATE_NOT_SUPPORTED_THIS_CMD,   //
-    SNIFFER_PARAMETER_CHECKSUM_ERR,                 //
-    SNIFFER_PARAMETER_INVALID,                      //
+    SNIFFER_SYNC_CREATE = 0,                      //
+    SNIFFER_CURRENT_STATE_NOT_SUPPORTED_THIS_CMD, //
+    SNIFFER_PARAMETER_CHECKSUM_ERR,               //
+    SNIFFER_PARAMETER_INVALID,                    //
 
     //0x04
-    SNIFFER_ESTABLISH_FAIL,                         //
-    SNIFFER_TIMEOUT,                                //
-    SNIFFER_LOSS,                                   //
-    SNIFFER_SEEK_FAIL,                              //
+    SNIFFER_ESTABLISH_FAIL, //
+    SNIFFER_TIMEOUT,        //
+    SNIFFER_LOSS,           //
+    SNIFFER_SEEK_FAIL,      //
 
     //0x08
-    SNIFFER_SEEK_IN_PROGRESS,                       //
-    SNIFFER_UNKNOWN_SNIFHANDLE,                     //
-    SNIFFER_USER_STOP_EFFECTIVE,                    //
-    SNIFFER_USER_STOP_NOT_SUPPORTED,                //
+    SNIFFER_SEEK_IN_PROGRESS,        //
+    SNIFFER_UNKNOWN_SNIFHANDLE,      //
+    SNIFFER_USER_STOP_EFFECTIVE,     //
+    SNIFFER_USER_STOP_NOT_SUPPORTED, //
 
     //0x0C
-    SNIFFER_UNSUPPORTED_FEATURE,                    //
+    SNIFFER_UNSUPPORTED_FEATURE, //
 };
-
 
 /**
  * @brief   acl sniffer sync status
  */
-enum{
+enum
+{
     //0x00
-    SNIFFER_STATUS_STANDBY          = 0,            //
-    SNIFFER_STATUS_CREATING,                        //
-    SNIFFER_STATUS_ESTABLISH,                       //
-    SNIFFER_STATUS_SEEK,                            //
+    SNIFFER_STATUS_STANDBY = 0, //
+    SNIFFER_STATUS_CREATING,    //
+    SNIFFER_STATUS_ESTABLISH,   //
+    SNIFFER_STATUS_SEEK,        //
 };
-
 
 /**
  * @brief   Telink defined LinkLayer Event Callback for Sniffer
  */
-typedef enum {
+typedef enum
+{
     BLT_EV_FLAG_CHANNEL_MAP_UPDATE = BLT_EV_MAX_NUM,
     BLT_EV_FLAG_SNIFFER_RSSI_REPORT,
     BLT_EV_FLAG_SNIFFER_SYNC_STATUS,
     BLT_EV_FLAG_ACL_EVERY_CONN_EVENT,
 
     BLT_SNIFFER_EV_MAX_NUM,
-}blt_ext_ev_flag_4_sniffer_t;
+} blt_ext_ev_flag_4_sniffer_t;
 
 /**
  *  @brief  Event Parameters for "BLT_EV_FLAG_SNIFFER_RSSI_REPORT"
  */
-typedef struct __attribute__((packed)) {
-    u8  snifChannel :6;
-    u8  type        :2;     //peer device RSSI mark, 2:master RSSI, 1:slave RSSI, 0:invalid RSSI
-    u8  snifHandle;
-    u8  rssi;
-}acl_sniffer_rssi_reportEvt_t;
-
+typedef struct __attribute__((packed))
+{
+    u8 snifChannel : 6;
+    u8 type        : 2; //peer device RSSI mark, 2:master RSSI, 1:slave RSSI, 0:invalid RSSI
+    u8 snifHandle;
+    u8 rssi;
+} acl_sniffer_rssi_reportEvt_t;
 
 /**
  *  @brief  Event Parameters for "BLT_EV_FLAG_SNIFFER_SYNC_STATUS"
  */
-typedef struct __attribute__((packed)) {
-    u8  snifHandle;
-    u8  status;
-}acl_sniffer_sync_statusEvt_t;
-
+typedef struct __attribute__((packed))
+{
+    u8 snifHandle;
+    u8 status;
+} acl_sniffer_sync_statusEvt_t;
 
 /**
  *  @brief  Event Parameters for "BLT_EV_FLAG_CHANNEL_MAP_UPDATE"
  */
-typedef struct __attribute__((packed)) {
+typedef struct __attribute__((packed))
+{
     u16 connHandle;
-}acl_channel_map_updateEvt_t;
-
+} acl_channel_map_updateEvt_t;
 
 /**
  *  @brief  Event Parameters for "BLT_EV_FLAG_ACL_EVERY_CONN_EVENT"
  */
-typedef struct __attribute__((packed)) {
+typedef struct __attribute__((packed))
+{
     u16 connHandle;
     u16 connEventCounter;
     u32 connExpectTime;
-}acl_every_conn_eventEvt_t;
-
+} acl_every_conn_eventEvt_t;
 
 /**
  * @brief      for user to get Legacy Adv status.
@@ -133,8 +132,7 @@ typedef struct __attribute__((packed)) {
  * @return     status, 0x00:  Adv enabled
  *                     other: Adv disabled
  */
-int         blc_ll_getLegacyAdvStatus(void);
-
+int blc_ll_getLegacyAdvStatus(void);
 
 /**
  * @brief      for user to update ACL sniffer sync information.
@@ -142,8 +140,7 @@ int         blc_ll_getLegacyAdvStatus(void);
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-int         blc_ll_updateAclSnifferSync(u8 *cmd);
-
+int blc_ll_updateAclSnifferSync(u8 *cmd);
 
 /**
  * @brief      for user to set ACL sniffer max Rx buffer len.
@@ -151,6 +148,39 @@ int         blc_ll_updateAclSnifferSync(u8 *cmd);
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_setAclSnifferMaxRxBufferLen(u8 len);
+ble_sts_t blc_ll_setAclSnifferMaxRxBufferLen(u8 len);
+
+/**
+ * @brief      for user to get acl connection index.
+ * @param[in]  connHandle - connection handle.
+ * @return     status, 0xFF:  failed
+ *                     other: succeed
+ */
+_attribute_ram_code_ u8 blc_sniffer_getAclConnectionIndex(u16 connHandle);
+
+/**
+ * @brief      for user to get acl task count.
+ * @param[in]  connHandle - connection handle.
+ * @param[out] count[2], 0: task count, 1: first receive OK count
+ * @return     status, 0xFF:  failed
+ *                     other: succeed
+ */
+ble_sts_t blc_sniffer_getAclTaskCount(u16 connHandle, u16 *count);
+
+/**
+ * @brief      for user to clear acl task count.
+ * @param[in]  connHandle - connection handle.
+ */
+void blc_sniffer_clearAclTaskCount(u16 connHandle);
+
+/**
+ * @brief      for user to check if the acl task is runing.
+ */
+u8 blc_sniffer_isAclTaskRuning(void);
+
+/**
+ * @brief      for user to get current acl task index.
+ */
+u8 blc_sniffer_getCurrentAclTaskIndex(void);
 
 #endif /* ACL_SNIFFER_C_H_ */

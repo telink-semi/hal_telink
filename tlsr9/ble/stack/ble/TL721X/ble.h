@@ -19,7 +19,6 @@
 #define BLE_H_
 
 
-
 #include "ble_common.h"
 #include "ble_format.h"
 

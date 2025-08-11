@@ -45,7 +45,6 @@
 #include "reg_include/register.h"
 #include "dma.h"
 
-
 /**********************************************************************************************************************
  *                                         global constants                                                           *
  *********************************************************************************************************************/
@@ -57,24 +56,88 @@
 /**
  * @brief   Type of Timer
  */
-typedef enum{
-    TIMER0      =0,
-    TIMER1      =1,
-}timer_type_e;
+typedef enum
+{
+    TIMER0 = 0,
+    TIMER1 = 1,
+} timer_type_e;
 
 /**
  * @brief   Mode of Timer
  */
+typedef enum
+{
+    TIMER_MODE_SYSCLK       = 0,
+    TIMER_MODE_GPIO_TRIGGER = 1,
+    TIMER_MODE_GPIO_WIDTH   = 2,
+    TIMER_MODE_TICK         = 3,
+} timer_mode_e;
+
+/*
+ *  @brief  Define timer capture mode
+ */
 typedef enum{
-    TIMER_MODE_SYSCLK       =0,
-    TIMER_MODE_GPIO_TRIGGER =1,
-    TIMER_MODE_GPIO_WIDTH   =2,
-    TIMER_MODE_TICK         =3,
-}timer_mode_e;
+     TMR_CAPT_RISING_EDGE         = 0,
+     TMR_CAPT_FALLING_EDGE        = 1,
+     TMR_CAPT_RISING_FALLING_EDGE = 2,
+} timer_capt_mode_e;
+
+
+/*
+ * @brief   Type of Timer mask.
+ */
+typedef enum{
+    TMR0_MODE_MASK      =       BIT(0),
+    TMR0_CAPT_MASK      =       BIT(1),
+    TMR0_COMP_MASK      =       BIT(2),
+    TMR1_MODE_MASK      =       BIT(3),
+    TMR1_CAPT_MASK      =       BIT(4),
+    TMR1_COMP_MASK      =       BIT(5),
+    TMR0_OV_MASK        =       BIT(6),
+    TMR1_OV_MASK        =       BIT(7),
+}timer_mask_e;
 
 /**********************************************************************************************************************
  *                                      global function prototype                                                     *
  *********************************************************************************************************************/
+
+/*
+ * @brief     This function servers to enable timer input capture mode.
+ * @return    none.
+ */
+static inline void timer_input_capture_en(timer_type_e type)
+{
+    switch(type)
+        {
+            case TIMER0:
+                reg_tmr_ctrl2 |= FLD_TMR0_CAPT_EN;
+                break;
+            case TIMER1:
+                reg_tmr_ctrl2 |= FLD_TMR1_CAPT_EN;
+                break;
+            default:
+                break;
+        }
+}
+
+/*
+ * @brief     This function servers to disable timer input capture mode.
+ * @return    none.
+ */
+static inline void timer_input_capture_dis(timer_type_e type)
+{
+    switch(type)
+        {
+            case TIMER0:
+                reg_tmr_ctrl2 &= ~(FLD_TMR0_CAPT_EN);
+                break;
+            case TIMER1:
+                reg_tmr_ctrl2 &= ~(FLD_TMR1_CAPT_EN);
+                break;
+            default:
+                break;
+        }
+}
 
 /**
  * @brief       This function refer to get timer irq status.
@@ -84,7 +147,7 @@ typedef enum{
  */
 static inline unsigned char timer_get_irq_status(timer_irq_e status)
 {
-    return  reg_tmr_sta1&status ;
+    return reg_tmr_sta1 & status;
 }
 
 /**
@@ -94,17 +157,16 @@ static inline unsigned char timer_get_irq_status(timer_irq_e status)
  */
 static inline void timer_clr_irq_status(timer_irq_e status)
 {
-         reg_tmr_sta1 = status;
+    reg_tmr_sta1 = status;
 }
 
 /**
  * @brief   This function refer to get timer0 tick.
  * @return  none
  */
-static inline  unsigned int timer0_get_gpio_width(void)
+static inline unsigned int timer0_get_gpio_width(void)
 {
-     return reg_tmr0_tick;
-
+    return reg_tmr0_tick;
 }
 
 /**
@@ -114,7 +176,6 @@ static inline  unsigned int timer0_get_gpio_width(void)
 static inline unsigned int timer1_get_gpio_width(void)
 {
     return reg_tmr1_tick;
-
 }
 
 /**
@@ -133,7 +194,7 @@ static inline void timer0_set_tick(unsigned int tick)
  */
 static inline unsigned int timer0_get_tick(void)
 {
-    return reg_tmr0_tick ;
+    return reg_tmr0_tick;
 }
 
 /**
@@ -176,8 +237,14 @@ static inline void timer_set_cap_tick(timer_type_e type, unsigned int cap_tick)
 {
     reg_tmr_capt(type) = cap_tick;
 }
-
-
+/*
+ * @brief     This function performs to get  timer capture value.
+ * @return    timer capture value.
+ */
+static inline unsigned int timer_get_capture_value(timer_type_e type)
+{
+    return reg_tmr_ccapt(type);
+}
 /**
  * @brief     This function set timer irq mask.
  * @param[in] mask - variable of enumeration to select the timer interrupt mask.
@@ -198,7 +265,6 @@ static inline void timer_clr_irq_mask(timer_irq_e mask)
     reg_tmr_ctrl3 &= ~mask;
 }
 
-
 /**
  * @brief     the specified timer start working.
  * @param[in] type - select the timer to start.
@@ -207,7 +273,7 @@ static inline void timer_clr_irq_mask(timer_irq_e mask)
 void timer_start(timer_type_e type);
 
 /**
- * @brief     set mode, initial tick and capture of timer.
+ * @brief     set mode of timer.
  * @param[in] type - select the timer to start.
  * @param[in] mode - select mode for timer.
  * @return    none
@@ -221,8 +287,23 @@ void timer_set_mode(timer_type_e type, timer_mode_e mode);
  * @param[in] pol - select polarity for gpio trigger and gpio width
  * @return    none
  */
-void timer_gpio_init(timer_type_e type, gpio_pin_e pin, gpio_pol_e pol );
+void timer_gpio_init(timer_type_e type, gpio_pin_e pin, gpio_pol_e pol);
 
+
+/*
+ * @brief     This function set timer input capture mode.
+ * @param[in] capt_mode  - timer input capture mode.
+ * @return    none.
+ */
+void timer_set_input_capture_mode(timer_type_e type, timer_capt_mode_e capt_mode, gpio_pin_e pin);
+
+/*
+ * @brief     This function is used to reset the tick value to 0 when it is equal to the preset capture tick value or when a capture is triggered.
+ * @param[in] type - TIMER0 or TIMER1.
+ * @param[in] reset - 1: reset the tick  0: do not reset the tick
+ * @return    none.
+ */
+void timer_reset_tick(timer_type_e type, unsigned char reset);
 /**
  * @brief     the specified timer stop working.
  * @param[in] type - select the timer to stop.
@@ -249,7 +330,7 @@ void timer_set_rx_dma_config(timer_type_e type, dma_chn_e chn);
  * @param[in]   rev_size - the receive length of DMA,The maximum transmission length of DMA is 0xFFFFFC bytes, so dont'n over this length.
  * @return      none
  */
-void timer_receive_dma(timer_type_e type, unsigned char * addr,unsigned int rev_size);
+void timer_receive_dma(timer_type_e type, unsigned char *addr, unsigned int rev_size);
 
 
 /**
@@ -261,7 +342,7 @@ void timer_receive_dma(timer_type_e type, unsigned char * addr,unsigned int rev_
  * @param[in] head_of_list - the head address of dma llp.
  * @return    none
  */
-void timer_set_dma_chain_llp(timer_type_e type, dma_chn_e chn,unsigned char * dst_addr,unsigned int data_len,dma_chain_config_t *head_of_list);
+void timer_set_dma_chain_llp(timer_type_e type, dma_chn_e chn, unsigned char *dst_addr, unsigned int data_len, dma_chain_config_t *head_of_list);
 
 /**
  * @brief     This function servers to configure DMA cycle chain node.
@@ -273,7 +354,7 @@ void timer_set_dma_chain_llp(timer_type_e type, dma_chn_e chn,unsigned char * ds
  * @param[in] data_len - to configure DMA length.
  * @return    none
  */
-void timer_set_rx_dma_add_list_element(timer_type_e type,dma_chn_e chn,dma_chain_config_t *config_addr,dma_chain_config_t *llpoint ,unsigned short * dst_addr,unsigned int data_len);
+void timer_set_rx_dma_add_list_element(timer_type_e type, dma_chn_e chn, dma_chain_config_t *config_addr, dma_chain_config_t *llpoint, unsigned short *dst_addr, unsigned int data_len);
 
 
 #endif /* TIMER_H_ */

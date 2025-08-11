@@ -38,7 +38,7 @@
 
 //When the watchdog comes back, the Eagle chip does not clear 0x7f[0]. To avoid this problem, this macro definition is added.
 #ifndef WDT_REBOOT_RESET_ANA7F_WORK_AROUND
-#define WDT_REBOOT_RESET_ANA7F_WORK_AROUND  1
+    #define WDT_REBOOT_RESET_ANA7F_WORK_AROUND 1
 #endif
 
 /********************************************************************************************************
@@ -48,28 +48,28 @@
 /*
  * @note    This is for internal stability debugging use only.
  */
-#define PM_DEBUG                        0
+#define PM_DEBUG 0
 //1 PB4, 2 PB5
-#define PM_SUSPEND_WHILE_DEBUG          0
-#define PM_SUSPEND_WHILE_DEBUG_2        0
-#define PM_MIN_CODE_DEBUG               0
-#define PM_START_CODE_DEBUG             0
-#define PM_XTAL_READY_DEBUG             0
-#define PM_XTAL_ONCE_DEBUG              0
-#define PM_XTAL_READY_TIME              0
-#define PM_MANUAL_SETTLE_DEBUG          0
+#define PM_SUSPEND_WHILE_DEBUG   0
+#define PM_SUSPEND_WHILE_DEBUG_2 0
+#define PM_MIN_CODE_DEBUG        0
+#define PM_START_CODE_DEBUG      0
+#define PM_XTAL_READY_DEBUG      0
+#define PM_XTAL_ONCE_DEBUG       0
+#define PM_XTAL_READY_TIME       0
+#define PM_MANUAL_SETTLE_DEBUG   0
 
 //system timer clock source is constant 24M, never change
 //NOTICE:We think that the external 32k crystal clk is very accurate, does not need to read through TIMER_32K_LAT_CAL.
 //register, the conversion error(use 32k:64 cycle, count 24M sys tmr's ticks), at least the introduction of 64ppm.
-#define STIMER_CLOCK_16M                    1
-#define STIMER_CLOCK_24M                    2
-#define STIMER_CLOCK                    STIMER_CLOCK_24M
+#define STIMER_CLOCK_16M 1
+#define STIMER_CLOCK_24M 2
+#define STIMER_CLOCK     STIMER_CLOCK_24M
 
-#if(STIMER_CLOCK == STIMER_CLOCK_16M)
-#define CRYSTAL32768_TICK_PER_32CYCLE   15625
-#elif(STIMER_CLOCK == STIMER_CLOCK_24M)
-#define CRYSTAL32768_TICK_PER_64CYCLE   46875
+#if (STIMER_CLOCK == STIMER_CLOCK_16M)
+    #define CRYSTAL32768_TICK_PER_32CYCLE 15625
+#elif (STIMER_CLOCK == STIMER_CLOCK_24M)
+    #define CRYSTAL32768_TICK_PER_64CYCLE 46875
 #endif
 
 
@@ -78,27 +78,28 @@ extern _attribute_data_retention_sec_ unsigned int  g_pm_tick_cur;
 extern _attribute_data_retention_sec_ unsigned int  g_pm_tick_32k_cur;
 extern _attribute_data_retention_sec_ unsigned char g_pm_long_suspend;
 
-
 /**
  * @brief   active mode VDDO3 output trim definition
  * @note    The voltage values of the following gears are all theoretical values, and there may be deviations between the actual and theoretical values.
  */
-typedef enum {
-    PM_VDDO3_VOLTAGE_1V4_2V9    = 0x00, /**<LDO output 1.4V in 1.8V mode & 2.9V in 3.3V mode */
-    PM_VDDO3_VOLTAGE_1V5_3V0    = 0x01, /**<LDO output 1.5V in 1.8V mode & 3.0V in 3.3V mode */
-    PM_VDDO3_VOLTAGE_1V6_3V1    = 0x02, /**<LDO output 1.6V in 1.8V mode & 3.1V in 3.3V mode */
-    PM_VDDO3_VOLTAGE_1V7_3V2    = 0x03, /**<LDO output 1.7V in 1.8V mode & 3.2V in 3.3V mode */
-    PM_VDDO3_VOLTAGE_1V8_3V3    = 0x04, /**<LDO output 1.8V in 1.8V mode & 3.3V in 3.3V mode */
-    PM_VDDO3_VOLTAGE_1V9_3V4    = 0x05, /**<LDO output 1.9V in 1.8V mode & 3.4V in 3.3V mode */
-    PM_VDDO3_VOLTAGE_2V0_3V5    = 0x06, /**<LDO output 2.0V in 1.8V mode & 3.5V in 3.3V mode */
-    PM_VDDO3_VOLTAGE_2V1_3V6    = 0x07, /**<LDO output 2.1V in 1.8V mode & 3.6V in 3.3V mode */
-}pm_vddo3_voltage_e;
+typedef enum
+{
+    PM_VDDO3_VOLTAGE_1V4_2V9 = 0x00, /**<LDO output 1.4V in 1.8V mode & 2.9V in 3.3V mode */
+    PM_VDDO3_VOLTAGE_1V5_3V0 = 0x01, /**<LDO output 1.5V in 1.8V mode & 3.0V in 3.3V mode */
+    PM_VDDO3_VOLTAGE_1V6_3V1 = 0x02, /**<LDO output 1.6V in 1.8V mode & 3.1V in 3.3V mode */
+    PM_VDDO3_VOLTAGE_1V7_3V2 = 0x03, /**<LDO output 1.7V in 1.8V mode & 3.2V in 3.3V mode */
+    PM_VDDO3_VOLTAGE_1V8_3V3 = 0x04, /**<LDO output 1.8V in 1.8V mode & 3.3V in 3.3V mode */
+    PM_VDDO3_VOLTAGE_1V9_3V4 = 0x05, /**<LDO output 1.9V in 1.8V mode & 3.4V in 3.3V mode */
+    PM_VDDO3_VOLTAGE_2V0_3V5 = 0x06, /**<LDO output 2.0V in 1.8V mode & 3.5V in 3.3V mode */
+    PM_VDDO3_VOLTAGE_2V1_3V6 = 0x07, /**<LDO output 2.1V in 1.8V mode & 3.6V in 3.3V mode */
+} pm_vddo3_voltage_e;
 
 /**
  * @brief dcdc trim flash out
  * 
  */
-typedef enum{
+typedef enum
+{
     TRIM_VDDF_TO_1P64V = 0,
     TRIM_VDDF_TO_1P66V,
     TRIM_VDDF_TO_1P68V,
@@ -115,13 +116,14 @@ typedef enum{
     TRIM_VDDF_TO_1P95V,
     TRIM_VDDF_TO_1P98V,
     TRIM_VDDF_TO_2P01V,
-}pm_trim_vddf_e;
+} pm_trim_vddf_e;
 
 /**
  * @brief trim vddo 1p8 out
  * 
  */
-typedef enum{
+typedef enum
+{
     TRIM_VDDO1P8_TO_1P664V = 0,
     TRIM_VDDO1P8_TO_1P703V,
     TRIM_VDDO1P8_TO_1P744V,
@@ -130,13 +132,14 @@ typedef enum{
     TRIM_VDDO1P8_TO_1P879V,
     TRIM_VDDO1P8_TO_1P929V,
     TRIM_VDDO1P8_TO_1P981V,
-}pm_trim_vddo1p8_e;
+} pm_trim_vddo1p8_e;
 
 /**
  * @brief trim vdd 0p94 out
  * 
  */
-typedef enum{
+typedef enum
+{
     TRIM_VDD0P94_TO_0P820V = 0,
     TRIM_VDD0P94_TO_0P835V,
     TRIM_VDD0P94_TO_0P850V,
@@ -153,13 +156,14 @@ typedef enum{
     TRIM_VDD0P94_TO_1P055V,
     TRIM_VDD0P94_TO_1P078V,
     TRIM_VDD0P94_TO_1P101V,
-}pm_trim_vdd0p94_e;
+} pm_trim_vdd0p94_e;
 
 /**
  * @brief trim dig ldo
  * 
  */
-typedef enum {
+typedef enum
+{
     DIG_LDO_TRIM_0P550V = 0,
     DIG_LDO_TRIM_0P575V,
     DIG_LDO_TRIM_0P600V,
@@ -182,7 +186,8 @@ typedef enum {
  * @brief trim suspend LDO
  *
  */
-typedef enum {
+typedef enum
+{
     SPD_LDO_TRIM_0P55V = 0,
     SPD_LDO_TRIM_0P60V, //0.571V
     SPD_LDO_TRIM_0P65V,
@@ -197,7 +202,8 @@ typedef enum {
  * @brief trim deep retention LDO
  *
  */
-typedef enum {
+typedef enum
+{
     RET_LDO_TRIM_0P55V = 0,
     RET_LDO_TRIM_0P60V, //0.589V
     RET_LDO_TRIM_0P65V,
@@ -212,18 +218,20 @@ typedef enum {
  * @brief trim deep retention LDO
  *
  */
-typedef enum {
-    NTV_LDO_TRIM_1P785V_0P908 = 0x00,//1.817 0.648
-    NTV_LDO_TRIM_1P812V_0P934 = 0x08,//1.860 0.662
-    NTV_LDO_TRIM_1P825V_0P847 = 0x10,//1.883 0.670
-    NTV_LDO_TRIM_1P734V_0P855 = 0x18,//1.895 0.676
+typedef enum
+{
+    NTV_LDO_TRIM_1P785V_0P908 = 0x00, //1.817 0.648
+    NTV_LDO_TRIM_1P812V_0P934 = 0x08, //1.860 0.662
+    NTV_LDO_TRIM_1P825V_0P847 = 0x10, //1.883 0.670
+    NTV_LDO_TRIM_1P734V_0P855 = 0x18, //1.895 0.676
 } pm_ntv_ldo_trim_e;
 
 /**
  * @brief trim dcore ldo
  * 
  */
-typedef enum {
+typedef enum
+{
     DCORE_LDO_TRIM_0P550V = 0,
     DCORE_LDO_TRIM_0P575V,
     DCORE_LDO_TRIM_0P600V,
@@ -246,7 +254,8 @@ typedef enum {
  * @brief trim sram ldo
  * 
  */
-typedef enum {
+typedef enum
+{
     SRAM_LDO_TRIM_0P60V = 0,
     SRAM_LDO_TRIM_0P65V,
     SRAM_LDO_TRIM_0P70V,
@@ -257,15 +266,17 @@ typedef enum {
     SRAM_LDO_TRIM_0P95V,
 } pm_sram_ldo_trim_e;
 
-typedef struct {
+typedef struct
+{
     unsigned char dcdc_0p95v;
     unsigned char ldo_0p95v;
     unsigned char dcdc_1p05v;
     unsigned char ldo_1p05v;
-}pm_cal_vdd0p94_t;
+} pm_cal_vdd0p94_t;
+
 extern _attribute_data_retention_sec_ pm_cal_vdd0p94_t g_pm_cal_vdd0p94_info;
 
-extern _attribute_data_retention_sec_ unsigned char g_pm_cal_vddo1p8_info;
+extern _attribute_data_retention_sec_ unsigned char  g_pm_cal_vddo1p8_info;
 extern _attribute_data_retention_sec_ pm_cal_0p94v_e g_pm_vdd0p94_level;
 
 /**
@@ -274,8 +285,9 @@ extern _attribute_data_retention_sec_ pm_cal_0p94v_e g_pm_vdd0p94_level;
  */
 _always_inline void sys_reset_all(void)
 {
-#if(PM_DEBUG)
-    while(1);
+#if (PM_DEBUG)
+    while (1)
+        ;
 #endif
     reg_pwdn_en = 0x20;
 }
@@ -345,6 +357,25 @@ static _always_inline void pm_set_dig_ldo_voltage(pm_dig_ldo_trim_e dig_ldo_trim
 static _always_inline pm_dig_ldo_trim_e pm_get_dig_ldo_voltage(void)
 {
     return (analog_read_reg8(0x0f) >> 4);
+}
+
+/**
+ * @brief       This function serves to get suspend LDO voltage
+ * @return      suspend LDO trim voltage
+ */
+static _always_inline unsigned char pm_get_spd_ldo_voltage(void)
+{
+    return analog_read_reg8(0x0e) & 0xf8;
+}
+
+/**
+ * @brief       This function serves to get deep retention LDO voltage
+ * @return      deep retention LDO trim voltage
+ */
+static _always_inline unsigned char pm_get_ret_ldo_voltage(void)
+{
+    return analog_read_reg8(0x0f) & 0xf8;
+
 }
 
 /**
@@ -466,7 +497,7 @@ static _always_inline void pm_set_delay_cycle(unsigned char xtal_delay, unsigned
  */
 static _always_inline void pm_set_reboot_reason(pm_sw_reboot_reason_e reboot_reason)
 {
-    analog_write_reg8(PM_ANA_REG_POWER_ON_CLR_BUF0, REBOOT_FLAG | (reboot_reason<<1));
+    analog_write_reg8(PM_ANA_REG_POWER_ON_CLR_BUF0, REBOOT_FLAG | (reboot_reason << 1));
 }
 
 /**
@@ -491,9 +522,8 @@ static _always_inline void pm_trigger_sleep(void)
  */
 static _always_inline void pm_24mrc_power_up(void)
 {
-    if(!g_24m_rc_is_used)
-    {
-        analog_write_reg8(areg_aon_0x05, analog_read_reg8(areg_aon_0x05) & ~(FLD_24M_RC_PD));//power on 24M RC
+    if (!g_24m_rc_is_used) {
+        analog_write_reg8(areg_aon_0x05, analog_read_reg8(areg_aon_0x05) & ~(FLD_24M_RC_PD)); //power on 24M RC
 
         /*
          * the calibration of 24m RC should wait for 1us if just power it up.
@@ -515,9 +545,8 @@ static _always_inline void pm_24mrc_power_up(void)
  */
 static _always_inline void pm_24mrc_power_down_if_unused(void)
 {
-    if(!g_24m_rc_is_used)
-    {
-        analog_write_reg8(areg_aon_0x05, analog_read_reg8(areg_aon_0x05) | FLD_24M_RC_PD);//power down 24M RC
+    if (!g_24m_rc_is_used) {
+        analog_write_reg8(areg_aon_0x05, analog_read_reg8(areg_aon_0x05) | FLD_24M_RC_PD); //power down 24M RC
     }
 }
 
@@ -525,13 +554,13 @@ static _always_inline void pm_24mrc_power_down_if_unused(void)
  * @brief       this function servers to power up BBPLL
  * @return      none.
  */
-_attribute_ram_code_sec_optimize_o2_noinline_ void pm_bbpll_power_up(void);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ void pm_bbpll_power_up(void);
 
 /**
  * @brief       this function servers to wait BBPLL clock lock.
  * @return      none.
  */
-_attribute_ram_code_sec_optimize_o2_noinline_ void pm_wait_bbpll_done(void);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ void pm_wait_bbpll_done(void);
 
 /**
  * @brief       This function is used to determine the stability of the crystal oscillator.
@@ -547,27 +576,27 @@ _attribute_ram_code_sec_optimize_o2_noinline_ void pm_wait_bbpll_done(void);
  * @attention   This function can only be called with the 24M clock configuration
  * @return      none.
  */
-_attribute_ram_code_sec_optimize_o2_noinline_ void pm_wait_xtal_ready(unsigned char all_ramcode_en);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ void pm_wait_xtal_ready(unsigned char all_ramcode_en);
 
 
 /**
  * @brief       this function serves to clear all irq status.
  * @return      Indicates whether clearing irq status was successful.
  */
-_attribute_ram_code_sec_optimize_o2_noinline_ unsigned char pm_clr_all_irq_status(void);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ unsigned char pm_clr_all_irq_status(void);
 
 /**
  * @brief       This function serves to recover system timer.
  *              The code is placed in the ram code section, in order to shorten the time.
  * @return      none.
  */
-_attribute_ram_code_sec_optimize_o2_noinline_ void pm_stimer_recover(void);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ void pm_stimer_recover(void);
 
 /**
  * @brief      This function serves to get vdd0p94 and vddo1p8 current value from analog register.
  * @return     none.
  */
-_attribute_ram_code_sec_optimize_o2_noinline_ void pm_update_vdd0p94_level(void);
+_attribute_ram_code_com_sec_optimize_o2_noinline_ void pm_update_vdd0p94_level(void);
 
 /**
  * @brief      This function serves to update vdd0p94 and vddo1p8 calibration value.
@@ -576,4 +605,3 @@ _attribute_ram_code_sec_optimize_o2_noinline_ void pm_update_vdd0p94_level(void)
  * @return     none
  */
 void pm_update_vdd0p94_vddo1p8_cal_value(unsigned char *vdd0p94_value, unsigned char vddo1p8_value);
-

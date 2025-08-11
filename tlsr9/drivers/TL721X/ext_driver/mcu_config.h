@@ -29,7 +29,7 @@
 /**
  * @brief   Public Device Address Company ID for this chip
  */
-#define PDA_COMPANY_ID                                          0x382228    //todo
+#define PDA_COMPANY_ID                                          0x382228
 
 
 
@@ -67,7 +67,7 @@
 /**
  * @brief   MAC address burning on EFUSE
  */
-#define BUILT_IN_MAC_ON_EFUSE                                   1
+#define BUILT_IN_MAC_ON_DEVICE                                   1
 
 
 

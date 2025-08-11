@@ -60,13 +60,6 @@ typedef struct __attribute__((packed)) {
 extern  _attribute_aligned_(4) misc_para_t              blt_miscParam;
 
 
-/**
- * @brief   This function serves to reboot chip.
- * @param   none.
- * @return  none.
- */
-void start_reboot(void);
-
 
 /**
  * @brief      This function serves to determine whether wake up source is internal 32k RC.

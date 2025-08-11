@@ -18,9 +18,9 @@
 #ifndef BIS_H_
 #define BIS_H_
 
-
-
-#define         BIS_PARAM_LENGTH                                    188 //user can't modify this value !!!
+#ifndef BIS_PARAM_LENGTH
+#define BIS_PARAM_LENGTH 200 //user can't modify this value !!!
+#endif
 
 
 /*
@@ -31,9 +31,7 @@
  * @return     status, 0x00:  succeed
  *                     other: failed
  */
-ble_sts_t   blc_ll_InitBisParametersBuffer(u8 *pBisPara, u8 bis_bcst_num, u8 bis_sync_num);
-
-
+ble_sts_t blc_ll_InitBisParametersBuffer(u8 *pBisPara, u8 bis_bcst_num, u8 bis_sync_num);
 
 
 #endif

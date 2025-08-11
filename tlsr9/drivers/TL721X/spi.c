@@ -30,110 +30,112 @@ static unsigned char s_gspi_slave_rx_dma_chn;
 static unsigned char s_lspi_tx_dma_chn;
 static unsigned char s_lspi_master_rx_dma_chn;
 static unsigned char s_lspi_slave_rx_dma_chn;
-dma_chain_config_t g_spi_rx_dma_list_cfg;
-dma_chain_config_t g_spi_tx_dma_list_cfg;
+dma_chain_config_t   g_spi_rx_dma_list_cfg;
+dma_chain_config_t   g_spi_tx_dma_list_cfg;
 
-spi_timeout_error_t g_spi_timeout_error[2]={
-    {   .g_spi_error_timeout_us         = 0xffffffff,
-        .spi_timeout_handler            = lspi_timeout_handler,
-        .g_spi_error_timeout_code       = SPI_API_ERROR_TIMEOUT_NONE,
-    },
-    {   .g_spi_error_timeout_us         = 0xffffffff,
-        .spi_timeout_handler            = gspi_timeout_handler,
-        .g_spi_error_timeout_code       = SPI_API_ERROR_TIMEOUT_NONE,
-    }
- };
+spi_timeout_error_t g_spi_timeout_error[2] = {
+    {
+     .g_spi_error_timeout_us   = 0xffffffff,
+     .spi_timeout_handler      = lspi_timeout_handler,
+     .g_spi_error_timeout_code = SPI_API_ERROR_TIMEOUT_NONE,
+     },
+    {
+     .g_spi_error_timeout_us   = 0xffffffff,
+     .spi_timeout_handler      = gspi_timeout_handler,
+     .g_spi_error_timeout_code = SPI_API_ERROR_TIMEOUT_NONE,
+     }
+};
 
 dma_config_t gspi_tx_dma_config = {
-    .dst_req_sel    = DMA_REQ_GSPI_TX,//tx req.
+    .dst_req_sel    = DMA_REQ_GSPI_TX,    //tx req.
     .src_req_sel    = 0,
     .dst_addr_ctrl  = DMA_ADDR_FIX,
-    .src_addr_ctrl  = DMA_ADDR_INCREMENT,//increment.
-    .dstmode        = DMA_HANDSHAKE_MODE,//handshake.
+    .src_addr_ctrl  = DMA_ADDR_INCREMENT, //increment.
+    .dstmode        = DMA_HANDSHAKE_MODE, //handshake.
     .srcmode        = DMA_NORMAL_MODE,
-    .dstwidth       = DMA_CTR_WORD_WIDTH,//must word.
-    .srcwidth       = DMA_CTR_WORD_WIDTH,//must word.
-    .src_burst_size = 0,//master tx dma support burst1(1 word).
+    .dstwidth       = DMA_CTR_WORD_WIDTH, //must word.
+    .srcwidth       = DMA_CTR_WORD_WIDTH, //must word.
+    .src_burst_size = 0,                  //master tx dma support burst1(1 word).
     .read_num_en    = 0,
     .priority       = 0,
     .write_num_en   = 0,
-    .auto_en        = 0,//must 0.
+    .auto_en        = 0, //must 0.
 };
 dma_config_t gspi_master_rx_dma_config = {
-    .dst_req_sel   = 0,
-    .src_req_sel    = DMA_REQ_GSPI_RX,//rx req.
+    .dst_req_sel    = 0,
+    .src_req_sel    = DMA_REQ_GSPI_RX, //rx req.
     .dst_addr_ctrl  = DMA_ADDR_INCREMENT,
     .src_addr_ctrl  = DMA_ADDR_FIX,
     .dstmode        = DMA_NORMAL_MODE,
     .srcmode        = DMA_HANDSHAKE_MODE,
-    .dstwidth       = DMA_CTR_WORD_WIDTH,//must word.
-    .srcwidth       = DMA_CTR_WORD_WIDTH,//must word.
-    .src_burst_size = 0,//master rx dma support burst1(1 word).
+    .dstwidth       = DMA_CTR_WORD_WIDTH, //must word.
+    .srcwidth       = DMA_CTR_WORD_WIDTH, //must word.
+    .src_burst_size = 0,                  //master rx dma support burst1(1 word).
     .read_num_en    = 0,
     .priority       = 0,
     .write_num_en   = 0,
-    .auto_en        = 0,//must 0.
+    .auto_en        = 0, //must 0.
 };
 dma_config_t gspi_slave_rx_dma_config = {
-    .dst_req_sel   = 0,
-    .src_req_sel    = DMA_REQ_GSPI_RX,//rx req.
+    .dst_req_sel    = 0,
+    .src_req_sel    = DMA_REQ_GSPI_RX, //rx req.
     .dst_addr_ctrl  = DMA_ADDR_INCREMENT,
     .src_addr_ctrl  = DMA_ADDR_FIX,
     .dstmode        = DMA_NORMAL_MODE,
     .srcmode        = DMA_HANDSHAKE_MODE,
-    .dstwidth       = DMA_CTR_WORD_WIDTH,//must word.
-    .srcwidth       = DMA_CTR_WORD_WIDTH,//must word.
-    .src_burst_size = 0,//slave not support burst.
+    .dstwidth       = DMA_CTR_WORD_WIDTH, //must word.
+    .srcwidth       = DMA_CTR_WORD_WIDTH, //must word.
+    .src_burst_size = 0,                  //slave not support burst.
     .read_num_en    = 0,
     .priority       = 0,
-    .write_num_en   = 1,//When write_num_en is set to 1, dma will write back the length information at the address 4 bytes before the destination address.
-    .auto_en        = 0,//must 0.
+    .write_num_en   = 1,                  //When write_num_en is set to 1, dma will write back the length information at the address 4 bytes before the destination address.
+    .auto_en        = 0,                  //must 0.
 };
 dma_config_t lspi_tx_dma_config = {
-    .dst_req_sel    = DMA_REQ_LSPI_TX,//tx req.
+    .dst_req_sel    = DMA_REQ_LSPI_TX,    //tx req.
     .src_req_sel    = 0,
     .dst_addr_ctrl  = DMA_ADDR_FIX,
-    .src_addr_ctrl  = DMA_ADDR_INCREMENT,//increment.
-    .dstmode        = DMA_HANDSHAKE_MODE,//handshake.
+    .src_addr_ctrl  = DMA_ADDR_INCREMENT, //increment.
+    .dstmode        = DMA_HANDSHAKE_MODE, //handshake.
     .srcmode        = DMA_NORMAL_MODE,
-    .dstwidth       = DMA_CTR_WORD_WIDTH,//must word.
-    .srcwidth       = DMA_CTR_WORD_WIDTH,//must word.
-    .src_burst_size = 0,//only master tx dma support burst4/2/1(4/2/1 word).
+    .dstwidth       = DMA_CTR_WORD_WIDTH, //must word.
+    .srcwidth       = DMA_CTR_WORD_WIDTH, //must word.
+    .src_burst_size = 0,                  //only master tx dma support burst4/2/1(4/2/1 word).
     .read_num_en    = 0,
     .priority       = 0,
     .write_num_en   = 0,
-    .auto_en        = 0,//must 0.
+    .auto_en        = 0, //must 0.
 };
 
 dma_config_t lspi_master_rx_dma_config = {
     .dst_req_sel    = 0,
-    .src_req_sel    = DMA_REQ_LSPI_RX,//rx req.
+    .src_req_sel    = DMA_REQ_LSPI_RX, //rx req.
     .dst_addr_ctrl  = DMA_ADDR_INCREMENT,
     .src_addr_ctrl  = DMA_ADDR_FIX,
     .dstmode        = DMA_NORMAL_MODE,
     .srcmode        = DMA_HANDSHAKE_MODE,
-    .dstwidth       = DMA_CTR_WORD_WIDTH,//must word.
-    .srcwidth       = DMA_CTR_WORD_WIDTH,//must word.
-    .src_burst_size = 0,//only master rx dma support burst2/1(2/1 word).
+    .dstwidth       = DMA_CTR_WORD_WIDTH, //must word.
+    .srcwidth       = DMA_CTR_WORD_WIDTH, //must word.
+    .src_burst_size = 0,                  //only master rx dma support burst2/1(2/1 word).
     .read_num_en    = 0,
     .priority       = 0,
     .write_num_en   = 0,
-    .auto_en        = 0,//must 0.
+    .auto_en        = 0, //must 0.
 };
 dma_config_t lspi_slave_rx_dma_config = {
     .dst_req_sel    = 0,
-    .src_req_sel    = DMA_REQ_LSPI_RX,//rx req.
+    .src_req_sel    = DMA_REQ_LSPI_RX, //rx req.
     .dst_addr_ctrl  = DMA_ADDR_INCREMENT,
     .src_addr_ctrl  = DMA_ADDR_FIX,
     .dstmode        = DMA_NORMAL_MODE,
     .srcmode        = DMA_HANDSHAKE_MODE,
-    .dstwidth       = DMA_CTR_WORD_WIDTH,//must word.
-    .srcwidth       = DMA_CTR_WORD_WIDTH,//must word.
-    .src_burst_size = 0,//slave not support burst.
+    .dstwidth       = DMA_CTR_WORD_WIDTH, //must word.
+    .srcwidth       = DMA_CTR_WORD_WIDTH, //must word.
+    .src_burst_size = 0,                  //slave not support burst.
     .read_num_en    = 0,
     .priority       = 0,
-    .write_num_en   = 1,//When write_num_en is set to 1, dma will write back the length information at the address 4 bytes before the destination address.
-    .auto_en        = 0,//must 0.
+    .write_num_en   = 1,                  //When write_num_en is set to 1, dma will write back the length information at the address 4 bytes before the destination address.
+    .auto_en        = 0,                  //must 0.
 };
 
 /**
@@ -143,15 +145,16 @@ dma_config_t lspi_slave_rx_dma_config = {
  * @note      This function can be rewritten according to the application scenario.
  */
 __attribute__((weak)) void lspi_timeout_handler(unsigned int spi_error_timeout_code)
- {
-     g_spi_timeout_error[LSPI_MODULE].g_spi_error_timeout_code = spi_error_timeout_code;
- }
-__attribute__((weak)) void gspi_timeout_handler(unsigned int spi_error_timeout_code)
- {
-     g_spi_timeout_error[GSPI_MODULE].g_spi_error_timeout_code = spi_error_timeout_code;
- }
+{
+    g_spi_timeout_error[LSPI_MODULE].g_spi_error_timeout_code = spi_error_timeout_code;
+}
 
- /**
+__attribute__((weak)) void gspi_timeout_handler(unsigned int spi_error_timeout_code)
+{
+    g_spi_timeout_error[GSPI_MODULE].g_spi_error_timeout_code = spi_error_timeout_code;
+}
+
+/**
   * @brief     This function serves to set the spi timeout(us).
   * @param[in] spi_sel   - the spi module.
   * @param[in] timeout_us - the timeout(us).
@@ -168,67 +171,64 @@ __attribute__((weak)) void gspi_timeout_handler(unsigned int spi_error_timeout_c
   *            when timeout exits, solution:
   *            reset SPI(as master or slave) module,corresponding api:spi_hw_fsm_reset;
   */
- void spi_set_error_timeout(spi_sel_e spi_sel,unsigned int timeout_us)
- {
+void spi_set_error_timeout(spi_sel_e spi_sel, unsigned int timeout_us)
+{
     g_spi_timeout_error[spi_sel].g_spi_error_timeout_us = timeout_us;
- }
+}
 
- /**
+/**
   * @brief     This function serves to return the spi api error timeout code.
   * @param[in] spi_sel   - the spi module.
   * @return    none.
   */
- spi_api_error_timeout_code_e spi_get_error_timeout_code(spi_sel_e spi_sel)
-  {
+spi_api_error_timeout_code_e spi_get_error_timeout_code(spi_sel_e spi_sel)
+{
     return g_spi_timeout_error[spi_sel].g_spi_error_timeout_code;
-  }
+}
 
-
- /**
+/**
   * @brief      This function servers to determine whether the txfifo is full.
   * @param[in]  spi_sel     - the spi module.
   * @return     1:Indicates that the txfifo is full. 0:Indicates that the txfifo is not full.
   */
-  bool spi_txfifo_is_full(spi_sel_e spi_sel)
- {
-    return  reg_spi_txfifo_status(spi_sel) & FLD_SPI_TXF_FULL;
+bool spi_txfifo_is_full(spi_sel_e spi_sel)
+{
+    return reg_spi_txfifo_status(spi_sel) & FLD_SPI_TXF_FULL;
+}
 
- }
-
- /**
+/**
   * @brief      This function servers to determine whether the rxfifo is empty.
   * @param[in]  spi_sel     - the spi module.
   * @return     1:Indicates that the rxfifo is empty. 0:Indicates that the rxfifo is not empty.
   */
-  bool spi_rxfifo_is_empty(spi_sel_e spi_sel)
- {
-    return  reg_spi_rxfifo_status(spi_sel)  & FLD_SPI_RXF_EMPTY;
+bool spi_rxfifo_is_empty(spi_sel_e spi_sel)
+{
+    return reg_spi_rxfifo_status(spi_sel) & FLD_SPI_RXF_EMPTY;
+}
 
- }
-
- /**
+/**
   * @brief      This function determines whether tx_fifo can continue to write a word.
   * @param[in]  spi_sel     - the spi module.
   * @return     1: cannot continue to write. 0: can continue to write.
   */
-  bool spi_txfifo_num_is_word(spi_sel_e spi_sel)
- {
+bool spi_txfifo_num_is_word(spi_sel_e spi_sel)
+{
     unsigned char tx_fifo_depth = 0;
 
-    (spi_sel == LSPI_MODULE)?(tx_fifo_depth = 20):(tx_fifo_depth = 8);
+    (spi_sel == LSPI_MODULE) ? (tx_fifo_depth = 20) : (tx_fifo_depth = 8);
 
-    return  (tx_fifo_depth - (reg_spi_txfifo_status(spi_sel) & FLD_SPI_TXF_ENTRIES) < 4);
- }
+    return (tx_fifo_depth - (reg_spi_txfifo_status(spi_sel) & FLD_SPI_TXF_ENTRIES) < 4);
+}
 
- /**
+/**
   * @brief      This function determines whether rx_fifo can continue to read a word.
   * @param[in]  spi_sel     - the spi module.
   * @return     1:cannot continue to read. 0:can continue to read.
   */
-  bool spi_rxfifo_num_is_word(spi_sel_e spi_sel)
- {
-    return  ((reg_spi_rxfifo_status(spi_sel)  & FLD_SPI_RXF_ENTRIES) < 4);
- }
+bool spi_rxfifo_num_is_word(spi_sel_e spi_sel)
+{
+    return ((reg_spi_rxfifo_status(spi_sel) & FLD_SPI_RXF_ENTRIES) < 4);
+}
 
 /**
  * @brief      This function selects  pin  for gspi master or slave mode.
@@ -236,17 +236,16 @@ __attribute__((weak)) void gspi_timeout_handler(unsigned int spi_error_timeout_c
  * @param[in]  function  - pin-multiplexing function.
  * @return     none.
  */
-void gspi_set_pin_mux(gpio_func_pin_e pin,gpio_func_e function)
+void gspi_set_pin_mux(gpio_func_pin_e pin, gpio_func_e function)
 {
-    if (pin != GPIO_NONE_PIN)
-    {
+    if (pin != GPIO_NONE_PIN) {
         /**
          * When configuring the mux pin of SPI, pull up the CSN configuration.
          * The chip SPI defaults to the master, and when the slave configures the pin as CSN, since the CSN is floating and in the input state,
          * an end interrupt may be generated by external influences.
          * Added by pengxiang
          */
-        if(GSPI_CN0_IO == function){
+        if (GSPI_CN0_IO == function) {
             gpio_set_up_down_res((gpio_pin_e)pin, GPIO_PIN_PULLUP_10K);
         }
         /**
@@ -266,7 +265,7 @@ void gspi_set_pin_mux(gpio_func_pin_e pin,gpio_func_e function)
  */
 void gspi_cs_pin_en(gpio_pin_e pin)
 {
-    gspi_set_pin_mux((gpio_func_pin_e)pin,GSPI_CN0_IO);
+    gspi_set_pin_mux((gpio_func_pin_e)pin, GSPI_CN0_IO);
 }
 
 /**
@@ -279,7 +278,7 @@ void gspi_cs_pin_dis(gpio_pin_e pin)
     gpio_output_en(pin);
     gpio_input_dis(pin);
     gpio_set_high_level(pin);
-    gpio_function_en(pin);//gpio_function_en must be set at the end
+    gpio_function_en(pin); //gpio_function_en must be set at the end
 }
 
 /**
@@ -288,7 +287,7 @@ void gspi_cs_pin_dis(gpio_pin_e pin)
  * @param[in]   next_csn_pin - the next csn pin.
  * @return      none.
  */
-void gspi_change_csn_pin(gpio_pin_e current_csn_pin,gpio_pin_e next_csn_pin)
+void gspi_change_csn_pin(gpio_pin_e current_csn_pin, gpio_pin_e next_csn_pin)
 {
     gspi_cs_pin_dis(current_csn_pin);
     gspi_cs_pin_en(next_csn_pin);
@@ -300,17 +299,16 @@ void gspi_change_csn_pin(gpio_pin_e current_csn_pin,gpio_pin_e next_csn_pin)
  * @param[in]  function  - pin-multiplexing function.
  * @return     none.
  */
-void lspi_set_pin_mux(gpio_func_pin_e pin,gpio_func_e function)
+void lspi_set_pin_mux(gpio_func_pin_e pin, gpio_func_e function)
 {
-    if (pin != GPIO_NONE_PIN)
-    {
+    if (pin != GPIO_NONE_PIN) {
         /**
          * When configuring the mux pin of SPI, pull up the CSN configuration.
          * The chip SPI defaults to the master, and when the slave configures the pin as CSN, since the CSN is floating and in the input state,
          * an end interrupt may be generated by external influences.
          * Added by pengxiang
          */
-        if(LSPI_CN_IO == function){
+        if (LSPI_CN_IO == function) {
             gpio_set_up_down_res((gpio_pin_e)pin, GPIO_PIN_PULLUP_10K);
             reg_gpio_func_mux(pin) = function;
         }
@@ -330,12 +328,12 @@ void lspi_set_pin_mux(gpio_func_pin_e pin,gpio_func_e function)
  */
 void gspi_set_pin(gspi_pin_config_t *spi_pin_config)
 {
-    gspi_set_pin_mux(spi_pin_config->spi_clk_pin,GSPI_CK_IO);
-    gspi_set_pin_mux(spi_pin_config->spi_csn_pin,GSPI_CN0_IO);
-    gspi_set_pin_mux(spi_pin_config->spi_mosi_io0_pin,GSPI_MOSI_IO);
-    gspi_set_pin_mux(spi_pin_config->spi_miso_io1_pin,GSPI_MISO_IO);
-    gspi_set_pin_mux(spi_pin_config->spi_io2_pin,GSPI_IO2_IO);
-    gspi_set_pin_mux(spi_pin_config->spi_io3_pin,GSPI_IO3_IO);
+    gspi_set_pin_mux(spi_pin_config->spi_clk_pin, GSPI_CK_IO);
+    gspi_set_pin_mux(spi_pin_config->spi_csn_pin, GSPI_CN0_IO);
+    gspi_set_pin_mux(spi_pin_config->spi_mosi_io0_pin, GSPI_MOSI_IO);
+    gspi_set_pin_mux(spi_pin_config->spi_miso_io1_pin, GSPI_MISO_IO);
+    gspi_set_pin_mux(spi_pin_config->spi_io2_pin, GSPI_IO2_IO);
+    gspi_set_pin_mux(spi_pin_config->spi_io3_pin, GSPI_IO3_IO);
 }
 
 /**
@@ -345,12 +343,12 @@ void gspi_set_pin(gspi_pin_config_t *spi_pin_config)
  */
 void gspi_set_xip_pin(gspi_xip_pin_config_t *gspi_xip_pin_config)
 {
-    gspi_set_pin_mux(gspi_xip_pin_config->gspi_clk_pin,GSPI_CK_IO);
-    gspi_set_pin_mux(gspi_xip_pin_config->gspi_csn0_pin,GSPI_CN0_IO);
-    gspi_set_pin_mux(gspi_xip_pin_config->gspi_csn1_pin,GSPI_MOSI_IO);
-    gspi_set_pin_mux(gspi_xip_pin_config->gspi_csn2_pin,GSPI_MISO_IO);
-    gspi_set_pin_mux(gspi_xip_pin_config->gspi_io2_pin,GSPI_IO2_IO);
-    gspi_set_pin_mux(gspi_xip_pin_config->gspi_io3_pin,GSPI_IO3_IO);
+    gspi_set_pin_mux(gspi_xip_pin_config->gspi_clk_pin, GSPI_CK_IO);
+    gspi_set_pin_mux(gspi_xip_pin_config->gspi_csn0_pin, GSPI_CN0_IO);
+    gspi_set_pin_mux(gspi_xip_pin_config->gspi_csn1_pin, GSPI_MOSI_IO);
+    gspi_set_pin_mux(gspi_xip_pin_config->gspi_csn2_pin, GSPI_MISO_IO);
+    gspi_set_pin_mux(gspi_xip_pin_config->gspi_io2_pin, GSPI_IO2_IO);
+    gspi_set_pin_mux(gspi_xip_pin_config->gspi_io3_pin, GSPI_IO3_IO);
 }
 
 /**
@@ -360,12 +358,12 @@ void gspi_set_xip_pin(gspi_xip_pin_config_t *gspi_xip_pin_config)
  */
 void lspi_set_pin(lspi_pin_config_t *spi_pin_config)
 {
-    lspi_set_pin_mux((gpio_func_pin_e)spi_pin_config->spi_clk_pin,(gpio_func_e)0);
-    lspi_set_pin_mux((gpio_func_pin_e)spi_pin_config->spi_csn_pin,LSPI_CN_IO);
-    lspi_set_pin_mux((gpio_func_pin_e)spi_pin_config->spi_mosi_io0_pin,(gpio_func_e)0);
-    lspi_set_pin_mux((gpio_func_pin_e)spi_pin_config->spi_miso_io1_pin,(gpio_func_e)0);
-    lspi_set_pin_mux((gpio_func_pin_e)spi_pin_config->spi_io2_pin,(gpio_func_e)0);
-    lspi_set_pin_mux((gpio_func_pin_e)spi_pin_config->spi_io3_pin,(gpio_func_e)0);
+    lspi_set_pin_mux((gpio_func_pin_e)spi_pin_config->spi_clk_pin, (gpio_func_e)0);
+    lspi_set_pin_mux((gpio_func_pin_e)spi_pin_config->spi_csn_pin, LSPI_CN_IO);
+    lspi_set_pin_mux((gpio_func_pin_e)spi_pin_config->spi_mosi_io0_pin, (gpio_func_e)0);
+    lspi_set_pin_mux((gpio_func_pin_e)spi_pin_config->spi_miso_io1_pin, (gpio_func_e)0);
+    lspi_set_pin_mux((gpio_func_pin_e)spi_pin_config->spi_io2_pin, (gpio_func_e)0);
+    lspi_set_pin_mux((gpio_func_pin_e)spi_pin_config->spi_io3_pin, (gpio_func_e)0);
 }
 
 /**
@@ -374,17 +372,16 @@ void lspi_set_pin(lspi_pin_config_t *spi_pin_config)
  * @param[in]  function  - pin-multiplexing function.
  * @return     none.
  */
-void sspi_set_pin_mux(gpio_func_pin_e pin,gpio_func_e function)
+void sspi_set_pin_mux(gpio_func_pin_e pin, gpio_func_e function)
 {
-    if (pin != GPIO_NONE_PIN)
-    {
+    if (pin != GPIO_NONE_PIN) {
         /**
          * When configuring the mux pin of SPI, pull up the CSN configuration.
          * The chip SPI defaults to the master, and when the slave configures the pin as CSN, since the CSN is floating and in the input state,
          * an end interrupt may be generated by external influences.
          * Added by pengxiang
          */
-        if(SSPI_CN_I == function){
+        if (SSPI_CN_I == function) {
             gpio_set_up_down_res((gpio_pin_e)pin, GPIO_PIN_PULLUP_10K);
         }
         /**
@@ -407,39 +404,31 @@ void spi_slave_set_pin(sspi_pin_config_t *spi_pin_config)
     /*  initialize sspi*/
     reg_rst1 |= FLD_RST1_SPISLV;
     reg_clk_en1 |= FLD_RST1_SPISLV;
-    if((spi_pin_config->spi_csn_pin!=GPIO_FC_PC0))
-    {
-        if((reg_gpio_func_mux(GPIO_FC_PC0) == SSPI_CN_I)&&((reg_gpio_func(GPIO_FC_PC0)&GPIO_PC0)==0))
-        {
+    if ((spi_pin_config->spi_csn_pin != GPIO_FC_PC0)) {
+        if ((reg_gpio_func_mux(GPIO_FC_PC0) == SSPI_CN_I) && ((reg_gpio_func(GPIO_FC_PC0) & GPIO_PC0) == 0)) {
             gpio_function_en(GPIO_PC0);
         }
     }
-    if((spi_pin_config->spi_clk_pin!=GPIO_FC_PC1))
-    {
-        if((reg_gpio_func_mux(GPIO_FC_PC1) == SSPI_CK_I)&&((reg_gpio_func(GPIO_FC_PC1)&GPIO_PC1)==0))
-        {
+    if ((spi_pin_config->spi_clk_pin != GPIO_FC_PC1)) {
+        if ((reg_gpio_func_mux(GPIO_FC_PC1) == SSPI_CK_I) && ((reg_gpio_func(GPIO_FC_PC1) & GPIO_PC1) == 0)) {
             gpio_function_en(GPIO_PC1);
         }
     }
-    if((spi_pin_config->spi_mosi_io0_pin!=GPIO_FC_PC2))
-        {
-            if((reg_gpio_func_mux(GPIO_FC_PC2) == SSPI_SI_IO)&&((reg_gpio_func(GPIO_FC_PC2)&GPIO_PC2)==0))
-            {
-                gpio_function_en(GPIO_PC2);
-            }
+    if ((spi_pin_config->spi_mosi_io0_pin != GPIO_FC_PC2)) {
+        if ((reg_gpio_func_mux(GPIO_FC_PC2) == SSPI_SI_IO) && ((reg_gpio_func(GPIO_FC_PC2) & GPIO_PC2) == 0)) {
+            gpio_function_en(GPIO_PC2);
         }
-    if((spi_pin_config->spi_miso_io1_pin!=GPIO_FC_PC3))
-    {
-        if((reg_gpio_func_mux(GPIO_FC_PC3) == SSPI_SO_IO)&&((reg_gpio_func(GPIO_FC_PC3)&GPIO_PC3)==0))
-        {
+    }
+    if ((spi_pin_config->spi_miso_io1_pin != GPIO_FC_PC3)) {
+        if ((reg_gpio_func_mux(GPIO_FC_PC3) == SSPI_SO_IO) && ((reg_gpio_func(GPIO_FC_PC3) & GPIO_PC3) == 0)) {
             gpio_function_en(GPIO_PC3);
         }
     }
 
-    sspi_set_pin_mux(spi_pin_config->spi_clk_pin,SSPI_CK_I);
-    sspi_set_pin_mux(spi_pin_config->spi_csn_pin,SSPI_CN_I);
-    sspi_set_pin_mux(spi_pin_config->spi_mosi_io0_pin,SSPI_SI_IO);
-    sspi_set_pin_mux(spi_pin_config->spi_miso_io1_pin,SSPI_SO_IO);
+    sspi_set_pin_mux(spi_pin_config->spi_clk_pin, SSPI_CK_I);
+    sspi_set_pin_mux(spi_pin_config->spi_csn_pin, SSPI_CN_I);
+    sspi_set_pin_mux(spi_pin_config->spi_mosi_io0_pin, SSPI_SI_IO);
+    sspi_set_pin_mux(spi_pin_config->spi_miso_io1_pin, SSPI_SO_IO);
 }
 
 /**
@@ -458,45 +447,42 @@ void spi_slave_set_pin(sspi_pin_config_t *spi_pin_config)
  *              - If the master is not connected or if there are other slave devices that can receive a higher frequency, spi_clk on the io output from the master will be 48M max.
  *              - The master connects to the telink's slave, since the maximum clock of the slave spi module is 48M, according to the formula(spi_clock_in(output from master clk_pin )  <= slave clk/4), the maximum value of spi_clk on the io is 12M.
  */
-void spi_master_init(spi_sel_e spi_sel,unsigned short div_clock, spi_mode_type_e mode)
+void spi_master_init(spi_sel_e spi_sel, unsigned short div_clock, spi_mode_type_e mode)
 {
-    switch (spi_sel)
-    {
-        case LSPI_MODULE:
-             reg_rst0 |= FLD_RST0_LSPI;
-             reg_clk_en0 |= FLD_CLK0_LSPI_EN;
-            if (div_clock > 15){//LSPI clock source select pll_clk when div_clock <= 15,select xtl 24m when div_clock > 15.
-                clock_bbpll_config(PLL_CLK);
-                reg_lspi_clk_set = ((FLD_LSPI_CLK_MOD&(unsigned char)(div_clock*24/(sys_clk.pll_clk)))|(1<<4));
-            }else{
-                reg_lspi_clk_set = ((FLD_LSPI_CLK_MOD&(unsigned char)div_clock)|(2<<4));
-            }
-            break;
-        case GSPI_MODULE:
-             reg_rst1 |= FLD_RST1_GSPI;
-             reg_clk_en1 |= FLD_CLK1_GSPI_EN;
-            if (div_clock > 255){//GSPI clock source select pll_clk when div_clock <= 255,select xtl 24m when div_clock > 255.
-                clock_bbpll_config(PLL_CLK);
-                reg_gspi_clk_set = ((FLD_GSPI_CLK_MOD&(unsigned char)(div_clock*24/(sys_clk.pll_clk)))|(1<<8));
-            }else{
-                reg_gspi_clk_set = ((FLD_GSPI_CLK_MOD&(unsigned char)div_clock)|(2<<8));
-            }
-            break;
+    switch (spi_sel) {
+    case LSPI_MODULE:
+        reg_rst0 |= FLD_RST0_LSPI;
+        reg_clk_en0 |= FLD_CLK0_LSPI_EN;
+        if (div_clock > 15) { //LSPI clock source select pll_clk when div_clock <= 15,select xtl 24m when div_clock > 15.
+            clock_bbpll_config(PLL_CLK);
+            reg_lspi_clk_set = ((FLD_LSPI_CLK_MOD & (unsigned char)(div_clock * 24 / (sys_clk.pll_clk))) | (1 << 4));
+        } else {
+            reg_lspi_clk_set = ((FLD_LSPI_CLK_MOD & (unsigned char)div_clock) | (2 << 4));
+        }
+        break;
+    case GSPI_MODULE:
+        reg_rst1 |= FLD_RST1_GSPI;
+        reg_clk_en1 |= FLD_CLK1_GSPI_EN;
+        if (div_clock > 255) { //GSPI clock source select pll_clk when div_clock <= 255,select xtl 24m when div_clock > 255.
+            clock_bbpll_config(PLL_CLK);
+            reg_gspi_clk_set = ((FLD_GSPI_CLK_MOD & (unsigned char)(div_clock * 24 / (sys_clk.pll_clk))) | (1 << 8));
+        } else {
+            reg_gspi_clk_set = ((FLD_GSPI_CLK_MOD & (unsigned char)div_clock) | (2 << 8));
+        }
+        break;
 
-        default:break;
+    default:
+        break;
     }
 
-    reg_spi_ctrl3(spi_sel)  |= (FLD_SPI_MASTER_MODE|FLD_SPI_AUTO_HREADY_EN);//master
-    reg_spi_ctrl3(spi_sel) = ((reg_spi_ctrl3(spi_sel) & (~FLD_SPI_WORK_MODE)) | (mode << 2));// select SPI mode, support four modes.
-    if(spi_sel == GSPI_MODULE)
-    {
-        spi_rx_irq_trig_cnt(spi_sel,4);//default gspi burst1(N=1) ,rx_fifo trig_cnt=4*N=4.
-        spi_tx_irq_trig_cnt(spi_sel,4);//default gspi burst1(N=1) ,tx_fifo trig_cnt=tx fifo depth-4*N=8-4=4.
-    }
-    else if(spi_sel == LSPI_MODULE)
-    {
-        spi_rx_irq_trig_cnt(spi_sel,4);//default lspi burst1(N=1) ,rx_fifo trig_cnt=4*N=4.
-        spi_tx_irq_trig_cnt(spi_sel,16);//default lspi burst1(N=1) ,tx_fifo trig_cnt=tx fifo depth-4*N=20-4=16.
+    reg_spi_ctrl3(spi_sel) |= (FLD_SPI_MASTER_MODE | FLD_SPI_AUTO_HREADY_EN);                 //master
+    reg_spi_ctrl3(spi_sel) = ((reg_spi_ctrl3(spi_sel) & (~FLD_SPI_WORK_MODE)) | (mode << 2)); // select SPI mode, support four modes.
+    if (spi_sel == GSPI_MODULE) {
+        spi_rx_irq_trig_cnt(spi_sel, 4);                                                      //default gspi burst1(N=1) ,rx_fifo trig_cnt=4*N=4.
+        spi_tx_irq_trig_cnt(spi_sel, 4);                                                      //default gspi burst1(N=1) ,tx_fifo trig_cnt=tx fifo depth-4*N=8-4=4.
+    } else if (spi_sel == LSPI_MODULE) {
+        spi_rx_irq_trig_cnt(spi_sel, 4);                                                      //default lspi burst1(N=1) ,rx_fifo trig_cnt=4*N=4.
+        spi_tx_irq_trig_cnt(spi_sel, 16);                                                     //default lspi burst1(N=1) ,tx_fifo trig_cnt=tx fifo depth-4*N=20-4=16.
     }
     spi_xip_dis(spi_sel);
 }
@@ -515,34 +501,31 @@ void spi_master_init(spi_sel_e spi_sel,unsigned short div_clock, spi_mode_type_e
  *             - spi_clock_in(output from master clk_pin )  <= slave clk/4.
  *             - The master connects to the telink's slave, since the maximum clock of the slave spi module is 48M, according to the formula, the maximum value of spi_clk on the io is 12M.
  */
-void spi_slave_init(spi_sel_e spi_sel,spi_mode_type_e mode)
+void spi_slave_init(spi_sel_e spi_sel, spi_mode_type_e mode)
 {
-    switch (spi_sel)
-    {
-        case LSPI_MODULE: //set the SPI clock to 48m by splitting the frequency of the pll.
-            reg_rst0 |= FLD_RST0_LSPI;
-            reg_clk_en0 |= FLD_CLK0_LSPI_EN;
-            reg_lspi_clk_set = ((FLD_LSPI_CLK_MOD&(unsigned char)(sys_clk.pll_clk/48))|(2<<4));
-            break;
-        case GSPI_MODULE: //set the SPI clock to 48m by splitting the frequency of the pll.
-            reg_rst1 |= FLD_RST1_GSPI;
-            reg_clk_en1 |= FLD_CLK1_GSPI_EN;
-            reg_gspi_clk_set = ((FLD_GSPI_CLK_MOD&(unsigned char)(sys_clk.pll_clk/48))|(2<<8));
-            break;
-        default:break;
+    switch (spi_sel) {
+    case LSPI_MODULE: //set the SPI clock to 48m by splitting the frequency of the pll.
+        reg_rst0 |= FLD_RST0_LSPI;
+        reg_clk_en0 |= FLD_CLK0_LSPI_EN;
+        reg_lspi_clk_set = ((FLD_LSPI_CLK_MOD & (unsigned char)(sys_clk.pll_clk / 48)) | (2 << 4));
+        break;
+    case GSPI_MODULE: //set the SPI clock to 48m by splitting the frequency of the pll.
+        reg_rst1 |= FLD_RST1_GSPI;
+        reg_clk_en1 |= FLD_CLK1_GSPI_EN;
+        reg_gspi_clk_set = ((FLD_GSPI_CLK_MOD & (unsigned char)(sys_clk.pll_clk / 48)) | (2 << 8));
+        break;
+    default:
+        break;
     }
-    reg_spi_ctrl3(spi_sel)  &= (~FLD_SPI_MASTER_MODE);//slave.
-    reg_spi_ctrl3(spi_sel)  |= FLD_SPI_AUTO_HREADY_EN;//slave.
-    reg_spi_ctrl3(spi_sel) = ((reg_spi_ctrl3(spi_sel) & (~FLD_SPI_WORK_MODE)) | (mode << 2));// select SPI mode, support four modes.
-    if(spi_sel == GSPI_MODULE)
-    {
-        spi_rx_irq_trig_cnt(spi_sel,4);//default gspi burst1(N=1) ,rx_fifo trig_cnt=4*N=4.
-        spi_tx_irq_trig_cnt(spi_sel,4);//default gspi burst1(N=1) ,tx_fifo trig_cnt=rx fifo depth-4*N=8-4=4.
-    }
-    else if(spi_sel == LSPI_MODULE)
-    {
-        spi_rx_irq_trig_cnt(spi_sel,4);//default lspi burst1(N=1) ,rx_fifo trig_cnt=4*N=4.
-        spi_tx_irq_trig_cnt(spi_sel,8);//default lspi burst1(N=1) ,tx_fifo trig_cnt=rx fifo depth-4*N=12-4=8.
+    reg_spi_ctrl3(spi_sel) &= (~FLD_SPI_MASTER_MODE);                                         //slave.
+    reg_spi_ctrl3(spi_sel) |= FLD_SPI_AUTO_HREADY_EN;                                         //slave.
+    reg_spi_ctrl3(spi_sel) = ((reg_spi_ctrl3(spi_sel) & (~FLD_SPI_WORK_MODE)) | (mode << 2)); // select SPI mode, support four modes.
+    if (spi_sel == GSPI_MODULE) {
+        spi_rx_irq_trig_cnt(spi_sel, 4);                                                      //default gspi burst1(N=1) ,rx_fifo trig_cnt=4*N=4.
+        spi_tx_irq_trig_cnt(spi_sel, 4);                                                      //default gspi burst1(N=1) ,tx_fifo trig_cnt=rx fifo depth-4*N=8-4=4.
+    } else if (spi_sel == LSPI_MODULE) {
+        spi_rx_irq_trig_cnt(spi_sel, 4);                                                      //default lspi burst1(N=1) ,rx_fifo trig_cnt=4*N=4.
+        spi_tx_irq_trig_cnt(spi_sel, 8);                                                      //default lspi burst1(N=1) ,tx_fifo trig_cnt=rx fifo depth-4*N=12-4=8.
     }
     spi_xip_dis(spi_sel);
 }
@@ -578,16 +561,13 @@ void spi_set_transmode(spi_sel_e spi_sel, spi_tans_mode_e mode)
   */
 void spi_set_io_mode(spi_sel_e spi_sel, spi_io_mode_e mode)
 {
-    if(mode == SPI_3_LINE_MODE)
-    {
+    if (mode == SPI_3_LINE_MODE) {
         /*The io mode must set to single mode*/
         spi_3line_mode_en(spi_sel);
         reg_spi_ctrl1(spi_sel) = ((reg_spi_ctrl1(spi_sel) & (~FLD_SPI_DATA_LANE)));
-    }
-    else
-    {
+    } else {
         /*must disable 3line mode*/
-        reg_spi_ctrl1(spi_sel) = ((reg_spi_ctrl1(spi_sel) & (~FLD_SPI_DATA_LANE))  | (mode & 0x3));
+        reg_spi_ctrl1(spi_sel) = ((reg_spi_ctrl1(spi_sel) & (~FLD_SPI_DATA_LANE)) | (mode & 0x3));
         spi_3line_mode_dis(spi_sel);
     }
 }
@@ -611,54 +591,39 @@ void spi_master_config(spi_sel_e spi_sel, spi_normal_3line_mode_e mode)
  * @param[in]   config  - the pointer of pin special config struct.
  * @return      none.
  */
-void spi_master_config_plus(spi_sel_e spi_sel,spi_wr_rd_config_t *config)
+void spi_master_config_plus(spi_sel_e spi_sel, spi_wr_rd_config_t *config)
 {
     spi_set_io_mode(spi_sel, config->spi_io_mode);
     spi_set_addr_len(spi_sel, config->spi_addr_len);
     spi_set_dummy_cnt(spi_sel, config->spi_dummy_cnt);
     spi_set_token_val(spi_sel, config->spi_token_val_sel);
 
-    if (1 == config->spi_cmd_en)
-    {
+    if (1 == config->spi_cmd_en) {
         spi_cmd_en(spi_sel);
-    }
-    else if (0 == config->spi_cmd_en)
-    {
+    } else if (0 == config->spi_cmd_en) {
         spi_cmd_dis(spi_sel);
     }
 
-    if (1 == config->spi_cmd_fmt_en)
-    {
+    if (1 == config->spi_cmd_fmt_en) {
         spi_cmd_fmt_en(spi_sel);
-    }
-    else if (0 == config->spi_cmd_fmt_en)
-    {
-       spi_cmd_fmt_dis(spi_sel);
+    } else if (0 == config->spi_cmd_fmt_en) {
+        spi_cmd_fmt_dis(spi_sel);
     }
 
-    if (1 == config->spi_addr_en)
-    {
+    if (1 == config->spi_addr_en) {
         spi_addr_en(spi_sel);
-    }
-    else if (0 == config->spi_addr_en)
-    {
+    } else if (0 == config->spi_addr_en) {
         spi_addr_dis(spi_sel);
     }
 
-    if (1 == config->spi_addr_fmt_en)
-    {
+    if (1 == config->spi_addr_fmt_en) {
         spi_addr_fmt_en(spi_sel);
-    }
-    else if (0 == config->spi_addr_fmt_en)
-    {
+    } else if (0 == config->spi_addr_fmt_en) {
         spi_addr_fmt_dis(spi_sel);
     }
-    if (1 == config->spi_token_en)
-    {
+    if (1 == config->spi_token_en) {
         spi_token_en(spi_sel);
-    }
-    else if (0 == config->spi_token_en)
-    {
+    } else if (0 == config->spi_token_en) {
         spi_token_dis(spi_sel);
     }
 }
@@ -673,12 +638,12 @@ void spi_master_config_plus(spi_sel_e spi_sel,spi_wr_rd_config_t *config)
 drv_api_status_e spi_master_send_cmd(spi_sel_e spi_sel, unsigned char cmd)
 {
     spi_tx_fifo_clr(spi_sel);
-    spi_set_transmode(spi_sel,SPI_MODE_NONE_DATA);//nodata.
-    spi_set_cmd(spi_sel,cmd);
-    if(SPI_WAIT(spi_is_busy,spi_sel,g_spi_timeout_error[spi_sel].g_spi_error_timeout_us,g_spi_timeout_error[spi_sel].spi_timeout_handler,SPI_API_ERROR_TIMEOUT_BUS_BUSY)){
+    spi_set_transmode(spi_sel, SPI_MODE_NONE_DATA); //nodata.
+    spi_set_cmd(spi_sel, cmd);
+    if (SPI_WAIT(spi_is_busy, spi_sel, g_spi_timeout_error[spi_sel].g_spi_error_timeout_us, g_spi_timeout_error[spi_sel].spi_timeout_handler, SPI_API_ERROR_TIMEOUT_BUS_BUSY)) {
         return DRV_API_TIMEOUT;
     }
-     return DRV_API_SUCCESS;
+    return DRV_API_SUCCESS;
 }
 
 /**
@@ -696,23 +661,21 @@ drv_api_status_e spi_master_send_cmd(spi_sel_e spi_sel, unsigned char cmd)
  */
 drv_api_status_e spi_write(spi_sel_e spi_sel, unsigned char *data, unsigned int len)
 {
-    unsigned int word_len = len >> 2;
+    unsigned int  word_len   = len >> 2;
     unsigned char single_len = len & 3;
     //When the remaining size in tx_fifo is not less than 4 bytes, the MCU moves the data according to the word length.
-    for (unsigned int i = 0; i < word_len; i++)
-    {
-        if(SPI_WAIT(spi_txfifo_num_is_word,spi_sel,g_spi_timeout_error[spi_sel].g_spi_error_timeout_us,g_spi_timeout_error[spi_sel].spi_timeout_handler,SPI_API_ERROR_TIMEOUT_TXFIFO_NUM_WORD)){
+    for (unsigned int i = 0; i < word_len; i++) {
+        if (SPI_WAIT(spi_txfifo_num_is_word, spi_sel, g_spi_timeout_error[spi_sel].g_spi_error_timeout_us, g_spi_timeout_error[spi_sel].spi_timeout_handler, SPI_API_ERROR_TIMEOUT_TXFIFO_NUM_WORD)) {
             return DRV_API_TIMEOUT;
         }
         reg_spi_wr_rd_data_word(spi_sel) = ((unsigned int *)data)[i];
     }
     //When the remaining size in tx_fifo is less than 4 bytes, the MCU moves the data according to the word length.
-    for (unsigned int i = 0; i < single_len; i++)
-    {
-        if(SPI_WAIT(spi_txfifo_is_full,spi_sel,g_spi_timeout_error[spi_sel].g_spi_error_timeout_us,g_spi_timeout_error[spi_sel].spi_timeout_handler,SPI_API_ERROR_TIMEOUT_TXFIFO_FULL)){
+    for (unsigned int i = 0; i < single_len; i++) {
+        if (SPI_WAIT(spi_txfifo_is_full, spi_sel, g_spi_timeout_error[spi_sel].g_spi_error_timeout_us, g_spi_timeout_error[spi_sel].spi_timeout_handler, SPI_API_ERROR_TIMEOUT_TXFIFO_FULL)) {
             return DRV_API_TIMEOUT;
         }
-        reg_spi_wr_rd_data(spi_sel,i % 4) = data[(word_len*4) + i];
+        reg_spi_wr_rd_data(spi_sel, i % 4) = data[(word_len * 4) + i];
     }
     return DRV_API_SUCCESS;
 }
@@ -732,26 +695,23 @@ drv_api_status_e spi_write(spi_sel_e spi_sel, unsigned char *data, unsigned int 
  */
 drv_api_status_e spi_read(spi_sel_e spi_sel, unsigned char *data, unsigned int len)
 {
-    unsigned int word_len = len >> 2;
+    unsigned int  word_len   = len >> 2;
     unsigned char single_len = len & 3;
     //When the data size in rx_fifo is not less than 4 bytes, the MCU moves the data according to the word length.
-    for (unsigned int i = 0; i < word_len; i++)
-    {
-        if(SPI_WAIT(spi_rxfifo_num_is_word,spi_sel,g_spi_timeout_error[spi_sel].g_spi_error_timeout_us,g_spi_timeout_error[spi_sel].spi_timeout_handler,SPI_API_ERROR_TIMEOUT_RXFIFO_NUM_WORD)){
+    for (unsigned int i = 0; i < word_len; i++) {
+        if (SPI_WAIT(spi_rxfifo_num_is_word, spi_sel, g_spi_timeout_error[spi_sel].g_spi_error_timeout_us, g_spi_timeout_error[spi_sel].spi_timeout_handler, SPI_API_ERROR_TIMEOUT_RXFIFO_NUM_WORD)) {
             return DRV_API_TIMEOUT;
         }
-        ((unsigned int *)data)[i] = reg_spi_wr_rd_data_word(spi_sel) ;
+        ((unsigned int *)data)[i] = reg_spi_wr_rd_data_word(spi_sel);
     }
     //When the data size in rx_fifo is less than 4 bytes, the MCU moves the data according to the word length.
-    for (unsigned char i = 0; i < single_len; i++)
-    {
-        if(SPI_WAIT(spi_rxfifo_is_empty,spi_sel,g_spi_timeout_error[spi_sel].g_spi_error_timeout_us,g_spi_timeout_error[spi_sel].spi_timeout_handler,SPI_API_ERROR_TIMEOUT_RXFIFO_EMPTY)){
+    for (unsigned char i = 0; i < single_len; i++) {
+        if (SPI_WAIT(spi_rxfifo_is_empty, spi_sel, g_spi_timeout_error[spi_sel].g_spi_error_timeout_us, g_spi_timeout_error[spi_sel].spi_timeout_handler, SPI_API_ERROR_TIMEOUT_RXFIFO_EMPTY)) {
             return DRV_API_TIMEOUT;
         }
-        data[(word_len*4) + i] = reg_spi_wr_rd_data((spi_sel), i % 4);
+        data[(word_len * 4) + i] = reg_spi_wr_rd_data((spi_sel), i % 4);
     }
     return DRV_API_SUCCESS;
-
 }
 
 /**
@@ -766,11 +726,11 @@ drv_api_status_e spi_master_write(spi_sel_e spi_sel, unsigned char *data, unsign
 {
     spi_tx_dma_dis(spi_sel);
     spi_tx_fifo_clr(spi_sel);
-    spi_tx_cnt(spi_sel,len);
-    spi_set_transmode(spi_sel,SPI_MODE_WRITE_ONLY);
-    spi_set_cmd(spi_sel,0x00);//when  cmd  disable that  will not sent cmd,just trigger spi send.
-    spi_write(spi_sel,(unsigned char *)data, len);
-    if(SPI_WAIT(spi_is_busy,spi_sel,g_spi_timeout_error[spi_sel].g_spi_error_timeout_us,g_spi_timeout_error[spi_sel].spi_timeout_handler,SPI_API_ERROR_TIMEOUT_BUS_BUSY)){
+    spi_tx_cnt(spi_sel, len);
+    spi_set_transmode(spi_sel, SPI_MODE_WRITE_ONLY);
+    spi_set_cmd(spi_sel, 0x00); //when  cmd  disable that  will not sent cmd,just trigger spi send.
+    spi_write(spi_sel, (unsigned char *)data, len);
+    if (SPI_WAIT(spi_is_busy, spi_sel, g_spi_timeout_error[spi_sel].g_spi_error_timeout_us, g_spi_timeout_error[spi_sel].spi_timeout_handler, SPI_API_ERROR_TIMEOUT_BUS_BUSY)) {
         return DRV_API_TIMEOUT;
     }
     return DRV_API_SUCCESS;
@@ -794,13 +754,13 @@ drv_api_status_e spi_master_write_read(spi_sel_e spi_sel, unsigned char *wr_data
     spi_rx_dma_dis(spi_sel);
     spi_tx_fifo_clr(spi_sel);
     spi_rx_fifo_clr(spi_sel);
-    spi_tx_cnt(spi_sel,wr_len);
-    spi_rx_cnt(spi_sel,rd_len);
-    spi_set_transmode(spi_sel,SPI_MODE_WRITE_READ);
-    spi_set_cmd(spi_sel,0x00);//when  cmd  disable that  will not sent cmd,just trigger spi send.
-    spi_write(spi_sel,(unsigned char *)wr_data, wr_len);
+    spi_tx_cnt(spi_sel, wr_len);
+    spi_rx_cnt(spi_sel, rd_len);
+    spi_set_transmode(spi_sel, SPI_MODE_WRITE_READ);
+    spi_set_cmd(spi_sel, 0x00); //when  cmd  disable that  will not sent cmd,just trigger spi send.
+    spi_write(spi_sel, (unsigned char *)wr_data, wr_len);
     spi_read(spi_sel, (unsigned char *)rd_data, rd_len);
-    if(SPI_WAIT(spi_is_busy,spi_sel,g_spi_timeout_error[spi_sel].g_spi_error_timeout_us,g_spi_timeout_error[spi_sel].spi_timeout_handler,SPI_API_ERROR_TIMEOUT_BUS_BUSY)){
+    if (SPI_WAIT(spi_is_busy, spi_sel, g_spi_timeout_error[spi_sel].g_spi_error_timeout_us, g_spi_timeout_error[spi_sel].spi_timeout_handler, SPI_API_ERROR_TIMEOUT_BUS_BUSY)) {
         return DRV_API_TIMEOUT;
     }
     return DRV_API_SUCCESS;
@@ -823,18 +783,17 @@ drv_api_status_e spi_master_write_plus(spi_sel_e spi_sel, unsigned char cmd, uns
     spi_tx_fifo_clr(spi_sel);
     spi_set_address(spi_sel, addr);
 
-    if(data_len == 0){
+    if (data_len == 0) {
         spi_set_transmode(spi_sel, SPI_MODE_NONE_DATA);
-    }
-    else{
+    } else {
         spi_set_transmode(spi_sel, (spi_tans_mode_e)wr_mode);
         spi_tx_cnt(spi_sel, data_len);
     }
-    spi_set_cmd(spi_sel,cmd);
-    if(data_len != 0){
+    spi_set_cmd(spi_sel, cmd);
+    if (data_len != 0) {
         spi_write(spi_sel, (unsigned char *)data, data_len);
     }
-    if(SPI_WAIT(spi_is_busy,spi_sel,g_spi_timeout_error[spi_sel].g_spi_error_timeout_us,g_spi_timeout_error[spi_sel].spi_timeout_handler,SPI_API_ERROR_TIMEOUT_BUS_BUSY)){
+    if (SPI_WAIT(spi_is_busy, spi_sel, g_spi_timeout_error[spi_sel].g_spi_error_timeout_us, g_spi_timeout_error[spi_sel].spi_timeout_handler, SPI_API_ERROR_TIMEOUT_BUS_BUSY)) {
         return DRV_API_TIMEOUT;
     }
     return DRV_API_SUCCESS;
@@ -854,20 +813,18 @@ drv_api_status_e spi_master_write_repeat(spi_sel_e spi_sel, unsigned char *data,
     unsigned int i = 0, j = 0, k = 0;
     spi_tx_dma_dis(spi_sel);
     spi_tx_fifo_clr(spi_sel);
-    spi_tx_cnt(spi_sel, len*repeat_time);
+    spi_tx_cnt(spi_sel, len * repeat_time);
     spi_set_transmode(spi_sel, SPI_MODE_WRITE_ONLY);
-    spi_set_cmd(spi_sel, 0x00);//when  cmd  disable that  will not sent cmd,just trigger spi send.
-    for (i = 0; i < repeat_time; i++)
-    {
-        for (j = 0; j < len; j++,k++)
-        {
-            if(SPI_WAIT(spi_txfifo_is_full,spi_sel,g_spi_timeout_error[spi_sel].g_spi_error_timeout_us,g_spi_timeout_error[spi_sel].spi_timeout_handler,SPI_API_ERROR_TIMEOUT_TXFIFO_FULL)){
+    spi_set_cmd(spi_sel, 0x00); //when  cmd  disable that  will not sent cmd,just trigger spi send.
+    for (i = 0; i < repeat_time; i++) {
+        for (j = 0; j < len; j++, k++) {
+            if (SPI_WAIT(spi_txfifo_is_full, spi_sel, g_spi_timeout_error[spi_sel].g_spi_error_timeout_us, g_spi_timeout_error[spi_sel].spi_timeout_handler, SPI_API_ERROR_TIMEOUT_TXFIFO_FULL)) {
                 return DRV_API_TIMEOUT;
             }
             reg_spi_wr_rd_data(spi_sel, k % 4) = data[j];
         }
     }
-    if(SPI_WAIT(spi_is_busy,spi_sel,g_spi_timeout_error[spi_sel].g_spi_error_timeout_us,g_spi_timeout_error[spi_sel].spi_timeout_handler,SPI_API_ERROR_TIMEOUT_BUS_BUSY)){
+    if (SPI_WAIT(spi_is_busy, spi_sel, g_spi_timeout_error[spi_sel].g_spi_error_timeout_us, g_spi_timeout_error[spi_sel].spi_timeout_handler, SPI_API_ERROR_TIMEOUT_BUS_BUSY)) {
         return DRV_API_TIMEOUT;
     }
     return DRV_API_SUCCESS;
@@ -893,20 +850,18 @@ drv_api_status_e spi_master_write_repeat_plus(spi_sel_e spi_sel, unsigned char c
     spi_tx_dma_dis(spi_sel);
     spi_tx_fifo_clr(spi_sel);
     spi_set_address(spi_sel, addr);
-    spi_tx_cnt(spi_sel, data_len*repeat_time);
+    spi_tx_cnt(spi_sel, data_len * repeat_time);
     spi_set_transmode(spi_sel, (spi_tans_mode_e)wr_mode);
-    spi_set_cmd(spi_sel,cmd);
-    for (i = 0; i < repeat_time; i++)
-    {
-        for (j = 0; j < data_len; j++,k++)
-        {
-            if(SPI_WAIT(spi_txfifo_is_full,spi_sel,g_spi_timeout_error[spi_sel].g_spi_error_timeout_us,g_spi_timeout_error[spi_sel].spi_timeout_handler,SPI_API_ERROR_TIMEOUT_TXFIFO_FULL)){
+    spi_set_cmd(spi_sel, cmd);
+    for (i = 0; i < repeat_time; i++) {
+        for (j = 0; j < data_len; j++, k++) {
+            if (SPI_WAIT(spi_txfifo_is_full, spi_sel, g_spi_timeout_error[spi_sel].g_spi_error_timeout_us, g_spi_timeout_error[spi_sel].spi_timeout_handler, SPI_API_ERROR_TIMEOUT_TXFIFO_FULL)) {
                 return DRV_API_TIMEOUT;
             }
             reg_spi_wr_rd_data(spi_sel, k % 4) = data[j];
         }
     }
-    if(SPI_WAIT(spi_is_busy,spi_sel,g_spi_timeout_error[spi_sel].g_spi_error_timeout_us,g_spi_timeout_error[spi_sel].spi_timeout_handler,SPI_API_ERROR_TIMEOUT_BUS_BUSY)){
+    if (SPI_WAIT(spi_is_busy, spi_sel, g_spi_timeout_error[spi_sel].g_spi_error_timeout_us, g_spi_timeout_error[spi_sel].spi_timeout_handler, SPI_API_ERROR_TIMEOUT_BUS_BUSY)) {
         return DRV_API_TIMEOUT;
     }
     return DRV_API_SUCCESS;
@@ -930,9 +885,9 @@ drv_api_status_e spi_master_read_plus(spi_sel_e spi_sel, unsigned char cmd, unsi
     spi_set_address(spi_sel, addr);
     spi_set_transmode(spi_sel, (spi_tans_mode_e)rd_mode);
     spi_rx_cnt(spi_sel, data_len);
-    spi_set_cmd(spi_sel,cmd);
+    spi_set_cmd(spi_sel, cmd);
     spi_read(spi_sel, (unsigned char *)data, data_len);
-    if(SPI_WAIT(spi_is_busy,spi_sel,g_spi_timeout_error[spi_sel].g_spi_error_timeout_us,g_spi_timeout_error[spi_sel].spi_timeout_handler,SPI_API_ERROR_TIMEOUT_BUS_BUSY)){
+    if (SPI_WAIT(spi_is_busy, spi_sel, g_spi_timeout_error[spi_sel].g_spi_error_timeout_us, g_spi_timeout_error[spi_sel].spi_timeout_handler, SPI_API_ERROR_TIMEOUT_BUS_BUSY)) {
         return DRV_API_TIMEOUT;
     }
     return DRV_API_SUCCESS;
@@ -960,10 +915,10 @@ drv_api_status_e spi_master_write_read_plus(spi_sel_e spi_sel, unsigned char cmd
     spi_tx_cnt(spi_sel, addr_len);
     spi_rx_cnt(spi_sel, data_len);
     spi_set_transmode(spi_sel, (spi_tans_mode_e)wr_mode);
-    spi_set_cmd(spi_sel,cmd);
+    spi_set_cmd(spi_sel, cmd);
     spi_write(spi_sel, (unsigned char *)addrs, addr_len);
     spi_read(spi_sel, (unsigned char *)data, data_len);
-    if(SPI_WAIT(spi_is_busy,spi_sel,g_spi_timeout_error[spi_sel].g_spi_error_timeout_us,g_spi_timeout_error[spi_sel].spi_timeout_handler,SPI_API_ERROR_TIMEOUT_BUS_BUSY)){
+    if (SPI_WAIT(spi_is_busy, spi_sel, g_spi_timeout_error[spi_sel].g_spi_error_timeout_us, g_spi_timeout_error[spi_sel].spi_timeout_handler, SPI_API_ERROR_TIMEOUT_BUS_BUSY)) {
         return DRV_API_TIMEOUT;
     }
     return DRV_API_SUCCESS;
@@ -975,15 +930,12 @@ drv_api_status_e spi_master_write_read_plus(spi_sel_e spi_sel, unsigned char cmd
  * @param[in]   chn     - dma channel.
  * @return      none.
  */
-void spi_set_master_rx_dma_config(spi_sel_e spi_sel,dma_chn_e chn)
+void spi_set_master_rx_dma_config(spi_sel_e spi_sel, dma_chn_e chn)
 {
-    if (GSPI_MODULE == spi_sel)
-    {
+    if (GSPI_MODULE == spi_sel) {
         s_gspi_master_rx_dma_chn = chn;
         dma_config(chn, &gspi_master_rx_dma_config);
-    }
-    else if(LSPI_MODULE == spi_sel)
-    {
+    } else if (LSPI_MODULE == spi_sel) {
         s_lspi_master_rx_dma_chn = chn;
         dma_config(chn, &lspi_master_rx_dma_config);
     }
@@ -995,15 +947,12 @@ void spi_set_master_rx_dma_config(spi_sel_e spi_sel,dma_chn_e chn)
  * @param[in]   chn     - dma channel.
  * @return      none.
  */
-void spi_set_slave_rx_dma_config(spi_sel_e spi_sel,dma_chn_e chn)
+void spi_set_slave_rx_dma_config(spi_sel_e spi_sel, dma_chn_e chn)
 {
-    if (GSPI_MODULE == spi_sel)
-    {
+    if (GSPI_MODULE == spi_sel) {
         s_gspi_slave_rx_dma_chn = chn;
         dma_config(chn, &gspi_slave_rx_dma_config);
-    }
-    else if(LSPI_MODULE == spi_sel)
-    {
+    } else if (LSPI_MODULE == spi_sel) {
         s_lspi_slave_rx_dma_chn = chn;
         dma_config(chn, &lspi_slave_rx_dma_config);
     }
@@ -1015,15 +964,12 @@ void spi_set_slave_rx_dma_config(spi_sel_e spi_sel,dma_chn_e chn)
  * @param[in]   chn     - dma channel.
  * @return      none.
  */
-void spi_set_tx_dma_config(spi_sel_e spi_sel,dma_chn_e chn)
+void spi_set_tx_dma_config(spi_sel_e spi_sel, dma_chn_e chn)
 {
-    if (GSPI_MODULE == spi_sel)
-    {
+    if (GSPI_MODULE == spi_sel) {
         s_gspi_tx_dma_chn = chn;
         dma_config(chn, &gspi_tx_dma_config);
-    }
-    else if(LSPI_MODULE == spi_sel)
-    {
+    } else if (LSPI_MODULE == spi_sel) {
         s_lspi_tx_dma_chn = chn;
         dma_config(chn, &lspi_tx_dma_config);
     }
@@ -1053,15 +999,12 @@ void spi_set_dma(dma_chn_e spi_dma_chn, unsigned int src_addr, unsigned int dst_
  * @note        src_addr : must be aligned by word (4 bytes), otherwise the program will enter an exception
  *
  */
-void spi_set_tx_dma(spi_sel_e spi_sel, unsigned char* src_addr,unsigned int len)
+void spi_set_tx_dma(spi_sel_e spi_sel, unsigned char *src_addr, unsigned int len)
 {
     unsigned char tx_dma_chn;
-    if (GSPI_MODULE == spi_sel)
-    {
+    if (GSPI_MODULE == spi_sel) {
         tx_dma_chn = s_gspi_tx_dma_chn;
-    }
-    else
-    {
+    } else {
         tx_dma_chn = s_lspi_tx_dma_chn;
     }
     spi_tx_dma_en(spi_sel);
@@ -1084,20 +1027,17 @@ void spi_set_tx_dma(spi_sel_e spi_sel, unsigned char* src_addr,unsigned int len)
                   for example:Tx_len=21,Rx_len=20,When the DMA stops working the buff is written with a length of 21 and only 20 bytes of data are stored.It is recommended to configure the appropriate Rx_len to avoid this situation.
                -# After DMA transfer completion, the interface needs to be invoked again to read the next batch of data.
  */
-void spi_set_rx_dma(spi_sel_e spi_sel, unsigned char* dst_addr,unsigned int len)
+void spi_set_rx_dma(spi_sel_e spi_sel, unsigned char *dst_addr, unsigned int len)
 {
     unsigned char rx_dma_chn;
-    if (GSPI_MODULE == spi_sel)
-    {
+    if (GSPI_MODULE == spi_sel) {
         rx_dma_chn = s_gspi_slave_rx_dma_chn;
-    }
-    else
-    {
+    } else {
         rx_dma_chn = s_lspi_slave_rx_dma_chn;
     }
     spi_rx_dma_en(spi_sel);
     dma_set_address(rx_dma_chn, reg_spi_data_buf_adr(spi_sel), (unsigned int)(dst_addr));
-    dma_set_size(rx_dma_chn,len,DMA_WORD_WIDTH);
+    dma_set_size(rx_dma_chn, len, DMA_WORD_WIDTH);
     dma_chn_en(rx_dma_chn);
 }
 
@@ -1116,16 +1056,13 @@ void spi_master_write_dma(spi_sel_e spi_sel, unsigned char *src_addr, unsigned i
     spi_tx_dma_en(spi_sel);
     spi_tx_cnt(spi_sel, len);
     spi_set_transmode(spi_sel, SPI_MODE_WRITE_ONLY);
-    if (GSPI_MODULE == spi_sel)
-    {
+    if (GSPI_MODULE == spi_sel) {
         tx_dma_chn = s_gspi_tx_dma_chn;
-    }
-    else
-    {
+    } else {
         tx_dma_chn = s_lspi_tx_dma_chn;
     }
 
-    spi_set_dma(tx_dma_chn,(unsigned int)src_addr, reg_spi_data_buf_adr(spi_sel), len);
+    spi_set_dma(tx_dma_chn, (unsigned int)src_addr, reg_spi_data_buf_adr(spi_sel), len);
     spi_set_cmd(spi_sel, 0x00);
 }
 
@@ -1145,13 +1082,10 @@ void spi_master_write_dma(spi_sel_e spi_sel, unsigned char *src_addr, unsigned i
 void spi_master_write_read_dma(spi_sel_e spi_sel, unsigned char *addr, unsigned int addr_len, unsigned char *data, unsigned int data_len)
 {
     unsigned char tx_dma_chn, rx_dma_chn;
-    if (GSPI_MODULE == spi_sel)
-    {
+    if (GSPI_MODULE == spi_sel) {
         tx_dma_chn = s_gspi_tx_dma_chn;
         rx_dma_chn = s_gspi_master_rx_dma_chn;
-    }
-    else
-    {
+    } else {
         tx_dma_chn = s_lspi_tx_dma_chn;
         rx_dma_chn = s_lspi_master_rx_dma_chn;
     }
@@ -1165,7 +1099,7 @@ void spi_master_write_read_dma(spi_sel_e spi_sel, unsigned char *addr, unsigned 
 
     spi_set_dma(tx_dma_chn, (unsigned int)(addr), reg_spi_data_buf_adr(spi_sel), addr_len);
     spi_set_dma(rx_dma_chn, reg_spi_data_buf_adr(spi_sel), (unsigned int)(data), data_len);
-    spi_set_cmd(spi_sel, 0x00);//when  cmd  disable that  will not sent cmd,just trigger spi send.
+    spi_set_cmd(spi_sel, 0x00); //when  cmd  disable that  will not sent cmd,just trigger spi send.
 }
 
 /**
@@ -1186,18 +1120,15 @@ void spi_master_write_dma_plus(spi_sel_e spi_sel, unsigned char cmd, unsigned in
     spi_tx_dma_en(spi_sel);
     spi_tx_cnt(spi_sel, data_len);
     spi_set_transmode(spi_sel, (spi_tans_mode_e)wr_mode);
-    spi_set_address(spi_sel,addr);
-    if (GSPI_MODULE == spi_sel)
-    {
+    spi_set_address(spi_sel, addr);
+    if (GSPI_MODULE == spi_sel) {
         tx_dma_chn = s_gspi_tx_dma_chn;
-    }
-    else
-    {
+    } else {
         tx_dma_chn = s_lspi_tx_dma_chn;
     }
 
     spi_set_dma(tx_dma_chn, (unsigned int)data, reg_spi_data_buf_adr(spi_sel), data_len);
-    spi_set_cmd(spi_sel,cmd);
+    spi_set_cmd(spi_sel, cmd);
 }
 
 /**
@@ -1214,21 +1145,18 @@ void spi_master_write_dma_plus(spi_sel_e spi_sel, unsigned char cmd, unsigned in
 void spi_master_read_dma_plus(spi_sel_e spi_sel, unsigned char cmd, unsigned int addr, unsigned char *dst_addr, unsigned int data_len, spi_rd_tans_mode_e rd_mode)
 {
     unsigned char rx_dma_chn;
-    if (GSPI_MODULE == spi_sel)
-    {
+    if (GSPI_MODULE == spi_sel) {
         rx_dma_chn = s_gspi_master_rx_dma_chn;
-    }
-    else
-    {
+    } else {
         rx_dma_chn = s_lspi_master_rx_dma_chn;
     }
     spi_rx_fifo_clr(spi_sel);
     spi_rx_dma_en(spi_sel);
     spi_set_transmode(spi_sel, (spi_tans_mode_e)rd_mode);
     spi_rx_cnt(spi_sel, data_len);
-    spi_set_address(spi_sel,addr);
+    spi_set_address(spi_sel, addr);
     spi_set_dma(rx_dma_chn, reg_spi_data_buf_adr(spi_sel), (unsigned int)(dst_addr), data_len);
-    spi_set_cmd(spi_sel,cmd);
+    spi_set_cmd(spi_sel, cmd);
 }
 
 /**
@@ -1254,22 +1182,19 @@ void spi_master_write_read_dma_plus(spi_sel_e spi_sel, unsigned char cmd, unsign
     spi_rx_fifo_clr(spi_sel);
     spi_tx_dma_en(spi_sel);
     spi_rx_dma_en(spi_sel);
-    spi_tx_cnt(spi_sel,addr_len);
+    spi_tx_cnt(spi_sel, addr_len);
     spi_rx_cnt(spi_sel, rd_len);
     spi_set_transmode(spi_sel, (spi_tans_mode_e)rd_mode);
-    if (GSPI_MODULE == spi_sel)
-    {
+    if (GSPI_MODULE == spi_sel) {
         tx_dma_chn = s_gspi_tx_dma_chn;
         rx_dma_chn = s_gspi_master_rx_dma_chn;
-    }
-    else
-    {
+    } else {
         tx_dma_chn = s_lspi_tx_dma_chn;
         rx_dma_chn = s_lspi_master_rx_dma_chn;
     }
     spi_set_dma(tx_dma_chn, (unsigned int)(addr), reg_spi_data_buf_adr(spi_sel), addr_len);
     spi_set_dma(rx_dma_chn, reg_spi_data_buf_adr(spi_sel), (unsigned int)(rd_data), rd_len);
-    spi_set_cmd(spi_sel, cmd);//when  cmd  disable that  will not sent cmd,just trigger spi send .
+    spi_set_cmd(spi_sel, cmd); //when  cmd  disable that  will not sent cmd,just trigger spi send .
 }
 
 /**
@@ -1284,10 +1209,10 @@ void spi_master_write_read_dma_plus(spi_sel_e spi_sel, unsigned char cmd, unsign
  * @param[in]   len         - write/read length.
  * @return      none.
  */
-void spi_master_write_read_full_duplex(spi_sel_e spi_sel,unsigned char *write_data, unsigned char *read_data, unsigned int len)
+void spi_master_write_read_full_duplex(spi_sel_e spi_sel, unsigned char *write_data, unsigned char *read_data, unsigned int len)
 {
     unsigned int spi_wr_rd_size = 8;
-    unsigned int chunk_size = spi_wr_rd_size;
+    unsigned int chunk_size     = spi_wr_rd_size;
     spi_tx_dma_dis(spi_sel);
     spi_rx_dma_dis(spi_sel);
     spi_set_transmode(spi_sel, SPI_MODE_WRITE_AND_READ);
@@ -1295,23 +1220,22 @@ void spi_master_write_read_full_duplex(spi_sel_e spi_sel,unsigned char *write_da
     spi_rx_fifo_clr(spi_sel);
     spi_tx_cnt(spi_sel, len);
     spi_rx_cnt(spi_sel, len);
-    spi_set_cmd(spi_sel, 0x00);//when  cmd  disable that  will not sent cmd,just trigger spi send .
+    spi_set_cmd(spi_sel, 0x00); //when  cmd  disable that  will not sent cmd,just trigger spi send .
 
 
-    for(unsigned int i = 0; i<len; i = i +chunk_size){
-        if(chunk_size > (len - i)){
+    for (unsigned int i = 0; i < len; i = i + chunk_size) {
+        if (chunk_size > (len - i)) {
             chunk_size = len - i;
         }
         spi_write(spi_sel, write_data + i, chunk_size);
-        if(len < spi_wr_rd_size){
+        if (len < spi_wr_rd_size) {
             spi_read(spi_sel, read_data, chunk_size);
-        }
-        else if(i == 0){
+        } else if (i == 0) {
             spi_read(spi_sel, read_data, chunk_size - 1);
-        }else if((len - i) > spi_wr_rd_size){
-            spi_read(spi_sel, read_data + i -1, chunk_size);
-        }else{
-            spi_read(spi_sel, read_data + i -1, chunk_size + 1);
+        } else if ((len - i) > spi_wr_rd_size) {
+            spi_read(spi_sel, read_data + i - 1, chunk_size);
+        } else {
+            spi_read(spi_sel, read_data + i - 1, chunk_size + 1);
         }
         spi_rx_fifo_clr(spi_sel);
         spi_tx_fifo_clr(spi_sel);
@@ -1331,7 +1255,7 @@ void spi_master_read(spi_sel_e spi_sel, unsigned char *data, unsigned int len)
     spi_rx_fifo_clr(spi_sel);
     spi_rx_cnt(spi_sel, len);
     spi_set_transmode(spi_sel, SPI_MODE_READ_ONLY);
-    spi_set_cmd(spi_sel, 0x00);//when  cmd  disable that  will not sent cmd,just trigger spi send.
+    spi_set_cmd(spi_sel, 0x00); //when  cmd  disable that  will not sent cmd,just trigger spi send.
     spi_read(spi_sel, (unsigned char *)data, len);
 }
 
@@ -1344,22 +1268,19 @@ void spi_master_read(spi_sel_e spi_sel, unsigned char *data, unsigned int len)
  *              - If the set burst size is larger than burst1 (burst2/burst4), the length of the dma transfer must be a multiple of the corresponding burst size,e.g., burst size= burst2,  dma transfer length must be a multiple of 8 bytes.
  *              - Must be configured after spi_set_tx_dma_config().
  */
- void spi_set_dma_tx_burst(spi_sel_e spi_sel, dma_burst_size_e  burst_size)
- {
+void spi_set_dma_tx_burst(spi_sel_e spi_sel, dma_burst_size_e burst_size)
+{
     unsigned char tx_fifo_depth = 0;
 
-    if(spi_sel == LSPI_MODULE)
-    {
+    if (spi_sel == LSPI_MODULE) {
         tx_fifo_depth = 20;
-        dma_set_burst_size(s_lspi_tx_dma_chn,burst_size);
-    }
-    else if(spi_sel == GSPI_MODULE)
-    {
+        dma_set_burst_size(s_lspi_tx_dma_chn, burst_size);
+    } else if (spi_sel == GSPI_MODULE) {
         tx_fifo_depth = 8;
-        dma_set_burst_size(s_gspi_tx_dma_chn,burst_size);
+        dma_set_burst_size(s_gspi_tx_dma_chn, burst_size);
     }
-    spi_tx_irq_trig_cnt(spi_sel,tx_fifo_depth-((DMA_BURST_1_WORD == burst_size)? 4:(8*burst_size)));
- }
+    spi_tx_irq_trig_cnt(spi_sel, tx_fifo_depth - ((DMA_BURST_1_WORD == burst_size) ? 4 : (8 * burst_size)));
+}
 
 /**
  * @brief       This function serves to set master rx dma burst size
@@ -1370,18 +1291,15 @@ void spi_master_read(spi_sel_e spi_sel, unsigned char *data, unsigned int len)
  *              - If the set burst size is larger than burst1 (burst2), the length of the dma transfer must be a multiple of the corresponding burst size,e.g., burst size= burst2,  dma transfer length must be a multiple of 8 bytes.
  *              - Must be configured after spi_set_master_rx_dma_config().
  */
- void spi_set_dma_rx_burst(spi_sel_e spi_sel, dma_burst_size_e  burst_size)
- {
-    if(spi_sel == LSPI_MODULE)
-    {
-        dma_set_burst_size(s_lspi_master_rx_dma_chn,burst_size);
+void spi_set_dma_rx_burst(spi_sel_e spi_sel, dma_burst_size_e burst_size)
+{
+    if (spi_sel == LSPI_MODULE) {
+        dma_set_burst_size(s_lspi_master_rx_dma_chn, burst_size);
+    } else if (spi_sel == GSPI_MODULE) {
+        dma_set_burst_size(s_gspi_master_rx_dma_chn, burst_size);
     }
-    else if(spi_sel == GSPI_MODULE)
-    {
-        dma_set_burst_size(s_gspi_master_rx_dma_chn,burst_size);
-    }
-    spi_rx_irq_trig_cnt(spi_sel, (DMA_BURST_1_WORD == burst_size)? 4:(8*burst_size));
- }
+    spi_rx_irq_trig_cnt(spi_sel, (DMA_BURST_1_WORD == burst_size) ? 4 : (8 * burst_size));
+}
 
 /**
  * @brief     This function serves to config slave rx_dma channel llp.
@@ -1391,19 +1309,19 @@ void spi_master_read(spi_sel_e spi_sel, unsigned char *data, unsigned int len)
  * @param[in] head_of_list - the head address of dma llp.
  * @return    none.
  */
-void spi_set_slave_rx_dma_chain_llp(spi_sel_e spi_sel, dma_chn_e chn,unsigned char * dst_addr, unsigned int data_len,dma_chain_config_t *head_of_list)
- {
-    spi_set_slave_rx_dma_config(spi_sel,chn);
+void spi_set_slave_rx_dma_chain_llp(spi_sel_e spi_sel, dma_chn_e chn, unsigned char *dst_addr, unsigned int data_len, dma_chain_config_t *head_of_list)
+{
+    spi_set_slave_rx_dma_config(spi_sel, chn);
     spi_rx_fifo_clr(spi_sel);
     /*
      * Dma sof function needs to be disabled for rx.
      */
-    spi_set_llp_sof_mode(chn,0);
+    spi_set_llp_sof_mode(chn, 0);
     spi_rx_dma_en(spi_sel);
-    dma_set_address(chn,reg_spi_data_buf_adr(spi_sel),(unsigned int)(dst_addr));
+    dma_set_address(chn, reg_spi_data_buf_adr(spi_sel), (unsigned int)(dst_addr));
     dma_set_size(chn, data_len, DMA_WORD_WIDTH);
-    reg_dma_llp(chn)=(unsigned int)(head_of_list);
- }
+    reg_dma_llp(chn) = (unsigned int)(head_of_list);
+}
 
 /**
  * @brief     This function serves to set rx dma chain transfer
@@ -1415,14 +1333,14 @@ void spi_set_slave_rx_dma_chain_llp(spi_sel_e spi_sel, dma_chn_e chn,unsigned ch
  * @param[in] data_len     -the length of dma size by byte.
  * @return    none.
  */
-void spi_rx_dma_add_list_element(spi_sel_e spi_sel,dma_chn_e chn,dma_chain_config_t *config_addr,dma_chain_config_t *llpointer ,unsigned char *dst_addr,unsigned int data_len)
- {
-    config_addr->dma_chain_ctl=reg_dma_ctrl(chn)|BIT(0);
-    config_addr->dma_chain_src_addr=reg_spi_data_buf_adr(spi_sel);
-    config_addr->dma_chain_dst_addr= (unsigned int)(dst_addr);
-    config_addr->dma_chain_data_len=dma_cal_size(data_len,4);
-    config_addr->dma_chain_llp_ptr=(unsigned int)(llpointer);
- }
+void spi_rx_dma_add_list_element(spi_sel_e spi_sel, dma_chn_e chn, dma_chain_config_t *config_addr, dma_chain_config_t *llpointer, unsigned char *dst_addr, unsigned int data_len)
+{
+    config_addr->dma_chain_ctl      = reg_dma_ctrl(chn) | BIT(0);
+    config_addr->dma_chain_src_addr = reg_spi_data_buf_adr(spi_sel);
+    config_addr->dma_chain_dst_addr = (unsigned int)(dst_addr);
+    config_addr->dma_chain_data_len = dma_cal_size(data_len, 4);
+    config_addr->dma_chain_llp_ptr  = (unsigned int)(llpointer);
+}
 
 /**
  * @brief      This function serves to set spi slave rx dma chain transfer.
@@ -1433,11 +1351,11 @@ void spi_rx_dma_add_list_element(spi_sel_e spi_sel,dma_chn_e chn,dma_chain_confi
  * @return     none.
  */
 void spi_slave_rx_dma_chain_init(spi_sel_e spi_sel, dma_chn_e chn, unsigned char *dst_addr, unsigned int data_len)
- {
-     spi_set_slave_rx_dma_chain_llp(spi_sel, chn, dst_addr, data_len, &g_spi_rx_dma_list_cfg);
-     spi_rx_dma_add_list_element(spi_sel, chn, &g_spi_rx_dma_list_cfg, &g_spi_rx_dma_list_cfg, (unsigned char *)(dst_addr), data_len);
-     dma_chn_en(chn);
- }
+{
+    spi_set_slave_rx_dma_chain_llp(spi_sel, chn, dst_addr, data_len, &g_spi_rx_dma_list_cfg);
+    spi_rx_dma_add_list_element(spi_sel, chn, &g_spi_rx_dma_list_cfg, &g_spi_rx_dma_list_cfg, (unsigned char *)(dst_addr), data_len);
+    dma_chn_en(chn);
+}
 
 /**
  * @brief     This function serves to config slave rx_dma channel llp.
@@ -1448,23 +1366,20 @@ void spi_slave_rx_dma_chain_init(spi_sel_e spi_sel, dma_chn_e chn, unsigned char
  * @param[in] head_of_list - the head address of dma llp.
  * @return    none.
  */
-void spi_set_slave_tx_dma_chain_llp(spi_sel_e spi_sel, dma_chn_e chn,unsigned char *src_addr,unsigned int data_len,dma_chain_config_t *head_of_list)
+void spi_set_slave_tx_dma_chain_llp(spi_sel_e spi_sel, dma_chn_e chn, unsigned char *src_addr, unsigned int data_len, dma_chain_config_t *head_of_list)
 {
-    if (GSPI_MODULE == spi_sel)
-    {
+    if (GSPI_MODULE == spi_sel) {
         dma_config(chn, &gspi_tx_dma_config);
-    }
-    else if(LSPI_MODULE == spi_sel)
-    {
+    } else if (LSPI_MODULE == spi_sel) {
         dma_config(chn, &lspi_tx_dma_config);
     }
     /* The sof function of dma needs to be started at tx otherwise data anomalies will occur.
      */
-    spi_set_llp_sof_mode(chn,1);
+    spi_set_llp_sof_mode(chn, 1);
     spi_tx_dma_en(spi_sel);
-    dma_set_address(chn,(unsigned int)(src_addr),reg_spi_data_buf_adr(spi_sel));
+    dma_set_address(chn, (unsigned int)(src_addr), reg_spi_data_buf_adr(spi_sel));
     dma_set_size(chn, data_len, DMA_WORD_WIDTH);
-    reg_dma_llp(chn)=(unsigned int)(head_of_list);
+    reg_dma_llp(chn) = (unsigned int)(head_of_list);
 }
 
 /**
@@ -1477,13 +1392,13 @@ void spi_set_slave_tx_dma_chain_llp(spi_sel_e spi_sel, dma_chn_e chn,unsigned ch
  * @param[in] data_len       - the length of dma size by byte.
  * @return    none.
  */
-void spi_tx_dma_add_list_element(spi_sel_e spi_sel,dma_chn_e chn,dma_chain_config_t *config_addr,dma_chain_config_t *llpointer ,unsigned char *src_addr,unsigned int data_len)
+void spi_tx_dma_add_list_element(spi_sel_e spi_sel, dma_chn_e chn, dma_chain_config_t *config_addr, dma_chain_config_t *llpointer, unsigned char *src_addr, unsigned int data_len)
 {
-   config_addr->dma_chain_ctl=reg_dma_ctrl(chn)|BIT(0);
-   config_addr->dma_chain_src_addr=(unsigned int)(src_addr);
-   config_addr->dma_chain_dst_addr= reg_spi_data_buf_adr(spi_sel);
-   config_addr->dma_chain_data_len=dma_cal_size(data_len,4);
-   config_addr->dma_chain_llp_ptr=(unsigned int)(llpointer);
+    config_addr->dma_chain_ctl      = reg_dma_ctrl(chn) | BIT(0);
+    config_addr->dma_chain_src_addr = (unsigned int)(src_addr);
+    config_addr->dma_chain_dst_addr = reg_spi_data_buf_adr(spi_sel);
+    config_addr->dma_chain_data_len = dma_cal_size(data_len, 4);
+    config_addr->dma_chain_llp_ptr  = (unsigned int)(llpointer);
 }
 
 /**
