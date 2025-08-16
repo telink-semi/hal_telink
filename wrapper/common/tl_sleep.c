@@ -29,6 +29,10 @@
 #include <tlx_bt.h>
 #endif /* CONFIG_BT_B9X */
 
+#if TLK_ONLY_BLE_HOST && CONFIG_PM
+	#include "stack/pm/pm_sys.h"
+#endif
+
 /**
  * @brief     This function sets Telink MCU to suspend mode
  * @param[in] wake_stimer_tick - wake-up stimer tick
@@ -41,6 +45,7 @@ bool tl_suspend(uint32_t wake_stimer_tick)
 #if (CONFIG_BT_B9X || CONFIG_BT_TLX)
 	enum tl_bt_controller_state state = tl_bt_controller_state();
 
+# if !CONFIG_TELINK_TL322X_ENABLE_N22
 	if (state == TL_BT_CONTROLLER_STATE_ACTIVE ||
 		state == TL_BT_CONTROLLER_STATE_STOPPING) {
 		blc_pm_setAppWakeupLowPower(wake_stimer_tick, 1);
@@ -56,6 +61,25 @@ bool tl_suspend(uint32_t wake_stimer_tick)
 			result = true;
 		}
 	}
+# else
+	if (state == TL_BT_CONTROLLER_STATE_ACTIVE ||
+		state == TL_BT_CONTROLLER_STATE_STOPPING) {
+		pm_set_suspend_power_cfg(FLD_PD_ZB_EN, 1);
+		result = !(tlksdk_pm_enterSleep(SUSPEND_MODE, wake_stimer_tick));
+
+		// printk("Suspend mode entered: %s\n", result ? "true" : "false");
+	} 
+	// else {
+	// 	if (cpu_sleep_wakeup_32k_rc(SUSPEND_MODE, PM_WAKEUP_TIMER | PM_WAKEUP_PAD,
+	// 		wake_stimer_tick) != STATUS_GPIO_ERR_NO_ENTER_PM) {
+			
+	// 		result = true;
+	// 	}
+	// }
+	
+
+# endif
+
 #else
 	if (cpu_sleep_wakeup_32k_rc(SUSPEND_MODE, PM_WAKEUP_TIMER | PM_WAKEUP_PAD,
 		wake_stimer_tick) != STATUS_GPIO_ERR_NO_ENTER_PM) {

@@ -33,6 +33,9 @@
 #if TLK_ONLY_BLE_HOST
 #include "stack/multiCoreComm/drv/shareMemory.h"
 #include "stack/multiCoreComm/service/service_shareMemory.h"
+# if CONFIG_PM
+#include "stack/pm/pm_sys.h"
+# endif
 #else
 #include "stack/ble/controller/ble_controller.h"
 #endif
@@ -75,6 +78,7 @@ static struct tlx_ctrl_t {
 	tlx_bt_host_callback_t callbacks;
 } tlx_ctrl;
 
+#ifndef TLK_ONLY_BLE_HOST
 /**
  * @brief    RF driver interrupt handler
  */
@@ -94,6 +98,7 @@ _attribute_ram_code_ void stimer_irq_handler(const void *param)
 
 	blc_sdk_irq_handler();
 }
+#endif
 
 /**
  * @brief    BLE Controller HCI Tx callback implementation
@@ -246,6 +251,22 @@ int tlx_bt_controller_init()
 #else
 	(void)tlx_bt_hci_rx_handler;
 	(void)tlx_bt_hci_tx_handler;
+
+	#if defined(TLK_ONLY_BLE_HOST)
+	// sys_n22_start();
+	// tlk_multi_core_send_clock_config();
+	// delay_ms(300);
+	sys_n22_start();
+	// tlk_multi_core_send_clock_config();		//Workaround for dual-core clock config. Currently, TL_BLE_SRC use RAM 0x12 to set clock, which is used by Zephyr .ram_code section
+	tlk_multi_core_communication_init();
+	k_sleep(K_MSEC(600));		//for N22 HW prepare
+	#endif
+
+	// tlk_multi_core_communication_init();
+
+	/* Enable PM for BLE stack */
+	blc_ll_initPowerManagement_module();
+	blc_pm_setSleepMask(PM_SLEEP_LEG_ADV | PM_SLEEP_ACL_PERIPHR);
 #endif
 #ifndef TLK_ONLY_BLE_HOST
 	/* Init IRQs */
