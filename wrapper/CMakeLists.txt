@@ -15,11 +15,20 @@ endif()
 
 if(CONFIG_BT_B9X OR CONFIG_BT_TLX)
 	zephyr_library_sources(
-		controller/${SOC_FAMILY}/${SOC_FAMILY}_bt_host.c
 		controller/${SOC_FAMILY}/${SOC_FAMILY}_bt_init.c
 		controller/${SOC_FAMILY}/${SOC_FAMILY}_bt_buffer.c
 		controller/${SOC_FAMILY}/${SOC_FAMILY}_bt_flash.c
 	)
+
+	if(CONFIG_TELINK_TL322X_ENABLE_N22)
+		zephyr_library_sources(
+			controller/${SOC_FAMILY}/${SOC_FAMILY}_bt_host.c
+		)
+	else()
+		zephyr_library_sources(
+			controller/${SOC_FAMILY}/${SOC_FAMILY}_bt.c
+		)
+	endif()
 endif()
 
 if(CONFIG_BT OR CONFIG_IEEE802154)
