@@ -81,67 +81,67 @@ blobs:
   ##################################################################################################
 
   - path: lib_zephyr_tl321x.a
-    sha256: aec8f4b9d197629ac647efcc78ae8f5f8c75a2818efb9a02fa142badec68381b
+    sha256: 418b243d9bc9ecec2fbd155c2a18cf4a07d35eee65b7857b3d258995e952ed6b
     type: lib
     version: 'V4.0.4.3r1'
     license-path: tlsr9/ble/license.txt
-    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl321x_lib/lib_zephyr_tl321x_cf7971cfbdfcc018fedc2657cfee7e22c7b5b018.a
+    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl321x_lib/lib_zephyr_tl321x_d36720b3019ecad9b388aab5d55e34020925fc54.a
     description: "Zephyr binary library supporting Telink TL321X series"
 
   - path: lib_nds_tl321x.a
-    sha256: bfd3c7b34397ea436dc2f991b5b37e8d84998e8186e0b57d7ef277212c89f8b4
+    sha256: 64d03eb76600dc05138d4b462e0d8cdb2c54211a6a110dde15b5cd8eaacccb0e
     type: lib
     version: 'V4.0.4.3r1'
     license-path: tlsr9/ble/license.txt
-    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl321x_lib/lib_nds_tl321x_cf7971cfbdfcc018fedc2657cfee7e22c7b5b018.a
+    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl321x_lib/lib_nds_tl321x_d36720b3019ecad9b388aab5d55e34020925fc54.a
     description: "Andes binary library supporting Telink TL321X series"
 
   - path: lib_zephyr_tl321x_Os.a
-    sha256: 24da6df736e3b4087956a67a154a0631d44d2b8690ae3ba8fcf632cdc30b6029
+    sha256: c900c2a061501a75fb1e7adf3296d9f69c55032004ebe166ac8ca6f490eaef97
     type: lib
     version: 'V4.0.4.3r1'
     license-path: tlsr9/ble/license.txt
-    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl321x_lib/lib_zephyr_tl321x_Os_cf7971cfbdfcc018fedc2657cfee7e22c7b5b018.a
+    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl321x_lib/lib_zephyr_tl321x_Os_d36720b3019ecad9b388aab5d55e34020925fc54.a
     description: "Zephyr size optimized binary libraries supporting Telink TL321X series"
 
   - path: lib_nds_tl321x_Os.a
-    sha256: 21f9eacf86a9a1ac1dae0092b498af396d6c4650fa184cc34db0a76db467c451
+    sha256: 7aa93009947e4b15bf78d3cc92caa0664735ac0da9a4ad545a2389c02b4a5553
     type: lib
     version: 'V4.0.4.3r1'
     license-path: tlsr9/ble/license.txt
-    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl321x_lib/lib_nds_tl321x_Os_cf7971cfbdfcc018fedc2657cfee7e22c7b5b018.a
+    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl321x_lib/lib_nds_tl321x_Os_d36720b3019ecad9b388aab5d55e34020925fc54.a
     description: "Andes size optimized binary libraries supporting Telink TL321X series"
 
   - path: lib_zephyr_tl321x_pm.a
-    sha256: 618040781d13c673b98a45936fe63298f8da61eb781bdac06712b01a92a28170
+    sha256: 07f49a6709ba4a59a5c3f11174efdda9eb2dcd728d024a64d4f6df2fc96f3603
     type: lib
     version: 'V4.0.4.3r1'
     license-path: tlsr9/ble/license.txt
-    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl321x_lib/lib_zephyr_tl321x_cf7971cfbdfcc018fedc2657cfee7e22c7b5b018_pm.a
+    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl321x_lib/lib_zephyr_tl321x_d36720b3019ecad9b388aab5d55e34020925fc54_pm.a
     description: "Zephyr binary library for the Telink TL321X series, optimized for low-power mode"
 
   - path: lib_nds_tl321x_pm.a
-    sha256: 3ca1d4e0e827a641260130bcfe11d5ba6bd0459bebbb56bacdd3e2ff2fc44fb9
+    sha256: 6752d99c39393050d07fec132c11fa985a11ab2a3642080ae735bb68a0ae6811
     type: lib
     version: 'V4.0.4.3r1'
     license-path: tlsr9/ble/license.txt
-    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl321x_lib/lib_nds_tl321x_cf7971cfbdfcc018fedc2657cfee7e22c7b5b018_pm.a
+    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl321x_lib/lib_nds_tl321x_d36720b3019ecad9b388aab5d55e34020925fc54_pm.a
     description: "Andes binary library for the Telink TL321X series, optimized for low-power mode"
 
   - path: lib_zephyr_tl321x_Os_pm.a
-    sha256: c5e08228fd3bb68c160ec929329d1c5e575c6935ed7d4316a65e147796174aab
+    sha256: 3dcd8cde59a758d5a1eb9d6577532a19c80b408b85b1fdf8ee7e83a482a092f0
     type: lib
     version: 'V4.0.4.3r1'
     license-path: tlsr9/ble/license.txt
-    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl321x_lib/lib_zephyr_tl321x_Os_cf7971cfbdfcc018fedc2657cfee7e22c7b5b018_pm.a
+    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl321x_lib/lib_zephyr_tl321x_Os_d36720b3019ecad9b388aab5d55e34020925fc54_pm.a
     description: "Zephyr size optimized binary library for the Telink TL321X series, optimized for low-power mode"
 
   - path: lib_nds_tl321x_Os_pm.a
-    sha256: 75a405097c58715d7e3aff64706cbdcb625a72cb5616c47815334eef10b0fad1
+    sha256: 769355bc1544eca6b16ee1f4bc5f14bd0920d3408a80032adb51fe271244b50e
     type: lib
     version: 'V4.0.4.3r1'
     license-path: tlsr9/ble/license.txt
-    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl321x_lib/lib_nds_tl321x_Os_cf7971cfbdfcc018fedc2657cfee7e22c7b5b018_pm.a
+    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl321x_lib/lib_nds_tl321x_Os_d36720b3019ecad9b388aab5d55e34020925fc54_pm.a
     description: "Andes size optimized binary library for the Telink TL321X series, optimized for low-power mode"
 
   ##################################################################################################
@@ -149,65 +149,65 @@ blobs:
   ##################################################################################################
 
   - path: lib_zephyr_tl721x.a
-    sha256: 2410ac2cedd6dd758f0fbf74b127732453ae68cbb0d3d5ffd0e3715c30f1a1e2
+    sha256: b4d87db55dd5a92aac9b1fb7a2b04634bcf58a55f800b9a8bf9068d39e438c86
     type: lib
     version: 'V4.0.4.4-dae64ed'
     license-path: tlsr9/ble/license.txt
-    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl721x_lib/lib_zephyr_tl721x_ecb578ff1ed4975a52c78cbab191d4d1406b6a2e.a
+    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl721x_lib/lib_zephyr_tl721x_bb72aa413a54831e12b2223492ebb3f16c104103.a
     description: "Zephyr binary library supporting Telink TL721X series"
 
   - path: lib_nds_tl721x.a
-    sha256: 5527029dfc294db0c09bfc9dd80cb440f557560854b7d6fcfb0eb48ded40615d
+    sha256: e2be45839ce41fe743ebf6c71aaeaa7d2002c0bfcd48b573e4e64827a61d4372
     type: lib
     version: 'V4.0.4.4-dae64ed'
     license-path: tlsr9/ble/license.txt
-    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl721x_lib/lib_nds_tl721x_ecb578ff1ed4975a52c78cbab191d4d1406b6a2e.a
+    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl721x_lib/lib_nds_tl721x_bb72aa413a54831e12b2223492ebb3f16c104103.a
     description: "Andes binary library supporting Telink TL721X series"
 
   - path: lib_zephyr_tl721x_Os.a
-    sha256: 501532a4246eabd29ace1233e9d89efa349ea1b2730231e697fe86405a06de20
+    sha256: cc317e271228c0d947af02cead18f5a73bb9454a259cc10de92f21093a5133ad
     type: lib
     version: 'V4.0.4.4-dae64ed'
     license-path: tlsr9/ble/license.txt
-    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl721x_lib/lib_zephyr_tl721x_Os_ecb578ff1ed4975a52c78cbab191d4d1406b6a2e.a
+    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl721x_lib/lib_zephyr_tl721x_Os_bb72aa413a54831e12b2223492ebb3f16c104103.a
     description: "Zephyr size optimized binary library supporting Telink TL721X series"
 
   - path: lib_nds_tl721x_Os.a
-    sha256: 029541331af33d0e3807acca9c0179630b372604d33bbae06c7b965cd5ac2494
+    sha256: 78c93d375bfa819fea72a27bd7f2745b684471db41068729ef5579ccfcd32073
     type: lib
     version: 'V4.0.4.4-dae64ed'
     license-path: tlsr9/ble/license.txt
-    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl721x_lib/lib_nds_tl721x_Os_ecb578ff1ed4975a52c78cbab191d4d1406b6a2e.a
+    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl721x_lib/lib_nds_tl721x_Os_bb72aa413a54831e12b2223492ebb3f16c104103.a
     description: "Andes size optimized binary library supporting Telink TL721X series"
 
   - path: lib_zephyr_tl721x_pm.a
-    sha256: 51eef2b5918fb0a604ba6c653c48df9c8d169899ef59b2a7707b7303a79a0552
+    sha256: 792c46f57a49991e4cd112173a2af082f9613b33b568691cd5af3160faa3a82b
     type: lib
     version: 'V4.0.4.4-dae64ed'
     license-path: tlsr9/ble/license.txt
-    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl721x_lib/lib_zephyr_tl721x_ecb578ff1ed4975a52c78cbab191d4d1406b6a2e_pm.a
+    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl721x_lib/lib_zephyr_tl721x_bb72aa413a54831e12b2223492ebb3f16c104103_pm.a
     description: "Zephyr binary library supporting Telink TL721X series, optimized for low-power mode"
 
   - path: lib_nds_tl721x_pm.a
-    sha256: 953017f42882631df809ea6e17091ef30726d77c36e911db63d8a2ebe86d947a
+    sha256: e7e77c0823c82de4884aa81841073aa1900537927690bbf95e76a6dc0e65975d
     type: lib
     version: 'V4.0.4.4-dae64ed'
     license-path: tlsr9/ble/license.txt
-    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl721x_lib/lib_nds_tl721x_ecb578ff1ed4975a52c78cbab191d4d1406b6a2e_pm.a
+    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl721x_lib/lib_nds_tl721x_bb72aa413a54831e12b2223492ebb3f16c104103_pm.a
     description: "Andes binary library supporting Telink TL721X series, optimized for low-power mode"
 
   - path: lib_zephyr_tl721x_Os_pm.a
-    sha256: eb7ce882a277c58587c81ffa6afc444f4f24e585f670e5e01d14259a89ac8987
+    sha256: 73fd8421cbe6debb844d52f1a71e7505401c2ae6c7539be10389f8580a818ea1
     type: lib
     version: 'V4.0.4.4-dae64ed'
     license-path: tlsr9/ble/license.txt
-    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl721x_lib/lib_zephyr_tl721x_Os_ecb578ff1ed4975a52c78cbab191d4d1406b6a2e_pm.a
+    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl721x_lib/lib_zephyr_tl721x_Os_bb72aa413a54831e12b2223492ebb3f16c104103_pm.a
     description: "Zephyr size optimized binary library supporting Telink TL721X series, optimized for low-power mode"
 
   - path: lib_nds_tl721x_Os_pm.a
-    sha256: 8d03ebace74974944b9f1c61e7ca8957e7cbc1db8c998e33c2e6daac1e90f1ca
+    sha256: 019d2b7e6de81b22bee3a6dea2da1fe547e72c7750a270b40a27ade7d7d3ac85
     type: lib
     version: 'V4.0.4.4-dae64ed'
     license-path: tlsr9/ble/license.txt
-    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl721x_lib/lib_nds_tl721x_Os_ecb578ff1ed4975a52c78cbab191d4d1406b6a2e_pm.a
+    url: https://doc.telink-semi.cn/Zephyr/binaries/public/tl721x_lib/lib_nds_tl721x_Os_bb72aa413a54831e12b2223492ebb3f16c104103_pm.a
     description: "Andes size optimized binary library supporting Telink TL721X series, optimized for low-power mode"
