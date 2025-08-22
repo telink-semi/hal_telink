@@ -67,9 +67,13 @@ int tlx_bt_controller_init()
 
     IRQ_CONNECT(IRQ_MAILBOX_N22_TO_D25 + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 2, mailbox_n22_to_d25_irq_handler, 0, 0);
 #ifdef TLK_ONLY_BLE_HOST
+	volatile uint32_t key = arch_irq_lock();
     sys_n22_start();
     tlk_multi_core_communication_init();
-    k_sleep(K_MSEC(600));		//for N22 HW prepare
+	delay_ms(600);
+	arch_irq_unlock(key);
+
+    // k_sleep(K_MSEC(600));		//for N22 HW prepare
 
 # if CONFIG_PM
 	/* Enable PM for BLE stack */
