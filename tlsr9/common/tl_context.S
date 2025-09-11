@@ -113,8 +113,8 @@ SECTION_VAR(retention_data, tl_context_backup_registers)
 SECTION_FUNC(ram_code, tl_context_save)
 
 	addi   sp, sp, (-2 * 4)
-	sw     x30, (1 * 4)(sp)
-	sw     x31, (2 * 4)(sp)
+	sw     x30, (0 * 4)(sp)
+	sw     x31, (1 * 4)(sp)
 
 	lui    x31, % hi(tl_context_backup_registers)
 	addi   x31, x31, % lo(tl_context_backup_registers)
@@ -228,10 +228,10 @@ SECTION_FUNC(ram_code, tl_context_save)
 #endif
 
 	/* save x31 - t6 */
-	lw     x31, (2 * 4)(sp)
+	lw     x31, (1 * 4)(sp)
 	sw     x31, (30 * 4)(x30)
 
-	lw     x30, (1 * 4)(sp)
+	lw     x30, (0 * 4)(sp)
 	addi   sp, sp, (2 * 4)
 
 	jr     ra
