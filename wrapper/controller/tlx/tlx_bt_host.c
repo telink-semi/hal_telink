@@ -68,12 +68,10 @@ int tlx_bt_controller_init()
     IRQ_CONNECT(IRQ_MAILBOX_N22_TO_D25 + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 2, mailbox_n22_to_d25_irq_handler, 0, 0);
 #ifdef TLK_ONLY_BLE_HOST
 	volatile uint32_t key = arch_irq_lock();
-    sys_n22_start();
-    tlk_multi_core_communication_init();
-	delay_ms(600);
+	sys_n22_start();
+	tlk_mailbox_service_init();
+	tlk_share_memory_service_init();
 	arch_irq_unlock(key);
-
-    // k_sleep(K_MSEC(600));		//for N22 HW prepare
 
 # if CONFIG_PM
 	/* Enable PM for BLE stack */
@@ -98,7 +96,7 @@ int tlx_bt_controller_init()
 	return status;
 }
 
-_attribute_ram_code_ void tlk_mailbox_d25f_wake_process(u8* data)
+_attribute_ram_code_ void tlk_mailbox_d25f_sm_data_ready_process(u8* data)
 {
     (void) data;
 
@@ -134,7 +132,7 @@ void tlx_bt_host_send_packet(uint8_t type, const uint8_t *data, uint16_t len)
 	hci_cmd[0] = type;
 	memcpy(hci_cmd+1, data, len);
 	tlk_sm_ret_e ret = tlk_d25f_hci_send_message(0, hci_cmd, len+1);
-	if (ret == TLK_SHARE_MEMOTY_SUCCESS) {
+	if (ret == TLK_SHARE_MEMORY_SUCCESS) {
 		/* No data to process, send host_send_available message to the host */
 		if (tlx_bt_cb.host_send_available) {
 			tlx_bt_cb.host_send_available();
@@ -151,7 +149,7 @@ void tlx_bt_host_callback_register(const tlx_bt_host_callback_t *pcb)
 	tlx_bt_cb.host_read_packet = pcb->host_read_packet;		//hci_tlx_host_rcv_pkt
 	tlx_bt_cb.host_send_available = pcb->host_send_available;	//hci_tlx_controller_rcv_pkt_ready
 #if TLK_ONLY_BLE_HOST
-	tlk_d25f_register_hci_receive_cb(TLK_SHARE_MEMOTY_MESSAGE_TYPE_BLE, (void (*)(unsigned char *, unsigned int))tlx_bt_cb.host_read_packet);
+	tlk_d25f_register_hci_receive_cb(TLK_SHARE_MEMORY_MESSAGE_TYPE_BLE, (void (*)(unsigned char *, unsigned int))tlx_bt_cb.host_read_packet);
 #endif
 }
 
