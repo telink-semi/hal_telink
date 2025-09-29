@@ -33,7 +33,7 @@ else()
 	message(FATAL_ERROR "Not supported SOC")
 endif()
 
-set(CONFIG_COMPILE_SDK 1)
+set(CONFIG_COMPILE_SDK 0)
 
 if(CONFIG_COMPILE_SDK)
 	add_subdirectory(tl_ble_sdk/tools)

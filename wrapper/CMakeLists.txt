@@ -1,5 +1,38 @@
 zephyr_library()
 
+if(CONFIG_SOC_RISCV_TELINK_TL322X)
+
+set(TL_ZIGBEE_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../tl_zigbee_src/)
+
+zephyr_compile_options(
+	-DFLASH_CAP_SIZE_1M=1
+	-DMCU_CORE_TL3228X=1
+	-DROUTER=1
+	-D__PROJECT_TL_DIMMABLE_LIGHT__=1
+)
+
+zephyr_include_directories(
+	zb_proj
+)
+
+	file(GLOB ZIGBEE_SOURCES
+			zb_proj/drivers/multi_core/*.c
+	)
+zephyr_library_sources(${ZIGBEE_SOURCES})
+
+
+zephyr_compile_options(
+	-DCHIP_TYPE=CHIP_TYPE_TL322X
+	-DTLK_MESSAGE_D25F=1
+	-DTLK_MESSAGE_N22=0
+	-DMAILBOX_D25F=1
+	-DMAILBOX_FALSH_WR_NOTIFY=1
+	-DSHM_MBOX_TYPE_TPSLL_EN=1
+	-DSHM_MBOX_TYPE_ZIGBEE_EN=1
+	-DMCU_CORE_TL322X_D25F=1
+)
+endif()
+
 zephyr_include_directories(
 	common
 	controller/${SOC_FAMILY}
