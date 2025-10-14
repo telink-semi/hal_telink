@@ -35,11 +35,15 @@
 #include "stack/multiCoreComm/service/service_shareMemory.h"
 # if CONFIG_PM
 #include "stack/pm/pm_sys.h"
-# endif
+#endif
 #else
 #include "stack/ble/controller/ble_controller.h"
 #endif
 #include "stack/ble/os_sup/os_sup.h"
+
+/* extern from controller lib */
+extern hci_fifo_t bltHci_rxfifo;
+extern hci_fifo_t bltHci_txfifo;
 
 /* Module defines */
 #define BLE_THREAD_STACK_SIZE CONFIG_TL_BLE_CTRL_THREAD_STACK_SIZE
