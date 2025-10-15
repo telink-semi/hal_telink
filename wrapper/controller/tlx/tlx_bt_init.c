@@ -65,6 +65,9 @@ _attribute_ble_data_retention_ u8
 #if CONFIG_SOC_RISCV_TELINK_TL321X
 	#define SUSPEND_EXIT_LATENCY_US		(320U)
 	#define DEEPRETN_EXIT_LATENCY_US	(1000U)		/*!< Not used for now */
+#elif CONFIG_SOC_RISCV_TELINK_TL323X
+	#define SUSPEND_EXIT_LATENCY_US		(200U)
+	#define DEEPRETN_EXIT_LATENCY_US	(1000U)		/*!< Not used for now */
 #elif CONFIG_SOC_RISCV_TELINK_TL721X
 	#define SUSPEND_EXIT_LATENCY_US		(250U)
 	#define DEEPRETN_EXIT_LATENCY_US	(0U)		/*!< Not used for now */
@@ -153,7 +156,7 @@ int tlx_bt_blc_init(void *prx, void *ptx)
 	}
 #endif /* CONFIG_BT_PERIPHERAL */
 
-#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL322X
+#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X
 	blc_ll_configLegacyAdvEnableStrategy(LEG_ADV_EN_STRATEGY_3);
 #endif
 
@@ -213,7 +216,7 @@ int tlx_bt_blc_init(void *prx, void *ptx)
 	/* Enable the sleep masks for BLE stack thread */
 	blc_pm_setSleepMask(PM_SLEEP_LEG_ADV | PM_SLEEP_LEG_SCAN | PM_SLEEP_ACL_SLAVE |
 			    PM_SLEEP_ACL_MASTER);
-	#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X
+	#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL323X
 	extern void blc_ll_setOsLowPowerExitLatencyUs(uint32_t suspendUs, uint32_t deepretUs);
 	blc_ll_setOsLowPowerExitLatencyUs(SUSPEND_EXIT_LATENCY_US, DEEPRETN_EXIT_LATENCY_US);
 	#endif
