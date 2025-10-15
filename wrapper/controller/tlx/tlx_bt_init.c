@@ -63,7 +63,7 @@ _attribute_ble_data_retention_ u8
 
 /** a temporary method to set exit latency which can be set in header files */
 #if CONFIG_SOC_RISCV_TELINK_TL321X
-	#define SUSPEND_EXIT_LATENCY_US		(200U)
+	#define SUSPEND_EXIT_LATENCY_US		(320U)
 	#define DEEPRETN_EXIT_LATENCY_US	(1000U)		/*!< Not used for now */
 #elif CONFIG_SOC_RISCV_TELINK_TL721X
 	#define SUSPEND_EXIT_LATENCY_US		(250U)
