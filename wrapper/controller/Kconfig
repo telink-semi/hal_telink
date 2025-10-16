@@ -76,6 +76,15 @@ config TL_BLE_CTRL_RF_POWER
 	  Telink TLX BLE TX power
 endif
 
+if SOC_RISCV_TELINK_TL323X
+config TL_BLE_CTRL_RF_POWER
+	int "Tx power, dbm"
+	default 3
+	range -20 10
+	help
+	  Telink TLX BLE TX power
+endif
+
 config TL_BLE_CTRL_MASTER_MAX_NUM
 	int "Maximum number of master connections"
 	default 0
