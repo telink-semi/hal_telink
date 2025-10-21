@@ -66,7 +66,7 @@ _attribute_ble_data_retention_ u8
 	#define SUSPEND_EXIT_LATENCY_US		(320U)
 	#define DEEPRETN_EXIT_LATENCY_US	(1000U)		/*!< Not used for now */
 #elif CONFIG_SOC_RISCV_TELINK_TL323X
-	#define SUSPEND_EXIT_LATENCY_US		(200U)
+	#define SUSPEND_EXIT_LATENCY_US		(400U)		/*!< No Fast Settle Used For Now, Update Later */
 	#define DEEPRETN_EXIT_LATENCY_US	(1000U)		/*!< Not used for now */
 #elif CONFIG_SOC_RISCV_TELINK_TL721X
 	#define SUSPEND_EXIT_LATENCY_US		(250U)
