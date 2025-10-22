@@ -71,7 +71,7 @@ SECTION_VAR(retention_data, tl_context_backup_registers)
  * 37 - mstatus
  * 38 - mxstatus
  * 39 - mdcause
- * 40 - mip
+ * 40 - reserved
  * 41 - mie
  * 42 -  f0 - ft0
  * 43 -  f1 - ft1
@@ -184,9 +184,6 @@ SECTION_FUNC(ram_code, tl_context_save)
 	csrr   x31, mdcause
 	sw     x31, (39 * 4)(x30)
 
-	csrr   x31, mip
-	sw     x31, (40 * 4)(x30)
-
 	csrr   x31, mie
 	sw     x31, (41 * 4)(x30)
 
@@ -273,9 +270,6 @@ SECTION_FUNC(ram_code, tl_context_restore)
 
 	lw     x30, (39 * 4)(x31)
 	csrw   mdcause, x30
-
-	lw     x30, (40 * 4)(x31)
-	csrw   mip, x30
 
 	lw     x30, (41 * 4)(x31)
 	csrw   mie, x30
