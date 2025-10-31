@@ -67,7 +67,7 @@ int tlx_bt_controller_init()
     mcc_d25f_service_init();
 	arch_irq_unlock(key);
 
-	ext_crypto_hw_init_enable();
+	ske_dig_en();
 
 # if CONFIG_PM
 	/* Enable PM for BLE stack */
