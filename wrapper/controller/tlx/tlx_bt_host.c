@@ -23,15 +23,10 @@
 #include "tlx_bt_host.h"
 #include "tlx_bt_init.h"
 
-#if TLK_ONLY_BLE_HOST
-#include "stack/multiCoreComm/drv/shareMemory.h"
-#include "stack/multiCoreComm/service/service_shareMemory.h"
+#include "stack/multicore_comm/service/service_d25f.h"
 # if CONFIG_PM
 #include "stack/pm/pm_sys.h"
 # endif
-#else
-#include "stack/ble/controller/ble_controller.h"
-#endif
 
 #define BLE_THREAD_STACK_SIZE CONFIG_TL_BLE_CTRL_THREAD_STACK_SIZE
 #define BLE_THREAD_PRIORITY CONFIG_TL_BLE_CTRL_THREAD_PRIORITY
@@ -50,13 +45,13 @@ static void tlx_bt_controller_thread()
 	while (tl_bt_state == TL_BT_CONTROLLER_STATE_ACTIVE ||
 		tl_bt_state == TL_BT_CONTROLLER_STATE_STOPPING) {
 		k_sem_take(&controller_sem, K_FOREVER);	//Mailbox irq can also trigger controller_sem in time.
-		tlk_multi_core_communication_loop();
+		mcc_d25f_loop();
 	}
 }
 
 static tlx_bt_host_callback_t tlx_bt_cb = {0};
 
-extern void mailbox_n22_to_d25_irq_handler(void);
+extern void mb_irq_handler(void);
 /**
  * @brief    Telink TLX BLE Controller initialization
  * @return   Status - 0: command succeeded; -1: command failed
@@ -65,20 +60,20 @@ int tlx_bt_controller_init()
 {
     int status = INIT_OK;
 
-    IRQ_CONNECT(IRQ_MAILBOX_N22_TO_D25 + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 2, mailbox_n22_to_d25_irq_handler, 0, 0);
-#ifdef TLK_ONLY_BLE_HOST
+    IRQ_CONNECT(IRQ_MAILBOX_N22_TO_D25 + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 2, mb_irq_handler, 0, 0);
 	volatile uint32_t key = arch_irq_lock();
-	sys_n22_start();
-	tlk_mailbox_service_init();
-	tlk_share_memory_service_init();
+	sys_n22_init(N22_FW_DOWNLOAD_FLASH_ADDR);
+    sys_n22_start();
+    mcc_d25f_service_init();
 	arch_irq_unlock(key);
+
+	ext_crypto_hw_init_enable();
 
 # if CONFIG_PM
 	/* Enable PM for BLE stack */
 	blc_ll_initPowerManagement_module();
 	blc_pm_setSleepMask(PM_SLEEP_LEG_ADV | PM_SLEEP_ACL_PERIPHR);
 # endif /* CONFIG_PM */
-#endif /* TLK_ONLY_BLE_HOST */
 
     /* init semaphore */
 	k_sem_reset(&controller_sem);
@@ -96,7 +91,7 @@ int tlx_bt_controller_init()
 	return status;
 }
 
-_attribute_ram_code_ void tlk_mailbox_d25f_sm_data_ready_process(u8* data)
+_attribute_ram_code_ void mcc_d25f_sm_data_ready(u8* data)
 {
     (void) data;
 
@@ -127,18 +122,16 @@ void tlx_bt_host_send_packet(uint8_t type, const uint8_t *data, uint16_t len)
 		return;
 	}
 
-#if TLK_ONLY_BLE_HOST
     u8 hci_cmd[255+3] = {0}; 			//Controllers shall be able to accept HCI Command packets with up to 255 bytes of data excluding the HCI Command packet header.
 	hci_cmd[0] = type;
 	memcpy(hci_cmd+1, data, len);
-	tlk_sm_ret_e ret = tlk_d25f_hci_send_message(0, hci_cmd, len+1);
-	if (ret == TLK_SHARE_MEMORY_SUCCESS) {
+	shm_fifo_status_e ret = mcc_d25f_hci_send_msg(hci_cmd, len+1);
+	if (ret == SHM_FIFO_SUCCESS) {
 		/* No data to process, send host_send_available message to the host */
 		if (tlx_bt_cb.host_send_available) {
 			tlx_bt_cb.host_send_available();
 		}
 	}
-#endif
 }
 
 /**
@@ -148,9 +141,7 @@ void tlx_bt_host_callback_register(const tlx_bt_host_callback_t *pcb)
 {
 	tlx_bt_cb.host_read_packet = pcb->host_read_packet;		//hci_tlx_host_rcv_pkt
 	tlx_bt_cb.host_send_available = pcb->host_send_available;	//hci_tlx_controller_rcv_pkt_ready
-#if TLK_ONLY_BLE_HOST
-	tlk_d25f_register_hci_receive_cb(TLK_SHARE_MEMORY_MESSAGE_TYPE_BLE, (void (*)(unsigned char *, unsigned int))tlx_bt_cb.host_read_packet);
-#endif
+	mcc_d25f_register_shm_recv_cb(TLK_SHM_MSG_HCI, tlx_bt_cb.host_read_packet);
 }
 
 /**
