@@ -208,15 +208,12 @@ int tlx_bt_controller_init()
 	pm_policy_state_lock_get(PM_STATE_STANDBY, PM_ALL_SUBSTATES);
 #endif /* CONFIG_PM && CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION */
 
+#if CONFIG_SOC_RISCV_TELINK_TL323X
     pm_set_dig_module_power_switch(FLD_PD_ZB_EN,PM_POWER_UP);
 
-    reg_rst4 |= FLD_RST4_ZB;
-    reg_clk_en4 |= FLD_CLK4_ZB_EN;
-    reg_n22_rst0 |= (FLD_RST0_ZB | FLD_RST0_ZB_PON | FLD_RST0_DMA_BB);
-    reg_n22_rst1 |= (FLD_RST1_RSTL_BB | FLD_RST1_RST_MDM | FLD_RST1_RSTL_STIMER);
-    reg_n22_clk_en0 |= (FLD_CLK0_ZB_HCLK_EN | FLD_CLK0_DMA_BB_EN);
-    reg_n22_clk_en1 |= (FLD_CLK1_CLK_BB);
-    reg_rf_tstimp_ctrl |= FLD_RF_R_STIMER_REVERT_EN; //Switching RF clock to stimer.
+	extern void rf_zb_init(void);
+	rf_zb_init();
+#endif /* CONFIG_SOC_RISCV_TELINK_TL323X */
 
 	/* Reset Radio */
 	rf_radio_reset();
