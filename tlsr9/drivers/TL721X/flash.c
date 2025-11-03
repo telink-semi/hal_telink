@@ -676,16 +676,21 @@ flash_capacity_e flash_get_capacity(unsigned int flash_mid)
 }
 
 /*******************************************************************************************************************
- *									This function serves to 1m area flash protection
+ *									This function serves to flash protection
  ******************************************************************************************************************/
 #define FLASH_1M_ADR_OFFSET 		0x100000
+#define FLASH_1920K_ADR_OFFSET 		0x1e0000
 #define FLASH_2M_ADR_OFFSET 		0x200000
 #define FLASH_3M_ADR_OFFSET 		0x300000
 #define FLASH_3M5_ADR_OFFSET 		0x380000
 
+#if CONFIG_DUAL_MODE
+#define FLASH_ADR_OFFSET_SELECT		FLASH_1920K_ADR_OFFSET
+#define FLASH_PROTECT_BLOCK_SIZE	FLASH_LOCK_FW_LOW_1920K
+#else
 #define FLASH_ADR_OFFSET_SELECT		FLASH_1M_ADR_OFFSET
-
 #define FLASH_PROTECT_BLOCK_SIZE	FLASH_LOCK_FW_LOW_1M
+#endif /* CONFIG_DUAL_MODE */
 
 void flash_protection_lock_init(void)
 {
