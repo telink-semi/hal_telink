@@ -19,6 +19,8 @@
 #ifndef TL_RF_POWER_H_
 #define TL_RF_POWER_H_
 
+#include "common/compiler.h"
+#include <stdbool.h>
 #include "stdint.h"
 
 #if CONFIG_SOC_RISCV_TELINK_TL321X
@@ -39,5 +41,8 @@
 #endif
 
 extern const uint8_t tl_tx_pwr_lt[];
+
+_attribute_ram_code_sec_ bool tl_rf_is_inited(void);
+_attribute_ram_code_sec_ void tl_rf_change_to_inited(void);
 
 #endif /* TL_RF_POWER_H_ */

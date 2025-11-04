@@ -208,19 +208,18 @@ int tlx_bt_controller_init()
 	pm_policy_state_lock_get(PM_STATE_STANDBY, PM_ALL_SUBSTATES);
 #endif /* CONFIG_PM && CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION */
 
-#if CONFIG_SOC_RISCV_TELINK_TL323X
-    pm_set_dig_module_power_switch(FLD_PD_ZB_EN,PM_POWER_UP);
+	if(tl_rf_is_inited()) {
+		/* Reset Radio */
+		rf_radio_reset();
+	#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X
+		rf_reset_dma();
+		rf_baseband_reset();
+	#endif
+	}
+	else {
+		tl_rf_change_to_inited();
+	}
 
-	extern void rf_zb_init(void);
-	rf_zb_init();
-#endif /* CONFIG_SOC_RISCV_TELINK_TL323X */
-
-	/* Reset Radio */
-	rf_radio_reset();
-#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X
-	rf_reset_dma();
-	rf_baseband_reset();
-#endif
 	/* Init RF driver */
 	rf_drv_ble_init();
 

@@ -275,3 +275,16 @@ const uint8_t tl_tx_pwr_lt[] = {
 
 
 #endif
+
+_attribute_data_retention_ static volatile bool tl_rf_inited = false;
+
+_attribute_ram_code_sec_ bool tl_rf_is_inited(void)
+{
+    return tl_rf_inited;
+}
+
+_attribute_ram_code_sec_ void tl_rf_change_to_inited(void)
+{
+	tl_rf_inited = true;
+}
+
