@@ -31,7 +31,11 @@
 
 #if TLK_ONLY_BLE_HOST && CONFIG_PM
 	#include "stack/pm/pm_sys.h"
+#elif !TLK_ONLY_BLE_HOST && CONFIG_PM
+	#include "stack/ble/controller/ble_controller.h"
 #endif
+
+extern int blc_pm_handler(void);
 
 /**
  * @brief     This function sets Telink MCU to suspend mode

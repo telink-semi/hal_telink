@@ -26,6 +26,7 @@
 
 #include "tlx_bt.h"
 #include "tlx_bt_init.h"
+#include "tl_rf_power.h"
 #include "compiler.h"
 #include "drivers.h"
 #include <stdlib.h>
