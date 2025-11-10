@@ -11,16 +11,6 @@ zephyr_compile_options(
 	-D__PROJECT_TL_DIMMABLE_LIGHT__=1
 )
 
-zephyr_include_directories(
-	zb_proj
-)
-
-	file(GLOB ZIGBEE_SOURCES
-			zb_proj/drivers/multi_core/*.c
-	)
-zephyr_library_sources(${ZIGBEE_SOURCES})
-
-
 zephyr_compile_options(
 	-DCHIP_TYPE=CHIP_TYPE_TL322X
 	-DTLK_MESSAGE_D25F=1
