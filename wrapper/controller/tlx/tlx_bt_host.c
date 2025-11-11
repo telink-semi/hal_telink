@@ -46,6 +46,12 @@ static void tlx_bt_controller_thread()
 		tl_bt_state == TL_BT_CONTROLLER_STATE_STOPPING) {
 		k_sem_take(&controller_sem, K_FOREVER);	//Mailbox irq can also trigger controller_sem in time.
 		mcc_d25f_loop();
+
+		/* temporary solutions */
+		if (tl_bt_state == TL_BT_CONTROLLER_STATE_STOPPING) {
+			tl_bt_state = TL_BT_CONTROLLER_STATE_STOPPED;
+			break;
+		}
 	}
 }
 
@@ -109,6 +115,9 @@ void tlx_bt_controller_deinit(void)
     	/* reset controller */
 	static const uint8_t hci_reset_cmd[] = {0x03, 0x0c, 0x00};
 	tlx_bt_host_send_packet(0x01, hci_reset_cmd, sizeof(hci_reset_cmd));
+
+	/* wait thread finish */
+	(void)k_thread_join(&tlx_bt_controller_thread_data, K_FOREVER);
 }
 
 /**
