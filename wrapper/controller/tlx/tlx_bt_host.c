@@ -22,7 +22,7 @@
 
 #include "tlx_bt_host.h"
 #include "tlx_bt_init.h"
-
+#include "tlx_bt_flash.h"
 #include "stack/multicore_comm/service/service_d25f.h"
 # if CONFIG_PM
 #include "stack/pm/pm_sys.h"
@@ -57,7 +57,6 @@ static void tlx_bt_controller_thread()
 
 static tlx_bt_host_callback_t tlx_bt_cb = {0};
 
-extern void mb_irq_handler(void);
 /**
  * @brief    Telink TLX BLE Controller initialization
  * @return   Status - 0: command succeeded; -1: command failed
@@ -66,15 +65,9 @@ int tlx_bt_controller_init()
 {
     int status = INIT_OK;
 
-    IRQ_CONNECT(IRQ_MAILBOX_N22_TO_D25 + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 2, mb_irq_handler, 0, 0);
-	volatile uint32_t key = arch_irq_lock();
-	sys_n22_init(N22_FW_DOWNLOAD_FLASH_ADDR);
-    sys_n22_start();
-    mcc_d25f_service_init();
-	arch_irq_unlock(key);
-
-	ske_dig_en();
-
+	/* pke and ske required to be used by the host SMP module */
+	ext_crypto_hw_init_enable();
+	
 # if CONFIG_PM
 	/* Enable PM for BLE stack */
 	blc_ll_initPowerManagement_module();
