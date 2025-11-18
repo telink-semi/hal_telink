@@ -116,9 +116,9 @@ bool tl_deep_sleep(uint32_t wake_stimer_tick)
 	__attribute__ ((section (".retention_data"))) = false;
 
 	extern void tl_context_save(void);
-#if CONFIG_BT_B9X
+#if CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION
 	extern void soc_b9x_restore(void);
-#elif CONFIG_BT_TLX
+#elif CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION
 	extern void soc_tlx_restore(void);
 #endif
 
@@ -143,9 +143,9 @@ bool tl_deep_sleep(uint32_t wake_stimer_tick)
 				wake_stimer_tick);
 			tl_sleep_retention = false;
 		} else {
-#if CONFIG_BT_B9X
+#if CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION
 			soc_b9x_restore();
-#elif CONFIG_BT_TLX
+#elif CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION
 			soc_tlx_restore();
 #endif
 			tl_sleep_retention = false;
@@ -161,9 +161,9 @@ bool tl_deep_sleep(uint32_t wake_stimer_tick)
 			wake_stimer_tick);
 		tl_sleep_retention = false;
 	} else {
-#if CONFIG_BT_B9X
+#if CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION
 		soc_b9x_restore();
-#elif CONFIG_BT_TLX
+#elif CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION
 		soc_tlx_restore();
 #endif
 		tl_sleep_retention = false;
