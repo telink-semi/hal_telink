@@ -37,6 +37,8 @@
 
 extern int blc_pm_handler(void);
 
+uint8_t g_2p4g_state_active = 0;
+
 /**
  * @brief     This function sets Telink MCU to suspend mode
  * @param[in] wake_stimer_tick - wake-up stimer tick
@@ -67,7 +69,8 @@ bool tl_suspend(uint32_t wake_stimer_tick)
 	}
 # else
 	if (state == TL_BT_CONTROLLER_STATE_ACTIVE ||
-		state == TL_BT_CONTROLLER_STATE_STOPPING) {
+		state == TL_BT_CONTROLLER_STATE_STOPPING ||
+		g_2p4g_state_active == 1) {
 		pm_set_suspend_power_cfg(FLD_PD_ZB_EN, 1);
 		result = !(tlksdk_pm_enterSleep(SUSPEND_MODE, wake_stimer_tick));
 
