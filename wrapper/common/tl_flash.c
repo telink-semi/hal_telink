@@ -25,21 +25,39 @@
  *									This function serves to 1m area flash protection
  ******************************************************************************************************************/
 #define FLASH_1M_ADR_OFFSET 		0x100000
+#define FLASH_1920K_ADR_OFFSET		0x1e0000
 #define FLASH_2M_ADR_OFFSET 		0x200000
-#define FLASH_3M_ADR_OFFSET 		0x300000
-#define FLASH_3M5_ADR_OFFSET 		0x380000
+#define FLASH_4M_ADR_OFFSET 		0x400000
 
-#define FLASH_ADR_OFFSET_SELECT		FLASH_1M_ADR_OFFSET
+#define FLASH_ADR_OFFSET_SELECT		FLASH_1920K_ADR_OFFSET
 
-#define FLASH_PROTECT_BLOCK_SIZE	3
+uint16_t flash_protection_lock_select(uint32_t addr)
+{
+	unsigned int flash_lockBlock_cmd;
+	unsigned int app_lockBlock = FLASH_LOCK_FW_LOW_1M; 
+	unsigned int blc_flash_mid;
+	if(addr == FLASH_1M_ADR_OFFSET) {
+		app_lockBlock = FLASH_LOCK_FW_LOW_1M;
+		flash_lockBlock_cmd = flash_change_app_lock_block_to_flash_lock_block(app_lockBlock);
+	}else if (addr == FLASH_2M_ADR_OFFSET || addr == FLASH_4M_ADR_OFFSET){
+		app_lockBlock = FLASH_LOCK_ALL_AREA;
+		flash_lockBlock_cmd = flash_change_app_lock_block_to_flash_lock_block(app_lockBlock);
+	}else if (addr == FLASH_1920K_ADR_OFFSET){
+		blc_flash_mid = ble_flash_read_mid();
+		if(blc_flash_mid == MID156085){
+			flash_lockBlock_cmd = FLASH_LOCK_LOW_1920K_MID156085;
+		}else if (blc_flash_mid == MID1560C8){
+			flash_lockBlock_cmd = FLASH_LOCK_LOW_1920K_MID1560C8;
+		}
+	}
+	return flash_lockBlock_cmd;
+}
 
 void flash_protection_lock_init(void)
 {
     flash_protection_init();
 
-    unsigned int app_lockBlock = FLASH_PROTECT_BLOCK_SIZE; // init is 1M, in the ble lib, actual area will be less than 1m, so we protect 1m.
-
-    unsigned int flash_lockBlock_cmd = flash_change_app_lock_block_to_flash_lock_block(app_lockBlock);
+    unsigned int flash_lockBlock_cmd = flash_protection_lock_select(FLASH_ADR_OFFSET_SELECT);
 
     flash_lock(flash_lockBlock_cmd);
 }
