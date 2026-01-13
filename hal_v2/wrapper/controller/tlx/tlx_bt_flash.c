@@ -59,6 +59,14 @@ static int get_bytes_from_str(uint8_t *buf, int buf_len, const char *src)
 }
 #endif
 
+#if CONFIG_DUAL_MODE == CONFIG_AUTO_SWITCH_DUAL_MODE
+#define USER_PARA_MAC_OFFSET	(0x100)
+#define USER_PARTITION dual_mode_partition
+#define USER_PARTITION_DEVICE FIXED_PARTITION_DEVICE(USER_PARTITION)
+#define USER_PARTITION_OFFSET FIXED_PARTITION_OFFSET(USER_PARTITION)
+#define USER_PARTITION_SIZE FIXED_PARTITION_SIZE(USER_PARTITION)
+#endif /* CONFIG_DUAL_MODE */
+
 /**
  * @brief		This function is used to initialize the MAC address
  * @param[in]	bt_mac - BT MAC address
@@ -105,6 +113,20 @@ _attribute_no_inline_ int tlx_bt_blc_mac_init(uint8_t *bt_mac)
 	temp_mac[8] = 0;
 	err = flash_write(flash_device, FIXED_PARTITION_OFFSET(vendor_partition)
 			+ TLX_BT_MAC_ADDR_OFFSET, temp_mac, BLE_ADDR_LEN + 3);
+
+#elif CONFIG_DUAL_MODE == CONFIG_AUTO_SWITCH_DUAL_MODE
+
+	uint8_t dummy_mac[BLE_ADDR_LEN] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+
+	/*Get the ramdom mac address from zb which will passed in the user-para sector */
+	err = flash_read(USER_PARTITION_DEVICE, USER_PARTITION_OFFSET
+			+ USER_PARA_MAC_OFFSET, bt_mac, BLE_ADDR_LEN);
+	if(memcmp(bt_mac, dummy_mac, sizeof(dummy_mac)) == 0){
+		// if mac address is empty, use random instead .
+		generateRandomNum(BLE_ADDR_LEN, bt_mac);
+	}
+	bt_mac[5] |= 0xC0; /* random static by default */
+
 #else
 	generateRandomNum(BLE_ADDR_LEN, bt_mac);
 	/* The random static address will be generated on every reboot */
