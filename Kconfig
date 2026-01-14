@@ -1,8 +1,20 @@
 # Copyright (c) 2022 Telink Semiconductor
 # SPDX-License-Identifier: Apache-2.0
 
-if HAS_TELINK_DRIVERS
+config HAL_TELINK_V1
+    bool "Telink HAL V1"
+    depends on SOC_RISCV_TELINK_B91 || SOC_RISCV_TELINK_B92 || SOC_RISCV_TELINK_TL721X || SOC_RISCV_TELINK_TL321X
+    default y
 
-rsource "tlsr9/Kconfig"
+config HAL_TELINK_V2
+    bool "Telink HAL V2"
+    depends on SOC_RISCV_TELINK_TL322X || SOC_RISCV_TELINK_TL323X
+    default y
 
-endif # HAS_TELINK_DRIVERS
+if HAL_TELINK_V1
+    rsource "hal_v1/Kconfig"
+endif
+
+if HAL_TELINK_V2
+    rsource "hal_v2/Kconfig"
+endif
