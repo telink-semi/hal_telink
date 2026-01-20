@@ -27,15 +27,24 @@
 #define FLASH_1M_ADR_OFFSET 		0x100000
 #define FLASH_1920K_ADR_OFFSET		0x1e0000
 #define FLASH_2M_ADR_OFFSET 		0x200000
+#define FLASH_3968K_ADR_OFFSET		0x3e0000
 #define FLASH_4M_ADR_OFFSET 		0x400000
 
-#define FLASH_ADR_OFFSET_SELECT		FLASH_1920K_ADR_OFFSET
+#if CONFIG_SOC_RISCV_TELINK_TL323X
+	#if CONFIG_PM
+	#define FLASH_ADR_OFFSET_SELECT		FLASH_1920K_ADR_OFFSET
+	#else 
+	#define FLASH_ADR_OFFSET_SELECT		FLASH_3968K_ADR_OFFSET
+	#endif/*CONFIG_PM*/
+#else
+	#define FLASH_ADR_OFFSET_SELECT		FLASH_1M_ADR_OFFSET
+#endif/*CONFIG_SOC_RISCV_TELINK_TL321X*/
 
 uint16_t flash_protection_lock_select(uint32_t addr)
 {
-	unsigned int flash_lockBlock_cmd;
+	unsigned int flash_lockBlock_cmd = flash_change_app_lock_block_to_flash_lock_block(FLASH_LOCK_FW_LOW_1M);;
 	unsigned int app_lockBlock = FLASH_LOCK_FW_LOW_1M; 
-	unsigned int blc_flash_mid;
+	unsigned int blc_flash_mid =0;
 	if(addr == FLASH_1M_ADR_OFFSET) {
 		app_lockBlock = FLASH_LOCK_FW_LOW_1M;
 		flash_lockBlock_cmd = flash_change_app_lock_block_to_flash_lock_block(app_lockBlock);
@@ -49,7 +58,21 @@ uint16_t flash_protection_lock_select(uint32_t addr)
 		}else if (blc_flash_mid == MID1560C8){
 			flash_lockBlock_cmd = FLASH_LOCK_LOW_1920K_MID1560C8;
 		}
+	}else if (addr == FLASH_3968K_ADR_OFFSET){
+		blc_flash_mid = ble_flash_read_mid();
+		/*	4M flash protect*/
+		if(blc_flash_mid == MID166085){
+			flash_lockBlock_cmd = FLASH_LOCK_LOW_3968K_MID166085;
+		}else{
+			/*use generic 1m flash protect*/
+			if(blc_flash_mid == MID156085){
+				flash_lockBlock_cmd = FLASH_LOCK_LOW_1920K_MID156085;
+			}else if (blc_flash_mid == MID1560C8){
+				flash_lockBlock_cmd = FLASH_LOCK_LOW_1920K_MID1560C8;
+			}
+		}
 	}
+
 	return flash_lockBlock_cmd;
 }
 
