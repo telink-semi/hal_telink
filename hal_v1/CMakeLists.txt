@@ -4,6 +4,8 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+if(CONFIG_HAS_TELINK_DRIVERS)
+
 add_subdirectory(tlsr9)
 
 if(${ZEPHYR_TOOLCHAIN_VARIANT} STREQUAL "zephyr")
@@ -42,3 +44,4 @@ if(CONFIG_PM)
 zephyr_ld_options(-mtune=rocket)
 endif() # PM
 
+endif() # CONFIG_HAS_TELINK_DRIVERS

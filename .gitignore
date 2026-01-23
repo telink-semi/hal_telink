@@ -1,3 +1,5 @@
+hal_v2/tl_ble_src
+hal_v2/tl_ble_sdk
 **/blobs
 *.o
 *.d

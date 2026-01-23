@@ -1,4 +1,12 @@
 #!/bin/bash
+#
+# Downloading Telink BLE sources.
+# !!! This script is for Telink internal usage only !!!
+# !!! Use ./fetch_sdk instead !!!
+#
+# Usage: ./fetch_src.sh
+# Copyright (c) 2026 Telink Semiconductor
+# SPDX-License-Identifier: Apache-2.0
 
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 
