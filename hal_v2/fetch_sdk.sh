@@ -1,8 +1,14 @@
 #!/bin/bash
+#
+# Downloading Telink BLE SDK.
+#
+# Usage: ./fetch_sdk.sh
+# Copyright (c) 2026 Telink Semiconductor
+# SPDX-License-Identifier: Apache-2.0
 
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 
-REPO_URL="http://192.168.48.36/sdk_app/ble/tl_ble_sdk.git"
+REPO_URL="https://github.com/telink-semi/tl_ble_sdk.git"
 TARGET_COMMIT="bf886feb6cb78dac40b4fc34c8cc1cec1316bf14"
 DEST_DIR="$SCRIPT_DIR/tl_ble_sdk"
 
