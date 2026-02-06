@@ -69,6 +69,7 @@ if(CONFIG_BT OR CONFIG_IEEE802154)
 endif()
 
 zephyr_library_sources(common/tl_flash.c)
+zephyr_library_sources(common/tl_sd_adc.c)
 
 if(CONFIG_PM)
 	zephyr_sources(common/tl_sleep.c)
