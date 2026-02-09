@@ -14,6 +14,8 @@ if(CONFIG_SOC_RISCV_TELINK_B91 OR CONFIG_SOC_RISCV_TELINK_B92 OR
 	add_subdirectory(hal_v1)
 elseif(CONFIG_SOC_RISCV_TELINK_TL322X OR CONFIG_SOC_RISCV_TELINK_TL323X)
 	add_subdirectory(hal_v2)
+elseif(CONFIG_SOC_RISCV_TELINK_TL711X)
+	add_subdirectory(tl_platform)
 else()
 	message(FATAL_ERROR "Not supported SOC")
 endif()
