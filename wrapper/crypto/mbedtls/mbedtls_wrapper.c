@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Telink Semiconductor
+ * Copyright (c) 2024-2025 Telink Semiconductor
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -44,10 +44,37 @@ extern int telink_b9x_ecp_muladd_restartable(mbedtls_ecp_group *grp,
 extern int telink_soc_ecp_self_test(int verbose);
 #endif /* MBEDTLS_SELF_TEST */
 
+#endif /* MBEDTLS_ECP_C */
+
+/*********************************************************************
+ * SHA256 HW accelerated functions
+ *********************************************************************/
+
+#ifdef MBEDTLS_SHA256_C
+
+#include <mbedtls/sha256.h>
+
+#if CONFIG_TELINK_TLX_MBEDTLS_HW_SHA_ACCELERATION
+extern void telink_tlx_sha256_init(mbedtls_sha256_context *ctx);
+extern int telink_tlx_sha256_starts(mbedtls_sha256_context *ctx, int is224);
+extern int telink_tlx_sha256_update(mbedtls_sha256_context *ctx,
+                                     const unsigned char *input,
+                                     size_t ilen);
+extern int telink_tlx_sha256_finish(mbedtls_sha256_context *ctx,
+                                     unsigned char output[32]);
+extern void telink_tlx_sha256_free(mbedtls_sha256_context *ctx);
+
+extern void telink_tlx_sha256_clone(mbedtls_sha256_context *dst,
+                                  const mbedtls_sha256_context *src);
+#endif /* CONFIG_TELINK_TLX_MBEDTLS_HW_SHA_ACCELERATION */
+
+#endif /* MBEDTLS_SHA256_C */
+
 /*********************************************************************
  * LD transformed software functions
  *********************************************************************/
 
+#ifdef MBEDTLS_ECP_C
 extern int __real_mbedtls_ecp_check_pubkey(const mbedtls_ecp_group *grp,
 	const mbedtls_ecp_point *pt);
 extern int __real_mbedtls_ecp_mul_restartable(mbedtls_ecp_group *grp,
@@ -62,10 +89,13 @@ extern int __real_mbedtls_ecp_muladd_restartable(mbedtls_ecp_group *grp,
 #ifdef MBEDTLS_SELF_TEST
 extern int __real_mbedtls_ecp_self_test(int verbose);
 #endif /* MBEDTLS_SELF_TEST */
+#endif /* MBEDTLS_ECP_C */
 
 /*********************************************************************
  * Call HW accelerated functionality if fails use software
  *********************************************************************/
+
+#ifdef MBEDTLS_ECP_C
 
 int __wrap_mbedtls_ecp_check_pubkey(const mbedtls_ecp_group *grp,
 	const mbedtls_ecp_point *pt)
@@ -182,3 +212,75 @@ int __wrap_mbedtls_ecp_self_test(int verbose)
 #endif /* MBEDTLS_SELF_TEST */
 
 #endif /* MBEDTLS_ECP_C */
+
+/*********************************************************************
+ * SHA256 wrapper functions
+ *********************************************************************/
+
+#ifdef MBEDTLS_SHA256_C
+
+#ifdef CONFIG_TELINK_TLX_MBEDTLS_HW_SHA_ACCELERATION
+void __wrap_mbedtls_sha256_init(mbedtls_sha256_context *ctx)
+{
+	telink_tlx_sha256_init(ctx);
+}
+
+int __wrap_mbedtls_sha256_starts(mbedtls_sha256_context *ctx, int is224)
+{
+	return telink_tlx_sha256_starts(ctx, is224);
+}
+
+int __wrap_mbedtls_sha256_update(mbedtls_sha256_context *ctx,
+                                  const unsigned char *input,
+                                  size_t ilen)
+{
+	return telink_tlx_sha256_update(ctx, input, ilen);;
+}
+
+int __wrap_mbedtls_sha256_finish(mbedtls_sha256_context *ctx,
+                                  unsigned char output[32])
+{
+	return telink_tlx_sha256_finish(ctx, output);
+}
+
+void __wrap_mbedtls_sha256_free(mbedtls_sha256_context *ctx)
+{
+	telink_tlx_sha256_free(ctx);
+}
+
+void __wrap_mbedtls_sha256_clone(mbedtls_sha256_context *dst,
+                                  const mbedtls_sha256_context *src)
+{
+    telink_tlx_sha256_clone(dst, src);
+}
+
+int __wrap_mbedtls_sha256(const unsigned char *input,
+                           size_t ilen,
+                           unsigned char output[32],
+                           int is224)
+{
+    mbedtls_sha256_context ctx;
+    int ret;
+
+    __wrap_mbedtls_sha256_init(&ctx);
+
+    ret = __wrap_mbedtls_sha256_starts(&ctx, is224);
+    if (ret != 0) {
+        goto exit;
+    }
+
+    ret = __wrap_mbedtls_sha256_update(&ctx, input, ilen);
+    if (ret != 0) {
+        goto exit;
+    }
+
+    ret = __wrap_mbedtls_sha256_finish(&ctx, output);
+
+exit:
+    __wrap_mbedtls_sha256_free(&ctx);
+    return ret;
+}
+
+#endif /* CONFIG_TELINK_TLX_MBEDTLS_HW_SHA_ACCELERATION */
+
+#endif /* MBEDTLS_SHA256_C */
