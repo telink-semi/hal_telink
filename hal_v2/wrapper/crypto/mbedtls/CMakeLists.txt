@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2022-2024, Telink
+# Copyright (c) 2022-2026, Telink
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -33,6 +33,30 @@ zephyr_library_sources_ifdef(CONFIG_TELINK_B9X_MBEDTLS_HW_ACCELERATION
 zephyr_library_sources_ifdef(CONFIG_TELINK_TLX_MBEDTLS_HW_ACCELERATION 
 	./ecp_tlx_backend.c
 )
+
+# Include TLX drivers for accelerated SHA256, linker wraps
+if(CONFIG_TELINK_TLX_MBEDTLS_HW_SHA_ACCELERATION)
+	message(STATUS "HW SHA configured")
+
+	zephyr_include_directories(
+		${ZEPHYR_HAL_TELINK_MODULE_DIR}/tl_ble_sdk/tl_ble_sdk/drivers/${SOC}/lib/include
+		${ZEPHYR_HAL_TELINK_MODULE_DIR}/tl_ble_sdk/tl_ble_sdk/drivers/${SOC}/lib/include/hash
+	)
+
+	zephyr_library_sources( 
+		./sha256_tlx_backend.c
+	)
+
+	zephyr_link_libraries(
+		-Wl,--wrap,mbedtls_sha256_init
+		-Wl,--wrap,mbedtls_sha256_starts
+		-Wl,--wrap,mbedtls_sha256_update
+		-Wl,--wrap,mbedtls_sha256_finish
+		-Wl,--wrap,mbedtls_sha256_free
+		-Wl,--wrap=mbedtls_sha256
+		-Wl,--wrap=mbedtls_sha256_clone
+	)
+endif() # CONFIG_TELINK_TLX_MBEDTLS_HW_SHA_ACCELERATION
 
 zephyr_link_libraries(
 	-Wl,--wrap,mbedtls_ecp_check_pubkey
