@@ -53,6 +53,8 @@ bool tl_suspend(uint32_t wake_stimer_tick)
 	if (state == TL_BT_CONTROLLER_STATE_ACTIVE ||
 		state == TL_BT_CONTROLLER_STATE_STOPPING) {
 		blc_pm_setAppWakeupLowPower(wake_stimer_tick, 1);
+		/* Enable the TIMER and PAD wakeup */
+		blc_pm_setWakeupSource(PM_WAKEUP_TIMER | PM_WAKEUP_PAD);
 		if (!blc_pm_handler()) {
 			rf_set_power_level(tl_tx_pwr_lt[CONFIG_TL_BLE_CTRL_RF_POWER
 			- TL_TX_POWER_MIN]);
@@ -128,6 +130,8 @@ bool tl_deep_sleep(uint32_t wake_stimer_tick)
 	if (state == TL_BT_CONTROLLER_STATE_ACTIVE ||
 		state == TL_BT_CONTROLLER_STATE_STOPPING) {
 		blc_pm_setAppWakeupLowPower(wake_stimer_tick, 1);
+		/* Enable the TIMER and PAD wakeup */
+		blc_pm_setWakeupSource(PM_WAKEUP_TIMER | PM_WAKEUP_PAD);
 		if (!blc_pm_handler()) {
 			rf_set_power_level(tl_tx_pwr_lt[CONFIG_TL_BLE_CTRL_RF_POWER
 			- TL_TX_POWER_MIN]);
