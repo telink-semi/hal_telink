@@ -32,6 +32,7 @@
 #define SD_ADC_SAMPLE_CNT 16 // Number of samples used to calculate the average.
 static signed int sd_adc_sample_buffer[SD_ADC_SAMPLE_CNT] __attribute__((aligned(4))) = {0};
 
+_attribute_ram_code_sec_
 int adc_sort_and_get_average_code(void)
 {
     signed int code_average = 0;
@@ -86,20 +87,36 @@ void AdcDriverInit(void)
 {
     /* Initialize the SD ADC module to single-channel mode */
     sd_adc_init(SD_ADC_SINGLE_DC_MODE);
-    sd_adc_vbat_sample_init(SD_ADC_SAPMPLE_CLK_1M, 
-        SD_ADC_VBAT_DIV_1F4, SD_ADC_DOWNSAMPLE_RATE_128);
+#if(SD_ADC_MODE == SD_ADC_GPIO_MODE)
+    sd_adc_gpio_cfg_t adc_gpio_cfg =
+    {
+        .clk_freq           = SD_ADC_CLK_FREQ,
+        .downsample_rate    = SD_ADC_DOWNSAMPLE_RATE,
+        .gpio_div           = SD_ADC_DIV,
+        .input_p            = SD_ADC_GPIO_PIN,
+        .input_n            = SD_ADC_GNDN,
+    };
+    sd_adc_gpio_sample_init(&adc_gpio_cfg);
+#elif(SD_ADC_MODE == SD_ADC_VBAT_MODE)
+    sd_adc_vbat_sample_init(SD_ADC_CLK_FREQ, 
+        SD_ADC_DIV, SD_ADC_DOWNSAMPLE_RATE);
+#endif
 }
 
 int AdcDriverRead(void)
 {
     int adc_mv_val = adc_sort_and_get_average_code();
     sd_adc_power_off(SD_ADC_SAMPLE_MODE);
+#if(SD_ADC_MODE == SD_ADC_GPIO_MODE)
+
+#elif(SD_ADC_MODE == SD_ADC_VBAT_MODE)
 	/*
 	 * Close LPC before sleep, otherwise
 	 * it will increase the standby current.
 	 */
 	lpc_vbat_detect_disable();
 	lpc_power_down();
+#endif
     return adc_mv_val;
 }
 
