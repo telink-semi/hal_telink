@@ -28,6 +28,20 @@
 #include "gpio.h"
 #include "reg_include/register.h"
 
+#define SD_ADC_GPIO_MODE    1
+#define SD_ADC_VBAT_MODE    2
+#define SD_ADC_MODE SD_ADC_VBAT_MODE
+
+#if(SD_ADC_MODE == SD_ADC_GPIO_MODE)
+#define SD_ADC_GPIO_PIN SD_ADC_GPIO_PB5P
+#define SD_ADC_DIV SD_ADC_GPIO_CHN_DIV_1F4
+#elif(SD_ADC_MODE == SD_ADC_VBAT_MODE)
+#define SD_ADC_DIV SD_ADC_VBAT_DIV_1F4
+#endif
+#define SD_ADC_CLK_FREQ SD_ADC_SAPMPLE_CLK_1M
+#define SD_ADC_DOWNSAMPLE_RATE SD_ADC_DOWNSAMPLE_RATE_128
+
+_attribute_ram_code_sec_
 int adc_sort_and_get_average_code(void);
 
 void AdcDriverInit(void);
