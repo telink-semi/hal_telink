@@ -58,6 +58,10 @@
 /**********************************************************************************************************************
  *                                      global function prototype                                                     *
  *********************************************************************************************************************/
+typedef void (*analog_write_t)(unsigned long, unsigned long);
+extern _attribute_data_retention_sec_ analog_write_t analog_write;
+typedef unsigned char (*analog_read_t)(unsigned char addr);
+extern _attribute_data_retention_sec_ analog_read_t analog_read;
 
 /**
  * @brief      This function serves to analog register read by byte.
