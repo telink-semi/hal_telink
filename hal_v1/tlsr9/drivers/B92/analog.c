@@ -82,6 +82,8 @@ dma_config_t analog_rx_dma_config={
 /**********************************************************************************************************************
  *                                          local function prototype                                               *
  *********************************************************************************************************************/
+_attribute_data_retention_sec_ analog_write_t analog_write = analog_write_reg8;
+_attribute_data_retention_sec_ analog_read_t analog_read = analog_read_reg8;
 
 
 /**
