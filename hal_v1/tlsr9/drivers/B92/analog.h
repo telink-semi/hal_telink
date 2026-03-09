@@ -58,10 +58,6 @@
 /**********************************************************************************************************************
  *                                      global function prototype                                                     *
  *********************************************************************************************************************/
-typedef void (*analog_write_t)(unsigned long, unsigned long);
-extern _attribute_data_retention_sec_ analog_write_t analog_write;
-typedef unsigned char (*analog_read_t)(unsigned char addr);
-extern _attribute_data_retention_sec_ analog_read_t analog_read;
 
 /**
  * @brief      This function serves to analog register read by byte.
@@ -188,3 +184,10 @@ void analog_read_buff_dma(dma_chn_e chn, unsigned char addr, unsigned char *pdat
  * @return     none.
  */
 void analog_write_addr_data_dma(dma_chn_e chn, void *pdat, int len);
+
+/* Operate analog reg8 by defalut */
+typedef unsigned char (*analog_read_f)(unsigned char addr);
+typedef void (*analog_write_f)(unsigned char addr, unsigned char data);
+
+extern _attribute_data_retention_ analog_read_f analog_read;
+extern _attribute_data_retention_ analog_write_f analog_write;
