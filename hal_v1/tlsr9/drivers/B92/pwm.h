@@ -477,6 +477,7 @@ static inline void pwm_32k_chn_dis(pwm_clk_32k_en_chn_e pwm_32K_en_chn)
 {
     BM_CLR(reg_pwm_mode32k, pwm_32K_en_chn);
 }
+#endif
 
 typedef void (*pwm_set_pin_t)(gpio_func_pin_e pin, gpio_func_e func);
 typedef void (*pwm_set_start_t)(pwm_en_e en);
@@ -485,12 +486,3 @@ typedef void (*pwm_set_stop_t)(pwm_en_e id);
 extern pwm_set_pin_t   pwm_set_pinctrl;
 extern pwm_set_start_t pwm_set_start;
 extern pwm_set_stop_t  pwm_set_stop;
-
-
-
-#endif
-
-
-
-
-
