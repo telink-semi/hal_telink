@@ -457,7 +457,12 @@ int telink_tlx_ecp_mul_restartable(mbedtls_ecp_group *grp,
 				break;
 			}
 			telink_soc_ecp_lock();
+#if CONFIG_SOC_RISCV_TELINK_TL322X
+/* pke_x25519_point_mul is not supported on TL322X pke module, directly use x25519_pointMul */
+			int r = x25519_pointMul(mont_curve, ms, Qx, Qx);
+#else
 			int r = pke_x25519_point_mul(mont_curve, ms, Qx, Qx);
+#endif /* CONFIG_SOC_RISCV_TELINK_TL322X */
 			telink_soc_ecp_unlock();
 			if (r != PKE_SUCCESS) {
 				LOG_ERR("EC multiplication error");
