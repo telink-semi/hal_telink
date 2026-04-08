@@ -189,5 +189,5 @@ void analog_write_addr_data_dma(dma_chn_e chn, void *pdat, int len);
 typedef unsigned char (*analog_read_f)(unsigned char addr);
 typedef void (*analog_write_f)(unsigned char addr, unsigned char data);
 
-extern _attribute_data_retention_ analog_read_f analog_read;
-extern _attribute_data_retention_ analog_write_f analog_write;
+extern _attribute_data_retention_sec_ analog_read_f analog_read;
+extern _attribute_data_retention_sec_ analog_write_f analog_write;
