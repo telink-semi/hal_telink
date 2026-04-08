@@ -33,8 +33,7 @@
 
 uint16_t flash_protection_lock_select(uint32_t addr)
 {
-	/* FLASH_LOCK_NONE_MID156085 or FLASH_LOCK_NONE_MID1560C8 is 0x0*/
-	unsigned int flash_lockBlock_cmd = flash_change_app_lock_block_to_flash_lock_block(FLASH_LOCK_FW_LOW_1M);
+	unsigned int flash_lockBlock_cmd = FLASH_LOCK_NONE_MID156085;
 	unsigned int app_lockBlock = FLASH_LOCK_FW_LOW_1M; 
 	unsigned int blc_flash_mid = 0;
 
