@@ -29,19 +29,19 @@ blobs:
   ##################################################################################################
 
   - path: lib_zephyr_b92.a
-    sha256: 33115738f3b9ee34251d69515104a1eb215d043814e351c0e7cc6a1e176760de
+    sha256: 5e65fa400a0d357823911068980afe3ddc7bb4f02ce77f9000bf137c28a868a5
     type: lib
     version: 'tl-wiki-0010'
     license-path: tlsr9/ble/license.txt
-    url: https://doc.telink-semi.cn/Zephyr/binaries/public/b92_lib/lib_zephyr_b92_9c16bd990c0c49df6ed9e53d50e21cc5c7f606d4.a
+    url: https://doc.telink-semi.cn/Zephyr/binaries/public/b92_lib/lib_zephyr_b92_aee143c8dcba557fecefc6ee92c6e0c957c59632.a
     description: "Zephyr size optimized binary library supporting Telink B92 series"
 
   - path: lib_nds_b92.a
-    sha256: d6ae352bb761560bcd4efbe9332d9fb1fd7d44bc4b92ed410153cb461f36ad1d
+    sha256: cf020a782a20c127b087ab63e02e165070f7f1b1b184a4e7b3536ccd1ed620f1
     type: lib
     version: 'tl-wiki-0010'
     license-path: tlsr9/ble/license.txt
-    url: https://doc.telink-semi.cn/Zephyr/binaries/public/b92_lib/lib_nds_b92_9c16bd990c0c49df6ed9e53d50e21cc5c7f606d4.a
+    url: https://doc.telink-semi.cn/Zephyr/binaries/public/b92_lib/lib_nds_b92_aee143c8dcba557fecefc6ee92c6e0c957c59632.a
     description: "Zephyr size optimized binary library supporting Telink B92 series"
 
   ##################################################################################################
