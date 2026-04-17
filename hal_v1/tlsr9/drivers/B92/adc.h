@@ -457,3 +457,18 @@ unsigned short adc_calculate_voltage(unsigned short adc_code);
  * 			Temp =  564 - ((adc_code * 819)>>13),when Vref = 1.2V, pre_scale = 1.
  */
 unsigned short adc_calculate_temperature(unsigned short adc_code);
+
+/* Operate adc ops by defalut */
+typedef void (*adc_vbat_sample_init_f)(void);
+extern _attribute_data_retention_sec_ adc_vbat_sample_init_f adc_vbat_sample_init;
+
+typedef void (*adc_power_on_hal_f)(void);
+extern _attribute_data_retention_sec_ adc_power_on_hal_f adc_vbat_power_on;
+
+typedef unsigned short (*adc_get_code_f)(void);
+extern _attribute_data_retention_sec_ adc_get_code_f adc_vbat_get_code;
+
+typedef unsigned short (*adc_calculate_voltage_f)(unsigned short adc_code);
+extern _attribute_data_retention_sec_ adc_calculate_voltage_f adc_vbat_calculate_voltage;
+
+

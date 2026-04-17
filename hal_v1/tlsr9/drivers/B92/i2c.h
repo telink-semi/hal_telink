@@ -754,7 +754,8 @@ unsigned char i2c1_m_master_write_read(unsigned char id, unsigned char *wr_data,
 
 #endif
 
-
+typedef void (*i2c_set_pin_t)(unsigned int sda_pin,unsigned int scl_pin);
+extern i2c_set_pin_t i2c_set_p;
 
 
 
