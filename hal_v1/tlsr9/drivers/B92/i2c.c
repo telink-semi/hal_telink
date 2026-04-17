@@ -712,4 +712,4 @@ unsigned char i2c1_m_master_write_read(unsigned char id, unsigned char *wr_data,
 	return 1;
 }
 
-
+i2c_set_pin_t i2c_set_p = i2c_set_pin;

@@ -459,4 +459,17 @@ unsigned short adc_calculate_temperature(unsigned short adc_code)
 	return 564 - ((adc_code * 819)>>13);
 }
 
+/**
+ * @brief      This function open sar_adc power.
+ * @return   none.
+ */
+void adc_power_on_hal(void)
+{
+	analog_write_reg8(areg_adc_pga_ctrl, (analog_read_reg8(areg_adc_pga_ctrl)&(~FLD_SAR_ADC_POWER_DOWN)));
+}
 
+/* Operate analog reg8 by defalut */
+_attribute_data_retention_sec_ adc_vbat_sample_init_f  adc_vbat_sample_init = adc_battery_voltage_sample_init;
+_attribute_data_retention_sec_ adc_power_on_hal_f      adc_vbat_power_on = adc_power_on_hal;
+_attribute_data_retention_sec_ adc_get_code_f          adc_vbat_get_code = adc_get_code;
+_attribute_data_retention_sec_ adc_calculate_voltage_f adc_vbat_calculate_voltage = adc_calculate_voltage;
