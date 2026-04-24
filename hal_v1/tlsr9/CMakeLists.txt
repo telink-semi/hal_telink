@@ -69,10 +69,9 @@ if (NOT (CONFIG_SOC_SERIES_RISCV_TELINK_TLX OR CONFIG_SOC_RISCV_TELINK_TLX))
 	zephyr_library_sources(drivers/${SOC}/analog.c)
 endif()
 
-# MbedTLS HW acceleration
-if(CONFIG_MBEDTLS)
-	add_subdirectory( crypto/mbedtls )
-endif() # MbedTLS HW acceleration
+if (CONFIG_MBEDTLS OR CONFIG_TINYCRYPT OR CONFIG_BOOT_USE_MBEDTLS OR CONFIG_BOOT_USE_TINYCRYPT)
+	add_subdirectory(crypto)
+endif()
 
 # Flash driver reference sources
 if(CONFIG_SOC_FLASH_TELINK_B9X OR CONFIG_USB_TELINK_B9X)

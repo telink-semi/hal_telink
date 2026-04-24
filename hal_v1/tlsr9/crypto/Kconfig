@@ -1,0 +1,39 @@
+# Copyright (c) 2026 Telink Semiconductor
+# SPDX-License-Identifier: Apache-2.0
+
+if TELINK_B9X_MBEDTLS_HW_ACCELERATION || TELINK_B9X_TINYCRYPT_HW_ACCELERATION || \
+	TELINK_TLX_MBEDTLS_HW_ACCELERATION || TELINK_TLX_TINYCRYPT_HW_ACCELERATION
+
+choice
+	prompt "Telink crypto back-ends log level"
+	default TELINK_CRYPTO_BACKEND_LOG_LEVEL_INFO
+	help
+		This option selects log level for Telink crypto back-ends.
+config TELINK_CRYPTO_BACKEND_LOG_LEVEL_CRIT
+	bool "Critical"
+config TELINK_CRYPTO_BACKEND_LOG_LEVEL_WARN
+	bool "Warning"
+config TELINK_CRYPTO_BACKEND_LOG_LEVEL_INFO
+	bool "Informational"
+config TELINK_CRYPTO_BACKEND_LOG_LEVEL_DEBG
+	bool "Debug"
+endchoice
+
+config TELINK_CRYPTO_BACKEND_LOG_LEVEL
+	int
+	default 1 if TELINK_CRYPTO_BACKEND_LOG_LEVEL_CRIT
+	default 2 if TELINK_CRYPTO_BACKEND_LOG_LEVEL_WARN
+	default 3 if TELINK_CRYPTO_BACKEND_LOG_LEVEL_INFO
+	default 4 if TELINK_CRYPTO_BACKEND_LOG_LEVEL_DEBG
+	default 0
+
+if TELINK_TLX_MBEDTLS_HW_ACCELERATION || TELINK_TLX_TINYCRYPT_HW_ACCELERATION
+
+config TELINK_TLX_SHA_HW_SLOTS
+	int "Telink TLX simultimes HW SHA slots number"
+	range 1 64
+	default 4
+
+endif
+
+endif
