@@ -66,17 +66,23 @@ _attribute_ble_data_retention_ u8
 	#define SUSPEND_EXIT_LATENCY_US		(320U)
 	#define DEEPRETN_EXIT_LATENCY_US	(1000U)		/*!< Not used for now */
 #elif CONFIG_SOC_RISCV_TELINK_TL323X
-	/*for tl323x, if in pm mode the cclk is 48M, the early wakeup should be 500us,*
-		but in non-pm mode ,the cclk is 96M , the early wakeup should be 400us ,will be more stable*/
+	/* for tl323x, if in pm mode the cclk is 48M, the early wakeup should be 500us.
+	 * In non-pm mode ,the cclk is 96M, the early wakeup should be 400us, will be
+	 * more stable
+	 */
 	#if CONFIG_PM
-	#define SUSPEND_EXIT_LATENCY_US		(500U)		/*!< No Fast Settle Used For Now, Update Later */
+	/*!< No Fast Settle Used For Now, Update Later */
+	#define SUSPEND_EXIT_LATENCY_US		(500U)
 	#else
-	#define SUSPEND_EXIT_LATENCY_US		(400U)		/*!< No Fast Settle Used For Now, Update Later */
+	/*!< No Fast Settle Used For Now, Update Later */
+	#define SUSPEND_EXIT_LATENCY_US		(400U)
 	#endif
-	#define DEEPRETN_EXIT_LATENCY_US	(1000U)		/*!< Not used for now */
+	/*!< Not used for now */
+	#define DEEPRETN_EXIT_LATENCY_US	(1000U)
 #elif CONFIG_SOC_RISCV_TELINK_TL721X
 	#define SUSPEND_EXIT_LATENCY_US		(250U)
-	#define DEEPRETN_EXIT_LATENCY_US	(0U)		/*!< Not used for now */
+	/*!< Not used for now */
+	#define DEEPRETN_EXIT_LATENCY_US	(0U)
 #endif
 
 /**
