@@ -11,7 +11,7 @@
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 
 REPO_URL="http://192.168.48.36/src/ble/telink_b91m_ble_multi_connection_src.git"
-TARGET_COMMIT="d8b779b1ed138c0579b548d3164cb255955e6f09"
+TARGET_COMMIT="2e6c313ac97f8fc0f457bb8cfd235d1821161e0f"
 DEST_DIR="$SCRIPT_DIR/tl_ble_src"
 
 echo "dest dir: $DEST_DIR"
