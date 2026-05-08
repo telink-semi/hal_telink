@@ -21,6 +21,7 @@
 #include "flash.h"
 #include "flash_prot.h"
 
+#ifndef CONFIG_SOC_RISCV_TELINK_TL523X
  /*******************************************************************************************************************
  *									This function serves to 1m area flash protection
  ******************************************************************************************************************/
@@ -79,3 +80,5 @@ void flash_protection_unlock_operation(unsigned int offset)
 		flash_unlock();
 	}
 }
+
+#endif
