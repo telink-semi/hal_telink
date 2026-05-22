@@ -69,7 +69,7 @@ if(CONFIG_BT OR CONFIG_IEEE802154)
 endif()
 
 zephyr_library_sources(common/tl_flash.c)
-if(CONFIG_SOC_RISCV_TELINK_TL323X)
+if(CONFIG_SOC_RISCV_TELINK_TL323X OR CONFIG_SOC_RISCV_TELINK_TL521X)
 zephyr_library_sources(common/tl_sd_adc.c)
 endif()
 
