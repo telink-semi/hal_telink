@@ -114,6 +114,7 @@ int tlx_bt_blc_init(void *prx, void *ptx)
 
 	blc_ll_initAclConnection_module();
 #ifdef CONFIG_BT_CENTRAL
+	blc_ll_initLegacyScanning_module(); // scan module: 		 mandatory for BLE slave
 	blc_ll_initAclMasterRole_module();
 #endif /* CONFIG_BT_CENTRAL */
 #ifdef CONFIG_BT_PERIPHERAL
