@@ -179,9 +179,9 @@ const uint8_t tl_tx_pwr_lt[] = {
 	RF_POWER_N1p08dBm,    /**<  -1.0 dbm  -1  */
 	RF_POWER_P0p03dBm,    /**<   0.0 dbm:   0 */
 	RF_POWER_P0p98dBm,    /**<   1.0 dbm:   1 */
-	/*VBAT*/
 	RF_POWER_P2p00dBm,    /**<   2.0 dbm:   2 */
-	RF_POWER_P3p04dBm,    /**<   3.0 dbm:   3 */
+	RF_POWER_P2p73dBm,    /**<   2.73 dbm:   3 */
+	/*VBAT*/
 	RF_POWER_P4p09dBm,    /**<   4.1 dbm:   4 */
 	RF_POWER_P5p53dBm,    /**<   5.5 dbm:   5 */
 	RF_POWER_P6p08dBm,    /**<   6.0 dbm:   6 */
