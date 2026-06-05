@@ -210,6 +210,8 @@ int tlx_bt_controller_init()
 #endif /* CONFIG_PM && CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION */
 
 	if(tl_rf_is_inited()) {
+		/* Enable clock before operate rf register */
+		rf_mode_init();
 		/* Reset Radio */
 		rf_radio_reset();
 	#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X
