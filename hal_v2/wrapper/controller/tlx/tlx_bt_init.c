@@ -86,13 +86,13 @@ _attribute_ble_data_retention_ u8
 	 */
 	#if CONFIG_PM
 	/*!< No Fast Settle Used For Now, Update Later */
-	#define SUSPEND_EXIT_LATENCY_US		(500U)
+	#define SUSPEND_EXIT_LATENCY_US		(260U)
 	#else
 	/*!< No Fast Settle Used For Now, Update Later */
-	#define SUSPEND_EXIT_LATENCY_US		(400U)
+	#define SUSPEND_EXIT_LATENCY_US		(300U)
 	#endif
 	/*!< Not used for now */
-	#define DEEPRETN_EXIT_LATENCY_US	(1000U)
+	#define DEEPRETN_EXIT_LATENCY_US	(0U)
 #elif CONFIG_SOC_RISCV_TELINK_TL721X
 	#define SUSPEND_EXIT_LATENCY_US		(250U)
 	/*!< Not used for now */
@@ -233,8 +233,8 @@ int tlx_bt_blc_init(void *prx, void *ptx)
 	blc_register_hci_handler(prx, ptx);
 #ifdef CONFIG_PM
 	/* Enable PM for BLE stack */
-	blc_ll_enOsPowerManagement_module();
 	blc_ll_initPowerManagement_module();
+	blc_ll_enOsPowerManagement_module();
 	/* Enable the sleep masks for BLE stack thread */
 	blc_pm_setSleepMask(PM_SLEEP_LEG_ADV | PM_SLEEP_LEG_SCAN | PM_SLEEP_ACL_SLAVE |
 			    PM_SLEEP_ACL_MASTER);
