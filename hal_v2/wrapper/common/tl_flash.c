@@ -28,16 +28,31 @@
 #define FLASH_1M_ADR_OFFSET 		0x100000
 #define FLASH_1920K_ADR_OFFSET		0x1e0000
 #define FLASH_2M_ADR_OFFSET 		0x200000
+#define FLASH_3968K_ADR_OFFSET		0x3e0000
 #define FLASH_4M_ADR_OFFSET 		0x400000
 
-#define FLASH_ADR_OFFSET_SELECT		FLASH_1920K_ADR_OFFSET
+#if CONFIG_SOC_RISCV_TELINK_TL323X
+        #if CONFIG_PM
+        #define FLASH_ADR_OFFSET_SELECT         FLASH_1920K_ADR_OFFSET
+        #else
+        #if (CONFIG_FLASH_SIZE > 2048)
+        /* 4MB flash or larger, protect up to 3968K */
+        #define FLASH_ADR_OFFSET_SELECT         FLASH_3968K_ADR_OFFSET
+        #else
+        /* 2MB flash or smaller, protect up to 1920K */
+        #define FLASH_ADR_OFFSET_SELECT         FLASH_1920K_ADR_OFFSET
+        #endif
+        #endif/*CONFIG_PM*/
+#else
+        #define FLASH_ADR_OFFSET_SELECT         FLASH_1M_ADR_OFFSET
+#endif/*CONFIG_SOC_RISCV_TELINK_TL321X*/
 
 uint16_t flash_protection_lock_select(uint32_t addr)
 {
 	/* FLASH_LOCK_NONE_MID156085 or FLASH_LOCK_NONE_MID1560C8 is 0x0*/
-	unsigned int flash_lockBlock_cmd = 0x0;
+	unsigned int flash_lockBlock_cmd = flash_change_app_lock_block_to_flash_lock_block(FLASH_LOCK_FW_LOW_1M);
 	unsigned int app_lockBlock = FLASH_LOCK_FW_LOW_1M; 
-	unsigned int blc_flash_mid;
+	unsigned int blc_flash_mid = 0;
 
 	if(addr == FLASH_1M_ADR_OFFSET) {
 		app_lockBlock = FLASH_LOCK_FW_LOW_1M;
@@ -52,6 +67,21 @@ uint16_t flash_protection_lock_select(uint32_t addr)
 		}else if (blc_flash_mid == MID1560C8){
 			flash_lockBlock_cmd = FLASH_LOCK_LOW_1920K_MID1560C8;
 		}
+#if CONFIG_SOC_RISCV_TELINK_TL323X
+	}else if (addr == FLASH_3968K_ADR_OFFSET){
+		blc_flash_mid = ble_flash_read_mid();
+		/* 4M flash protect */
+		if(blc_flash_mid == MID166085){
+			flash_lockBlock_cmd = FLASH_LOCK_LOW_3968K_MID166085;
+		}else{
+			/* use generic 1920k flash protect */
+			if(blc_flash_mid == MID156085){
+				flash_lockBlock_cmd = FLASH_LOCK_LOW_1920K_MID156085;
+			}else if (blc_flash_mid == MID1560C8){
+				flash_lockBlock_cmd = FLASH_LOCK_LOW_1920K_MID1560C8;
+			}
+		}
+#endif
 	}
 	return flash_lockBlock_cmd;
 }
