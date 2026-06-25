@@ -79,6 +79,20 @@ _attribute_ble_data_retention_ u8
 	#endif
 	/*!< Not used for now */
 	#define DEEPRETN_EXIT_LATENCY_US	(1000U)
+#elif CONFIG_SOC_RISCV_TELINK_TL521X
+	/* for tl521x, if in pm mode the cclk is 48M, the early wakeup should be 500us.
+	 * In non-pm mode ,the cclk is 96M, the early wakeup should be 400us, will be
+	 * more stable
+	 */
+	#if CONFIG_PM
+	/*!< No Fast Settle Used For Now, Update Later */
+	#define SUSPEND_EXIT_LATENCY_US		(260U)
+	#else
+	/*!< No Fast Settle Used For Now, Update Later */
+	#define SUSPEND_EXIT_LATENCY_US		(300U)
+	#endif
+	/*!< Not used for now */
+	#define DEEPRETN_EXIT_LATENCY_US	(0U)
 #elif CONFIG_SOC_RISCV_TELINK_TL721X
 	#define SUSPEND_EXIT_LATENCY_US		(250U)
 	/*!< Not used for now */
@@ -168,7 +182,7 @@ int tlx_bt_blc_init(void *prx, void *ptx)
 	}
 #endif /* CONFIG_BT_PERIPHERAL */
 
-#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X
+#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X || CONFIG_SOC_RISCV_TELINK_TL521X
 	blc_ll_configLegacyAdvEnableStrategy(LEG_ADV_EN_STRATEGY_3);
 #endif
 
@@ -219,12 +233,12 @@ int tlx_bt_blc_init(void *prx, void *ptx)
 	blc_register_hci_handler(prx, ptx);
 #ifdef CONFIG_PM
 	/* Enable PM for BLE stack */
-	blc_ll_enOsPowerManagement_module();
 	blc_ll_initPowerManagement_module();
+	blc_ll_enOsPowerManagement_module();
 	/* Enable the sleep masks for BLE stack thread */
 	blc_pm_setSleepMask(PM_SLEEP_LEG_ADV | PM_SLEEP_LEG_SCAN | PM_SLEEP_ACL_SLAVE |
 			    PM_SLEEP_ACL_MASTER);
-	#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL323X
+	#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL323X || CONFIG_SOC_RISCV_TELINK_TL521X
 	extern void blc_ll_setOsLowPowerExitLatencyUs(uint32_t suspendUs, uint32_t deepretUs);
 	blc_ll_setOsLowPowerExitLatencyUs(SUSPEND_EXIT_LATENCY_US, DEEPRETN_EXIT_LATENCY_US);
 	#endif

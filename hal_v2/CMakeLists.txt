@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2025, Telink
+# Copyright (c) 2026, Telink
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -23,6 +23,10 @@ elseif(CONFIG_SOC_RISCV_TELINK_TL323X)
 	set(SOC "TL323X")
 	set(LIB_SOC_NAME "tl323x")
 	message(STATUS "Configuring for SOC: TELINK_TL323X")
+elseif(CONFIG_SOC_RISCV_TELINK_TL521X)
+	set(SOC "TL521X")
+	set(LIB_SOC_NAME "tl521x")
+	message(STATUS "Configuring for SOC: TELINK_TL521X")
 elseif(CONFIG_SOC_RISCV_TELINK_TL523X)
 	set(SOC "TL523X")
 	set(LIB_SOC_NAME "tl523x")
@@ -43,7 +47,8 @@ if(CONFIG_COMPILE_SDK)
 		else()
 			zephyr_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/tl_ble_sdk/tl_ble_sdk/proj_lib/lib_zephyr_${LIB_SOC_NAME}_single_core.a)
 		endif()
-	elseif(CONFIG_SOC_RISCV_TELINK_TL321X OR CONFIG_SOC_RISCV_TELINK_TL323X OR CONFIG_SOC_RISCV_TELINK_TL721X)
+	elseif(CONFIG_SOC_RISCV_TELINK_TL321X OR CONFIG_SOC_RISCV_TELINK_TL323X OR 
+		CONFIG_SOC_RISCV_TELINK_TL721X OR CONFIG_SOC_RISCV_TELINK_TL521X)
 		zephyr_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/tl_ble_sdk/tl_ble_sdk/proj_lib/lib_zephyr_${LIB_SOC_NAME}.a)
 	endif()
 else()
