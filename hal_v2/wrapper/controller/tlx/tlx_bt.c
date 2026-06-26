@@ -258,6 +258,10 @@ int tlx_bt_controller_init()
 		tl_rf_change_to_inited();
 	}
 
+#ifdef CONFIG_IEEE802154_TLX_BLE_COEXIST
+	tlx_bt_802154_dual_mode_enable();
+#endif
+
 	/* Init RF driver */
 	rf_drv_ble_init();
 
@@ -341,6 +345,9 @@ void tlx_bt_controller_deinit()
 	rf_baseband_reset();
 #endif
 
+#ifdef CONFIG_IEEE802154_TLX_BLE_COEXIST
+	tlx_bt_802154_dual_mode_disable();
+#endif
 
 #ifdef CONFIG_BT_CENTRAL
 	free(app_acl_mstTxfifo);

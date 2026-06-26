@@ -257,4 +257,136 @@ blc_smp_smpParamInit();
 
 	return INIT_OK;
 }
+
+#ifdef CONFIG_IEEE802154_TLX_BLE_COEXIST
+#include <zephyr/device.h>
+#include <zephyr/net/ieee802154_radio.h>
+#include <zephyr/net/ieee802154.h>
+#include "/home/ubuntu/zephyrproject/zephyr/drivers/ieee802154/ieee802154_tlx.h"
+
+extern void tlx_init_ble_rf_hw(void);
+extern void tlx_init_802154_rf_hw(void);
+extern void tlx_rf_tx_is_sending(void);
+extern void tlx_rf_isr(const void *parameter);
+extern bool blc_ll_isOnly802p15p4ScanTaskBusy(void);
+
+extern void openthread_suspend(void);
+extern void openthread_resume(void);
+extern void net_if_thread_suspend(void);
+extern void net_if_thread_resume(void);
+extern void net_tc_threads_suspend(void);
+extern void net_tc_threads_resume(void);
+extern void ot_radio_workq_thread_suspend(void);
+extern void ot_radio_workq_thread_resume(void);
+extern volatile bool tlx_rf_zigbee_250K_mode;
+
+volatile bool tlx_rf_802154_mode;
+volatile bool tlx_openthread_threads_suspend;
+extern struct k_sem ieee802154_task_ready_sem;
+
+/* Suspend OpenThread and 802.15.4 threads at the same time */
+_attribute_ram_code_
+static void tlx_suspend_openthread_threads(void)
+{
+	const struct device *const radio_dev =
+	DEVICE_DT_GET(DT_CHOSEN(zephyr_ieee802154));
+
+	struct tlx_data *tlx = radio_dev->data;
+
+	if(k_sem_count_get(&tlx->ack_wait) == 0) {
+		LOG_ERR("ack_wait taking\n");
+		/* release ack wait semaphore */
+		k_sem_give(&tlx->ack_wait);
+		/* ack wait failure, disable ack handler */
+		tlx->ack_handler_en = false;
+	}
+
+	k_sched_lock();
+	ot_radio_workq_thread_suspend();
+	openthread_suspend();
+	net_if_thread_suspend();
+	net_tc_threads_suspend();
+	k_sched_unlock();
+	tlx_openthread_threads_suspend = true;
+}
+
+/* Resume OpenThread and 802.15.4 threads at the same time */
+_attribute_ram_code_
+static void tlx_resume_openthread_threads(void)
+{
+	k_sched_lock();
+	net_if_thread_resume();
+	net_tc_threads_resume();
+	openthread_resume();
+	ot_radio_workq_thread_resume();
+	k_sched_unlock();
+	tlx_openthread_threads_suspend = false;
+}
+
+_attribute_ram_code_
+void tlx_switch_to_802154_mode(void)
+{
+	// tlx_init_802154_rf_hw();
+	tlx_resume_openthread_threads();
+	k_sem_give(&ieee802154_task_ready_sem);
+	tlx_rf_zigbee_250K_mode = false;
+	tlx_rf_802154_mode = true;
+}
+
+_attribute_ram_code_
+void tlx_switch_to_ble_mode(void)
+{
+	tlx_rf_tx_is_sending();
+	tlx_suspend_openthread_threads();
+	k_sem_reset(&ieee802154_task_ready_sem);
+	// tlx_rf_zigbee_250K_mode = true;
+	tlx_rf_802154_mode = false;
+}
+
+void tlx_switch_to_802154_rf_irq_routine(void)
+{
+#ifdef CONFIG_IEEE802154_TLX_BLE_COEXIST
+#if CONFIG_DYNAMIC_INTERRUPTS
+		/* lock interrupts */
+		unsigned int key = irq_lock();
+		irq_connect_dynamic(DT_INST_IRQN(0), DT_INST_IRQ(0, priority),
+				(void (*)(const void *))tlx_rf_isr, DEVICE_DT_INST_GET(0), 0);
+		/* unlock interrupts */
+		irq_unlock(key);
+#else
+	#error "error occurred, BLE + 802154 dual-mode need to enable the dynamic interrupts"
+#endif
+#endif
+}
+
+/**
+ * @brief   Enable BLE and 802.15.4 coexistence mode
+ * @param   None.
+ * @return  None.
+ */
+void tlx_bt_802154_dual_mode_enable(void)
+{
+	// tlksdk_thd_initFlexibleTask_module();// add by junwei todo
+    tlksdk_thd_initInsertTask1_module();
+	tlksdk_thd_registerSwitchTo802154RfCb(tlx_init_802154_rf_hw, tlx_init_ble_rf_hw);
+	tlksdk_thd_registerModeChangeCb(tlx_switch_to_802154_mode, tlx_switch_to_ble_mode);
+
+	// tlksdk_thd_enableFlexibleTask(THD_TASK_ENABLE);
+	tlksdk_thd_enableInsertTask1(THD_TASK_ENABLE);
+
+
+}
+
+/**
+ * @brief   Disable BLE and 802.15.4 coexistence mode
+ * @param   None.
+ * @return  None.
+ */
+void tlx_bt_802154_dual_mode_disable(void)
+{
+	// tlksdk_thd_enableFlexibleTask(THD_TASK_DISABLE);
+    tlksdk_thd_enableInsertTask1(THD_TASK_DISABLE);
+}
+
+#endif /* IEEE802154_TLX_BLE_COEXIST */
 #endif /* TLK_ONLY_BLE_HOST */
