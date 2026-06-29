@@ -38,9 +38,24 @@
         #if (CONFIG_FLASH_SIZE > 2048)
         /* 4MB flash or larger, protect up to 3968K */
         #define FLASH_ADR_OFFSET_SELECT         FLASH_3968K_ADR_OFFSET
-        #else
-        /* 2MB flash or smaller, protect up to 1920K */
+        #elif (CONFIG_FLASH_SIZE > 1024)
+        /* 2MB flash, protect up to 1920K */
         #define FLASH_ADR_OFFSET_SELECT         FLASH_1920K_ADR_OFFSET
+        #else
+        /* 1MB flash, protect up to 1M */
+        #define FLASH_ADR_OFFSET_SELECT         FLASH_1M_ADR_OFFSET
+        #endif
+        #endif/*CONFIG_PM*/
+#elif CONFIG_SOC_RISCV_TELINK_TL721X
+        #if CONFIG_PM
+        #define FLASH_ADR_OFFSET_SELECT         FLASH_1920K_ADR_OFFSET
+        #else 
+        #if (CONFIG_FLASH_SIZE > 1024)
+        /* 2MB flash, protect up to 1920K */
+        #define FLASH_ADR_OFFSET_SELECT         FLASH_1920K_ADR_OFFSET
+        #else
+        /* 1MB flash, protect up to 1M */
+        #define FLASH_ADR_OFFSET_SELECT         FLASH_1M_ADR_OFFSET
         #endif
         #endif/*CONFIG_PM*/
 #else
