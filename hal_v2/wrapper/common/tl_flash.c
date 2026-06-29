@@ -59,8 +59,14 @@
         #endif
         #endif/*CONFIG_PM*/
 #else
+        #if (CONFIG_FLASH_SIZE > 1024)
+        /* 2MB flash, protect up to 1920K */
+        #define FLASH_ADR_OFFSET_SELECT         FLASH_1920K_ADR_OFFSET
+        #else
+        /* 1MB flash, protect up to 1M */
         #define FLASH_ADR_OFFSET_SELECT         FLASH_1M_ADR_OFFSET
-#endif/*CONFIG_SOC_RISCV_TELINK_TL321X*/
+        #endif
+#endif
 
 uint16_t flash_protection_lock_select(uint32_t addr)
 {
