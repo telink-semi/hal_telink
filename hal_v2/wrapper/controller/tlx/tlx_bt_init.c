@@ -15,6 +15,9 @@
  * limitations under the License.
  *
  *****************************************************************************/
+#include <zephyr/logging/log.h>
+LOG_MODULE_REGISTER(tlx_bt_init, LOG_LEVEL_INF);
+
 #include "zephyr/bluetooth/buf.h"
 #include <zephyr/storage/flash_map.h>
 #include "stack/ble/ble.h"
@@ -251,7 +254,8 @@ int tlx_bt_blc_init(void *prx, void *ptx)
 #include <zephyr/device.h>
 #include <zephyr/net/ieee802154_radio.h>
 #include <zephyr/net/ieee802154.h>
-#include "/home/ubuntu/zephyrproject/zephyr/drivers/ieee802154/ieee802154_tlx.h"
+#include "ieee802154_tlx.h"
+#include "thd_task.h"
 
 extern void tlx_init_ble_rf_hw(void);
 extern void tlx_init_802154_rf_hw(void);
@@ -338,8 +342,8 @@ void tlx_switch_to_802154_rf_irq_routine(void)
 #if CONFIG_DYNAMIC_INTERRUPTS
 		/* lock interrupts */
 		unsigned int key = irq_lock();
-		irq_connect_dynamic(DT_INST_IRQN(0), DT_INST_IRQ(0, priority),
-				(void (*)(const void *))tlx_rf_isr, DEVICE_DT_INST_GET(0), 0);
+		irq_connect_dynamic(15, 2,
+				(void (*)(const void *))tlx_rf_isr, 0, 0);
 		/* unlock interrupts */
 		irq_unlock(key);
 #else
