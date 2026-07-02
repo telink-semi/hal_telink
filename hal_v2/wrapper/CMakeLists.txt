@@ -42,6 +42,10 @@ if(CONFIG_IEEE802154_TELINK_B9X OR CONFIG_IEEE802154_TELINK_TLX)
 	zephyr_include_directories(controller/${SOC_FAMILY})
 endif()
 
+if(CONFIG_IEEE802154_TLX_BLE_COEXIST)
+	zephyr_include_directories(${ZEPHYR_BASE}/drivers/ieee802154)
+endif()
+
 if(CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION OR CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION)
 	zephyr_library_sources(common/tl_context.S)
 endif()
