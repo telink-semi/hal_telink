@@ -15,6 +15,7 @@
  * limitations under the License.
  *
  *****************************************************************************/
+#include "stack/ble/controller/phy/phy_stack.h"
 #include <zephyr/kernel.h>
 #ifdef CONFIG_PM
 #include <zephyr/pm/policy.h>
@@ -399,4 +400,42 @@ void tlx_bt_host_callback_register(const tlx_bt_host_callback_t *pcb)
 enum tl_bt_controller_state tl_bt_controller_state(void) {
 
 	return tl_bt_state;
+}
+
+/**
+ * @brief    BLE RF HW initialization
+ */
+void tlx_init_ble_rf_hw(void)
+{
+	/* make sure RF state machine is clean, and to prevent boundary RX packet */
+	unsigned int ref_time = clock_time();
+
+	rf_set_tx_rx_off();
+	rf_set_tx_rx_off_auto_mode();
+
+	/* Reset Radio */
+	rf_radio_reset();
+	rf_reset_dma();
+	rf_baseband_reset();
+
+	/* Init RF driver */
+	rf_drv_ble_init();
+	rf_clr_irq_mask(FLD_RF_IRQ_ALL);
+
+	HAL_BLE_STACK_RF_IRQ_MASK_SET;
+	reg_rf_ll_ctrl_1 = FLD_RF_RX_FIRST_TIMEOUT_EN | FLD_RF_RX_TIMEOUT_EN | FLD_RF_CRC_2_EN;
+
+	ble_rx_dma_config();
+
+	blt_ll_phy_param_reset();
+
+#if (FAST_SETTLE && BLMS_PM_ENABLE)
+	extern void ble_rf_fast_settle_recover(void);        
+	ble_rf_fast_settle_recover();
+#endif
+
+	rf_set_power_level(tl_tx_pwr_lt[CONFIG_TL_BLE_CTRL_RF_POWER - TL_TX_POWER_MIN]);
+
+	while(!clock_time_exceed(ref_time, 30));
+	rf_clr_irq_status(FLD_RF_IRQ_ALL);
 }
