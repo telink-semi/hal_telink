@@ -256,6 +256,7 @@ int tlx_bt_blc_init(void *prx, void *ptx)
 #include <zephyr/net/ieee802154.h>
 #include "ieee802154_tlx.h"
 #include "thd_task.h"
+#include "debug_gpio.h"
 
 extern void tlx_init_ble_rf_hw(void);
 extern void tlx_init_802154_rf_hw(void);
@@ -319,6 +320,7 @@ static void tlx_resume_openthread_threads(void)
 _attribute_ram_code_
 void tlx_switch_to_802154_mode(void)
 {
+	DBG_OT_BLE_CHN2_HIGH;
 	// tlx_init_802154_rf_hw();
 	tlx_resume_openthread_threads();
 	k_sem_give(&ieee802154_task_ready_sem);
@@ -329,6 +331,7 @@ void tlx_switch_to_802154_mode(void)
 _attribute_ram_code_
 void tlx_switch_to_ble_mode(void)
 {
+	DBG_OT_BLE_CHN2_LOW;
 	tlx_rf_tx_is_sending();
 	tlx_suspend_openthread_threads();
 	k_sem_reset(&ieee802154_task_ready_sem);
@@ -366,6 +369,15 @@ void tlx_bt_802154_dual_mode_enable(void)
 
 	// tlksdk_thd_enableFlexibleTask(THD_TASK_ENABLE);
 	tlksdk_thd_enableInsertTask1(THD_TASK_ENABLE);
+	gpio_function_en(GPIO_CHN0);
+    gpio_output_en(GPIO_CHN0);
+	gpio_function_en(GPIO_CHN1);
+    gpio_output_en(GPIO_CHN1);
+	gpio_function_en(GPIO_CHN2);
+    gpio_output_en(GPIO_CHN2);
+	gpio_function_en(GPIO_CHN3);
+    gpio_output_en(GPIO_CHN3);
+	DBG_OT_BLE_CHN0_HIGH;
 
 
 }
@@ -379,6 +391,7 @@ void tlx_bt_802154_dual_mode_disable(void)
 {
 	// tlksdk_thd_enableFlexibleTask(THD_TASK_DISABLE);
     tlksdk_thd_enableInsertTask1(THD_TASK_DISABLE);
+	DBG_OT_BLE_CHN0_LOW;
 }
 
 #endif /* IEEE802154_TLX_BLE_COEXIST */
