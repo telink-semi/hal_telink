@@ -378,8 +378,8 @@ void tlx_bt_802154_dual_mode_enable(void)
 	tlksdk_thd_registerSwitchTo802154RfCb(tlx_init_802154_rf_hw, tlx_init_ble_rf_hw);
 	tlksdk_thd_registerModeChangeCb(tlx_switch_to_802154_mode, tlx_switch_to_ble_mode);
 
-	// tlksdk_thd_enableFlexibleTask(THD_TASK_ENABLE);
-	tlksdk_thd_enableInsertTask1(THD_TASK_ENABLE);
+	// // tlksdk_thd_enableFlexibleTask(THD_TASK_ENABLE);
+	// tlksdk_thd_enableInsertTask1(THD_TASK_ENABLE);
 	gpio_function_en(GPIO_CHN0);
     gpio_output_en(GPIO_CHN0);
 	gpio_function_en(GPIO_CHN1);
