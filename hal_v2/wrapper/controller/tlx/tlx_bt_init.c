@@ -331,7 +331,6 @@ static void tlx_resume_openthread_threads(void)
 _attribute_ram_code_
 void tlx_switch_to_802154_mode(void)
 {
-	DBG_OT_BLE_CHN2_HIGH;
 	// tlx_init_802154_rf_hw();
 	tlx_resume_openthread_threads();
 	k_sem_give(&ieee802154_task_ready_sem);
@@ -342,7 +341,7 @@ void tlx_switch_to_802154_mode(void)
 _attribute_ram_code_
 void tlx_switch_to_ble_mode(void)
 {
-	DBG_OT_BLE_CHN2_LOW;
+	// DBG_OT_BLE_CHN2_LOW;
 	tlx_rf_tx_is_sending();
 	tlx_suspend_openthread_threads();
 	k_sem_reset(&ieee802154_task_ready_sem);
@@ -388,6 +387,14 @@ void tlx_bt_802154_dual_mode_enable(void)
     gpio_output_en(GPIO_CHN2);
 	gpio_function_en(GPIO_CHN3);
     gpio_output_en(GPIO_CHN3);
+	gpio_function_en(GPIO_CHN4);
+    gpio_output_en(GPIO_CHN4);
+	gpio_function_en(GPIO_CHN5);
+    gpio_output_en(GPIO_CHN5);
+	gpio_function_en(GPIO_CHN6);
+    gpio_output_en(GPIO_CHN6);
+	gpio_function_en(GPIO_CHN7);
+    gpio_output_en(GPIO_CHN7);
 	DBG_OT_BLE_CHN0_HIGH;
 
 
