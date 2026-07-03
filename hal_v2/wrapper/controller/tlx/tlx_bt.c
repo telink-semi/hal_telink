@@ -395,7 +395,7 @@ void tlx_init_ble_rf_hw(void)
 
 	blt_ll_phy_param_reset();
 
-#if (FAST_SETTLE && BLMS_PM_ENABLE)
+#if (FAST_SETTLE)
 	extern void ble_rf_fast_settle_recover(void);        
 	ble_rf_fast_settle_recover();
 #endif
