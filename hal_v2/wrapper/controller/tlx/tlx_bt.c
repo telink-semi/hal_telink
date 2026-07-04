@@ -15,7 +15,6 @@
  * limitations under the License.
  *
  *****************************************************************************/
-#include "stack/ble/controller/phy/phy_stack.h"
 #include <zephyr/kernel.h>
 #ifdef CONFIG_PM
 #include <zephyr/pm/policy.h>
@@ -281,8 +280,8 @@ int tlx_bt_controller_init()
 		return status;
 	}
 
-
 #ifdef CONFIG_IEEE802154_TLX_BLE_COEXIST
+	extern void tlx_bt_802154_dual_mode_enable(void);
 	tlx_bt_802154_dual_mode_enable();
 #endif
 
@@ -348,6 +347,7 @@ void tlx_bt_controller_deinit()
 #endif
 
 #ifdef CONFIG_IEEE802154_TLX_BLE_COEXIST
+	extern void tlx_bt_802154_dual_mode_disable(void);
 	tlx_bt_802154_dual_mode_disable();
 #endif
 
@@ -403,6 +403,9 @@ enum tl_bt_controller_state tl_bt_controller_state(void) {
 	return tl_bt_state;
 }
 
+#ifdef CONFIG_IEEE802154_TLX_BLE_COEXIST
+#include "stack/ble/controller/phy/phy_stack.h"
+
 /**
  * @brief    BLE RF HW initialization
  */
@@ -440,3 +443,4 @@ void tlx_init_ble_rf_hw(void)
 	while(!clock_time_exceed(ref_time, 30));
 	rf_clr_irq_status(FLD_RF_IRQ_ALL);
 }
+#endif /* CONFIG_IEEE802154_TLX_BLE_COEXIST */
