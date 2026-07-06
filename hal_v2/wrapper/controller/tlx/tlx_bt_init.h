@@ -18,6 +18,8 @@
 #ifndef TLX_BT_INIIT_H_
 #define TLX_BT_INIIT_H_
 
+#include "compiler.h"
+
 #define INIT_OK           (0)
 #define INIT_FAILED       (-1)
 
@@ -28,5 +30,7 @@
  * @return      Status - 0: command succeeded; -1: command failed
  */
 int tlx_bt_blc_init(void *prx, void *ptx);
+
+_attribute_no_inline_ void tlx_bt_802154_dual_mode_start(void);
 
 #endif /* TLX_BT_INIIT_H_ */
