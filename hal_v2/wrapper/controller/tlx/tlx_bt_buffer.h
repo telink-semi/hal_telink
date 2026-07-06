@@ -117,11 +117,26 @@
 */
 #define ACL_MASTER_TX_FIFO_NUM CAL_LL_ACL_BUF_NUM(CONFIG_BT_BUF_ACL_TX_COUNT)
 
+#define CS_PHY_RX_FIFO_NUM        1
+#define CS_TRANSPORT_RX_FIFO_NUM  32
+#define CS_TRANSPORT_RX_FIFO_SIZE CHANNEL_SOUNDING_TRANSPORT_RX_FIFO_SIZE_ALIGN16(MAX_ANT_PATHS_SUPPORT, 40, 10)
+
+/* Size of DRBG-generated information per step (channel, access address, sequence, etc.) 
+ * user can't change this value!!!
+ */
+#define CS_STEP_DRBG_INFO_SIZE        52
+
+
+
 extern _attribute_data_sec_ u8* app_acl_rxfifo;
 extern _attribute_data_sec_ u8* app_acl_mstTxfifo;
 extern _attribute_data_sec_ u8* app_acl_slvTxfifo;
 extern _attribute_data_sec_ u8* app_hci_rxfifo;
 extern _attribute_data_sec_ u8* app_hci_txfifo;
 extern _attribute_data_sec_ u8* app_hci_rxAclfifo;
+extern u8 app_cs_rx_buf[];
+extern u8 app_cs_transport_rx_buf[];
+extern u8 app_cs_stepDRBGInfoBuffer[];
+
 
 #endif /* TLX_BT_BUFFER_H_ */

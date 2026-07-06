@@ -16,6 +16,7 @@
  *
  *****************************************************************************/
 #include "tlx_bt_buffer.h"
+#include "tlx_bt_cs.h"
 
 /******* ACL connection LinkLayer TX & RX data FIFO allocation, Begin ********/
 _attribute_data_sec_ u8* app_acl_rxfifo;
@@ -29,3 +30,11 @@ _attribute_data_sec_ u8* app_acl_slvTxfifo;
 _attribute_data_sec_ u8* app_hci_rxfifo;
 _attribute_data_sec_ u8* app_hci_txfifo;
 _attribute_data_sec_ u8* app_hci_rxAclfifo;
+/******** CS data allocation, Begin  ******************************************/
+u8 app_CsConfigParam[CS_PARAM_LENGTH * APP_CS_CONFIG_NUM];
+u8 app_cs_rx_buf[CS_RX_FIFO_SIZE * CS_RX_FIFO_NUM];
+u8 hciCsSubeventRxFifo[CS_SUBEVENT_BUFF_LEN_MAX * HCI_RX_FIFO_NUM];
+u8 pct_raw_data[CS_PCT_DATA_SIZE];
+/******** CS data allocation, End  ********************************************/
+u8 app_cs_transport_rx_buf[CS_TRANSPORT_RX_FIFO_NUM * CS_TRANSPORT_RX_FIFO_SIZE];
+u8 app_cs_stepDRBGInfoBuffer[CS_STEP_DRBG_INFO_SIZE * STEP_NUM_PER_SUBEVENT];

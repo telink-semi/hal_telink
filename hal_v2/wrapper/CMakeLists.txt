@@ -57,6 +57,12 @@ if(CONFIG_BT_B9X OR CONFIG_BT_TLX)
 		controller/${SOC_FAMILY}/${SOC_FAMILY}_bt_flash.c
 	)
 
+	if(CONFIG_BT_CHANNEL_SOUNDING)
+		zephyr_library_sources(
+			controller/${SOC_FAMILY}/${SOC_FAMILY}_bt_cs.c
+		)
+	endif()
+
 	if(CONFIG_TELINK_TL322X_ENABLE_N22)
 		zephyr_library_sources(
 			controller/${SOC_FAMILY}/${SOC_FAMILY}_bt_host.c
