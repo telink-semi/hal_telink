@@ -22,6 +22,7 @@
 #include "tlx_bt_buffer.h"
 #include "tlx_bt_init.h"
 #include "tlx_bt_flash.h"
+#include "tlx_bt_cs.h"
 #include "tl_rf_power.h"
 
 #ifdef CONFIG_PM
@@ -224,6 +225,16 @@ int tlx_bt_blc_init(void *prx, void *ptx)
 	/* bluetooth low energy(LE) event, all enable */
 	blc_hci_le_setEventMask_cmd(0xFFFFFFFF);
 	blc_hci_le_setEventMask_2_cmd(0x7FFFFFFF);
+
+#ifdef CONFIG_BT_CHANNEL_SOUNDING
+	app_channel_sounding_init();
+#endif
+
+
+#if (ACL_PERIPHR_SMP_ENABLE || ACL_CENTRAL_SMP_ENABLE)
+blc_smp_configPairingSecurityInfoStorageAddressAndSize(0x1EC000, 2 * 4096);
+blc_smp_smpParamInit();
+#endif
 
 	u8 check_status = blc_controller_check_appBufferInitialization();
 	if (check_status != BLE_SUCCESS) {

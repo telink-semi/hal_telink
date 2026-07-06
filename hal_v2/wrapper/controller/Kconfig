@@ -188,4 +188,13 @@ config TL_BLE_CTRL_THREAD_PERIOD_MS
 	help
 	  Telink BLE Controller thread period in ms.
 
+config BT_TLX_CHANNEL_SOUNDING
+	bool "Telink TLX Channel Sounding support"
+	depends on BT_TLX
+	depends on SOC_RISCV_TELINK_TL322X || SOC_RISCV_TELINK_TL721X || SOC_RISCV_TELINK_TL321X
+	help
+	  Enable Channel Sounding (Bluetooth 6.0) in the Telink TLX Controller.
+	  NOTE: Requires Telink proprietary algorithm library (.a) compiled
+	  for Andes toolchain, not compatible with GNU RISC-V toolchain.
+
 endmenu
