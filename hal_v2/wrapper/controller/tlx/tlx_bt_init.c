@@ -380,6 +380,7 @@ void tlx_bt_802154_dual_mode_enable(void)
 
 	// // tlksdk_thd_enableFlexibleTask(THD_TASK_ENABLE);
 	// tlksdk_thd_enableInsertTask1(THD_TASK_ENABLE);
+#if (DEBUG_OT_BLE_GPIO_ENABLE)
 	gpio_function_en(GPIO_CHN0);
     gpio_output_en(GPIO_CHN0);
 	gpio_function_en(GPIO_CHN1);
@@ -397,7 +398,7 @@ void tlx_bt_802154_dual_mode_enable(void)
 	gpio_function_en(GPIO_CHN7);
     gpio_output_en(GPIO_CHN7);
 	DBG_OT_BLE_CHN0_HIGH;
-
+#endif
 
 }
 
@@ -411,6 +412,22 @@ void tlx_bt_802154_dual_mode_disable(void)
 	// tlksdk_thd_enableFlexibleTask(THD_TASK_DISABLE);
     tlksdk_thd_enableInsertTask1(THD_TASK_DISABLE);
 	DBG_OT_BLE_CHN0_LOW;
+}
+
+/**
+ * @brief   Start BLE and 802.15.4 coexistence mode
+ * @param   None.
+ * @return  None.
+ */
+_attribute_no_inline_ void tlx_bt_802154_dual_mode_start(void)
+{
+    k_sleep(K_SECONDS(1));
+    static int insert_flag = 0;
+    
+    if(insert_flag == 0){
+        insert_flag = 1;
+        tlksdk_thd_enableInsertTask1(0x01);
+    }
 }
 
 #endif /* IEEE802154_TLX_BLE_COEXIST */
