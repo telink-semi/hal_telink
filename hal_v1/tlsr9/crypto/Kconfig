@@ -31,7 +31,7 @@ if TELINK_TLX_MBEDTLS_HW_ACCELERATION || TELINK_TLX_TINYCRYPT_HW_ACCELERATION
 
 config TELINK_TLX_SHA_HW_SLOTS
 	int "Telink TLX simultimes HW SHA slots number"
-	range 1 64
+	range 0 64
 	default 4
 
 endif
