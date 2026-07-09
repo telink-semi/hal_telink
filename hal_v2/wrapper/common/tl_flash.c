@@ -21,6 +21,7 @@
 #include "flash.h"
 #include "flash_prot.h"
 
+#ifndef CONFIG_SOC_RISCV_TELINK_TL523X
  /*******************************************************************************************************************
  *									This function serves to 1m area flash protection
  ******************************************************************************************************************/
@@ -33,9 +34,11 @@
 
 uint16_t flash_protection_lock_select(uint32_t addr)
 {
-	unsigned int flash_lockBlock_cmd;
+	/* FLASH_LOCK_NONE_MID156085 or FLASH_LOCK_NONE_MID1560C8 is 0x0*/
+	unsigned int flash_lockBlock_cmd = 0x0;
 	unsigned int app_lockBlock = FLASH_LOCK_FW_LOW_1M; 
 	unsigned int blc_flash_mid;
+
 	if(addr == FLASH_1M_ADR_OFFSET) {
 		app_lockBlock = FLASH_LOCK_FW_LOW_1M;
 		flash_lockBlock_cmd = flash_change_app_lock_block_to_flash_lock_block(app_lockBlock);
@@ -77,3 +80,4 @@ void flash_protection_unlock_operation(unsigned int offset)
 		flash_unlock();
 	}
 }
+#endif

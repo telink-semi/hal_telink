@@ -23,8 +23,8 @@ zephyr_library_sources(${ZIGBEE_SOURCES})
 
 zephyr_compile_options(
 	-DCHIP_TYPE=CHIP_TYPE_TL322X
-	-DTLK_MESSAGE_D25F=1
-	-DTLK_MESSAGE_N22=0
+	# -DTLK_MESSAGE_D25F=1
+	# -DTLK_MESSAGE_N22=0
 	-DMAILBOX_D25F=1
 	-DMAILBOX_FALSH_WR_NOTIFY=1
 	-DSHM_MBOX_TYPE_TPSLL_EN=1
@@ -69,6 +69,9 @@ if(CONFIG_BT OR CONFIG_IEEE802154)
 endif()
 
 zephyr_library_sources(common/tl_flash.c)
+if(CONFIG_SOC_RISCV_TELINK_TL323X)
+zephyr_library_sources(common/tl_sd_adc.c)
+endif()
 
 if(CONFIG_PM)
 	zephyr_sources(common/tl_sleep.c)
