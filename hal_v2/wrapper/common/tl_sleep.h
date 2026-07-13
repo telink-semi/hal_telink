@@ -29,7 +29,8 @@ bool tl_deep_sleep(uint32_t wake_stimer_tick);
 #endif /* (CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION || */
 /* CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION) */
 
-#if CONFIG_SOC_RISCV_TELINK_TL322X
+#if CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X || \
+    CONFIG_SOC_RISCV_TELINK_TL721X
 #define cpu_sleep_wakeup_32k_rc cpu_sleep_wakeup
 #endif
 
