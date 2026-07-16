@@ -89,7 +89,7 @@ _attribute_ble_data_retention_ u8
 	#define SUSPEND_EXIT_LATENCY_US		(260U)
 	#else
 	/*!< No Fast Settle Used For Now, Update Later */
-	#define SUSPEND_EXIT_LATENCY_US		(300U)
+	#define SUSPEND_EXIT_LATENCY_US		(100U)
 	#endif
 	/*!< Not used for now */
 	#define DEEPRETN_EXIT_LATENCY_US	(0U)
