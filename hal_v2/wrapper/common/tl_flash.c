@@ -31,7 +31,7 @@
 #define FLASH_3968K_ADR_OFFSET		0x3e0000
 #define FLASH_4M_ADR_OFFSET 		0x400000
 
-#if CONFIG_SOC_RISCV_TELINK_TL323X
+#if CONFIG_SOC_RISCV_TELINK_TL323X || CONFIG_SOC_RISCV_TELINK_TL521X
         #if CONFIG_PM
         #define FLASH_ADR_OFFSET_SELECT         FLASH_1920K_ADR_OFFSET
         #else 
@@ -76,13 +76,21 @@ uint16_t flash_protection_lock_select(uint32_t addr)
 		}else if (blc_flash_mid == MID1560C8){
 			flash_lockBlock_cmd = FLASH_LOCK_LOW_1920K_MID1560C8;
 		}
-#if CONFIG_SOC_RISCV_TELINK_TL323X
+#if CONFIG_SOC_RISCV_TELINK_TL323X || CONFIG_SOC_RISCV_TELINK_TL521X
 	}else if (addr == FLASH_3968K_ADR_OFFSET){
 		blc_flash_mid = ble_flash_read_mid();
 		/* 4M flash protect */
+#if CONFIG_SOC_RISCV_TELINK_TL323X
 		if(blc_flash_mid == MID166085){
 			flash_lockBlock_cmd = FLASH_LOCK_LOW_3968K_MID166085;
-		}else{
+		}else
+#endif
+#if CONFIG_SOC_RISCV_TELINK_TL521X
+		if(blc_flash_mid == MID1660CD){
+			flash_lockBlock_cmd = FLASH_LOCK_LOW_3968K_MID1660CD;
+		}else
+#endif
+		{
 			/* use generic 1920k flash protect */
 			if(blc_flash_mid == MID156085){
 				flash_lockBlock_cmd = FLASH_LOCK_LOW_1920K_MID156085;
