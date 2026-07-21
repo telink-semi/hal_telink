@@ -8,7 +8,11 @@ config HAL_TELINK_V1
 
 config HAL_TELINK_V2
     bool "Telink HAL V2"
+<<<<<<< HEAD
     depends on SOC_RISCV_TELINK_TL322X || SOC_RISCV_TELINK_TL323X || SOC_RISCV_TELINK_TL721X || SOC_RISCV_TELINK_TL523X
+=======
+    depends on SOC_RISCV_TELINK_TL322X || SOC_RISCV_TELINK_TL323X || SOC_RISCV_TELINK_TL521X || SOC_RISCV_TELINK_TL523X
+>>>>>>> 84ea7a15 (Add tl521x support and update BLE SDK (#194))
     default y
 
 if HAL_TELINK_V1

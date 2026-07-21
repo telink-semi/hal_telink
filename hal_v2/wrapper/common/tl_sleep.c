@@ -62,6 +62,7 @@ bool tl_suspend(uint32_t wake_stimer_tick)
 		}
 		blc_pm_setAppWakeupLowPower(0, 0);
 	} else {
+		extern int  cpu_sleep_wakeup_32k_rc(pm_sleep_mode_e sleep_mode,  pm_sleep_wakeup_src_e wakeup_src, unsigned int  wakeup_tick);
 		if (cpu_sleep_wakeup_32k_rc(SUSPEND_MODE, PM_WAKEUP_TIMER | PM_WAKEUP_PAD,
 			wake_stimer_tick) != STATUS_GPIO_ERR_NO_ENTER_PM) {
 			result = true;
@@ -109,6 +110,8 @@ CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION)
 #define DEEPSLEEP_MODE_RET_SRAM DEEPSLEEP_MODE_RET_SRAM_LOW128K
 #elif CONFIG_SOC_RISCV_TELINK_TL323X
 #define DEEPSLEEP_MODE_RET_SRAM DEEPSLEEP_MODE_RET_SRAM_LOW160K
+#elif CONFIG_SOC_RISCV_TELINK_TL521X
+#define DEEPSLEEP_MODE_RET_SRAM DEEPSLEEP_MODE_RET_SRAM_LOW256K
 #elif CONFIG_SOC_RISCV_TELINK_TL721X
 #define DEEPSLEEP_MODE_RET_SRAM DEEPSLEEP_MODE_RET_SRAM_LOW256K
 #endif
