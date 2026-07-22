@@ -9,8 +9,6 @@ if(CONFIG_HAS_TELINK_DRIVERS)
 # SOC configuration for Telink RISC-V series
 string(REGEX REPLACE "^telink_" "" SOC_FAMILY ${CONFIG_SOC_SERIES})
 
-
-
 if(CONFIG_SOC_RISCV_TELINK_B91 OR CONFIG_SOC_RISCV_TELINK_B92 OR 
 	CONFIG_SOC_RISCV_TELINK_TL321X )
 	add_subdirectory(hal_v1)
