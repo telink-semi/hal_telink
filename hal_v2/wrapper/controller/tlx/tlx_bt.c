@@ -99,6 +99,35 @@ _attribute_ram_code_ void stimer_irq_handler(const void *param)
 	blc_sdk_irq_handler();
 	DBG_CHN15_LOW;
 }
+#if (LL_FEATURE_ENABLE_CHANNEL_SOUNDING)
+_attribute_ram_code_ void timer0_irq_handler(const void *param)
+{
+    (void)param;
+
+#if (MCU_CORE_TYPE == MCU_CORE_TL721X) || (MCU_CORE_TYPE == MCU_CORE_TL322X)
+    if (timer_get_irq_status(FLD_TMR0_MODE_IRQ))
+#else
+    if (timer_get_irq_status(TMR_STA_TMR0))
+#endif
+    {
+        u32 r = core_interrupt_disable();
+        reg_tmr_ctrl0 &= ~FLD_TMR0_EN;
+#if (MCU_CORE_TYPE == MCU_CORE_TL721X) || (MCU_CORE_TYPE == MCU_CORE_TL322X)
+        timer_clr_irq_status(FLD_TMR0_MODE_IRQ);
+#else
+        timer_clr_irq_status(TMR_STA_TMR0);
+#endif
+        core_restore_interrupt(r);
+
+        if (ll_cs_rawData_process_cb) {
+            ll_cs_rawData_process_cb();
+        }
+        if (ll_cs_hci_subevent_report_cb) {
+            ll_cs_hci_subevent_report_cb();
+        }
+    }
+}
+#endif
 
 /**
  * @brief    BLE Controller HCI Tx callback implementation
@@ -182,8 +211,8 @@ static void tlx_bt_controller_thread()
 static void tlx_bt_irq_init()
 {
 #if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X || CONFIG_SOC_RISCV_TELINK_TL521X
-	plic_preempt_feature_dis();
-	flash_plic_preempt_config(0,1);
+	plic_preempt_feature_en(CORE_PREEMPT_PRI_MODE0);
+	flash_plic_preempt_config(0, 1);
 #endif
 
 	/* Init STimer IRQ */
@@ -196,6 +225,12 @@ static void tlx_bt_irq_init()
 #endif
 	plic_set_priority(IRQ_SYSTIMER, 2);
 	plic_set_priority(IRQ_ZB_RT, 2);
+
+#if (LL_FEATURE_ENABLE_CHANNEL_SOUNDING)
+	/* Init TIMER0 IRQ for channel sounding */
+	IRQ_CONNECT(IRQ_TIMER0 + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 1, timer0_irq_handler, 0, 0);
+	plic_set_priority(IRQ_TIMER0, 1);
+#endif
 }
 #endif
 /**
