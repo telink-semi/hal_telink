@@ -12,7 +12,7 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 
 # default values
 DEFAULT_REPO_URL="http://192.168.48.36/src/ble/telink_b91m_ble_multi_connection_src.git"
-DEFAULT_TARGET="5bec8d9c1b067ded66fff43b74c64d0a065a02ff"
+DEFAULT_TARGET="499ee5b48cc872118afd008c0e4891bf0de1163f"
 
 # parse parameters
 REPO_URL="${1:-$DEFAULT_REPO_URL}"
