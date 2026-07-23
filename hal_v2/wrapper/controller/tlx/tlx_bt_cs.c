@@ -21,9 +21,10 @@
  *          limitations under the License.
  *
  *******************************************************************************************************/
+#include "tlx_bt_buffer.h"
+#include "cs_cal.h"
 #include "stack/ble/ble.h"
 #include "tlx_bt_cs.h"
-#include "tlx_bt_buffer.h"
 
 #if (FREERTOS_ENABLE)
 #include "app_port_freertos.h"
@@ -89,6 +90,7 @@ void app_channel_sounding_init(void)
     blc_cs_set_tx_power_level(CS_USE_TX_POWER_LEVEL);
 
     // init ACL - CS Tag map, used when exist multiple cs.
+    extern void blc_cs_connHandle_algo4Tag_map_init(void);
     blc_cs_connHandle_algo4Tag_map_init();
 
 #if (CONFIG_CS_SUPPORT_INITIATOR)
@@ -98,6 +100,7 @@ void app_channel_sounding_init(void)
 #endif
 
 #if (CS_SUPPORT_PRIVATE_CONTROL_PDU)
+    extern ble_sts_t blc_ll_initPrivateControl(void);
     blc_ll_initPrivateControl();
 #endif
 

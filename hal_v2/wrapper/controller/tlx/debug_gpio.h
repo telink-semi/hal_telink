@@ -2,7 +2,7 @@
 #define __DEBUG_GPIO_H__
 
 #ifndef DEBUG_OT_BLE_GPIO_ENABLE
-#define DEBUG_OT_BLE_GPIO_ENABLE 1
+#define DEBUG_OT_BLE_GPIO_ENABLE 0
 #endif
 
 #if (DEBUG_OT_BLE_GPIO_ENABLE)

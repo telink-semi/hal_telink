@@ -18,7 +18,7 @@
 #ifndef TLX_BT_BUFFER_H_
 #define TLX_BT_BUFFER_H_
 
-#include "zephyr/bluetooth/buf.h"
+#include <zephyr/bluetooth/buf.h>
 #include "stack/ble/ble.h"
 
 #define BT_BUF_HCI_RX_SIZE                                                                             \
