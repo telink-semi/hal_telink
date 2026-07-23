@@ -35,7 +35,10 @@ else()
 	message(FATAL_ERROR "Not supported SOC")
 endif()
 
-set(CONFIG_COMPILE_SDK 1)
+# Default to precompiled BLE SDK unless Kconfig (modules/hal/telink/hal_v2/wrapper/controller/Kconfig) overrides.
+if(NOT DEFINED CONFIG_COMPILE_SDK)
+    set(CONFIG_COMPILE_SDK 1)
+endif()
 
 if(CONFIG_COMPILE_SDK)
 	add_subdirectory(tl_ble_sdk/tools)
