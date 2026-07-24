@@ -53,7 +53,7 @@ if(CONFIG_COMPILE_SDK)
 	elseif(CONFIG_SOC_RISCV_TELINK_TL321X OR CONFIG_SOC_RISCV_TELINK_TL323X OR 
 		CONFIG_SOC_RISCV_TELINK_TL721X OR CONFIG_SOC_RISCV_TELINK_TL521X)
 		if(CONFIG_IEEE802154_TLX_BLE_COEXIST OR CONFIG_BT_TLX_CHANNEL_SOUNDING)
-			zephyr_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/tl_ble_sdk/tl_ble_sdk/proj_lib/zephyr/${LIB_SOC_NAME}/lib_zephyr_${LIB_SOC_NAME}_cs.a)
+			zephyr_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/tl_ble_sdk/tl_ble_sdk/proj_lib/zephyr/${LIB_SOC_NAME}/lib_zephyr_${LIB_SOC_NAME}_concurrent.a)
 		else()
 			zephyr_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/tl_ble_sdk/tl_ble_sdk/proj_lib/zephyr/${LIB_SOC_NAME}/lib_zephyr_${LIB_SOC_NAME}.a)
 		endif()
