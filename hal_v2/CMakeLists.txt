@@ -35,9 +35,15 @@ else()
 	message(FATAL_ERROR "Not supported SOC")
 endif()
 
-# Default to precompiled BLE SDK unless Kconfig (modules/hal/telink/hal_v2/wrapper/controller/Kconfig) overrides.
+# Default to precompiled BLE SDK unless Kconfig disables it.
+# A disabled bool Kconfig option is undefined in CMake, so use
+# CONFIG_SOC_SERIES as a sentinel to detect that Kconfig has run.
 if(NOT DEFINED CONFIG_COMPILE_SDK)
-    set(CONFIG_COMPILE_SDK 1)
+    if(DEFINED CONFIG_SOC_SERIES)
+        set(CONFIG_COMPILE_SDK 0)   # Kconfig processed; COMPILE_SDK explicitly disabled.
+    else()
+        set(CONFIG_COMPILE_SDK 1)   # Kconfig not loaded yet -> default to precompiled SDK.
+    endif()
 endif()
 
 if(CONFIG_COMPILE_SDK)
