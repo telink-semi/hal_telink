@@ -35,7 +35,16 @@ else()
 	message(FATAL_ERROR "Not supported SOC")
 endif()
 
-set(CONFIG_COMPILE_SDK 1)
+# Default to precompiled BLE SDK unless Kconfig disables it.
+# A disabled bool Kconfig option is undefined in CMake, so use
+# CONFIG_SOC_SERIES as a sentinel to detect that Kconfig has run.
+if(NOT DEFINED CONFIG_COMPILE_SDK)
+    if(DEFINED CONFIG_SOC_SERIES)
+        set(CONFIG_COMPILE_SDK 0)   # Kconfig processed; COMPILE_SDK explicitly disabled.
+    else()
+        set(CONFIG_COMPILE_SDK 1)   # Kconfig not loaded yet -> default to precompiled SDK.
+    endif()
+endif()
 
 if(CONFIG_COMPILE_SDK)
 	add_subdirectory(tl_ble_sdk/tools)
@@ -43,13 +52,17 @@ if(CONFIG_COMPILE_SDK)
 	if(CONFIG_SOC_RISCV_TELINK_TL322X)
 		if(CONFIG_TELINK_TL322X_ENABLE_N22)
 			message("Enabling N22 support for TL322X")
-			zephyr_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/tl_ble_sdk/tl_ble_sdk/proj_lib/lib_zephyr_${LIB_SOC_NAME}_dual_core.a)
+			zephyr_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/tl_ble_sdk/tl_ble_sdk/proj_lib/zephyr/${LIB_SOC_NAME}/lib_zephyr_${LIB_SOC_NAME}_dual_core.a)
 		else()
-			zephyr_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/tl_ble_sdk/tl_ble_sdk/proj_lib/lib_zephyr_${LIB_SOC_NAME}_single_core.a)
+			zephyr_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/tl_ble_sdk/tl_ble_sdk/proj_lib/zephyr/${LIB_SOC_NAME}/lib_zephyr_${LIB_SOC_NAME}_single_core.a)
 		endif()
 	elseif(CONFIG_SOC_RISCV_TELINK_TL321X OR CONFIG_SOC_RISCV_TELINK_TL323X OR 
 		CONFIG_SOC_RISCV_TELINK_TL721X OR CONFIG_SOC_RISCV_TELINK_TL521X)
-		zephyr_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/tl_ble_sdk/tl_ble_sdk/proj_lib/lib_zephyr_${LIB_SOC_NAME}.a)
+		if(CONFIG_IEEE802154_TLX_BLE_COEXIST OR CONFIG_BT_TLX_CHANNEL_SOUNDING)
+			zephyr_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/tl_ble_sdk/tl_ble_sdk/proj_lib/zephyr/${LIB_SOC_NAME}/lib_zephyr_${LIB_SOC_NAME}_concurrent.a)
+		else()
+			zephyr_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/tl_ble_sdk/tl_ble_sdk/proj_lib/zephyr/${LIB_SOC_NAME}/lib_zephyr_${LIB_SOC_NAME}.a)
+		endif()
 	endif()
 else()
 	add_subdirectory(tl_ble_src/tools)
