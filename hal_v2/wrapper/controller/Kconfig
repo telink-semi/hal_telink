@@ -6,8 +6,8 @@ config COMPILE_SDK
 	default y
 	help
 	  Use the precompiled Telink BLE SDK library instead of building from
-	  source. When enabled, internal headers like pm_internal.h are not
-	  available and must be excluded.
+	  source. When enabled, internal headers are not available and must
+	  be excluded.
 
 menu "Telink BLE Controller"
 	depends on BT_B9X || BT_TLX
@@ -202,7 +202,5 @@ config BT_TLX_CHANNEL_SOUNDING
 	depends on SOC_RISCV_TELINK_TL322X || SOC_RISCV_TELINK_TL721X
 	help
 	  Enable Channel Sounding (Bluetooth 6.0) in the Telink TLX Controller.
-	  NOTE: Requires Telink proprietary algorithm library (.a) compiled
-	  for Andes toolchain, not compatible with GNU RISC-V toolchain.
 
 endmenu

@@ -235,12 +235,6 @@ int tlx_bt_blc_init(void *prx, void *ptx)
 	app_channel_sounding_init();
 #endif
 
-
-#if (ACL_PERIPHR_SMP_ENABLE || ACL_CENTRAL_SMP_ENABLE)
-blc_smp_configPairingSecurityInfoStorageAddressAndSize(0x1EC000, 2 * 4096);
-blc_smp_smpParamInit();
-#endif
-
 	u8 check_status = blc_controller_check_appBufferInitialization();
 	if (check_status != BLE_SUCCESS) {
 		return INIT_FAILED;
