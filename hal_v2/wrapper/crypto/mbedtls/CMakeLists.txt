@@ -39,8 +39,8 @@ if(CONFIG_TELINK_TLX_MBEDTLS_HW_SHA_ACCELERATION)
 	message(STATUS "HW SHA configured")
 
 	zephyr_include_directories(
-		${ZEPHYR_HAL_TELINK_MODULE_DIR}/tl_ble_sdk/tl_ble_sdk/drivers/${SOC}/lib/include
-		${ZEPHYR_HAL_TELINK_MODULE_DIR}/tl_ble_sdk/tl_ble_sdk/drivers/${SOC}/lib/include/hash
+		${TELINK_BLE_SDK_DIR}/tl_ble_sdk/drivers/${SOC}/lib/include
+		${TELINK_BLE_SDK_DIR}/tl_ble_sdk/drivers/${SOC}/lib/include/hash
 	)
 
 	zephyr_library_sources( 

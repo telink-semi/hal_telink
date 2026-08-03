@@ -47,22 +47,35 @@ if(NOT DEFINED CONFIG_COMPILE_SDK)
 endif()
 
 if(CONFIG_COMPILE_SDK)
-	add_subdirectory(tl_ble_sdk/tools)
+	get_filename_component(
+		TELINK_BLE_SDK_DIR
+		"${ZEPHYR_HAL_TELINK_MODULE_DIR}/../telink_ble_sdk"
+		ABSOLUTE
+	)
+
+	if(NOT EXISTS "${TELINK_BLE_SDK_DIR}/tl_ble_sdk")
+		message(FATAL_ERROR
+			"Telink BLE SDK not found at ${TELINK_BLE_SDK_DIR}. "
+		)
+	endif()
+
+	add_subdirectory(${TELINK_BLE_SDK_DIR}/tools ${CMAKE_CURRENT_BINARY_DIR}/telink_ble_sdk_tools)
 
 	if(CONFIG_SOC_RISCV_TELINK_TL322X)
 		if(CONFIG_TELINK_TL322X_ENABLE_N22)
-			message("Enabling N22 support for TL322X")
-			zephyr_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/tl_ble_sdk/tl_ble_sdk/proj_lib/zephyr/${LIB_SOC_NAME}/lib_zephyr_${LIB_SOC_NAME}_dual_core.a)
+			message(STATUS "Enabling N22 support for TL322X")
+			zephyr_link_libraries(${TELINK_BLE_SDK_DIR}/tl_ble_sdk/proj_lib/zephyr/${LIB_SOC_NAME}/lib_zephyr_${LIB_SOC_NAME}_dual_core.a)
 		else()
-			zephyr_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/tl_ble_sdk/tl_ble_sdk/proj_lib/zephyr/${LIB_SOC_NAME}/lib_zephyr_${LIB_SOC_NAME}_single_core.a)
+			zephyr_link_libraries(${TELINK_BLE_SDK_DIR}/tl_ble_sdk/proj_lib/zephyr/${LIB_SOC_NAME}/lib_zephyr_${LIB_SOC_NAME}_single_core.a)
 		endif()
-	elseif(CONFIG_SOC_RISCV_TELINK_TL321X OR CONFIG_SOC_RISCV_TELINK_TL323X OR 
-		CONFIG_SOC_RISCV_TELINK_TL721X OR CONFIG_SOC_RISCV_TELINK_TL521X)
+	elseif(CONFIG_SOC_RISCV_TELINK_TL323X OR CONFIG_SOC_RISCV_TELINK_TL721X OR CONFIG_SOC_RISCV_TELINK_TL521X)
 		if(CONFIG_IEEE802154_TLX_BLE_COEXIST OR CONFIG_BT_TLX_CHANNEL_SOUNDING)
-			zephyr_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/tl_ble_sdk/tl_ble_sdk/proj_lib/zephyr/${LIB_SOC_NAME}/lib_zephyr_${LIB_SOC_NAME}_concurrent.a)
+			zephyr_link_libraries(${TELINK_BLE_SDK_DIR}/tl_ble_sdk/proj_lib/zephyr/${LIB_SOC_NAME}/lib_zephyr_${LIB_SOC_NAME}_concurrent.a)
 		else()
-			zephyr_link_libraries(${CMAKE_CURRENT_SOURCE_DIR}/tl_ble_sdk/tl_ble_sdk/proj_lib/zephyr/${LIB_SOC_NAME}/lib_zephyr_${LIB_SOC_NAME}.a)
+			zephyr_link_libraries(${TELINK_BLE_SDK_DIR}/tl_ble_sdk/proj_lib/zephyr/${LIB_SOC_NAME}/lib_zephyr_${LIB_SOC_NAME}.a)
 		endif()
+	elseif(CONFIG_SOC_RISCV_TELINK_TL321X)
+		zephyr_link_libraries(${TELINK_BLE_SDK_DIR}/tl_ble_sdk/proj_lib/lib_zephyr_${LIB_SOC_NAME}.a)
 	endif()
 else()
 	add_subdirectory(tl_ble_src/tools)
