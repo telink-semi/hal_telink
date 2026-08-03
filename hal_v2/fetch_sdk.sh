@@ -15,7 +15,9 @@ DEFAULT_TARGET="53eb98b32ea79ed7ab38f5daabde0a78a7880cd9"
 # parse parameters
 REPO_URL="${1:-$DEFAULT_REPO_URL}"
 TARGET="${2:-$DEFAULT_TARGET}"
-DEST_DIR="$SCRIPT_DIR/tl_ble_sdk"
+# Place the SDK alongside the hal_telink module (modules/hal/telink_ble_sdk),
+# matching the west manifest layout so both methods are interchangeable.
+DEST_DIR="$SCRIPT_DIR/../../telink_ble_sdk"
 
 # show help message
 show_help() {
@@ -51,32 +53,32 @@ echo "=========================================="
 if [ -d "$DEST_DIR/.git" ]; then
     echo "Repository already exists, updating..."
     cd "$DEST_DIR" || exit 1
-    
+
     # acquire latest data
     git fetch --all --tags --prune
-    
+
     # check if target commit exists in current remote
     TARGET_EXISTS=false
-    
+
     if git rev-parse --quiet --verify "$TARGET^{commit}" >/dev/null 2>&1; then
         TARGET_EXISTS=true
     else
         # Try to fetch from other remotes
         echo "Target not found in current remote, trying to add alternative remote..."
-        
+
         # Check if we need to switch to different repository
         CURRENT_REMOTE=$(git remote get-url origin 2>/dev/null)
         if [ "$CURRENT_REMOTE" != "$REPO_URL" ]; then
             echo "Current remote: $CURRENT_REMOTE"
             echo "Target remote: $REPO_URL"
             echo "Switching remote to target repository..."
-            
+
             # Add new remote
             git remote add target_repo "$REPO_URL" 2>/dev/null || git remote set-url target_repo "$REPO_URL"
-            
+
             # Fetch from target remote
             git fetch target_repo --tags --prune
-            
+
             # Check if target exists in target remote
             if git rev-parse --quiet --verify "target_repo/$TARGET^{commit}" >/dev/null 2>&1; then
                 TARGET_EXISTS=true
@@ -85,9 +87,9 @@ if [ -d "$DEST_DIR/.git" ]; then
             fi
         fi
     fi
-    
+
     CURRENT_COMMIT=$(git rev-parse HEAD)
-    
+
     # try to checkout target as commit, branch, or tag
     if [ "$TARGET_EXISTS" = true ] || git rev-parse --quiet --verify "$TARGET^{commit}" >/dev/null 2>&1; then
         # TARGET is valid commit hash
@@ -127,7 +129,7 @@ else
     echo "Cloning repository..."
     git clone "$REPO_URL" "$DEST_DIR"
     cd "$DEST_DIR" || exit 1
-    
+
     # switch to specific target
     if git rev-parse --quiet --verify "$TARGET^{commit}" >/dev/null 2>&1; then
         git checkout "$TARGET"
