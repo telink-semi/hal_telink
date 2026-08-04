@@ -295,7 +295,7 @@ static void tlx_suspend_openthread_threads(void)
 	struct tlx_data *tlx = radio_dev->data;
 
 	if(k_sem_count_get(&tlx->ack_wait) == 0) {
-		LOG_ERR("ack_wait taking\n");
+		/* LOG_ERR("ack_wait taking\n"); */
 		/* release ack wait semaphore */
 		k_sem_give(&tlx->ack_wait);
 		/* ack wait failure, disable ack handler */
@@ -393,6 +393,13 @@ void tlx_bt_802154_dual_mode_enable(void)
     gpio_output_en(GPIO_CHN6);
 	gpio_function_en(GPIO_CHN7);
     gpio_output_en(GPIO_CHN7);
+	gpio_function_en(GPIO_CHN8);
+    gpio_output_en(GPIO_CHN8);
+	gpio_function_en(GPIO_CHN9);
+    gpio_output_en(GPIO_CHN9);
+	gpio_function_en(GPIO_CHN10);
+    gpio_output_en(GPIO_CHN10);
+	rf_enable_bb_debug();
 	DBG_OT_BLE_CHN0_HIGH;
 #endif
 
