@@ -157,14 +157,14 @@ const uint8_t tl_tx_pwr_lt[] = {
 /* TX power TL721X lookup table */
 const uint8_t tl_tx_pwr_lt[] = {
 	/*VANT*/
-	RF_POWER_N20p22dBm,   /**< -20.2 dbm: -20 */
-	RF_POWER_N20p22dBm,   /**< -20.2 dbm: -19 */
-	RF_POWER_N20p22dBm,   /**< -20.2 dbm: -18 */
-	RF_POWER_N16p82dBm,   /**< -16.8 dbm: -17 */
-	RF_POWER_N16p82dBm,   /**< -16.8 dbm: -16 */
-	RF_POWER_N14p64dBm,   /**< -14.6 dbm: -15 */
-	RF_POWER_N14p64dBm,   /**< -14.6 dbm: -14 */
-	RF_POWER_N12p72dBm,   /**< -12.7 dbm: -13 */
+	RF_POWER_N21p29dBm,   /**< -20.2 dbm: -20 */
+	RF_POWER_N21p29dBm,   /**< -20.2 dbm: -19 */
+	RF_POWER_N21p29dBm,   /**< -20.2 dbm: -18 */
+	RF_POWER_N15p50dBm,   /**< -16.8 dbm: -17 */
+	RF_POWER_N15p50dBm,   /**< -16.8 dbm: -16 */
+	RF_POWER_N15p50dBm,   /**< -14.6 dbm: -15 */
+	RF_POWER_N13p62dBm,   /**< -14.6 dbm: -14 */
+	RF_POWER_N13p62dBm,   /**< -12.7 dbm: -13 */
 	RF_POWER_N12p72dBm,   /**< -12.7 dbm: -12 */
 	RF_POWER_N11p42dBm,   /**< -11.4 dbm: -11 */
 	RF_POWER_N10p09dBm,   /**< -10.1 dbm: -10 */
@@ -179,9 +179,9 @@ const uint8_t tl_tx_pwr_lt[] = {
 	RF_POWER_N1p08dBm,    /**<  -1.0 dbm  -1  */
 	RF_POWER_P0p03dBm,    /**<   0.0 dbm:   0 */
 	RF_POWER_P0p98dBm,    /**<   1.0 dbm:   1 */
-	/*VBAT*/
 	RF_POWER_P2p00dBm,    /**<   2.0 dbm:   2 */
-	RF_POWER_P3p04dBm,    /**<   3.0 dbm:   3 */
+	RF_POWER_P2p73dBm,    /**<   2.73 dbm:   3 */
+	/*VBAT*/
 	RF_POWER_P4p09dBm,    /**<   4.1 dbm:   4 */
 	RF_POWER_P5p53dBm,    /**<   5.5 dbm:   5 */
 	RF_POWER_P6p08dBm,    /**<   6.0 dbm:   6 */

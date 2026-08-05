@@ -207,8 +207,8 @@ int tlx_bt_blc_init(void *prx, void *ptx)
 	blc_register_hci_handler(prx, ptx);
 #ifdef CONFIG_PM
 	/* Enable PM for BLE stack */
-	blc_ll_enOsPowerManagement_module();
 	blc_ll_initPowerManagement_module();
+	blc_ll_enOsPowerManagement_module();
 	/* Enable the sleep masks for BLE stack thread */
 	blc_pm_setSleepMask(PM_SLEEP_LEG_ADV | PM_SLEEP_LEG_SCAN | PM_SLEEP_ACL_SLAVE |
 			    PM_SLEEP_ACL_MASTER);
