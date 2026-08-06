@@ -15,8 +15,9 @@
 #undef MBEDTLS_MEMORY_BUFFER_ALLOC_C
 #endif
 
-#if CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X || \
-    CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL521X
+#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL322X ||        \
+    CONFIG_SOC_RISCV_TELINK_TL323X || CONFIG_SOC_RISCV_TELINK_TL721X ||        \
+    CONFIG_SOC_RISCV_TELINK_TL521X
 
 #define big_integer_compare      uint32_BigNumCmp
 #define pke_clr_irq_status       pke_clear_interrupt
@@ -31,7 +32,9 @@
 #define pke_eccp_point_mul       eccp_pointMul
 #define pke_eccp_point_add       eccp_pointAdd
 #define pke_eccp_point_verify    eccp_pointVerify
-#if defined(SUPPORT_C25519) || defined(CONFIG_SOC_RISCV_TELINK_TL721X) 
+#if defined(SUPPORT_C25519) || defined(CONFIG_SOC_RISCV_TELINK_TL721X) ||      \
+    defined(CONFIG_SOC_RISCV_TELINK_TL321X)
+
 #define pke_x25519_point_mul     x25519_pointMul
 #define pke_ed25519_point_mul    ed25519_pointMul
 #define pke_ed25519_point_add    ed25519_pointAdd
