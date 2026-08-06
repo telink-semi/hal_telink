@@ -69,8 +69,11 @@ _attribute_ble_data_retention_ u8
 
 /** a temporary method to set exit latency which can be set in header files */
 #if CONFIG_SOC_RISCV_TELINK_TL321X
-	#define SUSPEND_EXIT_LATENCY_US		(320U)
+	#define SUSPEND_EXIT_LATENCY_US		(240U)
 	#define DEEPRETN_EXIT_LATENCY_US	(1000U)		/*!< Not used for now */
+#elif CONFIG_SOC_RISCV_TELINK_TL322X
+	#define SUSPEND_EXIT_LATENCY_US		(170U)
+	#define DEEPRETN_EXIT_LATENCY_US	(1000U)
 #elif CONFIG_SOC_RISCV_TELINK_TL323X
 	/* for tl323x, if in pm mode the cclk is 48M, the early wakeup should be 500us.
 	 * In non-pm mode ,the cclk is 96M, the early wakeup should be 400us, will be
@@ -78,7 +81,7 @@ _attribute_ble_data_retention_ u8
 	 */
 	#if CONFIG_PM
 	/*!< No Fast Settle Used For Now, Update Later */
-	#define SUSPEND_EXIT_LATENCY_US		(500U)
+	#define SUSPEND_EXIT_LATENCY_US		(260U)
 	#else
 	/*!< No Fast Settle Used For Now, Update Later */
 	#define SUSPEND_EXIT_LATENCY_US		(400U)
@@ -100,7 +103,7 @@ _attribute_ble_data_retention_ u8
 	/*!< Not used for now */
 	#define DEEPRETN_EXIT_LATENCY_US	(0U)
 #elif CONFIG_SOC_RISCV_TELINK_TL721X
-	#define SUSPEND_EXIT_LATENCY_US		(250U)
+	#define SUSPEND_EXIT_LATENCY_US		(200U)
 	/*!< Not used for now */
 	#define DEEPRETN_EXIT_LATENCY_US	(0U)
 #endif
@@ -248,7 +251,7 @@ int tlx_bt_blc_init(void *prx, void *ptx)
 	/* Enable the sleep masks for BLE stack thread */
 	blc_pm_setSleepMask(PM_SLEEP_LEG_ADV | PM_SLEEP_LEG_SCAN | PM_SLEEP_ACL_SLAVE |
 			    PM_SLEEP_ACL_MASTER);
-	#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL323X || CONFIG_SOC_RISCV_TELINK_TL521X
+	#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X || CONFIG_SOC_RISCV_TELINK_TL521X
 	extern void blc_ll_setOsLowPowerExitLatencyUs(uint32_t suspendUs, uint32_t deepretUs);
 	blc_ll_setOsLowPowerExitLatencyUs(SUSPEND_EXIT_LATENCY_US, DEEPRETN_EXIT_LATENCY_US);
 	#endif
