@@ -104,7 +104,7 @@ _attribute_ram_code_ void timer0_irq_handler(const void *param)
 {
     (void)param;
 
-#if (MCU_CORE_TYPE == MCU_CORE_TL721X) || (MCU_CORE_TYPE == MCU_CORE_TL322X)
+#if (MCU_CORE_TYPE == MCU_CORE_TL721X) || (MCU_CORE_TYPE == MCU_CORE_TL322X) || (MCU_CORE_TYPE == MCU_CORE_TL521X)
     if (timer_get_irq_status(FLD_TMR0_MODE_IRQ))
 #else
     if (timer_get_irq_status(TMR_STA_TMR0))
@@ -112,7 +112,7 @@ _attribute_ram_code_ void timer0_irq_handler(const void *param)
     {
         u32 r = core_interrupt_disable();
         reg_tmr_ctrl0 &= ~FLD_TMR0_EN;
-#if (MCU_CORE_TYPE == MCU_CORE_TL721X) || (MCU_CORE_TYPE == MCU_CORE_TL322X)
+#if (MCU_CORE_TYPE == MCU_CORE_TL721X) || (MCU_CORE_TYPE == MCU_CORE_TL322X) || (MCU_CORE_TYPE == MCU_CORE_TL521X)
         timer_clr_irq_status(FLD_TMR0_MODE_IRQ);
 #else
         timer_clr_irq_status(TMR_STA_TMR0);
