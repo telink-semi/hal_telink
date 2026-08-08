@@ -9,6 +9,13 @@ config COMPILE_SDK
 	  source. When enabled, internal headers are not available and must
 	  be excluded.
 
+config COMPILE_TL_LIB_GENERAL
+	bool "Use general telink lib"
+	default n
+	help
+	  Use the general Telink BLE SDK library instead of building with ram
+	  optimized library to support for more features.
+
 menu "Telink BLE Controller"
 	depends on BT_B9X || BT_TLX
 
