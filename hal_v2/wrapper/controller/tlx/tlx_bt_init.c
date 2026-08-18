@@ -95,7 +95,7 @@ _attribute_ble_data_retention_ u8
 	 */
 	#if CONFIG_PM
 	/*!< No Fast Settle Used For Now, Update Later */
-	#define SUSPEND_EXIT_LATENCY_US		(260U)
+	#define SUSPEND_EXIT_LATENCY_US		(360U)
 	#else
 	/*!< No Fast Settle Used For Now, Update Later */
 	#define SUSPEND_EXIT_LATENCY_US		(100U)
