@@ -234,13 +234,30 @@ int tlx_bt_blc_init(void *prx, void *ptx)
 #ifdef CONFIG_BT_CHANNEL_SOUNDING
 	app_channel_sounding_init();
 #endif
+	gpio_function_en(GPIO_PF0|GPIO_PF1);
+    gpio_output_en(GPIO_PF0|GPIO_PF1);
+    gpio_input_dis(GPIO_PF0|GPIO_PF1);
 
-
-#if (ACL_PERIPHR_SMP_ENABLE || ACL_CENTRAL_SMP_ENABLE)
-blc_smp_configPairingSecurityInfoStorageAddressAndSize(0x1EC000, 2 * 4096);
-blc_smp_smpParamInit();
-#endif
-
+float sum = 0.0f;
+for(int i= 0;i<100;i++)
+{
+	float angle = i * trng_rand() * 0.1f;
+	float sinVal;
+	gpio_set_high_level(GPIO_PF0);
+	sinVal = sinf(angle);
+	gpio_set_low_level(GPIO_PF0);
+	sum += sinVal;
+}
+for(int i= 0;i<100;i++)
+{
+	float angle = i * trng_rand()* 0.1f;
+	float cosVal;
+	gpio_set_high_level(GPIO_PF1);
+	cosVal = cosf(angle);
+	gpio_set_low_level(GPIO_PF1);
+	sum += cosVal;
+}
+printf("sum = %f\n", sum);
 	u8 check_status = blc_controller_check_appBufferInitialization();
 	if (check_status != BLE_SUCCESS) {
 		return INIT_FAILED;

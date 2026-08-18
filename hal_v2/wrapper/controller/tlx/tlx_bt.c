@@ -284,6 +284,7 @@ int tlx_bt_controller_init()
 	extern void tlx_bt_802154_dual_mode_enable(void);
 	tlx_bt_802154_dual_mode_enable();
 #endif
+	rf_enable_bb_debug();
 
 	/* Init IRQs */
 	tlx_bt_irq_init();
