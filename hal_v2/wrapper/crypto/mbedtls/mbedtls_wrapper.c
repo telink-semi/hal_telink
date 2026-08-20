@@ -15,7 +15,7 @@
  * ECP HW accelerated functions
  *********************************************************************/
 
-#if CONFIG_SOC_SERIES_RISCV_TELINK_TLX || CONFIG_SOC_RISCV_TELINK_TLX
+#if CONFIG_SOC_SERIES_RISCV_TELINK_TLX || CONFIG_SOC_RISCV_TELINK_TLX || CONFIG_SOC_FAMILY_TELINK_TL
 extern int telink_tlx_ecp_check_pubkey(const mbedtls_ecp_group *grp,
 	const mbedtls_ecp_point *pt);
 extern int telink_tlx_ecp_mul_restartable(mbedtls_ecp_group *grp,
@@ -100,7 +100,7 @@ extern int __real_mbedtls_ecp_self_test(int verbose);
 int __wrap_mbedtls_ecp_check_pubkey(const mbedtls_ecp_group *grp,
 	const mbedtls_ecp_point *pt)
 {
-#if CONFIG_SOC_SERIES_RISCV_TELINK_TLX || CONFIG_SOC_RISCV_TELINK_TLX
+#if CONFIG_SOC_SERIES_RISCV_TELINK_TLX || CONFIG_SOC_RISCV_TELINK_TLX || CONFIG_SOC_FAMILY_TELINK_TL
 	int result = telink_tlx_ecp_check_pubkey(grp, pt);
 #elif CONFIG_SOC_SERIES_RISCV_TELINK_B9X || CONFIG_SOC_RISCV_TELINK_B9X
 	int result = telink_b9x_ecp_check_pubkey(grp, pt);
@@ -117,7 +117,7 @@ int __wrap_mbedtls_ecp_mul_restartable(mbedtls_ecp_group *grp,
 	int (*f_rng)(void *, unsigned char *, size_t),
 	void *p_rng, mbedtls_ecp_restart_ctx *rs_ctx)
 {
-#if CONFIG_SOC_SERIES_RISCV_TELINK_TLX || CONFIG_SOC_RISCV_TELINK_TLX
+#if CONFIG_SOC_SERIES_RISCV_TELINK_TLX || CONFIG_SOC_RISCV_TELINK_TLX || CONFIG_SOC_FAMILY_TELINK_TL
 	int result = telink_tlx_ecp_mul_restartable(grp, R, m, P, f_rng, p_rng, rs_ctx);
 #elif CONFIG_SOC_SERIES_RISCV_TELINK_B9X || CONFIG_SOC_RISCV_TELINK_B9X
 	int result = telink_b9x_ecp_mul_restartable(grp, R, m, P, f_rng, p_rng, rs_ctx);
@@ -142,7 +142,7 @@ int __wrap_mbedtls_ecp_muladd_restartable(mbedtls_ecp_group *grp,
 	const mbedtls_mpi *n, const mbedtls_ecp_point *Q,
 	mbedtls_ecp_restart_ctx *rs_ctx)
 {
-#if CONFIG_SOC_SERIES_RISCV_TELINK_TLX || CONFIG_SOC_RISCV_TELINK_TLX
+#if CONFIG_SOC_SERIES_RISCV_TELINK_TLX || CONFIG_SOC_RISCV_TELINK_TLX || CONFIG_SOC_FAMILY_TELINK_TL
 	int result = telink_tlx_ecp_muladd_restartable(grp, R, m, P, n, Q, rs_ctx);
 #elif CONFIG_SOC_SERIES_RISCV_TELINK_B9X || CONFIG_SOC_RISCV_TELINK_B9X
 	int result = telink_b9x_ecp_muladd_restartable(grp, R, m, P, n, Q, rs_ctx);

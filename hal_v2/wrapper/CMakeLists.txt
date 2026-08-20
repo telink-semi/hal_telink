@@ -38,7 +38,7 @@ zephyr_include_directories(
 	controller/${SOC_FAMILY}
 )
 
-if(CONFIG_IEEE802154_TELINK_B9X OR CONFIG_IEEE802154_TELINK_TLX)
+if(CONFIG_IEEE802154_TELINK_B9X OR CONFIG_IEEE802154_TELINK_TLX OR CONFIG_SOC_FAMILY_TELINK_TL)
 	zephyr_include_directories(controller/${SOC_FAMILY})
 endif()
 
