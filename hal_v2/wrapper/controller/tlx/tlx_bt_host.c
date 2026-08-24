@@ -66,7 +66,10 @@ int tlx_bt_controller_init()
     int status = INIT_OK;
 
 	/* pke and ske required to be used by the host SMP module */
-	ext_crypto_hw_init_enable();
+	pke_reset();
+	pke_clk_en();
+	ske_reset();
+	ske_clk_en();
 	
 # if CONFIG_PM
 	/* Enable PM for BLE stack */
