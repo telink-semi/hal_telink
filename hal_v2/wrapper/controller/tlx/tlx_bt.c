@@ -99,6 +99,37 @@ _attribute_ram_code_ void stimer_irq_handler(const void *param)
 	blc_sdk_irq_handler();
 	DBG_CHN15_LOW;
 }
+#if (LL_FEATURE_ENABLE_CHANNEL_SOUNDING)
+_attribute_ram_code_ void timer0_irq_handler(const void *param)
+{
+	(void)param;
+
+#if (MCU_CORE_TYPE == MCU_CORE_TL721X) || (MCU_CORE_TYPE == MCU_CORE_TL322X) || \
+	(MCU_CORE_TYPE == MCU_CORE_TL521X)
+	if (timer_get_irq_status(FLD_TMR0_MODE_IRQ))
+#else
+	if (timer_get_irq_status(TMR_STA_TMR0))
+#endif
+	{
+		u32 r = core_interrupt_disable();
+		reg_tmr_ctrl0 &= ~FLD_TMR0_EN;
+#if (MCU_CORE_TYPE == MCU_CORE_TL721X) || (MCU_CORE_TYPE == MCU_CORE_TL322X) || \
+	(MCU_CORE_TYPE == MCU_CORE_TL521X)
+		timer_clr_irq_status(FLD_TMR0_MODE_IRQ);
+#else
+		timer_clr_irq_status(TMR_STA_TMR0);
+#endif
+		core_restore_interrupt(r);
+
+		if (ll_cs_rawData_process_cb) {
+			ll_cs_rawData_process_cb();
+		}
+		if (ll_cs_hci_subevent_report_cb) {
+			ll_cs_hci_subevent_report_cb();
+		}
+	}
+}
+#endif
 
 /**
  * @brief    BLE Controller HCI Tx callback implementation
@@ -109,7 +140,8 @@ static int tlx_bt_hci_tx_handler(void)
 	while(bltHci_txfifo.wptr != bltHci_txfifo.rptr)
 	{
 		/* Get HCI data */
-		u8 *p = bltHci_txfifo.p + (bltHci_txfifo.rptr & bltHci_txfifo.mask) * bltHci_txfifo.size;
+		u8 *p = bltHci_txfifo.p +
+			(bltHci_txfifo.rptr & bltHci_txfifo.mask) * bltHci_txfifo.size;
 		if (p) {
 			u32 len;
 			BSTREAM_TO_UINT16(len, p);
@@ -122,9 +154,11 @@ static int tlx_bt_hci_tx_handler(void)
 				}
 			} else if (tl_bt_state == TL_BT_CONTROLLER_STATE_STOPPING) {
 				/* In this state HCI reset is sent - waiting for command complete */
-				static const uint8_t hci_reset_cmd_complette[] = {0x04, 0x0e, 0x04, 0x01, 0x03, 0x0c, 0x00};
+				static const uint8_t hci_reset_cmd_complette[] =
+					{0x04, 0x0e, 0x04, 0x01, 0x03, 0x0c, 0x00};
 
-				if (len == sizeof(hci_reset_cmd_complette) && !memcmp(p, hci_reset_cmd_complette, len)) {
+				if (len == sizeof(hci_reset_cmd_complette) &&
+					!memcmp(p, hci_reset_cmd_complette, len)) {
 					tl_bt_state = TL_BT_CONTROLLER_STATE_STOPPED;
 					k_sem_give(&controller_sem);
 				}
@@ -154,7 +188,9 @@ static int tlx_bt_hci_rx_handler(void)
 	if (p) {
 		/* Send data to the controller */
 		blc_hci_handler(&p[0], 0);
-#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X
+#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || \
+		CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X || \
+		CONFIG_SOC_RISCV_TELINK_TL521X
 		if (p[0] == HCI_TYPE_ACL_DATA) {
 			k_sem_give(&controller_sem);
 		}
@@ -181,9 +217,11 @@ static void tlx_bt_controller_thread()
  */
 static void tlx_bt_irq_init()
 {
-#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X
-	plic_preempt_feature_dis();
-	flash_plic_preempt_config(0,1);
+#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || \
+	CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X || \
+	CONFIG_SOC_RISCV_TELINK_TL521X
+	plic_preempt_feature_en(CORE_PREEMPT_PRI_MODE0);
+	flash_plic_preempt_config(0, 1);
 #endif
 
 	/* Init STimer IRQ */
@@ -196,6 +234,12 @@ static void tlx_bt_irq_init()
 #endif
 	plic_set_priority(IRQ_SYSTIMER, 2);
 	plic_set_priority(IRQ_ZB_RT, 2);
+
+#if (LL_FEATURE_ENABLE_CHANNEL_SOUNDING)
+	/* Init TIMER0 IRQ for channel sounding */
+	IRQ_CONNECT(IRQ_TIMER0 + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 1, timer0_irq_handler, 0, 0);
+	plic_set_priority(IRQ_TIMER0, 1);
+#endif
 }
 #endif
 /**
@@ -214,7 +258,9 @@ int tlx_bt_controller_init()
 		rf_mode_init();
 		/* Reset Radio */
 		rf_radio_reset();
-	#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X
+	#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || \
+		CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X || \
+		CONFIG_SOC_RISCV_TELINK_TL521X
 		rf_reset_dma();
 		rf_baseband_reset();
 	#endif
@@ -227,11 +273,13 @@ int tlx_bt_controller_init()
 	rf_drv_ble_init();
 
 #ifdef CONFIG_BT_CENTRAL
-	app_acl_mstTxfifo = (u8 *)calloc(ACL_MASTER_TX_FIFO_SIZE * ACL_MASTER_TX_FIFO_NUM * CONFIG_TL_BLE_CTRL_MASTER_MAX_NUM,1);
+	app_acl_mstTxfifo = (u8 *)calloc(ACL_MASTER_TX_FIFO_SIZE *
+		ACL_MASTER_TX_FIFO_NUM * CONFIG_TL_BLE_CTRL_MASTER_MAX_NUM, 1);
 #endif /* CONFIG_BT_CENTRAL */
 
 #ifdef CONFIG_BT_PERIPHERAL
-	app_acl_slvTxfifo = (u8 *)calloc(ACL_SLAVE_TX_FIFO_SIZE * ACL_SLAVE_TX_FIFO_NUM * CONFIG_TL_BLE_CTRL_SLAVE_MAX_NUM,1);
+	app_acl_slvTxfifo = (u8 *)calloc(ACL_SLAVE_TX_FIFO_SIZE *
+		ACL_SLAVE_TX_FIFO_NUM * CONFIG_TL_BLE_CTRL_SLAVE_MAX_NUM, 1);
 #endif /* CONFIG_BT_PERIPHERAL */
 	
 	app_acl_rxfifo = (u8 *)calloc(ACL_RX_FIFO_SIZE * ACL_RX_FIFO_NUM,1);
@@ -245,11 +293,18 @@ int tlx_bt_controller_init()
 		return status;
 	}
 
+#ifdef CONFIG_IEEE802154_TLX_BLE_COEXIST
+	extern void tlx_bt_802154_dual_mode_enable(void);
+	tlx_bt_802154_dual_mode_enable();
+#endif
+
 	/* Init IRQs */
 	tlx_bt_irq_init();
 
 	/* Register callback to controller. */
-#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X
+#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || \
+	CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X || \
+	CONFIG_SOC_RISCV_TELINK_TL521X
 	blc_ll_registerGiveSemCb(os_give_sem_cb, os_give_sem_cb);
 	blc_setOsSupEnable(true);
 #endif
@@ -259,7 +314,8 @@ int tlx_bt_controller_init()
 
 	/* Create BLE main thread */
 	(void)k_thread_create(&tlx_bt_controller_thread_data,
-		tlx_bt_controller_thread_stack, K_THREAD_STACK_SIZEOF(tlx_bt_controller_thread_stack),
+		tlx_bt_controller_thread_stack,
+		K_THREAD_STACK_SIZEOF(tlx_bt_controller_thread_stack),
 		tlx_bt_controller_thread, NULL, NULL, NULL, BLE_THREAD_PRIORITY, 0, K_NO_WAIT);
 #if CONFIG_SOC_RISCV_TELINK_TL321X
 		(void)k_thread_name_set(&tlx_bt_controller_thread_data, "TL321X_BT");
@@ -269,6 +325,8 @@ int tlx_bt_controller_init()
 		(void)k_thread_name_set(&tlx_bt_controller_thread_data, "TL322X_BT");
 #elif CONFIG_SOC_RISCV_TELINK_TL323X
 		(void)k_thread_name_set(&tlx_bt_controller_thread_data, "TL323X_BT");
+#elif CONFIG_SOC_RISCV_TELINK_TL521X
+		(void)k_thread_name_set(&tlx_bt_controller_thread_data, "TL521X_BT");
 #endif
 
 	/* Start thread */
@@ -299,11 +357,17 @@ void tlx_bt_controller_deinit()
 
 	/* Reset Radio */
 	rf_radio_reset();
-#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X
+#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || \
+	CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X || \
+	CONFIG_SOC_RISCV_TELINK_TL521X
 	rf_reset_dma();
 	rf_baseband_reset();
 #endif
 
+#ifdef CONFIG_IEEE802154_TLX_BLE_COEXIST
+	extern void tlx_bt_802154_dual_mode_disable(void);
+	tlx_bt_802154_dual_mode_disable();
+#endif
 
 #ifdef CONFIG_BT_CENTRAL
 	free(app_acl_mstTxfifo);
@@ -345,8 +409,10 @@ void tlx_bt_host_send_packet(uint8_t type, const uint8_t *data, uint16_t len)
  */
 void tlx_bt_host_callback_register(const tlx_bt_host_callback_t *pcb)
 {
-	tlx_ctrl.callbacks.host_read_packet = pcb->host_read_packet;		//hci_tlx_host_rcv_pkt
-	tlx_ctrl.callbacks.host_send_available = pcb->host_send_available;	//hci_tlx_controller_rcv_pkt_ready
+	/* hci_tlx_host_rcv_pkt */
+	tlx_ctrl.callbacks.host_read_packet = pcb->host_read_packet;
+	/* hci_tlx_controller_rcv_pkt_ready */
+	tlx_ctrl.callbacks.host_send_available = pcb->host_send_available;
 }
 
 /**
@@ -356,3 +422,16 @@ enum tl_bt_controller_state tl_bt_controller_state(void) {
 
 	return tl_bt_state;
 }
+
+#ifdef CONFIG_IEEE802154_TLX_BLE_COEXIST
+
+
+/**
+ * @brief    BLE RF HW initialization
+ */
+void tlx_init_ble_rf_hw(void)
+{
+	extern void tlksdk_init_ble_rf_hw(rf_power_level_e rf_power_level);
+	tlksdk_init_ble_rf_hw(tl_tx_pwr_lt[CONFIG_TL_BLE_CTRL_RF_POWER - TL_TX_POWER_MIN]);
+}
+#endif /* CONFIG_IEEE802154_TLX_BLE_COEXIST */

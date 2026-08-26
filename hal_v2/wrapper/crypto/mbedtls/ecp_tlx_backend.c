@@ -34,7 +34,8 @@ LOG_MODULE_REGISTER(ecc_tlx, CONFIG_MBEDTLS_LOG_LEVEL);
  * HW unit curve data constants definition
  ****************************************************************/
 
-#if CONFIG_SOC_RISCV_TELINK_TL321X  || CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X
+#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL322X || \
+	CONFIG_SOC_RISCV_TELINK_TL323X || CONFIG_SOC_RISCV_TELINK_TL521X
 #define ECCP_P_BITLEN       eccp_p_bitLen
 #define ECCP_N_BITLEN       eccp_n_bitLen
 #define ECCP_P              eccp_p
@@ -222,7 +223,8 @@ static eccp_curve_t secp192k1_curve_dat = {
 
 #if defined(MBEDTLS_ECP_DP_CURVE25519_ENABLED)
 
-#if CONFIG_SOC_RISCV_TELINK_TL321X  || CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X
+#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL322X || \
+	CONFIG_SOC_RISCV_TELINK_TL323X || CONFIG_SOC_RISCV_TELINK_TL521X
 #define MONT_P_BITLEN       p_bitLen
 #define MONT_N_BITLEN       n_bitLen
 #define MONT_P              p
@@ -237,10 +239,13 @@ static eccp_curve_t secp192k1_curve_dat = {
 #define MONT_A24            a24
 #endif
 
-#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X  || CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X
+#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || \
+	CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X || \
+	CONFIG_SOC_RISCV_TELINK_TL521X
 static mont_curve_t x25519 = {
 	.MONT_P_BITLEN = 255,
-#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X
+#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL322X || \
+	CONFIG_SOC_RISCV_TELINK_TL323X || CONFIG_SOC_RISCV_TELINK_TL521X
 	.MONT_N_BITLEN = 253,
 #endif
 	.MONT_P = (unsigned int[]){
@@ -257,7 +262,9 @@ static mont_curve_t x25519 = {
 		0x00000000, 0x00000000, 0x00000000, 0x00000000
 	}
 };
-#endif /*CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL322X*/
+#endif /* CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X ||
+		CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X ||
+		CONFIG_SOC_RISCV_TELINK_TL521X */
 
 #endif /* MBEDTLS_ECP_DP_CURVE25519_ENABLED */
 
@@ -300,9 +307,13 @@ static const struct {
 	mont_curve_t *curve_dat;
 } mont_curve_linking[] = {
 #if defined(MBEDTLS_ECP_DP_CURVE25519_ENABLED)
-#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X
+#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || \
+	CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X || \
+	CONFIG_SOC_RISCV_TELINK_TL521X
 	{.group = MBEDTLS_ECP_DP_CURVE25519, .curve_dat = &x25519}
-#endif /*CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL322X*/
+#endif /* CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X ||
+		CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X ||
+		CONFIG_SOC_RISCV_TELINK_TL521X */
 #endif /* MBEDTLS_ECP_DP_CURVE25519_ENABLED */
 };
 #endif /* MBEDTLS_ECP_MONTGOMERY_ENABLED */
@@ -379,7 +390,7 @@ int telink_tlx_ecp_check_pubkey(const mbedtls_ecp_group *grp,
 			(void) mbedtls_mpi_write_binary_le(&pt->MBEDTLS_PRIVATE(Y),
 				(unsigned char *)Qy, sizeof(Qy));
 			telink_soc_ecp_lock();
-			int r = pke_eccp_point_verify(eccp_curve, Qx, Qy);
+			int r = eccp_pointVerify(eccp_curve, Qx, Qy);
 
 			telink_soc_ecp_unlock();
 			if (r == PKE_SUCCESS) {
@@ -435,7 +446,7 @@ int telink_tlx_ecp_mul_restartable(mbedtls_ecp_group *grp,
 				break;
 			}
 			telink_soc_ecp_lock();
-			int r = pke_eccp_point_mul(eccp_curve, ms, Qx, Qy, Qx, Qy);
+			int r = eccp_pointMul(eccp_curve, ms, Qx, Qy, Qx, Qy);
 
 			telink_soc_ecp_unlock();
 			if (r != PKE_SUCCESS) {
@@ -457,7 +468,7 @@ int telink_tlx_ecp_mul_restartable(mbedtls_ecp_group *grp,
 				break;
 			}
 			telink_soc_ecp_lock();
-			int r = pke_x25519_point_mul(mont_curve, ms, Qx, Qx);
+			int r = x25519_pointMul(mont_curve, ms, Qx, Qx);
 			telink_soc_ecp_unlock();
 			if (r != PKE_SUCCESS) {
 				LOG_ERR("EC multiplication error");
@@ -522,7 +533,7 @@ int telink_tlx_ecp_muladd_restartable(mbedtls_ecp_group *grp,
 
 			(void) mbedtls_mpi_write_binary_le(m, (unsigned char *)ms, sizeof(ms));
 			telink_soc_ecp_lock();
-			r = pke_eccp_point_mul(eccp_curve, ms, Q1x, Q1y, Q1x, Q1y);
+			r = eccp_pointMul(eccp_curve, ms, Q1x, Q1y, Q1x, Q1y);
 			telink_soc_ecp_unlock();
 			if (r != PKE_SUCCESS) {
 				LOG_ERR("EC multiplication error");
@@ -535,7 +546,7 @@ int telink_tlx_ecp_muladd_restartable(mbedtls_ecp_group *grp,
 			}
 			(void) mbedtls_mpi_write_binary_le(n, (unsigned char *)ms, sizeof(ms));
 			telink_soc_ecp_lock();
-			r = pke_eccp_point_mul(eccp_curve, ms, Q2x, Q2y, Q2x, Q2y);
+			r = eccp_pointMul(eccp_curve, ms, Q2x, Q2y, Q2x, Q2y);
 			telink_soc_ecp_unlock();
 			if (r != PKE_SUCCESS) {
 				LOG_ERR("EC multiplication error");
@@ -547,7 +558,7 @@ int telink_tlx_ecp_muladd_restartable(mbedtls_ecp_group *grp,
 				break;
 			}
 			telink_soc_ecp_lock();
-			r = pke_eccp_point_add(eccp_curve, Q1x, Q1y, Q2x, Q2y, Q1x, Q1y);
+			r = eccp_pointAdd(eccp_curve, Q1x, Q1y, Q2x, Q2y, Q1x, Q1y);
 			telink_soc_ecp_unlock();
 			if (r != PKE_SUCCESS) {
 				LOG_ERR("EC summation error");

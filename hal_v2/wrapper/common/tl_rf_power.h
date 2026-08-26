@@ -35,6 +35,9 @@
 #elif CONFIG_SOC_RISCV_TELINK_TL323X
 #define TL_TX_POWER_MIN                    (-20)
 #define TL_TX_POWER_MAX                    (11)
+#elif CONFIG_SOC_RISCV_TELINK_TL521X
+#define TL_TX_POWER_MIN                    (-20)
+#define TL_TX_POWER_MAX                    (11)
 #else
 #define TL_TX_POWER_MIN                    (-30)
 #define TL_TX_POWER_MAX                    (9)
