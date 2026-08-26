@@ -44,7 +44,8 @@ static void tlx_bt_controller_thread()
 {
 	while (tl_bt_state == TL_BT_CONTROLLER_STATE_ACTIVE ||
 		tl_bt_state == TL_BT_CONTROLLER_STATE_STOPPING) {
-		k_sem_take(&controller_sem, K_FOREVER);	//Mailbox irq can also trigger controller_sem in time.
+		/* Mailbox irq can also trigger controller_sem in time. */
+		k_sem_take(&controller_sem, K_FOREVER);
 		mcc_d25f_loop();
 
 		/* temporary solutions */
@@ -63,7 +64,7 @@ static tlx_bt_host_callback_t tlx_bt_cb = {0};
  */
 int tlx_bt_controller_init()
 {
-    int status = INIT_OK;
+	int status = INIT_OK;
 
 	/* pke and ske required to be used by the host SMP module */
 	ext_crypto_hw_init_enable();
@@ -74,17 +75,18 @@ int tlx_bt_controller_init()
 	blc_pm_setSleepMask(PM_SLEEP_LEG_ADV | PM_SLEEP_ACL_PERIPHR);
 # endif /* CONFIG_PM */
 
-    /* init semaphore */
+	/* init semaphore */
 	k_sem_reset(&controller_sem);
 	k_sem_give(&controller_sem);
 
-    (void)k_thread_create(&tlx_bt_controller_thread_data,
-		tlx_bt_controller_thread_stack, K_THREAD_STACK_SIZEOF(tlx_bt_controller_thread_stack),
+	(void)k_thread_create(&tlx_bt_controller_thread_data,
+		tlx_bt_controller_thread_stack,
+		K_THREAD_STACK_SIZEOF(tlx_bt_controller_thread_stack),
 		tlx_bt_controller_thread, NULL, NULL, NULL, BLE_THREAD_PRIORITY, 0, K_NO_WAIT);
 
-    (void)k_thread_name_set(&tlx_bt_controller_thread_data, "TL322X_BT");
+	(void)k_thread_name_set(&tlx_bt_controller_thread_data, "TL322X_BT");
 
-    tl_bt_state = TL_BT_CONTROLLER_STATE_ACTIVE;
+	tl_bt_state = TL_BT_CONTROLLER_STATE_ACTIVE;
 	k_thread_start(&tlx_bt_controller_thread_data);
 
 	return status;
@@ -92,9 +94,9 @@ int tlx_bt_controller_init()
 
 _attribute_ram_code_ void mcc_d25f_sm_data_ready(u8* data)
 {
-    (void) data;
+	(void) data;
 
-    k_sem_give(&controller_sem);
+	k_sem_give(&controller_sem);
 }
 
 /**
@@ -105,7 +107,7 @@ void tlx_bt_controller_deinit(void)
 	/* start BLE stopping procedure */
 	tl_bt_state = TL_BT_CONTROLLER_STATE_STOPPING;
 
-    	/* reset controller */
+	/* reset controller */
 	static const uint8_t hci_reset_cmd[] = {0x03, 0x0c, 0x00};
 	tlx_bt_host_send_packet(0x01, hci_reset_cmd, sizeof(hci_reset_cmd));
 
@@ -124,8 +126,12 @@ void tlx_bt_host_send_packet(uint8_t type, const uint8_t *data, uint16_t len)
 		return;
 	}
 
-    u8 hci_cmd[255+3] = {0}; 			//Controllers shall be able to accept HCI Command packets with up to 255 bytes of data excluding the HCI Command packet header.
+	/*
+	 * Controllers shall be able to accept HCI Command packets with
+	 * up to 255 bytes of data excluding the HCI Command packet header.
+	 */
 	hci_cmd[0] = type;
+	u8 hci_cmd[255+3] = {0};
 	memcpy(hci_cmd+1, data, len);
 	shm_fifo_status_e ret = mcc_d25f_hci_send_msg(hci_cmd, len+1);
 	if (ret == SHM_FIFO_SUCCESS) {
@@ -141,15 +147,17 @@ void tlx_bt_host_send_packet(uint8_t type, const uint8_t *data, uint16_t len)
  */
 void tlx_bt_host_callback_register(const tlx_bt_host_callback_t *pcb)
 {
-	tlx_bt_cb.host_read_packet = pcb->host_read_packet;		//hci_tlx_host_rcv_pkt
-	tlx_bt_cb.host_send_available = pcb->host_send_available;	//hci_tlx_controller_rcv_pkt_ready
+	/* hci_tlx_host_rcv_pkt */
+	tlx_bt_cb.host_read_packet = pcb->host_read_packet;
+	/* hci_tlx_controller_rcv_pkt_ready */
+	tlx_bt_cb.host_send_available = pcb->host_send_available;
 	mcc_d25f_register_shm_recv_cb(TLK_SHM_MSG_HCI, tlx_bt_cb.host_read_packet);
 }
 
 /**
  * @brief     Get state of Telink TLX BLE Controller
  */
-enum tl_bt_controller_state tl_bt_controller_state(void) {
-
+enum tl_bt_controller_state tl_bt_controller_state(void)
+{
 	return tl_bt_state;
 }

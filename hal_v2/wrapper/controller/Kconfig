@@ -1,6 +1,21 @@
 # Copyright (c) 2022 Telink Semiconductor
 # SPDX-License-Identifier: Apache-2.0
 
+config COMPILE_SDK
+	bool "Use precompiled BLE SDK library"
+	default y
+	help
+	  Use the precompiled Telink BLE SDK library instead of building from
+	  source. When enabled, internal headers are not available and must
+	  be excluded.
+
+config COMPILE_TL_LIB_GENERAL
+	bool "Use general telink lib"
+	default n
+	help
+	  Use the general Telink BLE SDK library instead of building with ram
+	  optimized library to support for more features.
+
 menu "Telink BLE Controller"
 	depends on BT_B9X || BT_TLX
 
@@ -77,6 +92,15 @@ config TL_BLE_CTRL_RF_POWER
 endif
 
 if SOC_RISCV_TELINK_TL323X
+config TL_BLE_CTRL_RF_POWER
+	int "Tx power, dbm"
+	default 3
+	range -20 10
+	help
+	  Telink TLX BLE TX power
+endif
+
+if SOC_RISCV_TELINK_TL521X
 config TL_BLE_CTRL_RF_POWER
 	int "Tx power, dbm"
 	default 3
@@ -178,5 +202,12 @@ config TL_BLE_CTRL_THREAD_PERIOD_MS
 	default 10
 	help
 	  Telink BLE Controller thread period in ms.
+
+config BT_TLX_CHANNEL_SOUNDING
+	bool "Telink TLX Channel Sounding support"
+	depends on BT_TLX
+	depends on SOC_RISCV_TELINK_TL721X
+	help
+	  Enable Channel Sounding (Bluetooth 6.0) in the Telink TLX Controller.
 
 endmenu

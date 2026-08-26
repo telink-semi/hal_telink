@@ -26,7 +26,7 @@
 #include "stack/ble/B92/ble.h"
 #endif
 
-#define BT_BUF_HCI_RX_SIZE                                                                             \
+#define BT_BUF_HCI_RX_SIZE                                                                         \
         MAX(BT_BUF_CMD_SIZE(CONFIG_BT_BUF_CMD_TX_SIZE), BT_BUF_ACL_SIZE(CONFIG_BT_BUF_ACL_TX_SIZE))
 
 #define ACL_CONN_MAX_RX_OCTETS (BT_BUF_RX_SIZE > 251 ? 251 : BT_BUF_RX_SIZE)
