@@ -41,9 +41,9 @@ static int get_bytes_from_str(uint8_t *buf, int buf_len, const char *src)
 
 	for (i = 0U; i < strlen(src); i++) {
 		if (!(src[i] >= '0' && src[i] <= '9') &&
-		    !(src[i] >= 'A' && src[i] <= 'F') &&
-		    !(src[i] >= 'a' && src[i] <= 'f') &&
-		    src[i] != ':') {
+			!(src[i] >= 'A' && src[i] <= 'F') &&
+			!(src[i] >= 'a' && src[i] <= 'f') &&
+			src[i] != ':') {
 			return -EINVAL;
 		}
 	}

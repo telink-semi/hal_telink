@@ -104,7 +104,8 @@ static int b9x_bt_hci_tx_handler(void)
 	while(bltHci_txfifo.wptr != bltHci_txfifo.rptr)
 	{
 		/* Get HCI data */
-		u8 *p = bltHci_txfifo.p + (bltHci_txfifo.rptr & bltHci_txfifo.mask) * bltHci_txfifo.size;
+		u8 *p = bltHci_txfifo.p +
+			(bltHci_txfifo.rptr & bltHci_txfifo.mask) * bltHci_txfifo.size;
 		if (p) {
 			u32 len;
 			BSTREAM_TO_UINT16(len, p);
@@ -117,9 +118,11 @@ static int b9x_bt_hci_tx_handler(void)
 				}
 			} else if (tl_bt_state == TL_BT_CONTROLLER_STATE_STOPPING) {
 				/* In this state HCI reset is sent - waiting for command complete */
-				static const uint8_t hci_reset_cmd_complette[] = {0x04, 0x0e, 0x04, 0x01, 0x03, 0x0c, 0x00};
+				static const uint8_t hci_reset_cmd_complette[] =
+					{0x04, 0x0e, 0x04, 0x01, 0x03, 0x0c, 0x00};
 
-				if (len == sizeof(hci_reset_cmd_complette) && !memcmp(p, hci_reset_cmd_complette, len)) {
+				if (len == sizeof(hci_reset_cmd_complette) &&
+					!memcmp(p, hci_reset_cmd_complette, len)) {
 					tl_bt_state = TL_BT_CONTROLLER_STATE_STOPPED;
 					k_sem_give(&controller_sem);
 				}
@@ -245,7 +248,8 @@ int b9x_bt_controller_init()
 
 	/* Create BLE main thread */
 	(void)k_thread_create(&b9x_bt_controller_thread_data,
-		b9x_bt_controller_thread_stack, K_THREAD_STACK_SIZEOF(b9x_bt_controller_thread_stack),
+		b9x_bt_controller_thread_stack,
+		K_THREAD_STACK_SIZEOF(b9x_bt_controller_thread_stack),
 		b9x_bt_controller_thread, NULL, NULL, NULL, BLE_THREAD_PRIORITY, 0, K_NO_WAIT);
 #if CONFIG_SOC_RISCV_TELINK_B91
 		(void)k_thread_name_set(&b9x_bt_controller_thread_data, "B91_BT");
@@ -322,7 +326,7 @@ void b9x_bt_host_callback_register(const b9x_bt_host_callback_t *pcb)
 /**
  * @brief     Get state of Telink B9X BLE Controller
  */
-enum tl_bt_controller_state tl_bt_controller_state(void) {
-
+enum tl_bt_controller_state tl_bt_controller_state(void)
+{
 	return tl_bt_state;
 }
