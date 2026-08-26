@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2025, Telink
+# Copyright (c) 2025-2026, Telink
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -23,11 +23,28 @@ elseif(CONFIG_SOC_RISCV_TELINK_TL323X)
 	set(SOC "TL323X")
 	set(LIB_SOC_NAME "tl323x")
 	message(STATUS "Configuring for SOC: TELINK_TL323X")
+elseif(CONFIG_SOC_RISCV_TELINK_TL521X)
+	set(SOC "TL521X")
+	set(LIB_SOC_NAME "tl521x")
+	message(STATUS "Configuring for SOC: TELINK_TL521X")
+elseif(CONFIG_SOC_RISCV_TELINK_TL523X)
+	set(SOC "TL523X")
+	set(LIB_SOC_NAME "tl523x")
+	message(STATUS "Configuring for SOC: TELINK_TL523X")
 else()
 	message(FATAL_ERROR "Not supported SOC")
 endif()
 
-set(CONFIG_COMPILE_SDK 1)
+# Default to precompiled BLE SDK unless Kconfig disables it.
+# A disabled bool Kconfig option is undefined in CMake, so use
+# CONFIG_SOC_SERIES as a sentinel to detect that Kconfig has run.
+if(NOT DEFINED CONFIG_COMPILE_SDK)
+    if(DEFINED CONFIG_SOC_SERIES)
+        set(CONFIG_COMPILE_SDK 0)   # Kconfig processed; COMPILE_SDK explicitly disabled.
+    else()
+        set(CONFIG_COMPILE_SDK 1)   # Kconfig not loaded yet -> default to precompiled SDK.
+    endif()
+endif()
 
 if(CONFIG_COMPILE_SDK)
 	get_filename_component(
@@ -51,10 +68,16 @@ if(CONFIG_COMPILE_SDK)
 		else()
 			zephyr_link_libraries(${TELINK_BLE_SDK_DIR}/tl_ble_sdk/proj_lib/zephyr/${LIB_SOC_NAME}/lib_zephyr_${LIB_SOC_NAME}_single_core.a)
 		endif()
-	elseif(CONFIG_SOC_RISCV_TELINK_TL323X OR CONFIG_SOC_RISCV_TELINK_TL721X)
-			zephyr_link_libraries(${TELINK_BLE_SDK_DIR}/tl_ble_sdk/proj_lib/zephyr/${LIB_SOC_NAME}/lib_zephyr_${LIB_SOC_NAME}.a)
-	elseif(CONFIG_SOC_RISCV_TELINK_TL321X)
-		zephyr_link_libraries(${TELINK_BLE_SDK_DIR}/tl_ble_sdk/proj_lib/lib_zephyr_${LIB_SOC_NAME}.a)
+	elseif(CONFIG_SOC_RISCV_TELINK_TL321X OR CONFIG_SOC_RISCV_TELINK_TL323X OR CONFIG_SOC_RISCV_TELINK_TL721X OR CONFIG_SOC_RISCV_TELINK_TL521X OR CONFIG_SOC_RISCV_TELINK_TL523X)
+		if(CONFIG_IEEE802154_TLX_BLE_COEXIST OR CONFIG_BT_TLX_CHANNEL_SOUNDING)
+			zephyr_link_libraries(${TELINK_BLE_SDK_DIR}/tl_ble_sdk/proj_lib/zephyr/${LIB_SOC_NAME}/lib_zephyr_${LIB_SOC_NAME}_concurrent.a)
+		else()
+			if(CONFIG_COMPILE_TL_LIB_GENERAL)
+				zephyr_link_libraries(${TELINK_BLE_SDK_DIR}/tl_ble_sdk/proj_lib/zephyr/${LIB_SOC_NAME}/lib_zephyr_${LIB_SOC_NAME}_general.a)
+			else()
+				zephyr_link_libraries(${TELINK_BLE_SDK_DIR}/tl_ble_sdk/proj_lib/zephyr/${LIB_SOC_NAME}/lib_zephyr_${LIB_SOC_NAME}.a)
+			endif()
+		endif()
 	endif()
 else()
 	add_subdirectory(tl_ble_src/tools)
@@ -62,8 +85,8 @@ endif()
 
 add_subdirectory(wrapper)
 
-if(CONFIG_MBEDTLS)
-	add_subdirectory(wrapper/crypto/mbedtls)
+if (CONFIG_MBEDTLS OR CONFIG_TINYCRYPT OR CONFIG_BOOT_USE_MBEDTLS OR CONFIG_BOOT_USE_TINYCRYPT)
+	add_subdirectory(wrapper/crypto)
 endif()
 
 if(CONFIG_PM)

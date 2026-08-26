@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2022-2024, Telink
+# Copyright (c) 2022-2026, Telink
 #
 # SPDX-License-Identifier: Apache-2.0
 #
