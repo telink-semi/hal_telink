@@ -5,7 +5,7 @@
 #
 
 # SOC configuration for Telink RISC-V series
-if(CONFIG_SOC_FAMILY_TELINK_TL)
+if(CONFIG_SOC_FAMILY_TELINK_TLX)
     set(SOC_FAMILY "tlx")
 else()
     string(REGEX REPLACE "^telink_" "" SOC_FAMILY ${CONFIG_SOC_SERIES})
