@@ -56,6 +56,8 @@ bool tl_suspend(uint32_t wake_stimer_tick)
 		/* Enable the TIMER and PAD wakeup */
 		blc_pm_setWakeupSource(PM_WAKEUP_TIMER | PM_WAKEUP_PAD);
 		if (!blc_pm_handler()) {
+			extern void blc_ll_get_suspend_exit_start_tick(void);
+			blc_ll_get_suspend_exit_start_tick();
 			rf_set_power_level(tl_tx_pwr_lt[CONFIG_TL_BLE_CTRL_RF_POWER
 			- TL_TX_POWER_MIN]);
 			result = true;

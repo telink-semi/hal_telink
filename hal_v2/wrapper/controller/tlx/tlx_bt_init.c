@@ -68,45 +68,9 @@ _attribute_ble_data_retention_ u8
 #endif /* CONFIG_TL_BLE_CTRL_PER_ADV */
 
 /** a temporary method to set exit latency which can be set in header files */
-#if CONFIG_SOC_RISCV_TELINK_TL321X
-	#define SUSPEND_EXIT_LATENCY_US		(240U)
-	#define DEEPRETN_EXIT_LATENCY_US	(1000U)		/*!< Not used for now */
-#elif CONFIG_SOC_RISCV_TELINK_TL322X
-	#define SUSPEND_EXIT_LATENCY_US		(170U)
-	#define DEEPRETN_EXIT_LATENCY_US	(1000U)
-#elif CONFIG_SOC_RISCV_TELINK_TL323X
-	/* for tl323x, if in pm mode the cclk is 48M, the early wakeup should be 500us.
-	 * In non-pm mode ,the cclk is 96M, the early wakeup should be 400us, will be
-	 * more stable
-	 */
-	#if CONFIG_PM
-	/*!< No Fast Settle Used For Now, Update Later */
-	#define SUSPEND_EXIT_LATENCY_US		(260U)
-	#else
-	/*!< No Fast Settle Used For Now, Update Later */
-	#define SUSPEND_EXIT_LATENCY_US		(400U)
-	#endif
-	/*!< Not used for now */
-	#define DEEPRETN_EXIT_LATENCY_US	(1000U)
-#elif CONFIG_SOC_RISCV_TELINK_TL521X
-	/* for tl521x, if in pm mode the cclk is 48M, the early wakeup should be 500us.
-	 * In non-pm mode ,the cclk is 96M, the early wakeup should be 400us, will be
-	 * more stable
-	 */
-	#if CONFIG_PM
-	/*!< No Fast Settle Used For Now, Update Later */
-	#define SUSPEND_EXIT_LATENCY_US		(360U)
-	#else
-	/*!< No Fast Settle Used For Now, Update Later */
-	#define SUSPEND_EXIT_LATENCY_US		(100U)
-	#endif
-	/*!< Not used for now */
-	#define DEEPRETN_EXIT_LATENCY_US	(0U)
-#elif CONFIG_SOC_RISCV_TELINK_TL721X
-	#define SUSPEND_EXIT_LATENCY_US		(200U)
-	/*!< Not used for now */
-	#define DEEPRETN_EXIT_LATENCY_US	(0U)
-#endif
+#define SUSPEND_EXIT_LATENCY_US		(1000U)
+/*!< Not used for now */
+#define DEEPRETN_EXIT_LATENCY_US	(0U)
 
 /**
  * @brief       Telink TLX BLE Controller initialization
