@@ -8,7 +8,12 @@ config HAL_TELINK_V1
 
 config HAL_TELINK_V2
     bool "Telink HAL V2"
-    depends on SOC_RISCV_TELINK_TL321X || SOC_RISCV_TELINK_TL322X || SOC_RISCV_TELINK_TL323X || SOC_RISCV_TELINK_TL521X || SOC_RISCV_TELINK_TL523X || SOC_RISCV_TELINK_TL721X
+    depends on SOC_RISCV_TELINK_TL321X || \
+                SOC_RISCV_TELINK_TL322X || \
+                SOC_RISCV_TELINK_TL323X || \
+                SOC_RISCV_TELINK_TL521X || \
+                SOC_RISCV_TELINK_TL523X || \
+                SOC_RISCV_TELINK_TL721X
     default y
 
 if HAL_TELINK_V1
