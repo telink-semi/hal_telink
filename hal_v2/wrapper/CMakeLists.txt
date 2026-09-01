@@ -15,10 +15,10 @@ zephyr_include_directories(
 	zb_proj
 )
 
-	file(GLOB ZIGBEE_SOURCES
-			zb_proj/drivers/multi_core/*.c
-	)
-zephyr_library_sources(${ZIGBEE_SOURCES})
+# file(GLOB ZIGBEE_SOURCES
+#		zb_proj/drivers/multi_core/*.c
+#)
+# zephyr_library_sources(${ZIGBEE_SOURCES})
 
 
 zephyr_compile_options(

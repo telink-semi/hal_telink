@@ -9,12 +9,44 @@ config COMPILE_SDK
 	  source. When enabled, internal headers are not available and must
 	  be excluded.
 
-config COMPILE_TL_LIB_GENERAL
-	bool "Use general telink lib"
-	default n
+choice TL_BLE_CTRL_VARIANT
+	prompt "Telink BLE Controller Variant"
+	default TL_BLE_CTRL_MULTIROLE if ((BT_OBSERVER && BT_BROADCASTER) || \
+										BT_CHANNEL_SOUNDING || \
+										BT_EXT_ADV || \
+										BT_PER_ADV || \
+										BT_ISO || \
+										IEEE802154_TLX_BLE_COEXIST)
+	default TL_BLE_CTRL_PERIPHERAL if BT_BROADCASTER
+	default TL_BLE_CTRL_CENTRAL if BT_OBSERVER
+
 	help
-	  Use the general Telink BLE SDK library instead of building with ram
-	  optimized library to support for more features.
+	  Select a Telink BLE Controller variant.
+
+config TL_BLE_CTRL_PERIPHERAL
+	bool "Telink BLE Controller peripheral library optimized for peripheral role applications"
+	depends on !BT_OBSERVER
+	help
+	  The peripheral library variant is optimized for simpler applications only
+	  requiring the peripheral role.
+
+config TL_BLE_CTRL_CENTRAL
+	bool "Telink BLE Controller optimized for central role applications"
+	depends on !BT_BROADCASTER
+	help
+	  The central library variant is optimized for simpler applications only
+	  requiring the central role.
+
+config TL_BLE_CTRL_MULTIROLE
+	bool "Telink BLE Controller optimized for multirole and other advanced configurations"
+	help
+	  The multirole library variant is contains all supported features and can be used
+	  for more advanced applications. Using this library may give slightly larger applications.
+	  However, the library is designed in such a way that unused functionality is removed
+	  by the linker.
+
+endchoice
+
 
 menu "Telink BLE Controller"
 	depends on BT_B9X || BT_TLX
