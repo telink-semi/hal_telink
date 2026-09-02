@@ -46,7 +46,8 @@ if (CONFIG_SOC_RISCV_TELINK_B92)
 endif()
 
 # add for TLX headers
-if (CONFIG_SOC_FAMILY_TELINK_TLX)
+if (CONFIG_SOC_SERIES_RISCV_TELINK_TLX OR CONFIG_SOC_RISCV_TELINK_TLX
+	OR CONFIG_SOC_FAMILY_TELINK_TLX)
 	zephyr_include_directories(
 		drivers/${SOC}/lib/include/rf
 		drivers/${SOC}/lib/include/ske
@@ -55,7 +56,8 @@ if (CONFIG_SOC_FAMILY_TELINK_TLX)
 endif()
 
 # add for TLX or B9X headers
-if (CONFIG_SOC_FAMILY_TELINK_TLX)
+if (CONFIG_SOC_SERIES_RISCV_TELINK_TLX OR CONFIG_SOC_RISCV_TELINK_TLX
+	OR CONFIG_SOC_FAMILY_TELINK_TLX)
 	zephyr_include_directories(drivers/${SOC}/ext_driver/driver_internal)
 elseif(CONFIG_SOC_SERIES_RISCV_TELINK_B9X)
 	zephyr_include_directories(drivers/${SOC}/ext_driver/driver_lib)
@@ -64,7 +66,8 @@ endif()
 endif() # NOT CONFIG_SOC_RISCV_TELINK_B91
 
 # soc.c reference sources for B9X
-if (NOT (CONFIG_SOC_FAMILY_TELINK_TLX))
+if (NOT (CONFIG_SOC_SERIES_RISCV_TELINK_TLX OR CONFIG_SOC_RISCV_TELINK_TLX
+	OR CONFIG_SOC_FAMILY_TELINK_TLX))
 	zephyr_library_sources(drivers/${SOC}/clock.c)
 	zephyr_library_sources(drivers/${SOC}/analog.c)
 endif()
@@ -90,8 +93,8 @@ if(CONFIG_GPIO_TELINK_B9X OR CONFIG_GPIO_TELINK_TLX)
 endif()
 
 # PWM driver reference sources
-if(CONFIG_PWM_TELINK_B9X OR CONFIG_PWM_TELINK_TLX 
-	OR CONFIG_SOC_FAMILY_TELINK_TLX)
+if(CONFIG_PWM_TELINK_B9X OR CONFIG_PWM_TELINK_TLX
+	OR CONFIG_SOC_RISCV_TELINK_TLX OR CONFIG_SOC_FAMILY_TELINK_TLX)
 	zephyr_library_sources(drivers/${SOC}/pwm.c)
 endif()
 
@@ -137,7 +140,8 @@ endif()
 #PM driver dependency
 if(CONFIG_PM)
 	zephyr_library_sources(common/tl_sleep.c)
-	zephyr_library_sources_ifdef(NOT (CONFIG_SOC_FAMILY_TELINK_TLX)
+	zephyr_library_sources_ifdef(NOT (CONFIG_SOC_SERIES_RISCV_TELINK_TLX
+		OR CONFIG_SOC_RISCV_TELINK_TLX OR CONFIG_SOC_FAMILY_TELINK_TLX)
 		drivers/${SOC}/stimer.c
 	)
 endif()
@@ -165,7 +169,8 @@ if (CONFIG_BT_B9X OR CONFIG_BT_TLX)
 	)
 endif() # CONFIG_BT_B9X OR CONFIG_BT_TLX
 
-if (CONFIG_SOC_FAMILY_TELINK_TLX)
+if (CONFIG_SOC_SERIES_RISCV_TELINK_TLX OR CONFIG_SOC_RISCV_TELINK_TLX
+	OR CONFIG_SOC_FAMILY_TELINK_TLX)
 	add_definitions(-DSTD_GCC)
 endif()
 
@@ -174,6 +179,7 @@ if (CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION OR CONFIG_SOC_SERIES_RISCV_TELI
 	zephyr_library_sources(common/tl_context.S)
 endif()
 
-if (CONFIG_SOC_FAMILY_TELINK_TLX)
+if (CONFIG_SOC_SERIES_RISCV_TELINK_TLX OR CONFIG_SOC_RISCV_TELINK_TLX
+	OR CONFIG_SOC_FAMILY_TELINK_TLX)
 	target_compile_options(${ZEPHYR_CURRENT_LIBRARY} PRIVATE -flto=auto)
 endif()
