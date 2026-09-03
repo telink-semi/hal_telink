@@ -25,6 +25,7 @@
 #include "mailbox_msg.h"
 #include "mailbox_service.h"
 #include "utility.h"
+#include <stdio.h>
 
 static share_mem_fifo_t *sm_tx_fifo = NULL;
 static share_mem_fifo_t *sm_rx_fifo = NULL;
@@ -91,7 +92,7 @@ void mailbox_msg_tx(share_mem_type_e type, u8 *data, u32 len)
     }
     printf("]\n");
 }
-
+#if 0
 static void mailbox_msg_tx_fifo_handler(u8 *data)
 {
     sm_tx_fifo = (share_mem_fifo_t *)BUILD_U32(data[3], data[4], data[5], data[6]);
@@ -112,7 +113,7 @@ static void mailbox_msg_nv_fifo_handler(u8 *data)
     share_memory_set_fifo_status(sm_nv_fifo, SHARE_MEMORY_STATUS_READY);
     printf("sm_nv_fifo: %x\n", (u32)sm_nv_fifo);
 }
-#if 0
+
 void mailbox_msg_init(void)
 {
     mailbox_service_cb_register(MAILBOX_MSG_TX_FIFO, mailbox_msg_tx_fifo_handler);

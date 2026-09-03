@@ -574,7 +574,7 @@ int telink_soc_ecp_self_test(int verbose)
 			item_allocated = false;
 			continue;
 		}
-
+#if defined(MBEDTLS_ECP_SHORT_WEIERSTRASS_ENABLED)
 		mbedtls_printf("\tstage 8\n");
 		MBEDTLS_MPI_CHK(mbedtls_ecp_muladd(&ecp_group, &sum, &sk, &ecp_group.G, &sk, &pk));
 		mbedtls_printf("\tstage 9\n");
@@ -582,7 +582,7 @@ int telink_soc_ecp_self_test(int verbose)
 			&sum_ref, ecp_tc[i].sum, ecp_tc[i].pk_len));
 		mbedtls_printf("\tstage 10\n");
 		MBEDTLS_MPI_CHK(mbedtls_ecp_point_cmp(&sum, &sum_ref));
-
+#endif /* MBEDTLS_ECP_SHORT_WEIERSTRASS_ENABLED */
 		mbedtls_ecp_point_free(&sum_ref);
 		mbedtls_ecp_point_free(&sum);
 		mbedtls_ecp_point_free(&pk_ref);

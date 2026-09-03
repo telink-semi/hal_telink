@@ -33,8 +33,10 @@ enum tl_bt_controller_state {
  *  used for vhci call host function to notify what host need to do
  */
 typedef struct tlx_bt_host_callback {
-    void (*host_send_available)(void);                      /* the host can send packet to the controller */
-    void (*host_read_packet)(uint8_t *data, uint16_t len);  /* the controller has a packet to send to the host */
+	/* the host can send packet to the controller */
+	void (*host_send_available)(void);
+	/* the controller has a packet to send to the host */
+	void (*host_read_packet)(uint8_t *data, uint16_t len);
 } tlx_bt_host_callback_t;
 
 /**
@@ -66,11 +68,8 @@ void tlx_bt_controller_deinit(void);
 enum tl_bt_controller_state tl_bt_controller_state(void);
 
 /* Compatible macros */
-#define rf_baseband_reset			rf_clr_dig_logic_state
-
-#define rf_radio_reset				rf_reset_register_value
-
-#define rf_reset_dma				rf_dma_reset
-
+#define rf_baseband_reset rf_clr_dig_logic_state
+#define rf_radio_reset    rf_reset_register_value
+#define rf_reset_dma      rf_dma_reset
 
 #endif /* TLX_BT_H_ */
