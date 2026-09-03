@@ -38,10 +38,6 @@ zephyr_include_directories(
 	controller/${SOC_FAMILY}
 )
 
-if(CONFIG_IEEE802154_TELINK_B9X OR CONFIG_IEEE802154_TELINK_TLX)
-	zephyr_include_directories(controller/${SOC_FAMILY})
-endif()
-
 if(CONFIG_IEEE802154_TLX_BLE_COEXIST)
 	zephyr_include_directories(${ZEPHYR_BASE}/drivers/ieee802154)
 endif()
