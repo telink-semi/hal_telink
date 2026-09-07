@@ -15,11 +15,12 @@ zephyr_include_directories(
 	zb_proj
 )
 
+if(CONFIG_IEEE802154_TELINK_TLX)
 	file(GLOB ZIGBEE_SOURCES
 			zb_proj/drivers/multi_core/*.c
 	)
 zephyr_library_sources(${ZIGBEE_SOURCES})
-
+endif()
 
 zephyr_compile_options(
 	-DCHIP_TYPE=CHIP_TYPE_TL322X
