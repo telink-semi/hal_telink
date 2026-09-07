@@ -38,6 +38,33 @@
 extern int blc_pm_handler(void);
 
 /**
+ * @brief     Weak hook for entering suspend mode when the BLE controller is not
+ *            running (e.g. 2.4G private protocol etc.).
+ *            Applications may override this to implement protocol-specific
+ *            suspend handling. The default implementation does nothing and
+ *            returns false, so non-BLE paths do not enter suspend by default.
+ * @param[in] wake_stimer_tick - wake-up stimer tick
+ * @return    true if suspend mode entered otherwise false
+ */
+__attribute__((weak)) bool tl_app_suspend(uint32_t wake_stimer_tick)
+{
+	(void)wake_stimer_tick;
+	return false;
+}
+/**
+ * @brief     Weak hook for querying whether the application is allowed to enter
+ *            suspend mode when the BLE controller is not running.
+ *            Applications may override this to implement protocol-specific
+ *            suspend handling. The default implementation returns false, so
+ *            non-BLE paths do not enter suspend by default.
+ * @return    true if suspend mode is allowed otherwise false
+ */
+__attribute__((weak)) bool tl_app_suspend_state(void)
+{
+	return false;
+}
+
+/**
  * @brief     This function sets Telink MCU to suspend mode
  * @param[in] wake_stimer_tick - wake-up stimer tick
  * @return    true if suspend mode entered otherwise false
@@ -76,15 +103,10 @@ bool tl_suspend(uint32_t wake_stimer_tick)
 		result = !(tlksdk_pm_enterSleep(SUSPEND_MODE, wake_stimer_tick));
 
 		// printk("Suspend mode entered: %s\n", result ? "true" : "false");
-	} 
-	// else {
-	// 	if (cpu_sleep_wakeup_32k_rc(SUSPEND_MODE, PM_WAKEUP_TIMER | PM_WAKEUP_PAD,
-	// 		wake_stimer_tick) != STATUS_GPIO_ERR_NO_ENTER_PM) {
-			
-	// 		result = true;
-	// 	}
-	// }
-	
+	} else if (tl_app_suspend_state()) {
+		/* (non-BLE scenario): let the application hook decide whether to enter suspend */
+		result = tl_app_suspend(wake_stimer_tick);
+	}
 
 # endif
 

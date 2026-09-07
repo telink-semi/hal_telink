@@ -23,6 +23,9 @@
 #define __TL_SLEEP_H
 
 bool tl_suspend(uint32_t wake_stimer_tick);
+bool tl_app_suspend(uint32_t wake_stimer_tick);
+bool tl_app_suspend_state(void);
+
 #if (CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION || \
 CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION)
 bool tl_deep_sleep(uint32_t wake_stimer_tick);
