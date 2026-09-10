@@ -8,7 +8,7 @@
 #include <zephyr/init.h>
 
 #include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(sha_tlx, CONFIG_TELINK_CRYPTO_BACKEND_LOG_LEVEL);
+LOG_MODULE_REGISTER(sha_tlx, CONFIG_TL_TELINK_CRYPTO_BACKEND_LOG_LEVEL);
 
 #include <hash/hash.h>
 #include <hash/hash_portable.h>
@@ -16,10 +16,10 @@ LOG_MODULE_REGISTER(sha_tlx, CONFIG_TELINK_CRYPTO_BACKEND_LOG_LEVEL);
 extern void telink_tlx_soc_sha_lock(void);
 extern void telink_tlx_soc_sha_unlock(void);
 
-struct {
+static struct {
 	void *lib_ctx;
 	HASH_CTX hw_ctx;
-} telink_tlx_sha_data[CONFIG_TELINK_TLX_SHA_HW_SLOTS];
+} telink_tlx_sha_data[CONFIG_TL_TELINK_TLX_SHA_HW_SLOTS];
 
 static int telink_tlx_sha_get_slot(const void *ctx, bool exist)
 {

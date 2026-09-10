@@ -1,0 +1,9 @@
+#
+# Copyright (c) 2026, Telink
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+if(CONFIG_TELINK_B9X_TINYCRYPT_HW_ACCELERATION OR CONFIG_TELINK_TLX_TINYCRYPT_HW_ACCELERATION)
+
+endif()
