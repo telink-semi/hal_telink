@@ -156,3 +156,8 @@ enum tl_bt_controller_state tl_bt_controller_state(void) {
 
 	return tl_bt_state;
 }
+
+uint32_t blc_ll_checkBleRfFsmIsBusy(void)
+{
+	return FALSE;
+}
