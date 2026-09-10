@@ -68,12 +68,17 @@ K_SEM_DEFINE(controller_sem, 0, BLE_CONTROLLER_SEMAPHORE_MAX);
  */
 _attribute_ram_code_ void os_give_sem_cb(void)
 {
-	k_sem_give(&controller_sem);
+	plic_set_pending(IRQ_SOFT);
 }
 
 static struct tlx_ctrl_t {
 	tlx_bt_host_callback_t callbacks;
 } tlx_ctrl;
+
+_attribute_ram_code_ void soft_irq_handler(const void *param)
+{
+	k_sem_give(&controller_sem);
+}
 
 /**
  * @brief    RF driver interrupt handler
@@ -205,6 +210,14 @@ static void tlx_bt_controller_thread()
 	}
 }
 #ifndef TLK_ONLY_BLE_HOST
+void tlx_soft_irq_init(void)
+{
+	IRQ_CONNECT(IRQ_SOFT + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 1, soft_irq_handler, 0, 0);
+	plic_interrupt_enable(IRQ_SOFT);
+
+	plic_set_priority(IRQ_SOFT, IRQ_PRI_LEV1);
+}
+
 /**
  * @brief    BLE Controller IRQs initialization
  */
@@ -212,7 +225,7 @@ static void tlx_bt_irq_init()
 {
 #if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X || CONFIG_SOC_RISCV_TELINK_TL521X
 	plic_preempt_feature_en(CORE_PREEMPT_PRI_MODE0);
-	flash_plic_preempt_config(0, 1);
+	flash_plic_preempt_config(1, 1);
 #endif
 
 	/* Init STimer IRQ */
@@ -223,6 +236,7 @@ static void tlx_bt_irq_init()
 #else
 	IRQ_CONNECT(IRQ_ZB_RT + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 2, rf_irq_handler, 0, 0);
 #endif
+	tlx_soft_irq_init();
 	plic_set_priority(IRQ_SYSTIMER, 2);
 	plic_set_priority(IRQ_ZB_RT, 2);
 
