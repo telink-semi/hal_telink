@@ -10,7 +10,7 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 
 # default values
 DEFAULT_REPO_URL="https://github.com/telink-semi/tl_ble_sdk_zephyr.git"
-DEFAULT_TARGET="3171a9bef5cec052598ed870181554817d2526b1"
+DEFAULT_TARGET="209df1123d3488a80b5217c4d470c3a906ef1098"
 
 # parse parameters
 REPO_URL="${1:-$DEFAULT_REPO_URL}"

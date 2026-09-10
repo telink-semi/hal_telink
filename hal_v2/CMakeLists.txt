@@ -96,8 +96,8 @@ endif()
 
 add_subdirectory(wrapper)
 
-if(CONFIG_MBEDTLS)
-	add_subdirectory(wrapper/crypto/mbedtls)
+if (CONFIG_MBEDTLS OR CONFIG_TINYCRYPT OR CONFIG_BOOT_USE_MBEDTLS OR CONFIG_BOOT_USE_TINYCRYPT)
+	add_subdirectory(wrapper/crypto)
 endif()
 
 if(CONFIG_PM)
