@@ -1,0 +1,16 @@
+hal_v2/wrapper/common/tl_sleep.c
+  h_12ef4c25fb166d 98-99,189-193
+hal_v2/wrapper/controller/tlx/tlx_bt.c
+  h_12ef4c25fb166d 71,78-82,213-220,228,239
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.2",
+  "base_commit_sha": "103fa7b12b88720c1ced54f8d2d1fdcc595515fa",
+  "prompts": {},
+  "humans": {
+    "h_12ef4c25fb166d": {
+      "author": "Zhihan Tao <zhihan.tao@telink-semi.com>"
+    }
+  }
+}
