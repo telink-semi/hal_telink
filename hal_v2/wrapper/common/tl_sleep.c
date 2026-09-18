@@ -64,6 +64,23 @@ __attribute__((weak, noinline)) bool tl_app_suspend_state(void)
 	return false;
 }
 
+/* Application suspend enter/exit callbacks. NULL by default so tl_sleep.c
+ * stays independent of any application-specific symbols; projects that need
+ * teardown/setup around suspend register their callbacks via
+ * tl_sleep_register_{pre,post}_suspend_cb(). */
+static tl_sleep_suspend_cb_t s_pre_suspend_cb;
+static tl_sleep_suspend_cb_t s_post_suspend_cb;
+
+void tl_sleep_register_pre_suspend_cb(tl_sleep_suspend_cb_t cb)
+{
+	s_pre_suspend_cb = cb;
+}
+
+void tl_sleep_register_post_suspend_cb(tl_sleep_suspend_cb_t cb)
+{
+	s_post_suspend_cb = cb;
+}
+
 /**
  * @brief     This function sets Telink MCU to suspend mode
  * @param[in] wake_stimer_tick - wake-up stimer tick
@@ -100,7 +117,16 @@ bool tl_suspend(uint32_t wake_stimer_tick)
 	if (state == TL_BT_CONTROLLER_STATE_ACTIVE ||
 		state == TL_BT_CONTROLLER_STATE_STOPPING) {
 		pm_set_suspend_power_cfg(FLD_PD_ZB_EN, 1);
+
+		if (s_pre_suspend_cb) {
+			s_pre_suspend_cb();
+		}
+
 		result = !(tlksdk_pm_enterSleep(SUSPEND_MODE, wake_stimer_tick));
+
+		if (s_post_suspend_cb) {
+			s_post_suspend_cb();
+		}
 
 		// printk("Suspend mode entered: %s\n", result ? "true" : "false");
 	} else if (tl_app_suspend_state()) {

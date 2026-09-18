@@ -26,6 +26,28 @@ bool tl_suspend(uint32_t wake_stimer_tick);
 bool tl_app_suspend(uint32_t wake_stimer_tick);
 bool tl_app_suspend_state(void);
 
+/**
+ * @brief Application callback invoked around suspend entry/exit.
+ *
+ * Applications (e.g. zmk keyscan) register these to perform hardware
+ * teardown/setup around suspend without tl_sleep.c depending on
+ * application-specific symbols. Default: unregistered (NULL), so other
+ * projects are unaffected.
+ */
+typedef void (*tl_sleep_suspend_cb_t)(void);
+
+/**
+ * @brief Register a callback invoked just before entering suspend mode.
+ *        Pass NULL to unregister.
+ */
+void tl_sleep_register_pre_suspend_cb(tl_sleep_suspend_cb_t cb);
+
+/**
+ * @brief Register a callback invoked just after exiting suspend mode.
+ *        Pass NULL to unregister.
+ */
+void tl_sleep_register_post_suspend_cb(tl_sleep_suspend_cb_t cb);
+
 #if (CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION || \
 CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION)
 bool tl_deep_sleep(uint32_t wake_stimer_tick);
