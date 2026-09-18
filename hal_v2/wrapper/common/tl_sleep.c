@@ -46,7 +46,7 @@ extern int blc_pm_handler(void);
  * @param[in] wake_stimer_tick - wake-up stimer tick
  * @return    true if suspend mode entered otherwise false
  */
-__attribute__((weak)) bool tl_app_suspend(uint32_t wake_stimer_tick)
+__attribute__((weak, noinline)) bool tl_app_suspend(uint32_t wake_stimer_tick)
 {
 	(void)wake_stimer_tick;
 	return false;
@@ -59,7 +59,7 @@ __attribute__((weak)) bool tl_app_suspend(uint32_t wake_stimer_tick)
  *            non-BLE paths do not enter suspend by default.
  * @return    true if suspend mode is allowed otherwise false
  */
-__attribute__((weak)) bool tl_app_suspend_state(void)
+__attribute__((weak, noinline)) bool tl_app_suspend_state(void)
 {
 	return false;
 }
