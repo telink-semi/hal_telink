@@ -340,7 +340,10 @@ void tlx_bt_802154_dual_mode_enable(void)
 	tlksdk_thd_registerSwitchTo802154RfCb(tlx_init_802154_rf_hw, tlx_init_ble_rf_hw);
 	tlksdk_thd_registerModeChangeCb(tlx_switch_to_802154_mode, tlx_switch_to_ble_mode);
 	tlksdk_thd_registerRfIsrCb(tlx_rf_isr, NULL);
-
+#ifdef CONFIG_PM
+	blc_pm_setSleepMask(PM_SLEEP_LEG_ADV | PM_SLEEP_LEG_SCAN | PM_SLEEP_ACL_SLAVE |
+			    PM_SLEEP_ACL_MASTER | PM_SLEEP_THREAD_INSERT_TASK);
+#endif
 	// // tlksdk_thd_enableFlexibleTask(THD_TASK_ENABLE);
 	// tlksdk_thd_enableInsertTask1(THD_TASK_ENABLE);
 #if (DEBUG_OT_BLE_GPIO_ENABLE)
@@ -366,8 +369,8 @@ void tlx_bt_802154_dual_mode_enable(void)
     gpio_output_en(GPIO_CHN9);
 	gpio_function_en(GPIO_CHN10);
     gpio_output_en(GPIO_CHN10);
-	rf_enable_bb_debug();
-	DBG_OT_BLE_CHN0_HIGH;
+	// rf_enable_bb_debug();
+	// DBG_OT_BLE_CHN0_HIGH;
 #endif
 
 }
@@ -381,7 +384,7 @@ void tlx_bt_802154_dual_mode_disable(void)
 {
 	// tlksdk_thd_enableFlexibleTask(THD_TASK_DISABLE);
     tlksdk_thd_enableInsertTask1(THD_TASK_DISABLE);
-	DBG_OT_BLE_CHN0_LOW;
+	// DBG_OT_BLE_CHN0_LOW;
 }
 
 /**

@@ -3,7 +3,7 @@
 
 config COMPILE_SDK
 	bool "Use precompiled BLE SDK library"
-	default y
+	default n
 	help
 	  Use the precompiled Telink BLE SDK library instead of building from
 	  source. When enabled, internal headers are not available and must

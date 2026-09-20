@@ -34,6 +34,7 @@
 #elif !TLK_ONLY_BLE_HOST && CONFIG_PM
 	#include "stack/ble/controller/ble_controller.h"
 #endif
+#include "debug_gpio.h"
 
 extern int blc_pm_handler(void);
 
@@ -94,6 +95,8 @@ bool tl_suspend(uint32_t wake_stimer_tick)
 		result = true;
 	}
 #endif /* CONFIG_BT_B9X || CONFIG_BT_TL */
+	DBG_OT_BLE_CHN8_LOW;
+	DBG_OT_BLE_CHN7_LOW;
 
 	return result;
 }
