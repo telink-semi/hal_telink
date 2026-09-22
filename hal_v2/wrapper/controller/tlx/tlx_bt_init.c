@@ -250,6 +250,8 @@ extern volatile bool tlx_rf_zigbee_250K_mode;
 
 volatile bool tlx_rf_802154_mode;
 volatile bool tlx_openthread_threads_suspend;
+/* Set true after Thread join: 802.15.4 keeps RF permanently, no longer suspends OT threads or hands RF back to BLE */
+static volatile bool tlx_802154_permanent_owner;
 extern struct k_sem ieee802154_task_ready_sem;
 
 /* Suspend OpenThread and 802.15.4 threads at the same time */
@@ -295,8 +297,10 @@ _attribute_ram_code_
 void tlx_switch_to_802154_mode(void)
 {
 	// tlx_init_802154_rf_hw();
-	tlx_resume_openthread_threads();
-	k_sem_give(&ieee802154_task_ready_sem);
+	if (!tlx_802154_permanent_owner) {
+		tlx_resume_openthread_threads();
+		k_sem_give(&ieee802154_task_ready_sem);
+	}
 	tlx_rf_zigbee_250K_mode = false;
 	tlx_rf_802154_mode = true;
 }
@@ -304,6 +308,10 @@ void tlx_switch_to_802154_mode(void)
 _attribute_ram_code_
 void tlx_switch_to_ble_mode(void)
 {
+	if (tlx_802154_permanent_owner) {
+		/* After join: 802.15.4 keeps RF permanently, no longer suspends OT threads or hands RF back to BLE */
+		return;
+	}
 	// DBG_OT_BLE_CHN2_LOW;
 	tlx_rf_tx_is_sending();
 	tlx_suspend_openthread_threads();
@@ -318,7 +326,9 @@ void tlx_switch_to_802154_rf_irq_routine(void)
 #if CONFIG_DYNAMIC_INTERRUPTS
 		/* lock interrupts */
 		unsigned int key = irq_lock();
-		irq_connect_dynamic(15, 2,
+		/* Note: the RF IRQ line (IRQ_ZB_RT) number in Zephyr = physical line + CONFIG_2ND_LVL_ISR_TBL_OFFSET,
+		 * consistent with the static binding for BLE in tlx_bt_irq_init() (e.g. 15+12=27 on TL721X) */
+		irq_connect_dynamic(IRQ_ZB_RT + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 2,
 				(void (*)(const void *))tlx_rf_isr, 0, 0);
 		/* unlock interrupts */
 		irq_unlock(key);
@@ -385,6 +395,32 @@ void tlx_bt_802154_dual_mode_disable(void)
 	// tlksdk_thd_enableFlexibleTask(THD_TASK_DISABLE);
     tlksdk_thd_enableInsertTask1(THD_TASK_DISABLE);
 	// DBG_OT_BLE_CHN0_LOW;
+}
+
+/**
+ * @brief   Called after Thread joins: stops the insert task time slot, 802.15.4 keeps RF
+ *          permanently and no longer relies on the BLE scheduler. BLE activity must be
+ *          stopped before/after the call (e.g. bt_le_adv_stop(NULL)).
+ */
+_attribute_no_inline_ void tlx_bt_802154_post_join(void)
+{
+	tlksdk_thd_enableInsertTask1(THD_TASK_DISABLE);
+
+	/* Set the flag first: if the current window still has a residual insert slot, its
+	 * wrap-up (tlx_switch_to_ble_mode) returns directly without suspending OT threads
+	 * or handing RF back to BLE */
+	tlx_802154_permanent_owner = true;
+	tlx_resume_openthread_threads();
+	k_sem_give(&ieee802154_task_ready_sem);
+	tlx_init_802154_rf_hw();
+
+	tlx_rf_zigbee_250K_mode = false;
+	tlx_rf_802154_mode = true;
+
+	/* After join the insert task is stopped, RF interrupts can no longer be dispatched
+	 * through BLE's software routing (g_lcll_state==INSERT_S); re-bind the RF interrupt
+	 * to the 802.15.4 tlx_rf_isr at hardware level */
+	tlx_switch_to_802154_rf_irq_routine();
 }
 
 /**
