@@ -399,28 +399,24 @@ void tlx_bt_802154_dual_mode_disable(void)
 
 /**
  * @brief   Called after Thread joins: stops the insert task time slot, 802.15.4 keeps RF
- *          permanently and no longer relies on the BLE scheduler. BLE activity must be
- *          stopped before/after the call (e.g. bt_le_adv_stop(NULL)).
+ *          permanently and no longer relies on the BLE scheduler. Restores the RF hardware
+ *          and IRQ routing, then releases the 802.15.4 threads. Safe to call after
+ *          bt_disable(): the RF re-init undoes the controller deinit radio reset.
+ *          Must NOT be called while an insert slot is in progress (park to BLE mode first).
  */
 _attribute_no_inline_ void tlx_bt_802154_post_join(void)
 {
 	tlksdk_thd_enableInsertTask1(THD_TASK_DISABLE);
 
-	/* Set the flag first: if the current window still has a residual insert slot, its
-	 * wrap-up (tlx_switch_to_ble_mode) returns directly without suspending OT threads
-	 * or handing RF back to BLE */
 	tlx_802154_permanent_owner = true;
-	tlx_resume_openthread_threads();
-	k_sem_give(&ieee802154_task_ready_sem);
+
+	tlx_switch_to_802154_rf_irq_routine();
 	tlx_init_802154_rf_hw();
 
 	tlx_rf_zigbee_250K_mode = false;
 	tlx_rf_802154_mode = true;
-
-	/* After join the insert task is stopped, RF interrupts can no longer be dispatched
-	 * through BLE's software routing (g_lcll_state==INSERT_S); re-bind the RF interrupt
-	 * to the 802.15.4 tlx_rf_isr at hardware level */
-	tlx_switch_to_802154_rf_irq_routine();
+	k_sem_give(&ieee802154_task_ready_sem);
+	tlx_resume_openthread_threads();
 }
 
 /**
