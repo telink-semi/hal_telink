@@ -159,5 +159,6 @@ enum tl_bt_controller_state tl_bt_controller_state(void) {
 
 uint32_t blc_ll_checkBleRfFsmIsBusy(void)
 {
-	return FALSE;
+	extern volatile unsigned int ll_pm_controller_core_status;
+	return ll_pm_controller_core_status != PM_MCU_WFI;
 }
