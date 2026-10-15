@@ -398,13 +398,14 @@ void tlx_bt_802154_dual_mode_disable(void)
 }
 
 /**
- * @brief   Called after Thread joins: stops the insert task time slot, 802.15.4 keeps RF
- *          permanently and no longer relies on the BLE scheduler. Restores the RF hardware
- *          and IRQ routing, then releases the 802.15.4 threads. Safe to call after
- *          bt_disable(): the RF re-init undoes the controller deinit radio reset.
- *          Must NOT be called while an insert slot is in progress (park to BLE mode first).
+ * @brief   Suspend BLE + 802.15.4 coexistence mode: stops the insert task time slot,
+ *          802.15.4 keeps RF permanently and no longer relies on the BLE scheduler.
+ *          Restores the RF hardware and IRQ routing, then releases the 802.15.4 threads.
+ *          Safe to call after bt_disable(): the RF re-init undoes the controller deinit
+ *          radio reset. Must NOT be called while an insert slot is in progress
+ *          (park to BLE mode first).
  */
-_attribute_no_inline_ void tlx_bt_802154_post_join(void)
+_attribute_no_inline_ void tlx_bt_802154_dual_mode_suspend(void)
 {
 	tlksdk_thd_enableInsertTask1(THD_TASK_DISABLE);
 
@@ -417,6 +418,25 @@ _attribute_no_inline_ void tlx_bt_802154_post_join(void)
 	tlx_rf_802154_mode = true;
 	k_sem_give(&ieee802154_task_ready_sem);
 	tlx_resume_openthread_threads();
+}
+
+/**
+ * @brief   Called to resume BLE + 802.15.4 coexistence after dual_mode_suspend.
+ *          Reverts the 802.15.4 permanent ownership and parks the RF back to
+ *          BLE mode, so the BLE scheduler can take over the RF again.
+ *          Must be called before re-enabling BLE (bt_enable()).
+ */
+void tlx_bt_802154_dual_mode_resume(void)
+{
+	/* 1. Revert 802.15.4 permanent ownership so switch_to_ble_mode() resumes time-sharing */
+	tlx_802154_permanent_owner = false;
+
+	/* 2. Manually park the RF back to BLE (equivalent to switch_to_ble_mode,
+	 *    since there is no BLE scheduler to trigger the switch back after dual_mode_suspend) */
+	tlx_rf_tx_is_sending();
+	tlx_suspend_openthread_threads();
+	k_sem_reset(&ieee802154_task_ready_sem);
+	tlx_rf_802154_mode = false;
 }
 
 /**
