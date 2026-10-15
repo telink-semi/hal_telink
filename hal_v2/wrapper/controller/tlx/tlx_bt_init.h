@@ -40,11 +40,20 @@ _attribute_no_inline_ void tlx_bt_802154_dual_mode_start(void);
 void tlx_bt_802154_dual_mode_disable(void);
 
 /**
- * @brief       Called after Thread joins: stops the insert task time slot, 802.15.4 keeps RF
- *              permanently and no longer relies on the BLE scheduler to feed time slots.
- *              BLE activity must be stopped before/after the call (e.g. bt_le_adv_stop()).
+ * @brief       Suspend BLE + 802.15.4 coexistence mode: stops the insert task time slot,
+ *              802.15.4 keeps RF permanently and no longer relies on the BLE scheduler
+ *              to feed time slots. BLE activity must be stopped before/after the call
+ *              (e.g. bt_le_adv_stop()).
  * @return      None
  */
-void tlx_bt_802154_post_join(void);
+void tlx_bt_802154_dual_mode_suspend(void);
+
+/**
+ * @brief       Called to resume BLE + 802.15.4 coexistence after dual_mode_suspend.
+ *              Reverts 802.15.4 permanent ownership and parks the RF back to BLE mode.
+ *              Must be called before re-enabling BLE (bt_enable()).
+ * @return      None
+ */
+void tlx_bt_802154_dual_mode_resume(void);
 
 #endif /* TLX_BT_INIIT_H_ */
