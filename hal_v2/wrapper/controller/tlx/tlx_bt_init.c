@@ -397,6 +397,7 @@ void tlx_bt_802154_dual_mode_disable(void)
 	// DBG_OT_BLE_CHN0_LOW;
 }
 
+#ifdef CONFIG_PM
 /**
  * @brief   Suspend BLE + 802.15.4 coexistence mode: stops the insert task time slot,
  *          802.15.4 keeps RF permanently and no longer relies on the BLE scheduler.
@@ -438,6 +439,7 @@ void tlx_bt_802154_dual_mode_resume(void)
 	k_sem_reset(&ieee802154_task_ready_sem);
 	tlx_rf_802154_mode = false;
 }
+#endif
 
 /**
  * @brief   Start BLE and 802.15.4 coexistence mode
