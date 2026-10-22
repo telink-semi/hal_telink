@@ -250,6 +250,8 @@ extern volatile bool tlx_rf_zigbee_250K_mode;
 
 volatile bool tlx_rf_802154_mode;
 volatile bool tlx_openthread_threads_suspend;
+/* Set true after Thread join: 802.15.4 keeps RF permanently, no longer suspends OT threads or hands RF back to BLE */
+static volatile bool tlx_802154_permanent_owner;
 extern struct k_sem ieee802154_task_ready_sem;
 
 /* Suspend OpenThread and 802.15.4 threads at the same time */
@@ -295,8 +297,10 @@ _attribute_ram_code_
 void tlx_switch_to_802154_mode(void)
 {
 	// tlx_init_802154_rf_hw();
-	tlx_resume_openthread_threads();
-	k_sem_give(&ieee802154_task_ready_sem);
+	if (!tlx_802154_permanent_owner) {
+		tlx_resume_openthread_threads();
+		k_sem_give(&ieee802154_task_ready_sem);
+	}
 	tlx_rf_zigbee_250K_mode = false;
 	tlx_rf_802154_mode = true;
 }
@@ -304,6 +308,10 @@ void tlx_switch_to_802154_mode(void)
 _attribute_ram_code_
 void tlx_switch_to_ble_mode(void)
 {
+	if (tlx_802154_permanent_owner) {
+		/* After join: 802.15.4 keeps RF permanently, no longer suspends OT threads or hands RF back to BLE */
+		return;
+	}
 	// DBG_OT_BLE_CHN2_LOW;
 	tlx_rf_tx_is_sending();
 	tlx_suspend_openthread_threads();
@@ -318,7 +326,9 @@ void tlx_switch_to_802154_rf_irq_routine(void)
 #if CONFIG_DYNAMIC_INTERRUPTS
 		/* lock interrupts */
 		unsigned int key = irq_lock();
-		irq_connect_dynamic(15, 2,
+		/* Note: the RF IRQ line (IRQ_ZB_RT) number in Zephyr = physical line + CONFIG_2ND_LVL_ISR_TBL_OFFSET,
+		 * consistent with the static binding for BLE in tlx_bt_irq_init() (e.g. 15+12=27 on TL721X) */
+		irq_connect_dynamic(IRQ_ZB_RT + CONFIG_2ND_LVL_ISR_TBL_OFFSET, 2,
 				(void (*)(const void *))tlx_rf_isr, 0, 0);
 		/* unlock interrupts */
 		irq_unlock(key);
@@ -340,7 +350,10 @@ void tlx_bt_802154_dual_mode_enable(void)
 	tlksdk_thd_registerSwitchTo802154RfCb(tlx_init_802154_rf_hw, tlx_init_ble_rf_hw);
 	tlksdk_thd_registerModeChangeCb(tlx_switch_to_802154_mode, tlx_switch_to_ble_mode);
 	tlksdk_thd_registerRfIsrCb(tlx_rf_isr, NULL);
-
+#ifdef CONFIG_PM
+	blc_pm_setSleepMask(PM_SLEEP_LEG_ADV | PM_SLEEP_LEG_SCAN | PM_SLEEP_ACL_SLAVE |
+			    PM_SLEEP_ACL_MASTER | PM_SLEEP_THREAD_INSERT_TASK);
+#endif
 	// // tlksdk_thd_enableFlexibleTask(THD_TASK_ENABLE);
 	// tlksdk_thd_enableInsertTask1(THD_TASK_ENABLE);
 #if (DEBUG_OT_BLE_GPIO_ENABLE)
@@ -366,8 +379,8 @@ void tlx_bt_802154_dual_mode_enable(void)
     gpio_output_en(GPIO_CHN9);
 	gpio_function_en(GPIO_CHN10);
     gpio_output_en(GPIO_CHN10);
-	rf_enable_bb_debug();
-	DBG_OT_BLE_CHN0_HIGH;
+	// rf_enable_bb_debug();
+	// DBG_OT_BLE_CHN0_HIGH;
 #endif
 
 }
@@ -381,8 +394,52 @@ void tlx_bt_802154_dual_mode_disable(void)
 {
 	// tlksdk_thd_enableFlexibleTask(THD_TASK_DISABLE);
     tlksdk_thd_enableInsertTask1(THD_TASK_DISABLE);
-	DBG_OT_BLE_CHN0_LOW;
+	// DBG_OT_BLE_CHN0_LOW;
 }
+
+#ifdef CONFIG_PM
+/**
+ * @brief   Suspend BLE + 802.15.4 coexistence mode: stops the insert task time slot,
+ *          802.15.4 keeps RF permanently and no longer relies on the BLE scheduler.
+ *          Restores the RF hardware and IRQ routing, then releases the 802.15.4 threads.
+ *          Safe to call after bt_disable(): the RF re-init undoes the controller deinit
+ *          radio reset. Must NOT be called while an insert slot is in progress
+ *          (park to BLE mode first).
+ */
+_attribute_no_inline_ void tlx_bt_802154_dual_mode_suspend(void)
+{
+	tlksdk_thd_enableInsertTask1(THD_TASK_DISABLE);
+
+	tlx_802154_permanent_owner = true;
+
+	tlx_switch_to_802154_rf_irq_routine();
+	tlx_init_802154_rf_hw();
+
+	tlx_rf_zigbee_250K_mode = false;
+	tlx_rf_802154_mode = true;
+	k_sem_give(&ieee802154_task_ready_sem);
+	tlx_resume_openthread_threads();
+}
+
+/**
+ * @brief   Called to resume BLE + 802.15.4 coexistence after dual_mode_suspend.
+ *          Reverts the 802.15.4 permanent ownership and parks the RF back to
+ *          BLE mode, so the BLE scheduler can take over the RF again.
+ *          Must be called before re-enabling BLE (bt_enable()).
+ */
+void tlx_bt_802154_dual_mode_resume(void)
+{
+	/* 1. Revert 802.15.4 permanent ownership so switch_to_ble_mode() resumes time-sharing */
+	tlx_802154_permanent_owner = false;
+
+	/* 2. Manually park the RF back to BLE (equivalent to switch_to_ble_mode,
+	 *    since there is no BLE scheduler to trigger the switch back after dual_mode_suspend) */
+	tlx_rf_tx_is_sending();
+	tlx_suspend_openthread_threads();
+	k_sem_reset(&ieee802154_task_ready_sem);
+	tlx_rf_802154_mode = false;
+}
+#endif
 
 /**
  * @brief   Start BLE and 802.15.4 coexistence mode

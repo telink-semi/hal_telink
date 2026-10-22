@@ -33,4 +33,29 @@ int tlx_bt_blc_init(void *prx, void *ptx);
 
 _attribute_no_inline_ void tlx_bt_802154_dual_mode_start(void);
 
+/**
+ * @brief       Telink TLX BLE Controller disable 802.15.4 dual mode
+ * @return      None
+ */
+void tlx_bt_802154_dual_mode_disable(void);
+
+#ifdef CONFIG_PM
+/**
+ * @brief       Suspend BLE + 802.15.4 coexistence mode: stops the insert task time slot,
+ *              802.15.4 keeps RF permanently and no longer relies on the BLE scheduler
+ *              to feed time slots. BLE activity must be stopped before/after the call
+ *              (e.g. bt_le_adv_stop()).
+ * @return      None
+ */
+void tlx_bt_802154_dual_mode_suspend(void);
+
+/**
+ * @brief       Called to resume BLE + 802.15.4 coexistence after dual_mode_suspend.
+ *              Reverts 802.15.4 permanent ownership and parks the RF back to BLE mode.
+ *              Must be called before re-enabling BLE (bt_enable()).
+ * @return      None
+ */
+void tlx_bt_802154_dual_mode_resume(void);
+#endif /* CONFIG_PM */
+
 #endif /* TLX_BT_INIIT_H_ */

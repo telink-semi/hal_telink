@@ -33,6 +33,7 @@
 #include "tlx_bt_buffer.h"
 #include "stack/ble/controller/ble_controller.h"
 #include "stack/ble/os_sup/os_sup.h"
+#include "debug_gpio.h"
 
 /* extern from controller lib */
 extern hci_fifo_t bltHci_rxfifo;
@@ -96,7 +97,9 @@ _attribute_ram_code_ void stimer_irq_handler(const void *param)
 	(void)param;
 
 	DBG_CHN15_HIGH;
+	DBG_OT_BLE_CHN0_HIGH;
 	blc_sdk_irq_handler();
+	DBG_OT_BLE_CHN0_LOW;
 	DBG_CHN15_LOW;
 }
 #if (LL_FEATURE_ENABLE_CHANNEL_SOUNDING)
