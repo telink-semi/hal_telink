@@ -98,6 +98,8 @@ bool tl_suspend(uint32_t wake_stimer_tick)
 	DBG_OT_BLE_CHN8_LOW;
 	DBG_OT_BLE_CHN7_LOW;
 
+	/* After suspend, soft irq will be reinitialized by PM modules */	
+
 	return result;
 }
 
@@ -186,6 +188,12 @@ bool tl_deep_sleep(uint32_t wake_stimer_tick)
 		result = true;
 	}
 #endif /* CONFIG_BT_B9X || CONFIG_BT_TLX */
+
+	/* After restore context, soft irq should be reinitialized */
+	if(result)	{
+		extern void tlx_soft_irq_init(void);
+		tlx_soft_irq_init();
+	}
 
 	return result;
 }
