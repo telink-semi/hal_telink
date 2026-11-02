@@ -186,7 +186,7 @@ static int tlx_bt_hci_rx_handler(void)
 	if (p) {
 		/* Send data to the controller */
 		blc_hci_handler(&p[0], 0);
-#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X || CONFIG_SOC_RISCV_TELINK_TL521X
+#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X || CONFIG_SOC_RISCV_TELINK_TL521X || CONFIG_SOC_RISCV_TELINK_TL523X
 		if (p[0] == HCI_TYPE_ACL_DATA) {
 			k_sem_give(&controller_sem);
 		}
@@ -213,7 +213,9 @@ static void tlx_bt_controller_thread()
  */
 static void tlx_bt_irq_init()
 {
-#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X || CONFIG_SOC_RISCV_TELINK_TL521X
+#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || \
+	CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X || \
+	CONFIG_SOC_RISCV_TELINK_TL521X || CONFIG_SOC_RISCV_TELINK_TL523X
 	plic_preempt_feature_en(CORE_PREEMPT_PRI_MODE0);
 	flash_plic_preempt_config(0, 1);
 #endif
@@ -252,9 +254,16 @@ int tlx_bt_controller_init()
 		rf_mode_init();
 		/* Reset Radio */
 		rf_radio_reset();
-	#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X || CONFIG_SOC_RISCV_TELINK_TL521X
+	#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || \
+		CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X || \
+		CONFIG_SOC_RISCV_TELINK_TL521X
 		rf_reset_dma();
 		rf_baseband_reset();
+	#endif
+
+	#if CONFIG_SOC_RISCV_TELINK_TL523X
+		dma_reset();
+		reset_baseband();
 	#endif
 	}
 	else {
@@ -292,7 +301,7 @@ int tlx_bt_controller_init()
 	tlx_bt_irq_init();
 
 	/* Register callback to controller. */
-#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X || CONFIG_SOC_RISCV_TELINK_TL521X
+#if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X || CONFIG_SOC_RISCV_TELINK_TL521X || CONFIG_SOC_RISCV_TELINK_TL523X
 	blc_ll_registerGiveSemCb(os_give_sem_cb, os_give_sem_cb);
 	blc_setOsSupEnable(true);
 #endif
@@ -314,6 +323,8 @@ int tlx_bt_controller_init()
 		(void)k_thread_name_set(&tlx_bt_controller_thread_data, "TL323X_BT");
 #elif CONFIG_SOC_RISCV_TELINK_TL521X
 		(void)k_thread_name_set(&tlx_bt_controller_thread_data, "TL521X_BT");
+#elif CONFIG_SOC_RISCV_TELINK_TL523X
+		(void)k_thread_name_set(&tlx_bt_controller_thread_data, "TL523X_BT");
 #endif
 
 	/* Start thread */
@@ -347,6 +358,11 @@ void tlx_bt_controller_deinit()
 #if CONFIG_SOC_RISCV_TELINK_TL321X || CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL322X || CONFIG_SOC_RISCV_TELINK_TL323X || CONFIG_SOC_RISCV_TELINK_TL521X
 	rf_reset_dma();
 	rf_baseband_reset();
+#endif
+
+#if CONFIG_SOC_RISCV_TELINK_TL523X
+	dma_reset();
+	reset_baseband();
 #endif
 
 #ifdef CONFIG_IEEE802154_TLX_BLE_COEXIST
