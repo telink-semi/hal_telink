@@ -152,6 +152,7 @@ endif
 
 config TL_BLE_CTRL_MASTER_MAX_NUM
 	int "Maximum number of master connections"
+	default 1 if TL_BLE_CTRL_CENTRAL
 	default 0
 	range 0 4
 	help
@@ -159,7 +160,8 @@ config TL_BLE_CTRL_MASTER_MAX_NUM
 
 config TL_BLE_CTRL_SLAVE_MAX_NUM
 	int "Maximum number of slave connections"
-	default 1
+	default 1 if TL_BLE_CTRL_PERIPHERAL
+	default 0
 	range 0 4
 	help
 	  Number of slave ACL connections supported.
