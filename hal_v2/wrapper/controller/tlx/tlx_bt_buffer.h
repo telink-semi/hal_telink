@@ -119,7 +119,8 @@
 
 #ifdef CONFIG_BT_CHANNEL_SOUNDING
 #define CS_PHY_RX_FIFO_NUM        1
-#define CS_TRANSPORT_RX_FIFO_NUM  8
+#define CS_HCI_RX_FIFO_NUM        2
+#define CS_TRANSPORT_RX_FIFO_NUM  4
 #define CS_TRANSPORT_RX_FIFO_SIZE CHANNEL_SOUNDING_TRANSPORT_RX_FIFO_SIZE_ALIGN16(MAX_ANT_PATHS_SUPPORT, 40, 10)
 
 /* Size of DRBG-generated information per step (channel, access address, sequence, etc.)

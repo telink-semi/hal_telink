@@ -36,7 +36,7 @@ _attribute_data_sec_ u8* app_hci_rxAclfifo;
 #ifdef CONFIG_BT_CHANNEL_SOUNDING
 u8 app_CsConfigParam[CS_PARAM_LENGTH * APP_CS_CONFIG_NUM];
 u8 app_cs_rx_buf[CS_RX_FIFO_SIZE * CS_RX_FIFO_NUM];
-u8 hciCsSubeventRxFifo[CS_SUBEVENT_BUFF_LEN_MAX * HCI_RX_FIFO_NUM];
+u8 hciCsSubeventRxFifo[CS_SUBEVENT_BUFF_LEN_MAX * CS_HCI_RX_FIFO_NUM];
 u8 pct_raw_data[CS_PCT_DATA_SIZE];
 /******** CS data allocation, End  ********************************************/
 u8 app_cs_transport_rx_buf[CS_TRANSPORT_RX_FIFO_NUM * CS_TRANSPORT_RX_FIFO_SIZE];

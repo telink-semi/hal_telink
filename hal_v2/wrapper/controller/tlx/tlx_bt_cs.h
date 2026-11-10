@@ -41,25 +41,26 @@ void app_channel_sounding_init(void);
  *  @brief  Antenna Switch Configuration
  */
 #ifndef ANTENNA_SWITCHING_AUTO_EN
-    #define ANTENNA_SWITCHING_AUTO_EN 0
+    #define ANTENNA_SWITCHING_AUTO_EN 1
 #endif
 
 #ifndef NUM_ANT_SUPPORT
-    #define NUM_ANT_SUPPORT 0x01
+    #define NUM_ANT_SUPPORT 0x02
 #endif
 
 #ifndef MAX_ANT_PATHS_SUPPORT
-    #define MAX_ANT_PATHS_SUPPORT 0X01
+    #define MAX_ANT_PATHS_SUPPORT 0X04
 #endif
 
 /**
  *  @brief  Antenna switch configuration for channel sounding
  */
-#define ANTENNA_SWITCHING_SEL_0_PIN GPIO_PB3
-#define ANTENNA_SWITCHING_CTRL_BASE     (0)
+#define ANTENNA_SWITCHING_SEL_0_PIN GPIO_PF0
+#define ANTENNA_SWITCHING_SEL_1_PIN GPIO_PF1
+#define ANTENNA_SWITCHING_CTRL_BASE     0x11111111
 
 #define APP_CS_CONFIG_NUM 1
-#define CS_RX_FIFO_NUM    4
+#define CS_RX_FIFO_NUM    2
 
 #ifndef CS_ALIGN_16
 #define CS_ALIGN_16(len)                 ((((len) + 15) >> 4) << 4)

@@ -36,11 +36,14 @@
 cs_ant_switch_config_t ant_cfg = {
     .ant_default_seq_value   = 0,
     .ant_ctrl_seq_base_value = ANTENNA_SWITCHING_CTRL_BASE,
+    .Num_Antennas_Supported = NUM_ANT_SUPPORT,
+    .Max_Antenna_Paths_Supported = MAX_ANT_PATHS_SUPPORT,
 };
 
-#if (CHIP_TYPE == CHIP_TYPE_TL322X)
+#if (CHIP_TYPE == CHIP_TYPE_TL322X) || (CHIP_TYPE == CHIP_TYPE_TL721X)
     rf_cs_ant_switch_ctrl ant_switch_ctrl[] = {
-            {ANTENNA_SWITCHING_SEL_0_PIN, ATSEL_0,},
+            {ANTENNA_SWITCHING_SEL_0_PIN, ATSEL_0},
+            {ANTENNA_SWITCHING_SEL_1_PIN, ATSEL_1},
     };
 #endif
 #endif // #if (ANTENNA_SWITCHING_AUTO_EN)
@@ -68,7 +71,7 @@ void app_channel_sounding_init(void)
     blc_ll_initCsTransportRxFifo(app_cs_transport_rx_buf, CS_TRANSPORT_RX_FIFO_SIZE, CS_TRANSPORT_RX_FIFO_NUM);
 
     // Initialize the channel sounding HCI receive FIFO
-    blc_cs_initCsHciRxFifo(hciCsSubeventRxFifo, CS_SUBEVENT_BUFF_LEN_MAX, HCI_RX_FIFO_NUM);
+    blc_cs_initCsHciRxFifo(hciCsSubeventRxFifo, CS_SUBEVENT_BUFF_LEN_MAX, CS_HCI_RX_FIFO_NUM);
 
     blc_ll_initCsPctDataBuff(pct_raw_data, CS_PCT_DATA_SIZE, MAX_ANT_PATHS_SUPPORT);
 
