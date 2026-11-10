@@ -154,9 +154,9 @@ static int tlx_bt_hci_tx_handler(void)
 				}
 			} else if (tl_bt_state == TL_BT_CONTROLLER_STATE_STOPPING) {
 				/* In this state HCI reset is sent - waiting for command complete */
-				static const uint8_t hci_reset_cmd_complette[] = {0x04, 0x0e, 0x04, 0x01, 0x03, 0x0c, 0x00};
+				static const uint8_t hci_reset_cmd_complete[] = {0x04, 0x0e, 0x04, 0x01, 0x03, 0x0c, 0x00};
 
-				if (len == sizeof(hci_reset_cmd_complette) && !memcmp(p, hci_reset_cmd_complette, len)) {
+				if (len == sizeof(hci_reset_cmd_complete) && !memcmp(p, hci_reset_cmd_complete, len)) {
 					tl_bt_state = TL_BT_CONTROLLER_STATE_STOPPED;
 					k_sem_give(&controller_sem);
 				}
@@ -204,7 +204,9 @@ static void tlx_bt_controller_thread()
 	while (tl_bt_state == TL_BT_CONTROLLER_STATE_ACTIVE ||
 		tl_bt_state == TL_BT_CONTROLLER_STATE_STOPPING) {
 		k_sem_take(&controller_sem, K_FOREVER);
+		tlx_bt_hci_rx_handler();
 		blc_sdk_main_loop();
+		tlx_bt_hci_tx_handler();
 	}
 }
 #ifndef TLK_ONLY_BLE_HOST
