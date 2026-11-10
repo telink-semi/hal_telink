@@ -207,8 +207,6 @@ int tlx_bt_blc_init(void *prx, void *ptx)
 	if (check_status != BLE_SUCCESS) {
 		return INIT_FAILED;
 	}
-	/* HCI configuration */
-	blc_register_hci_handler(prx, ptx);
 #ifdef CONFIG_PM
 	/* Enable PM for BLE stack */
 	blc_ll_initPowerManagement_module();
