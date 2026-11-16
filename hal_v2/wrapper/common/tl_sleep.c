@@ -120,8 +120,11 @@ CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION)
 #define DEEPSLEEP_MODE_RET_SRAM DEEPSLEEP_MODE_RET_SRAM_LOW256K
 #endif
 
-#if CONFIG_SOC_RISCV_TELINK_TL721X && CONFIG_PM
+#if (CONFIG_SOC_RISCV_TELINK_TL721X || CONFIG_SOC_RISCV_TELINK_TL521X) && CONFIG_PM
 __attribute__ ((section (".ram_code")))
+#if CONFIG_SOC_RISCV_TELINK_TL521X
+__attribute__((noinline))
+#endif
 #endif
 bool tl_deep_sleep(uint32_t wake_stimer_tick)
 {
