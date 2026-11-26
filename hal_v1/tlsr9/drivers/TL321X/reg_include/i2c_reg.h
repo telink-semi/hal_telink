@@ -155,8 +155,8 @@ typedef enum
 {
     FLD_I2C_MASTER             = BIT(0),
     FLD_I2C_MASTER_STRETCH_EN  = BIT(1),
-    FLD_MANUAL_TX_STOP_HIT     = BIT(2),
-    FLD_MANUAL_RX_STOP_HIT     = BIT(3),
+    FLD_MANUAL_RX_STOP_HIT     = BIT(2),
+    FLD_MANUAL_TX_STOP_HIT     = BIT(3),
     FLD_I2C_MASTER_NAK_STOP_EN = BIT(4),
     FLD_I2C_TX_STRETCH_SEL     = BIT(5),
     FLD_I2C_MASK_STRETCH       = BIT(6),
