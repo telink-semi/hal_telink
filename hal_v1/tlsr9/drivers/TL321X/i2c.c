@@ -261,6 +261,7 @@ static unsigned char i2c_master_data_nack_detect(void)
  */
 unsigned char i2c_master_write(unsigned char id, unsigned char *data, unsigned int len)
 {
+    reg_i2c_ctrl2 &= ~FLD_MANUAL_TX_STOP_HIT;
     i2c_clr_irq_status(I2C_TX_BUF_STATUS);
     reg_i2c_id   = id & (~FLD_I2C_WRITE_READ_BIT); //BIT(0):R:High  W:Low
     reg_i2c_sct1 = (FLD_I2C_LS_ID | FLD_I2C_LS_START);
@@ -269,6 +270,11 @@ unsigned char i2c_master_write(unsigned char id, unsigned char *data, unsigned i
     }
 
     I2C_NACK_DETECT(i2c_master_id_nack_detect);
+    if (len == 0) {
+        reg_i2c_ctrl2 |= FLD_MANUAL_TX_STOP_HIT;
+        reg_i2c_sct1 &= ~FLD_I2C_LS_STOP;
+        reg_i2c_sct1 = (g_i2c_stop_en); //launch stop cycle
+    }
     i2c_master_set_len(len);
     unsigned int       cnt         = 0;
     unsigned long long start_cycle = rdmcycle();
@@ -300,6 +306,7 @@ unsigned char i2c_master_write(unsigned char id, unsigned char *data, unsigned i
     if (I2C_WAIT(I2C_API_ERROR_TIMEOUT_STOP)) {
         return DRV_API_TIMEOUT;
     }
+    reg_i2c_ctrl2 &= ~FLD_MANUAL_TX_STOP_HIT;
 
     return 1;
 }
